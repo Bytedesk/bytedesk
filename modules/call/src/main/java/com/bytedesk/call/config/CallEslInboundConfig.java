@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-05 20:19:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 10:31:40
+ * @LastEditTime: 2025-08-11 18:26:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,7 +50,7 @@ public class CallEslInboundConfig {
     public InboundClient thingsCloudEslClient() {
         InboundClientOption option = new InboundClientOption();
 
-        log.info("配置 thingscloud ESL 客户端: {}:{}", 
+        log.info("配置 freeswitch ESL 客户端: {}:{}", 
                 callProperties.getServer(), 
                 callProperties.getEslPort());
 
@@ -68,14 +68,14 @@ public class CallEslInboundConfig {
         option.addListener(new IEslEventListener() {
             @Override
             public void eventReceived(String addr, EslEvent event) {
-                log.debug("收到事件来自 {}: {}", addr, event.getEventName());
+                log.debug("freeswitch ESL 收到事件来自 {}: {}", addr, event.getEventName());
                 // 在这里可以添加具体的事件处理逻辑
                 handleEvent(event);
             }
 
             @Override
             public void backgroundJobResultReceived(String addr, EslEvent event) {
-                log.debug("收到后台任务结果来自 {}: {}", addr, event);
+                log.debug("freeswitch ESL 收到后台任务结果来自 {}: {}", addr, event);
             }
         });
 
@@ -83,13 +83,13 @@ public class CallEslInboundConfig {
         option.serverConnectionListener(new ServerConnectionListener() {
             @Override
             public void onOpened(ServerOption serverOption) {
-                log.info("thingscloud ESL 连接已打开: {}:{}", 
+                log.info("freeswitch ESL 连接已打开: {}:{}", 
                         serverOption.host(), serverOption.port());
             }
 
             @Override
             public void onClosed(ServerOption serverOption) {
-                log.warn("thingscloud ESL 连接已关闭: {}:{}", 
+                log.warn("freeswitch ESL 连接已关闭: {}:{}", 
                         serverOption.host(), serverOption.port());
             }
         });
@@ -98,11 +98,11 @@ public class CallEslInboundConfig {
         InboundClient inboundClient = InboundClient.newInstance(option);
         
         try {
-            log.info("启动 thingscloud ESL 客户端...");
+            log.info("启动 freeswitch ESL 客户端...");
             inboundClient.start();
-            log.info("thingscloud ESL 客户端启动成功");
+            log.info("freeswitch ESL 客户端启动成功");
         } catch (Exception e) {
-            log.error("thingscloud ESL 客户端启动失败: {}", e.getMessage());
+            log.error("freeswitch ESL 客户端启动失败: {}", e.getMessage());
             
             // 分析错误类型并提供具体的解决建议
             if (e.getMessage() != null) {
@@ -124,7 +124,7 @@ public class CallEslInboundConfig {
             }
             
             // 记录当前配置信息用于调试
-            log.error("当前ESL配置 - 服务器: {}:{}, 密码: {}", 
+            log.error("freeswitch ESL 当前ESL配置 - 服务器: {}:{}, 密码: {}", 
                     callProperties.getServer(), 
                     callProperties.getEslPort(),
                     callProperties.getEslPassword());
@@ -138,7 +138,7 @@ public class CallEslInboundConfig {
      */
     private void handleEvent(EslEvent event) {
         String eventName = event.getEventName();
-        log.trace("处理事件: {} / {}", eventName, event.getEventHeaders());
+        log.trace("freeswitch ESL 处理事件: {} / {}", eventName, event.getEventHeaders());
         
         switch(eventName) {
             case "CHANNEL_CREATE":
@@ -171,7 +171,7 @@ public class CallEslInboundConfig {
         String callerId = event.getEventHeaders().get("Caller-Caller-ID-Number");
         String destination = event.getEventHeaders().get("Caller-Destination-Number");
         
-        log.info("thingscloud - 通道创建: UUID {} 主叫 {} 被叫 {}", uuid, callerId, destination);
+        log.info("freeswitch ESL - 通道创建: UUID {} 主叫 {} 被叫 {}", uuid, callerId, destination);
     }
 
     /**
@@ -180,7 +180,7 @@ public class CallEslInboundConfig {
     private void handleChannelAnswer(EslEvent event) {
         String uuid = event.getEventHeaders().get("Unique-ID");
         
-        log.info("thingscloud - 通道应答: UUID {}", uuid);
+        log.info("freeswitch ESL - 通道应答: UUID {}", uuid);
     }
 
     /**
@@ -190,7 +190,7 @@ public class CallEslInboundConfig {
         String uuid = event.getEventHeaders().get("Unique-ID");
         String hangupCause = event.getEventHeaders().get("Hangup-Cause");
         
-        log.info("thingscloud - 通道挂断: UUID {} 原因 {}", uuid, hangupCause);
+        log.info("freeswitch ESL - 通道挂断: UUID {} 原因 {}", uuid, hangupCause);
     }
 
     /**
@@ -200,6 +200,6 @@ public class CallEslInboundConfig {
         String uuid = event.getEventHeaders().get("Unique-ID");
         String digit = event.getEventHeaders().get("DTMF-Digit");
         
-        log.info("thingscloud - DTMF按键: UUID {} 键值 {}", uuid, digit);
+        log.info("freeswitch ESL - DTMF按键: UUID {} 键值 {}", uuid, digit);
     }
 }

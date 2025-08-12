@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 18:11:07
+ * @LastEditTime: 2025-08-11 18:22:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,21 +82,6 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     }
 
     /**
-     * 根据主题查询消息
-     * 
-     * @param request 查询请求
-     * @return 分页消息列表
-     */
-    @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
-    @GetMapping("/thread/topic")
-    public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
-
-        Page<MessageResponse> response = messageRestService.queryByOrg(request);
-        //
-        return ResponseEntity.ok(JsonResult.success(response));
-    }
-
-    /**
      * 根据UID查询消息
      * 
      * @param request 查询请求
@@ -107,6 +92,21 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     public ResponseEntity<?> queryByUid(MessageRequest request) {
         
         MessageResponse response = messageRestService.queryByUid(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 根据主题查询消息
+     * 
+     * @param request 查询请求
+     * @return 分页消息列表
+     */
+    @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
+    @GetMapping("/thread/topic")
+    public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
+
+        Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -184,7 +184,6 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
 
         String json = (String) map.get("json");
         log.debug("json {}", json);
-        // stompMqService.sendJsonMessageToMq(json);
         messageSendService.sendJsonMessage(json);
         //
         return ResponseEntity.ok(JsonResult.success(json));

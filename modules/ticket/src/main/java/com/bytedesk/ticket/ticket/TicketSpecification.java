@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-08 12:30:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-01 13:08:32
+ * @LastEditTime: 2025-08-11 20:05:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,6 +38,16 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
+            }
+
+            // topic
+            if (StringUtils.hasText(request.getTopic())) {
+                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
+            }
+
+            // threadUid
+            if (StringUtils.hasText(request.getThreadUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("threadUid"), request.getThreadUid()));
             }
             
             if (StringUtils.hasText(request.getUserUid())) {
