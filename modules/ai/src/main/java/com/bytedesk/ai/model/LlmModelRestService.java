@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:31:01
+ * @LastEditTime: 2025-08-12 21:00:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 @Description("LLM Model Service - Large Language Model management and configuration service")
 public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmModelRequest, LlmModelResponse> {
 
-    private final LlmModelRepository repository;
+    private final LlmModelRepository llmModelRepository;
 
     private final ModelMapper modelMapper;
 
@@ -52,7 +52,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     public Page<LlmModelResponse> queryByOrg(LlmModelRequest request) {
         Pageable pageable = request.getPageable();
         Specification<LlmModelEntity> specification = LlmModelSpecification.search(request);
-        Page<LlmModelEntity> page = repository.findAll(specification, pageable);
+        Page<LlmModelEntity> page = llmModelRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
 
@@ -68,7 +68,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     @Override
     public LlmModelResponse queryByUid(LlmModelRequest request) {
-        Optional<LlmModelEntity> optional = repository.findByUid(request.getUid());
+        Optional<LlmModelEntity> optional = llmModelRepository.findByUid(request.getUid());
         if (optional.isEmpty()) {
             throw new NotFoundException("model not found");
         }
@@ -77,26 +77,26 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     @Override
     public Optional<LlmModelEntity> findByUid(String uid) {
-        return repository.findByUid(uid);
+        return llmModelRepository.findByUid(uid);
     }
     
     public List<LlmModelEntity> findByProviderUid(String providerUid) {
-        return repository.findByProviderUid(providerUid);
+        return llmModelRepository.findByProviderUid(providerUid);
     }
 
     public List<LlmModelEntity> findByProviderNameAndOrgUid(String providerName, String orgUid) {
-        return repository.findByProviderNameAndOrgUidAndDeletedFalse(providerName, orgUid);
+        return llmModelRepository.findByProviderNameAndOrgUidAndDeletedFalse(providerName, orgUid);
     }
 
     public Boolean existsByNameAndProviderUid(String name, String providerUid) {
-        return repository.existsByNameAndProviderUid(name, providerUid);
+        return llmModelRepository.existsByNameAndProviderUid(name, providerUid);
     }
 
     @Override
     public LlmModelResponse create(LlmModelRequest request) {
 
         if (existsByNameAndProviderUid(request.getName(), request.getProviderUid())) {
-            Optional<LlmModelEntity> optional = repository.findByNameAndProviderUid(request.getName(), request.getProviderUid());
+            Optional<LlmModelEntity> optional = llmModelRepository.findByNameAndProviderUid(request.getName(), request.getProviderUid());
             if (optional.isPresent()) {
                 return convertToResponse(optional.get());
             }
@@ -138,7 +138,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     @Override
     public LlmModelResponse update(LlmModelRequest request) {
-        Optional<LlmModelEntity> optional = repository.findByUid(request.getUid());
+        Optional<LlmModelEntity> optional = llmModelRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             LlmModelEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -164,18 +164,18 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     @Override
     protected LlmModelEntity doSave(LlmModelEntity entity) {
-        return repository.save(entity);
+        return llmModelRepository.save(entity);
     }
 
     @Override
     public LlmModelEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, LlmModelEntity entity) {
         try {
-            Optional<LlmModelEntity> latest = repository.findByUid(entity.getUid());
+            Optional<LlmModelEntity> latest = llmModelRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 LlmModelEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 根据业务需求合并实体
-                return repository.save(latestEntity);
+                return llmModelRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
@@ -185,7 +185,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<LlmModelEntity> optional = repository.findByUid(uid);
+        Optional<LlmModelEntity> optional = llmModelRepository.findByUid(uid);
         if (optional.isPresent()) {
             LlmModelEntity entity = optional.get();
             entity.setDeleted(true);

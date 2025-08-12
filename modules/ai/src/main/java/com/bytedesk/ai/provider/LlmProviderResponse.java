@@ -41,15 +41,9 @@ public class LlmProviderResponse extends BaseResponse {
     //
     private String apiUrl;
     private String apiKey;
-    //
     private String webUrl;
-    // private String apiKeyUrl;
-    // private String docsUrl;
-    // private String modelsUrl;
     //
     private String status;
 
-    // private String level;
-
-    // private String orgUid;
+    private Boolean enabled;
 }

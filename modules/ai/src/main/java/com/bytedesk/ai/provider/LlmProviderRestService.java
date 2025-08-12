@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 14:21:02
+ * @LastEditTime: 2025-08-12 22:37:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,7 @@ import org.springframework.core.env.Environment;
 @Description("LLM Provider Service - Large Language Model provider management and configuration service")
 public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, LlmProviderRequest, LlmProviderResponse> {
 
-    private final LlmProviderRepository repository;
+    private final LlmProviderRepository llmProviderRepository;
 
     private final ModelMapper modelMapper;
 
@@ -57,7 +57,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
     public Page<LlmProviderResponse> queryByOrg(LlmProviderRequest request) {
         Pageable pageable = request.getPageable();
         Specification<LlmProviderEntity> specification = LlmProviderSpecification.search(request);
-        Page<LlmProviderEntity> page = repository.findAll(specification, pageable);
+        Page<LlmProviderEntity> page = llmProviderRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
 
@@ -74,55 +74,53 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     @Override
     public LlmProviderResponse queryByUid(LlmProviderRequest request) {
-        Optional<LlmProviderEntity> optional = repository.findByUid(request.getUid());
-        if (!optional.isPresent()) {
-            throw new RuntimeException("provider not found");
+        Optional<LlmProviderEntity> optional = llmProviderRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
         }
-        return convertToResponse(optional.get());
+        throw new RuntimeException("provider not found");
     }
 
     @Cacheable(value = "provider", key = "#uid", unless = "#result == null")
     @Override
     public Optional<LlmProviderEntity> findByUid(String uid) {
-        return repository.findByUid(uid);
+        return llmProviderRepository.findByUid(uid);
     }
 
     @Cacheable(value = "provider", key = "#name", unless = "#result == null")
     public Optional<LlmProviderEntity> findByNameAndOrgUid(String name, String orgUid) {
-        return repository.findByNameAndLevelAndOrgUidAndDeletedFalse(name, LevelEnum.ORGANIZATION.name(), orgUid);
+        return llmProviderRepository.findByNameAndLevelAndOrgUidAndDeletedFalse(name, LevelEnum.ORGANIZATION.name(), orgUid);
     }
 
     @Cacheable(value = "provider", key = "#name + '-' + #level", unless = "#result == null")
     public List<LlmProviderEntity> findByName(String name, String level) {
-        return repository.findByNameAndLevelAndDeletedFalse(name, level);
+        return llmProviderRepository.findByNameAndLevelAndDeletedFalse(name, level);
     }
 
     public List<LlmProviderEntity> findByStatusAndLevel(String status, String level) {
-        return repository.findByStatusAndLevelAndDeletedFalse(status, level);
+        return llmProviderRepository.findByStatusAndLevelAndDeletedFalse(status, level);
     }
 
     public Boolean existsByNameAndLevel(String name, String level) {
-        return repository.existsByNameAndLevelAndDeletedFalse(name, level);
+        return llmProviderRepository.existsByNameAndLevelAndDeletedFalse(name, level);
     }
 
     public Boolean existsByNameAndLevelAndStatus(String name, String level, String status) {
-        return repository.existsByNameAndLevelAndStatusAndDeletedFalse(name, level, status);
+        return llmProviderRepository.existsByNameAndLevelAndStatusAndDeletedFalse(name, level, status);
     }
 
     public Boolean existsByNameAndLevelAndOrgUid(String name, String level, String orgUid) {
-        return repository.existsByNameAndLevelAndOrgUidAndDeletedFalse(name, level, orgUid);
+        return llmProviderRepository.existsByNameAndLevelAndOrgUidAndDeletedFalse(name, level, orgUid);
     }
 
     @Override
     public LlmProviderResponse create(LlmProviderRequest request) {
         // 
-        if (existsByNameAndLevelAndOrgUid(request.getName(), request.getLevel(), request.getOrgUid())) {
-            Optional<LlmProviderEntity> optional = repository.findByNameAndLevelAndOrgUidAndDeletedFalse(request.getName(), request.getLevel(), request.getOrgUid());
-            if (optional.isPresent()) {
-                return convertToResponse(optional.get());
-            }
+        Optional<LlmProviderEntity> optional = llmProviderRepository.findByNameAndLevelAndOrgUidAndDeletedFalse(request.getName(), request.getLevel(), request.getOrgUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
         }
-
+        // 
         LlmProviderEntity entity = modelMapper.map(request, LlmProviderEntity.class);
         entity.setUid(uidUtils.getUid());
         //
@@ -151,15 +149,22 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     @Override
     public LlmProviderResponse update(LlmProviderRequest request) {
-        Optional<LlmProviderEntity> optional = repository.findByUid(request.getUid());
+        Optional<LlmProviderEntity> optional = llmProviderRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             LlmProviderEntity entity = optional.get();
             modelMapper.map(request, entity);
+            // 
             // entity.setName(request.getName());
             // entity.setNickname(request.getNickname());
+            // entity.setDescription(request.getDescription());
             // entity.setLogo(request.getLogo());
+            // // 
             // entity.setApiUrl(request.getApiUrl());
+            // entity.setApiKey(request.getApiKey());
             // entity.setWebUrl(request.getWebUrl());
+            // entity.setStatus(request.getStatus());
+            // // 
+            // entity.setEnabled(request.getEnabled());
             // 
             LlmProviderEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -182,18 +187,18 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     @Override
     protected LlmProviderEntity doSave(LlmProviderEntity entity) {
-        return repository.save(entity);
+        return llmProviderRepository.save(entity);
     }
 
     @Override
     public LlmProviderEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, LlmProviderEntity entity) {
         try {
-            Optional<LlmProviderEntity> latest = repository.findByUid(entity.getUid());
+            Optional<LlmProviderEntity> latest = llmProviderRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 LlmProviderEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 根据业务需求合并实体
-                return repository.save(latestEntity);
+                return llmProviderRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
@@ -203,7 +208,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<LlmProviderEntity> optional = repository.findByUid(uid);
+        Optional<LlmProviderEntity> optional = llmProviderRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());

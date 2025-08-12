@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 14:19:36
+ * @LastEditTime: 2025-08-12 22:01:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.ai.provider;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -52,10 +53,13 @@ public class LlmProviderEntity extends BaseEntity {
     // 
     private String apiUrl;
     private String apiKey;
-    // 
     private String webUrl;
     // 
     @Builder.Default
     private String status = LlmProviderStatusEnum.DEVELOPMENT.name();
-    
+
+    @Builder.Default
+    @Column(name = "is_enabled")
+    private Boolean enabled = true;
+
 }

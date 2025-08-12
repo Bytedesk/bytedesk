@@ -51,12 +51,11 @@ public class Ollama4jService {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return false;
             }
-            log.error("检查模型是否存在时发生错误: {}, 状态码: {}", modelName, e.getStatusCode(), e);
-            throw e;
+            log.error("检查模型是否存在时发生错误: {}, 状态码: {}", modelName, e.getStatusCode());
         } catch (Exception e) {
-            log.error("检查模型是否存在时发生未知错误: {}, 错误: {}", modelName, e.getMessage(), e);
-            throw new RuntimeException("检查模型是否存在时出错", e);
+            log.error("检查模型是否存在时发生未知错误: {}, 错误: {}", modelName, e.getMessage());
         }
+        return false;
     }
 
     /**
@@ -73,9 +72,9 @@ public class Ollama4jService {
         try {
             return ollama4jApi.ping();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Ollama4j is not running. Error: {}", e.getMessage());
         }
-        throw new RuntimeException("Ollama4j is not running.");
+        return false;
     }
 
     // 本地模型列表
@@ -85,9 +84,9 @@ public class Ollama4jService {
         try {
             return ollama4jApi.listModels();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Ollama4j get local models error: {}", e.getMessage());
         }
-        throw new RuntimeException("Ollama4j get local models error.");
+        return List.of();
     }
 
     // 远程模型列表
@@ -97,9 +96,10 @@ public class Ollama4jService {
         try {
             return ollama4jApi.listModelsFromLibrary();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
+            log.warn("Ollama4j get models error: {}", e.getMessage());
         }
-        throw new RuntimeException("Ollama4j get models error.");
+        return List.of();
     }
 
     // a list of running models and details about each model currently loaded into
@@ -109,9 +109,10 @@ public class Ollama4jService {
         try {
             return ollama4jApi.ps();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
+            log.warn("Ollama4j get ps error: {}", e.getMessage());
         }
-        throw new RuntimeException("Ollama4j get ps error.");
+        return null;
     }
 
     // This API Fetches the tags associated with a specific model from Ollama
@@ -120,7 +121,7 @@ public class Ollama4jService {
         try {
             return ollama4jApi.getLibraryModelDetails(model);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Ollama4j get model details error: {}", e.getMessage());
         }
         throw new RuntimeException("Ollama4j get model details error.");
     }
@@ -136,18 +137,18 @@ public class Ollama4jService {
         try {
             return ollama4jApi.getModelDetails(ollamaModelType);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Ollama4j get model details error: {}", e.getMessage());
         }
-        throw new RuntimeException("Ollama4j get model details error.");
+        return null;
     }
 
     public LibraryModelTag getModelTag(String model, String tag) {
         try {
             return ollama4jApi.findModelTagFromLibrary(model, tag);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Ollama4j get model tag error: {}", e.getMessage());
         }
-        throw new RuntimeException("Ollama4j get model tag error.");
+        return null;
     }
 
     // 拉取远程模型
@@ -156,8 +157,8 @@ public class Ollama4jService {
             ollama4jApi.pullModel(libraryModelTag);
             return; // 成功时返回
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Ollama4j pull model error: " + e.getMessage());
+            // e.printStackTrace();
+            log.warn("Ollama4j pull model error: {}", e.getMessage());
         }
     }
 
@@ -173,8 +174,7 @@ public class Ollama4jService {
             ollama4jApi.pullModel(ollamaModelType);
             return; // 成功时返回
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Ollama4j pull model error: " + e.getMessage());
+            log.warn("Ollama4j pull model error: {}", e.getMessage());
         }
     }
 
@@ -184,8 +184,7 @@ public class Ollama4jService {
             ollama4jApi.deleteModel(model, true);
             return; // 成功时返回
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Ollama4j delete model error: " + e.getMessage());
+            log.warn("Ollama4j delete model error: {}", e.getMessage());
         }
     }
 

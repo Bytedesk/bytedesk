@@ -31,8 +31,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
-import com.bytedesk.core.utils.ApplicationContextHolder;
-
 // import io.swagger.v3.oas.models.OpenAPI;
 // import io.swagger.v3.oas.models.info.Info;
 import lombok.Getter;
@@ -84,11 +82,6 @@ public class BytedeskConfig {
         restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         restTemplate.setInterceptors(Arrays.asList(new TraceIdInterceptor()));
         return restTemplate;
-    }
-
-    @Bean
-    public ApplicationContextHolder applicationContextHolder() {
-        return new ApplicationContextHolder();
     }
 
 }

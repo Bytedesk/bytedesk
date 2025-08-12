@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:03:17
+ * @LastEditTime: 2025-08-12 21:30:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,7 @@ package com.bytedesk.call.cdr;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
-import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.core.utils.EntityListenerHelper;
 import com.bytedesk.call.cdr.event.CallCdrCreateEvent;
 import com.bytedesk.call.cdr.event.CallCdrUpdateEvent;
 import com.bytedesk.call.config.CallEventPublisher;
@@ -37,10 +37,12 @@ public class CallCdrEntityListener {
         log.info("Call CDR记录创建: uuid={}, caller={}, destination={}, duration={}", 
                 entity.getUid(), entity.getCallerIdNumber(), 
                 entity.getDestinationNumber(), entity.getDuration());
-                
-        CallCdrEntity cloneEntity = SerializationUtils.clone(entity);
-        CallEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(CallEventPublisher.class);
-        freeSwitchEventPublisher.publishEvent(new CallCdrCreateEvent(cloneEntity));
+        
+        EntityListenerHelper.safeExecuteWithBean(CallEventPublisher.class, entity.getUid(), 
+            eventPublisher -> {
+                CallCdrEntity cloneEntity = SerializationUtils.clone(entity);
+                eventPublisher.publishEvent(new CallCdrCreateEvent(cloneEntity));
+            });
     }
     
     @PostUpdate
@@ -48,9 +50,11 @@ public class CallCdrEntityListener {
         log.info("Call CDR记录更新: uuid={}, caller={}, destination={}, duration={}", 
                 entity.getUid(), entity.getCallerIdNumber(), 
                 entity.getDestinationNumber(), entity.getDuration());
-                
-        CallCdrEntity cloneEntity = SerializationUtils.clone(entity);
-        CallEventPublisher freeSwitchEventPublisher = ApplicationContextHolder.getBean(CallEventPublisher.class);
-        freeSwitchEventPublisher.publishEvent(new CallCdrUpdateEvent(cloneEntity));
+        
+        EntityListenerHelper.safeExecuteWithBean(CallEventPublisher.class, entity.getUid(), 
+            eventPublisher -> {
+                CallCdrEntity cloneEntity = SerializationUtils.clone(entity);
+                eventPublisher.publishEvent(new CallCdrUpdateEvent(cloneEntity));
+            });
     }
 }

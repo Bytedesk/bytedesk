@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-09 10:18:45
+ * @LastEditTime: 2025-08-12 21:41:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,7 +45,7 @@ public class MqttAuthService {
     public Boolean checkValid(String username, String password) {
         // 客户端使用accessToken作为password传递，避免客户端存储密码
         String accessToken = password;
-        log.debug("mqtt auth username {}, accessToken {}", username, accessToken);
+        // log.debug("mqtt auth username {}, accessToken {}", username, accessToken);
         // return true;
         if (accessToken != null && validateJwtToken(accessToken)) {
             // 从数据库验证token是否有效（未被撤销且未过期）
