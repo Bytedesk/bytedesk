@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 11:28:17
+ * @LastEditTime: 2025-08-12 17:25:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, CallCdrRequest, CallCdrResponse, CallCdrExcel> {
 
-    private final CallCdrRepository freeSwitchCdrRepository;
+    private final CallCdrRepository callCdrRepository;
 
     private final ModelMapper modelMapper;
 
@@ -61,7 +61,7 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
     public Page<CallCdrEntity> queryByOrgEntity(CallCdrRequest request) {
         Pageable pageable = request.getPageable();
         Specification<CallCdrEntity> specification = CallCdrSpecification.search(request);
-        return freeSwitchCdrRepository.findAll(specification, pageable);
+        return callCdrRepository.findAll(specification, pageable);
     }
 
     public Page<CallCdrEntity> queryByUserEntity(CallCdrRequest request) {
@@ -74,7 +74,7 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
 
     @Override
     public Optional<CallCdrEntity> findByUid(String uid) {
-        return freeSwitchCdrRepository.findByUid(uid);
+        return callCdrRepository.findByUid(uid);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
     @Override
     public CallCdrEntity save(CallCdrEntity entity) {
         try {
-            return freeSwitchCdrRepository.save(entity);
+            return callCdrRepository.save(entity);
         } catch (ObjectOptimisticLockingFailureException e) {
             return handleOptimisticLockingFailureException(e, entity);
         }
@@ -147,7 +147,7 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
 
     @Override
     public CallCdrEntity doSave(CallCdrEntity entity) {
-        return freeSwitchCdrRepository.save(entity);
+        return callCdrRepository.save(entity);
     }
 
     @Override

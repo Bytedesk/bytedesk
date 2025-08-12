@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 12:45:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 12:29:17
+ * @LastEditTime: 2025-08-12 17:31:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,12 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallCallEventListener {
 
     private final CallCallService callService;
-    // private final CallCdrService cdrService; // 暂时未使用，保留以备后续扩展
-    // private final CallNumberService userService;
 
     /**
      * 监听通话开始事件

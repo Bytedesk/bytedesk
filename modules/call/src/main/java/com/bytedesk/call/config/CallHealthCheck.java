@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.net.Socket;
 
 @Component
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallHealthCheck implements HealthIndicator {
 
-    @Value("${bytedesk.freeswitch.server}")
+    @Value("${bytedesk.call.freeswitch.server}")
     private String freeswitchServer;
 
-    @Value("${bytedesk.freeswitch.esl-port}")
+    @Value("${bytedesk.call.freeswitch.esl-port}")
     private int eslPort;
 
     @Override

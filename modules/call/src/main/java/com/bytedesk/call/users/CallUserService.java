@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 21:32:17
+ * @LastEditTime: 2025-08-12 17:33:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @AllArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallUserService {
 
     private final CallUserRepository userRepository;

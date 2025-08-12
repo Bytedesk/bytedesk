@@ -38,10 +38,10 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @RequiredArgsConstructor
 // @ComponentScan("com.bytedesk.call")
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallEslInboundConfig {
 
-    private final CallProperties callProperties;
+    private final CallFreeswitchProperties callProperties;
 
     /**
      * 配置基于 thingscloud 的 Call ESL 客户端

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "bytedesk.call.freeswitch.enabled", havingValue = "true")
 public class CallConferenceService {
 
     private final CallConferenceRepository conferenceRepository;

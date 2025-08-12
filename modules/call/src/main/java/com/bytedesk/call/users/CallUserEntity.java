@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 10:15:35
+ * @LastEditTime: 2025-08-12 17:33:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -57,7 +57,7 @@ public class CallUserEntity extends BaseEntity {
      */
     @Column(nullable = false, length = 100)
     @Builder.Default
-    private String domain = "14.103.165.199";
+    private String domain = "127.0.0.1";
 
     /**
      * 密码

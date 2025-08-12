@@ -34,7 +34,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/freeswitch/api/v1/conferences")
 @AllArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "bytedesk.call.freeswitch.enabled", havingValue = "true")
 public class CallConferenceController {
 
     private final CallConferenceService conferenceService;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 14:50:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 08:59:37
+ * @LastEditTime: 2025-08-12 17:26:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,13 +31,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/freeswitch")
+@RequestMapping("/api/v1/call/management")
 @RequiredArgsConstructor
 @Tag(name = "Call Management", description = "Call连接管理和诊断API")
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallManagementController {
 
-    private final CallProperties callProperties;
+    private final CallFreeswitchProperties callProperties;
     private final CallConnectionTester connectionTester;
     private final CallHealthIndicator healthIndicator;
 

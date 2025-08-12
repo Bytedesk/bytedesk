@@ -31,10 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallConnectionTester implements CommandLineRunner {
 
-    private final CallProperties callProperties;
+    private final CallFreeswitchProperties callProperties;
 
     @Override
     public void run(String... args) {

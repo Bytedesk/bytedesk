@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/freeswitch/api/v1/gateways")
 @AllArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "bytedesk.call.freeswitch.enabled", havingValue = "true")
 public class CallGatewayController {
 
     private final CallGatewayService gatewayService;

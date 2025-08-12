@@ -28,12 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallService {
 
     private final Client eslClient;
     
-    private final CallProperties callProperties;
+    private final CallFreeswitchProperties callProperties;
 
     /**
      * 执行Call API命令
@@ -229,7 +229,7 @@ public class CallService {
     /**
      * 获取配置信息
      */
-    public CallProperties getProperties() {
+    public CallFreeswitchProperties getProperties() {
         return callProperties;
     }
 }

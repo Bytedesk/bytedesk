@@ -31,7 +31,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @AllArgsConstructor
-@ConditionalOnProperty(name = "bytedesk.freeswitch.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "bytedesk.call.freeswitch.enabled", havingValue = "true")
 public class CallGatewayService {
 
     private final CallGatewayRepository gatewayRepository;
