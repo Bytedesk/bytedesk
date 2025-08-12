@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 19:35:22
+ * @LastEditTime: 2025-08-12 14:24:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.message_unread;
+package com.bytedesk.core.message_unread;
 
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.service.utils.ServiceConvertUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -338,7 +338,7 @@ public class MessageUnreadRestService
 
     @Override
     public MessageUnreadResponse convertToResponse(MessageUnreadEntity entity) {
-        return ServiceConvertUtils.convertToMessageUnreadResponse(entity);
+        return ConvertUtils.convertToMessageUnreadResponse(entity);
     }
 
 }

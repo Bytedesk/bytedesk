@@ -40,11 +40,11 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message_unread.MessageUnreadRequest;
+import com.bytedesk.core.message_unread.MessageUnreadResponse;
+import com.bytedesk.core.message_unread.MessageUnreadRestService;
 import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.service.message_unread.MessageUnreadRequest;
-import com.bytedesk.service.message_unread.MessageUnreadResponse;
-import com.bytedesk.service.message_unread.MessageUnreadRestService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;

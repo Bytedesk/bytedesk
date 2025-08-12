@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 16:21:22
+ * @LastEditTime: 2025-08-12 14:24:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,8 @@ import com.bytedesk.core.config.properties.BytedeskPropertiesResponse;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
+import com.bytedesk.core.message_unread.MessageUnreadEntity;
+import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
 import com.bytedesk.core.rbac.role.RoleEntity;
@@ -302,4 +304,27 @@ public class ConvertUtils {
         return uploadResponse;
     }
 
+    public static MessageUnreadResponse convertToMessageUnreadResponse(MessageUnreadEntity message) {
+
+        MessageUnreadResponse messageResponse = getModelMapper().map(message, MessageUnreadResponse.class);
+        //
+        if (message.getUser() != null) {
+            UserProtobuf user = UserProtobuf.fromJson(message.getUser());
+            if (user != null) {
+                if (user.getExtra() == null) {
+                    user.setExtra(BytedeskConsts.EMPTY_JSON_STRING);
+                }
+                messageResponse.setUser(user);
+            }
+        }
+
+        // thread
+        if (message.getThread() != null) {
+            ThreadResponse thread = ConvertUtils.convertToThreadResponse(message.getThread());
+            messageResponse.setThread(thread);
+        }
+
+        return messageResponse;
+    }
+    
 }

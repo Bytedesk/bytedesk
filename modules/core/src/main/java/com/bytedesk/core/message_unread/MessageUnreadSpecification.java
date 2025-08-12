@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.message_unread;
+package com.bytedesk.core.message_unread;
 
 import java.util.ArrayList;
 import java.util.List;
