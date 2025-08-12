@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 11:45:28
+ * @LastEditTime: 2025-08-12 16:54:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,6 +41,9 @@ import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.redis.RedisLoginRetryService;
+import com.bytedesk.core.config.properties.BytedeskProperties;
+
 @Slf4j
 @RestController
 @RequestMapping("/auth/v1")
@@ -49,17 +52,21 @@ import org.springframework.util.StringUtils;
 @Description("Authentication Controller - User authentication and authorization management")
 public class AuthController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    private AuthService authService;
+    private final AuthService authService;
 
-    private PushRestService pushRestService;
+    private final PushRestService pushRestService;
 
-    private KaptchaRedisService kaptchaRestService;
+    private final KaptchaRedisService kaptchaRestService;
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    private TokenRestService tokenRestService;
+    private final TokenRestService tokenRestService;
+
+    private final RedisLoginRetryService redisLoginRetryService;
+
+    private final BytedeskProperties bytedeskProperties;
 
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
@@ -89,13 +96,82 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
+        // 检查用户是否被锁定
+        if (redisLoginRetryService.isUserLocked(authRequest.getUsername())) {
+            long remainingTime = redisLoginRetryService.getLockRemainingTime(authRequest.getUsername());
+            if (remainingTime > 0) {
+                long minutes = remainingTime / 60;
+                long seconds = remainingTime % 60;
+                String timeStr = minutes > 0 ? minutes + "分" + seconds + "秒" : seconds + "秒";
+                return ResponseEntity.ok().body(JsonResult.error("账户已被锁定，请" + timeStr + "后重试", -1, false));
+            } else {
+                // 锁定时间已过，解锁用户
+                redisLoginRetryService.unlockUser(authRequest.getUsername());
+            }
+        }
+
+        // 获取配置的最大重试次数和锁定时间
+        int maxRetryCount = 3; // 默认值
+        int lockTimeMinutes = 10; // 默认值
+        
+        try {
+            if (bytedeskProperties != null && bytedeskProperties.getCustom() != null) {
+                if (bytedeskProperties.getCustom().getLoginMaxRetryCount() != null) {
+                    maxRetryCount = bytedeskProperties.getCustom().getLoginMaxRetryCount();
+                }
+                if (bytedeskProperties.getCustom().getLoginMaxRetryLockTime() != null) {
+                    lockTimeMinutes = bytedeskProperties.getCustom().getLoginMaxRetryLockTime();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get BytedeskProperties, using default values", e);
+        }
+
+        // 如果最大重试次数为0，表示不限制
+        if (maxRetryCount > 0) {
+            int currentFailedCount = redisLoginRetryService.getLoginFailedCount(authRequest.getUsername());
+            if (currentFailedCount >= maxRetryCount) {
+                // 达到最大重试次数，锁定用户
+                if (lockTimeMinutes > 0) {
+                    redisLoginRetryService.lockUser(authRequest.getUsername(), lockTimeMinutes * 60L);
+                    return ResponseEntity.ok().body(JsonResult.error("密码错误次数过多，账户已被锁定" + lockTimeMinutes + "分钟", -1, false));
+                }
+            }
+        }
+
         Authentication authentication;
         // 判断是否使用密码哈希登录
         if (StringUtils.hasText(authRequest.getPassword())) {
             // 使用现有登录逻辑（明文密码）
             log.debug("Using plain password authentication");
-            authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            try {
+                authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+                
+                // 登录成功，重置失败次数
+                redisLoginRetryService.resetLoginFailedCount(authRequest.getUsername());
+                
+            } catch (Exception e) {
+                // 登录失败，增加失败次数
+                if (maxRetryCount > 0) {
+                    int newFailedCount = redisLoginRetryService.incrementLoginFailedCount(authRequest.getUsername(), 3600L); // 1小时过期
+                    int remainingAttempts = maxRetryCount - newFailedCount;
+                    
+                    if (remainingAttempts > 0) {
+                        return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误，还可尝试" + remainingAttempts + "次", -1, false));
+                    } else {
+                        // 达到最大重试次数，锁定用户
+                        if (lockTimeMinutes > 0) {
+                            redisLoginRetryService.lockUser(authRequest.getUsername(), lockTimeMinutes * 60L);
+                            return ResponseEntity.ok().body(JsonResult.error("密码错误次数过多，账户已被锁定" + lockTimeMinutes + "分钟", -1, false));
+                        } else {
+                            return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                        }
+                    }
+                } else {
+                    return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                }
+            }
         } else if (StringUtils.hasText(authRequest.getPasswordHash())
                 && StringUtils.hasText(authRequest.getPasswordSalt())) {
             // 使用密码哈希登录（AES解密）
@@ -103,8 +179,30 @@ public class AuthController {
             try {
                 authentication = authService.authenticateWithPasswordHash(authRequest);
                 if (authentication == null) {
-                    return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                    // 登录失败，增加失败次数
+                    if (maxRetryCount > 0) {
+                        int newFailedCount = redisLoginRetryService.incrementLoginFailedCount(authRequest.getUsername(), 3600L); // 1小时过期
+                        int remainingAttempts = maxRetryCount - newFailedCount;
+                        
+                        if (remainingAttempts > 0) {
+                            return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误，还可尝试" + remainingAttempts + "次", -1, false));
+                        } else {
+                            // 达到最大重试次数，锁定用户
+                            if (lockTimeMinutes > 0) {
+                                redisLoginRetryService.lockUser(authRequest.getUsername(), lockTimeMinutes * 60L);
+                                return ResponseEntity.ok().body(JsonResult.error("密码错误次数过多，账户已被锁定" + lockTimeMinutes + "分钟", -1, false));
+                            } else {
+                                return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                            }
+                        }
+                    } else {
+                        return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                    }
                 }
+                
+                // 登录成功，重置失败次数
+                redisLoginRetryService.resetLoginFailedCount(authRequest.getUsername());
+                
             } catch (Exception e) {
                 log.error("Password hash authentication failed for user: {}: {}", authRequest.getUsername(), e.getMessage());
                 return ResponseEntity.ok().body(JsonResult.error("密码解密失败，请检查密码格式", -1, false));

@@ -29,4 +29,9 @@ public class RedisConsts {
     public static final String AUTO_REPLY_PROCESSED_PREFIX = BYTEDESK_REDIS_PREFIX + "auto_reply_processed:";
     public static final String AUTO_REPLY_PROCESSED_VALUE = "1";
 
+    // 登录失败重试相关常量
+    public static final String LOGIN_FAILED_PREFIX = BYTEDESK_REDIS_PREFIX + "login_failed:";
+    public static final String LOGIN_LOCKED_PREFIX = BYTEDESK_REDIS_PREFIX + "login_locked:";
+    public static final String LOGIN_LOCKED_VALUE = "1";
+
 }

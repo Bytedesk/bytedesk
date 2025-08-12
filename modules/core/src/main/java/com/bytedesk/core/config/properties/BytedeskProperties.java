@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-30 09:14:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 17:17:11
+ * @LastEditTime: 2025-08-12 16:41:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -218,6 +218,8 @@ public class BytedeskProperties {
         private String privacyPolicyUrl;
         private String termsOfServiceUrl;
         private Boolean loginUsernameEnable = true;
+        private Integer loginMaxRetryCount = 3;
+        private Integer loginMaxRetryLockTime = 10;
         private Boolean loginMobileEnable = true;
         // private Boolean loginEmailEnable = false;
         private Boolean loginScanEnable = false;
