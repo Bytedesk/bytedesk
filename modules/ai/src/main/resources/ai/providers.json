@@ -9,7 +9,7 @@
     "zhipuai": {
         "nickname": "智谱",
         "logo": "zhipu.png",    
-        "apiUrl": "https://open.bigmodel.cn/api/paas/v4/",
+        "apiUrl": "https://open.bigmodel.cn/api/paas",
         "webUrl": "https://open.bigmodel.cn/",
         "status": "PRODUCTION"
     },
@@ -23,42 +23,42 @@
     "dashscope": {
         "nickname": "通义千问",
         "logo": "dashscope.png",
-        "apiUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1/",
+        "apiUrl": "https://dashscope.aliyuncs.com",
         "webUrl": "https://dashscope.aliyun.com/",
         "status": "PRODUCTION"
     },
     "silicon": {
         "nickname": "硅基流动",
         "logo": "silicon.png",
-        "apiUrl": "https://cloud.siliconflow.cn",
+        "apiUrl": "https://api.siliconflow.cn",
         "webUrl": "https://www.siliconflow.cn/",
         "status": "PRODUCTION"
     },
     "gitee": {
         "nickname": "Gitee魔力方舟",
         "logo": "gitee.svg",
-        "apiUrl": "https://api.gitee.com",
+        "apiUrl": "https://ai.gitee.com",
         "webUrl": "https://ai.gitee.com/",
         "status": "PRODUCTION"
     },
     "tencent": {
         "nickname": "腾讯混元",
         "logo": "hunyuan.png",
-        "apiUrl": "https://hunyuan.tencent.com/",
+        "apiUrl": "https://api.hunyuan.cloud.tencent.com",
         "webUrl": "https://hunyuan.tencent.com/",
         "status": "PRODUCTION"
     },
     "baidu": {
         "nickname": "百度千帆",
         "logo": "yiyan.png",
-        "apiUrl": "https://yiyan.baidu.com/",
+        "apiUrl": "https://qianfan.baidubce.com/v2",
         "webUrl": "https://yiyan.baidu.com/",
         "status": "PRODUCTION"
     },
     "volcengine": {
         "nickname": "火山引擎",
         "logo": "doubao.png",
-        "apiUrl": "https://ark.cn-beijing.volces.com/api/v3/",
+        "apiUrl": "https://ark.cn-beijing.volces.com/api/v3",
         "webUrl": "https://console.volcengine.com/ark/",
         "status": "PRODUCTION"
     },

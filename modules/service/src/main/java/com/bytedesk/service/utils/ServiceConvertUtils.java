@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 14:24:21
+ * @LastEditTime: 2025-08-12 20:33:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,6 @@ import org.modelmapper.ModelMapper;
 import lombok.experimental.UtilityClass;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -28,7 +27,6 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message_unread.MessageUnreadEntity;
-import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
