@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:37:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 16:37:29
+ * @LastEditTime: 2025-08-12 14:31:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,21 +42,29 @@ public class MessageUnreadEventListener {
     public void onMessageJsonEvent(MessageJsonEvent event) {
         // log.info("MessageJsonEvent {}", event.getJson());
         try {
-            MessageProtobuf message = MessageProtobuf.fromJson(event.getJson());
-            if (MessageTypeEnum.STREAM.equals(message.getType()) ||
-                    MessageTypeEnum.NOTICE.equals(message.getType()) ||
-                    MessageTypeEnum.SYSTEM.equals(message.getType())) {
+            MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(event.getJson());
+            MessageTypeEnum messageType = messageProtobuf.getType();
+            // 仅当收到文本、图片、文件、音频、视频类型的消息时才处理
+            if (!MessageTypeEnum.TEXT.equals(messageType) 
+                && !MessageTypeEnum.IMAGE.equals(messageType)
+                && !MessageTypeEnum.FILE.equals(messageType)
+                && !MessageTypeEnum.AUDIO.equals(messageType)
+                && !MessageTypeEnum.VIDEO.equals(messageType)
+                && !MessageTypeEnum.READ.equals(messageType)
+                ) {
+                log.info("message unread only for TEXT/IMAGE/FILE/AUDIO/VIDEO message, current: {}", messageType);
                 return;
             }
-            if (ChannelEnum.SYSTEM.equals(message.getChannel())) {
+            if (ChannelEnum.SYSTEM.equals(messageProtobuf.getChannel())) {
+                log.info("message unread system message {} 过滤掉", messageProtobuf.getChannel());
                 return;
             }
             // 删除已读消息
-            if (MessageTypeEnum.READ.equals(message.getType())) {
-                log.info("message unread update event: {} {} {}", message.getUid(), message.getType(),
-                        message.getContent());
+            if (MessageTypeEnum.READ.equals(messageProtobuf.getType())) {
+                log.info("message unread update event: {} {} {}", messageProtobuf.getUid(), messageProtobuf.getType(),
+                        messageProtobuf.getContent());
                 // message.getContent() 代表 已读消息的uid
-                String readMessageUid = message.getContent();
+                String readMessageUid = messageProtobuf.getContent();
                 if (readMessageUid != null && !readMessageUid.trim().isEmpty()) {
                     try {
                         // 先清理 Redis 缓存
@@ -68,14 +76,14 @@ public class MessageUnreadEventListener {
                         // 不重新抛出异常，避免影响其他事件处理
                     }
                 } else {
-                    log.warn("READ message content is null or empty: {}", message.getUid());
+                    log.warn("READ message content is null or empty: {}", messageProtobuf.getUid());
                 }
             } else {
                 // 缓存未读消息，create方法内部已包含重复检查逻辑
                 try {
-                    messageUnreadRestService.create(message);
+                    messageUnreadRestService.create(messageProtobuf);
                 } catch (Exception e) {
-                    log.error("Error creating unread message for uid {}: {}", message.getUid(), e.getMessage());
+                    log.error("Error creating unread message for uid {}: {}", messageProtobuf.getUid(), e.getMessage());
                     // 不重新抛出异常，避免影响其他事件处理
                 }
             }
