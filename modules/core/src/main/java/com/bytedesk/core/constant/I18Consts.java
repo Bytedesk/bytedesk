@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 13:55:58
+ * @LastEditTime: 2025-08-12 14:00:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ public class I18Consts {
     // public static final String I18N_WELCOME_TIP = I18N_PREFIX + "welcome.tip"; // 欢迎提示
     // public static final String I18N_TOP_TIP = I18N_PREFIX + "top.tip"; // 置顶提示
     // public static final String I18N_LEAVEMSG_TIP = I18N_PREFIX + "leavemsg.tip"; // 留言提示
-    // public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip"; // 重新进入提示
+    public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip"; // 重新进入提示
     // public static final String I18N_QUEUE_TIP = I18N_PREFIX + "queue.tip"; // 排队提示
     // public static final String I18N_QUEUE_MESSAGE_TEMPLATE = I18N_PREFIX + "queue.message.template"; // 您前面还有{0}人排队
     // public static final String I18N_AUTO_CLOSE_TIP = I18N_PREFIX + "auto.close.tip"; // 会话已自动关闭
@@ -217,7 +217,7 @@ public class I18Consts {
     public static final String I18N_WELCOME_TIP = "您好，请问有什么可以帮助您？"; // 欢迎提示
     public static final String I18N_TOP_TIP = "置顶提示"; // 置顶提示
     public static final String I18N_LEAVEMSG_TIP = "您好，请留言，我们会尽快回复您"; // 留言提示
-    public static final String I18N_REENTER_TIP = "继续会话"; // 重新进入提示
+    // public static final String I18N_REENTER_TIP = "继续会话"; // 重新进入提示
     public static final String I18N_QUEUE_TIP = "您好，客服繁忙，请稍后"; // 排队提示
     public static final String I18N_QUEUE_MESSAGE_TEMPLATE = "您前面还有{0}人排队"; // 您前面还有{0}人排队
     public static final String I18N_AUTO_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 会话已自动关闭
