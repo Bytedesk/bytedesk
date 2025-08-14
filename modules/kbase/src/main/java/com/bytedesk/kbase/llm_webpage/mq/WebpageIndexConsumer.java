@@ -19,7 +19,7 @@ import java.util.Random;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
@@ -58,7 +58,7 @@ public class WebpageIndexConsumer {
      * @param jmsMessage JMS原始消息
      * @param message 网页索引消息
      */
-    @JmsListener(destination = JmsArtemisConstants.QUEUE_WEBPAGE_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_WEBPAGE_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
     public void processIndexMessage(jakarta.jms.Message jmsMessage, WebpageIndexMessage message) {
         boolean success = false;
         int maxRetryAttempts = 3; // 最大重试次数

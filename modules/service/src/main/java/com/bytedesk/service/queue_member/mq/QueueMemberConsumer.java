@@ -21,7 +21,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.core.utils.OptimisticLockingHandler;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRepository;
@@ -62,7 +62,7 @@ public class QueueMemberConsumer implements MessageListener {
     }
     
     @Override
-    @JmsListener(destination = JmsArtemisConstants.QUEUE_MEMBER_UPDATE)
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_MEMBER_UPDATE)
     @Transactional
     public void onMessage(Message message) {
         String memberUid = "";

@@ -21,7 +21,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.member.MemberExcel;
 
@@ -114,7 +114,7 @@ public class MemberBatchMessageService {
                 };
 
                 // 发送消息到队列
-                jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_BATCH_IMPORT, message, postProcessor);
+                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, message, postProcessor);
 
                 log.debug("Member批量导入消息已发送: 批次{}, 索引{}/{}", 
                          batchUid, currentIndex, total);
@@ -180,7 +180,7 @@ public class MemberBatchMessageService {
             };
 
             // 重新发送到队列
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_BATCH_IMPORT, originalMessage, postProcessor);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, originalMessage, postProcessor);
 
             log.info("Member批量导入重试消息已发送: 批次{}, 索引{}, 重试次数{}, 延迟{}ms",
                     originalMessage.getBatchUid(), originalMessage.getBatchIndex(), 

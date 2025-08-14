@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,8 +69,8 @@ public class QuickReplyMessageService {
             };
             
             // 使用JmsArtemisConstants中定义的常量，带后置处理器发送消息
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_QUICK_REPLY_INDEX, message, postProcessor);
-            log.debug("消息已发送到队列: {}", JmsArtemisConstants.QUEUE_QUICK_REPLY_INDEX);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_QUICK_REPLY_INDEX, message, postProcessor);
+            log.debug("消息已发送到队列: {}", JmsArtemisConsts.QUEUE_QUICK_REPLY_INDEX);
         } catch (Exception e) {
             log.error("发送快捷回复索引消息失败: {}", e.getMessage(), e);
         }
@@ -116,8 +116,8 @@ public class QuickReplyMessageService {
                 }
             };
             
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_QUICK_REPLY_INDEX, message, postProcessor);
-            log.debug("删除消息已发送到队列: {}", JmsArtemisConstants.QUEUE_QUICK_REPLY_INDEX);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_QUICK_REPLY_INDEX, message, postProcessor);
+            log.debug("删除消息已发送到队列: {}", JmsArtemisConsts.QUEUE_QUICK_REPLY_INDEX);
         } catch (Exception e) {
             log.error("发送快捷回复删除消息失败: {}", e.getMessage(), e);
         }
@@ -223,7 +223,7 @@ public class QuickReplyMessageService {
                 };
                 
                 // 发送消息
-                jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_QUICK_REPLY_INDEX, message, postProcessor);
+                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_QUICK_REPLY_INDEX, message, postProcessor);
                 
             } catch (Exception e) {
                 log.error("发送快捷回复索引消息失败: {}, 错误: {}", quickReplyUid, e.getMessage(), e);

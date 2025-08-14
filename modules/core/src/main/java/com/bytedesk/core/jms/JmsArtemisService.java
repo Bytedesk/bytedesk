@@ -30,27 +30,27 @@ public class JmsArtemisService {
     }
 
     public void sendQueueMessage(String json) {
-        jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_STRING_NAME, json);
+        jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_STRING_NAME, json);
     }
 
     public void sendTopicMessage(String json) {
-        jmsTemplate.convertAndSend(JmsArtemisConstants.TOPIC_STRING_NAME, json);
+        jmsTemplate.convertAndSend(JmsArtemisConsts.TOPIC_STRING_NAME, json);
     }
 
     public void sendQueueMessage(MessageProtobuf message) {
-        jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MESSAGE_NAME, message);
+        jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_MESSAGE_NAME, message);
     }
 
     public void sendTopicMessage(MessageProtobuf message) {
-        jmsTemplate.convertAndSend(JmsArtemisConstants.TOPIC_MESSAGE_NAME, message);
+        jmsTemplate.convertAndSend(JmsArtemisConsts.TOPIC_MESSAGE_NAME, message);
     }
 
     public void testQueue() {
-        jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_TEST_NAME, new JmsArtemisMessage("bytedesk@example.com", "HelloWorld"));
+        jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_TEST_NAME, new JmsArtemisMessage("bytedesk@example.com", "HelloWorld"));
     }
 
     public void testTopic() {
-        jmsTemplate.convertAndSend(JmsArtemisConstants.TOPIC_TEST_NAME, new JmsArtemisMessage("bytedesk@example.com", "HelloWorld"));
+        jmsTemplate.convertAndSend(JmsArtemisConsts.TOPIC_TEST_NAME, new JmsArtemisMessage("bytedesk@example.com", "HelloWorld"));
     }
 
 }

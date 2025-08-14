@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.quick_reply.QuickReplyEntity;
 import com.bytedesk.kbase.quick_reply.QuickReplyRepository;
 import com.bytedesk.kbase.quick_reply.elastic.QuickReplyElasticService;
@@ -46,7 +46,7 @@ public class QuickReplyIndexConsumer {
     /**
      * 处理快捷回复索引消息
      */
-    @JmsListener(destination = JmsArtemisConstants.QUEUE_QUICK_REPLY_INDEX, containerFactory = "jmsArtemisQueueFactory")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_QUICK_REPLY_INDEX, containerFactory = "jmsArtemisQueueFactory")
     public void handleQuickReplyIndexMessage(QuickReplyIndexMessage indexMessage, Message message) throws JMSException {
         try {
             log.info("处理快捷回复索引消息: {}", indexMessage);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:54:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 11:37:44
+ * @LastEditTime: 2025-08-14 13:08:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,68 +50,10 @@ import jakarta.annotation.PostConstruct;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnClass(ActiveMQConnectionFactory.class)
-@ConditionalOnProperty(name = "spring.artemis.mode")
 @Slf4j
 public class JmsArtemisConfig {
 
 	private final JmsErrorHandler jmsErrorHandler;
-	
-	@Value("${spring.artemis.mode:embedded}")
-	private String artemisMode;
-	
-	@Value("${spring.artemis.broker-url:tcp://127.0.0.1:16161}")
-	private String brokerUrl;
-	
-	@Value("${spring.artemis.user:admin}")
-	private String username;
-	
-	@Value("${spring.artemis.password:admin}")
-	private String password;
-	
-	@PostConstruct
-	public void init() {
-		log.info("JmsArtemisConfig initialized with mode: {}", artemisMode);
-		if ("native".equals(artemisMode)) {
-			log.info("Native mode: will connect to external Artemis broker at {}", brokerUrl);
-		} else {
-			log.info("Embedded mode: using Spring Boot auto-configured Artemis broker");
-		}
-	}
-	
-	@Bean
-	@ConditionalOnProperty(name = "spring.artemis.mode", havingValue = "native")
-	public ConnectionFactory connectionFactory() {
-		log.info("Creating Artemis Native ConnectionFactory with broker URL: {}", brokerUrl);
-		try {
-			ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl);
-			connectionFactory.setUser(username);
-			connectionFactory.setPassword(password);
-			// 设置连接配置
-			connectionFactory.setConnectionTTL(30000L);
-			connectionFactory.setCallTimeout(10000L);
-			connectionFactory.setCallFailoverTimeout(10000L);
-			// 设置重连配置
-			connectionFactory.setRetryInterval(1000L);
-			connectionFactory.setMaxRetryInterval(30000L);
-			connectionFactory.setReconnectAttempts(10);
-			connectionFactory.setInitialConnectAttempts(3);
-			
-			// 测试连接
-			try (var connection = connectionFactory.createConnection()) {
-				connection.start();
-				log.info("Successfully connected to Artemis broker at {}", brokerUrl);
-			}
-			
-			return connectionFactory;
-		} catch (Exception e) {
-			log.error("Failed to create Artemis ConnectionFactory: {}", e.getMessage(), e);
-			throw new RuntimeException("Failed to create Artemis ConnectionFactory: " + e.getMessage(), e);
-		}
-	}
-	
-	// 对于embedded模式，Spring Boot会自动创建ConnectionFactory
-	// 我们只需要配置监听器工厂和JmsTemplate
-	// 这些bean会使用Spring Boot自动配置的ConnectionFactory
     
   	@Bean
 	public JmsListenerContainerFactory<?> jmsArtemisQueueFactory(ConnectionFactory connectionFactory,
@@ -180,7 +122,7 @@ public class JmsArtemisConfig {
         return new DynamicDestinationResolver() {
             @Override
             public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain) throws JMSException {
-                pubSubDomain = destinationName.startsWith(JmsArtemisConstants.TOPIC_PREFIX);
+                pubSubDomain = destinationName.startsWith(JmsArtemisConsts.TOPIC_PREFIX);
                 return super.resolveDestinationName(session, destinationName, pubSubDomain);
             }
         };
@@ -188,7 +130,7 @@ public class JmsArtemisConfig {
 
 	@Bean
 	public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
-		log.info("Creating JmsTemplate with custom configuration");
+		// log.info("Creating JmsTemplate with custom configuration for mode: {}", artemisMode);
 		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
 		// 设置消息转换器
 		jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());

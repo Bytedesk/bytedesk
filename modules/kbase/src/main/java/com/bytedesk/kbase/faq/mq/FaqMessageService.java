@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,8 +69,8 @@ public class FaqMessageService {
             };
             
             // 使用JmsArtemisConstants中定义的常量，带后置处理器发送消息
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_FAQ_INDEX, message, postProcessor);
-            log.debug("消息已发送到队列: {}", JmsArtemisConstants.QUEUE_FAQ_INDEX);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FAQ_INDEX, message, postProcessor);
+            log.debug("消息已发送到队列: {}", JmsArtemisConsts.QUEUE_FAQ_INDEX);
         } catch (Exception e) {
             log.error("发送FAQ索引消息失败: {}", e.getMessage(), e);
         }
@@ -116,8 +116,8 @@ public class FaqMessageService {
                 }
             };
             
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_FAQ_INDEX, message, postProcessor);
-            log.debug("删除消息已发送到队列: {}", JmsArtemisConstants.QUEUE_FAQ_INDEX);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FAQ_INDEX, message, postProcessor);
+            log.debug("删除消息已发送到队列: {}", JmsArtemisConsts.QUEUE_FAQ_INDEX);
         } catch (Exception e) {
             log.error("发送FAQ删除消息失败: {}", e.getMessage(), e);
         }
@@ -223,7 +223,7 @@ public class FaqMessageService {
                 };
                 
                 // 发送消息
-                jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_FAQ_INDEX, message, postProcessor);
+                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FAQ_INDEX, message, postProcessor);
                 
             } catch (Exception e) {
                 log.error("发送FAQ索引消息失败: {}, 错误: {}", faqUid, e.getMessage(), e);

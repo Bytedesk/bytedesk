@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 
 import lombok.extern.slf4j.Slf4j;
@@ -121,8 +121,8 @@ public class QueueMemberMessageService {
             };
             
             // 发送JSON字符串而不是对象
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_UPDATE, messageJson, postProcessor);
-            log.debug("消息已发送到队列: {}", JmsArtemisConstants.QUEUE_MEMBER_UPDATE);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_MEMBER_UPDATE, messageJson, postProcessor);
+            log.debug("消息已发送到队列: {}", JmsArtemisConsts.QUEUE_MEMBER_UPDATE);
         } catch (Exception e) {
             log.error("发送队列成员更新消息失败: {}", e.getMessage(), e);
         }
@@ -174,8 +174,8 @@ public class QueueMemberMessageService {
             };
             
             // 发送JSON字符串而不是对象
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_MEMBER_UPDATE, messageJson, postProcessor);
-            log.debug("删除消息已发送到队列: {}", JmsArtemisConstants.QUEUE_MEMBER_UPDATE);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_MEMBER_UPDATE, messageJson, postProcessor);
+            log.debug("删除消息已发送到队列: {}", JmsArtemisConsts.QUEUE_MEMBER_UPDATE);
         } catch (Exception e) {
             log.error("发送队列成员删除消息失败: {}", e.getMessage(), e);
         }

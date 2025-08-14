@@ -50,7 +50,7 @@ public class JmsArtemisListener {
 
 	// topic pub sub
 	// @TabooJsonFilter(title = "敏感词", action = "JmsArtemisListener")
-	@JmsListener(destination = JmsArtemisConstants.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
+	@JmsListener(destination = JmsArtemisConsts.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
 	public void receiveTopicMessage(String json) {
 		try {
 			log.debug("JmsArtemisListener receiveTopicMessage string {}", json);

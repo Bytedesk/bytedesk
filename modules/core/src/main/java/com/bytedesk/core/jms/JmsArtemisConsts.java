@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 16:49:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 11:15:48
+ * @LastEditTime: 2025-08-14 12:47:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,10 @@
  */
 package com.bytedesk.core.jms;
 
-public class JmsArtemisConstants {
+public class JmsArtemisConsts {
     
     // queue 为队列消息，每个实例轮流收取
-    public static final String QUEUE_PREFIX = "bytedesk.artemis.queue.";
+    public static final String QUEUE_PREFIX = "bytedesk.queue.";
 
     public static final String QUEUE_STRING_NAME = QUEUE_PREFIX + "string";
 
@@ -25,7 +25,7 @@ public class JmsArtemisConstants {
     public static final String QUEUE_TEST_NAME = QUEUE_PREFIX + "test";
 
     // topic 为pubsub广播消息，所有实例同时收取
-    public static final String TOPIC_PREFIX = "bytedesk.artemis.topic.";
+    public static final String TOPIC_PREFIX = "bytedesk.topic.";
 
     public static final String TOPIC_STRING_NAME = TOPIC_PREFIX + "string";
 

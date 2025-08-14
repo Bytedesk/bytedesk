@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 12:20:16
+ * @LastEditTime: 2025-08-14 13:12:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -138,7 +138,7 @@ public class MessagePersistService {
 
     // 处理消息回执
     private void dealWithMessageReceipt(MessageTypeEnum type, @Nonnull MessageProtobuf message) {
-        log.info("dealWithMessageReceipt: {}", type);
+        log.info("dealWithMessageReceipt: {}, content: {}", type, message.getContent());
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止delivered在后面更新read消息
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());

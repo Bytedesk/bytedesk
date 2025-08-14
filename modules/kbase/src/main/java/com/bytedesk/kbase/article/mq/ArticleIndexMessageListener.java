@@ -18,7 +18,7 @@ import java.util.Optional;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
@@ -50,7 +50,7 @@ public class ArticleIndexMessageListener {
      * @param message 文章索引消息
      */
     @JmsListener(
-        destination = JmsArtemisConstants.QUEUE_ARTICLE_INDEX, 
+        destination = JmsArtemisConsts.QUEUE_ARTICLE_INDEX, 
         concurrency = "3-5", // 并发消费者数量
         containerFactory = "jmsListenerContainerFactory"
     )

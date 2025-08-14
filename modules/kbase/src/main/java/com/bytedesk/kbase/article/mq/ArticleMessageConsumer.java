@@ -19,7 +19,7 @@ import java.util.Random;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.elastic.ArticleElasticService;
@@ -56,7 +56,7 @@ public class ArticleMessageConsumer {
      * @param message 文章索引消息
      */
     @JmsListener(
-        destination = JmsArtemisConstants.QUEUE_ARTICLE_INDEX, 
+        destination = JmsArtemisConsts.QUEUE_ARTICLE_INDEX, 
         containerFactory = "jmsListenerContainerFactory"
     )
     public void processIndexMessage(jakarta.jms.Message jmsMessage, ArticleIndexMessage message) {

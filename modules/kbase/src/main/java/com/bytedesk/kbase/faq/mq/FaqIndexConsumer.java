@@ -19,7 +19,7 @@ import java.util.Random;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.faq.FaqEntity;
 import com.bytedesk.kbase.faq.FaqRestService;
 import com.bytedesk.kbase.faq.elastic.FaqElasticService;
@@ -55,7 +55,7 @@ public class FaqIndexConsumer {
      * @param jmsMessage JMS原始消息
      * @param message FAQ索引消息
      */
-    @JmsListener(destination = JmsArtemisConstants.QUEUE_FAQ_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_FAQ_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
     public void processIndexMessage(jakarta.jms.Message jmsMessage, FaqIndexMessage message) {
         boolean success = false;
         int maxRetryAttempts = 3; // 最大重试次数

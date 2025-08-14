@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +66,7 @@ public class WebpageMessageService {
             };
             
             // 使用JmsArtemisConstants中定义的常量，带后置处理器发送消息
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_WEBPAGE_INDEX, message, postProcessor);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_WEBPAGE_INDEX, message, postProcessor);
             log.debug("网页索引消息已发送到队列: {}", webpageUid);
         } catch (Exception e) {
             log.error("发送网页索引消息失败: {}, 错误: {}", webpageUid, e.getMessage(), e);
@@ -87,7 +87,7 @@ public class WebpageMessageService {
                 .updateVectorIndex(true)
                 .build();
                 
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_WEBPAGE_INDEX, message);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_WEBPAGE_INDEX, message);
             log.debug("网页删除消息已发送到队列: {}", webpageUid);
         } catch (Exception e) {
             log.error("发送网页删除消息失败: {}, 错误: {}", webpageUid, e.getMessage(), e);
@@ -108,7 +108,7 @@ public class WebpageMessageService {
                 .updateVectorIndex(false)
                 .build();
                 
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_WEBPAGE_INDEX, message);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_WEBPAGE_INDEX, message);
             log.debug("网页全文索引消息已发送到队列: {}", webpageUid);
         } catch (Exception e) {
             log.error("发送网页全文索引消息失败: {}, 错误: {}", webpageUid, e.getMessage(), e);
@@ -129,7 +129,7 @@ public class WebpageMessageService {
                 .updateVectorIndex(true)
                 .build();
                 
-            jmsTemplate.convertAndSend(JmsArtemisConstants.QUEUE_WEBPAGE_INDEX, message);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_WEBPAGE_INDEX, message);
             log.debug("网页向量索引消息已发送到队列: {}", webpageUid);
         } catch (Exception e) {
             log.error("发送网页向量索引消息失败: {}, 错误: {}", webpageUid, e.getMessage(), e);

@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.jms.JmsArtemisConstants;
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberExcel;
 import com.bytedesk.core.member.MemberRestService;
@@ -51,7 +51,7 @@ public class MemberBatchConsumer implements MessageListener {
     private static final long BASE_RETRY_DELAY = 2000L;
 
     @Override
-    @JmsListener(destination = JmsArtemisConstants.QUEUE_MEMBER_BATCH_IMPORT, containerFactory = "jmsArtemisQueueFactory")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, containerFactory = "jmsArtemisQueueFactory")
     @Transactional
     public void onMessage(Message message) {
         try {
