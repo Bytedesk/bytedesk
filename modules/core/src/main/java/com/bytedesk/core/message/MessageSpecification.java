@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 17:17:34
+ * @LastEditTime: 2025-08-14 17:48:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,6 @@ import com.bytedesk.core.topic.TopicUtils;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
-import com.bytedesk.core.rbac.user.UserEntity;
 
 public class MessageSpecification extends BaseSpecification<MessageEntity, MessageRequest> {
 
@@ -126,101 +125,4 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
         };
     }
 
-    /**
-     * 查询未读消息的 Specification
-     * 参考 ThreadEntity.getUnreadCount 的逻辑
-     * 
-     * @param request 请求对象
-     * @param user 当前用户
-     * @return Specification对象
-     */
-    public static Specification<MessageEntity> searchUnread(MessageRequest request, UserEntity user) {
-        return (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            
-            // 获取 thread 关联，用于访问 thread 的属性
-            Join<Object, Object> threadJoin = root.join("thread", JoinType.LEFT);
-            
-            // 基础条件：未删除的消息
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            
-            // 根据 topic 过滤
-            if (StringUtils.hasText(request.getTopic())) {
-                String topic = request.getTopic();
-                Predicate topicPredicate = criteriaBuilder.equal(threadJoin.get("topic"), topic);
-                predicates.add(topicPredicate);
-            }
-            
-            // 未读消息条件：根据消息状态判断
-            // 参考 MessageEntity.isUnread() 方法
-            predicates.add(criteriaBuilder.or(
-                criteriaBuilder.equal(root.get("status"), MessageStatusEnum.SENDING.name()),
-                criteriaBuilder.equal(root.get("status"), MessageStatusEnum.SUCCESS.name()),
-                criteriaBuilder.equal(root.get("status"), MessageStatusEnum.DELIVERED.name())
-            ));
-            
-            // 根据用户类型和会话类型过滤未读消息
-            // 参考 ThreadEntity.getUnreadCount 的逻辑
-            String threadType = getThreadTypeFromTopic(request.getTopic());
-            if (isCustomerServiceType(threadType)) {
-                // 客服端：查询访客发送的未读消息
-                predicates.add(criteriaBuilder.like(root.get("user"), "%\"type\":\"VISITOR\"%"));
-            } else if (isMemberType(threadType)) {
-                // 成员端：查询其他成员发送的未读消息（排除自己）, TODO: 需要修改逻辑
-                predicates.add(criteriaBuilder.like(root.get("user"), "%\"type\":\"MEMBER\"%"));
-                predicates.add(criteriaBuilder.not(criteriaBuilder.like(root.get("user"), "%" + user.getUid() + "%")));
-            } else if (isGroupType(threadType)) {
-                // 群聊：查询其他成员发送的未读消息（排除自己）, TODO: 需要修改逻辑
-                predicates.add(criteriaBuilder.not(criteriaBuilder.like(root.get("user"), "%" + user.getUid() + "%")));
-            }
-            
-            // 组织过滤
-            if (StringUtils.hasText(request.getOrgUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-            }
-            
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-    }
-
-    /**
-     * 从 topic 推断会话类型
-     */
-    private static String getThreadTypeFromTopic(String topic) {
-        if (topic == null) {
-            return null;
-        }
-        
-        if (topic.contains("group")) {
-            return "GROUP";
-        } else if (topic.contains("member")) {
-            return "MEMBER";
-        } else if (topic.contains("agent") || topic.contains("workgroup") || topic.contains("robot")) {
-            return "AGENT";
-        }
-        
-        return null;
-    }
-
-    /**
-     * 判断是否为客服类型会话
-     */
-    private static boolean isCustomerServiceType(String threadType) {
-        return "AGENT".equals(threadType) || "WORKGROUP".equals(threadType) || 
-               "ROBOT".equals(threadType) || "UNIFIED".equals(threadType);
-    }
-
-    /**
-     * 判断是否为成员类型会话
-     */
-    private static boolean isMemberType(String threadType) {
-        return "MEMBER".equals(threadType);
-    }
-
-    /**
-     * 判断是否为群聊类型会话
-     */
-    private static boolean isGroupType(String threadType) {
-        return "GROUP".equals(threadType);
-    }
 }

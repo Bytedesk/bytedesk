@@ -102,14 +102,14 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
      * 
      * @param request 查询请求
      * @return 未读消息列表
+     * @deprecated 此功能已迁移到企业版，请使用 /api/v1/vip/message/unread
      */
-    @Operation(summary = "查询未读消息", description = "查询未读消息")
+    @Operation(summary = "查询未读消息", description = "查询未读消息（已迁移到企业版）")
     @GetMapping("/unread")
+    @Deprecated
     public ResponseEntity<?> queryUnread(MessageRequest request) {
-
-        Page<MessageResponse> response = messageRestService.queryUnread(request);
-        //
-        return ResponseEntity.ok(JsonResult.success(response));
+        // 此功能已迁移到企业版
+        return ResponseEntity.status(410).body(JsonResult.error("此功能已迁移到企业版，请使用 /api/v1/vip/message/unread"));
     }
 
     /**
@@ -230,14 +230,14 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
      * 
      * @param messageUid 消息UID
      * @return 更新后的消息
+     * @deprecated 此功能已迁移到企业版，请使用 /api/v1/vip/message/{messageUid}/read
      */
-    @Operation(summary = "标记消息为已读", description = "将指定消息的状态更新为已读")
+    @Operation(summary = "标记消息为已读", description = "将指定消息的状态更新为已读（已迁移到企业版）")
     @PostMapping("/{messageUid}/read")
+    @Deprecated
     public ResponseEntity<?> markAsRead(@PathVariable String messageUid) {
-        
-        MessageResponse response = messageRestService.markAsRead(messageUid);
-        //
-        return ResponseEntity.ok(JsonResult.success(response));
+        // 此功能已迁移到企业版
+        return ResponseEntity.status(410).body(JsonResult.error("此功能已迁移到企业版，请使用 /api/v1/vip/message/" + messageUid + "/read"));
     }
 
     /**
@@ -245,14 +245,14 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
      * 
      * @param threadUid 会话UID
      * @return 更新的消息数量
+     * @deprecated 此功能已迁移到企业版，请使用 /api/v1/vip/message/thread/{threadUid}/read
      */
-    @Operation(summary = "批量标记会话消息为已读", description = "将会话中所有未读消息的状态更新为已读")
+    @Operation(summary = "批量标记会话消息为已读", description = "将会话中所有未读消息的状态更新为已读（已迁移到企业版）")
     @PostMapping("/thread/{threadUid}/read")
+    @Deprecated
     public ResponseEntity<?> markThreadAsRead(@PathVariable String threadUid) {
-        
-        Integer updatedCount = messageRestService.markThreadAsRead(threadUid);
-        //
-        return ResponseEntity.ok(JsonResult.success(updatedCount));
+        // 此功能已迁移到企业版
+        return ResponseEntity.status(410).body(JsonResult.error("此功能已迁移到企业版，请使用 /api/v1/vip/message/thread/" + threadUid + "/read"));
     }
 
     
