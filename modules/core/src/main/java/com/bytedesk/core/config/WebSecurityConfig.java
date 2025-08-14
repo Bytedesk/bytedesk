@@ -23,7 +23,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -93,10 +92,11 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceImpl();
-    }
+    // 注释掉单独的 UserDetailsService bean，因为它已经在 DaoAuthenticationProvider 中使用
+    // @Bean
+    // public UserDetailsService userDetailsService() {
+    //     return new UserDetailsServiceImpl();
+    // }
 
     @Bean
     public AuthTokenFilter authTokenFilter() {
@@ -110,7 +110,8 @@ public class WebSecurityConfig {
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService());
+        // 直接创建 UserDetailsServiceImpl 实例，避免Spring Security的警告
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(new UserDetailsServiceImpl());
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
     }
