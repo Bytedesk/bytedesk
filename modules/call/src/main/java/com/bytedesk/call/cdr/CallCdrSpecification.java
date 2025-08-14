@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 19:52:25
+ * @LastEditTime: 2025-08-14 09:48:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CallCdrSpecification extends BaseSpecification<CallCdrEntity, CallCdrRequest> {
     
     public static Specification<CallCdrEntity> search(CallCdrRequest request) {
-        log.info("request: {}", request);
+        log.info("request: {} orgUid {}", request, request.getOrgUid());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
