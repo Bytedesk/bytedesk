@@ -3,8 +3,11 @@
 ## 概述
 
 本配置支持两种 Artemis 模式：
+
 - **Embedded 模式**：Spring Boot 自动启动内嵌 Artemis broker
 - **Native 模式**：连接外部 Artemis broker
+
+**注意**：JMS 和 Artemis 配置已合并放在一处，便于管理和维护。
 
 ## 配置方式
 
@@ -27,11 +30,13 @@ spring.artemis.embedded.configuration=classpath:artemis-config.xml
 ```
 
 **优点：**
+
 - 无需额外安装 Artemis
 - 配置简单
 - 适合开发和测试环境
 
 **缺点：**
+
 - 性能相对较低
 - 不适合生产环境
 
@@ -54,13 +59,49 @@ spring.artemis.password=admin
 ```
 
 **优点：**
+
 - 性能更高
 - 支持集群
 - 适合生产环境
 
 **缺点：**
+
 - 需要额外安装和配置 Artemis
 - 配置相对复杂
+
+## 配置结构
+
+所有 Artemis 和 JMS 相关配置现在都集中在 `application-local.properties` 文件的一个部分：
+
+```properties
+# ===============================
+# = Artemis 和 JMS 配置
+# ===============================
+
+# 1. 模式配置
+spring.artemis.mode=native
+
+# 2. Native模式配置
+spring.artemis.broker-url=...
+spring.artemis.user=...
+spring.artemis.password=...
+
+# 3. Embedded模式配置
+# spring.artemis.embedded.enabled=...
+
+# 4. JMS配置（适用于两种模式）
+spring.jms.listener.auto-startup=false
+spring.jms.listener.acknowledge-mode=auto
+
+# 5. 连接池和性能配置
+spring.artemis.pool.enabled=true
+spring.artemis.pool.max-connections=20
+# ... 其他配置
+
+# 6. 健康检查配置
+management.health.jms.enabled=true
+management.health.artemis.enabled=true
+```
 
 ## 切换模式
 
@@ -84,6 +125,10 @@ spring.artemis.password=admin
 3. **健康检查**：
    - 两种模式都支持健康检查
    - 可通过 `/actuator/health` 查看状态
+
+4. **配置管理**：
+   - 所有 Artemis 和 JMS 配置集中管理
+   - 避免配置分散和重复
 
 ## 故障排除
 

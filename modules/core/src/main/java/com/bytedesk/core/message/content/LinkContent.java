@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-17 15:43:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 18:11:08
+ * @LastEditTime: 2025-08-14 11:44:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LinkContent extends BaseContent {
+    
     private String url;           // 链接URL
     private String title;         // 链接标题
     private String description;   // 链接描述
