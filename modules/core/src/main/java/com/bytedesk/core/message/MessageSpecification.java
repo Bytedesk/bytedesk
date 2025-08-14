@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 16:08:00
+ * @LastEditTime: 2025-08-14 17:17:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -164,13 +164,13 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
             String threadType = getThreadTypeFromTopic(request.getTopic());
             if (isCustomerServiceType(threadType)) {
                 // 客服端：查询访客发送的未读消息
-                predicates.add(criteriaBuilder.like(root.get("user"), "%\"type\":\"visitor\"%"));
+                predicates.add(criteriaBuilder.like(root.get("user"), "%\"type\":\"VISITOR\"%"));
             } else if (isMemberType(threadType)) {
-                // 成员端：查询其他成员发送的未读消息（排除自己）
-                predicates.add(criteriaBuilder.like(root.get("user"), "%\"type\":\"member\"%"));
+                // 成员端：查询其他成员发送的未读消息（排除自己）, TODO: 需要修改逻辑
+                predicates.add(criteriaBuilder.like(root.get("user"), "%\"type\":\"MEMBER\"%"));
                 predicates.add(criteriaBuilder.not(criteriaBuilder.like(root.get("user"), "%" + user.getUid() + "%")));
             } else if (isGroupType(threadType)) {
-                // 群聊：查询其他成员发送的未读消息（排除自己）
+                // 群聊：查询其他成员发送的未读消息（排除自己）, TODO: 需要修改逻辑
                 predicates.add(criteriaBuilder.not(criteriaBuilder.like(root.get("user"), "%" + user.getUid() + "%")));
             }
             
