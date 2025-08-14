@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 07:20:11
+ * @LastEditTime: 2025-08-14 13:39:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -896,9 +896,6 @@ public class ThreadRestService
     public ThreadResponse convertToResponse(ThreadEntity thread) {
         return ConvertUtils.convertToThreadResponse(thread);
     }
-
-    
-
 
     @Override
     public ThreadExcel convertToExcel(ThreadEntity entity) {

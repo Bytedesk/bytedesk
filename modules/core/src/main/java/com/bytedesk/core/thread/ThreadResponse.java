@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-09 12:16:23
+ * @LastEditTime: 2025-08-14 13:49:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,12 +58,9 @@ public class ThreadResponse extends BaseResponse {
     @Builder.Default
     private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
-
     private Boolean top;
 
     private Boolean unread;
-
-    // private Integer queueNumber;
 
     private Integer unreadCount;
 
@@ -77,7 +74,6 @@ public class ThreadResponse extends BaseResponse {
 
     private Boolean autoClose;
 
-    // 备注
     private String note;
 
     private Boolean offline;
@@ -117,7 +113,6 @@ public class ThreadResponse extends BaseResponse {
     // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
     private String agent;
 
-    // private UserProtobuf agentProtobuf;
     public UserProtobuf getAgentProtobuf() {
         if (agent == null) {
             return null;
@@ -127,7 +122,6 @@ public class ThreadResponse extends BaseResponse {
 
     private String robot;
 
-    // private UserProtobuf robotProtobuf;
     public UserProtobuf getRobotProtobuf() {
         if (robot == null) {
             return null;
@@ -137,7 +131,6 @@ public class ThreadResponse extends BaseResponse {
 
     private String workgroup;
 
-    // private UserProtobuf workgroupProtobuf;
     public UserProtobuf getWorkgroupProtobuf() {
         if (workgroup == null) {
             return null;
@@ -150,4 +143,17 @@ public class ThreadResponse extends BaseResponse {
     
     // 流程定义实体UID
     private String processEntityUid;
+    
+    // 是否机器人转人工
+    private Boolean robotToAgent;
+    
+    // 是否有效会话
+    private Boolean valid;
+    
+    // 消息统计字段
+    private Integer allMessageCount;
+    private Integer visitorMessageCount;
+    private Integer agentMessageCount;
+    private Integer systemMessageCount;
+    private Integer robotMessageCount;
 }
