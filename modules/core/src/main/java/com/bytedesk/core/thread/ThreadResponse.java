@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 13:49:34
+ * @LastEditTime: 2025-08-14 15:49:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,7 +62,11 @@ public class ThreadResponse extends BaseResponse {
 
     private Boolean unread;
 
+    // 给客服端使用，统计未读消息数量
     private Integer unreadCount;
+
+    // 给访客端使用，统计未读消息数量
+    private Integer visitorUnreadCount;
 
     private Boolean mute;
 
