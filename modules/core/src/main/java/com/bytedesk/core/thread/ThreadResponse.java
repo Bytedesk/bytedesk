@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 15:49:01
+ * @LastEditTime: 2025-08-14 23:44:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -152,6 +152,7 @@ public class ThreadResponse extends BaseResponse {
     private Boolean robotToAgent;
     
     // 是否有效会话
+    // 至少包含一条用户消息 + 一条客服消息
     private Boolean valid;
     
     // 消息统计字段
