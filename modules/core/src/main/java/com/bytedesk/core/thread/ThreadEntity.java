@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 13:41:01
+ * @LastEditTime: 2025-08-14 14:35:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -112,6 +112,14 @@ public class ThreadEntity extends AbstractThreadEntity {
                 || ThreadTypeEnum.WORKGROUP.name().equals(getType())
                 || ThreadTypeEnum.ROBOT.name().equals(getType())
                 || ThreadTypeEnum.UNIFIED.name().equals(getType());
+    }
+
+    public Boolean isMember() {
+        return ThreadTypeEnum.MEMBER.name().equals(getType());
+    }
+
+    public Boolean isGroup() {
+        return ThreadTypeEnum.GROUP.name().equals(getType());
     }
 
     public Boolean isRobotType() {
@@ -256,6 +264,37 @@ public class ThreadEntity extends AbstractThreadEntity {
         int count = 0;
         for (MessageEntity message : messages) {
             if (message.isFromRobot()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // 未读消息数量
+    public Integer getUnreadCount() {
+        // 遍历消息列表，统计未读消息数量
+        int count = 0;
+        for (MessageEntity message : messages) {
+            if (isCustomerService() && message.isFromVisitor() && message.isUnread()) {
+                // 客服未读消息数量
+                count++;
+            } else if (isMember() && message.isFromMember() && message.isUnread()) {
+                // TODO: 成员未读消息数量，统计对方发送，且未读
+                count++;
+            } else if (isGroup() && message.isUnread()) {
+                // TODO: 群未读消息数量，统计群内其他成员发送，且未读
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // 访客未读消息数量
+    public Integer getVisitorUnreadCount() {
+        // 遍历消息列表，统计访客未读消息数量
+        int count = 0;
+        for (MessageEntity message : messages) {
+            if (message.isFromAgent() && message.isUnread()) {
                 count++;
             }
         }

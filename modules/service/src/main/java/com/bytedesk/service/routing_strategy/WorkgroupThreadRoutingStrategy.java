@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-28 07:35:17
+ * @LastEditTime: 2025-08-14 14:10:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -235,7 +235,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 未满则接待
         thread.setUserUid(agentEntity.getUid());
-        thread.setChatting().setContent(content).setUnreadCount(1);
+        thread.setChatting().setContent(content);//.setUnreadCount(1);
         // 
         // Only set owner if member exists
         if (agentEntity.getMember() != null) {
@@ -285,7 +285,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 进入排队队列
         thread.setUserUid(agentEntity.getUid());
-        thread.setQueuing().setContent(content).setUnreadCount(0);
+        thread.setQueuing().setContent(content);//.setUnreadCount(0);
         ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             throw new RuntimeException("Failed to save thread");
@@ -373,7 +373,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         // 更新线程状态
         thread.setUserUid(robotEntity.getUid());
-        thread.setRoboting().setContent(content).setUnreadCount(0);
+        thread.setRoboting().setContent(content);//.setUnreadCount(0);
         // 
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         thread.setRobot(robotString);

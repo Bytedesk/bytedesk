@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 13:04:55
+ * @LastEditTime: 2025-08-14 14:10:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,7 +100,7 @@ public class WorkflowThreadRoutingStrategy implements ThreadRoutingStrategy {
         log.info("routeWorkflow Enqueued to queue {}", queueMemberEntity.getUid());
 
         String content = "您好，请问有什么可以帮助您？";
-        thread.setChatting().setContent(content).setUnreadCount(0);
+        thread.setChatting().setContent(content);//.setUnreadCount(0);
         // 
         String workflowString = ConvertUtils.convertToUserProtobufString(workflowEntity);
         thread.setRobot(workflowString);

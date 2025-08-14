@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 17:19:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 14:24:38
+ * @LastEditTime: 2025-08-14 14:09:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -194,10 +194,10 @@ public class MessageUnreadRestService
         
         // 同步更新会话未读消息数
         try {
-            ThreadRequest threadRequest = ThreadRequest.builder()
-                    .uid(threadUid)
-                    .build();
-            threadRestService.increaseUnreadCount(threadRequest);
+            // ThreadRequest threadRequest = ThreadRequest.builder()
+            //         .uid(threadUid)
+            //         .build();
+            // threadRestService.increaseUnreadCount(threadRequest);
             log.info("thread unread count increased for thread: {}", threadUid);
         } catch (Exception e) {
             log.error("Failed to increase thread unread count for thread {}: {}", threadUid, e.getMessage(), e);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 13:39:02
+ * @LastEditTime: 2025-08-14 14:59:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -222,7 +222,7 @@ public class ThreadRestService
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.GROUP.name())
                 .topic(topic)
-                .unreadCount(0)
+                // .unreadCount(0)
                 .status(ThreadProcessStatusEnum.CHATTING.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .user(user)
@@ -273,7 +273,7 @@ public class ThreadRestService
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.ASSISTANT.name())
                 .topic(topic)
-                .unreadCount(0)
+                // .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
@@ -306,7 +306,7 @@ public class ThreadRestService
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.CHANNEL.name())
                 .topic(topic)
-                .unreadCount(0)
+                // .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .level(LevelEnum.USER.name())
@@ -336,7 +336,7 @@ public class ThreadRestService
         ThreadEntity thread = threadOptional.get();
         thread.setTop(threadRequest.getTop());
         thread.setUnread(threadRequest.getUnread());
-        thread.setUnreadCount(threadRequest.getUnreadCount());
+        // thread.setUnreadCount(threadRequest.getUnreadCount());
         thread.setMute(threadRequest.getMute());
         thread.setHide(threadRequest.getHide());
         thread.setStar(threadRequest.getStar());
@@ -499,45 +499,45 @@ public class ThreadRestService
         return convertToResponse(updateThread);
     }
 
-    public ThreadResponse updateUnreadCount(ThreadRequest threadRequest) {
-        if (!StringUtils.hasText(threadRequest.getUid())) {
-            throw new RuntimeException("thread uid is required");
-        }
-        //
-        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
-        if (!threadOptional.isPresent()) {
-            throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
-        }
-        //
-        ThreadEntity thread = threadOptional.get();
-        thread.setUnreadCount(threadRequest.getUnreadCount());
-        //
-        ThreadEntity updateThread = save(thread);
-        if (updateThread == null) {
-            throw new RuntimeException("thread save failed");
-        }
-        return convertToResponse(updateThread);
-    }
+    // public ThreadResponse updateUnreadCount(ThreadRequest threadRequest) {
+    //     if (!StringUtils.hasText(threadRequest.getUid())) {
+    //         throw new RuntimeException("thread uid is required");
+    //     }
+    //     //
+    //     Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+    //     if (!threadOptional.isPresent()) {
+    //         throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
+    //     }
+    //     //
+    //     ThreadEntity thread = threadOptional.get();
+    //     // thread.setUnreadCount(threadRequest.getUnreadCount());
+    //     //
+    //     ThreadEntity updateThread = save(thread);
+    //     if (updateThread == null) {
+    //         throw new RuntimeException("thread save failed");
+    //     }
+    //     return convertToResponse(updateThread);
+    // }
 
-    public ThreadResponse increaseUnreadCount(ThreadRequest threadRequest) {
-        if (!StringUtils.hasText(threadRequest.getUid())) {
-            throw new RuntimeException("thread uid is required");
-        }
-        //
-        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
-        if (!threadOptional.isPresent()) {
-            throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
-        }
-        //
-        ThreadEntity thread = threadOptional.get();
-        thread.setUnreadCount(threadRequest.getUnreadCount() + 1);
-        //
-        ThreadEntity updateThread = save(thread);
-        if (updateThread == null) {
-            throw new RuntimeException("thread save failed");
-        }
-        return convertToResponse(updateThread);
-    }
+    // public ThreadResponse increaseUnreadCount(ThreadRequest threadRequest) {
+    //     if (!StringUtils.hasText(threadRequest.getUid())) {
+    //         throw new RuntimeException("thread uid is required");
+    //     }
+    //     //
+    //     Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+    //     if (!threadOptional.isPresent()) {
+    //         throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
+    //     }
+    //     //
+    //     ThreadEntity thread = threadOptional.get();
+    //     thread.setUnreadCount(threadRequest.getUnreadCount() + 1);
+    //     //
+    //     ThreadEntity updateThread = save(thread);
+    //     if (updateThread == null) {
+    //         throw new RuntimeException("thread save failed");
+    //     }
+    //     return convertToResponse(updateThread);
+    // }
 
     // update unread
     public ThreadResponse updateUnread(ThreadRequest threadRequest) {
@@ -603,17 +603,24 @@ public class ThreadRestService
     }
 
     public ThreadResponse autoClose(ThreadEntity thread) {
+        UserEntity user = thread.getOwner();
         // log.info(thread.getUid() + "自动关闭");
         ThreadRequest threadRequest = ThreadRequest.builder()
                 .uid(thread.getUid())
                 .topic(thread.getTopic())
+                .userUid(user != null ? user.getUid() : null)
                 .autoClose(true)
                 .status(ThreadProcessStatusEnum.CLOSED.name())
                 .build();
-        return close(threadRequest);
+        return closeByUid(threadRequest);
     }
 
-    public ThreadResponse close(ThreadRequest request) {
+    public ThreadResponse closeByUid(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        if (user != null) {
+            request.setUserUid(user.getUid());
+        }
+        // 
         Optional<ThreadEntity> threadOptional = findByUid(request.getUid());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("close thread " + request.getUid() + " not found");
@@ -624,7 +631,7 @@ public class ThreadRestService
             throw new RuntimeException("thread " + thread.getUid() + " is already closed");
         }
         thread.setAutoClose(request.getAutoClose());
-        thread.setStatus(request.getStatus());
+        thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
         // 发布关闭消息, 通知用户
         String content = request.getAutoClose()
                 ? I18Consts.I18N_AUTO_CLOSED
@@ -790,7 +797,7 @@ public class ThreadRestService
                 log.info("latestEntity status: {}", latestEntity.getStatus());
 
                 // Preserve thread state flags
-                latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
+                // latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
                 latestEntity.setStar(entity.getStar() != null ? entity.getStar() : latestEntity.getStar());
                 latestEntity.setTop(entity.getTop() != null ? entity.getTop() : latestEntity.getTop());
                 latestEntity.setUnread(entity.getUnread() != null ? entity.getUnread() : latestEntity.getUnread());
@@ -934,39 +941,5 @@ public class ThreadRestService
         return excel;
     }
 
-    // 剪贴板会话：clipboard/{user_uid}
-    // public ThreadResponse createClipboardAssistantThread(UserEntity user) {
-    // //
-    // String topic = TopicUtils.getClipboardTopic(user.getUid());
-    // //
-    // Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(topic,
-    // user);
-    // if (threadOptional.isPresent()) {
-    // return convertToResponse(threadOptional.get());
-    // }
-    // // 剪贴助手用户信息，头像、昵称等
-    // UserProtobuf userSimple = UserUtils.getClipboardAssistantUser();
-    // ThreadEntity assistantThread = ThreadEntity.builder()
-    // .type(ThreadTypeEnum.ASSISTANT.name())
-    // .topic(topic)
-    // .unreadCount(0)
-    // .state(ThreadStateEnum.STARTED.name())
-    // .channel(ChannelEnum.SYSTEM.name())
-    // .user(JSON.toJSONString(userSimple))
-    // .owner(user)
-    // .build();
-    // assistantThread.setUid(uidUtils.getUid());
-    // if (StringUtils.hasText(user.getOrgUid())) {
-    // assistantThread.setOrgUid(user.getOrgUid());
-    // } else {
-    // assistantThread.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-    // }
-    // //
-    // ThreadEntity updateThread = save(assistantThread);
-    // if (updateThread == null) {
-    // throw new RuntimeException("thread save failed");
-    // }
-    // return convertToResponse(updateThread);
-    // }
 
 }

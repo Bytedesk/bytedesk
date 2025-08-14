@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 11:16:21
+ * @LastEditTime: 2025-08-14 14:18:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -52,6 +52,15 @@ public class MessageEntity extends AbstractMessageEntity {
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
     @JsonBackReference
     private ThreadEntity thread;
+
+    // 是否未读
+    public Boolean isUnread() {
+        if (MessageStatusEnum.SUCCESS.name().equals(getStatus()) 
+            || MessageStatusEnum.SENDING.name().equals(getStatus())) {
+            return true;
+        }
+        return false;
+    }
 
     // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
     public UserProtobuf getUserProtobuf() {

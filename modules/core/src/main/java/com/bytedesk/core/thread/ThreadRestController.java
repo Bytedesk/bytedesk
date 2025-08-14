@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 17:16:31
+ * @LastEditTime: 2025-08-14 14:59:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -281,14 +281,14 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
      * @param request 更新请求
      * @return 更新后的会话
      */
-    @Operation(summary = "更新会话未读数量", description = "更新会话的未读消息数量")
-    @PostMapping("/update/unread/count")
-    public ResponseEntity<?> updateUnreadCount(@RequestBody ThreadRequest request) {
+    // @Operation(summary = "更新会话未读数量", description = "更新会话的未读消息数量")
+    // @PostMapping("/update/unread/count")
+    // public ResponseEntity<?> updateUnreadCount(@RequestBody ThreadRequest request) {
 
-        ThreadResponse threadResponse = threadRestService.updateUnreadCount(request);
+    //     ThreadResponse threadResponse = threadRestService.updateUnreadCount(request);
 
-        return ResponseEntity.ok(JsonResult.success(threadResponse));
-    }
+    //     return ResponseEntity.ok(JsonResult.success(threadResponse));
+    // }
 
     /**
      * 根据用户UID查询所有会话
@@ -326,9 +326,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/close")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
 
-        request.setAutoClose(false);
-        request.setStatus(ThreadProcessStatusEnum.CLOSED.name());
-        ThreadResponse threadResponse = threadRestService.close(request);
+        ThreadResponse threadResponse = threadRestService.closeByUid(request);
         // 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
@@ -338,8 +336,6 @@ public class ThreadRestController extends BaseRestController<ThreadRequest> {
     @PostMapping("/close/topic")
     public ResponseEntity<?> closeByTopic(@RequestBody ThreadRequest request) {
         
-        request.setAutoClose(false);
-        request.setStatus(ThreadProcessStatusEnum.CLOSED.name());
         ThreadResponse threadResponse = threadRestService.closeByTopic(request);
         if (threadResponse == null) {
             return ResponseEntity.ok(JsonResult.error("not found"));

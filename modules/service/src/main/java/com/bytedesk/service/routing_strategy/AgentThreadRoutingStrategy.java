@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 14:46:23
+ * @LastEditTime: 2025-08-14 14:10:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -156,7 +156,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = "您好，请问有什么可以帮助您？";
         }
         ThreadEntity thread = threadOptional.get();
-        thread.setChatting().setContent(content).setUnreadCount(1);
+        thread.setChatting().setContent(content);//.setUnreadCount(1);
         ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
@@ -195,7 +195,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
             content = " 当前排队人数：" + queuingCount + " 大约等待时间：" + queuingCount * 2 + "  分钟";
         }
         // 进入排队队列
-        thread.setQueuing().setUnreadCount(0).setContent(content);
+        thread.setQueuing().setContent(content); // .setUnreadCount(0)
         ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
@@ -223,7 +223,7 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         }
         ThreadEntity thread = threadOptional.get();
         // 客服离线或小休不接待状态，则进入留言
-        thread.setOffline().setUnreadCount(0).setContent(content);
+        thread.setOffline().setContent(content); // .setUnreadCount(0)
         ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {
             log.error("Failed to save thread {}", thread.getUid());
