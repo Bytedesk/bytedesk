@@ -15,6 +15,7 @@ package com.bytedesk.core.message;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -215,6 +216,91 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         messageExcel.setContent(entity.getContent());
         messageExcel.setSender(entity.getUserProtobuf().getNickname());
         return messageExcel;
+    }
+
+    /**
+     * 标记消息为已读
+     * 
+     * @param messageUid 消息UID
+     * @return 更新后的消息响应
+     */
+    @CachePut(value = "message", key = "#messageUid")
+    public MessageResponse markAsRead(String messageUid) {
+        // 获取当前用户信息
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("login required");
+        }
+
+        // 查找消息
+        Optional<MessageEntity> messageOptional = findByUid(messageUid);
+        if (!messageOptional.isPresent()) {
+            throw new NotFoundException("Message not found");
+        }
+
+        MessageEntity message = messageOptional.get();
+        
+        // 检查消息是否已经是已读状态
+        if (MessageStatusEnum.READ.name().equals(message.getStatus())) {
+            log.debug("Message {} is already marked as read", messageUid);
+            return convertToResponse(message);
+        }
+
+        // 更新消息状态为已读
+        message.setStatus(MessageStatusEnum.READ.name());
+        
+        // 保存更新后的消息
+        MessageEntity savedMessage = save(message);
+        if (savedMessage == null) {
+            throw new RuntimeException("Failed to mark message as read");
+        }
+
+        log.debug("Message {} marked as read successfully", messageUid);
+        return convertToResponse(savedMessage);
+    }
+
+    /**
+     * 批量标记会话中所有消息为已读
+     * 
+     * @param threadUid 会话UID
+     * @return 更新的消息数量
+     */
+    @CacheEvict(value = "message", allEntries = true)
+    public Integer markThreadAsRead(String threadUid) {
+        // 获取当前用户信息
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("login required");
+        }
+
+        // 查找会话中所有未读消息
+        List<MessageEntity> unreadMessages = messageRepository.findByThread_UidAndStatusInOrderByCreatedAtAsc(
+            threadUid, 
+            Arrays.asList(
+                MessageStatusEnum.SENDING.name(),
+                MessageStatusEnum.SUCCESS.name(),
+                MessageStatusEnum.DELIVERED.name()
+            )
+        );
+
+        if (unreadMessages.isEmpty()) {
+            log.debug("No unread messages found in thread {}", threadUid);
+            return 0;
+        }
+
+        // 批量更新消息状态为已读
+        int updatedCount = 0;
+        for (MessageEntity message : unreadMessages) {
+            // 检查消息是否已经是已读状态（双重检查）
+            if (!MessageStatusEnum.READ.name().equals(message.getStatus())) {
+                message.setStatus(MessageStatusEnum.READ.name());
+                save(message);
+                updatedCount++;
+            }
+        }
+
+        log.debug("Marked {} messages as read in thread {}", updatedCount, threadUid);
+        return updatedCount;
     }
 
 }

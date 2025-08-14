@@ -48,5 +48,14 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             @Param("type") String type, 
             @Param("userUid") String userUid);
 
+    /**
+     * 根据会话UID和状态列表查询消息，按创建时间升序排列
+     * 
+     * @param threadUid 会话UID
+     * @param statuses 状态列表
+     * @return 消息列表
+     */
+    List<MessageEntity> findByThread_UidAndStatusInOrderByCreatedAtAsc(String threadUid, List<String> statuses);
+
     boolean existsByUid(String uid);
 }

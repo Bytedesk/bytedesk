@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 15:28:46
+ * @LastEditTime: 2025-08-14 17:06:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,7 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,7 +98,7 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     }
 
     /**
-     * 查询未读消息
+     * 客服端-根据会话topic-查询未读消息
      * 
      * @param request 查询请求
      * @return 未读消息列表
@@ -196,7 +197,6 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     @Operation(summary = "发送离线消息", description = "当客户端长连接断开时，通过REST接口发送消息")
     @PostMapping("/rest/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
-
         String json = (String) map.get("json");
         log.debug("json {}", json);
         messageSendService.sendJsonMessage(json);
@@ -223,6 +223,36 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
             "消息",
             "Message"
         );
+    }
+
+    /**
+     * 标记消息为已读
+     * 
+     * @param messageUid 消息UID
+     * @return 更新后的消息
+     */
+    @Operation(summary = "标记消息为已读", description = "将指定消息的状态更新为已读")
+    @PostMapping("/{messageUid}/read")
+    public ResponseEntity<?> markAsRead(@PathVariable String messageUid) {
+        
+        MessageResponse response = messageRestService.markAsRead(messageUid);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 批量标记会话中所有消息为已读
+     * 
+     * @param threadUid 会话UID
+     * @return 更新的消息数量
+     */
+    @Operation(summary = "批量标记会话消息为已读", description = "将会话中所有未读消息的状态更新为已读")
+    @PostMapping("/thread/{threadUid}/read")
+    public ResponseEntity<?> markThreadAsRead(@PathVariable String threadUid) {
+        
+        Integer updatedCount = messageRestService.markThreadAsRead(threadUid);
+        //
+        return ResponseEntity.ok(JsonResult.success(updatedCount));
     }
 
     
