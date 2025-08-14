@@ -34,6 +34,8 @@ public interface CallCdrRepository extends JpaRepository<CallCdrEntity, Long>, J
      */
     Optional<CallCdrEntity> findByUid(String uid);
 
+    List<CallCdrEntity> findByOrgUid(String orgUid);
+
     /**
      * 根据主叫号码查找CDR记录
      */

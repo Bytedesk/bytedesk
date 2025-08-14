@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 17:16:06
+ * @LastEditTime: 2025-08-14 07:20:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -635,7 +635,8 @@ public class ThreadRestService
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-        if (Boolean.TRUE.equals(request.getUnsubscribe())) {
+        if (Boolean.TRUE.equals(request.getUnsubscribe()) 
+            || Boolean.TRUE.equals(request.getAutoClose())) {
             TopicRequest topicRequest = TopicRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())

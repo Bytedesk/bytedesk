@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:16:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-10 12:31:00
+ * @LastEditTime: 2025-08-14 08:45:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,6 +85,18 @@ public abstract class BaseRestController<T> {
      */
     @PostMapping("/delete")
     abstract public ResponseEntity<?> delete(@RequestBody T request);
+
+    /**
+     * delete by org uid
+     *
+     * @param request role
+     * @return json
+     */
+    @PostMapping("/delete/org")
+    public ResponseEntity<?> deleteByOrgUid(@RequestBody T request) {
+        // 默认实现，子类可以覆盖
+        throw new UnsupportedOperationException("Method deleteByOrgUid needs to be implemented in child class");
+    }
 
     /**
      * 通用导出Excel模板方法

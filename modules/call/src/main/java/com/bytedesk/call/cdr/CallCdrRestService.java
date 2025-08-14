@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 17:25:44
+ * @LastEditTime: 2025-08-14 09:35:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.call.cdr;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -25,8 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -48,65 +48,63 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
     private final AuthService authService;
 
     @Override
-    public Page<CallCdrResponse> queryByOrg(CallCdrRequest request) {
-        return queryByOrgEntity(request).map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<CallCdrResponse> queryByUser(CallCdrRequest request) {
-        return queryByUserEntity(request).map(this::convertToResponse);
-    }
-
-    @Override
     public Page<CallCdrEntity> queryByOrgEntity(CallCdrRequest request) {
         Pageable pageable = request.getPageable();
         Specification<CallCdrEntity> specification = CallCdrSpecification.search(request);
         return callCdrRepository.findAll(specification, pageable);
     }
 
-    public Page<CallCdrEntity> queryByUserEntity(CallCdrRequest request) {
-
-        UserEntity user = authService.getUser();
-        request.setOrgUid(user.getOrgUid());
-
-        return queryByOrgEntity(request);
+    @Override
+    public Page<CallCdrResponse> queryByOrg(CallCdrRequest request) {
+        Page<CallCdrEntity> page = queryByOrgEntity(request);
+        return page.map(this::convertToResponse);
     }
 
+    @Override
+    public Page<CallCdrResponse> queryByUser(CallCdrRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("login required");
+        }
+        request.setUserUid(user.getUid());
+        //
+        return queryByOrg(request);
+    }
+    
+    @Override
+    @Cacheable(value = "freeswitch_cdr", key = "#uid", unless = "#result == null")
+    public CallCdrResponse queryByUid(CallCdrRequest request) {
+        Optional<CallCdrEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
+        }
+        throw new RuntimeException("Call CDR不存在");
+    }
+
+    @Cacheable(value = "freeswitch_cdr", key = "#uid", unless = "#result == null")
     @Override
     public Optional<CallCdrEntity> findByUid(String uid) {
         return callCdrRepository.findByUid(uid);
     }
-
+    @Cacheable(value = "freeswitch_cdr_org", key = "#orgUid", unless = "#result == null")
     @Override
-    public CallCdrResponse convertToResponse(CallCdrEntity entity) {
-        return modelMapper.map(entity, CallCdrResponse.class);
-    }
-
-    public CallCdrEntity convertToEntity(CallCdrRequest request) {
-        return modelMapper.map(request, CallCdrEntity.class);
-    }
-
-    @Override
-    public CallCdrExcel convertToExcel(CallCdrEntity entity) {
-        return modelMapper.map(entity, CallCdrExcel.class);
+    public List<CallCdrEntity> findByOrgUid(String orgUid) {
+        return callCdrRepository.findByOrgUid(orgUid);
     }
 
     @Override
     public CallCdrResponse create(CallCdrRequest request) {
-
         UserEntity user = authService.getUser();
         if (!StringUtils.hasText(request.getOrgUid())) {
             request.setOrgUid(user.getOrgUid());
         }
         
         if (!StringUtils.hasText(request.getUid())) {
-            request.setUid(uidUtils.getCacheSerialUid());
+            request.setUid(uidUtils.getUid());
         }
 
-        CallCdrEntity entity = convertToEntity(request);
-        entity.setLevel(LevelEnum.PLATFORM.name());
-        entity.setPlatform(BytedeskConsts.PLATFORM_BYTEDESK);
-
+        CallCdrEntity entity = modelMapper.map(request, CallCdrEntity.class);
+        // 
         CallCdrEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("创建Call CDR失败");
@@ -117,7 +115,6 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
 
     @Override
     public CallCdrResponse update(CallCdrRequest request) {
-
         Optional<CallCdrEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
             throw new RuntimeException("Call CDR不存在");
@@ -137,17 +134,28 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
     }
 
     @Override
-    public CallCdrEntity save(CallCdrEntity entity) {
-        try {
-            return callCdrRepository.save(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
+    public CallCdrEntity doSave(CallCdrEntity entity) {
+        return callCdrRepository.save(entity);
     }
 
     @Override
-    public CallCdrEntity doSave(CallCdrEntity entity) {
-        return callCdrRepository.save(entity);
+    public void deleteByUid(String uid) {
+        Optional<CallCdrEntity> optional = findByUid(uid);
+        optional.ifPresent(entity -> {
+            entity.setDeleted(true);
+            save(entity);
+        });
+    }
+    
+    @Override
+    public void deleteByOrgUid(String orgUid) {
+        List<CallCdrEntity> entities = findByOrgUid(orgUid);
+        if (entities != null && !entities.isEmpty()) {
+            entities.forEach(entity -> {
+                entity.setDeleted(true);
+                save(entity);
+            });
+        }
     }
 
     @Override
@@ -169,33 +177,15 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
         }
         return null;
     }
-
+    
     @Override
-    public void deleteByUid(String uid) {
-        Optional<CallCdrEntity> optional = findByUid(uid);
-        optional.ifPresent(entity -> {
-            entity.setDeleted(true);
-            save(entity);
-        });
+    public CallCdrResponse convertToResponse(CallCdrEntity entity) {
+        return modelMapper.map(entity, CallCdrResponse.class);
     }
 
     @Override
-    @Cacheable(value = "freeswitch_cdr", key = "#uid", unless = "#result == null")
-    public CallCdrResponse queryByUid(CallCdrRequest request) {
-        Optional<CallCdrEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        }
-        throw new RuntimeException("Call CDR不存在");
+    public CallCdrExcel convertToExcel(CallCdrEntity entity) {
+        return modelMapper.map(entity, CallCdrExcel.class);
     }
-
-    // 业务方法
-    // public Page<CallCdrEntity> findByCallerNumber(String callerNumber, Pageable pageable) {
-    //     return freeSwitchCdrRepository.findByCallerIdNumber(callerNumber, pageable);
-    // }
-
-    // public Page<CallCdrEntity> findByDestinationNumber(String destinationNumber, Pageable pageable) {
-    //     return freeSwitchCdrRepository.findByDestinationNumber(destinationNumber, pageable);
-    // }
 
 }

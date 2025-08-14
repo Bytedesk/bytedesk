@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 12:56:36
+ * @LastEditTime: 2025-08-13 23:42:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -290,7 +290,6 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    
     public VisitorThreadEntity update(ThreadEntity thread) {
         Optional<VisitorThreadEntity> visitorThreadOpt = findByUid(thread.getUid());
         if (visitorThreadOpt.isPresent()) {
@@ -335,10 +334,7 @@ public class VisitorThreadService
             }
             // 转换为分钟
             long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-            // log.info("before autoCloseThread threadUid {} threadType {} threadId {}
-            // diffInMinutes {}", thread.getUid(), thread.getType(),
-            // thread.getUid(),diffInMinutes);
-            
+
             // 添加空值检查，防止 NullPointerException
             ServiceSettingsResponseVisitor settings = null;
             if (StringUtils.hasText(thread.getExtra())) {
