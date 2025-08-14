@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:54:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 13:08:45
+ * @LastEditTime: 2025-08-14 13:13:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,11 +31,8 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Session;
 import lombok.RequiredArgsConstructor;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import lombok.extern.slf4j.Slf4j;
-import jakarta.annotation.PostConstruct;
 
 // http://localhost:8161/console/auth/login
 // https://spring.io/guides/gs/messaging-jms
