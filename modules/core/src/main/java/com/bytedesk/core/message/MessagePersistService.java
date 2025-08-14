@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 13:12:22
+ * @LastEditTime: 2025-08-14 22:56:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,37 +38,33 @@ public class MessagePersistService {
     private final ModelMapper modelMapper;
 
     public void persist(String messageJSON) {
-        // log.info("persist: {}", messageJSON);
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJSON); 
-        //
+        
         MessageTypeEnum type = messageProtobuf.getType();
         String threadUid = messageProtobuf.getThread().getUid();
-        // String threadTopic = messageProtobuf.getThread().getTopic();
-        // log.info("orgUid: {}", orgUid);
 
         // 返回true表示该消息是系统通知，不应该保存到数据库
         if (dealWithMessageNotification(type, messageProtobuf)) {
             return;
         }
-        //
+        
         String uid = messageProtobuf.getUid();
         if (messageRestService.existsByUid(uid)) {
             // 流式消息单独处理下
             if (MessageTypeEnum.STREAM.equals(type)) {
                 // 更新消息内容
-                Optional<MessageEntity> message = messageRestService.findByUid(uid);
-                if (message.isPresent()) {
-                    MessageEntity m = message.get();
-                    m.setContent(m.getContent() + messageProtobuf.getContent());
-                    messageRestService.save(m);
+                Optional<MessageEntity> messageOpt = messageRestService.findByUid(uid);
+                if (messageOpt.isPresent()) {
+                    MessageEntity message = messageOpt.get();
+                    message.setContent(message.getContent() + messageProtobuf.getContent());
+                    messageRestService.save(message);
                 }
                 return;
             }
             log.info("message already exists, uid: {}， type: {}, content: {}", uid, type, messageProtobuf.getContent());
-            //
             return;
         }
-        //
+        
         MessageEntity message = modelMapper.map(messageProtobuf, MessageEntity.class);
         if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
             message.setStatus(MessageStatusEnum.SUCCESS.name());
@@ -89,7 +85,7 @@ public class MessagePersistService {
         }
         message.setUser(messageProtobuf.getUser().toJson());
         message.setUserUid(messageProtobuf.getUser().getUid());
-        // 
+        
         MessageExtra extraObject = MessageExtra.fromJson(messageProtobuf.getExtra()); 
         if (extraObject != null) {
             String orgUid = extraObject.getOrgUid();
@@ -103,15 +99,11 @@ public class MessagePersistService {
         // String content = messageProtobuf.getContent();
         // log.info("dealWithMessageNotification: {}, {}", type, content);
 
-        // 正在输入/消息预知 - 不保存
+        // 不需要保存的消息类型
         if (MessageTypeEnum.TYPING.equals(type)
                 || MessageTypeEnum.PROCESSING.equals(type)
-                || MessageTypeEnum.PREVIEW.equals(type)) {
-            return true;
-        }
-
-        // 继续会话 - 不保存
-        if (MessageTypeEnum.CONTINUE.equals(type)) {
+                || MessageTypeEnum.PREVIEW.equals(type)
+                || MessageTypeEnum.CONTINUE.equals(type)) {
             return true;
         }
 
@@ -121,14 +113,8 @@ public class MessagePersistService {
             return true;
         }
 
-        // 消息送达回执 - 处理
-        if (MessageTypeEnum.DELIVERED.equals(type)) {
-            dealWithMessageReceipt(type, messageProtobuf);
-            return true;
-        }
-
-        // 消息已读回执 - 处理
-        if (MessageTypeEnum.READ.equals(type)) {
+        // 消息回执处理（送达/已读）
+        if (MessageTypeEnum.DELIVERED.equals(type) || MessageTypeEnum.READ.equals(type)) {
             dealWithMessageReceipt(type, messageProtobuf);
             return true;
         }
@@ -142,13 +128,10 @@ public class MessagePersistService {
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止delivered在后面更新read消息
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
-        if (messageOpt.isPresent() && messageOpt.get().getStatus() != MessageStatusEnum.READ.name()) {
+        if (messageOpt.isPresent() && !MessageStatusEnum.READ.name().equals(messageOpt.get().getStatus())) {
             MessageEntity messageEntity = messageOpt.get();
-            if (MessageTypeEnum.READ.equals(type)) {
-                messageEntity.setStatus(MessageStatusEnum.READ.name());
-            } else if (MessageTypeEnum.DELIVERED.equals(type)) {
-                messageEntity.setStatus(MessageStatusEnum.DELIVERED.name());
-            }
+            // 直接设置状态，避免重复判断
+            messageEntity.setStatus(type.name());
             messageRestService.save(messageEntity);
         }
     }
