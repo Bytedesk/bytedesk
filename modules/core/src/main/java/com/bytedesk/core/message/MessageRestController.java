@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 18:22:26
+ * @LastEditTime: 2025-08-14 15:28:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,6 +92,21 @@ public class MessageRestController extends BaseRestController<MessageRequest> {
     public ResponseEntity<?> queryByUid(MessageRequest request) {
         
         MessageResponse response = messageRestService.queryByUid(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 查询未读消息
+     * 
+     * @param request 查询请求
+     * @return 未读消息列表
+     */
+    @Operation(summary = "查询未读消息", description = "查询未读消息")
+    @GetMapping("/unread")
+    public ResponseEntity<?> queryUnread(MessageRequest request) {
+
+        Page<MessageResponse> response = messageRestService.queryUnread(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
     }

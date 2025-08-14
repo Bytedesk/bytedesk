@@ -55,8 +55,9 @@ public class MessageEntity extends AbstractMessageEntity {
 
     // 是否未读
     public Boolean isUnread() {
-        if (MessageStatusEnum.SUCCESS.name().equals(getStatus()) 
-            || MessageStatusEnum.SENDING.name().equals(getStatus())) {
+        if (MessageStatusEnum.SENDING.name().equals(getStatus()) 
+            || MessageStatusEnum.SUCCESS.name().equals(getStatus())
+            || MessageStatusEnum.DELIVERED.name().equals(getStatus())) {
             return true;
         }
         return false;

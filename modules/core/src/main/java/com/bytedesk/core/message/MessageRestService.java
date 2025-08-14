@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 18:18:16
+ * @LastEditTime: 2025-08-14 15:43:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.message;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.exception.NotFoundException;
@@ -82,6 +84,28 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         }
         return convertToResponse(optional.get());
     }
+
+    /**
+     * 根据 topic 查询未读消息
+     * 参考 ThreadEntity.getUnreadCount 的逻辑
+     */
+    public Page<MessageResponse> queryUnread(MessageRequest request) {
+        // 获取当前用户信息
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("login required");
+        }
+        request.setUserUid(user.getUid());
+        
+        // 使用 MessageSpecification.searchUnread 查询未读消息
+        Pageable pageable = request.getPageable();
+        Specification<MessageEntity> specs = MessageSpecification.searchUnread(request, user);
+        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
+        
+        return messagePage.map(this::convertToResponse);
+    }
+
+
 
     @Cacheable(value = "message", key = "#uid", unless = "#result == null")
     public Optional<MessageEntity> findByUid(String uid) {
