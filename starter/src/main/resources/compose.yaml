@@ -62,7 +62,31 @@ services:
       - ARTEMIS_USER=admin
       - ARTEMIS_PASSWORD=admin
       - ANONYMOUS_LOGIN=false
-      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia
+      # 基础配置
+      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia --global-max-size 100MB --journal-type NIO
+      # 地址策略配置 - 解决阻塞问题
+      - ARTEMIS_ADDRESS_FULL_POLICY=PAGE
+      - ARTEMIS_MAX_SIZE_BYTES=52428800
+      - ARTEMIS_PAGE_SIZE_BYTES=1048576
+      - ARTEMIS_PAGE_MAX_CACHE_SIZE=20
+      - ARTEMIS_AUTO_CREATE_QUEUES=true
+      - ARTEMIS_AUTO_CREATE_ADDRESSES=true
+      - ARTEMIS_AUTO_DELETE_QUEUES=false
+      - ARTEMIS_AUTO_DELETE_ADDRESSES=false
+      - ARTEMIS_MAX_REDELIVERY_ATTEMPTS=3
+      - ARTEMIS_REDELIVERY_DELAY=0
+      - ARTEMIS_MAX_REDELIVERY_DELAY=60000
+      - ARTEMIS_REDELIVERY_DELAY_MULTIPLIER=2
+      # 缓冲区配置
+      - ARTEMIS_TCP_SEND_BUFFER_SIZE=1048576
+      - ARTEMIS_TCP_RECEIVE_BUFFER_SIZE=1048576
+      # AMQP配置
+      - ARTEMIS_AMQP_CREDITS=1000
+      - ARTEMIS_AMQP_LOW_CREDITS=300
+      # 性能优化
+      - ARTEMIS_USE_EPOLL=true
+      - ARTEMIS_MAX_CONSUMERS=-1
+      - ARTEMIS_EXPIRY_DELAY=3600000
     ports:
       - "16161:61616"   # JMS
       - "16162:61617"   # AMQP

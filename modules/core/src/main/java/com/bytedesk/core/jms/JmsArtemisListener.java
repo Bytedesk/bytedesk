@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
-import jakarta.jms.JMSException;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -52,16 +51,14 @@ public class JmsArtemisListener {
 	// topic pub sub
 	// @TabooJsonFilter(title = "敏感词", action = "JmsArtemisListener")
 	@JmsListener(destination = JmsArtemisConstants.TOPIC_STRING_NAME, containerFactory = "jmsArtemisPubsubFactory")
-	public void receiveTopicMessage(String json, jakarta.jms.Message message) throws JMSException {
+	public void receiveTopicMessage(String json) {
 		try {
-			log.info("JmsArtemisListener receiveTopicMessage string {}", json);
+			log.debug("JmsArtemisListener receiveTopicMessage string {}", json);
 			BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
 			bytedeskEventPublisher.publishMessageJsonEvent(json);
-			// 处理成功后，显式确认消息已被消费
-			message.acknowledge();
 		} catch (Exception e) {
 			log.error("JmsArtemisListener 处理Topic消息失败: {}", e.getMessage(), e);
-			throw e; // 重新抛出异常，让错误处理器处理
+			// 不再重新抛出异常，避免阻塞消息队列
 		}
 	}
 
