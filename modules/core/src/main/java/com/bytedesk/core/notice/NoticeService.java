@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 11:22:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-15 13:36:26
+ * @LastEditTime: 2025-08-15 21:24:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,8 +50,7 @@ public class NoticeService {
         if (threadOptional.isPresent()) {
             ThreadEntity thread = threadOptional.get();
             // send notice message
-            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread.toProtobuf(),
-                    request.getOrgUid(), jsonContent);
+            MessageProtobuf message = MessageUtils.createNoticeMessage(uidUtils.getUid(), thread.toProtobuf(), request.getOrgUid(), jsonContent);
             messageSendService.sendProtobufMessage(message);
         }
     }
