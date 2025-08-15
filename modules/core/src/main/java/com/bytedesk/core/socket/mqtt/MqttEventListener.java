@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 10:44:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-16 07:45:19
+ * @LastEditTime: 2025-08-16 07:07:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,7 @@ import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 import com.bytedesk.core.topic.TopicCacheService;
-import com.bytedesk.core.topic.TopicService;
+import com.bytedesk.core.topic.TopicRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MqttEventListener {
 
-    private final TopicService topicService;
+    private final TopicRestService topicRestService;
 
     private final TopicCacheService topicCacheService;
 
@@ -61,7 +61,7 @@ public class MqttEventListener {
     public void onMqttSubscribeEvent(MqttSubscribeEvent event) {
         log.info("topic onMqttSubscribeEvent {}", event);
         //
-        topicService.subscribe(event.getTopic(), event.getClientId());
+        topicRestService.subscribe(event.getTopic(), event.getClientId());
     }
 
     @EventListener

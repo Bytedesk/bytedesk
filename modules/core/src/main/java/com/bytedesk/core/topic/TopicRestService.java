@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 11:16:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 15:52:46
+ * @LastEditTime: 2025-08-16 07:11:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -102,6 +102,14 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     public Boolean existsByUid(String uid) {
         return topicRepository.existsByUid(uid);
+    }
+
+    public void create(String topic, String userUid) {
+        TopicRequest request = TopicRequest.builder()
+                .topic(topic)
+                .userUid(userUid)
+                .build();
+        create(request);
     }
 
     @Transactional

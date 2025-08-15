@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.constant.RedisConsts;
+
 // https://redis.io/docs/latest/develop/data-types/streams/
 @Service
 public class RedisService {

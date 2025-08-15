@@ -14,7 +14,7 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.redis.RedisConsts;
+import com.bytedesk.core.constant.RedisConsts;
 
 public class RobotConsts {
   private RobotConsts() {

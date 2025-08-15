@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-28 13:32:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 17:49:19
+ * @LastEditTime: 2025-08-16 07:08:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,7 +25,6 @@ import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicRestService;
-import com.bytedesk.core.topic.TopicService;
 import com.bytedesk.core.topic.TopicUtils;
 
 import lombok.AllArgsConstructor;
@@ -35,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class ThreadEventListener {
-
-    private final TopicService topicService;
 
     private final TopicCacheService topicCacheService;
 
@@ -68,7 +65,7 @@ public class ThreadEventListener {
                     .build();
             request.getTopics().add(topic);
             request.getTopics().add(topicInternal);
-            topicService.create(request);
+            topicRestService.create(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
@@ -99,7 +96,7 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            topicService.create(request);
+            topicRestService.create(request);
         } else if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             // 工作组会话，需要订阅topic
             // 重新订阅
@@ -107,14 +104,14 @@ public class ThreadEventListener {
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            topicService.create(request);
+            topicRestService.create(request);
         } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
             // 会员会话，需要订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            topicService.create(request);
+            topicRestService.create(request);
         } else {
             // 文件助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()

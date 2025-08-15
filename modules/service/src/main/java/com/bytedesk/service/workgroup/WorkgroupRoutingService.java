@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.redis.RedisConsts;
+import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;

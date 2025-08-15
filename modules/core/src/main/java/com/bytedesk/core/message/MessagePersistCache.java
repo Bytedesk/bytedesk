@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.redis.RedisConsts;
+import com.bytedesk.core.constant.RedisConsts;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;

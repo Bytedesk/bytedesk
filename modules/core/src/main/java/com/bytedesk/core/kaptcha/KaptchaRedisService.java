@@ -20,8 +20,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.enums.ChannelEnum;
-import com.bytedesk.core.redis.RedisConsts;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

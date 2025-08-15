@@ -2,7 +2,7 @@
  * @Author: import java.util.HashSet;
  * @Date: 2024-05-29 15:11:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 17:49:06
+ * @LastEditTime: 2025-08-16 07:09:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TopicEventListener {
 
-    private final TopicService topicService;
+    private final TopicRestService topicRestService;
 
     private final TopicCacheService topicCacheService;
 
@@ -66,14 +66,14 @@ public class TopicEventListener {
             topicRequestList.forEach(item -> {
                 // log.info("topic onQuartzFiveSecondEvent {}", item);
                 TopicRequest topicRequest = JSON.parseObject(item, TopicRequest.class);
-                topicService.create(topicRequest);
+                topicRestService.create(topicRequest);
             });
         }
         List<String> clientIdList = topicCacheService.getClientIdList();
         if (clientIdList!= null) {
             clientIdList.forEach(item -> {
                 // log.info("topic onQuartzFiveSecondEvent {}", item);
-                topicService.addClientId(item);
+                topicRestService.addClientId(item);
             });
         }
     }
@@ -110,7 +110,7 @@ public class TopicEventListener {
         log.info("topic onQuartzDay0Event: 开始清理已结束的会话topics");
         
         // 获取所有的 TopicEntity
-        List<TopicEntity> allTopics = topicService.findAll();
+        List<TopicEntity> allTopics = topicRestService.findAll();
         
         for (TopicEntity topicEntity : allTopics) {
             Set<String> topics = topicEntity.getTopics();
@@ -144,7 +144,7 @@ public class TopicEventListener {
             
             // 从topics集合中移除符合条件的topic
             for (String topicToRemove : topicsToRemove) {
-                topicService.remove(topicToRemove, topicEntity.getUserUid());
+                topicRestService.remove(topicToRemove, topicEntity.getUserUid());
                 log.info("成功删除topic: {} 从 userUid: {}", topicToRemove, topicEntity.getUserUid());
             }
         }

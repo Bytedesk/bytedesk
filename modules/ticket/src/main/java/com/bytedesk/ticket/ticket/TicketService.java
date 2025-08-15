@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-29 12:24:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:49:33
+ * @LastEditTime: 2025-08-16 07:11:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.topic.TopicService;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
@@ -63,11 +63,10 @@ public class TicketService {
 
     private final RuntimeService runtimeService;
     private final TaskService taskService;
-    // private final TicketRepository ticketRepository;
     private final HistoryService historyService;
     private final MemberRestService memberRestService;
     private final ThreadRestService threadRestService;
-    private final TopicService topicService;
+    private final TopicRestService topicRestService;
     private final TicketRestService ticketRestService;
 
     /**
@@ -180,7 +179,7 @@ public class TicketService {
                 threadRestService.save(thread);
                 // 添加订阅
                 String userUid = member.getUser().getUid();
-                topicService.create(thread.getTopic(), userUid);
+                topicRestService.create(thread.getTopic(), userUid);
             }
 
             // 6. 发布工单分配消息事件

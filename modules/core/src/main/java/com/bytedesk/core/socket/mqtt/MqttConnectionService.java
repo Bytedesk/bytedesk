@@ -21,7 +21,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.redis.RedisConsts;
+import com.bytedesk.core.constant.RedisConsts;
 
 import lombok.AllArgsConstructor;
 
