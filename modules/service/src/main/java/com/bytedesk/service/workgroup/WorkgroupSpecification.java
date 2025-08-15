@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkgroupSpecification extends BaseSpecification<WorkgroupEntity, WorkgroupRequest> {
 
     public static Specification<WorkgroupEntity> search(WorkgroupRequest request, AuthService authService) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
