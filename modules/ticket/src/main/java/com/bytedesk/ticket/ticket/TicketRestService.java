@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-05 11:03:20
+ * @LastEditTime: 2025-08-15 10:45:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -308,7 +308,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.TICKET.name())
-                .unreadCount(0)
+                // .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .topic(topic)
                 .hide(true) // 默认隐藏
