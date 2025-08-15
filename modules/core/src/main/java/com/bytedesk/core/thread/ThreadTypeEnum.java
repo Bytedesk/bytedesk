@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-29 16:32:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 09:07:01
+ * @LastEditTime: 2025-08-15 11:20:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,8 +24,8 @@ public enum ThreadTypeEnum {
     MEMBER(3), // 组织成员对话
     GROUP(4), // 群组对话
     FEEDBACK(6), // 意见反馈
-    ASSISTANT(7), // 助理
-    CHANNEL(8), // 渠道对话
+    ASSISTANT(7), // 助理，包括文件助理、剪贴板助理
+    CHANNEL(8), // 渠道对话，包括系统通知、订阅号、服务号，NoticeAccountTypeEnum
     LOCAL(9), // 本地对话
     FRIEND(10), // 好友对话
     TICKET(11), // 工单对话

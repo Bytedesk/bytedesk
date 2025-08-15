@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 16:33:59
+ * @LastEditTime: 2025-08-15 11:20:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -112,6 +112,16 @@ public class ThreadEntity extends AbstractThreadEntity {
                 || ThreadTypeEnum.WORKGROUP.name().equals(getType())
                 || ThreadTypeEnum.ROBOT.name().equals(getType())
                 || ThreadTypeEnum.UNIFIED.name().equals(getType());
+    }
+
+    // 渠道对话，包括系统通知、订阅号、服务号，NoticeAccountTypeEnum
+    public Boolean isNoticeAccount() {
+        return ThreadTypeEnum.CHANNEL.name().equals(getType());
+    }
+
+    // isAssistant
+    public Boolean isAssistant() {
+        return ThreadTypeEnum.ASSISTANT.name().equals(getType());
     }
 
     public Boolean isMember() {
@@ -277,6 +287,12 @@ public class ThreadEntity extends AbstractThreadEntity {
         for (MessageEntity message : messages) {
             if (isCustomerService() && message.isFromVisitor() && message.isUnread()) {
                 // 客服未读消息数量
+                count++;
+            } else if (isNoticeAccount() && message.isUnread()) {
+                // 渠道未读消息数量
+                count++;
+            } else if (isAssistant() && message.isUnread()) {
+                // 助理未读消息数量
                 count++;
             } else if (isMember() && message.isFromMember() && message.isUnread()) {
                 // TODO: 成员未读消息数量，统计对方发送，且未读。 通过 MessageUnreadEntity统计
