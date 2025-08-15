@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-04-03 15:41:55
+ * @Date: 2025-03-10 11:18:16
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-09 12:07:26
+ * @LastEditTime: 2025-08-15 16:59:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,14 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.thread;
+package com.bytedesk.core.thread.enums;
 
-public enum ThreadTransferStatusEnum {
-    NONE, // 无转接
-    // 人工转人工
-    TRANSFER_PENDING, // 转接待处理
-    TRANSFER_ACCEPTED, // 接受转接
-    TRANSFER_REJECTED, // 拒绝转接
-    TRANSFER_TIMEOUT, // 转接超时
-    TRANSFER_CANCELED, // 取消转接
+public enum ThreadEmotionTypeEnum {
+    // 开心
+    HAPPY,
+    // 愤怒
+    ANGRY,
+    // 悲伤
+    SAD,
+    // 其他
+    OTHER
 }

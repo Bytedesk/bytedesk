@@ -37,7 +37,7 @@ import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;

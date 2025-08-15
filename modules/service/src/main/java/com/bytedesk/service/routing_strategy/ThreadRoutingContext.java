@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 
 import lombok.extern.slf4j.Slf4j;

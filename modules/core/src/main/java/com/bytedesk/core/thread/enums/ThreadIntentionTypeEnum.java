@@ -1,9 +1,8 @@
-package com.bytedesk.core.thread;
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-03-10 11:18:16
+ * @Date: 2025-03-10 11:17:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 16:10:52
+ * @LastEditTime: 2025-08-15 16:59:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,15 +11,15 @@ package com.bytedesk.core.thread;
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
+package com.bytedesk.core.thread.enums;
 
-
-public enum ThreadEmotionTypeEnum {
-    // 开心
-    HAPPY,
-    // 愤怒
-    ANGRY,
-    // 悲伤
-    SAD,
+public enum ThreadIntentionTypeEnum {
+    // 咨询
+    CONSULT,
+    // 投诉
+    COMPLAINT,
+    // 建议
+    SUGGESTION,
     // 其他
     OTHER
 }

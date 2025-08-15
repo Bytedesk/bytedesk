@@ -18,8 +18,8 @@ import java.time.ZonedDateTime;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
-import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
-import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadIntentionTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadSummaryStatusEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;

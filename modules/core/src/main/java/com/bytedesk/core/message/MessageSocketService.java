@@ -20,7 +20,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.bytedesk.core.thread.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicEntity;
 import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
@@ -31,6 +30,7 @@ import com.bytedesk.core.socket.mqtt.MqttSessionService;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.socket.protobuf.model.ThreadProto;
 import com.bytedesk.core.socket.protobuf.model.UserProto;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.mqtt.MqttFixedHeader;

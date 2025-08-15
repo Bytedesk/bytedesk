@@ -17,7 +17,7 @@ import org.modelmapper.ModelMapper;
 import lombok.experimental.UtilityClass;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.settings.ServiceSettings;

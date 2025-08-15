@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:01:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 23:44:13
+ * @LastEditTime: 2025-08-15 17:01:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,6 +18,9 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadSummaryStatusEnum;
 
 import lombok.Builder;
 import lombok.Data;

@@ -52,7 +52,7 @@ import com.bytedesk.core.department.DepartmentRequest;
 import com.bytedesk.core.department.DepartmentRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

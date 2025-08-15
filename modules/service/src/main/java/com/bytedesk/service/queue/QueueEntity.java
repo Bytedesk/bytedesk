@@ -14,7 +14,7 @@
 package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 
 import jakarta.persistence.*;

@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-04-03 15:42:20
+ * @Date: 2025-04-01 10:17:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-03 15:45:25
+ * @LastEditTime: 2025-08-15 17:00:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,13 +11,11 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.thread;
+package com.bytedesk.core.thread.enums;
 
-public enum ThreadInviteStatusEnum {
-    NONE, // 未邀请
-    INVITE_PENDING, // 邀请处理
-    INVITE_ACCEPTED, // 接受邀请
-    INVITE_REJECTED, // 拒绝邀请
-    INVITE_TIMEOUT, // 邀请超时
-    INVITE_CANCELED, // 取消邀请
+public enum ThreadSummaryStatusEnum {
+    PENDING,
+    PROCESSING,
+    RESOLVED,
+    CLOSED;
 }

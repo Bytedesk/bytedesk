@@ -18,6 +18,8 @@ import java.io.Serializable;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

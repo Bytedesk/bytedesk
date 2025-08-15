@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;

@@ -14,10 +14,9 @@
 package com.bytedesk.ticket.thread;
 
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.thread.ThreadProcessStatusEnum;
-// import com.bytedesk.core.thread.ThreadResolvedStatusEnum;
-import com.bytedesk.core.thread.ThreadTransferStatusEnum;
-import com.bytedesk.core.thread.ThreadInviteStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 
 public class ThreadConsts {
 

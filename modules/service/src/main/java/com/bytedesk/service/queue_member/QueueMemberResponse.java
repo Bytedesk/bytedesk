@@ -17,11 +17,11 @@ import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
-import com.bytedesk.core.thread.ThreadIntentionTypeEnum;
-import com.bytedesk.core.thread.ThreadInviteStatusEnum;
 import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.core.thread.ThreadSummaryStatusEnum;
-import com.bytedesk.core.thread.ThreadTransferStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadIntentionTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadSummaryStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.queue.QueueResponse;
 

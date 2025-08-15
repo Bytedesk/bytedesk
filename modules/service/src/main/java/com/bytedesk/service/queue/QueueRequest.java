@@ -14,7 +14,7 @@
 package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

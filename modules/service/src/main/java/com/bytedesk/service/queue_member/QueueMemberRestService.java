@@ -30,7 +30,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.thread.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 

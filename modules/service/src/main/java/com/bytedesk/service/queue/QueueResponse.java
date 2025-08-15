@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

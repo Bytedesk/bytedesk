@@ -19,7 +19,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.thread.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import lombok.Builder;
 import lombok.Data;

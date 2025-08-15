@@ -14,6 +14,7 @@
 package com.bytedesk.core.thread;
 
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 public class ThreadUtils {
     

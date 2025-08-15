@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 14:06:46
+ * @LastEditTime: 2025-08-15 17:01:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,8 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bytedesk.core.converter.JsonListConverter;
 import com.bytedesk.core.converter.StringListConverter;
@@ -73,9 +75,6 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_status")
     private String status = ThreadProcessStatusEnum.NEW.name();
-
-    // @Builder.Default
-    // private Integer unreadCount = 1;
 
     // 星标
     @Builder.Default
@@ -156,7 +155,6 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     private String robot = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 技能组客服对话中，存储技能组信息
-    // workgroup
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
