@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 19:17:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-29 10:57:57
+ * @LastEditTime: 2025-08-15 00:04:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.Utils;
 import com.google.code.kaptcha.Producer;
@@ -47,6 +48,7 @@ public class KaptchaRestController {
 
     // 获取验证码
     // http://127.0.0.1:9003/kaptcha/api/v1/get
+    @ApiRateLimiter(value = 1, timeout = 1)
     @GetMapping("/get")
     public ResponseEntity<?> getKaptcha() {
         //
@@ -76,6 +78,7 @@ public class KaptchaRestController {
     }
 
     // 验证验证码
+    @ApiRateLimiter(value = 1, timeout = 1)
     @PostMapping("/check")
     public ResponseEntity<?> checkKaptcha(@RequestBody Map<String, String> map) {
         //
