@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:07:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:07:43
+ * @LastEditTime: 2025-08-15 11:12:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.notice_account;
 
-import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.base.BaseResponseNoOrg;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,21 +28,15 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoticeAccountResponse extends BaseResponse {
+public class NoticeAccountResponse extends BaseResponseNoOrg {
     
-    // private String cid;
-
     private String topic;
 
-    // private String type;
-    private String level;
+    private String type;
     
     private String nickname;
     
     private String avatar;
 
     private String description;
-
-    /** belong to org */
-    // private String orgUid;
 }

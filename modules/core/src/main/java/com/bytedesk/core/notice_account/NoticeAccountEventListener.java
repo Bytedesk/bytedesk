@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 11:32:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:26:13
+ * @LastEditTime: 2025-08-15 11:11:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class NoticeAccountEventListener {
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     @EventListener
     public void onUserCreateEvent(UserCreateEvent event) {
@@ -36,7 +36,7 @@ public class NoticeAccountEventListener {
         log.info("channel onUserCreateEvent: {}", user.getUid());
         //
         // 每创建一个用户，自动给此用户生成一条系统通知的会话
-        threadService.createSystemNoticeAccountThread(user);
+        threadRestService.createSystemNoticeAccountThread(user);
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 11:32:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-14 14:29:44
+ * @LastEditTime: 2025-08-15 11:04:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AssistantEventListener {
 
-    private final ThreadRestService threadService;
+    private final ThreadRestService threadRestService;
 
     @EventListener
     public void onUserCreateEvent(UserCreateEvent event) {
@@ -36,7 +36,7 @@ public class AssistantEventListener {
         log.info("assistant onUserCreateEvent: {}", user.getUid());
         // 
         // 每创建一个用户，自动给此用户生成一条文件助理的会话
-        threadService.createFileAssistantThread(user);
+        threadRestService.createFileAssistantThread(user);
         // 每创建一个用户，自动给此用户生成一条剪贴助理的会话
         // threadService.createClipboardAssistantThread(user);
     }

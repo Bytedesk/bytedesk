@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 20:34:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:26:00
+ * @LastEditTime: 2025-08-15 11:14:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.notice_account;
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.I18Consts;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -45,8 +46,9 @@ public class NoticeAccountEntity extends BaseEntityNoOrg {
 
     private String topic;
 
-    // @Column(name = "channel_type")
-    // private String type;
+    @Builder.Default
+    @Column(name = "notice_account_type")
+    private String type = NoticeAccountTypeEnum.SYSTEM.name();
 
     private String nickname;
 
@@ -54,7 +56,4 @@ public class NoticeAccountEntity extends BaseEntityNoOrg {
 
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
-
-    // @Builder.Default
-    // private String level = LevelEnum.PLATFORM.name();
 }
