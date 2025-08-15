@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-15 17:01:17
+ * @LastEditTime: 2025-08-15 17:09:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bytedesk.core.converter.JsonListConverter;
 import com.bytedesk.core.converter.StringListConverter;
@@ -75,6 +76,11 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_status")
     private String status = ThreadProcessStatusEnum.NEW.name();
+
+    // transfer status
+    @Builder.Default
+    @Column(name = "thread_transfer_status")
+    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
 
     // 星标
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-14 17:23:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-30 14:38:45
+ * @LastEditTime: 2025-08-15 17:14:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,7 @@ import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadSummaryStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.service.queue.QueueEntity;
-import com.bytedesk.core.thread.ThreadEmotionTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
