@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-16 11:09:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 23:04:33
+ * @LastEditTime: 2025-08-15 13:08:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -79,7 +79,7 @@ public class MessagePersistCache {
         try {
             stringRedisTemplate.opsForList().rightPush(listKey, messageJSON);
             stringRedisTemplate.expire(listKey, EXPIRE_TIME_DAYS, TimeUnit.DAYS);
-            log.debug("Message pushed to list: {}, message: {}", listKey, messageJSON);
+            // log.debug("Message pushed to list: {}, message: {}", listKey, messageJSON);
         } catch (Exception e) {
             log.error("Failed to push message to list: {}", listKey, e);
         }
