@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 16:27:01
+ * @LastEditTime: 2025-08-16 15:40:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
     // private final BytedeskEventPublisher bytedeskEventPublisher;
     @Override
     public void onApplicationEvent(@NonNull SessionConnectedEvent event) {
-        log.debug("stomp sessionConnectedEvent {}", event.toString());
+        // log.debug("stomp sessionConnectedEvent {}", event.toString());
         // stomp sessionConnectedEvent SessionConnectedEvent[GenericMessage [payload=byte[0], headers={simpMessageType=CONNECT_ACK, simpConnectMessage=GenericMessage [payload=byte[0], headers={simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={login=[1513088171901063], accept-version=[1.2,1.1,1.0], heart-beat=[10000,10000]}, simpSessionAttributes={}, simpHeartbeat=[J@68e0e40, simpSessionId=18cf80bd-cbbb-4a62-7ac3-1eaa0a465184}], simpHeartbeat=[J@5ceab5fa, simpSessionId=18cf80bd-cbbb-4a62-7ac3-1eaa0a465184}]]
         // StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
         // 
@@ -49,7 +49,7 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
         // 
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         if (headerAccessor != null) {
-            log.info("headerAccessor {}", headerAccessor.getMessageHeaders());
+            // log.info("headerAccessor {}", headerAccessor.getMessageHeaders());
             // String login = headerAccessor.getLogin();
             // FIXME: nativeHeaders={login=[1513088171901063], 但是 stomp connection with uid:  null，未正确获取到 login 值
             // log.info("stomp connection with uid:  {}", login);

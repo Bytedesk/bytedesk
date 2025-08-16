@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 23:50:27
+ * @LastEditTime: 2025-08-16 15:40:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,8 +45,8 @@ public class StompSubscribeListener implements ApplicationListener<SessionSubscr
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
         String destination = headerAccessor.getDestination();
-        log.debug("SessionSubscribeEvent: {}", event.toString());
-        log.debug("SessionSubscribeEvent: sessionId={}, destination={}", sessionId, destination);
+        // log.debug("SessionSubscribeEvent: {}", event.toString());
+        // log.debug("SessionSubscribeEvent: sessionId={}, destination={}", sessionId, destination);
 
         if (sessionId == null || destination == null) {
             return;
@@ -56,7 +56,7 @@ public class StompSubscribeListener implements ApplicationListener<SessionSubscr
 
         synchronized (subscriptions) {
             if (subscriptions.contains(subscriptionKey)) {
-                log.debug("Duplicate subscription detected: {}", subscriptionKey);
+                // log.debug("Duplicate subscription detected: {}", subscriptionKey);
                 return;
             }
             subscriptions.add(subscriptionKey);

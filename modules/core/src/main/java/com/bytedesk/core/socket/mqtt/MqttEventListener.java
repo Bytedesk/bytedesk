@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-04 10:44:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 07:07:46
+ * @LastEditTime: 2025-08-16 15:38:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,9 +23,9 @@ import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRestService;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+// @Slf4j
 @Component
 @AllArgsConstructor
 public class MqttEventListener {
@@ -40,18 +40,18 @@ public class MqttEventListener {
     public void onMqttConnectedEvent(MqttConnectedEvent event) {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
-        final String uid = clientId.split("/")[0];
-        log.info("topic onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
+        // final String uid = clientId.split("/")[0];
+        // log.info("topic onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         //
         topicCacheService.pushClientId(clientId);
     }
 
     @EventListener
     public void onMqttDisconnectedEvent(MqttDisconnectedEvent event) {
-        String clientId = event.getClientId();
+        // String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
-        final String uid = clientId.split("/")[0];
-        log.info("topic onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
+        // final String uid = clientId.split("/")[0];
+        // log.info("topic onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
         //
         // 暂不删除
         // topicCacheService.removeClientId(clientId);
@@ -59,14 +59,14 @@ public class MqttEventListener {
 
     @EventListener
     public void onMqttSubscribeEvent(MqttSubscribeEvent event) {
-        log.info("topic onMqttSubscribeEvent {}", event);
+        // log.info("topic onMqttSubscribeEvent {}", event);
         //
         topicRestService.subscribe(event.getTopic(), event.getClientId());
     }
 
     @EventListener
     public void onMqttUnsubscribeEvent(MqttUnsubscribeEvent event) {
-        log.info("topic onMqttUnsubscribeEvent {}", event);
+        // log.info("topic onMqttUnsubscribeEvent {}", event);
         //
         // topicService.unsubscribe(event.getTopic(), event.getClientId());
     }

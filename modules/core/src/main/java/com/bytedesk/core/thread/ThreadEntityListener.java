@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-15 09:30:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 17:17:54
+ * @LastEditTime: 2025-08-16 15:46:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,7 @@ public class ThreadEntityListener {
 
     @PostPersist
     public void postPersist(ThreadEntity thread) {
-        log.info("thread postPersist {}", thread.getUid());
+        // log.info("thread postPersist {}", thread.getUid());
         ThreadEntity clonedThread = SerializationUtils.clone(thread);
         // send notifications
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -41,10 +41,9 @@ public class ThreadEntityListener {
 
     @PostUpdate
     public void postUpdate(ThreadEntity thread) {
-        log.info("postUpdate before {}", thread.getAgent());
+        // log.info("postUpdate before {}", thread.getAgent());
         ThreadEntity clonedThread = SerializationUtils.clone(thread);
-        log.info("postUpdate after {}", thread.getAgent());
-        
+        // log.info("postUpdate after {}", thread.getAgent());
         // send notifications
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishThreadUpdateEvent(clonedThread);

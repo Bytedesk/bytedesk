@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-12 17:58:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:21:06
+ * @LastEditTime: 2025-08-16 15:37:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,7 +59,7 @@ public class AgentEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
-        log.info("agent - organization created: {}", organization.getName());
+        // log.info("agent - organization created: {}", organization.getName());
         //
         String mobile = user.getMobile();
         // String agentUid = uidUtils.getUid();
@@ -73,7 +73,7 @@ public class AgentEventListener {
     public void onAgentCreateEvent(AgentCreateEvent event) {
         // AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
         AgentEntity agent = event.getAgent();
-        log.info("agent onAgentCreateEvent: {}", agent.getUid());
+        // log.info("agent onAgentCreateEvent: {}", agent.getUid());
         // 创建快捷回复知识库
         KbaseRequest kbaseQuickReply = KbaseRequest.builder()
                 .name(agent.getNickname() +  "Kb")
@@ -92,7 +92,7 @@ public class AgentEventListener {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
-        log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
+        // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         agentRestService.updateConnect(uid, true);
     }
 
@@ -101,7 +101,7 @@ public class AgentEventListener {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
-        log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
+        // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
         agentRestService.updateConnect(uid, false);
     }
 
@@ -118,7 +118,7 @@ public class AgentEventListener {
         // log.info("agent onThreadAcceptEvent: {}", event);
         ThreadEntity thread = event.getThread();
         String agentString = thread.getAgent();
-        log.info("agent onThreadAcceptEvent: {}", agentString);
+        // log.info("agent onThreadAcceptEvent: {}", agentString);
         UserProtobuf agentProtobuf = JSON.parseObject(agentString, UserProtobuf.class);
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentProtobuf.getUid());
         if (agentOptional.isPresent()) {

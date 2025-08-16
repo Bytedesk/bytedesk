@@ -157,7 +157,7 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
         // protocolProcess.getEventPublisher().publishUserDisconnected(userOptional.get());
         // }
         //
-        log.info("channelInactive {}", clientId);
+        // log.info("channelInactive {}", clientId);
         // FIXME: 客户端异常断开的情况，需要清理数据。目前会造成数据不一致，待完善
         // protocolProcess.getMqttSessionStoreService().remove(clientId);
         // protocolProcess.getMqttClientIdStoreService().remove(clientId);
@@ -230,7 +230,7 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
     public void updateDisconnectedStatus(String clientId) {
         // 用户离线
         // final String uid = clientId.split("/")[0];
-        log.error("MqttTransportHandler disconnected clientId {}", clientId);
+        // log.error("MqttTransportHandler disconnected clientId {}", clientId);
         // protocolProcess.getRedisConnectService().setDelayDisconnect(uid);
         //
         // if (protocolProcess.getRedisUserService().isAgent(uid)) {
