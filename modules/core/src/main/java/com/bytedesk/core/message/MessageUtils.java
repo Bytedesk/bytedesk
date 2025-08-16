@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-31 16:23:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:39:08
+ * @LastEditTime: 2025-08-16 12:00:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,25 @@ public class MessageUtils {
     
     public static MessageExtra getMessageExtra(String orgUid) {
         return MessageExtra.builder().orgUid(orgUid).build();
+    }
+
+    public static MessageProtobuf createLoginNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
+        // 
+        UserProtobuf system = UserUtils.getSystemUser();
+        MessageExtra messageExtra = MessageUtils.getMessageExtra(orgUid);
+        // 
+        MessageProtobuf message = MessageProtobuf.builder()
+                .uid(messageUid)
+                .type(MessageTypeEnum.NOTICE)
+                .content(content)
+                .status(MessageStatusEnum.READ)
+                .createdAt(BdDateUtils.now())
+                .channel(ChannelEnum.SYSTEM)
+                .thread(threadProtobuf)
+                .user(system)
+                .extra(messageExtra.toJson())
+                .build();
+        return message;
     }
 
     public static MessageProtobuf createNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
@@ -117,9 +136,7 @@ public class MessageUtils {
     }
 
     public static MessageEntity getThreadMessage(String content, String type, String extra, String user, ThreadEntity thread) {
-        // UserProtobuf system = UserProtobuf.getSystemUser();
-        // MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
+
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)

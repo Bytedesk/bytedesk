@@ -14,6 +14,8 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueRestService;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,8 @@ public class WorkgroupRoutingService {
     private static final String COUNTER_KEY_PREFIX = RedisConsts.BYTEDESK_REDIS_PREFIX + "roundRobinCounter:";
 
     private final QueueRestService queueRestService;
+
+    private final ThreadRestService threadRestService;
 
     // 获取当天日期
     private String getCurrentDay() {
@@ -57,6 +61,8 @@ public class WorkgroupRoutingService {
                 return selectByConsistentHash(thread.getUserProtobuf().getUid(), availableAgents);
             case "FASTEST_RESPONSE":
                 return selectByFastestResponse(availableAgents);
+            case "RECENT":
+                return selectByRecent(workgroup, thread);
             default:
                 return selectByRoundRobin(workgroup.getUid(), availableAgents); // 默认使用轮询
         }
@@ -195,10 +201,9 @@ public class WorkgroupRoutingService {
     }
 
     /**
-     * 获取平均响应时间(秒)
+     * TODO: 获取平均响应时间(秒)
      */
     private double getAverageResponseTime(AgentEntity agent) {
-        // TODO: 从统计数据中获取实际响应时间
         return 30.0; // 默认30秒
     }
 
@@ -224,5 +229,59 @@ public class WorkgroupRoutingService {
         // }
         
         return priority;
+    }
+
+    /**
+     * 选择最近一次会话ThreadEntity接待的客服。首先选择最近一次接待的客服 thread.agent
+     */
+    private AgentEntity selectByRecent(WorkgroupEntity workgroup, ThreadEntity thread) {
+        // 获取访客ID
+        String visitorUid = thread.getUserProtobuf().getUid();
+        if (visitorUid == null || workgroup.getAvailableAgents().isEmpty()) {
+            return null;
+        }
+        
+        // 查找访客最近的客服会话记录
+        List<ThreadEntity> recentThreads = threadRestService.findRecentAgentThreadsByVisitorUid(visitorUid);
+        
+        // 遍历最近的会话记录，查找第一个有客服信息的会话
+        for (ThreadEntity recentThread : recentThreads) {
+            if (recentThread.getAgent() != null && !recentThread.getAgent().isEmpty()) {
+                try {
+                    // 解析客服信息
+                    UserProtobuf agentProtobuf = UserProtobuf.fromJson(recentThread.getAgent());
+                    if (agentProtobuf != null && agentProtobuf.getUid() != null) {
+                        // 检查该客服是否在当前可用客服列表中
+                        Optional<AgentEntity> recentAgent = workgroup.getAvailableAgents().stream()
+                            .filter(agent -> agent.getUid().equals(agentProtobuf.getUid()))
+                            .findFirst();
+                        
+                        if (recentAgent.isPresent()) {
+                            // 检查客服是否在线且可以接受新会话
+                            AgentEntity agent = recentAgent.get();
+                            if (agent.isConnectedAndAvailable()) {
+                                String today = getCurrentDay();
+                                String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
+                                Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
+                                
+                                // 检查客服当前会话数是否未超过最大限制
+                                if (queueEntity.map(queue -> queue.getChattingCount() < agent.getMaxThreadCount())
+                                        .orElse(true)) {
+                                    log.info("选择最近一次会话的客服: {}", agent.getUid());
+                                    return agent;
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("解析最近会话的客服信息失败: {}", e.getMessage());
+                    continue;
+                }
+            }
+        }
+        
+        // 如果没有找到合适的最近客服，或者最近客服不在线，则使用轮询算法
+        log.info("未找到合适的最近客服，使用轮询算法");
+        return selectByRoundRobin(workgroup.getUid(), workgroup.getAvailableAgents());
     }
 }

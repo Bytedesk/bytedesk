@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-19 11:36:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-15 10:42:59
+ * @LastEditTime: 2025-08-16 11:58:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,17 +33,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AuthEventListener {
 
-    // private final IMessageSendService messageSendService;
-
-    // private final UidUtils uidUtils;
-
-    // private final ThreadRestService threadRestService;
-
     private final NoticeService noticeService;
 
     @EventListener
     public void onActionCreateEvent(ActionCreateEvent event) {
-        log.info("onActionCreateEvent Received event: {}", event.toString());
+        // log.info("onActionCreateEvent Received event: {}", event.toString());
         // do something
         ActionEntity action = event.getAction();
         if (action == null) {
@@ -67,12 +61,12 @@ public class AuthEventListener {
                     .title(action.getTitle())
                     .content(action.getAction())
                     .type(NoticeTypeEnum.LOGIN.name())
-                    .status(MessageStatusEnum.SUCCESS.name())
+                    .status(MessageStatusEnum.READ.name())
                     .extra(noticeExtraLogin.toJson())
                     .userUid(user.getUid())
                     .orgUid(user.getOrgUid())
                     .build();
-            noticeService.sendNotice(noticeRequest);
+            noticeService.sendLoginNotice(noticeRequest);
         }
     }
 

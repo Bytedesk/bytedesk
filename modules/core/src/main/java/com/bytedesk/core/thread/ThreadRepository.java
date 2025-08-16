@@ -87,4 +87,11 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         @Query("SELECT t FROM ThreadEntity t WHERE t.topic LIKE :topicPrefix AND t.status = :status AND t.deleted = false ORDER BY t.createdAt ASC")
         List<ThreadEntity> findByTopicStartsWithAndStatusAndDeletedFalse(@Param("topicPrefix") String topicPrefix, @Param("status") String status);
 
+        /**
+         * 根据访客ID查找最近的客服会话记录
+         * 查找访客与客服的最近一次会话，按更新时间倒序排列
+         */
+        @Query(value = "SELECT * FROM core_thread t WHERE t.thread_user LIKE %:visitorUid% AND t.thread_type IN ('AGENT', 'WORKGROUP', 'ROBOT') AND t.is_deleted = false ORDER BY t.updated_at DESC", nativeQuery = true)
+        List<ThreadEntity> findRecentAgentThreadsByVisitorUid(@Param("visitorUid") String visitorUid);
+
 }

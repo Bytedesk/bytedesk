@@ -753,6 +753,14 @@ public class ThreadRestService
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }
 
+    /**
+     * 根据访客ID查找最近的客服会话记录
+     * 用于最近一次会话路由策略
+     */
+    public List<ThreadEntity> findRecentAgentThreadsByVisitorUid(String visitorUid) {
+        return threadRepository.findRecentAgentThreadsByVisitorUid(visitorUid);
+    }
+
     public List<ThreadEntity> findServiceThreadStateStarted() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });

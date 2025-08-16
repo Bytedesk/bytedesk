@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 14:10:53
+ * @LastEditTime: 2025-08-16 11:38:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -94,7 +94,6 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
         // 是否已经存在会话
         ThreadEntity thread = null;
         WorkgroupEntity workgroup = null;
-        
         // 从数据库重新获取工作组信息，确保拿到最新的数据
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
         if (workgroupOptional.isPresent()) {
@@ -154,7 +153,7 @@ public class WorkgroupThreadRoutingStrategy implements ThreadRoutingStrategy {
                 }
             }
         }
-        // 
+        // 没有进行中会话，创建新会话，或者所有会话处于closed状态，创建新会话
         if (thread == null) {
             log.info("createWorkgroupThread: thread topic {} is null, create new thread", topic);
             // 不存在会话，或者所有会话处于closed状态，创建会话
