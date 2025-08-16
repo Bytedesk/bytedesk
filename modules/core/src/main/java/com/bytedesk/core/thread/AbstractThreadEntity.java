@@ -166,10 +166,13 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 存放被转接客服，存放多个 UserProtobuf 实体转换成的 JSON
+    // @Builder.Default
+    // @Convert(converter = JsonListConverter.class)
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // private List<String> transfers = new ArrayList<>();
     @Builder.Default
-    @Convert(converter = JsonListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> transfers = new ArrayList<>();
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String transfer = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 邀请多个客服参与会话，存放多个 UserProtobuf 实体转换成的 JSON
     @Builder.Default

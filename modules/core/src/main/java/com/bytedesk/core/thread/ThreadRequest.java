@@ -91,8 +91,9 @@ public class ThreadRequest extends BaseRequest {
     private List<String> tagList = new ArrayList<>();
 
     // 存放被转接客服
-    @Builder.Default
-    private List<String> transferUids = new ArrayList<>();
+    // @Builder.Default
+    // private List<String> transferUids = new ArrayList<>();
+    private String transfer;
 
     // 邀请多个客服参与会话
     @Builder.Default

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-13 23:42:49
+ * @LastEditTime: 2025-08-16 21:08:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
@@ -200,9 +201,18 @@ public class VisitorThreadService
         String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         thread.setExtra(extra);
-        // 考虑到客服信息发生变化，更新客服信息
-        String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
-        thread.setAgent(agentString);
+        if (thread.getTransfer() != null && !thread.getTransfer().isEmpty()) {
+            // 如果有转接信息，则使用转接信息
+            UserProtobuf transferUser = JSON.parseObject(thread.getTransfer(), UserProtobuf.class);
+            transferUser.setType(UserTypeEnum.AGENT.name());
+            thread.setAgent(transferUser.toJson());
+        } else {
+            // 使用agent的serviceSettings配置
+            // String agentString = ServiceConvertUtils.convertToUserProtobufJSONString(agent);
+            UserProtobuf agentProtobuf = agent.toUserProtobuf();
+            String agentString = agentProtobuf.toJson();
+            thread.setAgent(agentString); // 人工客服
+        }
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {
