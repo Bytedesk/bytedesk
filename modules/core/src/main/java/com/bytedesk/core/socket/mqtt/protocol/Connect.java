@@ -125,16 +125,19 @@ public class Connect {
             }
         }
 
-        // 处理遗嘱信息
+        // 异常断开：网络中断、程序崩溃等情况，Broker 会自动发布遗嘱消息
         final MqttSession mqttSession = new MqttSession(clientId, channel, isCleanSession, null);
+        // 检查连接消息中是否设置了遗嘱标志
         if (mqttConnectMessage.variableHeader().isWillFlag()) {
             log.debug("send will message");
+            // 创建遗嘱消息
             final MqttPublishMessage willMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                     new MqttFixedHeader(MqttMessageType.PUBLISH, false,
-                            MqttQoS.valueOf(mqttConnectMessage.variableHeader().willQos()),
-                            mqttConnectMessage.variableHeader().isWillRetain(), 0),
-                    new MqttPublishVariableHeader(mqttConnectMessage.payload().willTopic(), 0),
-                    Unpooled.buffer().writeBytes(mqttConnectMessage.payload().willMessageInBytes()));
+                            MqttQoS.valueOf(mqttConnectMessage.variableHeader().willQos()), // 遗嘱消息的QoS等级
+                            mqttConnectMessage.variableHeader().isWillRetain(), 0), // 是否保留消息
+                    new MqttPublishVariableHeader(mqttConnectMessage.payload().willTopic(), 0), // 遗嘱主题
+                    Unpooled.buffer().writeBytes(mqttConnectMessage.payload().willMessageInBytes())); // 遗嘱内容
+            // 将遗嘱消息保存到会话中
             mqttSession.setWillMessage(willMessage);
         }
 
