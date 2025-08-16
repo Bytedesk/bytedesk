@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 21:04:59
+ * @LastEditTime: 2025-08-16 21:16:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -262,11 +262,6 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("getAgentContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
-        if (thread.getTransfer() != null && !thread.getTransfer().isEmpty()) {
-            // 如果有转接信息，则使用转接信息
-            user = JSON.parseObject(thread.getTransfer(), UserProtobuf.class);
-            log.info("getAgentQueuingMessage transfer user: {}", user.toString());
-        }
         //
         return ThreadMessageUtil.getThreadContinueMessage(user, thread);
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-20 15:39:29
+ * @LastEditTime: 2025-08-16 21:30:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,6 +81,9 @@ public class TokenEntity extends BaseEntity {
 
     @Builder.Default
     private String channel = ChannelEnum.WEB.name();
+
+    // 客户端clientId： uid + "/" + constants.HTTP_CHANNEL + "/" + deviceUid;
+    private String clientId;
 
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;
