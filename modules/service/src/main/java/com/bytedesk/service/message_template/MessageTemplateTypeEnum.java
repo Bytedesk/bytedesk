@@ -11,9 +11,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.template;
+package com.bytedesk.service.message_template;
 
-public enum TemplateTypeEnum {
+public enum MessageTemplateTypeEnum {
     THREAD,
     CUSTOMER,
     TICKET

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 17:16:37
+ * @LastEditTime: 2025-08-18 16:17:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.template;
+package com.bytedesk.service.message_template;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +25,10 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TemplateSpecification extends BaseSpecification<TemplateEntity, TemplateRequest> {
+public class MessageTemplateSpecification extends BaseSpecification<MessageTemplateEntity, MessageTemplateRequest> {
     
-    public static Specification<TemplateEntity> search(TemplateRequest request) {
-        log.info("request: {}", request);
+    public static Specification<MessageTemplateEntity> search(MessageTemplateRequest request) {
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

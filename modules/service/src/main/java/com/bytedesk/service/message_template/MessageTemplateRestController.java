@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 00:02:04
+ * @LastEditTime: 2025-08-18 16:22:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.template;
+package com.bytedesk.service.message_template;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -32,20 +32,20 @@ import org.springframework.context.annotation.Description;
 
 @Tag(name = "模板管理", description = "模板管理相关接口")
 @RestController
-@RequestMapping("/api/v1/template")
+@RequestMapping("/api/v1/message/template")
 @AllArgsConstructor
-@Description("Template Management Controller - Message template creation and management APIs")
-public class TemplateRestController extends BaseRestController<TemplateRequest> {
+@Description("MessageTemplate Management Controller - Message template creation and management APIs")
+public class MessageTemplateRestController extends BaseRestController<MessageTemplateRequest> {
 
-    private final TemplateRestService templateRestService;
+    private final MessageTemplateRestService templateRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "模板", action = "组织查询", description = "query template by org")
     @Operation(summary = "根据组织查询模板", description = "查询组织的模板列表")
     @Override
-    public ResponseEntity<?> queryByOrg(TemplateRequest request) {
+    public ResponseEntity<?> queryByOrg(MessageTemplateRequest request) {
         
-        Page<TemplateResponse> templates = templateRestService.queryByOrg(request);
+        Page<MessageTemplateResponse> templates = templateRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(templates));
     }
@@ -53,9 +53,9 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     @ActionAnnotation(title = "模板", action = "用户查询", description = "query template by user")
     @Operation(summary = "根据用户查询模板", description = "查询用户的模板列表")
     @Override
-    public ResponseEntity<?> queryByUser(TemplateRequest request) {
+    public ResponseEntity<?> queryByUser(MessageTemplateRequest request) {
         
-        Page<TemplateResponse> templates = templateRestService.queryByUser(request);
+        Page<MessageTemplateResponse> templates = templateRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(templates));
     }
@@ -63,9 +63,9 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     @ActionAnnotation(title = "模板", action = "查询详情", description = "query template by uid")
     @Operation(summary = "根据UID查询模板", description = "通过UID查询具体的模板")
     @Override
-    public ResponseEntity<?> queryByUid(TemplateRequest request) {
+    public ResponseEntity<?> queryByUid(MessageTemplateRequest request) {
         
-        TemplateResponse template = templateRestService.queryByUid(request);
+        MessageTemplateResponse template = templateRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(template));
     }
@@ -74,9 +74,9 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     @Operation(summary = "创建模板", description = "创建新的模板")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(TemplateRequest request) {
+    public ResponseEntity<?> create(MessageTemplateRequest request) {
         
-        TemplateResponse template = templateRestService.create(request);
+        MessageTemplateResponse template = templateRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(template));
     }
@@ -85,9 +85,9 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     @Operation(summary = "更新模板", description = "更新现有的模板")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(TemplateRequest request) {
+    public ResponseEntity<?> update(MessageTemplateRequest request) {
         
-        TemplateResponse template = templateRestService.update(request);
+        MessageTemplateResponse template = templateRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(template));
     }
@@ -96,7 +96,7 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     @Operation(summary = "删除模板", description = "删除指定的模板")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(TemplateRequest request) {
+    public ResponseEntity<?> delete(MessageTemplateRequest request) {
         
         templateRestService.delete(request);
 
@@ -108,12 +108,12 @@ public class TemplateRestController extends BaseRestController<TemplateRequest> 
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
-    public Object export(TemplateRequest request, HttpServletResponse response) {
+    public Object export(MessageTemplateRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
             templateRestService,
-            TemplateExcel.class,
+            MessageTemplateExcel.class,
             "模板",
             "template"
         );

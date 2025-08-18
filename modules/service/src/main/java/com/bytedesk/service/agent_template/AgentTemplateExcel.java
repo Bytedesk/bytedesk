@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:58:22
+ * @LastEditTime: 2025-07-04 18:00:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.template;
+package com.bytedesk.service.agent_template;
 
 import java.time.ZonedDateTime;
 
@@ -25,7 +25,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class TemplateExcel {
+public class AgentTemplateExcel {
 
     @ExcelProperty(index = 0, value = "标签名称")
     @ColumnWidth(20)
@@ -43,10 +43,5 @@ public class TemplateExcel {
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
     private ZonedDateTime createdAt;
-
-    @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(value = "修改时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
-    @ColumnWidth(25)
-    private ZonedDateTime updatedAt;
 
 }

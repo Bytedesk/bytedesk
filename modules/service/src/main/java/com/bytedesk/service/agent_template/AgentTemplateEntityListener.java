@@ -11,14 +11,14 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.template;
+package com.bytedesk.service.agent_template;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.service.template.event.TemplateCreateEvent;
-import com.bytedesk.service.template.event.TemplateUpdateEvent;
+import com.bytedesk.service.agent_template.event.AgentTemplateCreateEvent;
+import com.bytedesk.service.agent_template.event.AgentTemplateUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
@@ -28,24 +28,24 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class TemplateEntityListener {
+public class AgentTemplateEntityListener {
 
     @PostPersist
-    public void onPostPersist(TemplateEntity template) {
-        log.info("onPostPersist: {}", template);
-        TemplateEntity cloneTemplate = SerializationUtils.clone(template);
+    public void onPostPersist(AgentTemplateEntity agentTemplate) {
+        log.info("onPostPersist: {}", agentTemplate);
+        AgentTemplateEntity cloneAgentTemplate = SerializationUtils.clone(agentTemplate);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TemplateCreateEvent(cloneTemplate));
+        bytedeskEventPublisher.publishEvent(new AgentTemplateCreateEvent(cloneAgentTemplate));
     }
 
     @PostUpdate
-    public void onPostUpdate(TemplateEntity template) {
-        log.info("onPostUpdate: {}", template);
-        TemplateEntity cloneTemplate = SerializationUtils.clone(template);
+    public void onPostUpdate(AgentTemplateEntity agentTemplate) {
+        log.info("onPostUpdate: {}", agentTemplate);
+        AgentTemplateEntity cloneAgentTemplate = SerializationUtils.clone(agentTemplate);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TemplateUpdateEvent(cloneTemplate));
+        bytedeskEventPublisher.publishEvent(new AgentTemplateUpdateEvent(cloneAgentTemplate));
     }
     
 }

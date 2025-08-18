@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-25 12:31:16
+ * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 12:31:19
+ * @LastEditTime: 2025-02-25 10:00:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,25 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.template.event;
+package com.bytedesk.service.message_template.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.service.template.TemplateEntity;
+import com.bytedesk.service.message_template.MessageTemplateEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TemplateDeleteEvent extends ApplicationEvent {
+public class MessageTemplateCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TemplateEntity template;
+    private MessageTemplateEntity template;
 
-    public TemplateDeleteEvent(TemplateEntity template) {
+    public MessageTemplateCreateEvent(MessageTemplateEntity template) {
         super(template);
         this.template = template;
     }
+
 }

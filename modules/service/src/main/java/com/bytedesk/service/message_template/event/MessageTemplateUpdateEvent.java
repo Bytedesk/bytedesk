@@ -11,24 +11,24 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.template.event;
+package com.bytedesk.service.message_template.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.service.template.TemplateEntity;
+import com.bytedesk.service.message_template.MessageTemplateEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TemplateUpdateEvent extends ApplicationEvent {
+public class MessageTemplateUpdateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TemplateEntity template;
+    private MessageTemplateEntity template;
 
-    public TemplateUpdateEvent(TemplateEntity template) {
+    public MessageTemplateUpdateEvent(MessageTemplateEntity template) {
         super(template);
         this.template = template;
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 15:44:34
+ * @LastEditTime: 2025-08-18 15:44:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.tag;
+package com.bytedesk.service.agent_template;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +25,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TagSpecification extends BaseSpecification<TagEntity, TagRequest> {
+public class AgentTemplateSpecification extends BaseSpecification<AgentTemplateEntity, AgentTemplateRequest> {
     
-    public static Specification<TagEntity> search(TagRequest request) {
+    public static Specification<AgentTemplateEntity> search(AgentTemplateRequest request) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
         //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
