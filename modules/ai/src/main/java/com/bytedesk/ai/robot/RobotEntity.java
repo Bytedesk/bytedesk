@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:16:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-29 15:33:39
+ * @LastEditTime: 2025-08-18 14:50:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,12 +61,7 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({ RobotEntityListener.class })
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
-// 限制name + orgUid唯一索引，防止重复创建机器人
-@Table(name = "bytedesk_ai_robot"
-// , uniqueConstraints = {
-    // UniqueConstraint(columnNames = {"name", "orgUid"})
-// }
-)
+@Table(name = "bytedesk_ai_robot")
 public class RobotEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -108,10 +103,6 @@ public class RobotEntity extends BaseEntity {
     @Embedded
     @Builder.Default
     private ServiceSettings serviceSettings = new ServiceSettings();
-
-    // 如果未匹配到关键词，默认回复内容
-    // @Builder.Default
-    // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
 
     /**
      * Type of robot service (SERVICE, ASK, CHAT)
