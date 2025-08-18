@@ -17,8 +17,6 @@ import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -47,10 +45,9 @@ public class CallQueueEntity extends BaseEntity {
     
     /**
      * 队列类型
-     */
-    @Enumerated(EnumType.STRING)
-    
-    private QueueType type;
+     */    
+    @Column(name = "queue_type")
+    private String type;
     
     /**
      * 队列技能（JSON格式）
@@ -74,10 +71,9 @@ public class CallQueueEntity extends BaseEntity {
     
     /**
      * 队列状态
-     */
-    @Enumerated(EnumType.STRING)
-    
-    private QueueStatus status;
+     */    
+    @Column(name = "queue_status")
+    private String status;
     
     /**
      * 备注

@@ -6,8 +6,6 @@ import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -37,8 +35,8 @@ public class CallCallEntity extends BaseEntity {
     /**
      * 呼叫类型
      */
-    @Enumerated(EnumType.STRING)
-    private CallType type;
+    @Column(name = "call_type")
+    private String type;
     
     /**
      * 主叫号码
