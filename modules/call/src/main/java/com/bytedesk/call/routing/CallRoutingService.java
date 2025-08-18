@@ -106,7 +106,7 @@ public class CallRoutingService {
     private Optional<CallQueueEntity> findQueueForCall(CallCallEntity call) {
         // 获取所有激活状态的队列
         List<CallQueueEntity> activeQueues = queueService.getQueuesByType(
-            CallQueueEntity.QueueType.valueOf(call.getType().name()));
+            CallQueueEntity.QueueType.valueOf(call.getType()));
             
         // 根据呼叫技能要求选择合适的队列
         return activeQueues.stream()
@@ -119,13 +119,13 @@ public class CallRoutingService {
      */
     public void routeCall(CallCallEntity call) {
         switch (call.getType()) {
-            case INBOUND:
+            case "INBOUND":
                 routeInboundCall(call);
                 break;
-            case OUTBOUND:
+            case "OUTBOUND":
                 routeOutboundCall(call);
                 break;
-            case INTERNAL:
+            case "INTERNAL":
                 routeInternalCall(call);
                 break;
             default:

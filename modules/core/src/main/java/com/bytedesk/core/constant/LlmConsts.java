@@ -41,6 +41,8 @@ public class LlmConsts {
     public static final String GEMINI = "gemini";
     public static final String AIHUBMIX = "aihubmix";
 
+    // 自定义模型提供商
+    public static final String CUSTOM = "custom";
 
     // 默认 智谱AI
     // 默认文字对话模型提供商

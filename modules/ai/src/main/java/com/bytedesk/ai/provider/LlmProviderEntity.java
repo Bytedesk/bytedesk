@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 22:01:26
+ * @LastEditTime: 2025-08-18 11:31:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,7 @@ public class LlmProviderEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    
+
     private String nickname;
 
     // https://cdn.weiyuai.cn/assets/images/llm/model/baichuan.png
@@ -50,6 +50,11 @@ public class LlmProviderEntity extends BaseEntity {
     // 
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
+
+    // 使用type代替name
+    // @Column(name = "provider_type")
+    // private String type;
+
     // 
     private String apiUrl;
     private String apiKey;
@@ -61,5 +66,10 @@ public class LlmProviderEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_enabled")
     private Boolean enabled = true;
+
+    // 是否允许租户调用系统API，默认不开启
+    @Builder.Default
+    @Column(name = "is_system_enabled")
+    private Boolean systemEnabled = false;
 
 }

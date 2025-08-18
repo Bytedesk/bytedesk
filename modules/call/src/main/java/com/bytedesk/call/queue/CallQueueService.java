@@ -32,7 +32,7 @@ public class CallQueueService {
             throw new RuntimeException("队列名称已存在: " + queue.getName());
         }
         
-        queue.setStatus(CallQueueEntity.QueueStatus.ACTIVE);
+        queue.setStatus(CallQueueEntity.QueueStatus.ACTIVE.name());
         queue.setCreatedAt(BdDateUtils.now());
         queue.setUpdatedAt(BdDateUtils.now());
         
@@ -95,7 +95,7 @@ public class CallQueueService {
         CallQueueEntity queue = queueRepository.findByName(queueName)
             .orElseThrow(() -> new RuntimeException("队列不存在: " + queueName));
             
-        queue.setStatus(status);
+        queue.setStatus(status.name());
         queue.setUpdatedAt(BdDateUtils.now());
         
         return queueRepository.save(queue);
@@ -109,7 +109,7 @@ public class CallQueueService {
         CallQueueEntity queue = queueRepository.findByName(queueName)
             .orElseThrow(() -> new RuntimeException("队列不存在: " + queueName));
             
-        if (queue.getStatus() != CallQueueEntity.QueueStatus.ACTIVE) {
+        if (CallQueueEntity.QueueStatus.ACTIVE.name().equals(queue.getStatus())) {
             throw new RuntimeException("队列未激活: " + queueName);
         }
         
