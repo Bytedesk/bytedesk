@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-11-12 22:23:31
+ * @Date: 2024-11-12 22:22:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-12 22:23:37
+ * @LastEditTime: 2024-11-12 22:22:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,24 +11,26 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.model;
+package com.bytedesk.ai.model.event;
 
 import org.springframework.context.ApplicationEvent;
+
+import com.bytedesk.ai.model.LlmModelEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LlmModelUpdateEvent extends ApplicationEvent {
+public class LlmModelCreateEvent extends ApplicationEvent {
 
     private final static long serialVersionUID = 1L;
     
-    private final LlmModelEntity llmModelEntity;
+    private final LlmModelEntity lmModel;
     
-    public LlmModelUpdateEvent(Object source, LlmModelEntity llmModelEntity) {
+    public LlmModelCreateEvent(Object source, LlmModelEntity lmModel) {
         super(source);
-        this.llmModelEntity = llmModelEntity;
+        this.lmModel = lmModel;
     }
     
 }

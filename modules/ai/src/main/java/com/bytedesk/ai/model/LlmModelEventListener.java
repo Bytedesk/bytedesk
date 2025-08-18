@@ -19,9 +19,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.ai.provider.LlmProviderCreateEvent;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
+import com.bytedesk.ai.provider.event.LlmProviderCreateEvent;
 import com.bytedesk.core.enums.LevelEnum;
 
 import lombok.AllArgsConstructor;

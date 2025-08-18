@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 11:31:42
+ * @LastEditTime: 2025-08-18 16:31:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -85,7 +85,7 @@ public class LlmModelEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
-    // 是否允许租户调用系统API，默认不开启
+    // 是否允许租户调用系统API，默认不开启。如果开启了，则租户默认调用系统API
     @Builder.Default
     @Column(name = "is_system_enabled")
     private Boolean systemEnabled = false;

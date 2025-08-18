@@ -16,6 +16,8 @@ package com.bytedesk.ai.provider;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
+import com.bytedesk.ai.provider.event.LlmProviderCreateEvent;
+import com.bytedesk.ai.provider.event.LlmProviderUpdateEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
