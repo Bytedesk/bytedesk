@@ -38,7 +38,6 @@ public class CallCallEntity extends BaseEntity {
      * 呼叫类型
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private CallType type;
     
     /**
@@ -54,9 +53,7 @@ public class CallCallEntity extends BaseEntity {
     /**
      * 呼叫状态
      */
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CallStatus status;
+    private String status;
     
     /**
      * 呼叫开始时间

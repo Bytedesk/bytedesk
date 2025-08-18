@@ -29,8 +29,8 @@ public class CallAgentService {
             throw new RuntimeException("坐席ID已存在: " + agent.getAgentId());
         }
         
-        agent.setStatus(CallAgentEntity.AgentStatus.OFFLINE);
-        agent.setMode(CallAgentEntity.AgentMode.MANUAL);
+        agent.setStatus(CallAgentEntity.AgentStatus.OFFLINE.name());
+        agent.setMode(CallAgentEntity.AgentMode.MANUAL.name());
         agent.setCreatedAt(BdDateUtils.now());
         agent.setUpdatedAt(BdDateUtils.now());
         
@@ -83,7 +83,7 @@ public class CallAgentService {
         CallAgentEntity agent = agentRepository.findByAgentId(agentId)
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
-        agent.setStatus(status);
+        agent.setStatus(status.name());
         agent.setLastStatusChange(BdDateUtils.now());
         agent.setUpdatedAt(BdDateUtils.now());
         
@@ -98,7 +98,7 @@ public class CallAgentService {
         CallAgentEntity agent = agentRepository.findByAgentId(agentId)
             .orElseThrow(() -> new RuntimeException("坐席不存在: " + agentId));
             
-        agent.setMode(mode);
+        agent.setMode(mode.name());
         agent.setUpdatedAt(BdDateUtils.now());
         
         return agentRepository.save(agent);
@@ -132,8 +132,8 @@ public class CallAgentService {
      */
     public boolean isAgentAvailable(String agentId) {
         return agentRepository.findByAgentId(agentId)
-            .map(agent -> agent.getStatus() == CallAgentEntity.AgentStatus.READY 
-                && agent.getMode() == CallAgentEntity.AgentMode.AUTO)
+            .map(agent -> agent.getStatus().equals(CallAgentEntity.AgentStatus.READY.name()) 
+                && agent.getMode().equals(CallAgentEntity.AgentMode.AUTO.name()))
             .orElse(false);
     }
 } 

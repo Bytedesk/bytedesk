@@ -78,7 +78,7 @@ public class CallUserEntity extends BaseEntity {
      * 对应数据库字段：enabled
      */
     @Builder.Default
-    @Column(nullable = false)
+    
     private Boolean enabled = true;
 
     /**

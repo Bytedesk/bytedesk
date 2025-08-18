@@ -52,7 +52,7 @@ public class CallRoutingService {
         // 3. 尝试立即分配坐席
         findAgentForCall(call).ifPresent(agent -> {
             // call.setAgentId(agent.getAgentId());
-            call.setStatus(CallCallEntity.CallStatus.RINGING);
+            call.setStatus(CallCallEntity.CallStatus.RINGING.name());
         });
     }
     
@@ -70,7 +70,7 @@ public class CallRoutingService {
         // 3. 尝试立即分配坐席
         findAgentForCall(call).ifPresent(agent -> {
             // call.setAgentId(agent.getAgentId());
-            call.setStatus(CallCallEntity.CallStatus.RINGING);
+            call.setStatus(CallCallEntity.CallStatus.RINGING.name());
         });
     }
     
@@ -88,7 +88,7 @@ public class CallRoutingService {
         // 3. 尝试立即分配坐席
         findAgentForCall(call).ifPresent(agent -> {
             // call.setAgentId(agent.getAgentId());
-            call.setStatus(CallCallEntity.CallStatus.RINGING);
+            call.setStatus(CallCallEntity.CallStatus.RINGING.name());
         });
     }
     

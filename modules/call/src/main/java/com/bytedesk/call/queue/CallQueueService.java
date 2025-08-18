@@ -119,7 +119,7 @@ public class CallQueueService {
         }
         
         // call.setCurrentQueue(queueName);
-        call.setStatus(CallStatus.QUEUED);
+        call.setStatus(CallStatus.QUEUED.name());
         // call.setQueueTime(BdDateUtils.now());
     }
     

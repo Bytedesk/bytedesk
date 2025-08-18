@@ -49,7 +49,7 @@ public class CallQueueEntity extends BaseEntity {
      * 队列类型
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    
     private QueueType type;
     
     /**
@@ -76,7 +76,7 @@ public class CallQueueEntity extends BaseEntity {
      * 队列状态
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    
     private QueueStatus status;
     
     /**
