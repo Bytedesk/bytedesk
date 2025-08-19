@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 // https://ollama4j.github.io/ollama4j/apis-model-management/list-library-models
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jService {
 
     @Autowired
