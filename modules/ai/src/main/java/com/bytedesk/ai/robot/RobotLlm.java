@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 18:34:54
+ * @LastEditTime: 2025-08-19 15:21:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,6 +50,9 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "llm_text_provider")
     private String textProvider = LlmConsts.DEFAULT_TEXT_PROVIDER;
+
+    @Column(name = "llm_text_provider_uid")
+    private String textProviderUid;
     
     // text chat model name
     @Builder.Default
@@ -67,6 +70,9 @@ public class RobotLlm {
     @Column(name = "llm_vision_provider")
     private String visionProvider = LlmConsts.DEFAULT_VISION_PROVIDER;
 
+    @Column(name = "llm_vision_provider_uid")
+    private String visionProviderUid;
+
     // 视觉模型名称
     @Builder.Default
     @Column(name = "llm_vision_model")
@@ -82,6 +88,9 @@ public class RobotLlm {
     @Column(name = "llm_audio_provider")
     private String audioProvider = LlmConsts.DEFAULT_AUDIO_PROVIDER;
 
+    @Column(name = "llm_audio_provider_uid")
+    private String audioProviderUid;
+
     // 语音模型名称
     @Builder.Default
     @Column(name = "llm_audio_model")
@@ -96,6 +105,9 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "llm_rerank_provider")
     private String rerankProvider = LlmConsts.DEFAULT_RERANK_PROVIDER;
+
+    @Column(name = "llm_rerank_provider_uid")
+    private String rerankProviderUid;
 
     // rerank model name
     @Builder.Default

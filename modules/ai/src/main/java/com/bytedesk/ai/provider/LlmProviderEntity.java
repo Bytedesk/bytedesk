@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 16:31:46
+ * @LastEditTime: 2025-08-19 14:21:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class LlmProviderEntity extends BaseEntity {
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
 
-    // 使用type代替name
+    // 使用type代替name，因为name可能重复
     // @Column(name = "provider_type")
     // private String type;
 
