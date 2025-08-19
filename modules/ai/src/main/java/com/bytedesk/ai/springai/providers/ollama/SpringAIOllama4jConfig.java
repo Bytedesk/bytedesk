@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 12:19:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 17:49:16
+ * @LastEditTime: 2025-08-19 10:08:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,7 @@ import io.github.ollama4j.OllamaAPI;
  * https://ollama4j.github.io/ollama4j/intro
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.ai.ollama.chat.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllama4jConfig {
 
     @Value("${spring.ai.ollama.base-url}")
