@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 09:47:10
+ * @LastEditTime: 2025-08-20 07:48:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,9 +46,9 @@ public class Ollama4jRestController {
 
     // http://127.0.0.1:9003/api/v1/ollama4j/ping
     @GetMapping("/ping")
-    public ResponseEntity<JsonResult<Boolean>> ping() {
+    public ResponseEntity<JsonResult<Boolean>> ping(OllamaRequest request) {
 
-        boolean isReachable = ollama4jService.isOllama4jReachable();
+        boolean isReachable = ollama4jService.isOllama4jReachable(request);
 
         return ResponseEntity.ok(JsonResult.success(isReachable));
     }
@@ -56,9 +56,9 @@ public class Ollama4jRestController {
     // 本地已经下载的模型列表
     // http://127.0.0.1:9003/api/v1/ollama4j/local-models
     @GetMapping("/local-models")
-    public ResponseEntity<JsonResult<List<Model>>> getLocalModels() {
+    public ResponseEntity<JsonResult<List<Model>>> getLocalModels(OllamaRequest request) {
 
-        List<Model> models = ollama4jService.getLocalModels();
+        List<Model> models = ollama4jService.getLocalModels(request);
 
         return ResponseEntity.ok(JsonResult.success(models));
     }
@@ -66,9 +66,9 @@ public class Ollama4jRestController {
     // 远程模型列表
     // http://127.0.0.1:9003/api/v1/ollama4j/models
     @GetMapping("/models")
-    public ResponseEntity<JsonResult<List<LibraryModel>>> getModels() {
+    public ResponseEntity<JsonResult<List<LibraryModel>>> getModels(OllamaRequest request) {
 
-        List<LibraryModel> models = ollama4jService.getModels();
+        List<LibraryModel> models = ollama4jService.getModels(request);
 
         return ResponseEntity.ok(JsonResult.success(models));
     }
@@ -76,9 +76,9 @@ public class Ollama4jRestController {
     // 当前运行的模型
     // http://127.0.0.1:9003/api/v1/ollama4j/ps
     @GetMapping("/ps")
-    public ResponseEntity<JsonResult<ModelsProcessResponse>> processModels() {
+    public ResponseEntity<JsonResult<ModelsProcessResponse>> processModelsResponse(OllamaRequest request) {
 
-        ModelsProcessResponse models = ollama4jService.getPs();
+        ModelsProcessResponse models = ollama4jService.getPs(request);
 
         return ResponseEntity.ok(JsonResult.success(models));
     }

@@ -68,7 +68,7 @@ public class Ollama4jService {
     }
 
     // 检查Ollama4j是否可用
-    public Boolean isOllama4jReachable() {
+    public Boolean isOllama4jReachable(OllamaRequest request) {
         try {
             return ollama4jApi.ping();
         } catch (Exception e) {
@@ -80,7 +80,7 @@ public class Ollama4jService {
     // 本地模型列表
     // https://ollama4j.github.io/ollama4j/apis-model-management/list-models
     // 拉取本地的模型
-    public List<Model> getLocalModels() {
+    public List<Model> getLocalModels(OllamaRequest request) {
         try {
             return ollama4jApi.listModels();
         } catch (Exception e) {
@@ -92,7 +92,7 @@ public class Ollama4jService {
     // 远程模型列表
     // https://ollama4j.github.io/ollama4j/apis-model-management/list-library-models
     // 拉取所有的模型
-    public List<LibraryModel> getModels() {
+    public List<LibraryModel> getModels(OllamaRequest request) {
         try {
             return ollama4jApi.listModelsFromLibrary();
         } catch (Exception e) {
@@ -105,7 +105,7 @@ public class Ollama4jService {
     // a list of running models and details about each model currently loaded into
     // memory.
     // 获取正在运行的模型
-    public ModelsProcessResponse getPs() {
+    public ModelsProcessResponse getPs(OllamaRequest request) {
         try {
             return ollama4jApi.ps();
         } catch (Exception e) {
