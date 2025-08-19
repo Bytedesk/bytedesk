@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:45:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-18 14:20:50
+ * @LastEditTime: 2025-08-20 07:24:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,8 +59,7 @@ public class Ollama4jChatController {
     // 同步接口
     // http://127.0.0.1:9003/ollama4j/chat/sync?message=Tell%20me%20a%20j
     @RequestMapping("/sync")
-    public ResponseEntity<?> getSyncAnswer(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+    public ResponseEntity<?> getSyncAnswer(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         //
         OllamaResult result;
         try {
