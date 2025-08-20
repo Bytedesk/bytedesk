@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 16:29:53
+ * @LastEditTime: 2025-08-20 16:35:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,12 +42,7 @@ public class AssistantRestService extends BaseRestService<AssistantEntity, Assis
 
     @Override
     protected Specification<AssistantEntity> createSpecification(AssistantRequest request) {
-        return (root, query, criteriaBuilder) -> {
-            if (request.getTopic() != null && !request.getTopic().isEmpty()) {
-                return criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%");
-            }
-            return criteriaBuilder.conjunction(); // 返回空条件表示查询所有
-        };
+        return AssistantSpecification.search(request, authService);
     }
 
     @Override

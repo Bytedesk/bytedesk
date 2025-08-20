@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 15:52:01
+ * @LastEditTime: 2025-08-20 16:36:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,6 +44,16 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    @Override
+    protected Specification<BlackEntity> createSpecification(BlackRequest request) {
+        return BlackSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<BlackEntity> executePageQuery(Specification<BlackEntity> specification, Pageable pageable) {
+        return repository.findAll(specification, pageable);
+    }
 
     @Cacheable(value = "black", key = "#uid", unless = "#result == null")
     @Override
@@ -167,14 +177,6 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
         return modelMapper.map(entity, BlackExcel.class);
     }
 
-    @Override
-    protected Specification<BlackEntity> createSpecification(BlackRequest request) {
-        return BlackSpecification.search(request, authService);
-    }
-
-    @Override
-    protected Page<BlackEntity> executePageQuery(Specification<BlackEntity> specification, Pageable pageable) {
-        return repository.findAll(specification, pageable);
-    }
+    
 
 }
