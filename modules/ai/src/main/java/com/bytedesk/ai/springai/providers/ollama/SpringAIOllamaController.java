@@ -157,6 +157,16 @@ public class SpringAIOllamaController {
         }
     }
 
+    // 检查嵌入模型是否已经存在
+    // http://127.0.0.1:9003/api/v1/ollama4j/embedding-model/exists
+    @GetMapping("/embedding-model/exists")
+    public ResponseEntity<?> isEmbeddingModelExists(OllamaRequest request) {
+        boolean exists = springAIOllamaService.isModelExists(request.getModel());
+        log.info("Embedding model exists: {}, {}", request.getModel(), exists);
+        // 
+        return ResponseEntity.ok(JsonResult.success(exists));
+    }
+
     /**
      * 检测Ollama服务是否正常运行
      * http://127.0.0.1:9003/springai/ollama/health

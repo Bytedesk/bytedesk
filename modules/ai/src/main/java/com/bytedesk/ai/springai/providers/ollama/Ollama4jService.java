@@ -2,15 +2,9 @@ package com.bytedesk.ai.springai.providers.ollama;
 
 import java.util.List;
 
-import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-
 import io.github.ollama4j.OllamaAPI;
 import io.github.ollama4j.models.ps.ModelsProcessResponse;
 import io.github.ollama4j.models.response.LibraryModel;
@@ -26,36 +20,28 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jService {
 
-    @Autowired
-    @Qualifier("ollama4jApi")
-    private OllamaAPI ollama4jApi;
-
-    @Autowired
-    @Qualifier("bytedeskOllamaApi")
-    private OllamaApi bytedeskOllamaApi;
-
     @Value("${spring.ai.ollama.embedding.options.model:bge-m3:latest}")
     private String ollamaEmbeddingOptionsModel;
 
+    @Value("${spring.ai.ollama.request-timeout-seconds:120}")
+    private Integer ollamaRequestTimeoutSeconds;
+
     /**
-     * 检查模型是否存在
+     * 根据请求中的 apiUrl 创建 OllamaAPI 实例
      * 
-     * @param modelName 模型名称
-     * @return 如果模型存在返回true，否则返回false
+     * @param request 包含 apiUrl 的请求对象
+     * @return OllamaAPI 实例
      */
-    public Boolean isModelExists(String modelName) {
-        try {
-            bytedeskOllamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
-            return true;
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return false;
-            }
-            log.error("检查模型是否存在时发生错误: {}, 状态码: {}", modelName, e.getStatusCode());
-        } catch (Exception e) {
-            log.error("检查模型是否存在时发生未知错误: {}, 错误: {}", modelName, e.getMessage());
+    private OllamaAPI createOllamaAPI(OllamaRequest request) {
+        String apiUrl = request.getApiUrl();
+        if (apiUrl == null || apiUrl.trim().isEmpty()) {
+            throw new IllegalArgumentException("apiUrl is required in OllamaRequest");
         }
-        return false;
+        
+        OllamaAPI ollamaAPI = new OllamaAPI(apiUrl);
+        ollamaAPI.setVerbose(true);
+        ollamaAPI.setRequestTimeoutSeconds(ollamaRequestTimeoutSeconds);
+        return ollamaAPI;
     }
 
     /**
@@ -70,7 +56,8 @@ public class Ollama4jService {
     // 检查Ollama4j是否可用
     public Boolean isOllama4jReachable(OllamaRequest request) {
         try {
-            return ollama4jApi.ping();
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            return ollamaAPI.ping();
         } catch (Exception e) {
             log.warn("Ollama4j is not running. Error: {}", e.getMessage());
         }
@@ -82,7 +69,8 @@ public class Ollama4jService {
     // 拉取本地的模型
     public List<Model> getLocalModels(OllamaRequest request) {
         try {
-            return ollama4jApi.listModels();
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            return ollamaAPI.listModels();
         } catch (Exception e) {
             log.warn("Ollama4j get local models error: {}", e.getMessage());
         }
@@ -94,7 +82,8 @@ public class Ollama4jService {
     // 拉取所有的模型
     public List<LibraryModel> getModels(OllamaRequest request) {
         try {
-            return ollama4jApi.listModelsFromLibrary();
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            return ollamaAPI.listModelsFromLibrary();
         } catch (Exception e) {
             // e.printStackTrace();
             log.warn("Ollama4j get models error: {}", e.getMessage());
@@ -107,7 +96,8 @@ public class Ollama4jService {
     // 获取正在运行的模型
     public ModelsProcessResponse getPs(OllamaRequest request) {
         try {
-            return ollama4jApi.ps();
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            return ollamaAPI.ps();
         } catch (Exception e) {
             // e.printStackTrace();
             log.warn("Ollama4j get ps error: {}", e.getMessage());
@@ -117,9 +107,13 @@ public class Ollama4jService {
 
     // This API Fetches the tags associated with a specific model from Ollama
     // library.
-    public LibraryModelDetail getLibraryModelDetails(LibraryModel model) {
+    public LibraryModelDetail getLibraryModelDetails(OllamaRequest request) {
         try {
-            return ollama4jApi.getLibraryModelDetails(model);
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            LibraryModel libraryModel = new LibraryModel();
+            libraryModel.setName(request.getModel());
+
+            return ollamaAPI.getLibraryModelDetails(libraryModel);
         } catch (Exception e) {
             log.warn("Ollama4j get model details error: {}", e.getMessage());
         }
@@ -133,18 +127,20 @@ public class Ollama4jService {
      * @param OllamaModelType
      * @return
      */
-    public ModelDetail getModelDetails(String ollamaModelType) {
+    public ModelDetail getModelDetails(OllamaRequest request) {
         try {
-            return ollama4jApi.getModelDetails(ollamaModelType);
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            return ollamaAPI.getModelDetails(request.getModel());
         } catch (Exception e) {
             log.warn("Ollama4j get model details error: {}", e.getMessage());
         }
         return null;
     }
 
-    public LibraryModelTag getModelTag(String model, String tag) {
+    public LibraryModelTag getModelTag(OllamaRequest request) {
         try {
-            return ollama4jApi.findModelTagFromLibrary(model, tag);
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            return ollamaAPI.findModelTagFromLibrary(request.getModel(), request.getTag());
         } catch (Exception e) {
             log.warn("Ollama4j get model tag error: {}", e.getMessage());
         }
@@ -152,9 +148,10 @@ public class Ollama4jService {
     }
 
     // 拉取远程模型
-    public void pullModel(LibraryModelTag libraryModelTag) {
+    public void pullModel(OllamaRequest request, LibraryModelTag libraryModelTag) {
         try {
-            ollama4jApi.pullModel(libraryModelTag);
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            ollamaAPI.pullModel(libraryModelTag);
             return; // 成功时返回
         } catch (Exception e) {
             // e.printStackTrace();
@@ -168,10 +165,11 @@ public class Ollama4jService {
      * 
      * @{OllamaModelType}
      */
-    public void pullModel(String ollamaModelType) {
+    public void pullModel(OllamaRequest request) {
         try {
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
             // OllamaModelType.LLAMA2
-            ollama4jApi.pullModel(ollamaModelType);
+            ollamaAPI.pullModel(request.getModel());
             return; // 成功时返回
         } catch (Exception e) {
             log.warn("Ollama4j pull model error: {}", e.getMessage());
@@ -179,9 +177,10 @@ public class Ollama4jService {
     }
 
     // https://ollama4j.github.io/ollama4j/apis-model-management/delete-model
-    public void deleteModel(String model) {
+    public void deleteModel(OllamaRequest request) {
         try {
-            ollama4jApi.deleteModel(model, true);
+            OllamaAPI ollamaAPI = createOllamaAPI(request);
+            ollamaAPI.deleteModel(request.getModel(), true);
             return; // 成功时返回
         } catch (Exception e) {
             log.warn("Ollama4j delete model error: {}", e.getMessage());

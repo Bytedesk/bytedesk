@@ -2,7 +2,6 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:19:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 07:48:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,30 +82,28 @@ public class Ollama4jRestController {
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/library/models/{model}/details
-    @GetMapping("/library/models/{model}/details")
-    public ResponseEntity<JsonResult<LibraryModelDetail>> getLibraryModelDetails(@PathVariable String model) {
-
-        LibraryModel libraryModel = new LibraryModel();
-        libraryModel.setName(model);
-        LibraryModelDetail modelDetail = ollama4jService.getLibraryModelDetails(libraryModel);
+    @GetMapping("/library/models/details")
+    public ResponseEntity<JsonResult<LibraryModelDetail>> getLibraryModelDetails(OllamaRequest request) {
+        
+        LibraryModelDetail modelDetail = ollama4jService.getLibraryModelDetails(request);
 
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }
 
-    // http://127.0.0.1:9003/api/v1/ollama4j/models/{model}/details
-    @GetMapping("/models/{model}/details")
-    public ResponseEntity<JsonResult<ModelDetail>> getModelDetails(@PathVariable String model) {
+    // http://127.0.0.1:9003/api/v1/ollama4j/models/details
+    @GetMapping("/models/details")
+    public ResponseEntity<JsonResult<ModelDetail>> getModelDetails(OllamaRequest request) {
 
-        ModelDetail modelDetail = ollama4jService.getModelDetails(model);
+        ModelDetail modelDetail = ollama4jService.getModelDetails(request);
 
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/{model}/tags/{tag}
-    @GetMapping("/models/{model}/tags/{tag}")
-    public ResponseEntity<JsonResult<LibraryModelTag>> getModelTag(@PathVariable String model, @PathVariable String tag) {
+    @GetMapping("/models/tags")
+    public ResponseEntity<JsonResult<LibraryModelTag>> getModelTag(OllamaRequest request) {
 
-        LibraryModelTag modelTag = ollama4jService.getModelTag(model, tag);
+        LibraryModelTag modelTag = ollama4jService.getModelTag(request);
 
         return ResponseEntity.ok(JsonResult.success(modelTag));
     }
@@ -116,7 +112,7 @@ public class Ollama4jRestController {
     @PostMapping("/models/pull")
     public ResponseEntity<?> pullModel(@RequestBody OllamaRequest request) {
 
-        ollama4jService.pullModel(request.getModel());
+        ollama4jService.pullModel(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -126,19 +122,9 @@ public class Ollama4jRestController {
     @PostMapping("/models/delete")
     public ResponseEntity<?> deleteModel(@RequestBody OllamaRequest request) {
 
-        ollama4jService.deleteModel(request.getModel());
+        ollama4jService.deleteModel(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    // 检查嵌入模型是否已经存在
-    // http://127.0.0.1:9003/api/v1/ollama4j/embedding-model/exists
-    @GetMapping("/embedding-model/exists")
-    public ResponseEntity<?> isEmbeddingModelExists(String model) {
-        // String modelName = ollama4jService.getEmbeddingModelName();
-        boolean exists = ollama4jService.isModelExists(model);
-        log.info("Embedding model exists: {}, {}", model, exists);
-        // 
-        return ResponseEntity.ok(JsonResult.success(exists));
-    }
 }

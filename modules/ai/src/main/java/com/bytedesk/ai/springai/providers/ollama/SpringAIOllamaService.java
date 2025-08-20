@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 14:18:12
+ * @LastEditTime: 2025-08-20 09:21:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,9 +24,11 @@ import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
@@ -41,6 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaService extends BaseSpringAIService {
+
+    @Autowired
+    @Qualifier("bytedeskOllamaApi")
+    private OllamaApi bytedeskOllamaApi;
 
     @Autowired(required = false)
     @Qualifier("bytedeskOllamaChatModel")
@@ -98,6 +104,28 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             return bytedeskOllamaChatModel;
         }
     }
+
+    /**
+     * 检查模型是否存在
+     * 
+     * @param modelName 模型名称
+     * @return 如果模型存在返回true，否则返回false
+     */
+    public Boolean isModelExists(String modelName) {
+        try {
+            bytedeskOllamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
+            return true;
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return false;
+            }
+            log.error("检查模型是否存在时发生错误: {}, 状态码: {}", modelName, e.getStatusCode());
+        } catch (Exception e) {
+            log.error("检查模型是否存在时发生未知错误: {}, 错误: {}", modelName, e.getMessage());
+        }
+        return false;
+    }
+
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
