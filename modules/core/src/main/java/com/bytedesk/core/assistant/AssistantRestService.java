@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:16:23
+ * @LastEditTime: 2025-08-20 16:29:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,11 +18,13 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 
@@ -36,18 +38,23 @@ public class AssistantRestService extends BaseRestService<AssistantEntity, Assis
 
     private final UidUtils uidUtils;
 
+    private final AuthService authService;
+
     @Override
-    public Page<AssistantResponse> queryByOrg(AssistantRequest request) {
-        Pageable pageable = request.getPageable();
-        Page<AssistantEntity> assistantPage = assistantRepository.findAll(pageable);
-        return assistantPage.map(assistant -> convertToResponse(assistant));
+    protected Specification<AssistantEntity> createSpecification(AssistantRequest request) {
+        return (root, query, criteriaBuilder) -> {
+            if (request.getTopic() != null && !request.getTopic().isEmpty()) {
+                return criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%");
+            }
+            return criteriaBuilder.conjunction(); // 返回空条件表示查询所有
+        };
     }
 
     @Override
-    public Page<AssistantResponse> queryByUser(AssistantRequest request) {
-        return queryByOrg(request);
+    protected Page<AssistantEntity> executePageQuery(Specification<AssistantEntity> spec, Pageable pageable) {
+        return assistantRepository.findAll(spec, pageable);
     }
-
+    
     @Override
     public Optional<AssistantEntity> findByUid(String uid) {
         return assistantRepository.findByUid(uid);
@@ -90,18 +97,6 @@ public class AssistantRestService extends BaseRestService<AssistantEntity, Assis
 
 
             return convertToResponse(save(assistant));
-        }
-        return null;
-    }
-
-    @Override
-    public AssistantEntity save(AssistantEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            handleOptimisticLockingFailureException(e, entity);
-        } catch (Exception e) {
-            // TODO: handle exception
         }
         return null;
     }

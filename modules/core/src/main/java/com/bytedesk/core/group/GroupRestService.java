@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:24:32
+ * @LastEditTime: 2025-08-20 16:21:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,30 +61,13 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
     private final ThreadRestService threadRestService;
 
     @Override
-    public Page<GroupEntity> queryByOrgEntity(GroupRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<GroupEntity> specification = GroupSpecification.search(request, authService);
-        return groupRepository.findAll(specification, pageable);
+    protected Specification<GroupEntity> createSpecification(GroupRequest request) {
+        return GroupSpecification.search(request, authService);
     }
 
     @Override
-    public Page<GroupResponse> queryByOrg(GroupRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<GroupEntity> specification = GroupSpecification.search(request, authService);
-        Page<GroupEntity> page = groupRepository.findAll(specification, pageable);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<GroupResponse> queryByUser(GroupRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("null");
-        }
-        request.setUserUid(user.getUid());
-        request.setOrgUid(user.getOrgUid());
-        //
-        return queryByOrg(request);
+    protected Page<GroupEntity> executePageQuery(Specification<GroupEntity> spec, Pageable pageable) {
+        return groupRepository.findAll(spec, pageable);
     }
 
     public Page<GroupEntity> queryForExport(GroupRequest request) {

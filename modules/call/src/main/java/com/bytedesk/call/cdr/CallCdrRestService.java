@@ -48,6 +48,16 @@ public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, 
     private final AuthService authService;
 
     @Override
+    protected Specification<CallCdrEntity> createSpecification(CallCdrRequest request) {
+        return CallCdrSpecification.search(request);
+    }
+
+    @Override
+    protected Page<CallCdrEntity> executePageQuery(Specification<CallCdrEntity> spec, Pageable pageable) {
+        return callCdrRepository.findAll(spec, pageable);
+    }
+
+    @Override
     public Page<CallCdrEntity> queryByOrgEntity(CallCdrRequest request) {
         Pageable pageable = request.getPageable();
         Specification<CallCdrEntity> specification = CallCdrSpecification.search(request);

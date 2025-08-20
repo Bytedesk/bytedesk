@@ -35,6 +35,16 @@ public class CallUserRestService extends BaseRestServiceWithExcel<CallUserEntity
     private final AuthService authService;
 
     @Override
+    protected Specification<CallUserEntity> createSpecification(CallUserRequest request) {
+        return CallUserSpecification.search(request);
+    }
+
+    @Override
+    protected Page<CallUserEntity> executePageQuery(Specification<CallUserEntity> spec, Pageable pageable) {
+        return freeSwitchNumberRepository.findAll(spec, pageable);
+    }
+
+    @Override
     public Page<CallUserEntity> queryByOrgEntity(CallUserRequest request) {
         Pageable pageable = request.getPageable();
         Specification<CallUserEntity> specification = CallUserSpecification.search(request);

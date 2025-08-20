@@ -46,6 +46,16 @@ public class ChannelAppRestService extends BaseRestServiceWithExcel<ChannelAppEn
     private final AuthService authService;
 
     @Override
+    protected Specification<ChannelAppEntity> createSpecification(ChannelAppRequest request) {
+        return ChannelAppSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ChannelAppEntity> executePageQuery(Specification<ChannelAppEntity> spec, Pageable pageable) {
+        return appRepository.findAll(spec, pageable);
+    }
+
+    @Override
     public Page<ChannelAppEntity> queryByOrgEntity(ChannelAppRequest request) {
         Pageable pageable = request.getPageable();
         Specification<ChannelAppEntity> spec = ChannelAppSpecification.search(request);

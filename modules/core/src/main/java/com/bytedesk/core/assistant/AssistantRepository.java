@@ -16,8 +16,9 @@ package com.bytedesk.core.assistant;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface AssistantRepository extends JpaRepository<AssistantEntity, Long> {
+public interface AssistantRepository extends JpaRepository<AssistantEntity, Long>, JpaSpecificationExecutor<AssistantEntity> {
 
     Optional<AssistantEntity> findByUid(String uid);
 

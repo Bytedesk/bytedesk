@@ -47,6 +47,16 @@ public class FormResultRestService extends BaseRestServiceWithExcel<FormResultEn
     private final AuthService authService;
 
     @Override
+    protected Specification<FormResultEntity> createSpecification(FormResultRequest request) {
+        return FormResultSpecification.search(request);
+    }
+
+    @Override
+    protected Page<FormResultEntity> executePageQuery(Specification<FormResultEntity> spec, Pageable pageable) {
+        return tagRepository.findAll(spec, pageable);
+    }
+
+    @Override
     public Page<FormResultEntity> queryByOrgEntity(FormResultRequest request) {
         Pageable pageable = request.getPageable();
         Specification<FormResultEntity> spec = FormResultSpecification.search(request);

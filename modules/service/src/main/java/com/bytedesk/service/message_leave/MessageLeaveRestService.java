@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 10:30:45
+ * @LastEditTime: 2025-08-20 16:28:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -68,27 +68,13 @@ public class MessageLeaveRestService extends
     private final ThreadRestService threadRestService;
 
     @Override
-    public Page<MessageLeaveEntity> queryByOrgEntity(MessageLeaveRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<MessageLeaveEntity> spec = MessageLeaveSpecification.search(request);
+    protected Specification<MessageLeaveEntity> createSpecification(MessageLeaveRequest request) {
+        return MessageLeaveSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MessageLeaveEntity> executePageQuery(Specification<MessageLeaveEntity> spec, Pageable pageable) {
         return messageLeaveRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<MessageLeaveResponse> queryByOrg(MessageLeaveRequest request) {
-        Page<MessageLeaveEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<MessageLeaveResponse> queryByUser(MessageLeaveRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("please login first.");
-        }
-        request.setUserUid(user.getUid());
-        //
-        return queryByOrg(request);
     }
 
     public Page<MessageLeaveResponse> queryByVisitor(MessageLeaveRequest request) {
