@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:28:07
+ * @LastEditTime: 2025-08-20 11:45:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -60,7 +62,7 @@ public class ChannelAppRestService extends BaseRestServiceWithExcel<ChannelAppEn
     public Page<ChannelAppResponse> queryByUser(ChannelAppRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 

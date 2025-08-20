@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-15 10:45:27
+ * @LastEditTime: 2025-08-20 11:48:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,8 +42,10 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -119,7 +121,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     public Page<TicketResponse> queryByUser(TicketRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-        throw new RuntimeException("login first");
+        throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         //
@@ -137,7 +139,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     public TicketResponse create(TicketRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         String userUid = owner.getUid();
         // 创建工单...
@@ -291,7 +293,7 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
         //
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         // 
         if (ticket.getDepartmentUid() == null || ticket.getDepartmentUid().isEmpty()) {

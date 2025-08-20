@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 21:49:05
+ * @LastEditTime: 2025-08-20 11:43:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -33,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallWebRTCRestService extends BaseRestServiceWithExcel<CallWebRTCEntity, CallWebRTCRequest, CallWebRTCResponse, CallWebRTCExcel> {
+public class CallWebRTCRestService extends BaseRestServiceWithExcelImproved<CallWebRTCEntity, CallWebRTCRequest, CallWebRTCResponse, CallWebRTCExcel> {
 
     private final CallWebRTCRepository webrtcRepository;
 
@@ -41,7 +42,15 @@ public class CallWebRTCRestService extends BaseRestServiceWithExcel<CallWebRTCEn
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<CallWebRTCEntity> createSpecification(CallWebRTCRequest request) {
+        return CallWebRTCSpecification.search(request);
+    }
+
+    @Override
+    protected Page<CallWebRTCEntity> executePageQuery(Specification<CallWebRTCEntity> spec, Pageable pageable) {
+        return webrtcRepository.findAll(spec, pageable);
+    }
 
     @Override
     public Page<CallWebRTCEntity> queryByOrgEntity(CallWebRTCRequest request) {
@@ -60,7 +69,7 @@ public class CallWebRTCRestService extends BaseRestServiceWithExcel<CallWebRTCEn
     public Page<CallWebRTCResponse> queryByUser(CallWebRTCRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 

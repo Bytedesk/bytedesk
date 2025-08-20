@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:23:27
+ * @LastEditTime: 2025-08-20 11:43:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,6 +27,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -71,7 +73,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
     public Page<ArticleResponse> queryByUser(ArticleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         String userUid = user.getUid();
         request.setUserUid(userUid);
@@ -102,7 +104,7 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
     public ArticleResponse create(ArticleRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
 
         ArticleEntity entity = modelMapper.map(request, ArticleEntity.class);

@@ -2,14 +2,8 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 23:52:38
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ * @LastEditTime: 2025-08-20 12:08:50
+ * @Description: 使用改进BaseRestService的TodoListRestService示例
  */
 package com.bytedesk.kanban.todo_list;
 
@@ -23,8 +17,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kanban.module.ModuleEntity;
@@ -36,101 +31,34 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TodoListRestService extends BaseRestService<TodoListEntity, TodoListRequest, TodoListResponse> {
+public class TodoListRestService extends BaseRestServiceImproved<TodoListEntity, TodoListRequest, TodoListResponse> {
 
     private final TodoListRepository todoRepository;
-
     private final ModuleRepository moduleRepository;
-
     private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    // === 实现必需的抽象方法 ===
 
     @Override
-    public Page<TodoListResponse> queryByOrg(TodoListRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TodoListEntity> spec = TodoListSpecification.search(request);
-        Page<TodoListEntity> page = todoRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<TodoListEntity> createSpecification(TodoListRequest request) {
+        return TodoListSpecification.search(request);
     }
 
     @Override
-    public Page<TodoListResponse> queryByUser(TodoListRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+    protected Page<TodoListEntity> executePageQuery(Specification<TodoListEntity> spec, Pageable pageable) {
+        return todoRepository.findAll(spec, pageable);
     }
 
-    @Cacheable(value = "todo", key = "#uid", unless="#result==null")
+    @Cacheable(value = "todo", key = "#uid", unless = "#result == null")
     @Override
     public Optional<TodoListEntity> findByUid(String uid) {
         return todoRepository.findByUid(uid);
     }
 
     @Override
-    public TodoListResponse create(TodoListRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        
-        TodoListEntity entity = modelMapper.map(request, TodoListEntity.class);
-        entity.setUid(uidUtils.getUid());
-        entity.setOrgUid(user.getOrgUid());
-        // 
-        TodoListEntity savedEntity = save(entity);
-        if (savedEntity == null) {
-            throw new RuntimeException("Create todo failed");
-        }
-        // 
-        Optional<ModuleEntity> moduleOptional = moduleRepository.findByUid(request.getModuleUid());
-        if (moduleOptional.isPresent()) {
-            moduleOptional.get().getTodoLists().add(savedEntity);
-            moduleRepository.save(moduleOptional.get());
-        }
-        // 
-        return convertToResponse(savedEntity);
-    }
-
-    @Override
-    public TodoListResponse update(TodoListRequest request) {
-        Optional<TodoListEntity> optional = todoRepository.findByUid(request.getUid());
-        if (optional.isPresent()) {
-            TodoListEntity entity = optional.get();
-            modelMapper.map(request, entity);
-            //
-            TodoListEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Update todo failed");
-            }
-            return convertToResponse(savedEntity);
-        }
-        else {
-            throw new RuntimeException("TodoList not found");
-        }
-    }
-
-    /**
-     * 保存标签，失败时自动重试
-     * maxAttempts: 最大重试次数（包括第一次尝试）
-     * backoff: 重试延迟，multiplier是延迟倍数
-     * recover: 当重试次数用完后的回调方法
-     */
-    @Override
-    public TodoListEntity save(TodoListEntity entity) {
-        try {
-            log.info("Attempting to save todo: {}", entity.getName());
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
+    public TodoListResponse convertToResponse(TodoListEntity entity) {
+        return modelMapper.map(entity, TodoListResponse.class);
     }
 
     @Override
@@ -154,15 +82,55 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
         return null;
     }
 
+    // === 业务逻辑方法 ===
+
+    @Override
+    public TodoListResponse create(TodoListRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        request.setUserUid(user.getUid());
+        
+        TodoListEntity entity = modelMapper.map(request, TodoListEntity.class);
+        entity.setUid(uidUtils.getUid());
+        entity.setOrgUid(user.getOrgUid());
+        
+        TodoListEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create todo failed");
+        }
+        
+        // 处理与Module的关联
+        handleModuleAssociation(request, savedEntity);
+        
+        return convertToResponse(savedEntity);
+    }
+
+    @Override
+    public TodoListResponse update(TodoListRequest request) {
+        Optional<TodoListEntity> optional = todoRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            TodoListEntity entity = optional.get();
+            modelMapper.map(request, entity);
+            
+            TodoListEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update todo failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("TodoList not found");
+        }
+    }
+
     @Override
     public void deleteByUid(String uid) {
         Optional<TodoListEntity> optional = todoRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // todoRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("TodoList not found");
         }
     }
@@ -172,15 +140,18 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
         deleteByUid(request.getUid());
     }
 
-    @Override
-    public TodoListResponse convertToResponse(TodoListEntity entity) {
-        return modelMapper.map(entity, TodoListResponse.class);
-    }
+    // === 私有辅助方法 ===
 
-    @Override
-    public TodoListResponse queryByUid(TodoListRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    /**
+     * 处理与Module的关联关系
+     */
+    private void handleModuleAssociation(TodoListRequest request, TodoListEntity savedEntity) {
+        if (request.getModuleUid() != null) {
+            Optional<ModuleEntity> moduleOptional = moduleRepository.findByUid(request.getModuleUid());
+            if (moduleOptional.isPresent()) {
+                moduleOptional.get().getTodoLists().add(savedEntity);
+                moduleRepository.save(moduleOptional.get());
+            }
+        }
     }
-    
 }

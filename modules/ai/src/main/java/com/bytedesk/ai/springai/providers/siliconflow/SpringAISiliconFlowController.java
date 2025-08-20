@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/siliconflow")
+@RequestMapping("/api/v1/siliconflow")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.siliconflow.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAISiliconFlowController {
@@ -57,7 +57,7 @@ public class SpringAISiliconFlowController {
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/deepseek/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -73,7 +73,7 @@ public class SpringAISiliconFlowController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/deepseek/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -91,7 +91,7 @@ public class SpringAISiliconFlowController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/deepseek/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -127,7 +127,7 @@ public class SpringAISiliconFlowController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/springai/deepseek/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(

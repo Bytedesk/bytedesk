@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 14:00:01
+ * @LastEditTime: 2025-08-20 11:26:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -162,6 +162,7 @@ public class I18Consts {
     // public static final String I18N_EMAIL_SIGNUP_FIRST = I18N_PREFIX + "email.signup.first"; // 请先使用邮箱注册
     // public static final String I18N_MOBILE_SIGNUP_FIRST = I18N_PREFIX + "mobile.signup.first"; // 请先使用手机号注册
     // public static final String I18N_RESOURCE_NOT_FOUND = I18N_PREFIX + "resource.not.found"; // 资源未找到
+    public static final String I18N_LOGIN_REQUIRED = I18N_PREFIX + "login.required"; // 请先登录
     // public static final String I18N_USER_DISABLED = I18N_PREFIX + "user.disabled"; // 用户已被禁用
     // public static final String I18N_FORBIDDEN_ACCESS = I18N_PREFIX + "forbidden.access"; // 禁止访问
     // public static final String I18N_USER_BLOCKED = I18N_PREFIX + "user.blocked"; // 用户已被封禁
@@ -321,7 +322,7 @@ public class I18Consts {
     public static final String I18N_EMAIL_SIGNUP_FIRST = "请先使用邮箱注册"; // 请先使用邮箱注册
     public static final String I18N_MOBILE_SIGNUP_FIRST = "请先使用手机号注册"; // 请先使用手机号注册
     public static final String I18N_RESOURCE_NOT_FOUND = "资源未找到"; // 资源未找到
-    public static final String I18N_NOT_LOGIN = "请先登录"; // 请先登录
+    // public static final String I18N_NOT_LOGIN = "请先登录"; // 请先登录
     public static final String I18N_USER_DISABLED = "用户已被禁用"; // 用户已被禁用
     public static final String I18N_FORBIDDEN_ACCESS = "禁止访问"; // 禁止访问
     public static final String I18N_USER_BLOCKED = "用户已被封禁"; // 用户已被封禁
@@ -339,7 +340,6 @@ public class I18Consts {
     public static final String I18N_NO_ANSWER = "您的这个问题暂时无法回答，请提问其他问题。";
     public static final String I18N_CANT_ANSWER = "您的这个问题我不能回答，请提问其他问题。"; 
 
-    public static final String I18N_LOGIN_REQUIRED = "请先登录"; // 请先登录
     public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
 
 

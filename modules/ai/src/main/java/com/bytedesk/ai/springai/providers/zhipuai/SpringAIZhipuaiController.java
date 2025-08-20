@@ -55,7 +55,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/zhipuai")
+@RequestMapping("/api/v1/zhipuai")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiController {
@@ -68,7 +68,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/zhipuai/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/zhipuai/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -84,7 +84,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/zhipuai/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/zhipuai/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -100,7 +100,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/zhipuai/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/zhipuai/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -136,7 +136,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/springai/zhipuai/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/zhipuai/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(
@@ -161,7 +161,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 图像生成接口
-     * http://127.0.0.1:9003/springai/zhipuai/image
+     * http://127.0.0.1:9003/api/v1/zhipuai/image
      */
     @GetMapping("/image")
     public ResponseEntity<JsonResult<?>> generateImage(
@@ -177,7 +177,7 @@ public class SpringAIZhipuaiController {
 
     /**
      * 测试token提取功能
-     * http://127.0.0.1:9003/springai/zhipuai/test-tokens
+     * http://127.0.0.1:9003/api/v1/zhipuai/test-tokens
      */
     @GetMapping("/test-tokens")
     public ResponseEntity<JsonResult<?>> testTokenExtraction() {
@@ -202,7 +202,7 @@ public class SpringAIZhipuaiController {
         }
     }
 
-    // http://127.0.0.1:9003/springai/zhipuai/stream-sse
+    // http://127.0.0.1:9003/api/v1/zhipuai/stream-sse
     @GetMapping("/stream-sse")
     public void streamSse(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

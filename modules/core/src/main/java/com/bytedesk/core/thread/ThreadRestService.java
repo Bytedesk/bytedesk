@@ -94,7 +94,7 @@ public class ThreadRestService
     public Page<ThreadResponse> query(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         request.setOwnerUid(user.getUid());
@@ -106,7 +106,7 @@ public class ThreadRestService
     public Page<ThreadResponse> queryByUser(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 

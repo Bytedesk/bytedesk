@@ -1,8 +1,9 @@
+ 
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 13:44:34
+ * @LastEditTime: 2025-08-20 11:11:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,17 +21,15 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -42,45 +41,47 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/ollama")
+@RequestMapping("/api/v1//ollama")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+// @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaController {
 
-    private final BytedeskProperties bytedeskProperties;
     private final SpringAIOllamaService springAIOllamaService;
+
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/ollama/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/ollama/chat/sync?message=hello&apiUrl=&model=llama3
      */
     @GetMapping("/chat/sync")
-    public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-
-        if (!bytedeskProperties.getDebug()) {
+    public ResponseEntity<JsonResult<?>> chatSync(OllamaRequest request) {
+        // 
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getApiUrl()).build();
+        OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
         }
-
-        String response = springAIOllamaService.processPromptSync(message, null, "");
+        var response = model.call(request.getMessage());
+        if (response == null) {
+            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+        }
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/ollama/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/ollama/chat/stream?message=hello&apiUrl=&model=llama3
      */
     @GetMapping("/chat/stream")
-    public Flux<ChatResponse> chatStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+    public Flux<ChatResponse> chatStream(OllamaRequest request) {
 
-        if (!bytedeskProperties.getDebug()) {
-            return Flux.empty();
-        }
-
-        Prompt prompt = new Prompt(new UserMessage(message));
-        OllamaChatModel model = springAIOllamaService.getChatModel();
+        Prompt prompt = new Prompt(new UserMessage(request.getMessage()));
+        // 
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getApiUrl()).build();
+        OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -90,14 +91,10 @@ public class SpringAIOllamaController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/ollama/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/ollama/chat/sse?message=hello&apiUrl=&model=llama3
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter chatSSE(@RequestParam(value = "message") String message) {
-
-        if (!bytedeskProperties.getDebug()) {
-            return null;
-        }
+    public SseEmitter chatSSE(OllamaRequest request) {
 
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
 
@@ -125,30 +122,20 @@ public class SpringAIOllamaController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/springai/ollama/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/ollama/chat/custom?message=hello&apiUrl=&model=llama3
      */
     @GetMapping("/chat/custom")
-    public ResponseEntity<JsonResult<?>> chatCustom(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+    public ResponseEntity<JsonResult<?>> chatCustom(OllamaRequest request) {
 
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
-        }
-
-        OllamaChatModel model = springAIOllamaService.getChatModel();
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getApiUrl()).build();
+        OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
         }
 
         try {
-            ChatResponse response = model.call(
-                    new Prompt(
-                            message,
-                            OllamaOptions.builder()
-                                    .model("llama2")
-                                    .temperature(0.7)
-                                    .topP(0.9)
-                                    .build()));
+            ChatResponse response = model.call(new Prompt(request.getMessage()));
 
             String result = response.getResult().getOutput().getText();
             return ResponseEntity.ok(JsonResult.success(result));
@@ -158,37 +145,13 @@ public class SpringAIOllamaController {
     }
 
     // 检查嵌入模型是否已经存在
-    // http://127.0.0.1:9003/api/v1/ollama4j/embedding-model/exists
+    // http://127.0.0.1:9003/api/v1//ollama4j/embedding-model/exists
     @GetMapping("/embedding-model/exists")
     public ResponseEntity<?> isEmbeddingModelExists(OllamaRequest request) {
-        boolean exists = springAIOllamaService.isModelExists(request.getModel());
+        boolean exists = springAIOllamaService.isModelExists(request);
         log.info("Embedding model exists: {}, {}", request.getModel(), exists);
         // 
         return ResponseEntity.ok(JsonResult.success(exists));
-    }
-
-    /**
-     * 检测Ollama服务是否正常运行
-     * http://127.0.0.1:9003/springai/ollama/health
-     */
-    @GetMapping("/health")
-    public ResponseEntity<JsonResult<?>> checkHealth() {
-
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
-        }
-
-        try {
-            boolean isHealthy = springAIOllamaService.isServiceHealthy();
-            if (isHealthy) {
-                return ResponseEntity.ok(JsonResult.success("Ollama service is running normally", true));
-            } else {
-                return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
-            }
-        } catch (Exception e) {
-            log.error("Error checking Ollama health", e);
-            return ResponseEntity.ok(JsonResult.error("Failed to check Ollama service: " + e.getMessage()));
-        }
     }
 
     // 在 Bean 销毁时关闭线程池

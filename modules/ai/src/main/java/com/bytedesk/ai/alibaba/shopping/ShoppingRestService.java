@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 16:07:08
+ * @LastEditTime: 2025-08-20 13:18:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,8 +24,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ShoppingRestService extends BaseRestServiceWithExcel<ShoppingEntity, ShoppingRequest, ShoppingResponse, ShoppingExcel> {
+public class ShoppingRestService extends BaseRestServiceWithExcelImproved<ShoppingEntity, ShoppingRequest, ShoppingResponse, ShoppingExcel> {
 
     private final ShoppingRepository shoppingRepository;
 
@@ -42,41 +43,14 @@ public class ShoppingRestService extends BaseRestServiceWithExcel<ShoppingEntity
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<ShoppingEntity> createSpecification(ShoppingRequest request) {
+        return ShoppingSpecification.search(request);
+    }
 
     @Override
-    public Page<ShoppingEntity> queryByOrgEntity(ShoppingRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ShoppingEntity> spec = ShoppingSpecification.search(request);
+    protected Page<ShoppingEntity> executePageQuery(Specification<ShoppingEntity> spec, Pageable pageable) {
         return shoppingRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<ShoppingResponse> queryByOrg(ShoppingRequest request) {
-        Page<ShoppingEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<ShoppingResponse> queryByUser(ShoppingRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public ShoppingResponse queryByUid(ShoppingRequest request) {
-        Optional<ShoppingEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            ShoppingEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Shopping not found");
-        }
     }
 
     @Cacheable(value = "shopping", key = "#uid", unless="#result==null")

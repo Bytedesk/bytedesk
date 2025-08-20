@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-02 07:02:01
+ * @LastEditTime: 2025-08-20 11:38:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -85,7 +86,7 @@ public abstract class BaseSpecification<T, TRequest> {
         if (Boolean.TRUE.equals(request.getSuperUser())) {
             UserEntity user = authService.getUser();
             if (user == null) {
-                throw new NotLoginException("login first");
+                throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
             }
             if (!user.isSuperUser()) {
                 // 如果不是超级管理员，则设置为false

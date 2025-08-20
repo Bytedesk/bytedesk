@@ -24,6 +24,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -36,11 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSettingsEntity, InviteSettingsRequest, InviteSettingsResponse, InviteSettingsExcel> {
 
     private final InviteSettingsRepository inviteSettingRepository;
-
     private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
-
     private final AuthService authService;
 
     @Override
@@ -60,7 +59,7 @@ public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSe
     public Page<InviteSettingsResponse> queryByUser(InviteSettingsRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 
@@ -69,8 +68,12 @@ public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSe
 
     @Override
     public InviteSettingsResponse queryByUid(InviteSettingsRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        Optional<InviteSettingsEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
+        } else {
+            throw new RuntimeException("InviteSettings not found");
+        }
     }
 
     @Cacheable(value = "inviteSetting", key = "#uid", unless="#result==null")

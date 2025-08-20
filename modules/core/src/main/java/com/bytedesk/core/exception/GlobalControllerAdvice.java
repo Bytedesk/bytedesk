@@ -81,7 +81,7 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(NotLoginException.class)
     public ResponseEntity<?> handleNotLoginException(NotLoginException e) {
-        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_NOT_LOGIN));
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_LOGIN_REQUIRED));
     }
 
     @ExceptionHandler(UserDisabledException.class)

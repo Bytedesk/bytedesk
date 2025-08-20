@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 16:25:59
+ * @LastEditTime: 2025-08-20 13:17:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,10 +28,11 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
@@ -47,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, BookingRequest, BookingResponse, BookingExcel> {
+public class BookingRestService extends BaseRestServiceWithExcelImproved<BookingEntity, BookingRequest, BookingResponse, BookingExcel> {
 
     private final BookingRepository bookingRepository;
 
@@ -55,44 +56,7 @@ public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, 
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     private final ConsumerRestService consumerRestService;
-
-    @Override
-    public Page<BookingEntity> queryByOrgEntity(BookingRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<BookingEntity> spec = BookingSpecification.search(request, authService);
-        return bookingRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<BookingResponse> queryByOrg(BookingRequest request) {
-        Page<BookingEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<BookingResponse> queryByUser(BookingRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public BookingResponse queryByUid(BookingRequest request) {
-        Optional<BookingEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            BookingEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Booking not found");
-        }
-    }
 
     @Cacheable(value = "booking", key = "#uid", unless="#result==null")
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 14:26:08
+ * @LastEditTime: 2025-08-20 12:15:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,108 +23,47 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kanban.todo_list.TodoListEntity;
 import com.bytedesk.kanban.todo_list.TodoListRepository;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, TaskResponse> {
+public class TaskRestService extends BaseRestServiceImproved<TaskEntity, TaskRequest, TaskResponse> {
 
     private final TaskRepository taskRepository;
-
     private final TodoListRepository todoListRepository;
-
     private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    // === 实现必需的抽象方法 ===
 
     @Override
-    public Page<TaskResponse> queryByOrg(TaskRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TaskEntity> spec = TaskSpecification.search(request);
-        Page<TaskEntity> page = taskRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<TaskEntity> createSpecification(TaskRequest request) {
+        return TaskSpecification.search(request);
     }
 
     @Override
-    public Page<TaskResponse> queryByUser(TaskRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+    protected Page<TaskEntity> executePageQuery(Specification<TaskEntity> spec, Pageable pageable) {
+        return taskRepository.findAll(spec, pageable);
     }
 
-    @Cacheable(value = "task", key = "#uid", unless="#result==null")
+    @Cacheable(value = "task", key = "#uid", unless = "#result == null")
     @Override
     public Optional<TaskEntity> findByUid(String uid) {
         return taskRepository.findByUid(uid);
     }
 
     @Override
-    public TaskResponse create(TaskRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        TaskEntity entity = modelMapper.map(request, TaskEntity.class);
-        entity.setUid(uidUtils.getUid());
-        entity.setOrgUid(user.getOrgUid());
-        // 
-        TaskEntity savedEntity = save(entity);
-        if (savedEntity == null) {
-            throw new RuntimeException("Create task failed");
-        }
-        // 
-        Optional<TodoListEntity> todoListOptional = todoListRepository.findByUid(request.getTodoListUid());
-        if (todoListOptional.isPresent()) {
-            todoListOptional.get().getTasks().add(savedEntity);
-            todoListRepository.save(todoListOptional.get());
-        }
-        // 
-        return convertToResponse(savedEntity);
-    }
-
-    @Override
-    public TaskResponse update(TaskRequest request) {
-        Optional<TaskEntity> optional = taskRepository.findByUid(request.getUid());
-        if (optional.isPresent()) {
-            TaskEntity entity = optional.get();
-            modelMapper.map(request, entity);
-            //
-            TaskEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Update task failed");
-            }
-            return convertToResponse(savedEntity);
-        }
-        else {
-            throw new RuntimeException("Task not found");
-        }
-    }
-
-    @Override
-    public TaskEntity save(TaskEntity entity) {
-        try {
-            log.info("Attempting to save task: {}", entity.getName());
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
+    public TaskResponse convertToResponse(TaskEntity entity) {
+        return modelMapper.map(entity, TaskResponse.class);
     }
 
     @Override
@@ -148,15 +87,55 @@ public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, Ta
         return null;
     }
 
+    // === 业务逻辑方法 ===
+
+    @Override
+    public TaskResponse create(TaskRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        request.setUserUid(user.getUid());
+        
+        TaskEntity entity = modelMapper.map(request, TaskEntity.class);
+        entity.setUid(uidUtils.getUid());
+        entity.setOrgUid(user.getOrgUid());
+        
+        TaskEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create task failed");
+        }
+        
+        // 处理与TodoList的关联
+        handleTodoListAssociation(request, savedEntity);
+        
+        return convertToResponse(savedEntity);
+    }
+
+    @Override
+    public TaskResponse update(TaskRequest request) {
+        Optional<TaskEntity> optional = taskRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            TaskEntity entity = optional.get();
+            modelMapper.map(request, entity);
+            //
+            TaskEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update task failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("Task not found");
+        }
+    }
+
     @Override
     public void deleteByUid(String uid) {
         Optional<TaskEntity> optional = taskRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // taskRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("Task not found");
         }
     }
@@ -166,15 +145,18 @@ public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, Ta
         deleteByUid(request.getUid());
     }
 
-    @Override
-    public TaskResponse convertToResponse(TaskEntity entity) {
-        return modelMapper.map(entity, TaskResponse.class);
-    }
+    // === 私有辅助方法 ===
 
-    @Override
-    public TaskResponse queryByUid(TaskRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    /**
+     * 处理与TodoList的关联关系
+     */
+    private void handleTodoListAssociation(TaskRequest request, TaskEntity savedEntity) {
+        if (request.getTodoListUid() != null) {
+            Optional<TodoListEntity> todoListOptional = todoListRepository.findByUid(request.getTodoListUid());
+            if (todoListOptional.isPresent()) {
+                todoListOptional.get().getTasks().add(savedEntity);
+                todoListRepository.save(todoListOptional.get());
+            }
+        }
     }
-    
 }

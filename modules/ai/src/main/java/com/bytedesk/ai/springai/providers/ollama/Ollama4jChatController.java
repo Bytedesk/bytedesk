@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:45:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 10:05:16
+ * @LastEditTime: 2025-08-20 11:10:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,6 @@ import com.bytedesk.core.utils.JsonResultCodeEnum;
 
 import io.github.ollama4j.OllamaAPI;
 import io.github.ollama4j.exceptions.OllamaBaseException;
-import io.github.ollama4j.exceptions.ToolInvocationException;
 import io.github.ollama4j.models.chat.OllamaChatMessageRole;
 import io.github.ollama4j.models.chat.OllamaChatRequest;
 import io.github.ollama4j.models.chat.OllamaChatRequestBuilder;
@@ -42,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 // https://ollama4j.github.io/ollama4j/apis-generate/generate/
 @Slf4j
 @RestController
-@RequestMapping("/ollama4j/chat")
+@RequestMapping("/api/v1/ollama4j/chat")
 @RequiredArgsConstructor
 // @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jChatController {
@@ -57,7 +56,7 @@ public class Ollama4jChatController {
     private final Ollama4jService ollama4jService;
 
     // 同步接口
-    // http://127.0.0.1:9003/ollama4j/chat/sync?message=Tell%20me%20a%20j
+    // http://127.0.0.1:9003/ollama4j/chat/sync?message=Tell%20me%20a%20j&apiUrl=http://127.0.0.1:11474&model=llama3
     @RequestMapping("/sync")
     public ResponseEntity<?> getSyncAnswer(OllamaRequest request) {
         //
@@ -74,7 +73,7 @@ public class Ollama4jChatController {
     }
 
     // 同步接口
-    // http://127.0.0.1:9003/ollama4j/chat/stream?message=Tell%20me%20a%2joke
+    // http://127.0.0.1:9003/ollama4j/chat/stream?message=Tell%20me%20a%2joke&apiUrl=http://127.0.0.1:11474&model=llama3
     @RequestMapping(value = "/stream")
     public ResponseEntity<?> getSyncAnswerStream(OllamaRequest request) {
         // define a stream handler (Consumer<String>)
@@ -98,7 +97,7 @@ public class Ollama4jChatController {
     }
 
     // 使用SSE返回流结果的接口
-    // http://127.0.0.1:9003/ollama4j/chat/stream-sse?message=Tell%20me%20a%20joke
+    // http://127.0.0.1:9003/ollama4j/chat/stream-sse?message=Tell%20me%20a%20joke&apiUrl=http://127.0.0.1:11474&model=llama3
     @RequestMapping(value = "/stream-sse")
     public SseEmitter getStreamAnswerSse(OllamaRequest request) {
 
@@ -149,7 +148,7 @@ public class Ollama4jChatController {
     }
 
     // 异步接口
-    // http://127.0.0.1:9003/ollama4j/chat/async?message=Tell%20me%20a%2joke
+    // http://127.0.0.1:9003/ollama4j/chat/async?message=Tell%20me%20a%2joke&apiUrl=http://127.0.0.1:11474&model=llama3
     @GetMapping("/async")
     public ResponseEntity<?> getAsyncAnswer(OllamaRequest request)
             throws InterruptedException {
@@ -174,7 +173,7 @@ public class Ollama4jChatController {
 
     // 添加-聊天上下文
     // https://ollama4j.github.io/ollama4j/apis-generate/chat
-    // http://127.0.0.1:9003/ollama4j/chat/context?message=Tell%20me%20a%2joke
+    // http://127.0.0.1:9003/ollama4j/chat/context?message=Tell%20me%20a%2joke&apiUrl=http://127.0.0.1:11474&model=llama3
     @GetMapping("/context")
     public ResponseEntity<?> getChatWithContext(OllamaRequest request)
             throws OllamaBaseException, IOException, InterruptedException {
@@ -202,16 +201,7 @@ public class Ollama4jChatController {
             System.out.println("Chat History: " + chatResult.getChatHistory());
 
             return ResponseEntity.ok(JsonResult.success(chatResult.toString()));
-        } catch (OllamaBaseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ToolInvocationException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

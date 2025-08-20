@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 22:16:54
+ * @LastEditTime: 2025-08-20 11:49:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -34,52 +35,68 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntity, ProjectInviteRequest, ProjectInviteResponse> {
+public class ProjectInviteRestService extends BaseRestServiceImproved<ProjectInviteEntity, ProjectInviteRequest, ProjectInviteResponse> {
 
-    private final ProjectInviteRepository project_inviteRepository;
-
+    private final ProjectInviteRepository projectInviteRepository;
     private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    // === 实现必需的抽象方法 ===
 
     @Override
-    public Page<ProjectInviteResponse> queryByOrg(ProjectInviteRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ProjectInviteEntity> spec = ProjectInviteSpecification.search(request);
-        Page<ProjectInviteEntity> page = project_inviteRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<ProjectInviteEntity> createSpecification(ProjectInviteRequest request) {
+        return ProjectInviteSpecification.search(request);
     }
 
     @Override
-    public Page<ProjectInviteResponse> queryByUser(ProjectInviteRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+    protected Page<ProjectInviteEntity> executePageQuery(Specification<ProjectInviteEntity> spec, Pageable pageable) {
+        return projectInviteRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "project_invite", key = "#uid", unless="#result==null")
     @Override
     public Optional<ProjectInviteEntity> findByUid(String uid) {
-        return project_inviteRepository.findByUid(uid);
+        return projectInviteRepository.findByUid(uid);
     }
+
+    @Override
+    public ProjectInviteResponse convertToResponse(ProjectInviteEntity entity) {
+        return modelMapper.map(entity, ProjectInviteResponse.class);
+    }
+
+    @Override
+    protected ProjectInviteEntity doSave(ProjectInviteEntity entity) {
+        return projectInviteRepository.save(entity);
+    }
+
+    @Override
+    public ProjectInviteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ProjectInviteEntity entity) {
+        try {
+            Optional<ProjectInviteEntity> latest = projectInviteRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                ProjectInviteEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                modelMapper.map(entity, latestEntity);
+                return projectInviteRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    // === 业务逻辑方法 ===
 
     @Override
     public ProjectInviteResponse create(ProjectInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         
         ProjectInviteEntity entity = modelMapper.map(request, ProjectInviteEntity.class);
         entity.setUid(uidUtils.getUid());
-        // 
         entity.setOrgUid(user.getOrgUid());
 
         ProjectInviteEntity savedEntity = save(entity);
@@ -91,7 +108,7 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
 
     @Override
     public ProjectInviteResponse update(ProjectInviteRequest request) {
-        Optional<ProjectInviteEntity> optional = project_inviteRepository.findByUid(request.getUid());
+        Optional<ProjectInviteEntity> optional = projectInviteRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             ProjectInviteEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -107,49 +124,12 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
         }
     }
 
-    /**
-     * 保存标签，失败时自动重试
-     * maxAttempts: 最大重试次数（包括第一次尝试）
-     * backoff: 重试延迟，multiplier是延迟倍数
-     */
-    @Override
-    public ProjectInviteEntity save(ProjectInviteEntity entity) {
-        try {
-            log.info("Attempting to save project_invite: {}", entity.getName());
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
-    protected ProjectInviteEntity doSave(ProjectInviteEntity entity) {
-        return project_inviteRepository.save(entity);
-    }
-
-    @Override
-    public ProjectInviteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ProjectInviteEntity entity) {
-        try {
-            Optional<ProjectInviteEntity> latest = project_inviteRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                ProjectInviteEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                modelMapper.map(entity, latestEntity);
-                return project_inviteRepository.save(latestEntity);
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
-        }
-        return null;
-    }
-
     @Override
     public void deleteByUid(String uid) {
-        Optional<ProjectInviteEntity> optional = project_inviteRepository.findByUid(uid);
+        Optional<ProjectInviteEntity> optional = projectInviteRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // project_inviteRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("ProjectInvite not found");
@@ -160,16 +140,4 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
     public void delete(ProjectInviteRequest request) {
         deleteByUid(request.getUid());
     }
-
-    @Override
-    public ProjectInviteResponse convertToResponse(ProjectInviteEntity entity) {
-        return modelMapper.map(entity, ProjectInviteResponse.class);
-    }
-
-    @Override
-    public ProjectInviteResponse queryByUid(ProjectInviteRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-    
-}
+}}

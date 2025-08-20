@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 21:17:54
+ * @LastEditTime: 2025-08-20 11:41:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -36,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, GroupInviteRequest, GroupInviteResponse> {
 
-    private final GroupInviteRepository group_inviteRepository;
+    private final GroupInviteRepository groupInviteRepository;
 
     private final ModelMapper modelMapper;
 
@@ -48,7 +50,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     public Page<GroupInviteResponse> queryByOrg(GroupInviteRequest request) {
         Pageable pageable = request.getPageable();
         Specification<GroupInviteEntity> spec = GroupInviteSpecification.search(request);
-        Page<GroupInviteEntity> page = group_inviteRepository.findAll(spec, pageable);
+        Page<GroupInviteEntity> page = groupInviteRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
 
@@ -56,7 +58,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     public Page<GroupInviteResponse> queryByUser(GroupInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 
@@ -66,14 +68,14 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     @Cacheable(value = "group_invite", key = "#uid", unless="#result==null")
     @Override
     public Optional<GroupInviteEntity> findByUid(String uid) {
-        return group_inviteRepository.findByUid(uid);
+        return groupInviteRepository.findByUid(uid);
     }
 
     @Override
     public GroupInviteResponse create(GroupInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         
@@ -91,7 +93,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
 
     @Override
     public GroupInviteResponse update(GroupInviteRequest request) {
-        Optional<GroupInviteEntity> optional = group_inviteRepository.findByUid(request.getUid());
+        Optional<GroupInviteEntity> optional = groupInviteRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             GroupInviteEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -120,12 +122,12 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
 
     @Override
     protected GroupInviteEntity doSave(GroupInviteEntity entity) {
-        return group_inviteRepository.save(entity);
+        return groupInviteRepository.save(entity);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<GroupInviteEntity> optional = group_inviteRepository.findByUid(uid);
+        Optional<GroupInviteEntity> optional = groupInviteRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -145,12 +147,12 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     public GroupInviteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, GroupInviteEntity entity) {
         // 乐观锁处理实现
         try {
-            Optional<GroupInviteEntity> latest = group_inviteRepository.findByUid(entity.getUid());
+            Optional<GroupInviteEntity> latest = groupInviteRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 GroupInviteEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return group_inviteRepository.save(latestEntity);
+                return groupInviteRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);

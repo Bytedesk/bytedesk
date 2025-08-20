@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-10 20:54:36
+ * @LastEditTime: 2025-08-20 11:42:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,10 +24,11 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
@@ -38,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, CallIvrRequest, CallIvrResponse, CallIvrExcel> {
+public class CallIvrRestService extends BaseRestServiceWithExcelImproved<CallIvrEntity, CallIvrRequest, CallIvrResponse, CallIvrExcel> {
 
     private final CallIvrRepository ivrRepository;
 
@@ -46,7 +47,15 @@ public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, 
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<CallIvrEntity> createSpecification(CallIvrRequest request) {
+        return CallIvrSpecification.search(request);
+    }
+
+    @Override
+    protected Page<CallIvrEntity> executePageQuery(Specification<CallIvrEntity> spec, Pageable pageable) {
+        return ivrRepository.findAll(spec, pageable);
+    }
 
     @Override
     public Page<CallIvrEntity> queryByOrgEntity(CallIvrRequest request) {
@@ -65,7 +74,7 @@ public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, 
     public Page<CallIvrResponse> queryByUser(CallIvrRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 

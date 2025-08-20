@@ -45,7 +45,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/dashscope")
+@RequestMapping("/api/v1/dashscope")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.dashscope.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeController {
@@ -61,7 +61,7 @@ public class SpringAIDashscopeController {
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/dashscope/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/dashscope/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -77,7 +77,7 @@ public class SpringAIDashscopeController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/dashscope/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/dashscope/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -98,7 +98,7 @@ public class SpringAIDashscopeController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/dashscope/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/dashscope/chat/sse?message=hello
      */
     @GetMapping("/chat/sse")
     public SseEmitter chatSse(
@@ -160,7 +160,7 @@ public class SpringAIDashscopeController {
 
     /**
      * 方式4：自定义参数调用
-     * http://127.0.0.1:9003/springai/dashscope/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/dashscope/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
@@ -195,7 +195,7 @@ public class SpringAIDashscopeController {
 
     /**
      * 方式5：使用 ChatClient 调用演示
-     * http://127.0.0.1:9003/springai/dashscope/chat/client?message=hello
+     * http://127.0.0.1:9003/api/v1/dashscope/chat/client?message=hello
      */
     @GetMapping("/chat/client")
     public ResponseEntity<JsonResult<?>> chatWithClient(
@@ -223,7 +223,7 @@ public class SpringAIDashscopeController {
 
     /**
      * 方式6：使用 ChatClient 流式调用演示
-     * http://127.0.0.1:9003/springai/dashscope/chat/client/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/dashscope/chat/client/stream?message=hello
      */
     @GetMapping("/chat/client/stream")
     public Flux<ChatResponse> chatWithClientStream(
@@ -247,7 +247,7 @@ public class SpringAIDashscopeController {
 
     /**
      * 方式7：使用 ChatClient 带系统提示的调用演示
-     * http://127.0.0.1:9003/springai/dashscope/chat/client/system?message=hello
+     * http://127.0.0.1:9003/api/v1/dashscope/chat/client/system?message=hello
      */
     @GetMapping("/chat/client/system")
     public ResponseEntity<JsonResult<?>> chatWithClientSystem(

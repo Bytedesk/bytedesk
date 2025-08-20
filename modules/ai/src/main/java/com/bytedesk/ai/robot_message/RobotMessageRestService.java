@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 07:05:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:09:50
+ * @LastEditTime: 2025-08-20 13:21:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -26,8 +26,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -40,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Description("Robot Message Service - AI robot message and conversation management service")
-public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessageEntity, RobotMessageRequest, RobotMessageResponse, RobotMessageExcel> {
+public class RobotMessageRestService extends BaseRestServiceWithExcelImproved<RobotMessageEntity, RobotMessageRequest, RobotMessageResponse, RobotMessageExcel> {
 
     private final RobotMessageRepository robotMessageRepository;
 
@@ -48,37 +49,16 @@ public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessa
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<RobotMessageEntity> createSpecification(RobotMessageRequest request) {
+        return RobotMessageSpecification.search(request);
+    }
 
     @Override
-    public Page<RobotMessageEntity> queryByOrgEntity(RobotMessageRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<RobotMessageEntity> spec = RobotMessageSpecification.search(request);
+    protected Page<RobotMessageEntity> executePageQuery(Specification<RobotMessageEntity> spec, Pageable pageable) {
         return robotMessageRepository.findAll(spec, pageable);
     }
 
-    @Override
-    public Page<RobotMessageResponse> queryByOrg(RobotMessageRequest request) {
-        Page<RobotMessageEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<RobotMessageResponse> queryByUser(RobotMessageRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public RobotMessageResponse queryByUid(RobotMessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
 
     @Cacheable(value = "robotMessage", key = "#uid", unless="#result==null")
     @Override

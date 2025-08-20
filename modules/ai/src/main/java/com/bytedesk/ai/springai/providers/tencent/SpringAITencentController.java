@@ -43,7 +43,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/tencent")
+@RequestMapping("/api/v1/tencent")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.tencent.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAITencentController {
@@ -55,7 +55,7 @@ public class SpringAITencentController {
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/tencent/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -71,7 +71,7 @@ public class SpringAITencentController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/tencent/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -92,7 +92,7 @@ public class SpringAITencentController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/tencent/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -128,7 +128,7 @@ public class SpringAITencentController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/springai/tencent/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(

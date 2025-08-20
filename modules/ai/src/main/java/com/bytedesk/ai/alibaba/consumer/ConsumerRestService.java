@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 11:22:05
+ * @LastEditTime: 2025-08-20 13:17:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,8 +24,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ConsumerRestService extends BaseRestServiceWithExcel<ConsumerEntity, ConsumerRequest, ConsumerResponse, ConsumerExcel> {
+public class ConsumerRestService extends BaseRestServiceWithExcelImproved<ConsumerEntity, ConsumerRequest, ConsumerResponse, ConsumerExcel> {
 
     private final ConsumerRepository consumerRepository;
 
@@ -42,41 +43,15 @@ public class ConsumerRestService extends BaseRestServiceWithExcel<ConsumerEntity
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     @Override
-    public Page<ConsumerEntity> queryByOrgEntity(ConsumerRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ConsumerEntity> spec = ConsumerSpecification.search(request);
-        return consumerRepository.findAll(spec, pageable);
+    protected Specification<ConsumerEntity> createSpecification(ConsumerRequest request) {
+        return ConsumerSpecification.search(request);
     }
 
     @Override
-    public Page<ConsumerResponse> queryByOrg(ConsumerRequest request) {
-        Page<ConsumerEntity> page = queryByOrgEntity(request);
+    protected Page<ConsumerResponse> executePageQuery(Specification<ConsumerEntity> spec, Pageable pageable) {
+        Page<ConsumerEntity> page = consumerRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<ConsumerResponse> queryByUser(ConsumerRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public ConsumerResponse queryByUid(ConsumerRequest request) {
-        Optional<ConsumerEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            ConsumerEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Consumer not found");
-        }
     }
 
     @Cacheable(value = "consumer", key = "#uid", unless="#result==null")

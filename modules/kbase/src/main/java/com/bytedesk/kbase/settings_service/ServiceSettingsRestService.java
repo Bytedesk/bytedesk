@@ -60,7 +60,7 @@ public class ServiceSettingsRestService extends BaseRestServiceWithExcel<Service
     public Page<ServiceSettingsResponse> queryByUser(ServiceSettingsRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 

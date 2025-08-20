@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 14:35:35
+ * @LastEditTime: 2025-08-20 11:48:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -34,42 +35,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRequest, ProjectResponse> {
+public class ProjectRestService extends BaseRestServiceImproved<ProjectEntity, ProjectRequest, ProjectResponse> {
 
     private final ProjectRepository projectRepository;
-
     private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    // === 实现必需的抽象方法 ===
 
     @Override
-    public Page<ProjectResponse> queryByOrg(ProjectRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ProjectEntity> spec = ProjectSpecification.search(request);
-        Page<ProjectEntity> page = projectRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<ProjectEntity> createSpecification(ProjectRequest request) {
+        return ProjectSpecification.search(request);
     }
 
     @Override
-    public Page<ProjectResponse> queryByUser(ProjectRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public ProjectResponse queryByUid(ProjectRequest request) {
-        Optional<ProjectEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        }
-        return null;
+    protected Page<ProjectEntity> executePageQuery(Specification<ProjectEntity> spec, Pageable pageable) {
+        return projectRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "project", key = "#uid", unless="#result==null")
@@ -79,10 +60,38 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
     }
 
     @Override
+    public ProjectResponse convertToResponse(ProjectEntity entity) {
+        return modelMapper.map(entity, ProjectResponse.class);
+    }
+
+    @Override
+    protected ProjectEntity doSave(ProjectEntity entity) {
+        return projectRepository.save(entity);
+    }
+
+    @Override
+    public ProjectEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ProjectEntity entity) {
+        try {
+            Optional<ProjectEntity> latest = projectRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                ProjectEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                modelMapper.map(entity, latestEntity);
+                return projectRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    // === 业务逻辑方法 ===
+
+    @Override
     public ProjectResponse create(ProjectRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         
@@ -120,49 +129,12 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
         }
     }
 
-    /**
-     * 保存标签，失败时自动重试
-     * maxAttempts: 最大重试次数（包括第一次尝试）
-     * backoff: 重试延迟，multiplier是延迟倍数
-     */
-    @Override
-    public ProjectEntity save(ProjectEntity entity) {
-        try {
-            log.info("Attempting to save project: {}", entity.getName());
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
-    protected ProjectEntity doSave(ProjectEntity entity) {
-        return projectRepository.save(entity);
-    }
-
-    @Override
-    public ProjectEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ProjectEntity entity) {
-        try {
-            Optional<ProjectEntity> latest = projectRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                ProjectEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                modelMapper.map(entity, latestEntity);
-                return projectRepository.save(latestEntity);
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
-        }
-        return null;
-    }
-
     @Override
     public void deleteByUid(String uid) {
         Optional<ProjectEntity> optional = projectRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // projectRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("Project not found");
@@ -173,10 +145,4 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
     public void delete(ProjectRequest request) {
         deleteByUid(request.getUid());
     }
-
-    @Override
-    public ProjectResponse convertToResponse(ProjectEntity entity) {
-        return modelMapper.map(entity, ProjectResponse.class);
-    }
-    
 }

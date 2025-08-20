@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-08 23:24:58
+ * @LastEditTime: 2025-08-20 11:48:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.base.BaseRestServiceImproved;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kanban.project.ProjectEntity;
@@ -36,35 +37,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleRequest, ModuleResponse> {
+public class ModuleRestService extends BaseRestServiceImproved<ModuleEntity, ModuleRequest, ModuleResponse> {
 
     private final ModuleRepository moduleRepository;
-
     private final ProjectRepository projectRepository;
-
     private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    // === 实现必需的抽象方法 ===
 
     @Override
-    public Page<ModuleResponse> queryByOrg(ModuleRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ModuleEntity> spec = ModuleSpecification.search(request);
-        Page<ModuleEntity> page = moduleRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<ModuleEntity> createSpecification(ModuleRequest request) {
+        return ModuleSpecification.search(request);
     }
 
     @Override
-    public Page<ModuleResponse> queryByUser(ModuleRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        //
-        return queryByOrg(request);
+    protected Page<ModuleEntity> executePageQuery(Specification<ModuleEntity> spec, Pageable pageable) {
+        return moduleRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "module", key = "#uid", unless = "#result==null")
@@ -74,67 +63,8 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
     }
 
     @Override
-    public ModuleResponse create(ModuleRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-
-        // ModuleEntity entity = modelMapper.map(request, ModuleEntity.class);
-        ModuleEntity entity = ModuleEntity.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .projectUid(request.getProjectUid())
-                .build();
-        entity.setUid(uidUtils.getUid());
-        entity.setUserUid(user.getUid());
-        entity.setOrgUid(user.getOrgUid());
-        //
-        ModuleEntity savedEntity = save(entity);
-        if (savedEntity == null) {
-            throw new RuntimeException("Create module failed");
-        }
-        //
-        Optional<ProjectEntity> projectOptional = projectRepository.findByUid(request.getProjectUid());
-        if (projectOptional.isPresent()) {
-            projectOptional.get().getModules().add(savedEntity);
-            projectRepository.save(projectOptional.get());
-        }
-        //
-        return convertToResponse(savedEntity);
-    }
-
-    @Override
-    public ModuleResponse update(ModuleRequest request) {
-        Optional<ModuleEntity> optional = moduleRepository.findByUid(request.getUid());
-        if (optional.isPresent()) {
-            ModuleEntity entity = optional.get();
-            modelMapper.map(request, entity);
-            //
-            ModuleEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Update module failed");
-            }
-            return convertToResponse(savedEntity);
-        } else {
-            throw new RuntimeException("Module not found");
-        }
-    }
-
-    /**
-     * 保存标签，失败时自动重试
-     * maxAttempts: 最大重试次数（包括第一次尝试）
-     * backoff: 重试延迟，multiplier是延迟倍数
-     */
-    @Override
-    public ModuleEntity save(ModuleEntity entity) {
-        try {
-            log.info("Attempting to save module: {}", entity.getName());
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
+    public ModuleResponse convertToResponse(ModuleEntity entity) {
+        return modelMapper.map(entity, ModuleResponse.class);
     }
 
     @Override
@@ -158,13 +88,60 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
         return null;
     }
 
+    // === 业务逻辑方法 ===
+
+    @Override
+    public ModuleResponse create(ModuleRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        request.setUserUid(user.getUid());
+
+        // ModuleEntity entity = modelMapper.map(request, ModuleEntity.class);
+        ModuleEntity entity = ModuleEntity.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .projectUid(request.getProjectUid())
+                .build();
+        entity.setUid(uidUtils.getUid());
+        entity.setUserUid(user.getUid());
+        entity.setOrgUid(user.getOrgUid());
+        //
+        ModuleEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create module failed");
+        }
+        
+        // 处理与Project的关联
+        handleProjectAssociation(request, savedEntity);
+        
+        return convertToResponse(savedEntity);
+    }
+
+    @Override
+    public ModuleResponse update(ModuleRequest request) {
+        Optional<ModuleEntity> optional = moduleRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            ModuleEntity entity = optional.get();
+            modelMapper.map(request, entity);
+            //
+            ModuleEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update module failed");
+            }
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("Module not found");
+        }
+    }
+
     @Override
     public void deleteByUid(String uid) {
         Optional<ModuleEntity> optional = moduleRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // moduleRepository.delete(optional.get());
         } else {
             throw new RuntimeException("Module not found");
         }
@@ -175,15 +152,18 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
         deleteByUid(request.getUid());
     }
 
-    @Override
-    public ModuleResponse convertToResponse(ModuleEntity entity) {
-        return modelMapper.map(entity, ModuleResponse.class);
-    }
+    // === 私有辅助方法 ===
 
-    @Override
-    public ModuleResponse queryByUid(ModuleRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    /**
+     * 处理与Project的关联关系
+     */
+    private void handleProjectAssociation(ModuleRequest request, ModuleEntity savedEntity) {
+        if (request.getProjectUid() != null) {
+            Optional<ProjectEntity> projectOptional = projectRepository.findByUid(request.getProjectUid());
+            if (projectOptional.isPresent()) {
+                projectOptional.get().getModules().add(savedEntity);
+                projectRepository.save(projectOptional.get());
+            }
+        }
     }
-
 }

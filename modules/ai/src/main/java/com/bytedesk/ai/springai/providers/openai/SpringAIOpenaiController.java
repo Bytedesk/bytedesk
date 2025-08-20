@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 17:10:10
+ * @LastEditTime: 2025-08-20 11:10:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,7 +42,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/openai")
+@RequestMapping("/api/v1/openai")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.openai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOpenaiController {
@@ -53,7 +53,7 @@ public class SpringAIOpenaiController {
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/openai/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -69,7 +69,7 @@ public class SpringAIOpenaiController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/openai/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -90,7 +90,7 @@ public class SpringAIOpenaiController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/openai/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -126,7 +126,7 @@ public class SpringAIOpenaiController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/springai/openai/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(

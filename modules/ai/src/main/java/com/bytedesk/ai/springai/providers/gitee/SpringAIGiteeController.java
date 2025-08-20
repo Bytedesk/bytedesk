@@ -43,7 +43,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/gitee")
+@RequestMapping("/api/v1/gitee")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.gitee.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIGiteeController {
@@ -55,7 +55,7 @@ public class SpringAIGiteeController {
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/gitee/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/gitee/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -71,7 +71,7 @@ public class SpringAIGiteeController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/gitee/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/gitee/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -92,7 +92,7 @@ public class SpringAIGiteeController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/gitee/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/gitee/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -128,7 +128,7 @@ public class SpringAIGiteeController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/springai/gitee/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/gitee/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(

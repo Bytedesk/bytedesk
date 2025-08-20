@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 14:09:38
+ * @LastEditTime: 2025-08-20 13:20:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,7 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
 import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
@@ -40,7 +40,6 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
@@ -64,11 +63,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 @Description("Robot Management Service - AI robot and chatbot management service")
-public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, RobotRequest, RobotResponse, RobotExcel> {
+public class RobotRestService extends BaseRestServiceWithExcelImproved<RobotEntity, RobotRequest, RobotResponse, RobotExcel> {
 
     private final RobotRepository robotRepository;
-
-    private final AuthService authService;
 
     private final FaqRestService faqRestService;
 
@@ -82,31 +79,17 @@ public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, Robo
 
     private final CategoryRestService categoryRestService;
 
-    private final LlmProviderRestService llmProviderRestService;
+    @Override
+    protected Specification<RobotEntity> createSpecification(RobotRequest request) {
+        return RobotSpecification.search(request);
+    }
 
     @Override
-    public Page<RobotEntity> queryByOrgEntity(RobotRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<RobotEntity> spec = RobotSpecification.search(request, authService);
+    protected Page<RobotEntity> executePageQuery(Specification<RobotEntity> spec, Pageable pageable) {
         return robotRepository.findAll(spec, pageable);
     }
 
-    @Override
-    public Page<RobotResponse> queryByOrg(RobotRequest request) {
-        Page<RobotEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<RobotResponse> queryByUser(RobotRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("login first");
-        }
-        request.setUserUid(user.getUid());
-        //
-        return queryByOrg(request);
-    }
+    private final LlmProviderRestService llmProviderRestService;
 
     @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
     @Override

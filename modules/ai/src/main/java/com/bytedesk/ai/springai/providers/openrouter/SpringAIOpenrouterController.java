@@ -42,19 +42,18 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/springai/openrouter")
+@RequestMapping("/api/v1/openrouter")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.openrouter.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOpenrouterController {
 
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIOpenrouterService springAIOpenrouterService;
-    // private final UidUtils uidUtils;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/springai/openrouter/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/openrouter/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -70,7 +69,7 @@ public class SpringAIOpenrouterController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/springai/openrouter/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/openrouter/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -91,7 +90,7 @@ public class SpringAIOpenrouterController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/springai/openrouter/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/openrouter/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -127,7 +126,7 @@ public class SpringAIOpenrouterController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/springai/openrouter/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/openrouter/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(

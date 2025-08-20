@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-13 21:16:20
+ * @LastEditTime: 2025-08-20 11:58:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,6 +24,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -56,7 +58,7 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     public Page<KbaseInviteResponse> queryByUser(KbaseInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 
@@ -73,7 +75,7 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     public KbaseInviteResponse create(KbaseInviteRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("login first");
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         
@@ -104,15 +106,6 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
         }
         else {
             throw new RuntimeException("KbaseInvite not found");
-        }
-    }
-
-    @Override
-    public KbaseInviteEntity save(KbaseInviteEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
         }
     }
 
