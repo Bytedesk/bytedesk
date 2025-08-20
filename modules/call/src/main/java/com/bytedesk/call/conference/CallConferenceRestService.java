@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-08 10:00:00
+ * @LastEditTime: 2025-08-20 15:52:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,25 +46,6 @@ public class CallConferenceRestService extends BaseRestServiceWithExcel<CallConf
     private final UidUtils uidUtils;
 
     private final AuthService authService;
-
-    @Override
-    public Page<CallConferenceResponse> queryByOrg(CallConferenceRequest request) {
-        return queryByOrgEntity(request).map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<CallConferenceResponse> queryByUser(CallConferenceRequest request) {
-        return queryByUserEntity(request).map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<CallConferenceEntity> queryByOrgEntity(CallConferenceRequest request) {
-
-        Pageable pageable = request.getPageable();
-        Specification<CallConferenceEntity> specification = CallConferenceSpecification.build(request);
-
-        return freeSwitchConferenceRepository.findAll(specification, pageable);
-    }
 
     public Page<CallConferenceEntity> queryByUserEntity(CallConferenceRequest request) {
 
@@ -216,6 +197,16 @@ public class CallConferenceRestService extends BaseRestServiceWithExcel<CallConf
             return convertToResponse(optional.get());
         }
         throw new RuntimeException("Call会议室不存在");
+    }
+
+    @Override
+    protected Specification<CallConferenceEntity> createSpecification(CallConferenceRequest request) {
+        return CallConferenceSpecification.build(request);
+    }
+
+    @Override
+    protected Page<CallConferenceEntity> executePageQuery(Specification<CallConferenceEntity> specification, Pageable pageable) {
+        return freeSwitchConferenceRepository.findAll(specification, pageable);
     }
 
 }

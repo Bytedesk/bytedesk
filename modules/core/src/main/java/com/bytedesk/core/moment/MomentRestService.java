@@ -215,5 +215,15 @@ public class MomentRestService extends BaseRestServiceWithExcel<MomentEntity, Mo
     //         create(momentRequest);
     //     }
     // }
+
+    @Override
+    protected Specification<MomentEntity> createSpecification(MomentRequest request) {
+        return MomentSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MomentEntity> executePageQuery(Specification<MomentEntity> spec, Pageable pageable) {
+        return momentRepository.findAll(spec, pageable);
+    }
     
 }

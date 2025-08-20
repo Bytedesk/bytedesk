@@ -340,4 +340,14 @@ public class MessageUnreadRestService
         return ConvertUtils.convertToMessageUnreadResponse(entity);
     }
 
+    @Override
+    protected Specification<MessageUnreadEntity> createSpecification(MessageUnreadRequest request) {
+        return MessageUnreadSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MessageUnreadEntity> executePageQuery(Specification<MessageUnreadEntity> spec, Pageable pageable) {
+        return messageUnreadRepository.findAll(spec, pageable);
+    }
+
 }

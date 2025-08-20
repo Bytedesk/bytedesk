@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:30:32
+ * @LastEditTime: 2025-08-20 15:57:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -381,11 +381,15 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     public PushResponse convertToResponse(PushEntity entity) {
         return modelMapper.map(entity, PushResponse.class);
     }
+    
+    @Override
+    protected Specification<PushEntity> createSpecification(PushRequest request) {
+        return PushSpecification.search(request);
+    }
 
     @Override
-    public PushResponse queryByUid(PushRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    protected Page<PushEntity> executePageQuery(Specification<PushEntity> spec, Pageable pageable) {
+        return pushRepository.findAll(spec, pageable);
     }
 
 }

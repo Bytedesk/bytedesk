@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 16:20:47
+ * @LastEditTime: 2025-08-20 15:43:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,25 +42,6 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
     private final UidUtils uidUtils;
 
     private final AuthService authService;
-
-    @Override
-    public Page<ActionEntity> queryByOrgEntity(ActionRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ActionEntity> spec = ActionSpecification.search(request);
-        return actionRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<ActionResponse> queryByOrg(ActionRequest request) {
-        Page<ActionEntity> page = queryByOrgEntity(request);
-        return page.map(action -> convertToResponse(action));
-    }
-
-    @Override
-    public Page<ActionResponse> queryByUser(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
 
     @Cacheable(cacheNames = "action", key = "#request.uid", unless = "#result == null")
     @Override
@@ -131,19 +112,18 @@ public class ActionRestService extends BaseRestServiceWithExcel<ActionEntity, Ac
     }
 
     @Override
-    public ActionResponse queryByUid(ActionRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    public ActionExcel convertToExcel(ActionEntity entity) {
+        return modelMapper.map(entity, ActionExcel.class);
     }
 
     @Override
-    public ActionExcel convertToExcel(ActionEntity entity) {
-        ActionExcel actionExcel = modelMapper.map(entity, ActionExcel.class);
-        if (entity.getUser() != null) {
-            actionExcel.setUser(entity.getUser().getNickname());
-        }
-        actionExcel.setCreatedAt(entity.getCreatedAtString());
-        return actionExcel;
+    protected Specification<ActionEntity> createSpecification(ActionRequest request) {
+        return ActionSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ActionEntity> executePageQuery(Specification<ActionEntity> specification, Pageable pageable) {
+        return actionRepository.findAll(specification, pageable);
     }
 
 }

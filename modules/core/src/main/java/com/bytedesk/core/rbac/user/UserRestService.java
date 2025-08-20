@@ -187,5 +187,15 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
         return excel;
     }
 
+    @Override
+    protected Specification<UserEntity> createSpecification(UserRequest request) {
+        return UserSpecification.search(request);
+    }
+
+    @Override
+    protected Page<UserEntity> executePageQuery(Specification<UserEntity> spec, Pageable pageable) {
+        return userRepository.findAll(spec, pageable);
+    }
+
 
 }

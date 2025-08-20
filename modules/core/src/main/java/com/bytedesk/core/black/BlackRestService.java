@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 12:20:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:30:45
+ * @LastEditTime: 2025-08-20 15:52:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -45,30 +44,6 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     private final UidUtils uidUtils;
 
     private final AuthService authService;
-
-    @Override
-    public Page<BlackEntity> queryByOrgEntity(BlackRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<BlackEntity> specification = BlackSpecification.search(request, authService);
-        return repository.findAll(specification, pageable);
-    }
-
-    @Override
-    public Page<BlackResponse> queryByOrg(BlackRequest request) {
-        Page<BlackEntity> blacks = queryByOrgEntity(request);
-        return blacks.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<BlackResponse> queryByUser(BlackRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
 
     @Cacheable(value = "black", key = "#uid", unless = "#result == null")
     @Override
@@ -89,13 +64,7 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     public Optional<BlackEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
         return repository.findByBlackUidAndOrgUidAndDeletedFalse(visitorUid, orgUid);
     }
-
-    @Override
-    public BlackResponse queryByUid(BlackRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
+    
     public Boolean existsByBlackUid(BlackRequest request) {
         // 根据黑名单用户uid查询
         Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
@@ -195,10 +164,17 @@ public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, Blac
     
     @Override
     public BlackExcel convertToExcel(BlackEntity entity) {
-        BlackExcel excel = modelMapper.map(entity, BlackExcel.class);
-        // return BlackConverter.toExcel(entity);
-        excel.setBlockIp(entity.getBlockIp() ? "是" : "否");
-        return excel;
+        return modelMapper.map(entity, BlackExcel.class);
+    }
+
+    @Override
+    protected Specification<BlackEntity> createSpecification(BlackRequest request) {
+        return BlackSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<BlackEntity> executePageQuery(Specification<BlackEntity> specification, Pageable pageable) {
+        return repository.findAll(specification, pageable);
     }
 
 }

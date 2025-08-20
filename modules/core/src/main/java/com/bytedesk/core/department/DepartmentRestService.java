@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 12:50:39
+ * @LastEditTime: 2025-08-20 15:53:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,12 +55,6 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         Specification<DepartmentEntity> specification = DepartmentSpecification.search(request);
         Page<DepartmentEntity> page = departmentRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<DepartmentResponse> queryByUser(DepartmentRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
@@ -230,5 +224,14 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return departmentResponse;
     }
 
+    @Override
+    protected Specification<DepartmentEntity> createSpecification(DepartmentRequest request) {
+        return DepartmentSpecification.search(request);
+    }
+
+    @Override
+    protected Page<DepartmentEntity> executePageQuery(Specification<DepartmentEntity> spec, Pageable pageable) {
+        return departmentRepository.findAll(spec, pageable);
+    }
 
 }

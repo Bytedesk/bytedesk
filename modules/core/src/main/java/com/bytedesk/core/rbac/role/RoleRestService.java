@@ -256,4 +256,14 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return null;
         }
 
+        @Override
+        protected Specification<RoleEntity> createSpecification(RoleRequest request) {
+                return RoleSpecification.search(request);
+        }
+
+        @Override
+        protected Page<RoleEntity> executePageQuery(Specification<RoleEntity> spec, Pageable pageable) {
+                return roleRepository.findAll(spec, pageable);
+        }
+
 }

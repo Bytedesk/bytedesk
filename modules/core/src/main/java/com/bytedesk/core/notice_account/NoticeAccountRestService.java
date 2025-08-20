@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -132,5 +133,15 @@ public class NoticeAccountRestService extends BaseRestService<NoticeAccountEntit
     @Override
     public NoticeAccountResponse convertToResponse(NoticeAccountEntity channel) {
         return modelMapper.map(channel, NoticeAccountResponse.class);
+    }
+
+    @Override
+    protected Specification<NoticeAccountEntity> createSpecification(NoticeAccountRequest request) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+    }
+
+    @Override
+    protected Page<NoticeAccountEntity> executePageQuery(Specification<NoticeAccountEntity> spec, Pageable pageable) {
+        return channelRepository.findAll(spec, pageable);
     }
 }

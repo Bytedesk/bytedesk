@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 14:09:22
+ * @LastEditTime: 2025-08-20 15:55:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,6 +100,14 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         return queryByOrg(request);
     }
 
+    public MemberResponse queryByUid(MemberRequest request) {
+        Optional<MemberEntity> memberOptional = findByUid(request.getUid());
+        if (!memberOptional.isPresent()) {
+            throw new RuntimeException("Member not found");
+        }
+        return convertToResponse(memberOptional.get());
+    }
+
     public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getUser();
         Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
@@ -117,13 +125,7 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
         return convertToResponse(memberOptional.get());
     }
 
-    public MemberResponse queryByUid(MemberRequest request) {
-        Optional<MemberEntity> memberOptional = findByUid(request.getUid());
-        if (!memberOptional.isPresent()) {
-            throw new RuntimeException("Member not found");
-        }
-        return convertToResponse(memberOptional.get());
-    }
+    
 
     public Boolean existsByUid(String uid) {
         return memberRepository.existsByUid(uid);
@@ -527,6 +529,16 @@ public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, Me
             }
         }
         return excel;
+    }
+
+    @Override
+    protected Specification<MemberEntity> createSpecification(MemberRequest request) {
+        return MemberSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MemberEntity> executePageQuery(Specification<MemberEntity> spec, Pageable pageable) {
+        return memberRepository.findAll(spec, pageable);
     }
 
 }

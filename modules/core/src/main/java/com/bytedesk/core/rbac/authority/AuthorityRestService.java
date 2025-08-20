@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 14:38:49
+ * @LastEditTime: 2025-08-20 15:57:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,6 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     private final AuthorityRepository authorityRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
-    // private final AuthService authService;
 
     @Override
     public Page<AuthorityResponse> queryByOrg(AuthorityRequest request) {
@@ -215,6 +214,16 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     //     }
 
     // }
+
+    @Override
+    protected Specification<AuthorityEntity> createSpecification(AuthorityRequest request) {
+        return AuthoritySpecification.search(request);
+    }
+
+    @Override
+    protected Page<AuthorityEntity> executePageQuery(Specification<AuthorityEntity> spec, Pageable pageable) {
+        return authorityRepository.findAll(spec, pageable);
+    }
 
     
 

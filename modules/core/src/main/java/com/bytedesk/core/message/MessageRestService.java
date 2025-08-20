@@ -233,4 +233,14 @@ public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, 
         throw new UnsupportedOperationException("此功能已迁移到企业版，请使用 MessageRestServiceVip.markThreadAsRead");
     }
 
+    @Override
+    protected Specification<MessageEntity> createSpecification(MessageRequest request) {
+        return MessageSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MessageEntity> executePageQuery(Specification<MessageEntity> spec, Pageable pageable) {
+        return messageRepository.findAll(spec, pageable);
+    }
+
 }
