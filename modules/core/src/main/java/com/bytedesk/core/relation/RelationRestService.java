@@ -200,5 +200,15 @@ public class RelationRestService extends BaseRestServiceWithExcel<RelationEntity
         return modelMapper.map(entity, RelationExcel.class);
     }
 
+    @Override
+    protected Specification<RelationEntity> createSpecification(RelationRequest request) {
+        return RelationSpecification.search(request);
+    }
+
+    @Override
+    protected Page<RelationEntity> executePageQuery(Specification<RelationEntity> spec, Pageable pageable) {
+        return relationRepository.findAll(spec, pageable);
+    }
+
     
 }

@@ -178,6 +178,16 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExcel<Organ
     public OrganizationApplyExcel convertToExcel(OrganizationApplyEntity entity) {
         return modelMapper.map(entity, OrganizationApplyExcel.class);
     }
+
+    @Override
+    protected Specification<OrganizationApplyEntity> createSpecification(OrganizationApplyRequest request) {
+        return OrganizationApplySpecification.search(request);
+    }
+
+    @Override
+    protected Page<OrganizationApplyEntity> executePageQuery(Specification<OrganizationApplyEntity> spec, Pageable pageable) {
+        return organizationRepository.findAll(spec, pageable);
+    }
     
     
 }

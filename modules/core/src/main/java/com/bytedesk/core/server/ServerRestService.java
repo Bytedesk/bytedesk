@@ -459,4 +459,14 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         }
     }
 
+    @Override
+    protected Specification<ServerEntity> createSpecification(ServerRequest request) {
+        return ServerSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ServerEntity> executePageQuery(Specification<ServerEntity> spec, Pageable pageable) {
+        return serverRepository.findAll(spec, pageable);
+    }
+
 } 

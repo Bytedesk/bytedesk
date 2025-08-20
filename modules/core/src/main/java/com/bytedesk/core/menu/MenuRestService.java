@@ -141,5 +141,15 @@ public class MenuRestService extends BaseRestService<MenuEntity, MenuRequest, Me
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
+
+    @Override
+    protected Specification<MenuEntity> createSpecification(MenuRequest request) {
+        return MenuSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MenuEntity> executePageQuery(Specification<MenuEntity> spec, Pageable pageable) {
+        return menuRepository.findAll(spec, pageable);
+    }
     
 }
