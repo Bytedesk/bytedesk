@@ -14,6 +14,7 @@
 package com.bytedesk.call.gateway;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class CallGatewaySpecification extends BaseSpecification<CallGatewayEntit
     /**
      * 查询规格
      */
-    public static Specification<CallGatewayEntity> search(CallGatewayRequest request) {
+    public static Specification<CallGatewayEntity> search(CallGatewayRequest request, AuthService authService) {
         
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

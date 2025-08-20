@@ -36,7 +36,7 @@ public class CallUserRestService extends BaseRestServiceWithExport<CallUserEntit
 
     @Override
     protected Specification<CallUserEntity> createSpecification(CallUserRequest request) {
-        return CallUserSpecification.search(request);
+        return CallUserSpecification.search(request, authService);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class CallUserRestService extends BaseRestServiceWithExport<CallUserEntit
     @Override
     public Page<CallUserEntity> queryByOrgEntity(CallUserRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CallUserEntity> specification = CallUserSpecification.search(request);
+        Specification<CallUserEntity> specification = CallUserSpecification.search(request, authService);
         return freeSwitchNumberRepository.findAll(specification, pageable);
     }
 

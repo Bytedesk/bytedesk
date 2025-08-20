@@ -45,7 +45,7 @@ public class GroupNoticeRestService extends BaseRestService<GroupNoticeEntity, G
 
     @Override
     protected Specification<GroupNoticeEntity> createSpecification(GroupNoticeRequest request) {
-        return GroupNoticeSpecification.search(request);
+        return GroupNoticeSpecification.search(request, authService);
     }
 
     @Override

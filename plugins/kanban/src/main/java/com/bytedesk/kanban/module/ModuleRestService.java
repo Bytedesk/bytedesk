@@ -48,7 +48,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
 
     @Override
     protected Specification<ModuleEntity> createSpecification(ModuleRequest request) {
-        return ModuleSpecification.search(request);
+        return ModuleSpecification.search(request, authService);
     }
 
     @Override

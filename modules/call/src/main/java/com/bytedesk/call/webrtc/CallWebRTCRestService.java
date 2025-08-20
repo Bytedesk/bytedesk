@@ -44,7 +44,7 @@ public class CallWebRTCRestService extends BaseRestServiceWithExport<CallWebRTCE
 
     @Override
     protected Specification<CallWebRTCEntity> createSpecification(CallWebRTCRequest request) {
-        return CallWebRTCSpecification.search(request);
+        return CallWebRTCSpecification.search(request, authService);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class CallWebRTCRestService extends BaseRestServiceWithExport<CallWebRTCE
     @Override
     public Page<CallWebRTCEntity> queryByOrgEntity(CallWebRTCRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CallWebRTCEntity> spec = CallWebRTCSpecification.search(request);
+        Specification<CallWebRTCEntity> spec = CallWebRTCSpecification.search(request, authService);
         return webrtcRepository.findAll(spec, pageable);
     }
 

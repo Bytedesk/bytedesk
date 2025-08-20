@@ -44,7 +44,7 @@ public class ReportRestService extends BaseRestService<ReportEntity, ReportReque
 
     @Override
     protected Specification<ReportEntity> createSpecification(ReportRequest request) {
-        return ReportSpecification.search(request);
+        return ReportSpecification.search(request, authService);
     }
 
     @Override

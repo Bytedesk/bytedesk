@@ -46,7 +46,7 @@ public class WebsiteRestService
 
     @Override
     protected Specification<WebsiteEntity> createSpecification(WebsiteRequest request) {
-        return WebsiteSpecification.search(request);
+        return WebsiteSpecification.search(request, authService);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 11:16:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 16:02:34
+ * @LastEditTime: 2025-08-20 20:30:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,6 +46,16 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     private final AuthService authService;
+
+    @Override
+    protected Specification<TopicEntity> createSpecification(TopicRequest request) {
+        return TopicSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<TopicEntity> executePageQuery(Specification<TopicEntity> spec, Pageable pageable) {
+        return topicRepository.findAll(spec, pageable);
+    }
 
     @Cacheable(value = "topic", key = "#clientId", unless = "#result == null")
     public Optional<TopicEntity> findByClientId(String clientId) {
@@ -379,14 +389,6 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         return topicRepository.findAll();
     }
 
-    @Override
-    protected Specification<TopicEntity> createSpecification(TopicRequest request) {
-        return TopicSpecification.search(request);
-    }
-
-    @Override
-    protected Page<TopicEntity> executePageQuery(Specification<TopicEntity> spec, Pageable pageable) {
-        return topicRepository.findAll(spec, pageable);
-    }
+    
 
 }

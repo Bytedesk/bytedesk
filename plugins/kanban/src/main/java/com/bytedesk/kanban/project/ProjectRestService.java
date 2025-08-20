@@ -45,7 +45,7 @@ public class ProjectRestService extends BaseRestService<ProjectEntity, ProjectRe
 
     @Override
     protected Specification<ProjectEntity> createSpecification(ProjectRequest request) {
-        return ProjectSpecification.search(request);
+        return ProjectSpecification.search(request, authService);
     }
 
     @Override

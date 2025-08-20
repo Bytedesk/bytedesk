@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 15:43:35
+ * @LastEditTime: 2025-08-20 21:06:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,6 +42,16 @@ public class ActionRestService extends BaseRestServiceWithExport<ActionEntity, A
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    @Override
+    protected Specification<ActionEntity> createSpecification(ActionRequest request) {
+        return ActionSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<ActionEntity> executePageQuery(Specification<ActionEntity> specification, Pageable pageable) {
+        return actionRepository.findAll(specification, pageable);
+    }
 
     @Cacheable(cacheNames = "action", key = "#request.uid", unless = "#result == null")
     @Override
@@ -116,14 +126,6 @@ public class ActionRestService extends BaseRestServiceWithExport<ActionEntity, A
         return modelMapper.map(entity, ActionExcel.class);
     }
 
-    @Override
-    protected Specification<ActionEntity> createSpecification(ActionRequest request) {
-        return ActionSpecification.search(request);
-    }
-
-    @Override
-    protected Page<ActionEntity> executePageQuery(Specification<ActionEntity> specification, Pageable pageable) {
-        return actionRepository.findAll(specification, pageable);
-    }
+    
 
 }

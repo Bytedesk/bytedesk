@@ -49,7 +49,7 @@ public class CallCdrRestService extends BaseRestServiceWithExport<CallCdrEntity,
 
     @Override
     protected Specification<CallCdrEntity> createSpecification(CallCdrRequest request) {
-        return CallCdrSpecification.search(request);
+        return CallCdrSpecification.search(request, authService);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class CallCdrRestService extends BaseRestServiceWithExport<CallCdrEntity,
     @Override
     public Page<CallCdrEntity> queryByOrgEntity(CallCdrRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CallCdrEntity> specification = CallCdrSpecification.search(request);
+        Specification<CallCdrEntity> specification = CallCdrSpecification.search(request, authService);
         return callCdrRepository.findAll(specification, pageable);
     }
 

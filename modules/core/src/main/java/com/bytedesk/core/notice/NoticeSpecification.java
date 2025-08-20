@@ -20,12 +20,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 
 public class NoticeSpecification extends BaseSpecification<NoticeEntity, NoticeRequest> {
     
-    public static Specification<NoticeEntity> search(NoticeRequest request) {
+    public static Specification<NoticeEntity> search(NoticeRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

@@ -65,7 +65,7 @@ public class TicketProcessRestService
     @Override
     public Page<TicketProcessResponse> queryByOrg(TicketProcessRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<TicketProcessEntity> spec = TicketProcessSpecification.search(request);
+        Specification<TicketProcessEntity> spec = TicketProcessSpecification.search(request, authService);
         Page<TicketProcessEntity> page = processRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }

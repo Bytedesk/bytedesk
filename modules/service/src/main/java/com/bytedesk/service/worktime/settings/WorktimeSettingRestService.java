@@ -149,7 +149,7 @@ public class WorktimeSettingRestService extends BaseRestServiceWithExport<Workti
 
     @Override
     protected Specification<WorktimeSettingEntity> createSpecification(WorktimeSettingRequest request) {
-        return WorktimeSettingSpecification.search(request);
+        return WorktimeSettingSpecification.search(request, authService);
     }
 
     @Override

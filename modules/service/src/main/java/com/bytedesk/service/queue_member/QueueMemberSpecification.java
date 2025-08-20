@@ -21,6 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.criteria.Predicate;
@@ -29,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class QueueMemberSpecification extends BaseSpecification<QueueMemberEntity, QueueMemberRequest> {
     
-    public static Specification <QueueMemberEntity> search(QueueMemberRequest request) {
+    public static Specification <QueueMemberEntity> search(QueueMemberRequest request, AuthService authService) {
         // log.info("QueueMemberSpecification search: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

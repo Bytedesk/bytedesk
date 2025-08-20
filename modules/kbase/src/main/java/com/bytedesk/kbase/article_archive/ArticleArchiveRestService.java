@@ -50,7 +50,7 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
 
     @Override
     protected Specification<ArticleArchiveEntity> createSpecification(ArticleArchiveRequest request) {
-        return ArticleArchiveSpecification.search(request);
+        return ArticleArchiveSpecification.search(request, authService);
     }
 
     @Override

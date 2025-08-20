@@ -46,7 +46,7 @@ public class AgentTemplateRestService extends BaseRestServiceWithExport<AgentTem
 
     @Override
     protected Specification<AgentTemplateEntity> createSpecification(AgentTemplateRequest request) {
-        return AgentTemplateSpecification.search(request);
+        return AgentTemplateSpecification.search(request, authService);
     }
 
     @Override

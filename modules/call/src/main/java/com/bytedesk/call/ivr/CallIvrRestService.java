@@ -49,7 +49,7 @@ public class CallIvrRestService extends BaseRestServiceWithExport<CallIvrEntity,
 
     @Override
     protected Specification<CallIvrEntity> createSpecification(CallIvrRequest request) {
-        return CallIvrSpecification.search(request);
+        return CallIvrSpecification.search(request, authService);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class CallIvrRestService extends BaseRestServiceWithExport<CallIvrEntity,
     @Override
     public Page<CallIvrEntity> queryByOrgEntity(CallIvrRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CallIvrEntity> spec = CallIvrSpecification.search(request);
+        Specification<CallIvrEntity> spec = CallIvrSpecification.search(request, authService);
         return ivrRepository.findAll(spec, pageable);
     }
 

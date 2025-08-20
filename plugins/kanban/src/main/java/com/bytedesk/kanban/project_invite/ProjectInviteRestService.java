@@ -45,7 +45,7 @@ public class ProjectInviteRestService extends BaseRestService<ProjectInviteEntit
 
     @Override
     protected Specification<ProjectInviteEntity> createSpecification(ProjectInviteRequest request) {
-        return ProjectInviteSpecification.search(request);
+        return ProjectInviteSpecification.search(request, authService);
     }
 
     @Override

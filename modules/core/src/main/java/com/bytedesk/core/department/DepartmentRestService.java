@@ -52,7 +52,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     public Page<DepartmentResponse> queryByOrg(DepartmentRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<DepartmentEntity> specification = DepartmentSpecification.search(request);
+        Specification<DepartmentEntity> specification = DepartmentSpecification.search(request, authService);
         Page<DepartmentEntity> page = departmentRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
@@ -226,7 +226,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     @Override
     protected Specification<DepartmentEntity> createSpecification(DepartmentRequest request) {
-        return DepartmentSpecification.search(request);
+        return DepartmentSpecification.search(request, authService);
     }
 
     @Override

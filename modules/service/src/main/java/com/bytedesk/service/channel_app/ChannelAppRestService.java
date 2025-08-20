@@ -47,7 +47,7 @@ public class ChannelAppRestService extends BaseRestServiceWithExport<ChannelAppE
 
     @Override
     protected Specification<ChannelAppEntity> createSpecification(ChannelAppRequest request) {
-        return ChannelAppSpecification.search(request);
+        return ChannelAppSpecification.search(request, authService);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ChannelAppRestService extends BaseRestServiceWithExport<ChannelAppE
     @Override
     public Page<ChannelAppEntity> queryByOrgEntity(ChannelAppRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<ChannelAppEntity> spec = ChannelAppSpecification.search(request);
+        Specification<ChannelAppEntity> spec = ChannelAppSpecification.search(request, authService);
         return appRepository.findAll(spec, pageable);
     }
 

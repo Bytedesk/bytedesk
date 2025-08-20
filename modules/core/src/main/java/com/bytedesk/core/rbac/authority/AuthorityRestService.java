@@ -47,7 +47,7 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     @Override
     public Page<AuthorityResponse> queryByOrg(AuthorityRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<AuthorityEntity> specification = AuthoritySpecification.search(request);
+        Specification<AuthorityEntity> specification = AuthoritySpecification.search(request, authService);
         Page<AuthorityEntity> page = authorityRepository.findAll(specification, pageable);
         return page.map(this::convertToResponse);
     }
@@ -217,7 +217,7 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
 
     @Override
     protected Specification<AuthorityEntity> createSpecification(AuthorityRequest request) {
-        return AuthoritySpecification.search(request);
+        return AuthoritySpecification.search(request, authService);
     }
 
     @Override

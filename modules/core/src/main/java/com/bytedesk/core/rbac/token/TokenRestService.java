@@ -52,7 +52,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     @Override
     public Page<TokenResponse> queryByOrg(TokenRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<TokenEntity> spec = TokenSpecification.search(request);
+        Specification<TokenEntity> spec = TokenSpecification.search(request, authService);
         Page<TokenEntity> page = tokenRepository.findAll(spec, pageable);
         return page.map(entity -> modelMapper.map(entity, TokenResponse.class));
     }
@@ -237,7 +237,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
 
     @Override
     protected Specification<TokenEntity> createSpecification(TokenRequest request) {
-        return TokenSpecification.search(request);
+        return TokenSpecification.search(request, authService);
     }
 
     @Override

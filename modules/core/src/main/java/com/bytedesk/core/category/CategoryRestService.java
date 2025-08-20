@@ -49,7 +49,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     @Override
     protected Specification<CategoryEntity> createSpecification(CategoryRequest request) {
-        return CategorySpecification.search(request);
+        return CategorySpecification.search(request, authService);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
 
     @Override
     protected Specification<CommentEntity> createSpecification(CommentRequest request) {
-        return CommentSpecification.search(request);
+        return CommentSpecification.search(request, authService);
     }
 
     @Override

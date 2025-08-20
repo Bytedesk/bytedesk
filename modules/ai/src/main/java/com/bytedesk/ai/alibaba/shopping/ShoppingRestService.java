@@ -43,7 +43,7 @@ public class ShoppingRestService extends BaseRestServiceWithExport<ShoppingEntit
 
     @Override
     protected Specification<ShoppingEntity> createSpecification(ShoppingRequest request) {
-        return ShoppingSpecification.search(request);
+        return ShoppingSpecification.search(request, authService);
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MemberSpecification extends BaseSpecification<MemberEntity, MemberRequest> {
 
-    public static Specification<MemberEntity> search(MemberRequest request) {
+    public static Specification<MemberEntity> search(MemberRequest request, AuthService authService) {
         log.info("member search request: {}, {}, {}", request, request.getOrgUid(), request.getSearchText());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

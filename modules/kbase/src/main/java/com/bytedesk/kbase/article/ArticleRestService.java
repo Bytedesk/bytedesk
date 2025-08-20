@@ -55,7 +55,7 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
 
     @Override
     protected Specification<ArticleEntity> createSpecification(ArticleRequest request) {
-        return ArticleSpecification.search(request);
+        return ArticleSpecification.search(request, authService);
     }
 
     @Override

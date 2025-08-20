@@ -243,7 +243,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
 
     @Override
     protected Specification<QueueMemberEntity> createSpecification(QueueMemberRequest request) {
-        return QueueMemberSpecification.search(request);
+        return QueueMemberSpecification.search(request, authService);
     }
 
     @Override

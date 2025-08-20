@@ -46,7 +46,7 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
 
     @Override
     protected Specification<ClipboardEntity> createSpecification(ClipboardRequest request) {
-        return ClipboardSpecification.search(request);
+        return ClipboardSpecification.search(request, authService);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     public Page<ClipboardResponse> queryByOrg(ClipboardRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
 
-        Specification<ClipboardEntity> specification = ClipboardSpecification.search(request);
+        Specification<ClipboardEntity> specification = ClipboardSpecification.search(request, authService);
 
         Page<ClipboardEntity> clipboardPage = clipboardRepository.findAll(specification, pageable);
 
@@ -76,7 +76,7 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
 
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Direction.DESC, "updatedAt");
 
-        Specification<ClipboardEntity> specification = ClipboardSpecification.search(request);
+        Specification<ClipboardEntity> specification = ClipboardSpecification.search(request, authService);
 
         Page<ClipboardEntity> clipboardPage = clipboardRepository.findAll(specification, pageable);
 

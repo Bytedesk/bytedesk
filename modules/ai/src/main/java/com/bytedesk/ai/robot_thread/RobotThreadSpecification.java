@@ -19,13 +19,14 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RobotThreadSpecification extends BaseSpecification<RobotThreadEntity, RobotThreadRequest> {
     
-    public static Specification<RobotThreadEntity> search(RobotThreadRequest request) {
+    public static Specification<RobotThreadEntity> search(RobotThreadRequest request, AuthService authService) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

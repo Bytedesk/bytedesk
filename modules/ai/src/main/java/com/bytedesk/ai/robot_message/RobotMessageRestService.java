@@ -49,7 +49,7 @@ public class RobotMessageRestService extends BaseRestServiceWithExport<RobotMess
 
     @Override
     protected Specification<RobotMessageEntity> createSpecification(RobotMessageRequest request) {
-        return RobotMessageSpecification.search(request);
+        return RobotMessageSpecification.search(request, authService);
     }
 
     @Override

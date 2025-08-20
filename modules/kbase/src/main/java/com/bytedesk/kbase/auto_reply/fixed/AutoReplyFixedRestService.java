@@ -59,7 +59,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoRep
 
     @Override
     protected Specification<AutoReplyFixedEntity> createSpecification(AutoReplyFixedRequest request) {
-        return AutoReplyFixedSpecification.search(request);
+        return AutoReplyFixedSpecification.search(request, authService);
     }
 
     @Override

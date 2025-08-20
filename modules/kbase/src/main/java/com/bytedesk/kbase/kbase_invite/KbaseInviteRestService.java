@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 13:40:33
+ * @LastEditTime: 2025-08-20 20:58:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, KbaseInviteRequest, KbaseInviteResponse> {
 
-    private final KbaseInviteRepository tagRepository;
+    private final KbaseInviteRepository kbaseInviteRepository;
 
     private final ModelMapper modelMapper;
 
@@ -45,17 +45,17 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
 
     @Override
     protected Specification<KbaseInviteEntity> createSpecification(KbaseInviteRequest request) {
-        return KbaseInviteSpecification.search(request);
+        return KbaseInviteSpecification.search(request, authService);
     }
 
     @Override
     protected Page<KbaseInviteEntity> executePageQuery(Specification<KbaseInviteEntity> spec, Pageable pageable) {
-        return tagRepository.findAll(spec, pageable);
+        return kbaseInviteRepository.findAll(spec, pageable);
     }
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
     @Override
     public Optional<KbaseInviteEntity> findByUid(String uid) {
-        return tagRepository.findByUid(uid);
+        return kbaseInviteRepository.findByUid(uid);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
 
     @Override
     public KbaseInviteResponse update(KbaseInviteRequest request) {
-        Optional<KbaseInviteEntity> optional = tagRepository.findByUid(request.getUid());
+        Optional<KbaseInviteEntity> optional = kbaseInviteRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             KbaseInviteEntity entity = optional.get();
             modelMapper.map(request, entity);
@@ -98,19 +98,19 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
 
     @Override
     protected KbaseInviteEntity doSave(KbaseInviteEntity entity) {
-        return tagRepository.save(entity);
+        return kbaseInviteRepository.save(entity);
     }
 
     @Override
     public KbaseInviteEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, KbaseInviteEntity entity) {
         // 乐观锁处理实现
         try {
-            Optional<KbaseInviteEntity> latest = tagRepository.findByUid(entity.getUid());
+            Optional<KbaseInviteEntity> latest = kbaseInviteRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 KbaseInviteEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return tagRepository.save(latestEntity);
+                return kbaseInviteRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
@@ -120,7 +120,7 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<KbaseInviteEntity> optional = tagRepository.findByUid(uid);
+        Optional<KbaseInviteEntity> optional = kbaseInviteRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());

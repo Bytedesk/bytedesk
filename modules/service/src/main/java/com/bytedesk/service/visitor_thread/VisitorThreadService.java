@@ -439,7 +439,7 @@ public class VisitorThreadService
 
     @Override
     protected Specification<VisitorThreadEntity> createSpecification(VisitorThreadRequest request) {
-        return VisitorThreadSpecification.search(request);
+        return VisitorThreadSpecification.search(request, authService);
     }
 
     @Override

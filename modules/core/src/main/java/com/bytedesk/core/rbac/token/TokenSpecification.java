@@ -20,12 +20,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 
 public class TokenSpecification extends BaseSpecification<TokenEntity, TokenRequest> {
 
-    public static Specification<TokenEntity> search(TokenRequest request) {
+    public static Specification<TokenEntity> search(TokenRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

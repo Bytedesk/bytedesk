@@ -19,6 +19,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServerMetricsSpecification extends BaseSpecification<ServerMetricsEntity, ServerMetricsRequest> {
     
-    public static Specification<ServerMetricsEntity> search(ServerMetricsRequest request) {
+    public static Specification<ServerMetricsEntity> search(ServerMetricsRequest request, AuthService authService) {
         log.info("request: {} userUid: {} pageNumber: {} pageSize: {}", 
             request, request.getUserUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {

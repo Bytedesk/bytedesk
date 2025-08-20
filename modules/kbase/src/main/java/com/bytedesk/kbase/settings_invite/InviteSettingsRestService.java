@@ -44,7 +44,7 @@ public class InviteSettingsRestService extends BaseRestServiceWithExport<InviteS
 
     @Override
     protected Specification<InviteSettingsEntity> createSpecification(InviteSettingsRequest request) {
-        return InviteSettingsSpecification.search(request);
+        return InviteSettingsSpecification.search(request, authService);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class InviteSettingsRestService extends BaseRestServiceWithExport<InviteS
     @Override
     public Page<InviteSettingsEntity> queryByOrgEntity(InviteSettingsRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<InviteSettingsEntity> spec = InviteSettingsSpecification.search(request);
+        Specification<InviteSettingsEntity> spec = InviteSettingsSpecification.search(request, authService);
         return inviteSettingRepository.findAll(spec, pageable);
     }
 

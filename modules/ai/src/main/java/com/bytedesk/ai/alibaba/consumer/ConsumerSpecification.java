@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConsumerSpecification extends BaseSpecification<ConsumerEntity, ConsumerRequest> {
     
-    public static Specification<ConsumerEntity> search(ConsumerRequest request) {
+    public static Specification<ConsumerEntity> search(ConsumerRequest request, AuthService authService) {
         log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
             request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {

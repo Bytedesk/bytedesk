@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MessageUnreadSpecification extends BaseSpecification<MessageUnreadEntity, MessageUnreadRequest> {
 
-    public static Specification<MessageUnreadEntity> search(MessageUnreadRequest request) {
+    public static Specification<MessageUnreadEntity> search(MessageUnreadRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // 使用基础过滤条件，包括 deleted = false

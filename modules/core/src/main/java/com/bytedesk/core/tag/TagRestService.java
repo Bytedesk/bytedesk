@@ -53,7 +53,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     @Override
     public Page<TagEntity> queryByOrgEntity(TagRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<TagEntity> spec = TagSpecification.search(request);
+        Specification<TagEntity> spec = TagSpecification.search(request, authService);
         return tagRepository.findAll(spec, pageable);
     }
 
@@ -222,7 +222,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
 
     @Override
     protected Specification<TagEntity> createSpecification(TagRequest request) {
-        return TagSpecification.search(request);
+        return TagSpecification.search(request, authService);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:40:41
+ * @LastEditTime: 2025-08-20 20:42:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,7 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
 
     @Override
     protected Specification<FavoriteEntity> createSpecification(FavoriteRequest request) {
-        return FavoriteSpecification.search(request);
+        return FavoriteSpecification.search(request, authService);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
     @Override
     public Page<FavoriteResponse> queryByOrg(FavoriteRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<FavoriteEntity> spec = FavoriteSpecification.search(request);
+        Specification<FavoriteEntity> spec = FavoriteSpecification.search(request, authService);
         Page<FavoriteEntity> page = favoriteRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }

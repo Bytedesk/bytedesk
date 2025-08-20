@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-22 23:26:48
+ * @LastEditTime: 2025-08-20 20:57:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,31 +56,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     private final ModelMapper modelMapper;
 
     @Override
-    public Page<OrganizationResponse> queryByOrg(OrganizationRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<OrganizationEntity> specification = OrganizationSpecification.search(request);
-        Page<OrganizationEntity> orgPage = organizationRepository.findAll(specification, pageable);
-        return orgPage.map(this::convertToResponse);
+    protected Specification<OrganizationEntity> createSpecification(OrganizationRequest request) {
+        return OrganizationSpecification.search(request, authService);
     }
 
     @Override
-    public Page<OrganizationResponse> queryByUser(OrganizationRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("User not found.");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public OrganizationResponse queryByUid(OrganizationRequest request) {
-        Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
-        if (!organizationOptional.isPresent()) {
-            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
-        }
-        return convertToResponse(organizationOptional.get());
+    protected Page<OrganizationEntity> executePageQuery(Specification<OrganizationEntity> spec, Pageable pageable) {
+        return organizationRepository.findAll(spec, pageable);
     }
 
     @Transactional
@@ -451,14 +433,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return response;
     }
 
-    @Override
-    protected Specification<OrganizationEntity> createSpecification(OrganizationRequest request) {
-        return OrganizationSpecification.search(request);
-    }
-
-    @Override
-    protected Page<OrganizationEntity> executePageQuery(Specification<OrganizationEntity> spec, Pageable pageable) {
-        return organizationRepository.findAll(spec, pageable);
-    }
+    
 
 }

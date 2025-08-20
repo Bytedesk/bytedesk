@@ -341,7 +341,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     public Page<PushResponse> queryByOrg(PushRequest request) {
 
         Pageable pageable = request.getPageable();
-        Specification<PushEntity> specification = PushSpecification.search(request);
+        Specification<PushEntity> specification = PushSpecification.search(request, authService);
         Page<PushEntity> page = pushRepository.findAll(specification, pageable);
 
         return page.map(push -> convertToResponse(push));
@@ -384,7 +384,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     
     @Override
     protected Specification<PushEntity> createSpecification(PushRequest request) {
-        return PushSpecification.search(request);
+        return PushSpecification.search(request, authService);
     }
 
     @Override

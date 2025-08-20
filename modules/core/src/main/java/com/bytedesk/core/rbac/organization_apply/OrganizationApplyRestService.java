@@ -48,7 +48,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
     @Override
     public Page<OrganizationApplyEntity> queryByOrgEntity(OrganizationApplyRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<OrganizationApplyEntity> spec = OrganizationApplySpecification.search(request);
+        Specification<OrganizationApplyEntity> spec = OrganizationApplySpecification.search(request, authService);
         return organizationRepository.findAll(spec, pageable);
     }
 
@@ -181,7 +181,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     @Override
     protected Specification<OrganizationApplyEntity> createSpecification(OrganizationApplyRequest request) {
-        return OrganizationApplySpecification.search(request);
+        return OrganizationApplySpecification.search(request, authService);
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServerSpecification extends BaseSpecification<ServerEntity, ServerRequest> {
     
-    public static Specification<ServerEntity> search(ServerRequest request) {
+    public static Specification<ServerEntity> search(ServerRequest request, AuthService authService) {
         log.info("request: {} userUid: {} pageNumber: {} pageSize: {}", 
             request, request.getUserUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {

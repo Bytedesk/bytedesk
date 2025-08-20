@@ -46,7 +46,7 @@ public class MaterialRestService extends BaseRestServiceWithExport<MaterialEntit
 
     @Override
     protected Specification<MaterialEntity> createSpecification(MaterialRequest request) {
-        return MaterialSpecification.search(request);
+        return MaterialSpecification.search(request, authService);
     }
 
     @Override

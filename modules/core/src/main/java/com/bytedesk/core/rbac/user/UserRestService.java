@@ -138,7 +138,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     }
 
     public List<UserEntity> findAll(UserRequest request) {
-        Specification<UserEntity> specification = UserSpecification.search(request);
+        Specification<UserEntity> specification = UserSpecification.search(request, authService);
         return userRepository.findAll(specification);
     }
 
@@ -154,7 +154,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
 
     @Override
     protected Specification<UserEntity> createSpecification(UserRequest request) {
-        return UserSpecification.search(request);
+        return UserSpecification.search(request, authService);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class IntentionSettingsRestService extends BaseRestServiceWithExport<Inte
 
     @Override
     protected Specification<IntentionSettingsEntity> createSpecification(IntentionSettingsRequest request) {
-        return IntentionSettingsSpecification.search(request);
+        return IntentionSettingsSpecification.search(request, authService);
     }
 
     @Override

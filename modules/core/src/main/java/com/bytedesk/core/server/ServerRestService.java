@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-25 07:44:42
+ * @LastEditTime: 2025-08-20 20:57:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -47,34 +47,14 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
 
-    // Helper method for internal use
-    private Page<ServerEntity> queryByOrgEntity(ServerRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ServerEntity> spec = ServerSpecification.search(request);
+    @Override
+    protected Specification<ServerEntity> createSpecification(ServerRequest request) {
+        return ServerSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<ServerEntity> executePageQuery(Specification<ServerEntity> spec, Pageable pageable) {
         return serverRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<ServerResponse> queryByOrg(ServerRequest request) {
-        Page<ServerEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<ServerResponse> queryByUser(ServerRequest request) {
-        // For server monitoring, user query is same as org query
-        return queryByOrg(request);
-    }
-
-    @Override
-    public ServerResponse queryByUid(ServerRequest request) {
-        Optional<ServerEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            ServerEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Server not found");
-        }
     }
 
     @Cacheable(value = "server", key = "#uid", unless="#result==null")
@@ -459,14 +439,6 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         }
     }
 
-    @Override
-    protected Specification<ServerEntity> createSpecification(ServerRequest request) {
-        return ServerSpecification.search(request);
-    }
-
-    @Override
-    protected Page<ServerEntity> executePageQuery(Specification<ServerEntity> spec, Pageable pageable) {
-        return serverRepository.findAll(spec, pageable);
-    }
+    
 
 } 

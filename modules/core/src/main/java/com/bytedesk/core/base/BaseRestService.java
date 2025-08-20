@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-10 12:13:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 12:13:20
+ * @LastEditTime: 2025-08-20 21:03:05
  * @Description: 改进后的BaseRestService，增加通用方法实现
  */
 package com.bytedesk.core.base;

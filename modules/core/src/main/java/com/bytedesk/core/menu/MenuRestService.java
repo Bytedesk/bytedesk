@@ -44,7 +44,7 @@ public class MenuRestService extends BaseRestService<MenuEntity, MenuRequest, Me
     public Page<MenuResponse> queryByOrg(MenuRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
                 "updatedAt");
-        Specification<MenuEntity> spec = MenuSpecification.search(request);
+        Specification<MenuEntity> spec = MenuSpecification.search(request, authService);
         Page<MenuEntity> page = menuRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }
@@ -144,7 +144,7 @@ public class MenuRestService extends BaseRestService<MenuEntity, MenuRequest, Me
 
     @Override
     protected Specification<MenuEntity> createSpecification(MenuRequest request) {
-        return MenuSpecification.search(request);
+        return MenuSpecification.search(request, authService);
     }
 
     @Override

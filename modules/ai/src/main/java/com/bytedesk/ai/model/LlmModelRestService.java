@@ -48,7 +48,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
     @Override
     protected Specification<LlmModelEntity> createSpecification(LlmModelRequest request) {
-        return LlmModelSpecification.search(request);
+        return LlmModelSpecification.search(request, authService);
     }
 
     @Override

@@ -45,7 +45,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
 
     @Override
     protected Specification<GroupInviteEntity> createSpecification(GroupInviteRequest request) {
-        return GroupInviteSpecification.search(request);
+        return GroupInviteSpecification.search(request, authService);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
     @Override
     public Page<GroupInviteResponse> queryByOrg(GroupInviteRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<GroupInviteEntity> spec = GroupInviteSpecification.search(request);
+        Specification<GroupInviteEntity> spec = GroupInviteSpecification.search(request, authService);
         Page<GroupInviteEntity> page = groupInviteRepository.findAll(spec, pageable);
         return page.map(this::convertToResponse);
     }

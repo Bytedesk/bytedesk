@@ -39,7 +39,7 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
 
     @Override
     protected Specification<FormEntity> createSpecification(FormRequest request) {
-        return FormSpecification.search(request);
+        return FormSpecification.search(request, authService);
     }
 
     @Override

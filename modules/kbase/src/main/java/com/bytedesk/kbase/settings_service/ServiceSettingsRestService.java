@@ -48,7 +48,7 @@ public class ServiceSettingsRestService extends BaseRestServiceWithExport<Servic
     @Override
     public Page<ServiceSettingsEntity> queryByOrgEntity(ServiceSettingsRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<ServiceSettingsEntity> spec = ServiceSettingsSpecification.search(request);
+        Specification<ServiceSettingsEntity> spec = ServiceSettingsSpecification.search(request, authService);
         return serviceSettingRepository.findAll(spec, pageable);
     }
 
@@ -179,7 +179,7 @@ public class ServiceSettingsRestService extends BaseRestServiceWithExport<Servic
 
     @Override
     protected Specification<ServiceSettingsEntity> createSpecification(ServiceSettingsRequest request) {
-        return ServiceSettingsSpecification.search(request);
+        return ServiceSettingsSpecification.search(request, authService);
     }
 
     @Override

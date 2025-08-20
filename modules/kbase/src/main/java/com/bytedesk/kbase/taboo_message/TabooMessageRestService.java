@@ -41,7 +41,7 @@ public class TabooMessageRestService extends BaseRestServiceWithExport<TabooMess
 
     @Override
     protected Specification<TabooMessageEntity> createSpecification(TabooMessageRequest request) {
-        return TabooMessageSpecification.search(request);
+        return TabooMessageSpecification.search(request, authService);
     }
 
     @Override

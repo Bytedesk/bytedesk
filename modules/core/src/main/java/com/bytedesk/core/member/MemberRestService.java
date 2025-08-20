@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 15:55:31
+ * @LastEditTime: 2025-08-20 21:16:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -77,35 +77,13 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     private final DepartmentRestService departmentRestService;
 
     @Override
-    public Page<MemberEntity> queryByOrgEntity(MemberRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<MemberEntity> spec = MemberSpecification.search(request);
+    protected Specification<MemberEntity> createSpecification(MemberRequest request) {
+        return MemberSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<MemberEntity> executePageQuery(Specification<MemberEntity> spec, Pageable pageable) {
         return memberRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<MemberResponse> queryByOrg(MemberRequest request) {
-        Page<MemberEntity> memberPage = queryByOrgEntity(request);
-        return memberPage.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<MemberResponse> queryByUser(MemberRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            return null;
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    public MemberResponse queryByUid(MemberRequest request) {
-        Optional<MemberEntity> memberOptional = findByUid(request.getUid());
-        if (!memberOptional.isPresent()) {
-            throw new RuntimeException("Member not found");
-        }
-        return convertToResponse(memberOptional.get());
     }
 
     public MemberResponse query(MemberRequest request) {
@@ -124,8 +102,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         return convertToResponse(memberOptional.get());
     }
-
-    
 
     public Boolean existsByUid(String uid) {
         return memberRepository.existsByUid(uid);
@@ -531,14 +507,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return excel;
     }
 
-    @Override
-    protected Specification<MemberEntity> createSpecification(MemberRequest request) {
-        return MemberSpecification.search(request);
-    }
-
-    @Override
-    protected Page<MemberEntity> executePageQuery(Specification<MemberEntity> spec, Pageable pageable) {
-        return memberRepository.findAll(spec, pageable);
-    }
+    
 
 }

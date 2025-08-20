@@ -48,7 +48,7 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
 
     @Override
     protected Specification<FormResultEntity> createSpecification(FormResultRequest request) {
-        return FormResultSpecification.search(request);
+        return FormResultSpecification.search(request, authService);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
     @Override
     public Page<FormResultEntity> queryByOrgEntity(FormResultRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<FormResultEntity> spec = FormResultSpecification.search(request);
+        Specification<FormResultEntity> spec = FormResultSpecification.search(request, authService);
         return tagRepository.findAll(spec, pageable);
     }
 

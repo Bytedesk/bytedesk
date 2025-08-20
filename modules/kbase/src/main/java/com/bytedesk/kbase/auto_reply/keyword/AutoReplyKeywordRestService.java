@@ -60,7 +60,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExport<AutoR
 
     @Override
     protected Specification<AutoReplyKeywordEntity> createSpecification(AutoReplyKeywordRequest request) {
-        return AutoReplyKeywordSpecification.search(request);
+        return AutoReplyKeywordSpecification.search(request, authService);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExport<AutoR
         request.setKbUid(kbUid);
         request.setOrgUid(orgUid);
         //
-        Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
+        Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request, authService);
         List<AutoReplyKeywordEntity> keywordObjects = autoReplyKeywordRepository.findAll(spec);
         if (keywordObjects.isEmpty()) {
             return null;

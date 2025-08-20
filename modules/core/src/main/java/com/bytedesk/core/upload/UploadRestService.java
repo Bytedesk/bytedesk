@@ -79,7 +79,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	@Override
 	protected Specification<UploadEntity> createSpecification(UploadRequest request) {
-		return UploadSpecification.search(request);
+		return UploadSpecification.search(request, authService);
 	}
 
 	@Override

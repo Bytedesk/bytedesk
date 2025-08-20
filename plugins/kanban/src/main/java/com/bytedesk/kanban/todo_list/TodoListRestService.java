@@ -42,7 +42,7 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
 
     @Override
     protected Specification<TodoListEntity> createSpecification(TodoListRequest request) {
-        return TodoListSpecification.search(request);
+        return TodoListSpecification.search(request, authService);
     }
 
     @Override

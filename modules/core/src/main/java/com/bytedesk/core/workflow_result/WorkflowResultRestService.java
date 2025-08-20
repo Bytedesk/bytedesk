@@ -49,7 +49,7 @@ public class WorkflowResultRestService extends BaseRestServiceWithExport<Workflo
     @Override
     public Page<WorkflowResultEntity> queryByOrgEntity(WorkflowResultRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<WorkflowResultEntity> spec = WorkflowResultSpecification.search(request);
+        Specification<WorkflowResultEntity> spec = WorkflowResultSpecification.search(request, authService);
         return workflowResultRepository.findAll(spec, pageable);
     }
 
@@ -202,7 +202,7 @@ public class WorkflowResultRestService extends BaseRestServiceWithExport<Workflo
 
     @Override
     protected Specification<WorkflowResultEntity> createSpecification(WorkflowResultRequest request) {
-        return WorkflowResultSpecification.search(request);
+        return WorkflowResultSpecification.search(request, authService);
     }
 
     @Override

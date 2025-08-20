@@ -19,6 +19,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UrlSpecification extends BaseSpecification<UrlEntity, UrlRequest> {
     
-    public static Specification<UrlEntity> search(UrlRequest request) {
+    public static Specification<UrlEntity> search(UrlRequest request, AuthService authService) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

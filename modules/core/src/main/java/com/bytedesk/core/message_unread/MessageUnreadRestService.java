@@ -61,7 +61,7 @@ public class MessageUnreadRestService
     @Override
     public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<MessageUnreadEntity> specs = MessageUnreadSpecification.search(request);
+        Specification<MessageUnreadEntity> specs = MessageUnreadSpecification.search(request, authService);
         Page<MessageUnreadEntity> page = messageUnreadRepository.findAll(specs, pageable);
         return page.map(this::convertToResponse);
     }
@@ -342,7 +342,7 @@ public class MessageUnreadRestService
 
     @Override
     protected Specification<MessageUnreadEntity> createSpecification(MessageUnreadRequest request) {
-        return MessageUnreadSpecification.search(request);
+        return MessageUnreadSpecification.search(request, authService);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
 
     @Override
     protected Specification<QuickReplyEntity> createSpecification(QuickReplyRequest request) {
-        return QuickReplySpecification.search(request);
+        return QuickReplySpecification.search(request, authService);
     }
 
     @Override

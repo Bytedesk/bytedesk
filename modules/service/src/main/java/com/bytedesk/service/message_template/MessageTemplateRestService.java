@@ -45,7 +45,7 @@ public class MessageTemplateRestService extends BaseRestServiceWithExport<Messag
 
     @Override
     protected Specification<MessageTemplateEntity> createSpecification(MessageTemplateRequest request) {
-        return MessageTemplateSpecification.search(request);
+        return MessageTemplateSpecification.search(request, authService);
     }
 
     @Override

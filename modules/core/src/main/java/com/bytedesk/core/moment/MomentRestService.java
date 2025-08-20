@@ -49,7 +49,7 @@ public class MomentRestService extends BaseRestServiceWithExport<MomentEntity, M
     @Override
     public Page<MomentEntity> queryByOrgEntity(MomentRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<MomentEntity> spec = MomentSpecification.search(request);
+        Specification<MomentEntity> spec = MomentSpecification.search(request, authService);
         return momentRepository.findAll(spec, pageable);
     }
 
@@ -218,7 +218,7 @@ public class MomentRestService extends BaseRestServiceWithExport<MomentEntity, M
 
     @Override
     protected Specification<MomentEntity> createSpecification(MomentRequest request) {
-        return MomentSpecification.search(request);
+        return MomentSpecification.search(request, authService);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class CallGatewayRestService extends BaseRestServiceWithExport<CallGatewa
 
     @Override
     protected Specification<CallGatewayEntity> createSpecification(CallGatewayRequest request) {
-        return CallGatewaySpecification.search(request);
+        return CallGatewaySpecification.search(request, authService);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class CallGatewayRestService extends BaseRestServiceWithExport<CallGatewa
     @Cacheable(value = "gateway", key = "#request.orgUid + ':' + #request.pageNumber + ':' + #request.pageSize")
     public Page<CallGatewayResponse> queryByOrg(CallGatewayRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CallGatewayEntity> spec = CallGatewaySpecification.search(request);
+        Specification<CallGatewayEntity> spec = CallGatewaySpecification.search(request, authService);
         Page<CallGatewayEntity> gatewayPage = gatewayRepository.findAll(spec, pageable);
         return gatewayPage.map(this::convertToResponse);
     }
@@ -147,7 +147,7 @@ public class CallGatewayRestService extends BaseRestServiceWithExport<CallGatewa
     //     // }
         
     //     // 查询所有数据，不分页
-    //     Specification<CallGatewayEntity> spec = CallGatewaySpecification.search(request);
+    //     Specification<CallGatewayEntity> spec = CallGatewaySpecification.search(request, authService);
     //     List<CallGatewayEntity> gateways = gatewayRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "updatedAt"));
         
     //     List<CallGatewayExcel> excelList = gateways.stream()
@@ -160,7 +160,7 @@ public class CallGatewayRestService extends BaseRestServiceWithExport<CallGatewa
     @Override
     public Page<CallGatewayEntity> queryByOrgEntity(CallGatewayRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<CallGatewayEntity> spec = CallGatewaySpecification.search(request);
+        Specification<CallGatewayEntity> spec = CallGatewaySpecification.search(request, authService);
         return gatewayRepository.findAll(spec, pageable);
     }
 

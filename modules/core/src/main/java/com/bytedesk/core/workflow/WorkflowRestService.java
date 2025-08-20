@@ -43,7 +43,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Override
     protected Specification<WorkflowEntity> createSpecification(WorkflowRequest request) {
-        return WorkflowSpecification.search(request);
+        return WorkflowSpecification.search(request, authService);
     }
 
     @Override

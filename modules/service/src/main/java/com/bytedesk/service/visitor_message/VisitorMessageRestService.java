@@ -103,7 +103,7 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
 
     @Override
     protected Specification<MessageEntity> createSpecification(MessageRequest request) {
-        return MessageSpecification.search(request);
+        return MessageSpecification.search(request, authService);
     }
 
     @Override

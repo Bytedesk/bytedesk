@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-11 21:26:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 23:30:21
+ * @LastEditTime: 2025-08-20 20:42:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,13 +18,15 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
+
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DepartmentSpecification extends BaseSpecification<DepartmentEntity, DepartmentRequest> {
 
-    public static Specification<DepartmentEntity> search(DepartmentRequest request) {
+    public static Specification<DepartmentEntity> search(DepartmentRequest request, AuthService authService) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

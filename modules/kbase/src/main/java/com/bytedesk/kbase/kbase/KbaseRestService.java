@@ -66,7 +66,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     @Override
     protected Specification<KbaseEntity> createSpecification(KbaseRequest request) {
-        return KbaseSpecification.search(request);
+        return KbaseSpecification.search(request, authService);
     }
 
     @Override

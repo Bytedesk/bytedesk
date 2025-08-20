@@ -68,7 +68,7 @@ public class MessageLeaveRestService extends
 
     @Override
     protected Specification<MessageLeaveEntity> createSpecification(MessageLeaveRequest request) {
-        return MessageLeaveSpecification.search(request);
+        return MessageLeaveSpecification.search(request, authService);
     }
 
     @Override

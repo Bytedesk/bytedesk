@@ -49,7 +49,7 @@ public class RelationRestService extends BaseRestServiceWithExport<RelationEntit
     @Override
     public Page<RelationEntity> queryByOrgEntity(RelationRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<RelationEntity> spec = RelationSpecification.search(request);
+        Specification<RelationEntity> spec = RelationSpecification.search(request, authService);
         return relationRepository.findAll(spec, pageable);
     }
 
@@ -202,7 +202,7 @@ public class RelationRestService extends BaseRestServiceWithExport<RelationEntit
 
     @Override
     protected Specification<RelationEntity> createSpecification(RelationRequest request) {
-        return RelationSpecification.search(request);
+        return RelationSpecification.search(request, authService);
     }
 
     @Override

@@ -47,7 +47,7 @@ public class RatedownSettingsRestService extends BaseRestServiceWithExport<Rated
 
     @Override
     protected Specification<RatedownSettingsEntity> createSpecification(RatedownSettingsRequest request) {
-        return RatedownSettingsSpecification.search(request);
+        return RatedownSettingsSpecification.search(request, authService);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class RatedownSettingsRestService extends BaseRestServiceWithExport<Rated
     @Override
     public Page<RatedownSettingsEntity> queryByOrgEntity(RatedownSettingsRequest request) {
         Pageable pageable = request.getPageable();
-        Specification<RatedownSettingsEntity> spec = RatedownSettingsSpecification.search(request);
+        Specification<RatedownSettingsEntity> spec = RatedownSettingsSpecification.search(request, authService);
         return ratedownSettingRepository.findAll(spec, pageable);
     }
 

@@ -33,7 +33,7 @@ public class ServerMetricsRestService extends BaseRestService<ServerMetricsEntit
 
     @Override
     protected Specification<ServerMetricsEntity> createSpecification(ServerMetricsRequest request) {
-        return ServerMetricsSpecification.search(request);
+        return ServerMetricsSpecification.search(request, authService);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 22:19:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 23:30:02
+ * @LastEditTime: 2025-08-20 20:42:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,12 +20,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 
 import jakarta.persistence.criteria.Predicate;
 
 public class ClipboardSpecification extends BaseSpecification<ClipboardEntity, ClipboardRequest> {
 
-    public static Specification<ClipboardEntity> search(ClipboardRequest request) {
+    public static Specification<ClipboardEntity> search(ClipboardRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));

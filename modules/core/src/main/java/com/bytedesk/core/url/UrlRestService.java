@@ -158,7 +158,7 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
 
     @Override
     protected Specification<UrlEntity> createSpecification(UrlRequest request) {
-        return UrlSpecification.search(request);
+        return UrlSpecification.search(request, authService);
     }
 
     @Override

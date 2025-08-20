@@ -41,7 +41,7 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
 
     @Override
     protected Specification<NoticeEntity> createSpecification(NoticeRequest request) {
-        return NoticeSpecification.search(request);
+        return NoticeSpecification.search(request, authService);
     }
 
     @Override

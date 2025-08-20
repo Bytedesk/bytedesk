@@ -57,7 +57,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
 
     @Override
     protected Specification<VisitorEntity> createSpecification(VisitorRequest request) {
-        return VisitorSpecification.search(request);
+        return VisitorSpecification.search(request, authService);
     }
 
     @Override

@@ -251,7 +251,7 @@ public class QuartzRestService extends BaseRestService<QuartzEntity, QuartzReque
 
     @Override
     protected Specification<QuartzEntity> createSpecification(QuartzRequest request) {
-        return QuartzSpecification.search(request);
+        return QuartzSpecification.search(request, authService);
     }
 
     @Override

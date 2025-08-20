@@ -57,7 +57,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         public Page<RoleResponse> queryByOrg(RoleRequest request) {
                 Pageable pageable = request.getPageable();
-                Specification<RoleEntity> specification = RoleSpecification.search(request);
+                Specification<RoleEntity> specification = RoleSpecification.search(request, authService);
                 Page<RoleEntity> rolePage = roleRepository.findAll(specification, pageable);
                 return rolePage.map(this::convertToResponse);
         }
@@ -258,7 +258,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         @Override
         protected Specification<RoleEntity> createSpecification(RoleRequest request) {
-                return RoleSpecification.search(request);
+                return RoleSpecification.search(request, authService);
         }
 
         @Override

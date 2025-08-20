@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.enums.LevelEnum;
 
 import jakarta.persistence.criteria.Predicate;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoleSpecification extends BaseSpecification<RoleEntity, RoleRequest> {
 
-    public static Specification<RoleEntity> search(RoleRequest request) {
+    public static Specification<RoleEntity> search(RoleRequest request, AuthService authService) {
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

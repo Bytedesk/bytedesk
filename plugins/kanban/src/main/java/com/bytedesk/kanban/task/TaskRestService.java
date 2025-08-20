@@ -47,7 +47,7 @@ public class TaskRestService extends BaseRestService<TaskEntity, TaskRequest, Ta
 
     @Override
     protected Specification<TaskEntity> createSpecification(TaskRequest request) {
-        return TaskSpecification.search(request);
+        return TaskSpecification.search(request, authService);
     }
 
     @Override
