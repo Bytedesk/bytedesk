@@ -32,25 +32,13 @@ public class ServerMetricsRestService extends BaseRestService<ServerMetricsEntit
     private final ServerRestService serverRestService;
 
     @Override
-    public Page<ServerMetricsResponse> queryByOrg(ServerMetricsRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ServerMetricsEntity> spec = ServerMetricsSpecification.search(request);
-        Page<ServerMetricsEntity> page = serverMetricsRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<ServerMetricsEntity> createSpecification(ServerMetricsRequest request) {
+        return ServerMetricsSpecification.search(request);
     }
 
     @Override
-    public Page<ServerMetricsResponse> queryByUser(ServerMetricsRequest request) {
-        return queryByOrg(request);
-    }
-
-    @Override
-    public ServerMetricsResponse queryByUid(ServerMetricsRequest request) {
-        Optional<ServerMetricsEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        }
-        return null;
+    protected Page<ServerMetricsEntity> executePageQuery(Specification<ServerMetricsEntity> spec, Pageable pageable) {
+        return serverMetricsRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "server_metrics", key = "#uid", unless="#result==null")
@@ -234,4 +222,6 @@ public class ServerMetricsRestService extends BaseRestService<ServerMetricsEntit
         private Long peakUsedMemoryMb;
         private Long peakUsedDiskGb;
     }
+
+    
 }

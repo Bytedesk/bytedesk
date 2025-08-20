@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 15:20:33
+ * @LastEditTime: 2025-08-20 15:21:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,22 +45,13 @@ public class WebpageRestService
     private final KbaseRestService kbaseRestService;
 
     @Override
-    public Page<WebpageEntity> queryByOrgEntity(WebpageRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<WebpageEntity> spec = WebpageSpecification.search(request);
+    protected Specification<WebpageEntity> createSpecification(WebpageRequest request) {
+        return WebpageSpecification.search(request);
+    }
+
+    @Override
+    protected Page<WebpageEntity> executePageQuery(Specification<WebpageEntity> spec, Pageable pageable) {
         return webpageRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<WebpageResponse> queryByOrg(WebpageRequest request) {
-        Page<WebpageEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<WebpageResponse> queryByUser(WebpageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Cacheable(value = "webpage", key = "#uid", unless = "#result==null")

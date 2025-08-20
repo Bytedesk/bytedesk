@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:45:14
+ * @LastEditTime: 2025-08-20 14:52:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -47,38 +45,13 @@ public class AgentTemplateRestService extends BaseRestServiceWithExcel<AgentTemp
     private final AuthService authService;
 
     @Override
-    public Page<AgentTemplateEntity> queryByOrgEntity(AgentTemplateRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<AgentTemplateEntity> spec = AgentTemplateSpecification.search(request);
+    protected Specification<AgentTemplateEntity> createSpecification(AgentTemplateRequest request) {
+        return AgentTemplateSpecification.search(request);
+    }
+
+    @Override
+    protected Page<AgentTemplateEntity> executePageQuery(Specification<AgentTemplateEntity> spec, Pageable pageable) {
         return agentTemplateRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<AgentTemplateResponse> queryByOrg(AgentTemplateRequest request) {
-        Page<AgentTemplateEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<AgentTemplateResponse> queryByUser(AgentTemplateRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public AgentTemplateResponse queryByUid(AgentTemplateRequest request) {
-        Optional<AgentTemplateEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            AgentTemplateEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("AgentTemplate not found");
-        }
     }
 
     @Cacheable(value = "agentTemplate", key = "#uid", unless="#result==null")
@@ -203,5 +176,6 @@ public class AgentTemplateRestService extends BaseRestServiceWithExcel<AgentTemp
     public void initAgentTemplates(String orgUid) {
         // log.info("initThreadAgentTemplate");
     }
+
     
 }

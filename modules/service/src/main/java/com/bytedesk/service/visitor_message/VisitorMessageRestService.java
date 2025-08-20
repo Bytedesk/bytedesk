@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-20 13:21:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 12:47:44
+ * @LastEditTime: 2025-08-20 14:08:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,14 +36,6 @@ import lombok.AllArgsConstructor;
 public class VisitorMessageRestService extends BaseRestService<MessageEntity, MessageRequest, MessageResponse> {
 
     private final MessageRepository messageRepository;
-    
-    @Override
-    public Page<MessageResponse> queryByOrg(MessageRequest request) {
-         Pageable pageable = request.getPageable();
-        Specification<MessageEntity> specs = MessageSpecification.search(request);
-        Page<MessageEntity> messagePage = messageRepository.findAll(specs, pageable);
-        return messagePage.map(this::convertToResponse);
-    }
 
     @Override
     public Page<MessageResponse> queryByUser(MessageRequest request) {
@@ -107,6 +99,16 @@ public class VisitorMessageRestService extends BaseRestService<MessageEntity, Me
     @Override
     public MessageResponse convertToResponse(MessageEntity entity) {
         return ConvertUtils.convertToMessageResponse(entity);
+    }
+
+    @Override
+    protected Specification<MessageEntity> createSpecification(MessageRequest request) {
+        return MessageSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MessageEntity> executePageQuery(Specification<MessageEntity> spec, Pageable pageable) {
+        return messageRepository.findAll(spec, pageable);
     }
     
 }

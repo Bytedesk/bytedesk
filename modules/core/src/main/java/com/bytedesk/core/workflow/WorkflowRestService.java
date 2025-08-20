@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-25 11:46:09
+ * @LastEditTime: 2025-08-20 14:47:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,9 +25,6 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -44,35 +41,16 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     @Override
-    public Page<WorkflowResponse> queryByOrg(WorkflowRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<WorkflowEntity> spec = WorkflowSpecification.search(request);
-        Page<WorkflowEntity> page = workflowRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<WorkflowEntity> createSpecification(WorkflowRequest request) {
+        return WorkflowSpecification.search(request);
     }
 
     @Override
-    public Page<WorkflowResponse> queryByUser(WorkflowRequest request) {
-        UserEntity user = authService.getCurrentUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByUser(request);
+    protected Page<WorkflowEntity> executePageQuery(Specification<WorkflowEntity> spec, Pageable pageable) {
+        return workflowRepository.findAll(spec, pageable);
     }
 
-    @Override
-    public WorkflowResponse queryByUid(WorkflowRequest request) {
-        Optional<WorkflowEntity> optional = findByUid(request.getUid());
-        if (!optional.isPresent()) {
-            throw new RuntimeException("Workflow not found");
-        }
-        return convertToResponse(optional.get());
-    }
     
     @Cacheable(value = "workflow", key = "#uid", unless="#result==null")
     @Override
@@ -164,5 +142,6 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         return modelMapper.map(entity, WorkflowResponse.class);
     }
 
+    
 
 }

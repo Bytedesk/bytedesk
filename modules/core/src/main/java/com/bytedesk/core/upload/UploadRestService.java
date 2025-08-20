@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-27 22:35:52
+ * @LastEditTime: 2025-08-20 14:47:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,32 +78,15 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	private UploadMinioService uploadMinioService;
 
 	@Override
-	public Page<UploadResponse> queryByOrg(UploadRequest request) {
-		Pageable pageable = request.getPageable();
-		Specification<UploadEntity> specification = UploadSpecification.search(request);
-		Page<UploadEntity> page = uploadRepository.findAll(specification, pageable);
-		return page.map(this::convertToResponse);
+	protected Specification<UploadEntity> createSpecification(UploadRequest request) {
+		return UploadSpecification.search(request);
 	}
 
 	@Override
-	public Page<UploadResponse> queryByUser(UploadRequest request) {
-		UserEntity user = authService.getUser();
-		if (user == null) {
-			throw new RuntimeException("用户未登录");
-		}
-		request.setUserUid(user.getUid());
-		return queryByOrg(request);
+	protected Page<UploadEntity> executePageQuery(Specification<UploadEntity> spec, Pageable pageable) {
+		return uploadRepository.findAll(spec, pageable);
 	}
 
-	@Override
-	public UploadResponse queryByUid(UploadRequest request) {
-		Optional<UploadEntity> uploadOptional = findByUid(request.getUid());
-		if (uploadOptional.isPresent()) {
-			return convertToResponse(uploadOptional.get());
-		} else {
-			throw new RuntimeException("Upload with uid '" + request.getUid() + "' not found");
-		}
-	}
 
 	@Override
 	public Optional<UploadEntity> findByUid(String uid) {
@@ -680,6 +663,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		return uploadMinioService.getUploadUrl(objectPath, expiry);
 	}
 
+	
 	
 
 }

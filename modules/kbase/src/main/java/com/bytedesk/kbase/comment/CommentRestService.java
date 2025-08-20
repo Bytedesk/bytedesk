@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:43:43
+ * @LastEditTime: 2025-08-20 14:50:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,17 +50,13 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
     private final AuthService authService;
 
     @Override
-    public Page<CommentResponse> queryByOrg(CommentRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<CommentEntity> spec = CommentSpecification.search(request);
-        Page<CommentEntity> page = commentRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<CommentEntity> createSpecification(CommentRequest request) {
+        return CommentSpecification.search(request);
     }
 
     @Override
-    public Page<CommentResponse> queryByUser(CommentRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    protected Page<CommentEntity> executePageQuery(Specification<CommentEntity> spec, Pageable pageable) {
+        return commentRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "comment", key = "#uid", unless="#result==null")
@@ -163,5 +159,7 @@ public class CommentRestService extends BaseRestService<CommentEntity, CommentRe
     public CommentResponse convertToResponse(CommentEntity entity) {
         return modelMapper.map(entity, CommentResponse.class);
     }
+
+    
     
 }

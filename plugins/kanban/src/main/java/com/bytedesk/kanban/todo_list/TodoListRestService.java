@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceImproved;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TodoListRestService extends BaseRestServiceImproved<TodoListEntity, TodoListRequest, TodoListResponse> {
+public class TodoListRestService extends BaseRestService<TodoListEntity, TodoListRequest, TodoListResponse> {
 
     private final TodoListRepository todoRepository;
     private final ModuleRepository moduleRepository;

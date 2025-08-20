@@ -22,7 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import com.bytedesk.core.base.BaseRestServiceImproved;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ReportRestService extends BaseRestServiceImproved<ReportEntity, ReportRequest, ReportResponse> {
+public class ReportRestService extends BaseRestService<ReportEntity, ReportRequest, ReportResponse> {
 
     private final ReportRepository reportRepository;
     private final ModelMapper modelMapper;

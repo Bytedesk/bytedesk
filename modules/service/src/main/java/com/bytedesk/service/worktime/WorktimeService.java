@@ -16,6 +16,8 @@ package com.bytedesk.service.worktime;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -149,6 +151,16 @@ public class WorktimeService extends BaseRestService<WorktimeEntity, WorktimeReq
         WorktimeResponse worktimeResponse = create(worktimeRequest);
 
         return worktimeResponse.getUid();
+    }
+
+    @Override
+    protected Specification<WorktimeEntity> createSpecification(WorktimeRequest request) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.and();
+    }
+
+    @Override
+    protected Page<WorktimeEntity> executePageQuery(Specification<WorktimeEntity> spec, Pageable pageable) {
+        return worktimeRepository.findAll(pageable);
     }
 
 }

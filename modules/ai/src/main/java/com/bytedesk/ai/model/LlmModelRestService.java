@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 21:00:33
+ * @LastEditTime: 2025-08-20 14:41:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,8 +27,6 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -49,30 +47,13 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     private final AuthService authService;
 
     @Override
-    public Page<LlmModelResponse> queryByOrg(LlmModelRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<LlmModelEntity> specification = LlmModelSpecification.search(request);
-        Page<LlmModelEntity> page = llmModelRepository.findAll(specification, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<LlmModelEntity> createSpecification(LlmModelRequest request) {
+        return LlmModelSpecification.search(request);
     }
 
     @Override
-    public Page<LlmModelResponse> queryByUser(LlmModelRequest request) {
-        UserEntity user = authService.getCurrentUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
-    }
-
-    @Override
-    public LlmModelResponse queryByUid(LlmModelRequest request) {
-        Optional<LlmModelEntity> optional = llmModelRepository.findByUid(request.getUid());
-        if (optional.isEmpty()) {
-            throw new NotFoundException("model not found");
-        }
-        return convertToResponse(optional.get());
+    protected Page<LlmModelEntity> executePageQuery(Specification<LlmModelEntity> spec, Pageable pageable) {
+        return llmModelRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -206,6 +187,8 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     public LlmModelResponse convertToResponse(LlmModelEntity entity) {
         return modelMapper.map(entity, LlmModelResponse.class);
     }
+
+    
 
     
 

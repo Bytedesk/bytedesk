@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-22 18:40:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:47:53
+ * @LastEditTime: 2025-08-20 15:18:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -25,7 +25,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.file.FileEntity;
@@ -34,7 +33,6 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -51,8 +49,6 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     private final KbaseRestService kbaseRestService;
 
     private final FileRestService fileRestService;
@@ -60,27 +56,13 @@ public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, Chun
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
-    public Page<ChunkEntity> queryByOrgEntity(ChunkRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ChunkEntity> spec = ChunkSpecification.search(request);
+    protected Specification<ChunkEntity> createSpecification(ChunkRequest request) {
+        return ChunkSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ChunkEntity> executePageQuery(Specification<ChunkEntity> spec, Pageable pageable) {
         return chunkRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<ChunkResponse> queryByOrg(ChunkRequest request) {
-        Page<ChunkEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<ChunkResponse> queryByUser(ChunkRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        //
-        return queryByOrg(request);
     }
 
     @Cacheable(value = "chunk", key = "#uid", unless = "#result==null")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 09:52:15
+ * @LastEditTime: 2025-08-20 15:21:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -57,22 +57,13 @@ public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRe
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
-    public Page<FileEntity> queryByOrgEntity(FileRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<FileEntity> spec = FileSpecification.search(request);
+    protected Specification<FileEntity> createSpecification(FileRequest request) {
+        return FileSpecification.search(request);
+    }
+
+    @Override
+    protected Page<FileEntity> executePageQuery(Specification<FileEntity> spec, Pageable pageable) {
         return fileRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<FileResponse> queryByOrg(FileRequest request) {
-        Page<FileEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<FileResponse> queryByUser(FileRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
     }
 
     @Cacheable(value = "file", key = "#uid", unless = "#result==null")

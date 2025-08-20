@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:58:18
+ * @LastEditTime: 2025-08-20 13:40:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -44,27 +43,15 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     @Override
-    public Page<KbaseInviteResponse> queryByOrg(KbaseInviteRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<KbaseInviteEntity> spec = KbaseInviteSpecification.search(request);
-        Page<KbaseInviteEntity> page = tagRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<KbaseInviteEntity> createSpecification(KbaseInviteRequest request) {
+        return KbaseInviteSpecification.search(request);
     }
 
     @Override
-    public Page<KbaseInviteResponse> queryByUser(KbaseInviteRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+    protected Page<KbaseInviteEntity> executePageQuery(Specification<KbaseInviteEntity> spec, Pageable pageable) {
+        return tagRepository.findAll(spec, pageable);
     }
-
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
     @Override
     public Optional<KbaseInviteEntity> findByUid(String uid) {

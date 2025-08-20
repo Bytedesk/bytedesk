@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 15:07:12
+ * @LastEditTime: 2025-08-20 15:21:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -42,7 +42,6 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -76,8 +75,6 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
 
     private final FaqJsonLoader faqJsonLoader;
 
-    private final AuthService authService;
-
     private final KbaseRestService kbaseRestService;
 
     private final ThreadRestService threadRestService;
@@ -87,29 +84,14 @@ public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqReque
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
-    public Page<FaqEntity> queryByOrgEntity(FaqRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<FaqEntity> spec = FaqSpecification.search(request);
+    protected Specification<FaqEntity> createSpecification(FaqRequest request) {
+        return FaqSpecification.search(request);
+    }
+
+    @Override
+    protected Page<FaqEntity> executePageQuery(Specification<FaqEntity> spec, Pageable pageable) {
         return faqRepository.findAll(spec, pageable);
     }
-
-    @Override
-    public Page<FaqResponse> queryByOrg(FaqRequest request) {
-        Page<FaqEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<FaqResponse> queryByUser(FaqRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        //
-        return queryByOrg(request);
-    }
-
     @Transactional
     @Override
     public FaqResponse queryByUid(FaqRequest request) {

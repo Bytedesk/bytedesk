@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-05 22:19:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:17:14
+ * @LastEditTime: 2025-08-20 14:44:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,6 +43,16 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    @Override
+    protected Specification<ClipboardEntity> createSpecification(ClipboardRequest request) {
+        return ClipboardSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ClipboardEntity> executePageQuery(Specification<ClipboardEntity> spec, Pageable pageable) {
+        return clipboardRepository.findAll(spec, pageable);
+    }
 
     @Override
     public Page<ClipboardResponse> queryByOrg(ClipboardRequest request) {
@@ -136,11 +146,6 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     public ClipboardResponse convertToResponse(ClipboardEntity entity) {
         return modelMapper.map(entity, ClipboardResponse.class);
     }
-
-    @Override
-    public ClipboardResponse queryByUid(ClipboardRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
 }

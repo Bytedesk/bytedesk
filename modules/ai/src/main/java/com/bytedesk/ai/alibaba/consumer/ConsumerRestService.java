@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 13:17:48
+ * @LastEditTime: 2025-08-20 14:40:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,9 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -35,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ConsumerRestService extends BaseRestServiceWithExcelImproved<ConsumerEntity, ConsumerRequest, ConsumerResponse, ConsumerExcel> {
+public class ConsumerRestService extends BaseRestServiceWithExcel<ConsumerEntity, ConsumerRequest, ConsumerResponse, ConsumerExcel> {
 
     private final ConsumerRepository consumerRepository;
 
@@ -49,9 +47,8 @@ public class ConsumerRestService extends BaseRestServiceWithExcelImproved<Consum
     }
 
     @Override
-    protected Page<ConsumerResponse> executePageQuery(Specification<ConsumerEntity> spec, Pageable pageable) {
-        Page<ConsumerEntity> page = consumerRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Page<ConsumerEntity> executePageQuery(Specification<ConsumerEntity> spec, Pageable pageable) {
+        return consumerRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "consumer", key = "#uid", unless="#result==null")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:43:25
+ * @LastEditTime: 2025-08-20 13:31:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
@@ -50,45 +49,20 @@ public class ArticleRestService extends BaseRestServiceWithExcel<ArticleEntity, 
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     // 循环依赖
     // private final KbaseRestService kbaseRestService;
     private final KbaseRepository kbaseRepository;
 
     @Override
-    public Page<ArticleEntity> queryByOrgEntity(ArticleRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ArticleEntity> spec = ArticleSpecification.search(request);
+    protected Specification<ArticleEntity> createSpecification(ArticleRequest request) {
+        return ArticleSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ArticleEntity> executePageQuery(Specification<ArticleEntity> spec, Pageable pageable) {
         return articleRepository.findAll(spec, pageable);
     }
 
-    @Override
-    public Page<ArticleResponse> queryByOrg(ArticleRequest request) {
-        Page<ArticleEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<ArticleResponse> queryByUser(ArticleRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        String userUid = user.getUid();
-        request.setUserUid(userUid);
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public ArticleResponse queryByUid(ArticleRequest request) {
-        Optional<ArticleEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        }
-        return null;
-    }
 
     @Cacheable(value = "article", key="#uid", unless = "#result == null")
     @Override

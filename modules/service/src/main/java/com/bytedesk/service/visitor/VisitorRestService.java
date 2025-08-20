@@ -56,30 +56,13 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
     private final ThreadRoutingContext threadRoutingContext;
 
     @Override
-    public Page<VisitorEntity> queryByOrgEntity(VisitorRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<VisitorEntity> spec = VisitorSpecification.search(request);
+    protected Specification<VisitorEntity> createSpecification(VisitorRequest request) {
+        return VisitorSpecification.search(request);
+    }
+
+    @Override
+    protected Page<VisitorEntity> executePageQuery(Specification<VisitorEntity> spec, Pageable pageable) {
         return visitorRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<VisitorResponse> queryByOrg(VisitorRequest request) {
-        Page<VisitorEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<VisitorResponse> queryByUser(VisitorRequest request) {
-        return queryByOrg(request);
-    }
-
-    @Override
-    public VisitorResponse queryByUid(VisitorRequest request) {
-        Optional<VisitorEntity> visitorOptional = findByUid(request.getUid());
-        if (visitorOptional.isEmpty()) {
-            throw new NotFoundException("visitor not found");
-        }
-        return convertToResponse(visitorOptional.get());
     }
 
     @Transactional
@@ -292,5 +275,7 @@ public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, 
         excel.setChannel(ChannelEnum.toChineseDisplay(entity.getChannel()));
         return excel;
     }
+
+    
 
 }

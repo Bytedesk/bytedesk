@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:30:06
+ * @LastEditTime: 2025-08-20 14:55:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,9 +23,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -40,36 +37,14 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     @Override
-    public Page<FormResponse> queryByOrg(FormRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<FormEntity> spec = FormSpecification.search(request);
-        Page<FormEntity> page = formRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<FormEntity> createSpecification(FormRequest request) {
+        return FormSpecification.search(request);
     }
 
     @Override
-    public Page<FormResponse> queryByUser(FormRequest request) {
-        UserEntity user = authService.getCurrentUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public FormResponse queryByUid(FormRequest request) {
-        Optional<FormEntity> optional = formRepository.findByUid(request.getUid());
-        if (optional.isPresent()) {
-            FormEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Form not found");
-        }
+    protected Page<FormEntity> executePageQuery(Specification<FormEntity> spec, Pageable pageable) {
+        return formRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -149,6 +124,8 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     public FormResponse convertToResponse(FormEntity entity) {
         return modelMapper.map(entity, FormResponse.class);
     }
+
+    
 
     
 }

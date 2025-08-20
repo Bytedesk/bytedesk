@@ -24,7 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallIvrRestService extends BaseRestServiceWithExcelImproved<CallIvrEntity, CallIvrRequest, CallIvrResponse, CallIvrExcel> {
+public class CallIvrRestService extends BaseRestServiceWithExcel<CallIvrEntity, CallIvrRequest, CallIvrResponse, CallIvrExcel> {
 
     private final CallIvrRepository ivrRepository;
 

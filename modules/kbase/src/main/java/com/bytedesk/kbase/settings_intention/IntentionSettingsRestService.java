@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:44:14
+ * @LastEditTime: 2025-08-20 15:25:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,9 +24,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -43,36 +40,14 @@ public class IntentionSettingsRestService extends BaseRestServiceWithExcel<Inten
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<IntentionSettingsEntity> createSpecification(IntentionSettingsRequest request) {
+        return IntentionSettingsSpecification.search(request);
+    }
 
     @Override
-    public Page<IntentionSettingsEntity> queryByOrgEntity(IntentionSettingsRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<IntentionSettingsEntity> spec = IntentionSettingsSpecification.search(request);
+    protected Page<IntentionSettingsEntity> executePageQuery(Specification<IntentionSettingsEntity> spec, Pageable pageable) {
         return intentionSettingsRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<IntentionSettingsResponse> queryByOrg(IntentionSettingsRequest request) {
-        Page<IntentionSettingsEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<IntentionSettingsResponse> queryByUser(IntentionSettingsRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public IntentionSettingsResponse queryByUid(IntentionSettingsRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "intentionSettings", key = "#uid", unless="#result==null")

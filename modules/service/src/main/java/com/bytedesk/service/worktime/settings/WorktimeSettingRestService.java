@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:47:46
+ * @LastEditTime: 2025-08-20 14:02:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,8 +24,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -44,36 +42,6 @@ public class WorktimeSettingRestService extends BaseRestServiceWithExcel<Worktim
     private final UidUtils uidUtils;
 
     private final AuthService authService;
-
-    @Override
-    public Page<WorktimeSettingEntity> queryByOrgEntity(WorktimeSettingRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<WorktimeSettingEntity> spec = WorktimeSettingSpecification.search(request);
-        return tagRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<WorktimeSettingResponse> queryByOrg(WorktimeSettingRequest request) {
-        Page<WorktimeSettingEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<WorktimeSettingResponse> queryByUser(WorktimeSettingRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public WorktimeSettingResponse queryByUid(WorktimeSettingRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
     @Override
@@ -177,6 +145,16 @@ public class WorktimeSettingRestService extends BaseRestServiceWithExcel<Worktim
     @Override
     public WorktimeSettingExcel convertToExcel(WorktimeSettingEntity entity) {
         return modelMapper.map(entity, WorktimeSettingExcel.class);
+    }
+
+    @Override
+    protected Specification<WorktimeSettingEntity> createSpecification(WorktimeSettingRequest request) {
+        return WorktimeSettingSpecification.search(request);
+    }
+
+    @Override
+    protected Page<WorktimeSettingEntity> executePageQuery(Specification<WorktimeSettingEntity> spec, Pageable pageable) {
+        return tagRepository.findAll(spec, pageable);
     }
     
     

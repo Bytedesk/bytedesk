@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:35:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:29:24
+ * @LastEditTime: 2025-08-20 15:26:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,9 +25,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 // import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -43,30 +40,14 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     @Override
-    public Page<TabooMessageEntity> queryByOrgEntity(TabooMessageRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TabooMessageEntity> specification = TabooMessageSpecification.search(request);
-        return tabooMessageRepository.findAll(specification, pageable);
+    protected Specification<TabooMessageEntity> createSpecification(TabooMessageRequest request) {
+        return TabooMessageSpecification.search(request);
     }
 
     @Override
-    public Page<TabooMessageResponse> queryByOrg(TabooMessageRequest request) {
-        Page<TabooMessageEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<TabooMessageResponse> queryByUser(TabooMessageRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+    protected Page<TabooMessageEntity> executePageQuery(Specification<TabooMessageEntity> spec, Pageable pageable) {
+        return tabooMessageRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "taboo_message", key="#uid", unless = "#result == null")
@@ -115,16 +96,7 @@ public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessa
             throw new RuntimeException("update taboo_message failed");
         }
     }
-
-    @Override
-    public TabooMessageEntity save(TabooMessageEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
+    
     protected TabooMessageEntity doSave(TabooMessageEntity entity) {
         return tabooMessageRepository.save(entity);
     }

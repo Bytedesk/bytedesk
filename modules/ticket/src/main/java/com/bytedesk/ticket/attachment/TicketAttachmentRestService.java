@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-06 15:06:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 13:39:04
+ * @LastEditTime: 2025-08-20 13:51:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,8 @@ package com.bytedesk.ticket.attachment;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +28,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TicketAttachmentRestService extends BaseRestService<TicketAttachmentEntity, TicketAttachmentRequest, TicketAttachmentResponse> {
 
-    // private final TicketAttachmentRepository ticketAttachmentRepository;
-
-    // private final ModelMapper modelMapper;
-
-    // private final UidUtils uidUtils;
 
     @Override
     public Page<TicketAttachmentResponse> queryByOrg(TicketAttachmentRequest request) {
@@ -115,6 +112,18 @@ public class TicketAttachmentRestService extends BaseRestService<TicketAttachmen
     public TicketAttachmentResponse convertToResponse(TicketAttachmentEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+    }
+
+    @Override
+    protected Specification<TicketAttachmentEntity> createSpecification(TicketAttachmentRequest request) {
+        // TODO: 实现查询规范
+        throw new UnsupportedOperationException("Unimplemented method 'createSpecification'");
+    }
+
+    @Override
+    protected Page<TicketAttachmentEntity> executePageQuery(Specification<TicketAttachmentEntity> specification, Pageable pageable) {
+        // TODO: 实现分页查询
+        throw new UnsupportedOperationException("Unimplemented method 'executePageQuery'");
     }
     
 }

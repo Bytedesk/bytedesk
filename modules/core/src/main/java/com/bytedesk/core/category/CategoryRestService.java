@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 13:19:30
+ * @LastEditTime: 2025-08-20 14:44:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,11 +29,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 
@@ -51,7 +47,15 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<CategoryEntity> createSpecification(CategoryRequest request) {
+        return CategorySpecification.search(request);
+    }
+
+    @Override
+    protected Page<CategoryEntity> executePageQuery(Specification<CategoryEntity> spec, Pageable pageable) {
+        return categoryRepository.findAll(spec, pageable);
+    }
 
     public List<CategoryResponse> findByNullParent(String platform) {
         // 一级分类

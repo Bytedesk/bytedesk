@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:31:30
+ * @LastEditTime: 2025-08-20 14:41:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,11 +29,7 @@ import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.LlmConfigUtils;
 
@@ -51,36 +47,16 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     private final Environment environment;
 
     @Override
-    public Page<LlmProviderResponse> queryByOrg(LlmProviderRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<LlmProviderEntity> specification = LlmProviderSpecification.search(request);
-        Page<LlmProviderEntity> page = llmProviderRepository.findAll(specification, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<LlmProviderEntity> createSpecification(LlmProviderRequest request) {
+        return LlmProviderSpecification.search(request);
     }
 
     @Override
-    public Page<LlmProviderResponse> queryByUser(LlmProviderRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public LlmProviderResponse queryByUid(LlmProviderRequest request) {
-        Optional<LlmProviderEntity> optional = llmProviderRepository.findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        }
-        throw new RuntimeException("provider not found");
+    protected Page<LlmProviderEntity> executePageQuery(Specification<LlmProviderEntity> spec, Pageable pageable) {
+        return llmProviderRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "provider", key = "#uid", unless = "#result == null")
@@ -234,4 +210,5 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return LlmConfigUtils.getLlmProviderConfigDefault(environment);
     }
 
+    
 }

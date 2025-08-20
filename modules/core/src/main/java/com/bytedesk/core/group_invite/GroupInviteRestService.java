@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -44,7 +43,15 @@ public class GroupInviteRestService extends BaseRestService<GroupInviteEntity, G
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<GroupInviteEntity> createSpecification(GroupInviteRequest request) {
+        return GroupInviteSpecification.search(request);
+    }
+
+    @Override
+    protected Page<GroupInviteEntity> executePageQuery(Specification<GroupInviteEntity> spec, Pageable pageable) {
+        return groupInviteRepository.findAll(spec, pageable);
+    }
 
     @Override
     public Page<GroupInviteResponse> queryByOrg(GroupInviteRequest request) {

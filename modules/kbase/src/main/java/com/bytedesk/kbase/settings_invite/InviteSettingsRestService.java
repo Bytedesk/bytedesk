@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:27:51
+ * @LastEditTime: 2025-08-20 13:37:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,6 +43,16 @@ public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSe
     private final AuthService authService;
 
     @Override
+    protected Specification<InviteSettingsEntity> createSpecification(InviteSettingsRequest request) {
+        return InviteSettingsSpecification.search(request);
+    }
+
+    @Override
+    protected Page<InviteSettingsEntity> executePageQuery(Specification<InviteSettingsEntity> spec, Pageable pageable) {
+        return inviteSettingRepository.findAll(spec, pageable);
+    }
+
+    @Override
     public Page<InviteSettingsEntity> queryByOrgEntity(InviteSettingsRequest request) {
         Pageable pageable = request.getPageable();
         Specification<InviteSettingsEntity> spec = InviteSettingsSpecification.search(request);
@@ -62,18 +72,12 @@ public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSe
             throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
-        // 
         return queryByOrg(request);
     }
 
     @Override
     public InviteSettingsResponse queryByUid(InviteSettingsRequest request) {
-        Optional<InviteSettingsEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        } else {
-            throw new RuntimeException("InviteSettings not found");
-        }
+        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "inviteSetting", key = "#uid", unless="#result==null")
@@ -156,7 +160,6 @@ public class InviteSettingsRestService extends BaseRestServiceWithExcel<InviteSe
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // inviteSettingRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("InviteSettings not found");

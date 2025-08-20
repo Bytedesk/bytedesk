@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-14 11:27:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-14 12:45:23
+ * @LastEditTime: 2025-08-20 14:43:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,8 @@ package com.bytedesk.call.call;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
@@ -29,11 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class CallCallRestService extends BaseRestService<CallCallEntity, CallCallRequest, CallCallResponse> {
-    
-    // private final CallCallRepository callRepository;
-    // private final CallAgentService agentService;
-    // private final CallQueueService queueService;
-    
+
     @Override
     public Page<CallCallResponse> queryByOrg(CallCallRequest request) {
         // TODO Auto-generated method stub
@@ -93,5 +91,17 @@ public class CallCallRestService extends BaseRestService<CallCallEntity, CallCal
     public CallCallResponse convertToResponse(CallCallEntity entity) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'convertToResponse'");
+    }
+
+    @Override
+    protected Specification<CallCallEntity> createSpecification(CallCallRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createSpecification'");
+    }
+
+    @Override
+    protected Page<CallCallEntity> executePageQuery(Specification<CallCallEntity> spec, Pageable pageable) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'executePageQuery'");
     }
 }

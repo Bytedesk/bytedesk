@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 21:15:05
+ * @LastEditTime: 2025-08-20 14:06:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,20 +75,6 @@ public class VisitorThreadService
     private final AgentRestService agentRestService;
 
     private final IMessageSendService messageSendService;
-
-    @Override
-    public Page<VisitorThreadResponse> queryByOrg(VisitorThreadRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<VisitorThreadEntity> spec = VisitorThreadSpecification.search(request);
-        Page<VisitorThreadEntity> threads = visitorThreadRepository.findAll(spec, pageable);
-        return threads.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<VisitorThreadResponse> queryByUser(VisitorThreadRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
 
     @Cacheable(value = "visitor_thread", key = "#uid", unless = "#result == null")
     @Override
@@ -449,6 +435,16 @@ public class VisitorThreadService
     @Override
     public VisitorThreadResponse convertToResponse(VisitorThreadEntity entity) {
         return modelMapper.map(entity, VisitorThreadResponse.class);
+    }
+
+    @Override
+    protected Specification<VisitorThreadEntity> createSpecification(VisitorThreadRequest request) {
+        return VisitorThreadSpecification.search(request);
+    }
+
+    @Override
+    protected Page<VisitorThreadEntity> executePageQuery(Specification<VisitorThreadEntity> spec, Pageable pageable) {
+        return visitorThreadRepository.findAll(spec, pageable);
     }
 
 }

@@ -45,7 +45,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class BaseRequest implements Serializable {
+public abstract class BaseRequest implements Serializable, PageableRequest {
 
     private static final long serialVersionUID = 1L;
 

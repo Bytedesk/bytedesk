@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:06:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-15 14:22:38
+ * @LastEditTime: 2025-08-20 14:55:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,8 +26,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -43,39 +41,14 @@ public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<CustomerEntity> createSpecification(CustomerRequest request) {
+        return CustomerSpecification.search(request);
+    }
 
     @Override
-    public Page<CustomerEntity> queryByOrgEntity(CustomerRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<CustomerEntity> spec = CustomerSpecification.search(request, authService);
+    protected Page<CustomerEntity> executePageQuery(Specification<CustomerEntity> spec, Pageable pageable) {
         return customerRepository.findAll(spec, pageable);
-    }
-    
-    @Override
-    public Page<CustomerResponse> queryByOrg(CustomerRequest request) {
-        Page<CustomerEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<CustomerResponse> queryByUser(CustomerRequest request) {
-       UserEntity user = authService.getCurrentUser();
-       if (user == null) {
-        throw new RuntimeException("用户未登录");
-       }
-       request.setUserUid(user.getUid());
-       // 
-       return queryByOrg(request);
-    }
-
-    @Override
-    public CustomerResponse queryByUid(CustomerRequest request) {
-        Optional<CustomerEntity> entity = findByUid(request.getUid());
-        if (entity.isPresent()) {
-            return convertToResponse(entity.get());
-        }
-        return null;
     }
 
     public CustomerResponse queryByVisitorUid(CustomerRequest request) {

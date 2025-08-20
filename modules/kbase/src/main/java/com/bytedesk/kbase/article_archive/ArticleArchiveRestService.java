@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:43:35
+ * @LastEditTime: 2025-08-20 14:48:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEntity, ArticleArchiveRequest, ArticleArchiveResponse> {
 
-    private final ArticleArchiveRepository article_archiveRepository;
+    private final ArticleArchiveRepository articleArchiveRepository;
 
     private final ModelMapper modelMapper;
 
@@ -49,39 +49,20 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
     private final AuthService authService;
 
     @Override
-    public Page<ArticleArchiveResponse> queryByOrg(ArticleArchiveRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<ArticleArchiveEntity> spec = ArticleArchiveSpecification.search(request);
-        Page<ArticleArchiveEntity> page = article_archiveRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<ArticleArchiveEntity> createSpecification(ArticleArchiveRequest request) {
+        return ArticleArchiveSpecification.search(request);
     }
 
     @Override
-    public Page<ArticleArchiveResponse> queryByUser(ArticleArchiveRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        String userUid = user.getUid();
-        //
-        request.setUserUid(userUid);
-        // 
-        return queryByOrg(request);
+    protected Page<ArticleArchiveEntity> executePageQuery(Specification<ArticleArchiveEntity> spec, Pageable pageable) {
+        return articleArchiveRepository.findAll(spec, pageable);
     }
 
-    @Override
-    public ArticleArchiveResponse queryByUid(ArticleArchiveRequest request) {
-        Optional<ArticleArchiveEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        }
-        return null;
-    }
 
     @Cacheable(value = "article_archive", key="#uid", unless = "#result == null")
     @Override
     public Optional<ArticleArchiveEntity> findByUid(String uid) {
-        return article_archiveRepository.findByUid(uid);
+        return articleArchiveRepository.findByUid(uid);
     }
 
     @Override
@@ -130,31 +111,22 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
             throw new RuntimeException("article_archive not found");
         }
     }
-
-    @Override
-    public ArticleArchiveEntity save(ArticleArchiveEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
+    
     @Override
     protected ArticleArchiveEntity doSave(ArticleArchiveEntity entity) {
-        return article_archiveRepository.save(entity);
+        return articleArchiveRepository.save(entity);
     }
 
     @Override
     public ArticleArchiveEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ArticleArchiveEntity entity) {
         // 乐观锁处理实现
         try {
-            Optional<ArticleArchiveEntity> latest = article_archiveRepository.findByUid(entity.getUid());
+            Optional<ArticleArchiveEntity> latest = articleArchiveRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 ArticleArchiveEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // 这里可以根据业务需求合并实体
-                return article_archiveRepository.save(latestEntity);
+                return articleArchiveRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
@@ -181,5 +153,6 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
         return KbaseConvertUtils.convertToArticleArchiveResponse(entity);
     }
 
+    
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:44:22
+ * @LastEditTime: 2025-08-20 13:38:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,6 +46,16 @@ public class RatedownSettingsRestService extends BaseRestServiceWithExcel<Ratedo
     private final AuthService authService;
 
     @Override
+    protected Specification<RatedownSettingsEntity> createSpecification(RatedownSettingsRequest request) {
+        return RatedownSettingsSpecification.search(request);
+    }
+
+    @Override
+    protected Page<RatedownSettingsEntity> executePageQuery(Specification<RatedownSettingsEntity> spec, Pageable pageable) {
+        return ratedownSettingRepository.findAll(spec, pageable);
+    }
+
+    @Override
     public Page<RatedownSettingsEntity> queryByOrgEntity(RatedownSettingsRequest request) {
         Pageable pageable = request.getPageable();
         Specification<RatedownSettingsEntity> spec = RatedownSettingsSpecification.search(request);
@@ -65,13 +75,11 @@ public class RatedownSettingsRestService extends BaseRestServiceWithExcel<Ratedo
             throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
-        // 
         return queryByOrg(request);
     }
 
     @Override
     public RatedownSettingsResponse queryByUid(RatedownSettingsRequest request) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
@@ -155,7 +163,6 @@ public class RatedownSettingsRestService extends BaseRestServiceWithExcel<Ratedo
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // ratedownSettingRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("RatedownSettings not found");

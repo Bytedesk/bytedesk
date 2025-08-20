@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-14 09:39:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 12:26:55
+ * @LastEditTime: 2025-08-20 14:45:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,6 +30,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -54,25 +55,6 @@ public class QuartzRestService extends BaseRestService<QuartzEntity, QuartzReque
     private UidUtils uidUtils;
 
     private QuartzRepository quartzRepository;
-
-    @Override
-    public Page<QuartzResponse> queryByOrg(QuartzRequest request) {
-
-        Pageable pageable = request.getPageable();
-
-        Page<QuartzEntity> page = quartzRepository.findByOrgUidAndDeleted(request.getOrgUid(), false, pageable);
-
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<QuartzResponse> queryByUser(QuartzRequest request) {
-
-        // Pageable pageable = PageRequest.of(request.getPageNumber(),
-        // request.getPageSize(), Sort.Direction.DESC, "updatedAt");
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'query'");
-    }
 
     @Override
     public Optional<QuartzEntity> findByUid(String uid) {
@@ -268,36 +250,14 @@ public class QuartzRestService extends BaseRestService<QuartzEntity, QuartzReque
     }
 
     @Override
-    public QuartzResponse queryByUid(QuartzRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    protected Specification<QuartzEntity> createSpecification(QuartzRequest request) {
+        return QuartzSpecification.search(request);
     }
 
-    // //
-    // public void initData() {
-    //     if (quartzRepository.count() > 0) {
-    //         return;
-    //     }
+    @Override
+    protected Page<QuartzEntity> executePageQuery(Specification<QuartzEntity> spec, Pageable pageable) {
+        return quartzRepository.findAll(spec, pageable);
+    }
 
-    //     //
-    //     String jobName = "test1name";
-    //     String group = "testGroup";
-    //     QuartzRequest quartzRequest = QuartzRequest.builder()
-    //             .jobName(jobName)
-    //             .jobGroup(group)
-    //             .jobClassName("com.bytedesk.core.quartz.QuartzJob")
-    //             .jobMethodName("test1")
-    //             .description("quartz test")
-    //             .cronExpression("*/5 * * * * ?")
-    //             .triggerName(jobName + "trigger")
-    //             .triggerGroup(group)
-    //             .triggerType("cron")
-    //             .triggerState("started")
-    //             .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
-    //             .build();
-    //     create(quartzRequest);
-    //     //
-    //     // startJob(quartzRequest);
-    // }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-27 22:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 22:23:16
+ * @LastEditTime: 2025-08-20 14:49:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,27 +58,13 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
     private final AuthService authService;
 
     @Override
-    public Page<AutoReplyFixedEntity> queryByOrgEntity(AutoReplyFixedRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<AutoReplyFixedEntity> specification = AutoReplyFixedSpecification.search(request);
-        return autoReplyFixedRepository.findAll(specification, pageable);
+    protected Specification<AutoReplyFixedEntity> createSpecification(AutoReplyFixedRequest request) {
+        return AutoReplyFixedSpecification.search(request);
     }
 
     @Override
-    public Page<AutoReplyFixedResponse> queryByOrg(AutoReplyFixedRequest request) {
-        Page<AutoReplyFixedEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<AutoReplyFixedResponse> queryByUser(AutoReplyFixedRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+    protected Page<AutoReplyFixedEntity> executePageQuery(Specification<AutoReplyFixedEntity> spec, Pageable pageable) {
+        return autoReplyFixedRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "auto_reply", key="#uid", unless = "#result == null")
@@ -284,5 +270,6 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoRepl
         // 保存所有数据
         save(autoReplyList);
     }
+
     
 }

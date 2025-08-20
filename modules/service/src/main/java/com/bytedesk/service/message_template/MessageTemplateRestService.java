@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:47:14
+ * @LastEditTime: 2025-08-20 15:18:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,8 +24,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -46,35 +44,16 @@ public class MessageTemplateRestService extends BaseRestServiceWithExcel<Message
     private final AuthService authService;
 
     @Override
-    public Page<MessageTemplateEntity> queryByOrgEntity(MessageTemplateRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<MessageTemplateEntity> spec = MessageTemplateSpecification.search(request);
+    protected Specification<MessageTemplateEntity> createSpecification(MessageTemplateRequest request) {
+        return MessageTemplateSpecification.search(request);
+    }
+
+    @Override
+    protected Page<MessageTemplateEntity> executePageQuery(Specification<MessageTemplateEntity> spec,
+            Pageable pageable) {
         return templateRepository.findAll(spec, pageable);
     }
-
-    @Override
-    public Page<MessageTemplateResponse> queryByOrg(MessageTemplateRequest request) {
-        Page<MessageTemplateEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<MessageTemplateResponse> queryByUser(MessageTemplateRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public MessageTemplateResponse queryByUid(MessageTemplateRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
+    
     @Cacheable(value = "template", key = "#uid", unless="#result==null")
     @Override
     public Optional<MessageTemplateEntity> findByUid(String uid) {
@@ -194,5 +173,7 @@ public class MessageTemplateRestService extends BaseRestServiceWithExcel<Message
         //     create(templateRequest);
         // }
     }
+
+    
     
 }

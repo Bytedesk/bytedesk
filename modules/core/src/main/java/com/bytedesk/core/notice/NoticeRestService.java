@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:28:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:17:42
+ * @LastEditTime: 2025-08-20 14:44:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,17 +40,13 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
     private UidUtils uidUtils;
 
     @Override
-    public Page<NoticeResponse> queryByOrg(NoticeRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<NoticeEntity> specification = NoticeSpecification.search(request);
-        Page<NoticeEntity> page = noticeRepository.findAll(specification, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<NoticeEntity> createSpecification(NoticeRequest request) {
+        return NoticeSpecification.search(request);
     }
 
     @Override
-    public Page<NoticeResponse> queryByUser(NoticeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+    protected Page<NoticeEntity> executePageQuery(Specification<NoticeEntity> spec, Pageable pageable) {
+        return noticeRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "notice", key = "#uid", unless = "#result == null")
@@ -182,12 +178,6 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
     @Override
     public NoticeResponse convertToResponse(NoticeEntity entity) {
         return modelMapper.map(entity, NoticeResponse.class);
-    }
-
-    @Override
-    public NoticeResponse queryByUid(NoticeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
     
 }

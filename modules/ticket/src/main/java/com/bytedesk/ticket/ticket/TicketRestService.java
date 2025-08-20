@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:48:02
+ * @LastEditTime: 2025-08-20 13:48:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -103,30 +103,6 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
     private final RobotAgentService robotAgentService;
 
     private final MessageRestService messageRestService;
-
-    @Override
-    public Page<TicketEntity> queryByOrgEntity(TicketRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TicketEntity> spec = TicketSpecification.search(request, authService);
-        return ticketRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<TicketResponse> queryByOrg(TicketRequest request) {
-        Page<TicketEntity> ticketPage = queryByOrgEntity(request);
-        return ticketPage.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<TicketResponse> queryByUser(TicketRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-        throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        //
-        return queryByOrg(request);
-    }
 
     @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
@@ -510,6 +486,16 @@ public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, Ti
             log.error("解析自动填充工单JSON失败", e);
             return request; // 解析失败时返回原始请求
         }
+    }
+
+    @Override
+    protected Specification<TicketEntity> createSpecification(TicketRequest request) {
+        return TicketSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<TicketEntity> executePageQuery(Specification<TicketEntity> specification, Pageable pageable) {
+        return ticketRepository.findAll(specification, pageable);
     }
 
 }

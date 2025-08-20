@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 13:17:34
+ * @LastEditTime: 2025-08-20 14:40:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,11 +28,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
@@ -48,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class BookingRestService extends BaseRestServiceWithExcelImproved<BookingEntity, BookingRequest, BookingResponse, BookingExcel> {
+public class BookingRestService extends BaseRestServiceWithExcel<BookingEntity, BookingRequest, BookingResponse, BookingExcel> {
 
     private final BookingRepository bookingRepository;
 
@@ -57,6 +55,16 @@ public class BookingRestService extends BaseRestServiceWithExcelImproved<Booking
     private final UidUtils uidUtils;
 
     private final ConsumerRestService consumerRestService;
+
+    @Override
+    protected Specification<BookingEntity> createSpecification(BookingRequest request) {
+        return BookingSpecification.search(request);
+    }
+
+    @Override
+    protected Page<BookingEntity> executePageQuery(Specification<BookingEntity> spec, Pageable pageable) {
+        return bookingRepository.findAll(spec, pageable);
+    }
 
     @Cacheable(value = "booking", key = "#uid", unless="#result==null")
     @Override

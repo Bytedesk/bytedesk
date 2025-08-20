@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:28:23
+ * @LastEditTime: 2025-08-20 15:18:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,6 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
@@ -52,8 +51,6 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     private final KbaseRestService kbaseRestService;
 
     private final CategoryRestService categoryRestService;
@@ -61,26 +58,13 @@ public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRe
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
-    public Page<TextEntity> queryByOrgEntity(TextRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TextEntity> spec = TextSpecification.search(request);
+    protected Specification<TextEntity> createSpecification(TextRequest request) {
+        return TextSpecification.search(request);
+    }
+
+    @Override
+    protected Page<TextEntity> executePageQuery(Specification<TextEntity> spec, Pageable pageable) {
         return textRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<TextResponse> queryByOrg(TextRequest request) {
-        Page<TextEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<TextResponse> queryByUser(TextRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
     }
 
     @Cacheable(value = "text", key = "#uid", unless = "#result==null")

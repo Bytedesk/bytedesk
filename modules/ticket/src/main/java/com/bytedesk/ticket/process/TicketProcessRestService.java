@@ -305,4 +305,14 @@ public class TicketProcessRestService
         }
     }
 
+    @Override
+    protected Specification<TicketProcessEntity> createSpecification(TicketProcessRequest request) {
+        return TicketProcessSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<TicketProcessEntity> executePageQuery(Specification<TicketProcessEntity> specification, Pageable pageable) {
+        return processRepository.findAll(specification, pageable);
+    }
+
 }

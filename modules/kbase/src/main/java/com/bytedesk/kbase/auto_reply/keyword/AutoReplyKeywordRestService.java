@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-06 10:04:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 21:26:15
+ * @LastEditTime: 2025-08-20 14:49:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,29 +59,16 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
     private final AuthService authService;
 
     @Override
-    public Page<AutoReplyKeywordEntity> queryByOrgEntity(AutoReplyKeywordRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request);
+    protected Specification<AutoReplyKeywordEntity> createSpecification(AutoReplyKeywordRequest request) {
+        return AutoReplyKeywordSpecification.search(request);
+    }
+
+    @Override
+    protected Page<AutoReplyKeywordEntity> executePageQuery(Specification<AutoReplyKeywordEntity> spec,
+            Pageable pageable) {
         return autoReplyKeywordRepository.findAll(spec, pageable);
     }
-
-    @Override
-    public Page<AutoReplyKeywordResponse> queryByOrg(AutoReplyKeywordRequest request) {
-        Page<AutoReplyKeywordEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<AutoReplyKeywordResponse> queryByUser(AutoReplyKeywordRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
+    
     @Cacheable(value = "keyword", key = "#uid", unless = "#result == null")
     @Override
     public Optional<AutoReplyKeywordEntity> findByUid(String uid) {
@@ -320,4 +307,5 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoRe
         save(keywordList);
     }
 
+    
 }

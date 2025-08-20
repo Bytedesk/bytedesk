@@ -24,6 +24,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -173,6 +175,16 @@ public class ServiceSettingsRestService extends BaseRestServiceWithExcel<Service
     @Override
     public ServiceSettingsExcel convertToExcel(ServiceSettingsEntity entity) {
         return modelMapper.map(entity, ServiceSettingsExcel.class);
+    }
+
+    @Override
+    protected Specification<ServiceSettingsEntity> createSpecification(ServiceSettingsRequest request) {
+        return ServiceSettingsSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ServiceSettingsEntity> executePageQuery(Specification<ServiceSettingsEntity> spec, Pageable pageable) {
+        return serviceSettingRepository.findAll(spec, pageable);
     }
     
     

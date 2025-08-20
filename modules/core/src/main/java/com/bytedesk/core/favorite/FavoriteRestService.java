@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -42,7 +41,15 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<FavoriteEntity> createSpecification(FavoriteRequest request) {
+        return FavoriteSpecification.search(request);
+    }
+
+    @Override
+    protected Page<FavoriteEntity> executePageQuery(Specification<FavoriteEntity> spec, Pageable pageable) {
+        return favoriteRepository.findAll(spec, pageable);
+    }
 
     @Override
     public Page<FavoriteResponse> queryByOrg(FavoriteRequest request) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:41:24
+ * @LastEditTime: 2025-08-20 13:51:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -44,25 +43,14 @@ public class GroupNoticeRestService extends BaseRestService<GroupNoticeEntity, G
 
     private final UidUtils uidUtils;
 
-    private final AuthService authService;
-
     @Override
-    public Page<GroupNoticeResponse> queryByOrg(GroupNoticeRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<GroupNoticeEntity> spec = GroupNoticeSpecification.search(request);
-        Page<GroupNoticeEntity> page = group_noticeRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+    protected Specification<GroupNoticeEntity> createSpecification(GroupNoticeRequest request) {
+        return GroupNoticeSpecification.search(request);
     }
 
     @Override
-    public Page<GroupNoticeResponse> queryByUser(GroupNoticeRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+    protected Page<GroupNoticeEntity> executePageQuery(Specification<GroupNoticeEntity> spec, Pageable pageable) {
+        return group_noticeRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "group_notice", key = "#uid", unless="#result==null")

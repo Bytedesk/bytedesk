@@ -23,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import com.bytedesk.core.base.BaseRestServiceWithExcelImproved;
+import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,8 +38,16 @@ public class CallGatewayRestService extends BaseRestServiceWithExcel<CallGateway
     private final CallGatewayRepository gatewayRepository;
     
     private final ModelMapper modelMapper;
-    
-    // private final AuthService authService;
+
+    @Override
+    protected Specification<CallGatewayEntity> createSpecification(CallGatewayRequest request) {
+        return CallGatewaySpecification.search(request);
+    }
+
+    @Override
+    protected Page<CallGatewayEntity> executePageQuery(Specification<CallGatewayEntity> spec, Pageable pageable) {
+        return gatewayRepository.findAll(spec, pageable);
+    }
 
     @Override
     @Cacheable(value = "gateway", key = "#request.orgUid + ':' + #request.pageNumber + ':' + #request.pageSize")

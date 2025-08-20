@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-29 14:54:46
+ * @LastEditTime: 2025-08-20 15:07:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
@@ -60,31 +59,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     private final ServiceSettingsService serviceSettingsService;
 
     private final AuthService authService;
-
-    public Page<WorkgroupResponse> queryByOrg(WorkgroupRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<WorkgroupEntity> specs = WorkgroupSpecification.search(request, authService);
-        Page<WorkgroupEntity> workgroupPage = workgroupRepository.findAll(specs, pageable);
-        return workgroupPage.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<WorkgroupResponse> queryByUser(WorkgroupRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new RuntimeException("user should not be null");
-        }
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
-    }
-
-    public WorkgroupResponse queryByUid(WorkgroupRequest request) {
-        Optional<WorkgroupEntity> workgroupOptional = findByUid(request.getUid());
-        if (!workgroupOptional.isPresent()) {
-            throw new RuntimeException(request.getUid() + " is not found.");
-        }
-        return convertToResponse(workgroupOptional.get());
-    }
 
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
@@ -337,6 +311,16 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     @Override
     public WorkgroupResponse convertToResponse(WorkgroupEntity entity) {
         return modelMapper.map(entity, WorkgroupResponse.class);
+    }
+
+    @Override
+    protected Specification<WorkgroupEntity> createSpecification(WorkgroupRequest request) {
+        return WorkgroupSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<WorkgroupEntity> executePageQuery(Specification<WorkgroupEntity> spec, Pageable pageable) {
+        return workgroupRepository.findAll(spec, pageable);
     }
 
 

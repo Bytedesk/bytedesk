@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 14:05:49
+ * @LastEditTime: 2025-08-20 13:35:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,10 +36,7 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import lombok.AllArgsConstructor;
@@ -56,53 +53,16 @@ public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEn
 
     private final CategoryRestService categoryRestService;
 
-    private final AuthService authService;
+    @Override
+    protected Specification<QuickReplyEntity> createSpecification(QuickReplyRequest request) {
+        return QuickReplySpecification.search(request);
+    }
 
     @Override
-    public Page<QuickReplyEntity> queryByOrgEntity(QuickReplyRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<QuickReplyEntity> spec = QuickReplySpecification.search(request);
+    protected Page<QuickReplyEntity> executePageQuery(Specification<QuickReplyEntity> spec, Pageable pageable) {
         return quickReplyRepository.findAll(spec, pageable);
     }
 
-    @Override
-    public Page<QuickReplyResponse> queryByOrg(QuickReplyRequest request) {
-        Page<QuickReplyEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-    
-    @Override
-    public Page<QuickReplyResponse> queryByUser(QuickReplyRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    // @Cacheable(value = "quickreply", key = "#request.agentUid", unless = "#result == null")
-    // public List<QuickReplyResponseAgent> query(QuickReplyRequest request) {
-    //     List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
-    //     // 当前用户快捷回复/常用语
-    //     List<KbaseEntity> agentKbase = kbaseRestService.findByLevelAndTypeAndAgentUid(LevelEnum.AGENT,
-    //             KbaseTypeEnum.QUICKREPLY,
-    //             request.getAgentUid());
-    //     quickReplyList.addAll(transformToQuickReplyResponseAgent(agentKbase));
-    //     // 当前组织快捷回复/常用语
-    //     List<KbaseEntity> orgKbase = kbaseRestService.findByLevelAndTypeAndOrgUid(LevelEnum.ORGANIZATION,
-    //             KbaseTypeEnum.QUICKREPLY,
-    //             request.getOrgUid());
-    //     quickReplyList.addAll(transformToQuickReplyResponseAgent(orgKbase));
-    //     // 平台快捷回复/常用语
-    //     List<KbaseEntity> platformKbase = kbaseRestService.findByLevelAndType(LevelEnum.PLATFORM,
-    //             KbaseTypeEnum.QUICKREPLY);
-    //     quickReplyList.addAll(transformToQuickReplyResponseAgent(platformKbase));
-    //     return quickReplyList;
-    // }
-
-    
     @Cacheable(value = "quickreply", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QuickReplyEntity> findByUid(String uid) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:44:55
+ * @LastEditTime: 2025-08-20 14:51:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,8 +31,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -85,22 +83,14 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final ThreadRestService threadRestService;
 
-    public Page<AgentResponse> queryByOrg(AgentRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<AgentEntity> spec = AgentSpecification.search(request, authService);
-        Page<AgentEntity> agentPage = agentRepository.findAll(spec, pageable);
-        return agentPage.map(this::convertToResponse);
+    @Override
+    protected Specification<AgentEntity> createSpecification(AgentRequest request) {
+        return AgentSpecification.search(request);
     }
 
     @Override
-    public Page<AgentResponse> queryByUser(AgentRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        //
-        return queryByUser(request);
+    protected Page<AgentEntity> executePageQuery(Specification<AgentEntity> spec, Pageable pageable) {
+        return agentRepository.findAll(spec, pageable);
     }
 
     public AgentResponse query(AgentRequest request) {
@@ -108,14 +98,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         Optional<AgentEntity> agentOptional = findByUserUidAndOrgUid(user.getUid(), request.getOrgUid());
         if (!agentOptional.isPresent()) {
             return null;
-        }
-        return convertToResponse(agentOptional.get());
-    }
-
-    public AgentResponse queryByUid(AgentRequest request) {
-        Optional<AgentEntity> agentOptional = findByUid(request.getUid());
-        if (!agentOptional.isPresent()) {
-            throw new RuntimeException("agent not found");
         }
         return convertToResponse(agentOptional.get());
     }
@@ -505,5 +487,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     public List<AgentEntity> findByConnected(boolean connected) {
         return agentRepository.findByConnectedAndDeletedFalse(connected);
     }
+
+    
 
 }
