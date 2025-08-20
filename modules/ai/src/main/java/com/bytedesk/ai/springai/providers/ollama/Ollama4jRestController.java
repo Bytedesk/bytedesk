@@ -35,14 +35,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1//ollama4j")
+@RequestMapping("/api/v1/ollama4j")
 @RequiredArgsConstructor
 // @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jRestController {
 
     private final Ollama4jService ollama4jService;
 
-    // http://127.0.0.1:9003/api/v1//ollama4j/ping
+    // http://127.0.0.1:9003/api/v1/ollama4j/ping
     @GetMapping("/ping")
     public ResponseEntity<JsonResult<Boolean>> ping(OllamaRequest request) {
 
@@ -52,7 +52,7 @@ public class Ollama4jRestController {
     }
 
     // 本地已经下载的模型列表
-    // http://127.0.0.1:9003/api/v1//ollama4j/local-models
+    // http://127.0.0.1:9003/api/v1/ollama4j/local-models
     @GetMapping("/local-models")
     public ResponseEntity<JsonResult<List<Model>>> getLocalModels(OllamaRequest request) {
 
@@ -62,7 +62,7 @@ public class Ollama4jRestController {
     }
 
     // 远程模型列表
-    // http://127.0.0.1:9003/api/v1//ollama4j/models
+    // http://127.0.0.1:9003/api/v1/ollama4j/models
     @GetMapping("/models")
     public ResponseEntity<JsonResult<List<LibraryModel>>> getModels(OllamaRequest request) {
 
@@ -72,7 +72,7 @@ public class Ollama4jRestController {
     }
 
     // 当前运行的模型
-    // http://127.0.0.1:9003/api/v1//ollama4j/ps
+    // http://127.0.0.1:9003/api/v1/ollama4j/ps
     @GetMapping("/ps")
     public ResponseEntity<JsonResult<ModelsProcessResponse>> processModelsResponse(OllamaRequest request) {
 
@@ -81,7 +81,7 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
-    // http://127.0.0.1:9003/api/v1//ollama4j/library/models/{model}/details
+    // http://127.0.0.1:9003/api/v1/ollama4j/library/models/{model}/details
     @GetMapping("/library/models/details")
     public ResponseEntity<JsonResult<LibraryModelDetail>> getLibraryModelDetails(OllamaRequest request) {
         
@@ -90,7 +90,7 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }
 
-    // http://127.0.0.1:9003/api/v1//ollama4j/models/details
+    // http://127.0.0.1:9003/api/v1/ollama4j/models/details
     @GetMapping("/models/details")
     public ResponseEntity<JsonResult<ModelDetail>> getModelDetails(OllamaRequest request) {
 
@@ -99,7 +99,7 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }
 
-    // http://127.0.0.1:9003/api/v1//ollama4j/models/{model}/tags/{tag}
+    // http://127.0.0.1:9003/api/v1/ollama4j/models/{model}/tags/{tag}
     @GetMapping("/models/tags")
     public ResponseEntity<JsonResult<LibraryModelTag>> getModelTag(OllamaRequest request) {
 
@@ -108,7 +108,7 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(modelTag));
     }
 
-    // http://127.0.0.1:9003/api/v1//ollama4j/models/pull
+    // http://127.0.0.1:9003/api/v1/ollama4j/models/pull
     @PostMapping("/models/pull")
     public ResponseEntity<?> pullModel(@RequestBody OllamaRequest request) {
 
@@ -118,7 +118,7 @@ public class Ollama4jRestController {
     }
 
     // 删除模型    
-    // http://127.0.0.1:9003/api/v1//ollama4j/models/delete
+    // http://127.0.0.1:9003/api/v1/ollama4j/models/delete
     @PostMapping("/models/delete")
     public ResponseEntity<?> deleteModel(@RequestBody OllamaRequest request) {
 

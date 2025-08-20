@@ -3,7 +3,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 09:50:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:11:02
+ * @LastEditTime: 2025-08-20 21:25:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,7 +41,7 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1//ollama")
+@RequestMapping("/api/v1/ollama")
 @RequiredArgsConstructor
 // @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaController {
@@ -145,7 +145,7 @@ public class SpringAIOllamaController {
     }
 
     // 检查嵌入模型是否已经存在
-    // http://127.0.0.1:9003/api/v1//ollama4j/embedding-model/exists
+    // http://127.0.0.1:9003/api/v1/ollama4j/embedding-model/exists
     @GetMapping("/embedding-model/exists")
     public ResponseEntity<?> isEmbeddingModelExists(OllamaRequest request) {
         boolean exists = springAIOllamaService.isModelExists(request);
