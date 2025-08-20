@@ -58,7 +58,7 @@ public class BookingRestService extends BaseRestServiceWithExport<BookingEntity,
 
     @Override
     protected Specification<BookingEntity> createSpecification(BookingRequest request) {
-        return BookingSpecification.search(request);
+        return BookingSpecification.search(request, authService);
     }
 
     @Override

@@ -953,7 +953,7 @@ public class ThreadRestService
 
     @Override
     protected Specification<ThreadEntity> createSpecification(ThreadRequest request) {
-        return ThreadSpecification.search(request);
+        return ThreadSpecification.search(request, authService);
     }
 
     @Override

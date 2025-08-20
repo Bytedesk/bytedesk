@@ -81,7 +81,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     @Override
     protected Specification<RobotEntity> createSpecification(RobotRequest request) {
-        return RobotSpecification.search(request);
+        return RobotSpecification.search(request, authService);
     }
 
     @Override

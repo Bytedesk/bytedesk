@@ -235,7 +235,7 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
 
     @Override
     protected Specification<MessageEntity> createSpecification(MessageRequest request) {
-        return MessageSpecification.search(request);
+        return MessageSpecification.search(request, authService);
     }
 
     @Override

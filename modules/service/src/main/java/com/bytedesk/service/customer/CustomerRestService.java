@@ -43,7 +43,7 @@ public class CustomerRestService extends BaseRestServiceWithExport<CustomerEntit
 
     @Override
     protected Specification<CustomerEntity> createSpecification(CustomerRequest request) {
-        return CustomerSpecification.search(request);
+        return CustomerSpecification.search(request, authService);
     }
 
     @Override

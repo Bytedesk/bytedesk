@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:19:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 14:51:23
+ * @LastEditTime: 2025-08-20 20:06:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,7 +69,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final UidUtils uidUtils;
 
-    private final MemberRestService memberService;
+    private final MemberRestService memberRestService;
 
     private final UserService userService;
 
@@ -85,7 +85,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Override
     protected Specification<AgentEntity> createSpecification(AgentRequest request) {
-        return AgentSpecification.search(request);
+        return AgentSpecification.search(request, authService);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             return convertToResponse(findByUid(request.getUid()).get());
         }
         //
-        Optional<MemberEntity> memberOptional = memberService.findByUid(request.getMemberUid());
+        Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
         if (!memberOptional.isPresent() || memberOptional.get().getUser() == null) {
             throw new RuntimeException("member uid: " + request.getMemberUid() + " not found");
         }
@@ -151,7 +151,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     public void createFromMember(String mobile, String orgUid) {
         //
-        Optional<MemberEntity> memberOptional = memberService.findByMobileAndOrgUid(mobile, orgUid);
+        Optional<MemberEntity> memberOptional = memberRestService.findByMobileAndOrgUid(mobile, orgUid);
         if (!memberOptional.isPresent()) {
             return;
         }
@@ -487,7 +487,5 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     public List<AgentEntity> findByConnected(boolean connected) {
         return agentRepository.findByConnectedAndDeletedFalse(connected);
     }
-
-    
 
 }
