@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -44,39 +42,6 @@ public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRe
     private final UserService userService;
 
     private final BCryptPasswordEncoder passwordEncoder;
-
-    @Override
-    public Page<UserEntity> queryByOrgEntity(UserRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<UserEntity> specification = UserSpecification.search(request);
-        return userRepository.findAll(specification, pageable);
-    }
-
-    @Override
-    public Page<UserResponse> queryByOrg(UserRequest request) {
-        Page<UserEntity> page = queryByOrgEntity(request);
-        return page.map(ConvertUtils::convertToUserResponse);
-    }
-
-    @Override
-    public Page<UserResponse> queryByUser(UserRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required.");
-        }
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
-    }
-
-    @Override
-    public UserResponse queryByUid(UserRequest request) {
-        Optional<UserEntity> userOptional = findByUid(request.getUid());
-        if (userOptional.isPresent()) {
-            return convertToResponse(userOptional.get());
-        } else {
-            throw new NotFoundException("User with UID: " + request.getUid() + " not found.");
-        }
-    }
 
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     @Override

@@ -235,5 +235,15 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
     }
 
+    @Override
+    protected Specification<TokenEntity> createSpecification(TokenRequest request) {
+        return TokenSpecification.search(request);
+    }
+
+    @Override
+    protected Page<TokenEntity> executePageQuery(Specification<TokenEntity> spec, Pageable pageable) {
+        return tokenRepository.findAll(spec, pageable);
+    }
+
 
 }

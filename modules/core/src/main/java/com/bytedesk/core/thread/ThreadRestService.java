@@ -951,5 +951,15 @@ public class ThreadRestService
         return excel;
     }
 
+    @Override
+    protected Specification<ThreadEntity> createSpecification(ThreadRequest request) {
+        return ThreadSpecification.search(request);
+    }
+
+    @Override
+    protected Page<ThreadEntity> executePageQuery(Specification<ThreadEntity> spec, Pageable pageable) {
+        return threadRepository.findAll(spec, pageable);
+    }
+
 
 }

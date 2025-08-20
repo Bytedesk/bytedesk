@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-11 11:21:18
+ * @LastEditTime: 2025-08-20 16:05:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,9 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -39,21 +37,6 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
-
-    @Override
-    public Page<UrlResponse> queryByOrg(UrlRequest request) {
-        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.Direction.ASC,
-                "updatedAt");
-        Specification<UrlEntity> spec = UrlSpecification.search(request);
-        Page<UrlEntity> page = urlRepository.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<UrlResponse> queryByUser(UrlRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
-    }
 
     @Cacheable(value = "url", key = "#uid", unless="#result==null")
     @Override
@@ -172,5 +155,15 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
     // public Boolean existsByPlatform(PlatformEnum platform) {
     //     return tagRepository.existsByPlatform(platform.name());
     // }
+
+    @Override
+    protected Specification<UrlEntity> createSpecification(UrlRequest request) {
+        return UrlSpecification.search(request);
+    }
+
+    @Override
+    protected Page<UrlEntity> executePageQuery(Specification<UrlEntity> spec, Pageable pageable) {
+        return urlRepository.findAll(spec, pageable);
+    }
     
 }

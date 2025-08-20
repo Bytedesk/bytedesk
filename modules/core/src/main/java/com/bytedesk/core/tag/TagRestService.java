@@ -219,5 +219,15 @@ public class TagRestService extends BaseRestServiceWithExcel<TagEntity, TagReque
             create(tagRequest);
         }
     }
+
+    @Override
+    protected Specification<TagEntity> createSpecification(TagRequest request) {
+        return TagSpecification.search(request);
+    }
+
+    @Override
+    protected Page<TagEntity> executePageQuery(Specification<TagEntity> spec, Pageable pageable) {
+        return tagRepository.findAll(spec, pageable);
+    }
     
 }

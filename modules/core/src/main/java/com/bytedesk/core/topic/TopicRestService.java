@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-20 11:16:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:42:16
+ * @LastEditTime: 2025-08-20 16:02:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,38 +46,6 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     private final AuthService authService;
-
-    public Page<TopicEntity> queryByOrgEntity(TopicRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TopicEntity> spec = TopicSpecification.search(request);
-        return topicRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<TopicResponse> queryByOrg(TopicRequest request) {
-        Page<TopicEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<TopicResponse> queryByUser(TopicRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
-    }
-
-    @Override
-    public TopicResponse queryByUid(TopicRequest request) {
-        Optional<TopicEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        } else {
-            throw new RuntimeException("Failed to query topic by uid: " + request.getUid());
-        }
-    }
 
     @Cacheable(value = "topic", key = "#clientId", unless = "#result == null")
     public Optional<TopicEntity> findByClientId(String clientId) {
@@ -409,6 +377,16 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
      */
     public List<TopicEntity> findAll() {
         return topicRepository.findAll();
+    }
+
+    @Override
+    protected Specification<TopicEntity> createSpecification(TopicRequest request) {
+        return TopicSpecification.search(request);
+    }
+
+    @Override
+    protected Page<TopicEntity> executePageQuery(Specification<TopicEntity> spec, Pageable pageable) {
+        return topicRepository.findAll(spec, pageable);
     }
 
 }

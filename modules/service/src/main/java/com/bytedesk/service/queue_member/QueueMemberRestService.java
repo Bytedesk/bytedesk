@@ -27,9 +27,6 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExcel;
 import com.bytedesk.core.enums.ChannelEnum;
-import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -45,32 +42,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
     private final QueueMemberRepository queueMemberRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
-    private final AuthService authService;
-
-    @Override
-    public Page<QueueMemberEntity> queryByOrgEntity(QueueMemberRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<QueueMemberEntity> specification = QueueMemberSpecification.search(request);
-        return queueMemberRepository.findAll(specification, pageable);
-    }
-
-    @Override
-    public Page<QueueMemberResponse> queryByOrg(QueueMemberRequest request) {
-        Page<QueueMemberEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<QueueMemberResponse> queryByUser(QueueMemberRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        // set user uid
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
-    }
-
+    
     @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {
@@ -267,5 +239,15 @@ public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMember
             return null;
         }
         return value ? "是" : "否";
+    }
+
+    @Override
+    protected Specification<QueueMemberEntity> createSpecification(QueueMemberRequest request) {
+        return QueueMemberSpecification.search(request);
+    }
+
+    @Override
+    protected Page<QueueMemberEntity> executePageQuery(Specification<QueueMemberEntity> spec, Pageable pageable) {
+        return queueMemberRepository.findAll(spec, pageable);
     }
 }

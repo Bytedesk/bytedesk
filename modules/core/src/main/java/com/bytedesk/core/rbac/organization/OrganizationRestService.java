@@ -451,4 +451,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return response;
     }
 
+    @Override
+    protected Specification<OrganizationEntity> createSpecification(OrganizationRequest request) {
+        return OrganizationSpecification.search(request);
+    }
+
+    @Override
+    protected Page<OrganizationEntity> executePageQuery(Specification<OrganizationEntity> spec, Pageable pageable) {
+        return organizationRepository.findAll(spec, pageable);
+    }
+
 }

@@ -199,5 +199,15 @@ public class WorkflowResultRestService extends BaseRestServiceWithExcel<Workflow
     public WorkflowResultExcel convertToExcel(WorkflowResultEntity entity) {
         return modelMapper.map(entity, WorkflowResultExcel.class);
     }
+
+    @Override
+    protected Specification<WorkflowResultEntity> createSpecification(WorkflowResultRequest request) {
+        return WorkflowResultSpecification.search(request);
+    }
+
+    @Override
+    protected Page<WorkflowResultEntity> executePageQuery(Specification<WorkflowResultEntity> spec, Pageable pageable) {
+        return workflowResultRepository.findAll(spec, pageable);
+    }
     
 }
