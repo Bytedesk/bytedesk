@@ -14,8 +14,7 @@ package com.bytedesk.ai.springai.providers.ollama;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,16 +30,17 @@ import io.github.ollama4j.models.response.LibraryModelDetail;
 import io.github.ollama4j.models.response.LibraryModelTag;
 import io.github.ollama4j.models.response.Model;
 import io.github.ollama4j.models.response.ModelDetail;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/ollama4j")
-@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+@RequiredArgsConstructor
+// @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jRestController {
 
-    @Autowired
-    private Ollama4jService ollama4jService;
+    private final Ollama4jService ollama4jService;
 
     // http://127.0.0.1:9003/api/v1/ollama4j/ping
     @GetMapping("/ping")
