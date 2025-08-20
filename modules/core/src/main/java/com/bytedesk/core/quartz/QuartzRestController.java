@@ -37,7 +37,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/quartz")
 @Tag(name = "Quartz Job Management", description = "Quartz job scheduling and management APIs")
 @Description("Quartz Job Management Controller - Task scheduling and job management APIs using Quartz")
-public class QuartzRestController extends BaseRestController<QuartzRequest> {
+public class QuartzRestController extends BaseRestController<QuartzRequest, QuartzRestService> {
 
     private QuartzRestService quartzRestService;
 

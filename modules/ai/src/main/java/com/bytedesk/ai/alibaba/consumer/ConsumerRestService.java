@@ -24,7 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ConsumerRestService extends BaseRestServiceWithExcel<ConsumerEntity, ConsumerRequest, ConsumerResponse, ConsumerExcel> {
+public class ConsumerRestService extends BaseRestServiceWithExport<ConsumerEntity, ConsumerRequest, ConsumerResponse, ConsumerExcel> {
 
     private final ConsumerRepository consumerRepository;
 

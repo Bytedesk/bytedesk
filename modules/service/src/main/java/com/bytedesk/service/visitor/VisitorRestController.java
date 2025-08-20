@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 @RequestMapping("/api/v1/visitor")
 @Description("Visitor Management Controller - Visitor information and interaction management APIs")
-public class VisitorRestController extends BaseRestController<VisitorRequest> {
+public class VisitorRestController extends BaseRestController<VisitorRequest, VisitorRestService> {
 
     private final VisitorRestService visitorRestService;
 

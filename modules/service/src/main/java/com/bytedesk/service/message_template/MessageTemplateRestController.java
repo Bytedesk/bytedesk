@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Description;
 @RequestMapping("/api/v1/message/template")
 @AllArgsConstructor
 @Description("MessageTemplate Management Controller - Message template creation and management APIs")
-public class MessageTemplateRestController extends BaseRestController<MessageTemplateRequest> {
+public class MessageTemplateRestController extends BaseRestController<MessageTemplateRequest, MessageTemplateRestService> {
 
     private final MessageTemplateRestService templateRestService;
 

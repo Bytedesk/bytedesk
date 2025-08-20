@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("/api/v1/action")
 @Tag(name = "Action Log Management", description = "Action log management APIs for tracking user activities and system events")
-public class ActionRestController extends BaseRestController<ActionRequest> {
+public class ActionRestController extends BaseRestController<ActionRequest, ActionRestService> {
     
     private final ActionRestService actionRestService;
 

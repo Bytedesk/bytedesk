@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
@@ -43,7 +43,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TextRestService extends BaseRestServiceWithExcel<TextEntity, TextRequest, TextResponse, TextExcel> {
+public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextRequest, TextResponse, TextExcel> {
 
     private final TextRepository textRepository;
 

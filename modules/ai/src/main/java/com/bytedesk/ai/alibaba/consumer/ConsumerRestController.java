@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 12:49:17
+ * @LastEditTime: 2025-08-20 17:31:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Tag(name = "Consumer Management", description = "Consumer management APIs for organizing and categorizing content with consumers")
 @Description("Consumer Management Controller - Content consumer and categorization APIs")
-public class ConsumerRestController extends BaseRestController<ConsumerRequest> {
+public class ConsumerRestController extends BaseRestController<ConsumerRequest, ConsumerRestService> {
 
     private final ConsumerRestService consumerRestService;
 

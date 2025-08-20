@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/api/v1/autoreply/fixed")
 @AllArgsConstructor
-public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFixedRequest> {
+public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFixedRequest, AutoReplyFixedRestService> {
 
     private final AutoReplyFixedRestService autoReplyService;
 

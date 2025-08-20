@@ -27,7 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AutoReplyKeywordRestService extends BaseRestServiceWithExcel<AutoReplyKeywordEntity, AutoReplyKeywordRequest, AutoReplyKeywordResponse, AutoReplyKeywordExcel> {
+public class AutoReplyKeywordRestService extends BaseRestServiceWithExport<AutoReplyKeywordEntity, AutoReplyKeywordRequest, AutoReplyKeywordResponse, AutoReplyKeywordExcel> {
 
     private final AutoReplyKeywordRepository autoReplyKeywordRepository;
 

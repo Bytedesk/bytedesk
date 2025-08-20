@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-25 11:08:11
+ * @LastEditTime: 2025-08-20 17:18:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,9 +35,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/api/v1/channel/app")
 @AllArgsConstructor
-public class ChannelAppRestController extends BaseRestController<ChannelAppRequest> {
+public class ChannelAppRestController extends BaseRestController<ChannelAppRequest, ChannelAppRestService> {
 
-    private final ChannelAppRestService appRestService;
+    private final ChannelAppRestService channelRestService;
 
     @Operation(summary = "查询组织下的渠道应用", description = "根据组织ID查询渠道应用列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -46,7 +46,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @Override
     public ResponseEntity<?> queryByOrg(ChannelAppRequest request) {
         
-        Page<ChannelAppResponse> apps = appRestService.queryByOrg(request);
+        Page<ChannelAppResponse> apps = channelRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(apps));
     }
@@ -58,7 +58,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @Override
     public ResponseEntity<?> queryByUser(ChannelAppRequest request) {
         
-        Page<ChannelAppResponse> apps = appRestService.queryByUser(request);
+        Page<ChannelAppResponse> apps = channelRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(apps));
     }
@@ -70,7 +70,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @Override
     public ResponseEntity<?> queryByUid(ChannelAppRequest request) {
         
-        ChannelAppResponse app = appRestService.queryByUid(request);
+        ChannelAppResponse app = channelRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(app));
     }
@@ -82,7 +82,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @Override
     public ResponseEntity<?> create(ChannelAppRequest request) {
         
-        ChannelAppResponse app = appRestService.create(request);
+        ChannelAppResponse app = channelRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(app));
     }
@@ -94,7 +94,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @Override
     public ResponseEntity<?> update(ChannelAppRequest request) {
         
-        ChannelAppResponse app = appRestService.update(request);
+        ChannelAppResponse app = channelRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(app));
     }
@@ -104,7 +104,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @Override
     public ResponseEntity<?> delete(ChannelAppRequest request) {
         
-        appRestService.delete(request);
+        channelRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -117,7 +117,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return exportTemplate(
             request,
             response,
-            appRestService,
+            channelRestService,
             ChannelAppExcel.class,
             "应用",
             "app"

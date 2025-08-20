@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 21:48:49
+ * @LastEditTime: 2025-08-20 17:32:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/freeswitch/webrtc")
 @AllArgsConstructor
-public class CallWebRTCRestController extends BaseRestController<CallWebRTCRequest> {
+public class CallWebRTCRestController extends BaseRestController<CallWebRTCRequest, CallWebRTCRestService> {
 
     private final CallWebRTCRestService freeswitchWebRTCRestService;
 

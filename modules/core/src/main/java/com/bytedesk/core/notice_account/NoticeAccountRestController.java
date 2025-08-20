@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:06:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-24 12:57:27
+ * @LastEditTime: 2025-08-20 17:25:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/channel")
 // @Tag(name = "channel - 频道", description = "channel apis")
-public class NoticeAccountRestController extends BaseRestController<NoticeAccountRequest> {
+public class NoticeAccountRestController extends BaseRestController<NoticeAccountRequest, NoticeAccountRestService> {
 
     private final NoticeAccountRestService channelService;
 

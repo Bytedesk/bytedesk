@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "Notice Management", description = "Notice management APIs for system announcements and notifications")
 @Description("Notice Management Controller - System notice and announcement management APIs")
-public class NoticeRestController extends BaseRestController<NoticeRequest> {
+public class NoticeRestController extends BaseRestController<NoticeRequest, NoticeRestService> {
 
     private final NoticeRestService noticeRestService;
 

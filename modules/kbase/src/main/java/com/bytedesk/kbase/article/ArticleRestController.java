@@ -45,7 +45,7 @@ import org.springframework.context.annotation.Description;
 @RestController
 @RequestMapping("/api/v1/article")
 @Description("Article Management Controller - Knowledge base article content management APIs")
-public class ArticleRestController extends BaseRestController<ArticleRequest> {
+public class ArticleRestController extends BaseRestController<ArticleRequest, ArticleRestService> {
 
     private final ArticleRestService articleRestService;
 

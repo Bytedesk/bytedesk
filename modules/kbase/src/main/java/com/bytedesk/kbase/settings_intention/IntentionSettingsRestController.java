@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/intention/settings")
 @AllArgsConstructor
 @Tag(name = "意图设置管理", description = "意图设置管理相关接口")
-public class IntentionSettingsRestController extends BaseRestController<IntentionSettingsRequest> {
+public class IntentionSettingsRestController extends BaseRestController<IntentionSettingsRequest, IntentionSettingsRestService> {
 
     private final IntentionSettingsRestService intentionSettingsService;
 

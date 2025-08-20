@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Tag(name = "Booking Management", description = "Booking management APIs for organizing and categorizing content with bookings")
 @Description("Booking Management Controller - Content booking and categorization APIs")
-public class BookingRestController extends BaseRestController<BookingRequest> {
+public class BookingRestController extends BaseRestController<BookingRequest, BookingRestService> {
 
     private final BookingRestService bookingRestService;
 

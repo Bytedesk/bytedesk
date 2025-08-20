@@ -47,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/message")
 @Tag(name = "消息管理", description = "消息管理相关接口，包括查询、创建、更新、删除等操作")
 @Description("Message Management Controller - Message management APIs for CRUD operations")
-public class MessageRestController extends BaseRestController<MessageRequest> {
+public class MessageRestController extends BaseRestController<MessageRequest, MessageRestService> {
 
     private final MessageRestService messageRestService;
 

@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/llm/webpage")
 @AllArgsConstructor
-public class WebpageRestController extends BaseRestController<WebpageRequest> {
+public class WebpageRestController extends BaseRestController<WebpageRequest, WebpageRestService> {
 
     private final WebpageRestService webpageRestService;
 

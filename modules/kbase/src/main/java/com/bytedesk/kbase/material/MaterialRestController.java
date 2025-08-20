@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/material")
 @AllArgsConstructor
 @Tag(name = "素材管理", description = "素材管理相关接口")
-public class MaterialRestController extends BaseRestController<MaterialRequest> {
+public class MaterialRestController extends BaseRestController<MaterialRequest, MaterialRestService> {
 
     private final MaterialRestService materialRestService;
 

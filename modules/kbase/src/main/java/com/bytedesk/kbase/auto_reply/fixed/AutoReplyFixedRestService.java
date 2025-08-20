@@ -25,7 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -45,7 +45,7 @@ import com.bytedesk.core.utils.Utils;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AutoReplyFixedRestService extends BaseRestServiceWithExcel<AutoReplyFixedEntity, AutoReplyFixedRequest, AutoReplyFixedResponse, AutoReplyFixedExcel> {
+public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoReplyFixedEntity, AutoReplyFixedRequest, AutoReplyFixedResponse, AutoReplyFixedExcel> {
 
     private final AutoReplyFixedRepository autoReplyFixedRepository;
 

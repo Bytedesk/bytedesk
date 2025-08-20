@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/v1/taboo/message")
 @AllArgsConstructor
 @Tag(name = "敏感词消息管理", description = "敏感词消息管理相关接口")
-public class TabooMessageRestController extends BaseRestController<TabooMessageRequest> {
+public class TabooMessageRestController extends BaseRestController<TabooMessageRequest, TabooMessageRestService> {
 
     private final TabooMessageRestService tabooMessageService;
 

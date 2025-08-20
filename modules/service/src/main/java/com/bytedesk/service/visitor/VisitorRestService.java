@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.exception.NotFoundException;
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 @Description("Visitor Management Service - Visitor information and interaction management service")
-public class VisitorRestService extends BaseRestServiceWithExcel<VisitorEntity, VisitorRequest, VisitorResponse, VisitorExcel> {
+public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity, VisitorRequest, VisitorResponse, VisitorExcel> {
 
     private final VisitorRepository visitorRepository;
 

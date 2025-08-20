@@ -43,7 +43,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member")
 @Tag(name = "成员管理", description = "成员管理相关接口")
-public class MemberRestController extends BaseRestController<MemberRequest> {
+public class MemberRestController extends BaseRestController<MemberRequest, MemberRestService> {
 
     private final MemberRestService memberRestService;
 

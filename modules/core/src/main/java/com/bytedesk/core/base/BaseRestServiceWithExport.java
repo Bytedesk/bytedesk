@@ -21,7 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
  * 改进的带Excel导出功能的基础RestService类
  * 继承自BaseRestServiceImproved，增加Excel相关抽象方法
  */
-public abstract class BaseRestServiceWithExcel<T, TRequest extends PageableRequest, TResponse, TExcel> 
+public abstract class BaseRestServiceWithExport<T, TRequest extends PageableRequest, TResponse, TExcel> 
         extends BaseRestService<T, TRequest, TResponse> {
     
     /**

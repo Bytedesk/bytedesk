@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-14 18:25:24
+ * @LastEditTime: 2025-08-20 17:17:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/category")
 @Tag(name = "Category Management", description = "Category management APIs for organizing and classifying content")
 @Description("Category Management Controller - Content categorization and organization APIs")
-public class CategoryRestController extends BaseRestController<CategoryRequest> {
+public class CategoryRestController extends BaseRestController<CategoryRequest, CategoryRestService> {
     
     private final CategoryRestService categoryRestService;
     

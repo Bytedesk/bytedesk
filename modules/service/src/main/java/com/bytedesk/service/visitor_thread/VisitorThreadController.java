@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/visitor/api/v1/visitor_thread")
 @AllArgsConstructor
 @Tag(name = "访客会话管理", description = "访客会话管理相关接口")
-public class VisitorThreadController extends BaseRestController<VisitorThreadRequest> {
+public class VisitorThreadController extends BaseRestController<VisitorThreadRequest, VisitorThreadService> {
 
     private VisitorThreadService visitorThreadService;
  

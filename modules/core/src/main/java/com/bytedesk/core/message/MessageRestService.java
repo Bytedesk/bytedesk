@@ -27,7 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageRestService extends BaseRestServiceWithExcel<MessageEntity, MessageRequest, MessageResponse, MessageExcel> {
+public class MessageRestService extends BaseRestServiceWithExport<MessageEntity, MessageRequest, MessageResponse, MessageExcel> {
 
     private final MessageRepository messageRepository;
 

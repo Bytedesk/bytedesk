@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:38:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 09:49:50
+ * @LastEditTime: 2025-08-20 17:22:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/v1/message/unread")
 @AllArgsConstructor
 @Tag(name = "未读消息管理", description = "未读消息管理相关接口")
-public class MessageUnreadRestController extends BaseRestController<MessageUnreadRequest> {
+public class MessageUnreadRestController extends BaseRestController<MessageUnreadRequest, MessageUnreadRestService> {
 
     private final MessageUnreadRestService messageUnreadService;
 

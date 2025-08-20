@@ -31,7 +31,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/article_archive")
 @AllArgsConstructor
 @Tag(name = "文章归档管理", description = "文章归档管理相关接口")
-public class ArticleArchiveRestController extends BaseRestController<ArticleArchiveRequest> {
+public class ArticleArchiveRestController extends BaseRestController<ArticleArchiveRequest, ArticleArchiveRestService> {
 
     private final ArticleArchiveRestService article_archiveService;
 

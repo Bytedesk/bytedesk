@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class WebpageRestService
-        extends BaseRestServiceWithExcel<WebpageEntity, WebpageRequest, WebpageResponse, WebpageExcel> {
+        extends BaseRestServiceWithExport<WebpageEntity, WebpageRequest, WebpageResponse, WebpageExcel> {
 
     private final WebpageRepository webpageRepository;
 

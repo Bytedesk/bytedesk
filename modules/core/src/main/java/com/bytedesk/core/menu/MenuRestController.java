@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Tag(name = "Menu Management", description = "Menu management APIs for organizing application navigation and permissions")
 @Description("Menu Management Controller - Application menu and navigation management APIs")
-public class MenuRestController extends BaseRestController<MenuRequest> {
+public class MenuRestController extends BaseRestController<MenuRequest, MenuRestService> {
 
     private final MenuRestService menuService;
 

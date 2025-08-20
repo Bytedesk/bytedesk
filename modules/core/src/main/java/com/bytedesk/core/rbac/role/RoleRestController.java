@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/v1/role")
 @Tag(name = "Role Management", description = "Role management APIs")
-public class RoleRestController extends BaseRestController<RoleRequest> {
+public class RoleRestController extends BaseRestController<RoleRequest, RoleRestService> {
 
     private final RoleRestService roleService;
 

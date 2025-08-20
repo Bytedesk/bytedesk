@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("/api/v1/topic")
 @Tag(name = "主题管理", description = "主题管理相关接口，包括查询、创建、更新、删除等操作")
-public class TopicRestController extends BaseRestController<TopicRequest> {
+public class TopicRestController extends BaseRestController<TopicRequest, TopicRestService> {
 
     private final TopicRestService topicRestService;
 

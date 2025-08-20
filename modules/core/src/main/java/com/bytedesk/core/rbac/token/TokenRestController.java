@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/v1/token")
 @AllArgsConstructor
 @Tag(name = "Token Management", description = "Token management APIs")
-public class TokenRestController extends BaseRestController<TokenRequest> {
+public class TokenRestController extends BaseRestController<TokenRequest, TokenRestService> {
 
     private final TokenRestService tokenRestService;
 

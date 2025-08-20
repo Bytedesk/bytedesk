@@ -25,7 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.ConvertUtils;
 
@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserRestService extends BaseRestServiceWithExcel<UserEntity, UserRequest, UserResponse, UserExcel> {
+public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserRequest, UserResponse, UserExcel> {
 
     private final UserRepository userRepository;
     

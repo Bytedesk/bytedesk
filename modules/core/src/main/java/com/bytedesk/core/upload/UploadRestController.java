@@ -46,7 +46,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @RequestMapping("/api/v1/upload")
 @Tag(name = "Upload Management", description = "File upload management APIs")
 @Description("File Upload Controller - File upload and management APIs for handling file operations")
-public class UploadRestController extends BaseRestController<UploadRequest> {
+public class UploadRestController extends BaseRestController<UploadRequest, UploadRestService> {
 
 	private final UploadRestService uploadRestService;
 	

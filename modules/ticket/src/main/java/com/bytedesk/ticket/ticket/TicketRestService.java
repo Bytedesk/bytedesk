@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.bytedesk.ai.robot.agent.RobotAgentService;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -76,7 +76,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TicketRestService extends BaseRestServiceWithExcel<TicketEntity, TicketRequest, TicketResponse, TicketExcel> {
+public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, TicketRequest, TicketResponse, TicketExcel> {
 
     private final TaskService taskService;
 

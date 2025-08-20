@@ -25,7 +25,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallCdrRestService extends BaseRestServiceWithExcel<CallCdrEntity, CallCdrRequest, CallCdrResponse, CallCdrExcel> {
+public class CallCdrRestService extends BaseRestServiceWithExport<CallCdrEntity, CallCdrRequest, CallCdrResponse, CallCdrExcel> {
 
     private final CallCdrRepository callCdrRepository;
 

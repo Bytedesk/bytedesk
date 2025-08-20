@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/worktime/setting")
 @AllArgsConstructor
 @Tag(name = "工作时间设置管理", description = "工作时间设置管理相关接口")
-public class WorktimeSettingRestController extends BaseRestController<WorktimeSettingRequest> {
+public class WorktimeSettingRestController extends BaseRestController<WorktimeSettingRequest, WorktimeSettingRestService> {
 
     private final WorktimeSettingRestService tagService;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 16:21:06
+ * @LastEditTime: 2025-08-20 18:10:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, GroupRequest, GroupResponse, GroupExcel> {
+public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, GroupRequest, GroupResponse, GroupExcel> {
 
     private final GroupRepository groupRepository;
 
@@ -68,20 +68,6 @@ public class GroupRestService extends BaseRestServiceWithExcel<GroupEntity, Grou
     @Override
     protected Page<GroupEntity> executePageQuery(Specification<GroupEntity> spec, Pageable pageable) {
         return groupRepository.findAll(spec, pageable);
-    }
-
-    public Page<GroupEntity> queryForExport(GroupRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<GroupEntity> specification = GroupSpecification.search(request, authService);
-        return groupRepository.findAll(specification, pageable);
-    }
-
-    public GroupResponse queryByUid(GroupRequest request) {
-        Optional<GroupEntity> optional = findByUid(request.getUid());
-        if (!optional.isPresent()) {
-            throw new RuntimeException("Failed to query group by uid: " + request.getUid());
-        }
-        return convertToResponse(optional.get());
     }
 
     /**

@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/visitor/message")
-public class VisitorMessageRestController extends BaseRestController<MessageRequest> {
+public class VisitorMessageRestController extends BaseRestController<MessageRequest, VisitorMessageRestService> {
     
     private final VisitorMessageRestService messageRestService;
 

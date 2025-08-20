@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Tag(name = "常见问题管理", description = "常见问题管理相关接口")
 @RestController
 @RequestMapping("/api/v1/faq")
-public class FaqRestController extends BaseRestController<FaqRequest> {
+public class FaqRestController extends BaseRestController<FaqRequest, FaqRestService> {
 
     private final FaqRestService faqRestService;
 

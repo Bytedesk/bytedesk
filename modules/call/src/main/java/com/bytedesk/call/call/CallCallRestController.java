@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-03 14:30:25
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-17 17:57:36
+ * @LastEditTime: 2025-08-20 17:25:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/freeswitch/call")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class CallCallRestController extends BaseRestController<CallCallRequest> {
+public class CallCallRestController extends BaseRestController<CallCallRequest, CallCallRestService> {
 
     private final CallCallService callService;
 

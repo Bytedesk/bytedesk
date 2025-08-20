@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/v1/llm/chunk")
-public class ChunkRestController extends BaseRestController<ChunkRequest> {
+public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkRestService> {
 
     private final ChunkRestService chunkRestService;
     

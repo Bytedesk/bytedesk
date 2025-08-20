@@ -25,7 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class BlackRestService extends BaseRestServiceWithExcel<BlackEntity, BlackRequest, BlackResponse, BlackExcel> {
+public class BlackRestService extends BaseRestServiceWithExport<BlackEntity, BlackRequest, BlackResponse, BlackExcel> {
 
     private final BlackRepository repository;
 

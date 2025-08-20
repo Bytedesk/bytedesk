@@ -42,7 +42,7 @@ import org.springframework.context.annotation.Description;
 @RequestMapping("/api/v1/robot")
 @RequiredArgsConstructor
 @Description("Robot Management Controller - AI robot and chatbot management APIs")
-public class RobotRestController extends BaseRestController<RobotRequest> {
+public class RobotRestController extends BaseRestController<RobotRequest, RobotRestService> {
 
     private final RobotRestService robotRestService;
 

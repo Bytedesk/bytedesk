@@ -39,7 +39,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/black")
 @AllArgsConstructor
 @Tag(name = "黑名单管理", description = "黑名单增删改查操作")
-public class BlackRestController extends BaseRestController<BlackRequest> {
+public class BlackRestController extends BaseRestController<BlackRequest, BlackRestService> {
 
     private final BlackRestService blackRestService;
 

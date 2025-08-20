@@ -27,7 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageStatusEnum;
@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class MessageLeaveRestService extends
-        BaseRestServiceWithExcel<MessageLeaveEntity, MessageLeaveRequest, MessageLeaveResponse, MessageLeaveExcel> {
+        BaseRestServiceWithExport<MessageLeaveEntity, MessageLeaveRequest, MessageLeaveResponse, MessageLeaveExcel> {
 
     private final MessageLeaveRepository messageLeaveRepository;
 

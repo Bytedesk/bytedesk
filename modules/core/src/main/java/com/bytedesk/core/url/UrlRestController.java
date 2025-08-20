@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:38:13
+ * @LastEditTime: 2025-08-20 17:24:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,15 +30,15 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/url")
 @AllArgsConstructor
 @Tag(name = "URL Management", description = "URL management APIs for managing system URLs")
-public class UrlRestController extends BaseRestController<UrlRequest> {
+public class UrlRestController extends BaseRestController<UrlRequest, UrlRestService> {
 
-    private final UrlRestService urlService;
+    private final UrlRestService urlRestService;
 
     @Operation(summary = "Query URLs by Organization", description = "Retrieve URLs for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(UrlRequest request) {
         
-        Page<UrlResponse> urls = urlService.queryByOrg(request);
+        Page<UrlResponse> urls = urlRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(urls));
     }
@@ -47,7 +47,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
     @Override
     public ResponseEntity<?> queryByUser(UrlRequest request) {
         
-        Page<UrlResponse> urls = urlService.queryByUser(request);
+        Page<UrlResponse> urls = urlRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(urls));
     }
@@ -56,7 +56,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
     @Override
     public ResponseEntity<?> create(UrlRequest request) {
         
-        UrlResponse url = urlService.create(request);
+        UrlResponse url = urlRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(url));
     }
@@ -65,7 +65,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
     @Override
     public ResponseEntity<?> update(UrlRequest request) {
         
-        UrlResponse url = urlService.update(request);
+        UrlResponse url = urlRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(url));
     }
@@ -74,7 +74,7 @@ public class UrlRestController extends BaseRestController<UrlRequest> {
     @Override
     public ResponseEntity<?> delete(UrlRequest request) {
         
-        urlService.delete(request);
+        urlRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

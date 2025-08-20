@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * @author jackning 270580156@qq.com
  */
-public abstract class BaseRestController<T extends PageableRequest, S> {
+public abstract class BaseRestControllerWithExport<T extends PageableRequest, S> {
 
     /**
      * 获取对应的服务实例

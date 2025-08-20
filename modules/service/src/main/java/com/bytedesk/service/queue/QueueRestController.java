@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 @RequestMapping("/api/v1/queue")
 @Description("Queue Management Controller - Customer service queue and routing management APIs")
-public class QueueRestController extends BaseRestController<QueueRequest> {
+public class QueueRestController extends BaseRestController<QueueRequest, QueueRestService> {
 
     private final QueueRestService queueRestService;
 

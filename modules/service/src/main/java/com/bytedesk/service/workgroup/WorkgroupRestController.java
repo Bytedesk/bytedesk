@@ -40,7 +40,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 @RequestMapping("/api/v1/workgroup")
 @Description("Workgroup Management Controller - Workgroup and team management APIs")
-public class WorkgroupRestController extends BaseRestController<WorkgroupRequest> {
+public class WorkgroupRestController extends BaseRestController<WorkgroupRequest, WorkgroupRestService> {
 
     private final WorkgroupRestService workgroupRestService;
 

@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ChannelEnum;
@@ -60,7 +60,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MemberRestService extends BaseRestServiceWithExcel<MemberEntity, MemberRequest, MemberResponse, MemberExcel> {
+public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, MemberRequest, MemberResponse, MemberExcel> {
 
     private final UserService userService;
 

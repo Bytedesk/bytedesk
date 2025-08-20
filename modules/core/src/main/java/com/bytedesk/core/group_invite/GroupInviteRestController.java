@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-07 13:37:34
+ * @LastEditTime: 2025-08-20 17:22:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/group/invite")
 @AllArgsConstructor
 @Tag(name = "Group Invitation Management", description = "Group invitation management APIs for creating and managing group invitations")
-public class GroupInviteRestController extends BaseRestController<GroupInviteRequest> {
+public class GroupInviteRestController extends BaseRestController<GroupInviteRequest, GroupInviteRestService> {
 
     private final GroupInviteRestService groupInviteService;
 

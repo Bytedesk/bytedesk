@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/api/v1/workflow")
 @AllArgsConstructor
-public class WorkflowRestController extends BaseRestController<WorkflowRequest> {
+public class WorkflowRestController extends BaseRestController<WorkflowRequest, WorkflowRestService> {
 
     private final WorkflowRestService workflowRestService;
     

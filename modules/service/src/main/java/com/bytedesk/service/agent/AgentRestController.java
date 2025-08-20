@@ -55,7 +55,7 @@ import org.springframework.context.annotation.Description;
 @AllArgsConstructor
 @RequestMapping("/api/v1/agent")
 @Description("Agent Management Controller - Customer service agent management and chat APIs")
-public class AgentRestController extends BaseRestController<AgentRequest> {
+public class AgentRestController extends BaseRestController<AgentRequest, AgentRestService> {
 
     private final AgentRestService agentRestService;
 

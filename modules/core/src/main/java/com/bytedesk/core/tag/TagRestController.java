@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-20 12:39:37
+ * @LastEditTime: 2025-08-20 17:05:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,11 +35,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Tag(name = "Tag Management", description = "Tag management APIs for organizing and categorizing content with tags")
 @Description("Tag Management Controller - Content tagging and categorization APIs")
-public class TagRestController extends BaseRestController<TagRequest> {
+public class TagRestController extends BaseRestController<TagRequest, TagRestService> {
 
     private final TagRestService tagRestService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
     @Operation(summary = "Query Tags by Organization", description = "Retrieve tags for the current organization")
     @Override

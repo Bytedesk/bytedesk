@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Description("Robot Message Service - AI robot message and conversation management service")
-public class RobotMessageRestService extends BaseRestServiceWithExcel<RobotMessageEntity, RobotMessageRequest, RobotMessageResponse, RobotMessageExcel> {
+public class RobotMessageRestService extends BaseRestServiceWithExport<RobotMessageEntity, RobotMessageRequest, RobotMessageResponse, RobotMessageExcel> {
 
     private final RobotMessageRepository robotMessageRepository;
 

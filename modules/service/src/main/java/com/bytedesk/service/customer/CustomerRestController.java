@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RequestMapping("/api/v1/customer")
 @AllArgsConstructor
 @Description("Customer Management Controller - Customer information and relationship management APIs")
-public class CustomerRestController extends BaseRestController<CustomerRequest> {
+public class CustomerRestController extends BaseRestController<CustomerRequest, CustomerRestService> {
 
     private final CustomerRestService customerService;
 

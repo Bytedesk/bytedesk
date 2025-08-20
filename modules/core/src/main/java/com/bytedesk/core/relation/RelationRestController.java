@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-14 09:25:07
+ * @LastEditTime: 2025-08-20 17:23:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/relation")
 @AllArgsConstructor
 @Tag(name = "Relation Management", description = "Relation management APIs for organizing and categorizing content with relations")
-public class RelationRestController extends BaseRestController<RelationRequest> {
+public class RelationRestController extends BaseRestController<RelationRequest, RelationRestService> {
 
     private final RelationRestService relationRestService;
 

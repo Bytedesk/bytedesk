@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageTemplateRestService extends BaseRestServiceWithExcel<MessageTemplateEntity, MessageTemplateRequest, MessageTemplateResponse, MessageTemplateExcel> {
+public class MessageTemplateRestService extends BaseRestServiceWithExport<MessageTemplateEntity, MessageTemplateRequest, MessageTemplateResponse, MessageTemplateExcel> {
 
     private final MessageTemplateRepository templateRepository;
 

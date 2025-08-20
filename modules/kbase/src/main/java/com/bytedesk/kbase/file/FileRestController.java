@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/api/v1/llm/file")
 @AllArgsConstructor
-public class FileRestController extends BaseRestController<FileRequest> {
+public class FileRestController extends BaseRestController<FileRequest, FileRestService> {
 
     private final FileRestService fileRestService;
 

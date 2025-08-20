@@ -41,7 +41,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/queue/member")
-public class QueueMemberRestController extends BaseRestController<QueueMemberRequest> {
+public class QueueMemberRestController extends BaseRestController<QueueMemberRequest, QueueMemberRestService> {
 
     private final QueueMemberRestService queueMemberRestService;
 

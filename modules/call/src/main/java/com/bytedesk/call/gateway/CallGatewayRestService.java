@@ -23,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallGatewayRestService extends BaseRestServiceWithExcel<CallGatewayEntity, CallGatewayRequest, CallGatewayResponse, CallGatewayExcel> {
+public class CallGatewayRestService extends BaseRestServiceWithExport<CallGatewayEntity, CallGatewayRequest, CallGatewayResponse, CallGatewayExcel> {
 
     private final CallGatewayRepository gatewayRepository;
     

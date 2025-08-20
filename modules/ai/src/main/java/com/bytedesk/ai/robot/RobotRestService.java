@@ -31,7 +31,7 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
@@ -63,7 +63,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 @Description("Robot Management Service - AI robot and chatbot management service")
-public class RobotRestService extends BaseRestServiceWithExcel<RobotEntity, RobotRequest, RobotResponse, RobotExcel> {
+public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, RobotRequest, RobotResponse, RobotExcel> {
 
     private final RobotRepository robotRepository;
 

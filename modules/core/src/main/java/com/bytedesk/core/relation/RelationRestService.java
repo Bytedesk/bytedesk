@@ -24,7 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class RelationRestService extends BaseRestServiceWithExcel<RelationEntity, RelationRequest, RelationResponse, RelationExcel> {
+public class RelationRestService extends BaseRestServiceWithExport<RelationEntity, RelationRequest, RelationResponse, RelationExcel> {
 
     private final RelationRepository relationRepository;
 

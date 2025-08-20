@@ -26,7 +26,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
@@ -42,7 +42,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class FileRestService extends BaseRestServiceWithExcel<FileEntity, FileRequest, FileResponse, FileExcel> {
+public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileRequest, FileResponse, FileExcel> {
 
     private final FileRepository fileRepository;
 

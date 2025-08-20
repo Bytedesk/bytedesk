@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/org")
 @Tag(name = "Organization", description = "Organization management APIs")
-public class OrganizationRestController extends BaseRestController<OrganizationRequest> {
+public class OrganizationRestController extends BaseRestController<OrganizationRequest, OrganizationRestService> {
 
     private final OrganizationRestService organizationRestService;
 

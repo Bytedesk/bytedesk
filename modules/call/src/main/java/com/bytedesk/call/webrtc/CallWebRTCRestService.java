@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallWebRTCRestService extends BaseRestServiceWithExcel<CallWebRTCEntity, CallWebRTCRequest, CallWebRTCResponse, CallWebRTCExcel> {
+public class CallWebRTCRestService extends BaseRestServiceWithExport<CallWebRTCEntity, CallWebRTCRequest, CallWebRTCResponse, CallWebRTCExcel> {
 
     private final CallWebRTCRepository webrtcRepository;
 

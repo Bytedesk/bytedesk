@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/ratedown/setting")
 @AllArgsConstructor
 @Tag(name = "降级设置管理", description = "降级设置管理相关接口")
-public class RatedownSettingsRestController extends BaseRestController<RatedownSettingsRequest> {
+public class RatedownSettingsRestController extends BaseRestController<RatedownSettingsRequest, RatedownSettingsRestService> {
 
     private final RatedownSettingsRestService ratedownSettingService;
 

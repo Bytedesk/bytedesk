@@ -35,7 +35,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Tag(name = "AgentTemplate Management", description = "AgentTemplate management APIs for organizing and categorizing content with agentTemplates")
 @Description("AgentTemplate Management Controller - Content agent template and categorization APIs")
-public class AgentTemplateRestController extends BaseRestController<AgentTemplateRequest> {
+public class AgentTemplateRestController extends BaseRestController<AgentTemplateRequest, AgentTemplateRestService> {
 
     private final AgentTemplateRestService agentTemplateRestService;
 

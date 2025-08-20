@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
@@ -63,7 +63,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FaqRestService extends BaseRestServiceWithExcel<FaqEntity, FaqRequest, FaqResponse, FaqExcel> {
+public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequest, FaqResponse, FaqExcel> {
 
     private final FaqRepository faqRepository;
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 21:04:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:16:11
+ * @LastEditTime: 2025-08-20 17:22:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/assistant")
 // @Tag(name = "assistant - 助手", description = "assistant apis")
 @Description("Assistant Management Controller - AI assistant and chatbot management APIs")
-public class AssistantRestController extends BaseRestController<AssistantRequest> {
+public class AssistantRestController extends BaseRestController<AssistantRequest, AssistantRestService> {
 
     private final AssistantRestService assistantRestService;
 

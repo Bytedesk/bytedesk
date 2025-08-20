@@ -28,7 +28,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.worktime.WorktimeService;
+import com.bytedesk.service.worktime.WorktimeRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class WorkgroupEventListener {
     
     private final WorkgroupRestService workgroupService;
 
-    private final WorktimeService worktimeService;
+    private final WorktimeRestService worktimeService;
 
     private final UidUtils uidUtils;
 

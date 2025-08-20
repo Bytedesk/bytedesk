@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Description;
 @RestController
 @RequestMapping("/api/v1/llm/text")
 @Description("Text Management Controller - LLM text content management and vector processing APIs")
-public class TextRestController extends BaseRestController<TextRequest> {
+public class TextRestController extends BaseRestController<TextRequest, TextRestService> {
 
     private final TextRestService textRestService;
 

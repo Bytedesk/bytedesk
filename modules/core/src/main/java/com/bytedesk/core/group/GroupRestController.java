@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:24:28
+ * @LastEditTime: 2025-08-20 17:22:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 @RequestMapping("/api/v1/group")
 @Tag(name = "群组管理", description = "群组管理相关接口")
-public class GroupRestController extends BaseRestController<GroupRequest> {
+public class GroupRestController extends BaseRestController<GroupRequest, GroupRestService> {
     
     private final GroupRestService groupRestService;
     

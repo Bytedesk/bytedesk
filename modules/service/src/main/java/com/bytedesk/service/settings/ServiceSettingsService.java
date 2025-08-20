@@ -32,7 +32,7 @@ import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.workgroup.WorkgroupRequest;
 import com.bytedesk.service.worktime.WorktimeEntity;
-import com.bytedesk.service.worktime.WorktimeService;
+import com.bytedesk.service.worktime.WorktimeRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class ServiceSettingsService {
 
     private final FaqRestService faqService;
 
-    private final WorktimeService worktimeService;
+    private final WorktimeRestService worktimeService;
 
     private final RobotRestService robotService;
 

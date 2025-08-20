@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/invite/setting")
 @AllArgsConstructor
-public class InviteSettingsRestController extends BaseRestController<InviteSettingsRequest> {
+public class InviteSettingsRestController extends BaseRestController<InviteSettingsRequest, InviteSettingsRestService> {
 
     private final InviteSettingsRestService inviteSettingService;
 

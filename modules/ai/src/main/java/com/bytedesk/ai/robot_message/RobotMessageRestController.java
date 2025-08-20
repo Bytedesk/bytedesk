@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/robot/message")
 @AllArgsConstructor
 @Description("Robot Message Controller - AI robot message and conversation management APIs")
-public class RobotMessageRestController extends BaseRestController<RobotMessageRequest> {
+public class RobotMessageRestController extends BaseRestController<RobotMessageRequest, RobotMessageRestService> {
 
     private final RobotMessageRestService robotMessageRestService;
 

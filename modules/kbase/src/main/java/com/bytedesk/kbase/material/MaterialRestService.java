@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MaterialRestService extends BaseRestServiceWithExcel<MaterialEntity, MaterialRequest, MaterialResponse, MaterialExcel> {
+public class MaterialRestService extends BaseRestServiceWithExport<MaterialEntity, MaterialRequest, MaterialResponse, MaterialExcel> {
 
     private final MaterialRepository materialRepository;
 

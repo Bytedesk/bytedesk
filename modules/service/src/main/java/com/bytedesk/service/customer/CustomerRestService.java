@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Description;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 @Description("Customer Management Service - Customer information and relationship management service")
-public class CustomerRestService extends BaseRestServiceWithExcel<CustomerEntity, CustomerRequest, CustomerResponse, CustomerExcel> {
+public class CustomerRestService extends BaseRestServiceWithExport<CustomerEntity, CustomerRequest, CustomerResponse, CustomerExcel> {
     
     private final CustomerRepository customerRepository;
 

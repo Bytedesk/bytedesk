@@ -11,7 +11,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CallUserRestService extends BaseRestServiceWithExcel<CallUserEntity, CallUserRequest, CallUserResponse, CallUserExcel> {
+public class CallUserRestService extends BaseRestServiceWithExport<CallUserEntity, CallUserRequest, CallUserResponse, CallUserExcel> {
 
     private final CallUserRepository freeSwitchNumberRepository;
 

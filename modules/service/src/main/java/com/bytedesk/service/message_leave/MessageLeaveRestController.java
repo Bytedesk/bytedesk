@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/v1/message/leave")
 @AllArgsConstructor
 @Tag(name = "留言消息管理", description = "留言消息管理相关接口")
-public class MessageLeaveRestController extends BaseRestController<MessageLeaveRequest> {
+public class MessageLeaveRestController extends BaseRestController<MessageLeaveRequest, MessageLeaveRestService> {
 
     private final MessageLeaveRestService messageLeaveRestService;
 

@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Description;
 @RequestMapping("/api/v1/kbase")
 @AllArgsConstructor
 @Description("Knowledge Base Controller - Knowledge base content management and organization APIs")
-public class KbaseRestController extends BaseRestController<KbaseRequest> {
+public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseRestService> {
 
     private final KbaseRestService knowledgeService;
 

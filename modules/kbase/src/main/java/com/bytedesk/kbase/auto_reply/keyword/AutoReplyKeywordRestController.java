@@ -39,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/api/v1/autoreply/keyword")
 @AllArgsConstructor
-public class AutoReplyKeywordRestController extends BaseRestController<AutoReplyKeywordRequest> {
+public class AutoReplyKeywordRestController extends BaseRestController<AutoReplyKeywordRequest, AutoReplyKeywordRestService> {
 
     private final AutoReplyKeywordRestService keywordRestService;
 

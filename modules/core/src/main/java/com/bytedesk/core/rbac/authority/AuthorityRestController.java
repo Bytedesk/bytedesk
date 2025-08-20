@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-24 09:50:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:37:02
+ * @LastEditTime: 2025-08-20 17:23:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/v1/authority")
 @AllArgsConstructor
 @Tag(name = "Authority Management", description = "Authority management APIs")
-public class AuthorityRestController extends BaseRestController<AuthorityRequest> {
+public class AuthorityRestController extends BaseRestController<AuthorityRequest, AuthorityRestService> {
 
     private final AuthorityRestService authorityService;
 

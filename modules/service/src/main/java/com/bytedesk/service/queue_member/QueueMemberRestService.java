@@ -25,7 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class QueueMemberRestService extends BaseRestServiceWithExcel<QueueMemberEntity, QueueMemberRequest, QueueMemberResponse, QueueMemberExcel> {
+public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMemberEntity, QueueMemberRequest, QueueMemberResponse, QueueMemberExcel> {
 
     private final QueueMemberRepository queueMemberRepository;
     private final ModelMapper modelMapper;

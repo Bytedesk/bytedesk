@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Tag(name = "User Management", description = "User management APIs")
 @Description("User Management Controller - User management APIs for user CRUD operations")
-public class UserRestController extends BaseRestController<UserRequest> {
+public class UserRestController extends BaseRestController<UserRequest, UserRestService> {
 
     private final UserRestService userRestService;
 

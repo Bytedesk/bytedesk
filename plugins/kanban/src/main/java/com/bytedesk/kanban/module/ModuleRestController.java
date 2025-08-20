@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-05 16:37:26
+ * @LastEditTime: 2025-08-20 17:02:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,15 +29,15 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/module")
 @AllArgsConstructor
-public class ModuleRestController extends BaseRestController<ModuleRequest> {
+public class ModuleRestController extends BaseRestController<ModuleRequest, ModuleRestService> {
 
-    private final ModuleRestService moduleService;
+    private final ModuleRestService moduleRestService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(ModuleRequest request) {
         
-        Page<ModuleResponse> modules = moduleService.queryByOrg(request);
+        Page<ModuleResponse> modules = moduleRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(modules));
     }
@@ -45,7 +45,7 @@ public class ModuleRestController extends BaseRestController<ModuleRequest> {
     @Override
     public ResponseEntity<?> queryByUser(ModuleRequest request) {
         
-        Page<ModuleResponse> modules = moduleService.queryByUser(request);
+        Page<ModuleResponse> modules = moduleRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(modules));
     }
@@ -53,7 +53,7 @@ public class ModuleRestController extends BaseRestController<ModuleRequest> {
     @Override
     public ResponseEntity<?> create(ModuleRequest request) {
         
-        ModuleResponse module = moduleService.create(request);
+        ModuleResponse module = moduleRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(module));
     }
@@ -61,7 +61,7 @@ public class ModuleRestController extends BaseRestController<ModuleRequest> {
     @Override
     public ResponseEntity<?> update(ModuleRequest request) {
         
-        ModuleResponse module = moduleService.update(request);
+        ModuleResponse module = moduleRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(module));
     }
@@ -69,7 +69,7 @@ public class ModuleRestController extends BaseRestController<ModuleRequest> {
     @Override
     public ResponseEntity<?> delete(ModuleRequest request) {
         
-        moduleService.delete(request);
+        moduleRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }

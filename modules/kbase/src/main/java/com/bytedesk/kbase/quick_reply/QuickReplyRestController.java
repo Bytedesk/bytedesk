@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/quickreply")
 @AllArgsConstructor
-public class QuickReplyRestController extends BaseRestController<QuickReplyRequest> {
+public class QuickReplyRestController extends BaseRestController<QuickReplyRequest, QuickReplyRestService> {
 
     private final QuickReplyRestService quickReplyRestService;
 

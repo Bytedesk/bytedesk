@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Description;
 @RequestMapping("/api/v1/form/result")
 @AllArgsConstructor
 @Description("Form Result Controller - Form submission result collection and management APIs")
-public class FormResultRestController extends BaseRestController<FormResultRequest> {
+public class FormResultRestController extends BaseRestController<FormResultRequest, FormResultRestService> {
 
     private final FormResultRestService tagRestService;
 

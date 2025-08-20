@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/clipboard")
 @AllArgsConstructor
 @Tag(name = "Clipboard Management", description = "Clipboard management APIs for sharing and managing clipboard content")
-public class ClipboardRestController extends BaseRestController<ClipboardRequest> {
+public class ClipboardRestController extends BaseRestController<ClipboardRequest, ClipboardRestService> {
 
     private final ClipboardRestService clipboardService;
 

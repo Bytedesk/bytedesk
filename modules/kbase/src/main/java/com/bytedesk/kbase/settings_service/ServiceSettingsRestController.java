@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Description;
 @AllArgsConstructor
 @Tag(name = "服务设置管理", description = "服务设置管理相关接口")
 @Description("Service Settings Controller - Knowledge base service configuration management APIs")
-public class ServiceSettingsRestController extends BaseRestController<ServiceSettingsRequest> {
+public class ServiceSettingsRestController extends BaseRestController<ServiceSettingsRequest, ServiceSettingsRestService> {
 
     private final ServiceSettingsRestService serviceSettingService;
 

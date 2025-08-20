@@ -49,7 +49,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Tag(name = "Server Metrics Management", description = "Server metrics management APIs for monitoring and analyzing server performance data")
 @Description("Server Metrics Management Controller - Server performance monitoring and metrics analysis APIs")
-public class ServerMetricsRestController extends BaseRestController<ServerMetricsRequest> {
+public class ServerMetricsRestController extends BaseRestController<ServerMetricsRequest, ServerMetricsRestService> {
 
     private final ServerMetricsRestService serverMetricsRestService;
     private final ServerRestService serverRestService;

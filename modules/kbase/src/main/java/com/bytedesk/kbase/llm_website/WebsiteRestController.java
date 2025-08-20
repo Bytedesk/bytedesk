@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/llm/website")
 @AllArgsConstructor
 @Tag(name = "网站管理", description = "网站管理相关接口")
-public class WebsiteRestController extends BaseRestController<WebsiteRequest> {
+public class WebsiteRestController extends BaseRestController<WebsiteRequest, WebsiteRestService> {
 
     private final WebsiteRestService websiteRestService;
 

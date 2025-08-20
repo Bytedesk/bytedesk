@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.file.FileEntity;
@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChunkRestService extends BaseRestServiceWithExcel<ChunkEntity, ChunkRequest, ChunkResponse, ChunkExcel> {
+public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, ChunkRequest, ChunkResponse, ChunkExcel> {
 
     private final ChunkRepository chunkRepository;
 

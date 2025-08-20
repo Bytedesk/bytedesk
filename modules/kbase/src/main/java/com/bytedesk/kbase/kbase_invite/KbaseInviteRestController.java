@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/kbase/invite")
 @AllArgsConstructor
-public class KbaseInviteRestController extends BaseRestController<KbaseInviteRequest> {
+public class KbaseInviteRestController extends BaseRestController<KbaseInviteRequest, KbaseInviteRestService> {
 
     private final KbaseInviteRestService tagService;
 

@@ -24,14 +24,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class TabooMessageRestService extends BaseRestServiceWithExcel<TabooMessageEntity, TabooMessageRequest, TabooMessageResponse, TabooMessageExcel> {
+public class TabooMessageRestService extends BaseRestServiceWithExport<TabooMessageEntity, TabooMessageRequest, TabooMessageResponse, TabooMessageExcel> {
 
     private final TabooMessageRepository tabooMessageRepository;
 

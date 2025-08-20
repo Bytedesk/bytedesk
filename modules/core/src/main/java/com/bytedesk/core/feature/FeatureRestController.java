@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/features")
-public class FeatureRestController extends BaseRestController<FeatureRequest> {
+public class FeatureRestController extends BaseRestController<FeatureRequest, FeatureRestService> {
 
     @Autowired
     private FeatureService featureService;

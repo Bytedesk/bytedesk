@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
@@ -65,7 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class ThreadRestService
-        extends BaseRestServiceWithExcel<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
+        extends BaseRestServiceWithExport<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
 
     private final AuthService authService;
 

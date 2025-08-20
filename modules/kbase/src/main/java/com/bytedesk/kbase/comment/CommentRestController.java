@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @RequestMapping("/api/v1/comment")
 @AllArgsConstructor
-public class CommentRestController extends BaseRestController<CommentRequest> {
+public class CommentRestController extends BaseRestController<CommentRequest, CommentRestService> {
 
     private final CommentRestService commentService;
 

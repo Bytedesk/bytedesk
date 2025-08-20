@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "Push Notification Management", description = "Push notification management APIs for sending and managing push notifications")
 @Description("Push Notification Controller - Push notification and messaging APIs")
-public class PushRestController extends BaseRestController<PushRequest> {
+public class PushRestController extends BaseRestController<PushRequest, PushRestService> {
 
     private final PushRestService pushService;
 

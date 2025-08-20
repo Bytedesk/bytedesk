@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RequestMapping("/api/v1/provider")
 @AllArgsConstructor
 @Description("LLM Provider Controller - Large Language Model provider management and configuration APIs")
-public class LlmProviderRestController extends BaseRestController<LlmProviderRequest> {
+public class LlmProviderRestController extends BaseRestController<LlmProviderRequest, LlmProviderRestService> {
 
     private final LlmProviderRestService llmProviderRestService;
 

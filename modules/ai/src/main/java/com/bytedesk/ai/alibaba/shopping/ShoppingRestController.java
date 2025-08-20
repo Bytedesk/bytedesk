@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-21 12:50:18
+ * @LastEditTime: 2025-08-20 17:31:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,7 +35,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Tag(name = "Shopping Management", description = "Shopping management APIs for organizing and categorizing content with shoppings")
 @Description("Shopping Management Controller - Content shopping and categorization APIs")
-public class ShoppingRestController extends BaseRestController<ShoppingRequest> {
+public class ShoppingRestController extends BaseRestController<ShoppingRequest, ShoppingRestService> {
 
     private final ShoppingRestService shoppingRestService;
 

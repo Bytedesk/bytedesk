@@ -27,7 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
@@ -43,7 +43,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class QuickReplyRestService extends BaseRestServiceWithExcel<QuickReplyEntity, QuickReplyRequest, QuickReplyResponse, QuickReplyExcel> {
+public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyEntity, QuickReplyRequest, QuickReplyResponse, QuickReplyExcel> {
 
     private final QuickReplyRepository quickReplyRepository;
 

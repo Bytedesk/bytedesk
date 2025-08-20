@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 17:33:37
+ * @LastEditTime: 2025-08-20 17:32:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/freeswitch/user")
 @AllArgsConstructor
-public class CallUserRestController extends BaseRestController<CallUserRequest> {
+public class CallUserRestController extends BaseRestController<CallUserRequest, CallUserRestService> {
 
     private final CallUserRestService freeSwitchNumberRestService;
 

@@ -18,9 +18,9 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import jakarta.persistence.PostLoad;
@@ -34,7 +34,7 @@ import jakarta.persistence.PrePersist;
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
+@NoArgsConstructor
 @EntityListeners({ ArticleEntityListener.class })
 @Table(name = "bytedesk_kbase_article")
 public class ArticleEntity extends AbstractArticleEntity {

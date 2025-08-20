@@ -27,7 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Description;
-import com.bytedesk.core.base.BaseRestServiceWithExcel;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 @Description("Queue Management Service - Customer service queue and routing management service")
-public class QueueRestService extends BaseRestServiceWithExcel<QueueEntity, QueueRequest, QueueResponse, QueueExcel> {
+public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, QueueRequest, QueueResponse, QueueExcel> {
 
     private final QueueRepository queueRepository;
 

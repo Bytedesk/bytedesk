@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-09 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 21:55:49
+ * @LastEditTime: 2025-08-20 17:31:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/freeswitch/gateway")
 @AllArgsConstructor
-public class CallGatewayRestController extends BaseRestController<CallGatewayRequest> {
+public class CallGatewayRestController extends BaseRestController<CallGatewayRequest, CallGatewayRestService> {
 
     private final CallGatewayRestService gatewayRestService;
 
