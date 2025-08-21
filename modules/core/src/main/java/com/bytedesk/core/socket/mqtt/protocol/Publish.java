@@ -41,15 +41,26 @@ public class Publish {
         //
         // QoS=0
         if (mqttPublishMessage.fixedHeader().qosLevel() == MqttQoS.AT_MOST_ONCE) {
+            // QoS=0 消息不需要回执，无需发送PUBACK
             // this.sendMqMessage(clientId, mqttPublishMessage, messageBytes);
         }
         // QoS=1
         else if (mqttPublishMessage.fixedHeader().qosLevel() == MqttQoS.AT_LEAST_ONCE) {
-            MqttChannelUtils.sendPubAckMessage(channel, mqttPublishMessage.variableHeader().packetId());
+            int packetId = mqttPublishMessage.variableHeader().packetId();
+            if (packetId > 0 && packetId <= 65535) {
+                MqttChannelUtils.sendPubAckMessage(channel, packetId);
+            } else {
+                // log.warn("Invalid packet ID for QoS=1 message: {}", packetId);
+            }
         }
         // QoS=2
         else if (mqttPublishMessage.fixedHeader().qosLevel() == MqttQoS.EXACTLY_ONCE) {
-            MqttChannelUtils.sendPubRecMessage(channel, mqttPublishMessage.variableHeader().packetId());
+            int packetId = mqttPublishMessage.variableHeader().packetId();
+            if (packetId > 0 && packetId <= 65535) {
+                MqttChannelUtils.sendPubRecMessage(channel, packetId);
+            } else {
+                // log.warn("Invalid packet ID for QoS=2 message: {}", packetId);
+            }
         }
         // retain=1, 保留消息
         if (mqttPublishMessage.fixedHeader().isRetain()) {
@@ -64,12 +75,18 @@ public class Publish {
         publishMessage.payload().getBytes(publishMessage.payload().readerIndex(), messageBytes);
         // publish message event, developers can listener to new message
         try {
+            if (messageBytes.length == 0) {
+                // log.warn("Empty message payload, skipping protobuf parsing");
+                return;
+            }
             MessageProto.Message messageProto = MessageProto.Message.parseFrom(messageBytes);
             String messageJson = MessageConvertUtils.toJson(messageProto);
             // 
             messageSendService.sendJsonMessage(messageJson);
         } catch (Exception e) {
-            e.printStackTrace();
+            // log.warn("Failed to parse protobuf message: {}, message length: {}", e.getMessage(), messageBytes.length);
+            // 对于无法解析的消息，我们可以记录但不抛出异常，以免影响整个系统
+            // e.printStackTrace();
         }
     }
 

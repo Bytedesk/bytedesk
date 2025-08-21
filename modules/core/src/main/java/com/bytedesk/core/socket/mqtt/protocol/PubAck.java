@@ -28,6 +28,13 @@ public class PubAck {
         //
         String clientId = MqttChannelUtils.getClientId(channel);
         int messageId = variableHeader.messageId();
+        
+        // 验证messageId的有效性
+        if (messageId <= 0 || messageId > 65535) {
+            log.warn("Invalid message ID in PUBACK: {}, ignoring", messageId);
+            return;
+        }
+        
         log.debug("PUBACK - clientId: {}, messageId: {}", clientId, messageId);
         //
         // mqttDupPublishMessageStoreService.remove(clientId, messageId);

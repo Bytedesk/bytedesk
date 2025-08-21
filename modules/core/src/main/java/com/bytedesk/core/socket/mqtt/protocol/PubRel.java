@@ -27,6 +27,12 @@ public class PubRel {
         int messageId = variableHeader.messageId();
         String clientId = MqttChannelUtils.getClientId(channel);
         log.debug("PUBREL - clientId: {}, messageId: {}", clientId, messageId);
+        
+        // 验证messageId的有效性
+        if (messageId <= 0 || messageId > 65535) {
+            log.warn("Invalid message ID in PUBREL: {}, ignoring", messageId);
+            return;
+        }
 
         MqttMessage pubCompMessage = MqttMessageFactory.newMessage(
                 new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0),

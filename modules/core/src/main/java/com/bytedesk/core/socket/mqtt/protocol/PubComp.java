@@ -30,6 +30,13 @@ public class PubComp {
     public void processPubComp(Channel channel, MqttMessageIdVariableHeader variableHeader) {
         String clientId = MqttChannelUtils.getClientId(channel);
         int messageId = variableHeader.messageId();
+        
+        // 验证messageId的有效性
+        if (messageId <= 0 || messageId > 65535) {
+            log.warn("Invalid message ID in PUBCOMP: {}, ignoring", messageId);
+            return;
+        }
+        
         log.debug("PUBCOMP - clientId: {}, messageId: {}", clientId, messageId);
         // mqttDupPubRelMessageStoreService.remove(clientId, messageId);
     }

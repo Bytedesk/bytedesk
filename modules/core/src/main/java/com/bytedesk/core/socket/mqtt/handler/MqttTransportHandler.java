@@ -172,6 +172,21 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
     public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable cause) throws Exception {
         // FIXME: 异常断开，发送will topic消息 java.io.IOException: Connection reset by peer
         // FIXME: 异常断开，发送will topic消息 java.lang.ArrayIndexOutOfBoundsException
+        
+        // 检查特定的异常类型
+        if (cause instanceof IllegalArgumentException && cause.getMessage() != null 
+            && cause.getMessage().contains("messageId: 0")) {
+            // 这是由于MQTT messageId为0导致的异常，已经在上游修复
+            log.debug("Handled invalid messageId exception: {}", cause.getMessage());
+            return;
+        }
+        
+        if (cause instanceof com.google.protobuf.InvalidProtocolBufferException) {
+            // Protobuf解析异常，记录但不中断连接
+            log.debug("Protobuf parsing error: {}", cause.getMessage());
+            return;
+        }
+        
         log.error("TODO: 异常断开，发送will topic消息 {}", cause.toString());
         if (cause instanceof IOException) {
             // 远程主机强迫关闭了一个现有的连接的异常

@@ -35,6 +35,13 @@ public class PubRec {
                 int messageId = variableHeader.messageId();
                 String clientId = MqttChannelUtils.getClientId(channel);
                 log.debug("PUBREC - clientId: {}, messageId: {}", clientId, messageId);
+                
+                // 验证messageId的有效性
+                if (messageId <= 0 || messageId > 65535) {
+                    log.warn("Invalid message ID in PUBREC: {}, ignoring", messageId);
+                    return;
+                }
+                
                 //
                 // mqttDupPublishMessageStoreService.remove(clientId, messageId);
                 //

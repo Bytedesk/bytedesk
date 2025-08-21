@@ -36,6 +36,11 @@ public class MqttChannelUtils {
     }
 
     public static void sendPubAckMessage(Channel channel, int messageId) {
+        if (messageId <= 0 || messageId > 65535) {
+            // 根据MQTT规范，消息ID必须在1-65535之间
+            // log.warn("Invalid message ID for PUBACK: {}, ignoring", messageId);
+            return;
+        }
         MqttPubAckMessage pubAckMessage = (MqttPubAckMessage) MqttMessageFactory.newMessage(
                 new MqttFixedHeader(MqttMessageType.PUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
                 MqttMessageIdVariableHeader.from(messageId),
@@ -44,6 +49,11 @@ public class MqttChannelUtils {
     }
 
     public static void sendPubRecMessage(Channel channel, int messageId) {
+        if (messageId <= 0 || messageId > 65535) {
+            // 根据MQTT规范，消息ID必须在1-65535之间
+            // log.warn("Invalid message ID for PUBREC: {}, ignoring", messageId);
+            return;
+        }
         MqttMessage pubRecMessage = MqttMessageFactory.newMessage(
                 new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0),
                 MqttMessageIdVariableHeader.from(messageId),
