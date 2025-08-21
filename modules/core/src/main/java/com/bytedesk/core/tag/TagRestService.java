@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:42:07
+ * @LastEditTime: 2025-08-22 07:04:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,9 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -51,38 +49,13 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     private final AuthService authService;
 
     @Override
-    public Page<TagEntity> queryByOrgEntity(TagRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TagEntity> spec = TagSpecification.search(request, authService);
+    protected Specification<TagEntity> createSpecification(TagRequest request) {
+        return TagSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<TagEntity> executePageQuery(Specification<TagEntity> spec, Pageable pageable) {
         return tagRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<TagResponse> queryByOrg(TagRequest request) {
-        Page<TagEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<TagResponse> queryByUser(TagRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public TagResponse queryByUid(TagRequest request) {
-        Optional<TagEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            TagEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Tag not found");
-        }
     }
 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
@@ -220,14 +193,6 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
         }
     }
 
-    @Override
-    protected Specification<TagEntity> createSpecification(TagRequest request) {
-        return TagSpecification.search(request, authService);
-    }
-
-    @Override
-    protected Page<TagEntity> executePageQuery(Specification<TagEntity> spec, Pageable pageable) {
-        return tagRepository.findAll(spec, pageable);
-    }
+    
     
 }

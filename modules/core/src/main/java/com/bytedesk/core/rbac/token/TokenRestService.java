@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-20 16:11:29
+ * @LastEditTime: 2025-08-22 07:08:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,32 +50,13 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     private final AuthService authService;
 
     @Override
-    public Page<TokenResponse> queryByOrg(TokenRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<TokenEntity> spec = TokenSpecification.search(request, authService);
-        Page<TokenEntity> page = tokenRepository.findAll(spec, pageable);
-        return page.map(entity -> modelMapper.map(entity, TokenResponse.class));
+    protected Specification<TokenEntity> createSpecification(TokenRequest request) {
+        return TokenSpecification.search(request, authService);
     }
 
     @Override
-    public Page<TokenResponse> queryByUser(TokenRequest request) {
-        UserEntity user = authService.getCurrentUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
-    }
-
-    @Override
-    public TokenResponse queryByUid(TokenRequest request) {
-        Optional<TokenEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            TokenEntity entity = optional.get();
-            return convertToResponse(entity);
-        } else {
-            throw new RuntimeException("Token not found for uid: " + request.getUid());
-        }
+    protected Page<TokenEntity> executePageQuery(Specification<TokenEntity> spec, Pageable pageable) {
+        return tokenRepository.findAll(spec, pageable);
     }
 
     @Cacheable(cacheNames = "token", key = "#uid", unless = "#result == null")
@@ -235,15 +216,6 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
     }
 
-    @Override
-    protected Specification<TokenEntity> createSpecification(TokenRequest request) {
-        return TokenSpecification.search(request, authService);
-    }
-
-    @Override
-    protected Page<TokenEntity> executePageQuery(Specification<TokenEntity> spec, Pageable pageable) {
-        return tokenRepository.findAll(spec, pageable);
-    }
-
+    
 
 }
