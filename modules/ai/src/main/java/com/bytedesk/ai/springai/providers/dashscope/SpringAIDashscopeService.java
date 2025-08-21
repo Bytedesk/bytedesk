@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 17:04:41
+ * @LastEditTime: 2025-08-21 12:46:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,7 @@ import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,7 +88,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
         final StringBuilder[] fullResponseText = {new StringBuilder()};
         
         // 使用同一个ChatModel实例，但传入不同的选项
@@ -132,7 +133,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
         log.info("Dashscope API sync fullPromptContent: {}", fullPromptContent);
         
@@ -202,7 +203,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
         final StringBuilder[] fullResponseText = {new StringBuilder()};
 
         bytedeskDashscopeChatModel.stream(requestPrompt).subscribe(
@@ -259,17 +260,17 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
      * @param response ChatResponse对象
      * @return TokenUsage对象
      */
-    private TokenUsage extractDashscopeTokenUsage(ChatResponse response) {
+    private ChatTokenUsage extractDashscopeTokenUsage(ChatResponse response) {
         try {
             if (response == null) {
                 log.warn("Dashscope API response is null");
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
 
             var metadata = response.getMetadata();
             if (metadata == null) {
                 log.warn("Dashscope API response metadata is null");
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
 
             log.info("Dashscope API token extraction - metadata: {}", metadata);
@@ -286,18 +287,18 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                             promptTokens, completionTokens, totalTokens);
                     
                     if (totalTokens > 0) {
-                        return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                        return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
                     }
                 }
             } catch (Exception e) {
                 log.debug("Could not get usage via getUsage() method: {}", e.getMessage());
             }
 
-            return new TokenUsage(0, 0, 0);
+            return new ChatTokenUsage(0, 0, 0);
             
         } catch (Exception e) {
             log.error("Error in Dashscope token extraction", e);
-            return new TokenUsage(0, 0, 0);
+            return new ChatTokenUsage(0, 0, 0);
         }
     }
     

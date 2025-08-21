@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:23:44
+ * @LastEditTime: 2025-08-21 12:46:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@ import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,7 +85,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
         // 使用同一个ChatModel实例，但传入不同的选项
         giteeChatModel.stream(requestPrompt).subscribe(
@@ -123,7 +124,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         log.info("SpringAIGiteeService processPromptSync with full prompt content: {}", fullPromptContent);
         long startTime = System.currentTimeMillis();
         boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
         try {
             if (giteeChatModel == null) {
@@ -193,7 +194,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
         giteeChatModel.stream(requestPrompt).subscribe(
                 response -> {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 09:33:50
+ * @LastEditTime: 2025-08-21 12:22:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,7 +41,7 @@ public class ZhipuaiChatConfig {
     @Value("${spring.ai.zhipuai.api-key:}")
     private String apiKey;
 
-    @Value("${spring.ai.zhipuai.chat.options.model:glm-4}")
+    @Value("${spring.ai.zhipuai.chat.options.model:glm-4-flash}")
     private String model;
 
     @Value("${spring.ai.zhipuai.chat.options.temperature:0.7}")

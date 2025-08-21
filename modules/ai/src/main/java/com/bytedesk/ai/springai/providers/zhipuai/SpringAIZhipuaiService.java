@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 13:58:57
+ * @LastEditTime: 2025-08-21 12:47:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,6 +35,7 @@ import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -117,7 +118,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
         chatModel.stream(prompt).subscribe(
                 response -> {
@@ -160,7 +161,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
         log.info("Zhipuai API sync fullPromptContent: {}", fullPromptContent);
         
@@ -263,7 +264,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
         final ChatResponse[] lastResponse = {null};
 
         Flux<ChatResponse> responseFlux = chatModel.stream(prompt);
@@ -341,16 +342,16 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * @param response ChatResponse对象
      * @return TokenUsage对象
      */
-    private TokenUsage extractZhipuaiTokenUsage(org.springframework.ai.chat.model.ChatResponse response) {
+    private ChatTokenUsage extractZhipuaiTokenUsage(org.springframework.ai.chat.model.ChatResponse response) {
         try {
             if (response == null) {
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
             
             var metadata = response.getMetadata();
             if (metadata == null) {
                 log.warn("Zhipuai API response metadata is null");
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
             
             log.info("Zhipuai API manual token extraction - metadata: {}", metadata);
@@ -440,7 +441,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     log.info("Zhipuai API manual token extraction result from string parsing - prompt: {}, completion: {}, total: {}", 
                             promptTokens, completionTokens, totalTokens);
                     
-                    return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                    return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
                 }
             }
             
@@ -491,7 +492,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                     log.info("Zhipuai API manual token extraction result - prompt: {}, completion: {}, total: {}", 
                             promptTokens, completionTokens, totalTokens);
                     
-                    return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                    return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
                 }
             }
             
@@ -505,7 +506,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             
             // 方法4: 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
             log.info("Zhipuai API manual extraction failed, trying original extractTokenUsage method");
-            TokenUsage fallbackUsage = extractTokenUsage(response);
+            ChatTokenUsage fallbackUsage = extractTokenUsage(response);
             if (fallbackUsage.getTotalTokens() > 0) {
                 log.info("Zhipuai API fallback extraction successful: {}", fallbackUsage);
                 return fallbackUsage;
@@ -513,7 +514,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             
             // 方法5: 如果所有方法都失败，尝试估算token使用量
             log.info("Zhipuai API all extraction methods failed, attempting to estimate token usage");
-            TokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
+            ChatTokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
             if (estimatedUsage.getTotalTokens() > 0) {
                 log.info("Zhipuai API estimated token usage: {}", estimatedUsage);
                 return estimatedUsage;
@@ -525,7 +526,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             // 如果手动提取出错，尝试使用原始的extractTokenUsage方法作为后备
             try {
                 log.info("Zhipuai API manual extraction error, trying original extractTokenUsage method");
-                TokenUsage fallbackUsage = extractTokenUsage(response);
+                ChatTokenUsage fallbackUsage = extractTokenUsage(response);
                 if (fallbackUsage.getTotalTokens() > 0) {
                     log.info("Zhipuai API fallback extraction successful after error: {}", fallbackUsage);
                     return fallbackUsage;
@@ -536,7 +537,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         }
         
         log.warn("Zhipuai API all token extraction methods failed, returning zeros");
-        return new TokenUsage(0, 0, 0);
+        return new ChatTokenUsage(0, 0, 0);
     }
 
     /**
@@ -545,10 +546,10 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * @param response ChatResponse对象
      * @return 估算的TokenUsage对象
      */
-    private TokenUsage estimateTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse response) {
+    private ChatTokenUsage estimateTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse response) {
         try {
             if (response == null) {
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
             
             // 获取输出文本
@@ -563,11 +564,11 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             log.info("Zhipuai API estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens", 
                     outputText.length(), completionTokens, promptTokens, totalTokens);
             
-            return new TokenUsage(promptTokens, completionTokens, totalTokens);
+            return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
             
         } catch (Exception e) {
             log.error("Error estimating token usage", e);
-            return new TokenUsage(0, 0, 0);
+            return new ChatTokenUsage(0, 0, 0);
         }
     }
     
@@ -639,15 +640,15 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
             }
             
             // 测试手动token提取
-            TokenUsage manualUsage = extractZhipuaiTokenUsage(response);
+            ChatTokenUsage manualUsage = extractZhipuaiTokenUsage(response);
             log.info("Zhipuai API test manual token extraction result: {}", manualUsage);
             
             // 测试原始token提取
-            TokenUsage originalUsage = extractTokenUsage(response);
+            ChatTokenUsage originalUsage = extractTokenUsage(response);
             log.info("Zhipuai API test original token extraction result: {}", originalUsage);
             
             // 测试token估算功能
-            TokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
+            ChatTokenUsage estimatedUsage = estimateTokenUsageFromResponse(response);
             log.info("Zhipuai API test estimated token usage result: {}", estimatedUsage);
             
             // 测试token估算算法

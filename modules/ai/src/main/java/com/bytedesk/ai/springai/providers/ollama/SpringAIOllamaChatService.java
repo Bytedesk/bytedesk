@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 12:45:56
+ * @LastEditTime: 2025-08-21 12:45:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,6 @@
 package com.bytedesk.ai.springai.providers.ollama;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -23,7 +21,8 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -31,8 +30,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.provider.LlmProviderEntity;
-import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -45,21 +42,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-// @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIOllamaService extends BaseSpringAIService {
-
-    // @Autowired
-    // @Qualifier("bytedeskOllamaApi")
-    // private OllamaApi bytedeskOllamaApi;
-
-    // @Autowired(required = false)
-    // @Qualifier("bytedeskOllamaChatModel")
-    // private OllamaChatModel bytedeskOllamaChatModel;
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIOllamaChatService extends BaseSpringAIService {
 
     @Autowired
-    private LlmProviderRestService llmProviderRestService;
+    @Qualifier("bytedeskOllamaApi")
+    private OllamaApi bytedeskOllamaApi;
 
-    public SpringAIOllamaService() {
+    @Autowired(required = false)
+    @Qualifier("bytedeskOllamaChatModel")
+    private OllamaChatModel bytedeskOllamaChatModel;
+
+    public SpringAIOllamaChatService() {
         super(); // 调用基类的无参构造函数
     }
 
@@ -81,31 +75,6 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     public OllamaApi createOllamaApi(String apiUrl) {
         return OllamaApi.builder()
                 .baseUrl(apiUrl)
-                .build();
-    }
-
-    /**
-     * 根据机器人配置创建动态的OllamaChatModel
-     * 
-     * @param llm 机器人LLM配置
-     * @return 配置了特定模型的OllamaChatModel
-     */
-    private OllamaChatModel createOllamaChatModel(RobotLlm llm) {
-
-        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
-        if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
-        }
-        // 使用默认的OllamaApi实例
-        OllamaApi ollamaApi = createOllamaApi(llmProviderOptional.get().getApiUrl());
-        OllamaOptions options = createOllamaOptions(llm);
-        if (options == null) {
-            return null;
-        }
-        return OllamaChatModel.builder()
-                .ollamaApi(ollamaApi)
-                .defaultOptions(options)
                 .build();
     }
 
@@ -133,7 +102,6 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         return false;
     }
 
-    @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
@@ -146,7 +114,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
 
         // 获取适当的模型实例
-        OllamaChatModel chatModel = createOllamaChatModel(llm);
+        OllamaChatModel chatModel = bytedeskOllamaChatModel;
         if (chatModel == null) {
             log.info("Ollama API not available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, "Ollama service is not available", messageProtobufReply);
@@ -202,7 +170,6 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
     }
 
-    @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
@@ -220,7 +187,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
 
         // 获取适当的模型实例
-        OllamaChatModel chatModel = createOllamaChatModel(llm);
+        OllamaChatModel chatModel = bytedeskOllamaChatModel;
 
         try {
             try {
@@ -264,7 +231,6 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
     }
 
-    @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         Assert.notNull(emitter, "SseEmitter must not be null");
@@ -281,7 +247,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         }
 
         // 获取适当的模型实例
-        OllamaChatModel chatModel = createOllamaChatModel(llm);
+        OllamaChatModel chatModel = bytedeskOllamaChatModel;
 
         if (chatModel == null) {
             log.info("Ollama API not available");

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 15:10:31
+ * @LastEditTime: 2025-08-21 12:46:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,7 @@ import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,7 +83,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         // 记录开始时间和初始化token使用统计
         long startTime = System.currentTimeMillis();
         final boolean[] success = { false };
-        final TokenUsage[] tokenUsage = { new TokenUsage(0, 0, 0) };
+        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
         // 用于累积所有响应文本
         final StringBuilder[] fullResponseText = { new StringBuilder() };
 
@@ -118,7 +119,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     // 如果token提取失败，使用累积的完整响应文本来估算token
                     if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
                         log.info("Baidu API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
-                        TokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
+                        ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
                         tokenUsage[0] = estimatedUsage;
                         log.info("Baidu API final estimated token usage: {}", estimatedUsage);
                     }
@@ -138,7 +139,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         log.info("SpringAIBaiduService processPromptSync with full prompt content: {}", fullPromptContent);
         long startTime = System.currentTimeMillis();
         boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
 
         try {
             if (baiduChatModel == null) {
@@ -212,7 +213,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         // 记录开始时间和初始化token使用统计
         long startTime = System.currentTimeMillis();
         final boolean[] success = { false };
-        final TokenUsage[] tokenUsage = { new TokenUsage(0, 0, 0) };
+        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
         // 用于累积所有响应文本
         final StringBuilder[] fullResponseText = { new StringBuilder() };
 
@@ -255,7 +256,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     // 如果token提取失败，使用累积的完整响应文本来估算token
                     if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
                         log.info("Baidu API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
-                        TokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
+                        ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
                         tokenUsage[0] = estimatedUsage;
                         log.info("Baidu API final estimated token usage: {}", estimatedUsage);
                     }
@@ -283,17 +284,17 @@ public class SpringAIBaiduService extends BaseSpringAIService {
      * @param response ChatResponse对象
      * @return TokenUsage对象
      */
-    private TokenUsage extractBaiduTokenUsage(org.springframework.ai.chat.model.ChatResponse response) {
+    private ChatTokenUsage extractBaiduTokenUsage(org.springframework.ai.chat.model.ChatResponse response) {
         try {
             if (response == null) {
                 log.warn("Baidu API response is null");
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
 
             var metadata = response.getMetadata();
             if (metadata == null) {
                 log.warn("Baidu API response metadata is null");
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
 
             log.info("Baidu API manual token extraction - metadata: {}", metadata);
@@ -390,7 +391,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     log.info("Baidu API manual token extraction result - prompt: {}, completion: {}, total: {}",
                             promptTokens, completionTokens, totalTokens);
 
-                    return new TokenUsage(promptTokens, completionTokens, totalTokens);
+                    return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
                 }
             }
 
@@ -404,7 +405,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
             // 方法3: 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
             log.info("Baidu API manual extraction failed, trying original extractTokenUsage method");
-            TokenUsage fallbackUsage = extractTokenUsage(response);
+            ChatTokenUsage fallbackUsage = extractTokenUsage(response);
             if (fallbackUsage.getTotalTokens() > 0) {
                 log.info("Baidu API fallback extraction successful: {}", fallbackUsage);
                 return fallbackUsage;
@@ -412,13 +413,13 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
             // 方法4: 如果所有方法都失败，尝试估算token使用量
             log.info("Baidu API all extraction methods failed, attempting to estimate token usage");
-            TokenUsage estimatedUsage = estimateBaiduTokenUsageFromResponse(response);
+            ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromResponse(response);
             log.info("Baidu API estimated token usage: {}", estimatedUsage);
             return estimatedUsage;
 
         } catch (Exception e) {
             log.error("Error in manual Baidu token extraction", e);
-            return new TokenUsage(0, 0, 0);
+            return new ChatTokenUsage(0, 0, 0);
         }
     }
 
@@ -428,10 +429,10 @@ public class SpringAIBaiduService extends BaseSpringAIService {
      * @param response ChatResponse对象
      * @return 估算的TokenUsage对象
      */
-    private TokenUsage estimateBaiduTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse response) {
+    private ChatTokenUsage estimateBaiduTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse response) {
         try {
             if (response == null || response.getResults() == null || response.getResults().isEmpty()) {
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
             
             // 获取输出文本
@@ -446,7 +447,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
             
         } catch (Exception e) {
             log.error("Error estimating Baidu token usage", e);
-            return new TokenUsage(0, 0, 0);
+            return new ChatTokenUsage(0, 0, 0);
         }
     }
 
@@ -456,10 +457,10 @@ public class SpringAIBaiduService extends BaseSpringAIService {
      * @param outputText 完整的输出文本
      * @return 估算的TokenUsage对象
      */
-    private TokenUsage estimateBaiduTokenUsageFromText(String outputText) {
+    private ChatTokenUsage estimateBaiduTokenUsageFromText(String outputText) {
         try {
             if (outputText == null || outputText.isEmpty()) {
-                return new TokenUsage(0, 0, 0);
+                return new ChatTokenUsage(0, 0, 0);
             }
             
             // 估算token使用量
@@ -474,11 +475,11 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     "Baidu API estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens",
                     outputText.length(), completionTokens, promptTokens, totalTokens);
             
-            return new TokenUsage(promptTokens, completionTokens, totalTokens);
+            return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
             
         } catch (Exception e) {
             log.error("Error estimating Baidu token usage from text", e);
-            return new TokenUsage(0, 0, 0);
+            return new ChatTokenUsage(0, 0, 0);
         }
     }
 

@@ -721,11 +721,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter, fullPromptContent);
     }
 
-    // private String createAndProcessPromptSync(String query, String context, RobotProtobuf robot,
-    //         MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-    //     return createAndProcessPromptSyncWithPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply).getResponse();
-    // }
-
     private PromptResult createAndProcessPromptSyncWithPrompt(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         
@@ -1145,7 +1140,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * @param response ChatResponse from AI service
      * @return TokenUsage object containing prompt and completion tokens
      */
-    protected TokenUsage extractTokenUsage(Object response) {
+    protected ChatTokenUsage extractTokenUsage(Object response) {
         try {
             if (response instanceof org.springframework.ai.chat.model.ChatResponse) {
                 org.springframework.ai.chat.model.ChatResponse chatResponse = (org.springframework.ai.chat.model.ChatResponse) response;
@@ -1306,7 +1301,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     
                     log.info("BaseSpringAIService extractTokenUsage extracted tokens - prompt: {}, completion: {}, total: {}", 
                             prompt, completion, total);
-                    return new TokenUsage(prompt, completion, total);
+                    return new ChatTokenUsage(prompt, completion, total);
                 }
             }
         } catch (Exception e) {
@@ -1315,7 +1310,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 如果无法提取，返回默认值
         log.warn("BaseSpringAIService extractTokenUsage could not extract token usage, returning zeros");
-        return new TokenUsage(0, 0, 0);
+        return new ChatTokenUsage(0, 0, 0);
     }
 
     /**
@@ -1421,21 +1416,21 @@ public abstract class BaseSpringAIService implements SpringAIService {
     /**
      * Token usage data class
      */
-    protected static class TokenUsage {
-        private final long promptTokens;
-        private final long completionTokens;
-        private final long totalTokens;
+    // protected static class TokenUsage {
+    //     private final long promptTokens;
+    //     private final long completionTokens;
+    //     private final long totalTokens;
 
-        public TokenUsage(long promptTokens, long completionTokens, long totalTokens) {
-            this.promptTokens = promptTokens;
-            this.completionTokens = completionTokens;
-            this.totalTokens = totalTokens;
-        }
+    //     public TokenUsage(long promptTokens, long completionTokens, long totalTokens) {
+    //         this.promptTokens = promptTokens;
+    //         this.completionTokens = completionTokens;
+    //         this.totalTokens = totalTokens;
+    //     }
 
-        public long getPromptTokens() { return promptTokens; }
-        public long getCompletionTokens() { return completionTokens; }
-        public long getTotalTokens() { return totalTokens; }
-    }
+    //     public long getPromptTokens() { return promptTokens; }
+    //     public long getCompletionTokens() { return completionTokens; }
+    //     public long getTotalTokens() { return totalTokens; }
+    // }
 
     // 带prompt参数的抽象方法重载
     protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,

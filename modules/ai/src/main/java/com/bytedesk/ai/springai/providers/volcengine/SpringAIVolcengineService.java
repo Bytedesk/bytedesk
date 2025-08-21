@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 14:16:43
+ * @LastEditTime: 2025-08-21 12:47:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,6 +32,7 @@ import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 @Slf4j
 @Service
@@ -82,7 +83,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
         
         // 使用同一个ChatModel实例，但传入不同的选项
         volcengineChatModel.stream(requestPrompt).subscribe(
@@ -121,7 +122,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         log.info("SpringAIVolcengineService processPromptSync with full prompt content: {}", fullPromptContent);
         long startTime = System.currentTimeMillis();
         boolean success = false;
-        TokenUsage tokenUsage = new TokenUsage(0, 0, 0);
+        ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
         try {
             if (volcengineChatModel == null) {
@@ -191,7 +192,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
-        final TokenUsage[] tokenUsage = {new TokenUsage(0, 0, 0)};
+        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
         volcengineChatModel.stream(requestPrompt).subscribe(
                 response -> {

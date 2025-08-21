@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 15:45:45
+ * @LastEditTime: 2025-08-21 12:38:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,6 +49,7 @@ public class ZhipuaiController {
 
     private final BytedeskProperties bytedeskProperties;
     private final ZhipuaiService zhipuaiService;
+    private final ZhipuaiChatService zhipuaiChatService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
@@ -140,7 +141,7 @@ public class ZhipuaiController {
         }
         
         try {
-            String result = zhipuaiService.rolePlayChat(message, userInfo, botInfo, botName, userName);
+            String result = zhipuaiChatService.rolePlayChat(message, userInfo, botInfo, botName, userName);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in role play chat", e);
@@ -191,7 +192,7 @@ public class ZhipuaiController {
                 functions.add(function);
             }
             
-            String result = zhipuaiService.functionCallingChat(message, functions);
+            String result = zhipuaiChatService.functionCallingChat(message, functions);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in function calling chat", e);
@@ -224,7 +225,7 @@ public class ZhipuaiController {
                 functions.add(function);
             }
             
-            return zhipuaiService.functionCallingChatStream(message, functions);
+            return zhipuaiChatService.functionCallingChatStream(message, functions);
         } catch (Exception e) {
             log.error("Error in function calling chat stream", e);
             return Flux.just("Error: " + e.getMessage());
@@ -303,7 +304,7 @@ public class ZhipuaiController {
             functions.add(weatherFunction);
             
             String message = "请告诉我" + city + "的天气情况";
-            String result = zhipuaiService.functionCallingChat(message, functions);
+            String result = zhipuaiChatService.functionCallingChat(message, functions);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in weather function call", e);
@@ -351,7 +352,7 @@ public class ZhipuaiController {
             functions.add(flightFunction);
             
             String message = "请查询从" + from + "到" + to + "的航班价格";
-            String result = zhipuaiService.functionCallingChat(message, functions);
+            String result = zhipuaiChatService.functionCallingChat(message, functions);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in flight function call", e);
@@ -377,7 +378,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Prompt is required"));
             }
             
-            String result = zhipuaiService.generateImage(prompt, requestId);
+            String result = zhipuaiChatService.generateImage(prompt, requestId);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in image generation", e);
@@ -402,7 +403,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Text is required"));
             }
             
-            List<Double> result = zhipuaiService.getEmbedding(text);
+            List<Double> result = zhipuaiChatService.getEmbedding(text);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in embedding", e);
@@ -428,7 +429,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Texts are required"));
             }
             
-            List<List<Double>> result = zhipuaiService.getEmbeddings(texts);
+            List<List<Double>> result = zhipuaiChatService.getEmbeddings(texts);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in embeddings", e);
@@ -455,7 +456,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Text is required"));
             }
             
-            File result = zhipuaiService.generateSpeech(text, voice, responseFormat);
+            File result = zhipuaiChatService.generateSpeech(text, voice, responseFormat);
             if (result != null) {
                 return ResponseEntity.ok(JsonResult.success("Speech generated: " + result.getAbsolutePath()));
             } else {
@@ -496,7 +497,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Voice data file not found"));
             }
             
-            File result = zhipuaiService.generateCustomSpeech(text, voiceText, voiceData, responseFormat);
+            File result = zhipuaiChatService.generateCustomSpeech(text, voiceText, voiceData, responseFormat);
             if (result != null) {
                 return ResponseEntity.ok(JsonResult.success("Custom voice generated: " + result.getAbsolutePath()));
             } else {
@@ -530,7 +531,7 @@ public class ZhipuaiController {
                 purpose = "fine-tune";
             }
             
-            String result = zhipuaiService.uploadFile(filePath, purpose);
+            String result = zhipuaiChatService.uploadFile(filePath, purpose);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in file upload", e);
@@ -549,7 +550,7 @@ public class ZhipuaiController {
         }
         
         try {
-            List<Map<String, Object>> result = zhipuaiService.queryFiles();
+            List<Map<String, Object>> result = zhipuaiChatService.queryFiles();
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in query files", e);
@@ -579,7 +580,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Output path is required"));
             }
             
-            File result = zhipuaiService.downloadFile(fileId, outputPath);
+            File result = zhipuaiChatService.downloadFile(fileId, outputPath);
             if (result != null) {
                 return ResponseEntity.ok(JsonResult.success("File downloaded: " + result.getAbsolutePath()));
             } else {
@@ -613,7 +614,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Training file is required"));
             }
             
-            String result = zhipuaiService.createFineTuningJob(model, trainingFile);
+            String result = zhipuaiChatService.createFineTuningJob(model, trainingFile);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in create fine-tuning job", e);
@@ -632,7 +633,7 @@ public class ZhipuaiController {
         }
         
         try {
-            Map<String, Object> result = zhipuaiService.queryFineTuningJob(jobId);
+            Map<String, Object> result = zhipuaiChatService.queryFineTuningJob(jobId);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in query fine-tuning job", e);
@@ -657,7 +658,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Message is required"));
             }
             
-            String result = zhipuaiService.chatAsync(message);
+            String result = zhipuaiChatService.chatAsync(message);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in async chat", e);
@@ -687,7 +688,7 @@ public class ZhipuaiController {
                 searchQuery = message; // 如果没有指定搜索查询，使用消息作为搜索查询
             }
             
-            String result = zhipuaiService.chatWithWebSearch(message, searchQuery);
+            String result = zhipuaiChatService.chatWithWebSearch(message, searchQuery);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in web search chat", e);
@@ -712,7 +713,7 @@ public class ZhipuaiController {
                 return ResponseEntity.ok(JsonResult.error("Message is required"));
             }
             
-            String result = zhipuaiService.chatWithVoice(message);
+            String result = zhipuaiChatService.chatWithVoice(message);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in voice chat", e);
@@ -724,39 +725,39 @@ public class ZhipuaiController {
      * 测试流式响应功能
      * GET http://127.0.0.1:9003/zhipuai/test-stream
      */
-    @GetMapping("/test-stream")
-    public ResponseEntity<JsonResult<?>> testStreamResponse() {
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
-        }
+    // @GetMapping("/test-stream")
+    // public ResponseEntity<JsonResult<?>> testStreamResponse() {
+    //     if (!bytedeskProperties.getDebug()) {
+    //         return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+    //     }
         
-        try {
-            zhipuaiService.testStreamResponse();
-            return ResponseEntity.ok(JsonResult.success("Stream response test completed. Check logs for details."));
-        } catch (Exception e) {
-            log.error("Error testing stream response", e);
-            return ResponseEntity.ok(JsonResult.error("Error testing stream response: " + e.getMessage()));
-        }
-    }
+    //     try {
+    //         zhipuaiService.testStreamResponse();
+    //         return ResponseEntity.ok(JsonResult.success("Stream response test completed. Check logs for details."));
+    //     } catch (Exception e) {
+    //         log.error("Error testing stream response", e);
+    //         return ResponseEntity.ok(JsonResult.error("Error testing stream response: " + e.getMessage()));
+    //     }
+    // }
 
     /**
      * 简单流式测试 - 完全按照官方示例代码实现
      * GET http://127.0.0.1:9003/zhipuai/test-simple-stream
      */
-    @GetMapping("/test-simple-stream")
-    public ResponseEntity<JsonResult<?>> testSimpleStream() {
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
-        }
+    // @GetMapping("/test-simple-stream")
+    // public ResponseEntity<JsonResult<?>> testSimpleStream() {
+    //     if (!bytedeskProperties.getDebug()) {
+    //         return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
+    //     }
         
-        try {
-            zhipuaiService.testSimpleStream();
-            return ResponseEntity.ok(JsonResult.success("Simple stream test completed. Check logs for details."));
-        } catch (Exception e) {
-            log.error("Error testing simple stream", e);
-            return ResponseEntity.ok(JsonResult.error("Error testing simple stream: " + e.getMessage()));
-        }
-    }
+    //     try {
+    //         zhipuaiChatService.testSimpleStream();
+    //         return ResponseEntity.ok(JsonResult.success("Simple stream test completed. Check logs for details."));
+    //     } catch (Exception e) {
+    //         log.error("Error testing simple stream", e);
+    //         return ResponseEntity.ok(JsonResult.error("Error testing simple stream: " + e.getMessage()));
+    //     }
+    // }
 
     /**
      * 在 Bean 销毁时关闭线程池
