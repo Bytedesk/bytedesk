@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-08 11:35:24
+ * @LastEditTime: 2025-08-22 07:20:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -84,12 +83,6 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         tokenRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
-    }
-
-    @Override
-    public Object export(TokenRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     @PostMapping("/generate")
