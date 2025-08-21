@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-19 13:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 16:09:00
+ * @LastEditTime: 2025-08-21 14:34:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -56,6 +56,7 @@ public class SpringAIServiceRegistry {
     private final Optional<SpringAIBaiduService> springAIBaiduService;
     private final Optional<SpringAIVolcengineService> springAIVolcengineService;
     private final Optional<SpringAIMinimaxService> springAIMinimaxService;
+    // 自定义服务，用于处理未知或未注册的提供商，兼容OpenAI
     private final Optional<SpringAICustomService> springAICustomService;
 
     // 服务注册表，用于存储各种AI服务提供商的实现
@@ -75,7 +76,6 @@ public class SpringAIServiceRegistry {
         registerService(LlmConsts.BAIDU, springAIBaiduService.orElse(null));
         registerService(LlmConsts.VOLCENGINE, springAIVolcengineService.orElse(null));
         registerService(LlmConsts.MINIMAX, springAIMinimaxService.orElse(null));
-        registerService(LlmConsts.CUSTOM, springAICustomService.orElse(null));
         
         log.info("SpringAI服务注册表初始化完成，注册了{}个服务", serviceRegistry.size());
     }
@@ -103,7 +103,9 @@ public class SpringAIServiceRegistry {
     public SpringAIService getServiceByProviderName(String providerName) {
         SpringAIService service = serviceRegistry.get(providerName);
         if (service == null) {
-            throw new IllegalArgumentException("未找到AI服务提供商: " + providerName);
+            // throw new IllegalArgumentException("未找到AI服务提供商: " + providerName);
+            return springAICustomService
+                .orElseThrow(() -> new IllegalArgumentException("未找到AI服务提供商: " + providerName));
         }
         return service;
     }

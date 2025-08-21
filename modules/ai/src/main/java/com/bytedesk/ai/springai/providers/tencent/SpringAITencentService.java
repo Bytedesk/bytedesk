@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 13:59:17
+ * @LastEditTime: 2025-08-21 14:41:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -156,8 +156,6 @@ public class SpringAITencentService extends BaseSpringAIService {
                 });
     }
 
-
-
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
         long startTime = System.currentTimeMillis();
@@ -278,20 +276,4 @@ public class SpringAITencentService extends BaseSpringAIService {
                 });
     }
 
-    public OpenAiChatModel getChatModel() {
-        // 由于现在使用动态创建，这个方法可能需要传入RobotLlm参数
-        // 这里返回null，因为不再使用静态注入的chatModel
-        return null;
-    }
-    
-    public Boolean isServiceHealthy() {
-        try {
-            // 由于现在使用动态创建，健康检查需要有效的robot配置
-            // 这里简化处理，返回true表示服务可用
-            return true;
-        } catch (Exception e) {
-            log.error("Error checking Tencent service health", e);
-            return false;
-        }
-    }
 }

@@ -66,8 +66,9 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         );
     }
 
-    public DashScopeApi createDashscopeApi(String apiKey) {
+    public DashScopeApi createDashscopeApi(String apiUrl, String apiKey) {
         return DashScopeApi.builder()
+                .baseUrl(apiUrl)
                 .apiKey(apiKey)
                 .build();
     }
@@ -87,7 +88,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         }
         // 使用动态的DashScopeApi实例
         LlmProviderEntity provider = llmProviderOptional.get();
-        DashScopeApi dashscopeApi = createDashscopeApi(provider.getApiKey());
+        DashScopeApi dashscopeApi = createDashscopeApi(provider.getApiUrl(), provider.getApiKey());
         DashScopeChatOptions options = createDashscopeOptions(llm);
         if (options == null) {
             return null;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 13:58:38
+ * @LastEditTime: 2025-08-21 14:14:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -25,7 +24,6 @@ import org.springframework.ai.minimax.MiniMaxChatModel;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.minimax.api.MiniMaxApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -87,7 +85,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
         
         try {
             // 尝试使用 MiniMaxApi 构造函数而不是 builder
-            MiniMaxApi miniMaxApi = new MiniMaxApi(provider.getApiKey());
+            MiniMaxApi miniMaxApi = new MiniMaxApi(provider.getApiUrl(), provider.getApiKey());
             
             // 创建选项
             MiniMaxChatOptions options = createDynamicOptions(llm);
@@ -141,7 +139,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                             sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractDeepSeekTokenUsage(response);
+                        tokenUsage[0] = extractMinimaxTokenUsage(response);
                         success[0] = true;
                     }
                 },
@@ -183,14 +181,14 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
                         var response = chatModel.call(prompt);
-                        tokenUsage = extractDeepSeekTokenUsage(response);
+                        tokenUsage = extractMinimaxTokenUsage(response);
                         success = true;
                         return extractTextFromResponse(response);
                     }
                 }
                 
-                ChatResponse response = minimaxChatModel.call(new Prompt(message));
-                tokenUsage = extractDeepSeekTokenUsage(response);
+                ChatResponse response = chatModel.call(new Prompt(message));
+                tokenUsage = extractMinimaxTokenUsage(response);
                 success = true;
                 return extractTextFromResponse(response);
             } catch (Exception e) {
@@ -254,7 +252,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                                 sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractDeepSeekTokenUsage(response);
+                            tokenUsage[0] = extractMinimaxTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
@@ -288,7 +286,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
      * @param response ChatResponse对象
      * @return TokenUsage对象
      */
-    private ChatTokenUsage extractDeepSeekTokenUsage(ChatResponse response) {
+    private ChatTokenUsage extractMinimaxTokenUsage(ChatResponse response) {
         try {
             if (response == null) {
                 log.warn("Minimax API response is null");
@@ -328,18 +326,6 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
             log.error("Error in Minimax token extraction", e);
             return new ChatTokenUsage(0, 0, 0);
         }
-    }
-    
-    public Boolean isServiceHealthy() {
-        try {
-            // 由于现在使用动态创建，健康检查需要有效的robot配置
-            // 这里简化处理，返回true表示服务可用
-            return true;
-        } catch (Exception e) {
-            log.error("Error checking Minimax service health", e);
-            return false;
-        }
-    }
     }
 
 }
