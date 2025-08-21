@@ -45,6 +45,8 @@ public class TokenRequest extends BaseRequest {
 
     private ZonedDateTime expiresAt;
 
+    private Boolean permanent;
+
     private Boolean revoked;
 
     private String revokeReason;

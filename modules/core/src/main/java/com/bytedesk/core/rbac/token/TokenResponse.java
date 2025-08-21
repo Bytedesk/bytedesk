@@ -45,6 +45,8 @@ public class TokenResponse extends BaseResponse {
 
     private ZonedDateTime expiresAt;
 
+    private Boolean permanent;
+
     private Boolean revoked;
 
     private String revokeReason;

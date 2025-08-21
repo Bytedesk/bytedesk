@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-08 11:22:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 21:30:58
+ * @LastEditTime: 2025-08-22 07:34:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -73,6 +73,11 @@ public class TokenEntity extends BaseEntity {
 
     private ZonedDateTime expiresAt;
 
+    // 是否永久有效
+    @Builder.Default
+    @Column(name = "is_permanent")
+    private Boolean permanent = false;
+
     @Builder.Default
     @Column(name = "is_revoked")
     private Boolean revoked = false;
@@ -90,7 +95,8 @@ public class TokenEntity extends BaseEntity {
 
     // 验证token是否有效
     public Boolean isValid() {
-        return !revoked && !isDeleted() && expiresAt != null && expiresAt.isAfter(BdDateUtils.now());
+        return !revoked && !isDeleted() && 
+               (permanent || (expiresAt != null && expiresAt.isAfter(BdDateUtils.now())));
     }
 
     // 撤销token
