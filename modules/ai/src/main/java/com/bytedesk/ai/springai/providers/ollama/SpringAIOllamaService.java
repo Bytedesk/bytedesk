@@ -100,30 +100,6 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                 .build();
     }
 
-    /**
-     * 检查模型是否存在
-     * 
-     * @param modelName 模型名称
-     * @return 如果模型存在返回true，否则返回false
-     */
-    public Boolean isModelExists(OllamaRequest request) {
-        OllamaApi ollamaApi = createOllamaApi(request.getApiUrl());
-        String modelName = request.getModel();
-        Assert.hasText(modelName, "Model name must not be null or empty");
-        try {
-            ollamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
-            return true;
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return false;
-            }
-            log.error("检查模型是否存在时发生错误: {}, 状态码: {}", modelName, e.getStatusCode());
-        } catch (Exception e) {
-            log.error("检查模型是否存在时发生未知错误: {}, 错误: {}", modelName, e.getMessage());
-        }
-        return false;
-    }
-
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
@@ -344,6 +320,30 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             recordAiTokenUsage(robot, LlmConsts.OLLAMA, modelType,
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
+    }
+
+    /**
+     * 检查模型是否存在
+     * 
+     * @param modelName 模型名称
+     * @return 如果模型存在返回true，否则返回false
+     */
+    public Boolean isModelExists(OllamaRequest request) {
+        OllamaApi ollamaApi = createOllamaApi(request.getApiUrl());
+        String modelName = request.getModel();
+        Assert.hasText(modelName, "Model name must not be null or empty");
+        try {
+            ollamaApi.showModel(new OllamaApi.ShowModelRequest(modelName));
+            return true;
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return false;
+            }
+            log.error("检查模型是否存在时发生错误: {}, 状态码: {}", modelName, e.getStatusCode());
+        } catch (Exception e) {
+            log.error("检查模型是否存在时发生未知错误: {}, 错误: {}", modelName, e.getMessage());
+        }
+        return false;
     }
 
 }

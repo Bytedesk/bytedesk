@@ -98,6 +98,8 @@ public class SpringAIDashscopeChatController {
                             response -> {
                                 try {
                                     emitter.send(response, MediaType.APPLICATION_JSON);
+                                } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+                                    log.debug("SSE connection no longer usable in Dashscope response: {}", e.getMessage());
                                 } catch (Exception e) {
                                     log.error("Error sending SSE event", e);
                                 }
@@ -106,6 +108,8 @@ public class SpringAIDashscopeChatController {
                                 log.error("Error in chat stream", error);
                                 try {
                                     emitter.send(SseEmitter.event().name("error").data(error.getMessage()));
+                                } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+                                    log.debug("SSE connection no longer usable during error: {}", e.getMessage());
                                 } catch (Exception e) {
                                     log.error("Error sending error event", e);
                                 }
@@ -114,22 +118,32 @@ public class SpringAIDashscopeChatController {
                                 try {
                                     emitter.send(SseEmitter.event().name("complete").data(""));
                                     emitter.complete();
+                                } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+                                    log.debug("SSE connection no longer usable during completion: {}", e.getMessage());
                                 } catch (Exception e) {
                                     log.error("Error sending complete event", e);
                                 }
                             }
                     );
                 } else {
-                    emitter.send(SseEmitter.event().name("error").data("Chat model not available"));
-                    emitter.complete();
+                    try {
+                        emitter.send(SseEmitter.event().name("error").data("Chat model not available"));
+                        emitter.complete();
+                    } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+                        log.debug("SSE connection no longer usable: {}", e.getMessage());
+                    } catch (Exception e) {
+                        log.error("Error sending model unavailable message", e);
+                    }
                 }
             } catch (Exception e) {
                 log.error("Error in SSE execution", e);
                 try {
                     emitter.send(SseEmitter.event().name("error").data(e.getMessage()));
                     emitter.complete();
+                } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException ex) {
+                    log.debug("SSE connection no longer usable during error handling: {}", ex.getMessage());
                 } catch (Exception ex) {
-                    log.error("Error sending error event", ex);
+                    log.error("Error sending final error event", ex);
                 }
             }
         });

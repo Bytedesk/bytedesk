@@ -15,6 +15,7 @@ package com.bytedesk.core.exception;
 
 import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 // import org.apache.coyote.BadRequestException; // tomcat
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
@@ -24,6 +25,9 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 // import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +38,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -222,6 +227,34 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<?> handleMEntityNotFoundException(EntityNotFoundException ex) {
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_ENTITY_NOT_FOUND));
+    }
+
+    // 添加对异步请求不可用异常的处理
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public ResponseEntity<?> handleAsyncRequestNotUsableException(AsyncRequestNotUsableException ex) {
+        log.warn("AsyncRequestNotUsableException: SSE connection is no longer usable - {}", ex.getMessage());
+        
+        // 获取当前请求上下文
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                String acceptHeader = request.getHeader("Accept");
+                
+                // 检查是否是SSE请求
+                if (acceptHeader != null && acceptHeader.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
+                    // 对于SSE请求，返回空响应或者适当的错误信息
+                    log.debug("SSE connection closed by client, not sending response");
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Unable to get request context: {}", e.getMessage());
+        }
+        
+        // 对于其他情况，返回正常的错误响应
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(JsonResult.error("Connection no longer available"));
     }
 
     @ExceptionHandler(Exception.class)

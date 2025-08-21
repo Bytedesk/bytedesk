@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-27 10:24:33
+ * @LastEditTime: 2025-08-21 17:04:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,6 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Index;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -56,12 +55,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ KbaseEntityListener.class })
-@Table(
-    name = "bytedesk_kbase",
-    indexes = {
-        @Index(name = "idx_kbase_uid", columnList = "uuid")
-    }
-)
+@Table(name = "bytedesk_kbase")
 public class KbaseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -80,8 +74,15 @@ public class KbaseEntity extends BaseEntity {
      * Type of knowledge base (HELPCENTER, DOCUMENTATION, FAQ, etc.)
      */
     @Builder.Default
-    @Column(name = "kb_type")
+    @Column(name = "kbase_type")
     private String type = KbaseTypeEnum.HELPCENTER.name();
+
+    /**
+     * Subtype of the knowledge base (e.g., DEFAULT, COZE, DIFY, RAGFLOW)
+     */
+    @Builder.Default
+    @Column(name = "kbase_subtype")
+    private String subtype = KbaseSubtypeEnum.DEFAULT.name();
 
     /**
      * Main headline or title displayed on the knowledge base

@@ -112,9 +112,16 @@ public class Ollama4jChatController {
                         JsonResultCodeEnum.ROBOT_ANSWER_CONTINUE.getName(),
                         JsonResultCodeEnum.ROBOT_ANSWER_CONTINUE.getValue(), content)));
 
+            } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+                log.debug("SSE connection no longer usable in Ollama stream handler: {}", e.getMessage());
             } catch (Exception e) {
                 // 处理发送事件时的异常，例如客户端断开连接
-                emitter.completeWithError(e);
+                log.error("Error in Ollama stream handler", e);
+                try {
+                    emitter.completeWithError(e);
+                } catch (Exception completeException) {
+                    log.debug("Failed to complete emitter with error: {}", completeException.getMessage());
+                }
             }
         };
 
@@ -135,9 +142,16 @@ public class Ollama4jChatController {
                         JsonResultCodeEnum.ROBOT_ANSWER_END.getName())));
                 // 完成SseEmitter
                 emitter.complete();
+            } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+                log.debug("SSE connection no longer usable in Ollama thread: {}", e.getMessage());
             } catch (Exception e) {
                 // 处理异常，并完成SseEmitter
-                emitter.completeWithError(e);
+                log.error("Error generating content with Ollama", e);
+                try {
+                    emitter.completeWithError(e);
+                } catch (Exception completeException) {
+                    log.debug("Failed to complete emitter with error: {}", completeException.getMessage());
+                }
             }
         }).start();
 

@@ -208,19 +208,39 @@ public class VisitorRestControllerVisitor {
                 robotService.processSseMemberMessage(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
-                emitter.completeWithError(e);
+                // 检查连接是否还可用
+                try {
+                    emitter.completeWithError(e);
+                } catch (Exception completeException) {
+                    log.debug("SSE emitter completion failed, connection may already be closed: {}", 
+                            completeException.getMessage());
+                }
             }
         });
         
         // 添加超时和完成时的回调
         emitter.onTimeout(() -> {
             log.warn("sendSseMemberMessage SSE connection timed out");
-            emitter.complete();
+            try {
+                emitter.complete();
+            } catch (Exception e) {
+                log.debug("SSE emitter timeout completion failed: {}", e.getMessage());
+            }
         });
         
         emitter.onCompletion(() -> {
             log.info("sendSseMemberMessage SSE connection completed");
             // KeepAliveHelper.removeKeepAliveEvent(emitter);
+        });
+        
+        // 添加错误处理回调
+        emitter.onError((e) -> {
+            log.warn("sendSseMemberMessage SSE connection error: {}", e.getMessage());
+            try {
+                emitter.complete();
+            } catch (Exception completeException) {
+                log.debug("SSE emitter error completion failed: {}", completeException.getMessage());
+            }
         });
         
         return emitter;
@@ -243,19 +263,39 @@ public class VisitorRestControllerVisitor {
                 robotService.processSseVisitorMessage(message, emitter);
             } catch (Exception e) {
                 log.error("sendSseVisitorMessage Error processing SSE request", e);
-                emitter.completeWithError(e);
+                // 检查连接是否还可用
+                try {
+                    emitter.completeWithError(e);
+                } catch (Exception completeException) {
+                    log.debug("SSE emitter completion failed, connection may already be closed: {}", 
+                            completeException.getMessage());
+                }
             }
         });
         
         // 添加超时和完成时的回调
         emitter.onTimeout(() -> {
             log.warn("sendSseVisitorMessage SSE connection timed out");
-            emitter.complete();
+            try {
+                emitter.complete();
+            } catch (Exception e) {
+                log.debug("SSE emitter timeout completion failed: {}", e.getMessage());
+            }
         });
         
         emitter.onCompletion(() -> {
             log.info("sendSseVisitorMessage SSE connection completed");
             // KeepAliveHelper.removeKeepAliveEvent(emitter);
+        });
+        
+        // 添加错误处理回调
+        emitter.onError((e) -> {
+            log.warn("sendSseVisitorMessage SSE connection error: {}", e.getMessage());
+            try {
+                emitter.complete();
+            } catch (Exception completeException) {
+                log.debug("SSE emitter error completion failed: {}", completeException.getMessage());
+            }
         });
         
         return emitter;

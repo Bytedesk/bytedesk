@@ -828,15 +828,27 @@ public abstract class BaseSpringAIService implements SpringAIService {
         persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered);
         String messageJson = messageProtobufReply.toJson();
         try {
-            // 发送SSE事件
-            emitter.send(SseEmitter.event()
-                    .data(messageJson)
-                    .id(messageProtobufReply.getUid())
-                    .name("message"));
-            emitter.complete();
+            // 检查emitter状态并发送SSE事件
+            if (!isEmitterCompleted(emitter)) {
+                emitter.send(SseEmitter.event()
+                        .data(messageJson)
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+                emitter.complete();
+            } else {
+                log.debug("SSE emitter already completed, skipping message send");
+            }
+        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+            log.debug("SSE connection no longer usable: {}", e.getMessage());
         } catch (Exception e) {
             log.error("BaseSpringAIService processAnswerMessage Error sending SSE event 1：", e);
-            emitter.completeWithError(e);
+            try {
+                if (!isEmitterCompleted(emitter)) {
+                    emitter.completeWithError(e);
+                }
+            } catch (Exception completeException) {
+                log.debug("Failed to complete emitter with error: {}", completeException.getMessage());
+            }
         }
     }
 
@@ -857,11 +869,17 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 persistMessage(messageProtobufQuery, messageProtobufReply, true);
                 String messageJson = messageProtobufReply.toJson();
 
-                emitter.send(SseEmitter.event()
-                        .data(messageJson)
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-                emitter.complete();
+                try {
+                    emitter.send(SseEmitter.event()
+                            .data(messageJson)
+                            .id(messageProtobufReply.getUid())
+                            .name("message"));
+                    emitter.complete();
+                } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+                    log.debug("SSE connection no longer usable during error handling: {}", e.getMessage());
+                } catch (Exception sendException) {
+                    log.error("Error sending SSE error message", sendException);
+                }
             } else {
                 log.warn("SSE emitter already completed, skipping sending error message");
                 // 仍然需要持久化消息
@@ -876,7 +894,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     emitter.completeWithError(e);
                 }
             } catch (Exception ex) {
-                log.error("Failed to complete emitter with error", ex);
+                log.debug("Failed to complete emitter with error: {}", ex.getMessage());
             }
         }
     }
@@ -893,6 +911,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         .id(messageProtobufReply.getUid())
                         .name("message"));
             }
+        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+            log.debug("SSE connection no longer usable during stream start: {}", e.getMessage());
         } catch (Exception e) {
             log.error("Error sending stream start message", e);
         }
@@ -914,6 +934,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         .id(messageProtobufReply.getUid())
                         .name("message"));
             }
+        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+            log.debug("SSE connection no longer usable during stream message: {}", e.getMessage());
         } catch (Exception e) {
             log.error("Error sending stream message", e);
         }
@@ -952,6 +974,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         .name("message"));
                 emitter.complete();
             }
+        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+            log.debug("SSE connection no longer usable during stream end: {}", e.getMessage());
         } catch (Exception e) {
             log.error("Error sending stream end message", e);
         }
@@ -992,13 +1016,20 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         try {
-            // 尝试发送一个心跳消息，如果emitter已完成则会抛出异常
-            // 使用一个空注释作为心跳，这不会影响客户端
-            emitter.send(SseEmitter.event().comment("heartbeat"));
-            return false; // 如果发送成功，则表示emitter未完成
+            // 通过反射检查SseEmitter的内部状态，避免实际发送消息
+            java.lang.reflect.Field timeoutField = emitter.getClass().getDeclaredField("timeout");
+            timeoutField.setAccessible(true);
+            Long timeout = (Long) timeoutField.get(emitter);
+            
+            // 如果超时时间为null或负数，通常表示emitter已完成
+            if (timeout != null && timeout <= 0) {
+                return true;
+            }
+            
+            return false; // 假设emitter仍然活跃
         } catch (Exception e) {
-            // 如果发送失败，说明emitter已经完成或关闭
-            log.debug("Emitter appears to be completed: {}", e.getMessage());
+            // 如果无法检查状态，保守地假设emitter已完成
+            log.debug("Unable to check emitter status, assuming completed: {}", e.getMessage());
             return true;
         }
     }
