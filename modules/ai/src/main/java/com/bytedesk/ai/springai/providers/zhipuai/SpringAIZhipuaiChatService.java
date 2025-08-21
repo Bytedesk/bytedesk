@@ -14,7 +14,6 @@
 package com.bytedesk.ai.springai.providers.zhipuai;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -24,13 +23,12 @@ import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.provider.LlmProviderEntity;
-import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -43,19 +41,23 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * Spring AI ZhiPuAI服务
- * @deprecated 请使用ZhipuaiService替代
+ * Spring AI ZhiPuAI聊天服务
  */
 @Slf4j
 @Service
-// @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIZhipuaiService extends BaseSpringAIService {
+@ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIZhipuaiChatService extends BaseSpringAIService {
 
     @Autowired
-    private LlmProviderRestService llmProviderRestService;
+    @Qualifier("bytedeskZhipuaiChatModel")
+    private ZhiPuAiChatModel bytedeskZhipuaiChatModel;
+
+    @Autowired
+    @Qualifier("bytedeskZhipuaiApi")
+    private ZhiPuAiApi bytedeskZhipuaiApi;
 
     
-    public SpringAIZhipuaiService() {
+    public SpringAIZhipuaiChatService() {
         super(); // 调用基类的无参构造函数
     }
 
@@ -65,7 +67,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private ZhiPuAiChatOptions createZhipuaiOptions(RobotLlm llm) {
+    private ZhiPuAiChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
             ZhiPuAiChatOptions.builder()
                 .model(robotLlm.getTextModel())
@@ -75,31 +77,29 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         );
     }
 
-    public ZhiPuAiApi createZhipuaiApi(String apiKey) {
-        return new ZhiPuAiApi(apiKey);
-    }
-
     /**
      * 根据机器人配置创建动态的ZhiPuAiChatModel
      * 
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的ZhiPuAiChatModel
      */
-    private ZhiPuAiChatModel createZhipuaiChatModel(RobotLlm llm) {
+    private ZhiPuAiChatModel createDynamicChatModel(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            // 如果没有指定模型或设置，使用默认配置
+            return bytedeskZhipuaiChatModel;
+        }
 
-        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
-        if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+        try {
+            ZhiPuAiChatOptions options = createDynamicOptions(llm);
+            if (options == null) {
+                return bytedeskZhipuaiChatModel;
+            }
+
+            return new ZhiPuAiChatModel(bytedeskZhipuaiApi, options);
+        } catch (Exception e) {
+            log.error("Error creating dynamic chat model for model {}", llm.getTextModel(), e);
+            return bytedeskZhipuaiChatModel;
         }
-        // 使用动态的ZhiPuAiApi实例
-        LlmProviderEntity provider = llmProviderOptional.get();
-        ZhiPuAiApi zhipuaiApi = createZhipuaiApi(provider.getApiKey());
-        ZhiPuAiChatOptions options = createZhipuaiOptions(llm);
-        if (options == null) {
-            return null;
-        }
-        return new ZhiPuAiChatModel(zhipuaiApi, options);
     }
 
     /**
@@ -111,19 +111,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API websocket fullPromptContent: {}", fullPromptContent);
-        if (llm == null) {
-            log.info("Zhipuai API not available");
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "Zhipuai service is not available", messageProtobufReply);
-            return;
-        }
 
         // 获取适当的模型实例
-        ZhiPuAiChatModel chatModel = createZhipuaiChatModel(llm);
-        if (chatModel == null) {
-            log.info("Zhipuai API not available");
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "Zhipuai service is not available", messageProtobufReply);
-            return;
-        }
+        ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
