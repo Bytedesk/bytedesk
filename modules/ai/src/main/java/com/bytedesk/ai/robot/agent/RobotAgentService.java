@@ -29,7 +29,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.springai.service.SpringAIService;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
-import com.bytedesk.kbase.faq.FaqRequest;
+import com.bytedesk.kbase.llm_faq.FaqRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

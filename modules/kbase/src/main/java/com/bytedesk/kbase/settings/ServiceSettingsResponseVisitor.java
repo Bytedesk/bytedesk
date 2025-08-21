@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.kbase.faq.FaqResponseVisitor;
+import com.bytedesk.kbase.llm_faq.FaqResponseVisitor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

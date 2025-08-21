@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.kbase.faq.FaqResponse;
+import com.bytedesk.kbase.llm_faq.FaqResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

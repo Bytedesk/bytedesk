@@ -20,8 +20,10 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.kbase.faq.mq.FaqMessageService;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.llm_faq.FaqRepository;
+import com.bytedesk.kbase.llm_faq.mq.FaqMessageService;
 
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;

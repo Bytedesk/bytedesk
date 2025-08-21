@@ -52,8 +52,8 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqRestService;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;

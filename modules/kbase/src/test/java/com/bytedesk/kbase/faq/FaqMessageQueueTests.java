@@ -19,11 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bytedesk.kbase.faq.elastic.FaqElasticService;
-import com.bytedesk.kbase.faq.mq.FaqIndexConsumer;
-import com.bytedesk.kbase.faq.mq.FaqIndexMessage;
-import com.bytedesk.kbase.faq.mq.FaqMessageService;
-import com.bytedesk.kbase.faq.vector.FaqVectorService;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.llm_faq.FaqRepository;
+import com.bytedesk.kbase.llm_faq.FaqRestService;
+import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
+import com.bytedesk.kbase.llm_faq.mq.FaqIndexConsumer;
+import com.bytedesk.kbase.llm_faq.mq.FaqIndexMessage;
+import com.bytedesk.kbase.llm_faq.mq.FaqMessageService;
+import com.bytedesk.kbase.llm_faq.vector.FaqVectorService;
 
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;

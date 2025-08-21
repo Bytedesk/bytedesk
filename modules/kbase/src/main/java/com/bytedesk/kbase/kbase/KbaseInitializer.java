@@ -21,9 +21,9 @@ import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedInitializer;
 import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordInitializer;
-import com.bytedesk.kbase.faq.FaqInitializer;
-import com.bytedesk.kbase.file.FileInitializer;
+import com.bytedesk.kbase.llm_file.FileInitializer;
 import com.bytedesk.kbase.llm_chunk.ChunkInitializer;
+import com.bytedesk.kbase.llm_faq.FaqInitializer;
 import com.bytedesk.kbase.llm_text.TextInitializer;
 import com.bytedesk.kbase.quick_reply.QuickReplyInitializer;
 

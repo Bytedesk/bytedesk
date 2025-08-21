@@ -27,9 +27,9 @@ import com.bytedesk.kbase.article_archive.ArticleArchiveEntity;
 import com.bytedesk.kbase.article_archive.ArticleArchiveResponse;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseResponse;
-import com.bytedesk.kbase.faq.FaqEntity;
-import com.bytedesk.kbase.faq.FaqResponse;
-import com.bytedesk.kbase.faq.FaqResponseSimple;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.llm_faq.FaqResponse;
+import com.bytedesk.kbase.llm_faq.FaqResponseSimple;
 
 @UtilityClass
 public class KbaseConvertUtils {

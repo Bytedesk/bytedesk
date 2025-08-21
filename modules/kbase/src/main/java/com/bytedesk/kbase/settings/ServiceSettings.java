@@ -23,7 +23,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.kbase.faq.FaqEntity;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

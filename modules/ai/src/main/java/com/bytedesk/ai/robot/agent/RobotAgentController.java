@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.kbase.faq.FaqRequest;
+import com.bytedesk.kbase.llm_faq.FaqRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

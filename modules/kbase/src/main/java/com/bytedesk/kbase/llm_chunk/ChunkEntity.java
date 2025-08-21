@@ -20,7 +20,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.kbase.file.FileEntity;
+import com.bytedesk.kbase.llm_file.FileEntity;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 
 import jakarta.persistence.Column;

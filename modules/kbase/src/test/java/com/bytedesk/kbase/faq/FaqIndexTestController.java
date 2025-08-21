@@ -30,7 +30,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.kbase.faq.mq.FaqMessageService;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.llm_faq.FaqRestService;
+import com.bytedesk.kbase.llm_faq.mq.FaqMessageService;
 
 import lombok.extern.slf4j.Slf4j;
 
