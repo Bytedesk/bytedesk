@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 11:22:10
+ * @LastEditTime: 2025-08-21 13:32:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,16 +11,18 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.providers.tencent;
+package com.bytedesk.ai.springai.providers.deepseek;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-// import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -39,39 +40,42 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * Tencent接口
+ * DeepSeek接口
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/tencent")
+@RequestMapping("/api/v1/deepseek")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.tencent.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAITencentController {
+@ConditionalOnProperty(prefix = "spring.ai.deepseek.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIDeepseekChatController {
 
+    @Autowired(required = false)
+    @Qualifier("deepseekChatModel")
+    private ChatModel deepseekChatModel;
+    
     private final BytedeskProperties bytedeskProperties;
-    private final SpringAITencentService springAITencentService;
-    // private final UidUtils uidUtils;
+    private final SpringAIDeepseekChatService springAIDeepseekService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/tencent/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
+            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
         
-        String response = springAITencentService.processPromptSync(message, null, "");
+        String response = springAIDeepseekService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/tencent/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -82,7 +86,7 @@ public class SpringAITencentController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAITencentService.getChatModel();
+        ChatModel model = deepseekChatModel;
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -92,7 +96,7 @@ public class SpringAITencentController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/tencent/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -106,7 +110,7 @@ public class SpringAITencentController {
         
         executorService.execute(() -> {
             try {
-                // springAITencentService.processPromptSSE(message, emitter);
+                // springAIDeepseekService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);
@@ -128,27 +132,27 @@ public class SpringAITencentController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/api/v1/tencent/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/deepseek/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
+            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
         
-        OpenAiChatModel model = springAITencentService.getChatModel();
+        ChatModel model = deepseekChatModel;
         if (model == null) {
-            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
+            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
 
         try {
             ChatResponse response = model.call(
                 new Prompt(
                     message,
-                    OpenAiChatOptions.builder()
-                        .model("tencent-chat")
+                    DeepSeekChatOptions.builder()
+                        .model("deepseek-chat")
                         .temperature(0.7)
                         .topP(0.9)
                         .build()

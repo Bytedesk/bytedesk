@@ -3,7 +3,6 @@ package com.bytedesk.ai.springai.providers.ollama;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import io.github.ollama4j.OllamaAPI;
 import io.github.ollama4j.models.ps.ModelsProcessResponse;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 // https://ollama4j.github.io/ollama4j/apis-model-management/list-library-models
 @Slf4j
 @Service
-// @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jService {
 
     @Value("${spring.ai.ollama.embedding.options.model:bge-m3:latest}")

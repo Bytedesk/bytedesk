@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 11:48:23
+ * @LastEditTime: 2025-08-21 13:40:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.providers.gitee;
+package com.bytedesk.ai.springai.providers.openai;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-// import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -39,39 +38,38 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * Gitee接口
+ * Openai接口
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/gitee")
+@RequestMapping("/api/v1/openai")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.gitee.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIGiteeController {
+@ConditionalOnProperty(prefix = "spring.ai.openai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIOpenaiChatController {
 
     private final BytedeskProperties bytedeskProperties;
-    private final SpringAIGiteeService springAIGiteeService;
-    // private final UidUtils uidUtils;
+    private final SpringAIOpenaiChatService springAIOpenaiService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/gitee/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
         }
         
-        String response = springAIGiteeService.processPromptSync(message, null, "");
+        String response = springAIOpenaiService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/gitee/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -82,7 +80,7 @@ public class SpringAIGiteeController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAIGiteeService.getChatModel();
+        OpenAiChatModel model = springAIOpenaiService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -92,7 +90,7 @@ public class SpringAIGiteeController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/gitee/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -106,7 +104,7 @@ public class SpringAIGiteeController {
         
         executorService.execute(() -> {
             try {
-                // springAIGiteeService.processPromptSSE(message, emitter);
+                // springAIOpenaiService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);
@@ -128,19 +126,19 @@ public class SpringAIGiteeController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/api/v1/gitee/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/openai/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
         }
         
-        OpenAiChatModel model = springAIGiteeService.getChatModel();
+        OpenAiChatModel model = springAIOpenaiService.getChatModel();
         if (model == null) {
-            return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
         }
 
         try {
@@ -148,7 +146,7 @@ public class SpringAIGiteeController {
                 new Prompt(
                     message,
                     OpenAiChatOptions.builder()
-                        .model("gitee-chat")
+                        .model("openai-chat")
                         .temperature(0.7)
                         .topP(0.9)
                         .build()

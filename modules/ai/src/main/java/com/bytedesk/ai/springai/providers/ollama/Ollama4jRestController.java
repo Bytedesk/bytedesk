@@ -37,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/v1/ollama4j")
 @RequiredArgsConstructor
-// @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jRestController {
 
     private final Ollama4jService ollama4jService;

@@ -7,7 +7,7 @@
  * <ul>
  *   <li>{@link com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService} - SiliconFlow AI 服务实现，提供对话生成、FAQ生成等核心功能</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowConfig} - SiliconFlow AI 服务配置类，包含API密钥和模型设置</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowController} - SiliconFlow AI 服务的REST API控制器</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowChatController} - SiliconFlow AI 服务的REST API控制器</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.siliconflow.SiliconFlowApi} - 与SiliconFlow AI API交互的底层接口</li>
  * </ul>
  * 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 13:45:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:10:14
+ * @LastEditTime: 2025-08-21 13:28:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,7 +15,10 @@ package com.bytedesk.ai.springai.providers.ollama;
 
 import java.io.IOException;
 
-// import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,17 +46,15 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/v1/ollama4j/chat")
 @RequiredArgsConstructor
-// @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jChatController {
 
-    // @Autowired
-    // @Qualifier("ollama4jApi")
-    // private OllamaAPI ollama4jApi;
+    @Autowired
+    @Qualifier("ollama4jApi")
+    private OllamaAPI ollama4jApi;
 
-    // @Value("${spring.ai.ollama.chat.options.model}")
-    // private String ollamaDefaultModel;
-
-    private final Ollama4jService ollama4jService;
+    @Value("${spring.ai.ollama.chat.options.model}")
+    private String ollamaDefaultModel;
 
     // 同步接口
     // http://127.0.0.1:9003/ollama4j/chat/sync?message=Tell%20me%20a%20j&apiUrl=http://127.0.0.1:11474&model=llama3
@@ -62,8 +63,7 @@ public class Ollama4jChatController {
         //
         OllamaResult result;
         try {
-            OllamaAPI ollamaAPI = ollama4jService.createOllamaAPI(request);
-            result = ollamaAPI.generate(request.getModel(), request.getMessage(), false, new OptionsBuilder().build());
+            result = ollama4jApi.generate(request.getModel(), request.getMessage(), false, new OptionsBuilder().build());
 
             return ResponseEntity.ok(JsonResult.success(result.getResponse()));
         } catch (Exception e) {
@@ -82,7 +82,6 @@ public class Ollama4jChatController {
         };
         //
         try {
-            OllamaAPI ollama4jApi = ollama4jService.createOllamaAPI(request);
             // Should be called using separate thread to gain non blocking streaming effect.
             OllamaResult result = ollama4jApi.generate(request.getModel(), request.getMessage(),
                     false,
@@ -128,7 +127,6 @@ public class Ollama4jChatController {
                         JsonResultCodeEnum.ROBOT_ANSWER_START.getValue(),
                         JsonResultCodeEnum.ROBOT_ANSWER_START.getName())));
 
-                OllamaAPI ollama4jApi = ollama4jService.createOllamaAPI(request);
                 ollama4jApi.generate(request.getModel(), request.getMessage(), false, new OptionsBuilder().build(), streamHandler);
                 // 发送完成事件
                 emitter.send(SseEmitter.event().data(JsonResult.success(
@@ -153,7 +151,6 @@ public class Ollama4jChatController {
     public ResponseEntity<?> getAsyncAnswer(OllamaRequest request)
             throws InterruptedException {
 
-        OllamaAPI ollama4jApi = ollama4jService.createOllamaAPI(request);
         OllamaAsyncResultStreamer streamer = ollama4jApi.generateAsync(request.getModel(), request.getMessage(), false);
         // Set the poll interval according to your needs.
         // Smaller the poll interval, more frequently you receive the tokens.
@@ -186,7 +183,6 @@ public class Ollama4jChatController {
         OllamaChatResult chatResult;
         try {
 
-            OllamaAPI ollama4jApi = ollama4jService.createOllamaAPI(request);
             // "start" conversation with model
             chatResult = ollama4jApi.chat(requestModel);
 

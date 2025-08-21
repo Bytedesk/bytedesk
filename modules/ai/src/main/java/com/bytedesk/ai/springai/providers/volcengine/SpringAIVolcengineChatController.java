@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-22 08:34:15
+ * @LastEditTime: 2025-08-21 13:41:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,18 +11,16 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.providers.minimax;
+package com.bytedesk.ai.springai.providers.volcengine;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.minimax.MiniMaxChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+// import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -40,43 +39,39 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * DeepSeek接口
+ * Volcengine接口
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/minimax")
+@RequestMapping("/api/v1/volcengine")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.minimax.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIMinimaxController {
+@ConditionalOnProperty(prefix = "spring.ai.volcengine.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIVolcengineChatController {
 
-    @Autowired(required = false)
-    @Qualifier("minimaxChatModel")
-    private ChatModel minimaxChatModel;
-    
     private final BytedeskProperties bytedeskProperties;
-    private final SpringAIMinimaxService springAIMinimaxService;
+    private final SpringAIVolcengineService springAIVolcengineService;
     // private final UidUtils uidUtils;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/minimax/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/volcengine/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Volcengine service is not available"));
         }
         
-        String response = springAIMinimaxService.processPromptSync(message, null, "");
+        String response = springAIVolcengineService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/minimax/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/volcengine/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -87,7 +82,7 @@ public class SpringAIMinimaxController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        ChatModel model = minimaxChatModel;
+        OpenAiChatModel model = springAIVolcengineService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -97,7 +92,7 @@ public class SpringAIMinimaxController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/minimax/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/volcengine/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -111,7 +106,7 @@ public class SpringAIMinimaxController {
         
         executorService.execute(() -> {
             try {
-                // springAIMinimaxService.processPromptSSE(message, emitter);
+                // springAIVolcengineService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);
@@ -133,27 +128,27 @@ public class SpringAIMinimaxController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/api/v1/minimax/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/volcengine/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Volcengine service is not available"));
         }
         
-        ChatModel model = minimaxChatModel;
+        OpenAiChatModel model = springAIVolcengineService.getChatModel();
         if (model == null) {
-            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Volcengine service is not available"));
         }
 
         try {
             ChatResponse response = model.call(
                 new Prompt(
                     message,
-                    MiniMaxChatOptions.builder()
-                        .model("minimax-chat")
+                    OpenAiChatOptions.builder()
+                        .model("volcengine-chat")
                         .temperature(0.7)
                         .topP(0.9)
                         .build()

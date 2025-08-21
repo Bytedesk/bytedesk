@@ -20,7 +20,7 @@
  * <ul>
  *   <li>{@link com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService} - 火山引擎 AI 服务实现，提供对话生成、FAQ生成等核心功能</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineConfig} - 火山引擎 AI 服务配置类，包含API密钥和模型设置</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineController} - 火山引擎 AI 服务的REST API控制器</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineChatController} - 火山引擎 AI 服务的REST API控制器</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.volcengine.VolcengineApi} - 与火山引擎 AI API交互的底层接口</li>
  * </ul>
  * 

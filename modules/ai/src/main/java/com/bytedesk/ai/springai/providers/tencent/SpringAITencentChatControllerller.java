@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 11:22:02
+ * @LastEditTime: 2025-08-21 13:41:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.providers.openrouter;
+package com.bytedesk.ai.springai.providers.tencent;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+// import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -38,38 +39,39 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * Openrouter接口
+ * Tencent接口
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/openrouter")
+@RequestMapping("/api/v1/tencent")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.openrouter.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIOpenrouterController {
+@ConditionalOnProperty(prefix = "spring.ai.tencent.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAITencentChatControllerller {
 
     private final BytedeskProperties bytedeskProperties;
-    private final SpringAIOpenrouterService springAIOpenrouterService;
+    private final SpringAITencentService springAITencentService;
+    // private final UidUtils uidUtils;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/openrouter/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Openrouter service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
         }
         
-        String response = springAIOpenrouterService.processPromptSync(message, null, "");
+        String response = springAITencentService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/openrouter/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -80,7 +82,7 @@ public class SpringAIOpenrouterController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAIOpenrouterService.getChatModel();
+        OpenAiChatModel model = springAITencentService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -90,7 +92,7 @@ public class SpringAIOpenrouterController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/openrouter/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -104,7 +106,7 @@ public class SpringAIOpenrouterController {
         
         executorService.execute(() -> {
             try {
-                // springAIOpenrouterService.processPromptSSE(message, emitter);
+                // springAITencentService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);
@@ -126,19 +128,19 @@ public class SpringAIOpenrouterController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/api/v1/openrouter/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/tencent/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Openrouter service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
         }
         
-        OpenAiChatModel model = springAIOpenrouterService.getChatModel();
+        OpenAiChatModel model = springAITencentService.getChatModel();
         if (model == null) {
-            return ResponseEntity.ok(JsonResult.error("Openrouter service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
         }
 
         try {
@@ -146,7 +148,7 @@ public class SpringAIOpenrouterController {
                 new Prompt(
                     message,
                     OpenAiChatOptions.builder()
-                        .model("openrouter-chat")
+                        .model("tencent-chat")
                         .temperature(0.7)
                         .topP(0.9)
                         .build()

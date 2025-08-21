@@ -8,7 +8,7 @@
  * <ul>
  *   <li>{@link com.bytedesk.ai.springai.providers.custom.SpringAICustomService} - 自定义 AI 服务实现，提供对话生成、FAQ生成等核心功能</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.custom.SpringAICustomConfig} - 自定义 AI 服务配置类，包含API端点、密钥和模型设置</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.custom.SpringAICustomController} - 自定义 AI 服务的REST API控制器</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.custom.SpringAICustomChatController} - 自定义 AI 服务的REST API控制器</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.custom.CustomApi} - 与自定义 AI API交互的底层接口</li>
  * </ul>
  * 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:10:36
+ * @LastEditTime: 2025-08-21 13:38:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.providers.openai;
+package com.bytedesk.ai.springai.providers.baidu;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,38 +38,38 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * Openai接口
+ * Baidu接口
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/openai")
+@RequestMapping("/api/v1/baidu")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "spring.ai.openai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class SpringAIOpenaiController {
+@ConditionalOnProperty(prefix = "spring.ai.baidu.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIBaiduChatController {
 
     private final BytedeskProperties bytedeskProperties;
-    private final SpringAIOpenaiService springAIOpenaiService;
+    private final SpringAIBaiduService springAIBaiduService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/openai/chat/sync?message=hello
+     * http://127.0.0.1:9003/api/v1/baidu/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Baidu service is not available"));
         }
         
-        String response = springAIOpenaiService.processPromptSync(message, null, "");
+        String response = springAIBaiduService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/openai/chat/stream?message=hello
+     * http://127.0.0.1:9003/api/v1/baidu/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -80,7 +80,7 @@ public class SpringAIOpenaiController {
         }
         
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAIOpenaiService.getChatModel();
+        OpenAiChatModel model = springAIBaiduService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -90,7 +90,7 @@ public class SpringAIOpenaiController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/openai/chat/sse?message=hello
+     * http://127.0.0.1:9003/api/v1/baidu/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
@@ -104,7 +104,7 @@ public class SpringAIOpenaiController {
         
         executorService.execute(() -> {
             try {
-                // springAIOpenaiService.processPromptSSE(message, emitter);
+                // springAIBaiduService.processPromptSSE(message, emitter);
             } catch (Exception e) {
                 log.error("Error processing SSE request", e);
                 emitter.completeWithError(e);
@@ -126,19 +126,19 @@ public class SpringAIOpenaiController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/api/v1/openai/chat/custom?message=hello
+     * http://127.0.0.1:9003/api/v1/baidu/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Baidu service is not available"));
         }
         
-        OpenAiChatModel model = springAIOpenaiService.getChatModel();
+        OpenAiChatModel model = springAIBaiduService.getChatModel();
         if (model == null) {
-            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
+            return ResponseEntity.ok(JsonResult.error("Baidu service is not available"));
         }
 
         try {
@@ -146,7 +146,7 @@ public class SpringAIOpenaiController {
                 new Prompt(
                     message,
                     OpenAiChatOptions.builder()
-                        .model("openai-chat")
+                        .model("baidu-chat")
                         .temperature(0.7)
                         .topP(0.9)
                         .build()

@@ -7,7 +7,7 @@
  * <ul>
  *   <li>{@link com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService} - Gitee AI 服务实现，提供对话生成、FAQ生成等核心功能</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeConfig} - Gitee AI 服务配置类，包含API密钥和模型设置</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeController} - Gitee AI 服务的REST API控制器</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeChatController} - Gitee AI 服务的REST API控制器</li>
  *   <li>{@link com.bytedesk.ai.springai.providers.gitee.GiteeApi} - 与Gitee AI API交互的底层接口</li>
  * </ul>
  * 
