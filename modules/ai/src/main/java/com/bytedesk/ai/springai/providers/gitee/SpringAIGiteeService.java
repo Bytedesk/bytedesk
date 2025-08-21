@@ -14,18 +14,22 @@
 package com.bytedesk.ai.springai.providers.gitee;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.provider.LlmProviderEntity;
+import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -41,8 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.gitee.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIGiteeService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private OpenAiChatModel giteeChatModel;
+    @Autowired
+    private LlmProviderRestService llmProviderRestService;
 
     public SpringAIGiteeService() {
         super(); // 调用基类的无参构造函数
@@ -64,6 +68,40 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         );
     }
 
+    /**
+     * 根据机器人配置创建动态的OpenAiChatModel
+     * 
+     * @param llm 机器人LLM配置
+     * @return 配置了特定模型的OpenAiChatModel
+     */
+    private OpenAiChatModel createGiteeChatModel(RobotLlm llm) {
+
+        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
+        if (llmProviderOptional.isEmpty()) {
+            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
+            return null;
+        }
+        
+        LlmProviderEntity provider = llmProviderOptional.get();
+        
+        // 创建 OpenAiApi 实例
+        OpenAiApi openAiApi = OpenAiApi.builder()
+                .baseUrl(provider.getApiUrl())
+                .apiKey(provider.getApiKey())
+                .build();
+        
+        // 创建选项
+        OpenAiChatOptions options = createDynamicOptions(llm);
+        if (options == null) {
+            return null;
+        }
+        
+        return OpenAiChatModel.builder()
+                .openAiApi(openAiApi)
+                .defaultOptions(options)
+                .build();
+    }
+
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
@@ -71,6 +109,13 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
+        if (llm == null) {
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "Gitee服务不可用", messageProtobufReply);
+            return;
+        }
+
+        // 获取适当的模型实例
+        OpenAiChatModel giteeChatModel = createGiteeChatModel(llm);
         if (giteeChatModel == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, "Gitee服务不可用", messageProtobufReply);
             return;
@@ -127,6 +172,14 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
         try {
+            // 从robot中获取llm配置
+            RobotLlm llm = robot.getLlm();
+            if (llm == null) {
+                return "Gitee service is not available";
+            }
+
+            // 获取适当的模型实例
+            OpenAiChatModel giteeChatModel = createGiteeChatModel(llm);
             if (giteeChatModel == null) {
                 return "Gitee service is not available";
             }
@@ -176,6 +229,14 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         RobotLlm llm = robot.getLlm();
 
+        if (llm == null) {
+            handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery,
+                    messageProtobufReply, emitter);
+            return;
+        }
+
+        // 获取适当的模型实例
+        OpenAiChatModel giteeChatModel = createGiteeChatModel(llm);
         if (giteeChatModel == null) {
             handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery,
                     messageProtobufReply, emitter);
@@ -240,17 +301,14 @@ public class SpringAIGiteeService extends BaseSpringAIService {
 
 
     public OpenAiChatModel getChatModel() {
-        return giteeChatModel;
+        // 动态创建chatModel，不再返回静态实例
+        return null;
     }
 
     public Boolean isServiceHealthy() {
-        if (giteeChatModel == null) {
-            return false;
-        }
-
         try {
-            String response = processPromptSync("test", null, "");
-            return !response.contains("不可用") && !response.equals("Gitee service is not available");
+            // 简单的健康检查，通过LlmProviderRestService是否可用来判断
+            return llmProviderRestService != null;
         } catch (Exception e) {
             log.error("Error checking Gitee service health", e);
             return false;

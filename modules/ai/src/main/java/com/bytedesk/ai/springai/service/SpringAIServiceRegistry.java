@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
+import com.bytedesk.ai.springai.providers.custom.SpringAICustomService;
 import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
@@ -55,6 +56,7 @@ public class SpringAIServiceRegistry {
     private final Optional<SpringAIBaiduService> springAIBaiduService;
     private final Optional<SpringAIVolcengineService> springAIVolcengineService;
     private final Optional<SpringAIMinimaxService> springAIMinimaxService;
+    private final Optional<SpringAICustomService> springAICustomService;
 
     // 服务注册表，用于存储各种AI服务提供商的实现
     private final Map<String, SpringAIService> serviceRegistry = new HashMap<>();
@@ -73,6 +75,7 @@ public class SpringAIServiceRegistry {
         registerService(LlmConsts.BAIDU, springAIBaiduService.orElse(null));
         registerService(LlmConsts.VOLCENGINE, springAIVolcengineService.orElse(null));
         registerService(LlmConsts.MINIMAX, springAIMinimaxService.orElse(null));
+        registerService(LlmConsts.CUSTOM, springAICustomService.orElse(null));
         
         log.info("SpringAI服务注册表初始化完成，注册了{}个服务", serviceRegistry.size());
     }

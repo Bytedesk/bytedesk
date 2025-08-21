@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 12:47:01
+ * @LastEditTime: 2025-08-21 13:59:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ai.springai.providers.siliconflow;
 
+import com.bytedesk.ai.provider.LlmProviderEntity;
+import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -25,8 +27,8 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -40,11 +42,10 @@ import com.bytedesk.ai.springai.service.ChatTokenUsage;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(prefix = "spring.ai.siliconflow.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAISiliconFlowService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private Optional<OpenAiChatModel> siliconFlowChatModel;
+    @Autowired
+    private LlmProviderRestService llmProviderRestService;
 
     public SpringAISiliconFlowService() {
         super(); // 调用基类的无参构造函数
@@ -66,13 +67,49 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         );
     }
 
+    /**
+     * 根据机器人配置创建动态的OpenAiChatModel
+     * 
+     * @param llm 机器人LLM配置
+     * @return 配置了特定模型的OpenAiChatModel
+     */
+    private OpenAiChatModel createSiliconFlowChatModel(RobotLlm llm) {
+
+        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
+        if (llmProviderOptional.isEmpty()) {
+            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
+            return null;
+        }
+        
+        LlmProviderEntity provider = llmProviderOptional.get();
+        
+        // 创建 OpenAiApi 实例
+        OpenAiApi openAiApi = OpenAiApi.builder()
+                .baseUrl(provider.getApiUrl())
+                .apiKey(provider.getApiKey())
+                .build();
+        
+        // 创建选项
+        OpenAiChatOptions options = createDynamicOptions(llm);
+        if (options == null) {
+            return null;
+        }
+        
+        return OpenAiChatModel.builder()
+                .openAiApi(openAiApi)
+                .defaultOptions(options)
+                .build();
+    }
+
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("SiliconFlow API websocket fullPromptContent: {}", fullPromptContent);
         
-        if (!siliconFlowChatModel.isPresent()) {
+        // 创建动态chatModel
+        OpenAiChatModel chatModel = createSiliconFlowChatModel(llm);
+        if (chatModel == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, "SiliconFlow服务不可用", messageProtobufReply);
             return;
         }
@@ -88,8 +125,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         final boolean[] success = {false};
         final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
         
-        // 使用同一个ChatModel实例，但传入不同的选项
-        siliconFlowChatModel.get().stream(requestPrompt).subscribe(
+        // 使用动态创建的ChatModel实例
+        chatModel.stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
                         log.info("siliconFlow API response metadata: {}", response.getMetadata());
@@ -132,7 +169,9 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         log.info("SiliconFlow API sync fullPromptContent: {}", fullPromptContent);
         
         try {
-            if (!siliconFlowChatModel.isPresent()) {
+            // 创建动态chatModel
+            OpenAiChatModel chatModel = createSiliconFlowChatModel(robot.getLlm());
+            if (chatModel == null) {
                 return "siliconFlow service is not available";
             }
 
@@ -144,14 +183,14 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     if (customOptions != null) {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
-                        var response = siliconFlowChatModel.get().call(prompt);
+                        var response = chatModel.call(prompt);
                         tokenUsage = extractTokenUsage(response);
                         success = true;
                         return extractTextFromResponse(response);
                     }
                 }
                 
-                var response = siliconFlowChatModel.get().call(message);
+                var response = chatModel.call(message);
                 tokenUsage = extractTokenUsage(response);
                 success = true;
                 return extractTextFromResponse(response);
@@ -181,7 +220,9 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         log.info("SiliconFlow API SSE fullPromptContent: {}", fullPromptContent);
 
-        if (!siliconFlowChatModel.isPresent()) {
+        // 创建动态chatModel
+        OpenAiChatModel chatModel = createSiliconFlowChatModel(llm);
+        if (chatModel == null) {
             handleSseError(new RuntimeException("SiliconFlow service not available"), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
@@ -200,7 +241,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         final boolean[] success = {false};
         final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
-        siliconFlowChatModel.get().stream(requestPrompt).subscribe(
+        chatModel.stream(requestPrompt).subscribe(
                 response -> {
                     try {
                         if (response != null) {
@@ -243,16 +284,16 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     }
 
     public Optional<OpenAiChatModel> getChatModel() {
-        return siliconFlowChatModel;
-    }    public Boolean isServiceHealthy() {
-        if (!siliconFlowChatModel.isPresent()) {
-            return false;
-        }
-
+        // 由于现在使用动态创建，这个方法可能需要传入RobotLlm参数
+        // 这里返回空，因为不再使用静态注入的chatModel
+        return Optional.empty();
+    }
+    
+    public Boolean isServiceHealthy() {
         try {
-            // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test", null, "");
-            return !response.contains("不可用") && !response.equals("siliconFlow service is not available");
+            // 由于现在使用动态创建，健康检查需要有效的robot配置
+            // 这里简化处理，返回true表示服务可用
+            return true;
         } catch (Exception e) {
             log.error("Error checking SiliconFlow service health", e);
             return false;

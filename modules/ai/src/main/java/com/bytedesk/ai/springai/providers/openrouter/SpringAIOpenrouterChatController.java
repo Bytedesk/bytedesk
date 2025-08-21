@@ -48,7 +48,7 @@ import reactor.core.publisher.Flux;
 public class SpringAIOpenrouterChatController {
 
     private final BytedeskProperties bytedeskProperties;
-    private final SpringAIOpenrouterService springAIOpenrouterService;
+    private final SpringAIOpenrouterChatService springAIOpenrouterService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**

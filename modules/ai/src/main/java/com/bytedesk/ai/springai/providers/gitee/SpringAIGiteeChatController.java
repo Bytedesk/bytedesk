@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-13 13:41:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 13:39:26
+ * @LastEditTime: 2025-08-21 13:54:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -49,8 +49,7 @@ import reactor.core.publisher.Flux;
 public class SpringAIGiteeChatController {
 
     private final BytedeskProperties bytedeskProperties;
-    private final SpringAIGiteeService springAIGiteeService;
-    // private final UidUtils uidUtils;
+    private final SpringAIGiteeChatService springAIGiteeService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**

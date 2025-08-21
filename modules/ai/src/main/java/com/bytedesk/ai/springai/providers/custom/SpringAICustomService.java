@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 10:36:15
+ * @LastEditTime: 2025-08-21 13:58:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,18 +14,21 @@
 package com.bytedesk.ai.springai.providers.custom;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.provider.LlmProviderEntity;
+import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -36,14 +39,47 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(prefix = "spring.ai.custom.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAICustomService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private OpenAiChatModel customChatModel;
+    @Autowired
+    private LlmProviderRestService llmProviderRestService;
 
     public SpringAICustomService() {
         super(); // 调用基类的无参构造函数
+    }
+
+    /**
+     * 根据机器人配置创建动态的OpenAiChatModel
+     * 
+     * @param llm 机器人LLM配置
+     * @return 配置了特定模型的OpenAiChatModel
+     */
+    private OpenAiChatModel createCustomChatModel(RobotLlm llm) {
+
+        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
+        if (llmProviderOptional.isEmpty()) {
+            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
+            return null;
+        }
+        
+        LlmProviderEntity provider = llmProviderOptional.get();
+        
+        // 创建 OpenAiApi 实例
+        OpenAiApi openAiApi = OpenAiApi.builder()
+                .baseUrl(provider.getApiUrl())
+                .apiKey(provider.getApiKey())
+                .build();
+        
+        // 创建选项
+        OpenAiChatOptions options = createDynamicOptions(llm);
+        if (options == null) {
+            return null;
+        }
+        
+        return OpenAiChatModel.builder()
+                .openAiApi(openAiApi)
+                .defaultOptions(options)
+                .build();
     }
 
     /**
@@ -76,6 +112,13 @@ public class SpringAICustomService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         log.info("Custom API websocket fullPromptContent: {}", fullPromptContent);
         
+        if (llm == null) {
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "Custom服务不可用", messageProtobufReply);
+            return;
+        }
+
+        // 获取适当的模型实例
+        OpenAiChatModel customChatModel = createCustomChatModel(llm);
         if (customChatModel == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, "Custom服务不可用", messageProtobufReply);
             return;
@@ -123,6 +166,14 @@ public class SpringAICustomService extends BaseSpringAIService {
         log.info("Custom API sync fullPromptContent: {}", fullPromptContent);
         
         try {
+            // 从robot中获取llm配置
+            RobotLlm llm = robot.getLlm();
+            if (llm == null) {
+                return "Custom service is not available";
+            }
+
+            // 获取适当的模型实例
+            OpenAiChatModel customChatModel = createCustomChatModel(llm);
             if (customChatModel == null) {
                 return "Custom service is not available";
             }
@@ -139,7 +190,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                         return extractTextFromResponse(response);
                     }
                 }
-                
+
                 var response = customChatModel.call(message);
                 return extractTextFromResponse(response);
             } catch (Exception e) {
@@ -158,6 +209,13 @@ public class SpringAICustomService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         log.info("Custom API SSE fullPromptContent: {}", fullPromptContent);
 
+        if (llm == null) {
+            handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            return;
+        }
+
+        // 获取适当的模型实例
+        OpenAiChatModel customChatModel = createCustomChatModel(llm);
         if (customChatModel == null) {
             handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
@@ -204,17 +262,14 @@ public class SpringAICustomService extends BaseSpringAIService {
     }
 
     public OpenAiChatModel getChatModel() {
-        return customChatModel;
+        // 动态创建chatModel，不再返回静态实例
+        return null;
     }
     
     public Boolean isServiceHealthy() {
-        if (customChatModel == null) {
-            return false;
-        }
-
         try {
-            String response = processPromptSync("test", null, "");
-            return !response.contains("不可用") && !response.equals("Custom service is not available");
+            // 简单的健康检查，通过LlmProviderRestService是否可用来判断
+            return llmProviderRestService != null;
         } catch (Exception e) {
             log.error("Error checking Custom service health", e);
             return false;

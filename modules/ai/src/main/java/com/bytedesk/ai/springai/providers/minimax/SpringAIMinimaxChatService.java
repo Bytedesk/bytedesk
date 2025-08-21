@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 14:00:47
+ * @LastEditTime: 2025-08-21 13:56:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,24 +11,22 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.providers.openrouter;
+package com.bytedesk.ai.springai.providers.minimax;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.provider.LlmProviderEntity;
-import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
@@ -41,24 +39,27 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class SpringAIOpenrouterService extends BaseSpringAIService {
+@ConditionalOnProperty(prefix = "spring.ai.minimax.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+public class SpringAIMinimaxChatService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
+    @Autowired(required = false)
+    @Qualifier("minimaxChatModel")
+    private ChatModel minimaxChatModel;
 
-    public SpringAIOpenrouterService() {
+
+    public SpringAIMinimaxChatService() {
         super(); // 调用基类的无参构造函数
     }
-    
+
     /**
-     * 根据机器人配置创建动态的OpenAiChatOptions
+     * 根据机器人配置创建动态的MiniMaxChatOptions
      * 
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+    private MiniMaxChatOptions createDynamicOptions(RobotLlm llm) {
         return super.createDynamicOptions(llm, robotLlm -> 
-            OpenAiChatOptions.builder()
+            MiniMaxChatOptions.builder()
                 .model(robotLlm.getTextModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
@@ -66,57 +67,21 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
         );
     }
 
-    /**
-     * 根据机器人配置创建动态的OpenAiChatModel
-     * 
-     * @param llm 机器人LLM配置
-     * @return 配置了特定模型的OpenAiChatModel
-     */
-    private OpenAiChatModel createOpenrouterChatModel(RobotLlm llm) {
-
-        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
-        if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
-        }
-        
-        LlmProviderEntity provider = llmProviderOptional.get();
-        
-        // 创建 OpenAiApi 实例
-        OpenAiApi openAiApi = OpenAiApi.builder()
-                .baseUrl(provider.getApiUrl())
-                .apiKey(provider.getApiKey())
-                .build();
-        
-        // 创建选项
-        OpenAiChatOptions options = createDynamicOptions(llm);
-        if (options == null) {
-            return null;
-        }
-        
-        return OpenAiChatModel.builder()
-                .openAiApi(openAiApi)
-                .defaultOptions(options)
-                .build();
-    }
-
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
-        log.info("SpringAIOpenrouterService processPromptWebsocket with full prompt content: {}", fullPromptContent);
+        log.info("SpringAIMinimaxService processPromptWebsocket with full prompt content: {}", fullPromptContent);
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
-        // 创建动态chatModel
-        OpenAiChatModel chatModel = createOpenrouterChatModel(llm);
-        if (chatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "Openrouter服务不可用", messageProtobufReply);
+        if (minimaxChatModel == null) {
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "Minimax服务不可用", messageProtobufReply);
             return;
         }
         
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        MiniMaxChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
@@ -125,11 +90,11 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
         final boolean[] success = {false};
         final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
         
-        // 使用动态创建的ChatModel实例
-        chatModel.stream(requestPrompt).subscribe(
+        // 使用同一个ChatModel实例，但传入不同的选项
+        minimaxChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     if (response != null) {
-                        log.info("Openrouter API response metadata: {}", response.getMetadata());
+                        log.info("Minimax API response metadata: {}", response.getMetadata());
                         List<Generation> generations = response.getResults();
                         for (Generation generation : generations) {
                             AssistantMessage assistantMessage = generation.getOutput();
@@ -138,12 +103,12 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                             sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractTokenUsage(response);
+                        tokenUsage[0] = extractDeepSeekTokenUsage(response);
                         success[0] = true;
                     }
                 },
                 error -> {
-                    log.error("Openrouter API error: ", error);
+                    log.error("Minimax API error: ", error);
                     sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
                     success[0] = false;
                 },
@@ -151,54 +116,58 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "openrouter-chat";
-                    recordAiTokenUsage(robot, LlmConsts.OPENROUTER, modelType, 
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.DEEPSEEK;
+                    recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
-        log.info("SpringAIOpenrouterService processPromptSync with full prompt content: {}", fullPromptContent);
+        log.info("SpringAIMinimaxService processPromptSync with full prompt content: {}", fullPromptContent);
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
         try {
-            // 创建动态chatModel
-            OpenAiChatModel chatModel = createOpenrouterChatModel(robot.getLlm());
-            if (chatModel == null) {
-                return "Openrouter service is not available";
+            if (minimaxChatModel == null) {
+                return "Minimax service is not available";
             }
-            
-            // 如果有robot参数，尝试创建自定义选项
-            if (robot != null && robot.getLlm() != null) {
-                // 创建自定义选项
-                OpenAiChatOptions customOptions = createDynamicOptions(robot.getLlm());
-                if (customOptions != null) {
-                    // 使用自定义选项创建Prompt
-                    Prompt prompt = new Prompt(message, customOptions);
-                    var response = chatModel.call(prompt);
-                    tokenUsage = extractTokenUsage(response);
-                    success = true;
-                    return extractTextFromResponse(response);
+
+            try {
+                // 如果有robot参数，尝试创建自定义选项
+                if (robot != null && robot.getLlm() != null) {
+                    // 创建自定义选项
+                    MiniMaxChatOptions customOptions = createDynamicOptions(robot.getLlm());
+                    if (customOptions != null) {
+                        // 使用自定义选项创建Prompt
+                        Prompt prompt = new Prompt(message, customOptions);
+                        var response = minimaxChatModel.call(prompt);
+                        tokenUsage = extractDeepSeekTokenUsage(response);
+                        success = true;
+                        return extractTextFromResponse(response);
+                    }
                 }
+                
+                ChatResponse response = minimaxChatModel.call(new Prompt(message));
+                tokenUsage = extractDeepSeekTokenUsage(response);
+                success = true;
+                return extractTextFromResponse(response);
+            } catch (Exception e) {
+                log.error("Minimax API call error: ", e);
+                success = false;
+                return "服务暂时不可用，请稍后重试";
             }
-            
-            var response = chatModel.call(message);
-            tokenUsage = extractTokenUsage(response);
-            success = true;
-            return extractTextFromResponse(response);
         } catch (Exception e) {
-            log.error("Openrouter API sync error: ", e);
+            log.error("Minimax API sync error: ", e);
             success = false;
             return "服务暂时不可用，请稍后重试";
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
-                    ? robot.getLlm().getTextModel() : "openrouter-chat";
-            recordAiTokenUsage(robot, LlmConsts.OPENROUTER, modelType, 
+                    ? robot.getLlm().getTextModel() : LlmConsts.DEEPSEEK;
+            recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -206,22 +175,21 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
-        log.info("SpringAIOpenrouterService processPromptSse with full prompt content: {}", fullPromptContent);
-        // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
+        log.info("SpringAIMinimaxService processPromptSse with full prompt content: {}", fullPromptContent);
+        // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
-        // 创建动态chatModel
-        OpenAiChatModel chatModel = createOpenrouterChatModel(llm);
-        if (chatModel == null) {
-            handleSseError(new RuntimeException("Openrouter service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+        if (minimaxChatModel == null) {
+            handleSseError(new RuntimeException("Minimax service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
         sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
 
+        // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        MiniMaxChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
@@ -230,7 +198,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
         final boolean[] success = {false};
         final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
-        chatModel.stream(requestPrompt).subscribe(
+        minimaxChatModel.stream(requestPrompt).subscribe(
                 response -> {
                     try {
                         if (response != null) {
@@ -238,13 +206,13 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
-                                log.info("Openrouter API response metadata: {}, text {}",
+                                log.info("Minimax API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
                                 sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = extractDeepSeekTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
@@ -254,48 +222,84 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                     }
                 },
                 error -> {
-                    log.error("Openrouter API SSE error: ", error);
+                    log.error("Minimax API SSE error: ", error);
                     handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
-                    log.info("OpenRouter API SSE complete");
-                    // 发送流结束消息，包含token使用情况和prompt内容
+                    log.info("Minimax API SSE complete");
+                    // 发送流结束消息，包含token使用情况
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.OPENROUTER, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "openrouter-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.DEEPSEEK, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.DEEPSEEK);
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "openrouter-chat";
-                    recordAiTokenUsage(robot, LlmConsts.OPENROUTER, modelType, 
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.DEEPSEEK;
+                    recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
 
+    /**
+     * 专门为Minimax API提取token使用情况
+     * 由于Minimax API返回的usage字段是EmptyUsage对象，需要特殊处理
+     * 
+     * @param response ChatResponse对象
+     * @return TokenUsage对象
+     */
+    private ChatTokenUsage extractDeepSeekTokenUsage(ChatResponse response) {
+        try {
+            if (response == null) {
+                log.warn("Minimax API response is null");
+                return new ChatTokenUsage(0, 0, 0);
+            }
 
+            var metadata = response.getMetadata();
+            if (metadata == null) {
+                log.warn("Minimax API response metadata is null");
+                return new ChatTokenUsage(0, 0, 0);
+            }
 
-    // @Override
-    // protected String generateFaqPairs(String prompt) {
-    //     return openrouterChatModel != null ? openrouterChatModel.call(prompt) : "";
-    // }
+            log.info("Minimax API token extraction - metadata: {}", metadata);
 
+            // 直接通过getUsage()方法获取token使用情况，无需反射
+            try {
+                var usage = metadata.getUsage();
+                if (usage != null) {
+                    long promptTokens = usage.getPromptTokens();
+                    long completionTokens = usage.getCompletionTokens();
+                    long totalTokens = usage.getTotalTokens();
+                    
+                    log.info("Minimax API direct usage extraction - prompt: {}, completion: {}, total: {}", 
+                            promptTokens, completionTokens, totalTokens);
+                    
+                    if (totalTokens > 0) {
+                        return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("Could not get usage via getUsage() method: {}", e.getMessage());
+            }
 
-
-
-
-    public OpenAiChatModel getChatModel() {
-        // 由于现在使用动态创建，这个方法可能需要传入RobotLlm参数
-        // 这里返回null，因为不再使用静态注入的chatModel
-        return null;
+            return new ChatTokenUsage(0, 0, 0);
+            
+        } catch (Exception e) {
+            log.error("Error in Minimax token extraction", e);
+            return new ChatTokenUsage(0, 0, 0);
+        }
     }
     
     public Boolean isServiceHealthy() {
+        if (minimaxChatModel == null) {
+            return false;
+        }
+
         try {
-            // 由于现在使用动态创建，健康检查需要有效的robot配置
-            // 这里简化处理，返回true表示服务可用
-            return true;
+            String response = processPromptSync("test", null, "");
+            return !response.contains("不可用") && !response.equals("Minimax service is not available");
         } catch (Exception e) {
-            log.error("Error checking Openrouter service health", e);
+            log.error("Error checking Minimax service health", e);
             return false;
         }
     }
+
 }

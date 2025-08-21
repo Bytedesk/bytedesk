@@ -47,7 +47,7 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(name = "spring.ai.custom.chat.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAICustomChatController {
 
-    private final SpringAICustomService springAICustomService;
+    private final SpringAICustomChatService springAICustomService;
     // private final UidUtils uidUtils;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
