@@ -17,7 +17,7 @@
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>
-		<freeswitch.esl.version>0.9.3</freeswitch.esl.version>
+		<freeswitch.esl.version>0.9.2</freeswitch.esl.version>
 	</properties>
 	<dependencies>
 
