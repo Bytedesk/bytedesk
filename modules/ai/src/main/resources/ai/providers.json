@@ -52,7 +52,7 @@
         "nickname": "百度千帆",
         "logo": "yiyan.png",
         "apiUrl": "https://qianfan.baidubce.com/v2",
-        "webUrl": "https://yiyan.baidu.com/",
+        "webUrl": "https://console.bce.baidu.com/iam/#/iam/apikey/list",
         "status": "PRODUCTION"
     },
     "volcengine": {

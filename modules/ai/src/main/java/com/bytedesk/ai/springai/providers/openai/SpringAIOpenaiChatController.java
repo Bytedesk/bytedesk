@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,6 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "spring.ai.openai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOpenaiChatController {
 
-    private final BytedeskProperties bytedeskProperties;
     private final SpringAIOpenaiChatService springAIOpenaiService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -59,10 +57,6 @@ public class SpringAIOpenaiChatController {
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
-        }
-        
         String response = springAIOpenaiService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -73,13 +67,7 @@ public class SpringAIOpenaiChatController {
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return Flux.empty();
-        }
-        
-        Prompt prompt = new Prompt(new UserMessage(message));
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {Prompt prompt = new Prompt(new UserMessage(message));
         OpenAiChatModel model = springAIOpenaiService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
@@ -94,13 +82,7 @@ public class SpringAIOpenaiChatController {
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return null;
-        }
-        
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         
         executorService.execute(() -> {
             try {
@@ -130,13 +112,7 @@ public class SpringAIOpenaiChatController {
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
-        }
-        
-        OpenAiChatModel model = springAIOpenaiService.getChatModel();
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {OpenAiChatModel model = springAIOpenaiService.getChatModel();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Openai service is not available"));
         }

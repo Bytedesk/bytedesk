@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -52,8 +51,6 @@ public class SpringAIMinimaxChatController {
     @Autowired(required = false)
     @Qualifier("minimaxChatModel")
     private ChatModel minimaxChatModel;
-    
-    private final BytedeskProperties bytedeskProperties;
     private final SpringAIMinimaxChatService springAIMinimaxService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -63,13 +60,7 @@ public class SpringAIMinimaxChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
-        }
-        
-        String response = springAIMinimaxService.processPromptSync(message, null, "");
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIMinimaxService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -79,13 +70,7 @@ public class SpringAIMinimaxChatController {
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return Flux.empty();
-        }
-        
-        Prompt prompt = new Prompt(new UserMessage(message));
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {Prompt prompt = new Prompt(new UserMessage(message));
         ChatModel model = minimaxChatModel;
         if (model != null) {
             return model.stream(prompt);
@@ -100,13 +85,7 @@ public class SpringAIMinimaxChatController {
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return null;
-        }
-        
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         
         executorService.execute(() -> {
             try {
@@ -136,13 +115,7 @@ public class SpringAIMinimaxChatController {
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
-        }
-        
-        ChatModel model = minimaxChatModel;
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {ChatModel model = minimaxChatModel;
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }

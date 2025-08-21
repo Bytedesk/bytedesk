@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -53,8 +52,6 @@ public class SpringAIDashscopeChatController {
     @Autowired(required = false)
     @Qualifier("bytedeskDashscopeChatModel")
     private ChatModel bytedeskDashscopeChatModel;
-
-    private final BytedeskProperties bytedeskProperties;
     private final SpringAIDashscopeChatService springAIDashscopeService;
     private final ChatClient bytedeskDashscopeChatClient;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -65,13 +62,7 @@ public class SpringAIDashscopeChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
-        }
-        
-        String response = springAIDashscopeService.processPromptSync(message, null, "");
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIDashscopeService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -81,13 +72,7 @@ public class SpringAIDashscopeChatController {
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return Flux.empty();
-        }
-        
-        Prompt prompt = new Prompt(new UserMessage(message));
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {Prompt prompt = new Prompt(new UserMessage(message));
         ChatModel model = bytedeskDashscopeChatModel;
         if (model != null) {
             return model.stream(prompt);
@@ -102,13 +87,7 @@ public class SpringAIDashscopeChatController {
      */
     @GetMapping("/chat/sse")
     public SseEmitter chatSse(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return null;
-        }
-        
-        SseEmitter emitter = new SseEmitter();
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {SseEmitter emitter = new SseEmitter();
         
         executorService.execute(() -> {
             try {
@@ -164,13 +143,7 @@ public class SpringAIDashscopeChatController {
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
-        }
-        
-        ChatModel model = bytedeskDashscopeChatModel;
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {ChatModel model = bytedeskDashscopeChatModel;
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
         }
@@ -199,13 +172,7 @@ public class SpringAIDashscopeChatController {
      */
     @GetMapping("/chat/client")
     public ResponseEntity<JsonResult<?>> chatWithClient(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
-        }
-        
-        try {
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {try {
             // 使用 ChatClient 进行同步调用
             var response = bytedeskDashscopeChatClient.prompt()
                     .user(message)
@@ -227,13 +194,7 @@ public class SpringAIDashscopeChatController {
      */
     @GetMapping("/chat/client/stream")
     public Flux<ChatResponse> chatWithClientStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return Flux.empty();
-        }
-        
-        try {
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {try {
             // 使用 ChatClient 进行流式调用
             return bytedeskDashscopeChatClient.prompt()
                     .user(message)
@@ -252,13 +213,7 @@ public class SpringAIDashscopeChatController {
     @GetMapping("/chat/client/system")
     public ResponseEntity<JsonResult<?>> chatWithClientSystem(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message,
-            @RequestParam(value = "systemPrompt", defaultValue = "You are a helpful assistant.") String systemPrompt) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("DashScope service is not available"));
-        }
-        
-        try {
+            @RequestParam(value = "systemPrompt", defaultValue = "You are a helpful assistant.") String systemPrompt) {try {
             // 使用 ChatClient 带系统提示的调用
             var response = bytedeskDashscopeChatClient.prompt()
                     .system(systemPrompt)

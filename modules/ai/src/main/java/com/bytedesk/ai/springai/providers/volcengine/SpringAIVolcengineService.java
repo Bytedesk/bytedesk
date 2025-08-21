@@ -81,10 +81,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         LlmProviderEntity provider = llmProviderOptional.get();
         
         // 创建 OpenAiApi 实例
-        OpenAiApi openAiApi = OpenAiApi.builder()
-                .baseUrl(provider.getApiUrl())
-                .apiKey(provider.getApiKey())
-                .build();
+        OpenAiApi openAiApi = VolcengineApi.create(provider.getApiUrl(), provider.getApiKey());
         
         // 创建选项
         OpenAiChatOptions options = createDynamicOptions(llm);

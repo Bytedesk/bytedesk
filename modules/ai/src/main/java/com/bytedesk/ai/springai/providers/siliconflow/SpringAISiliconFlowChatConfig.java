@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-17 11:17:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 11:47:03
+ * @LastEditTime: 2025-08-21 15:18:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,16 +32,16 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "spring.ai.siliconflow.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAISiliconFlowChatConfig {
 
-    @Value("${spring.ai.siliconflow.base-url}")
+    @Value("${spring.ai.siliconflow.base-url:https://api.siliconflow.cn}")
     private String baseUrl;
 
-    @Value("${spring.ai.siliconflow.api-key}")
+    @Value("${spring.ai.siliconflow.api-key:sk-xxxx}")
     private String apiKey;
 
-    @Value("${spring.ai.siliconflow.chat.options.model}")
+    @Value("${spring.ai.siliconflow.chat.options.model:Qwen/QwQ-32B}")
     private String model;
 
-    @Value("${spring.ai.siliconflow.chat.options.temperature}")
+    @Value("${spring.ai.siliconflow.chat.options.temperature:0.5}")
     private Double temperature;
 
     @Bean("siliconFlowApi")

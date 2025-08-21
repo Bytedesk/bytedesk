@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-11 16:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-21 13:04:38
+ * @LastEditTime: 2025-08-21 15:59:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,9 +20,12 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import lombok.Builder;
+
 /**
- * 百度智能云API配置
+ * 重构API配置
  */
+@Builder
 public class BaiduApi {
     
     // 私有构造函数，防止实例化
@@ -38,7 +41,7 @@ public class BaiduApi {
     public static OpenAiApi create(String baseUrl, String apiKey) {
         // 百度API路径直接是/chat/completions，不需要v1前缀
         String chatCompletionsPath = "/chat/completions";
-        String embeddingsPath = "/embeddings"; // 假设百度API也支持embeddings
+        // String embeddingsPath = "/embeddings"; // 假设百度API也支持embeddings
         
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         
@@ -46,13 +49,19 @@ public class BaiduApi {
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .completionsPath(chatCompletionsPath)
-                .embeddingsPath(embeddingsPath)
+                // .embeddingsPath(embeddingsPath)
                 .headers(headers)
                 .build();
     }
-    
     /**
-     * 创建百度智能云API实例，带更多自定义配置选项
+     * 创建适用于百度智能云的OpenAiApi实例
+     * 
+     * @param baseUrl 百度智能云API的基础URL
+     * @param apiKey API密钥
+     * @param restClientBuilder RestClient构建器
+     * @param webClientBuilder WebClient构建器
+     * @param responseErrorHandler 响应错误处理程序
+     * @return 配置好的OpenAiApi实例
      */
     public static OpenAiApi create(String baseUrl, String apiKey, 
             RestClient.Builder restClientBuilder, 

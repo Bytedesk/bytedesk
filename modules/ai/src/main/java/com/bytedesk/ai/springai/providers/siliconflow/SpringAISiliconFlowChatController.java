@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ai.springai.providers.siliconflow;
 
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +48,6 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.siliconflow.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAISiliconFlowChatController {
-
-    private final BytedeskProperties bytedeskProperties;
     private final SpringAISiliconFlowChatService springAISiliconFlowService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -60,13 +57,7 @@ public class SpringAISiliconFlowChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("SiliconFlow service is not available"));
-        }
-        
-        String response = springAISiliconFlowService.processPromptSync(message, null, "");
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAISiliconFlowService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -76,13 +67,7 @@ public class SpringAISiliconFlowChatController {
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return Flux.empty();
-        }
-        
-        Prompt prompt = new Prompt(new UserMessage(message));
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {Prompt prompt = new Prompt(new UserMessage(message));
         return springAISiliconFlowService.getChatModel()
                 .map(model -> model.stream(prompt))
                 .orElse(Flux.empty());
@@ -94,13 +79,7 @@ public class SpringAISiliconFlowChatController {
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-
-        if (!bytedeskProperties.getDebug()) {
-            return null;
-        }
-
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
 
         executorService.execute(() -> {
             try {
@@ -130,13 +109,7 @@ public class SpringAISiliconFlowChatController {
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("SiliconFlow service is not available"));
-        }
-
-        if (!springAISiliconFlowService.getChatModel().isPresent()) {
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {if (!springAISiliconFlowService.getChatModel().isPresent()) {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }
 

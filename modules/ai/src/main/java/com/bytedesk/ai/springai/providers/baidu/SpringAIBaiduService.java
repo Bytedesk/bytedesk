@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 14:40:35
+ * @LastEditTime: 2025-08-21 15:20:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,10 +80,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         LlmProviderEntity provider = llmProviderOptional.get();
         
         // 创建 OpenAiApi 实例
-        OpenAiApi openAiApi = OpenAiApi.builder()
-                .baseUrl(provider.getApiUrl())
-                .apiKey(provider.getApiKey())
-                .build();
+        OpenAiApi openAiApi = BaiduApi.create(provider.getApiUrl(), provider.getApiKey());
         
         // 创建选项
         OpenAiChatOptions options = createDynamicOptions(llm);

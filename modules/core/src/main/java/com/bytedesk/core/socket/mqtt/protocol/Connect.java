@@ -129,7 +129,7 @@ public class Connect {
         final MqttSession mqttSession = new MqttSession(clientId, channel, isCleanSession, null);
         // 检查连接消息中是否设置了遗嘱标志
         if (mqttConnectMessage.variableHeader().isWillFlag()) {
-            log.debug("send will message");
+            // log.debug("send will message");
             // 创建遗嘱消息
             final MqttPublishMessage willMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                     new MqttFixedHeader(MqttMessageType.PUBLISH, false,

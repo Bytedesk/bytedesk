@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 // import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -47,8 +46,6 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.gitee.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIGiteeChatController {
-
-    private final BytedeskProperties bytedeskProperties;
     private final SpringAIGiteeChatService springAIGiteeService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -58,13 +55,7 @@ public class SpringAIGiteeChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
-        }
-        
-        String response = springAIGiteeService.processPromptSync(message, null, "");
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIGiteeService.processPromptSync(message, null, "");
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -74,13 +65,7 @@ public class SpringAIGiteeChatController {
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return Flux.empty();
-        }
-        
-        Prompt prompt = new Prompt(new UserMessage(message));
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {Prompt prompt = new Prompt(new UserMessage(message));
         OpenAiChatModel model = springAIGiteeService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
@@ -95,13 +80,7 @@ public class SpringAIGiteeChatController {
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return null;
-        }
-        
-        SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         
         executorService.execute(() -> {
             try {
@@ -131,13 +110,7 @@ public class SpringAIGiteeChatController {
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
-        }
-        
-        OpenAiChatModel model = springAIGiteeService.getChatModel();
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {OpenAiChatModel model = springAIGiteeService.getChatModel();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Gitee service is not available"));
         }
