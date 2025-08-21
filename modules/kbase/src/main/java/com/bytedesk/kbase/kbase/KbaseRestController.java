@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:34:42
+ * @LastEditTime: 2025-08-21 20:39:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -78,9 +78,6 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
 
         KbaseResponse kbase = knowledgeService.queryByUid(request);
-        if (kbase == null) {
-            return ResponseEntity.ok(JsonResult.error("not found"));
-        }
 
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
@@ -94,9 +91,9 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
 
-        KbaseResponse Faq = knowledgeService.create(request);
+        KbaseResponse kbase = knowledgeService.create(request);
 
-        return ResponseEntity.ok(JsonResult.success(Faq));
+        return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
     @Operation(summary = "更新知识库", description = "更新知识库信息")
@@ -108,9 +105,9 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
 
-        KbaseResponse Faq = knowledgeService.update(request);
+        KbaseResponse kbase = knowledgeService.update(request);
 
-        return ResponseEntity.ok(JsonResult.success(Faq));
+        return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
     @Operation(summary = "删除知识库", description = "删除指定的知识库")

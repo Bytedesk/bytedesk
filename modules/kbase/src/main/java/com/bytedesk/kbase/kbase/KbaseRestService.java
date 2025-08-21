@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 15:19:43
+ * @LastEditTime: 2025-08-21 20:40:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.kbase.kbase;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -64,6 +65,8 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     private final Environment environment;
 
+    private final ModelMapper modelMapper;
+
     @Override
     protected Specification<KbaseEntity> createSpecification(KbaseRequest request) {
         return KbaseSpecification.search(request, authService);
@@ -106,6 +109,7 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
         entity.setType(request.getType());
+        entity.setSubType(request.getSubType());
         entity.setHeadline(request.getHeadline());
         entity.setDescriptionHtml(request.getDescriptionHtml());
         entity.setFooterHtml(request.getFooterHtml());
@@ -115,7 +119,8 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         entity.setAgentUid(request.getAgentUid());
         //
         // Get default model config if not provided
-        if (!StringUtils.hasText(request.getEmbeddingProvider()) || !StringUtils.hasText(request.getEmbeddingModel())) {
+        if (!StringUtils.hasText(request.getEmbeddingProvider()) 
+            || !StringUtils.hasText(request.getEmbeddingModel())) {
             LlmProviderConfigDefault modelConfig = getLlmProviderConfigDefault();
             entity.setEmbeddingProvider(request.getEmbeddingProvider() != null ? request.getEmbeddingProvider() : modelConfig.getDefaultEmbeddingProvider());
             entity.setEmbeddingModel(request.getEmbeddingModel() != null ? request.getEmbeddingModel() : modelConfig.getDefaultEmbeddingModel());
@@ -134,27 +139,28 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     @Override
     public KbaseResponse update(KbaseRequest request) {
-
         Optional<KbaseEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             KbaseEntity entity = optional.get();
-            entity.setName(request.getName());
-            entity.setDescription(request.getDescription());
-            entity.setType(request.getType());
-            entity.setHeadline(request.getHeadline());
-            entity.setDescriptionHtml(request.getDescriptionHtml());
-            entity.setFooterHtml(request.getFooterHtml());
-            entity.setLanguage(request.getLanguage());
-            //
-            entity.setEmbeddingProvider(request.getEmbeddingProvider());
-            entity.setEmbeddingModel(request.getEmbeddingModel());
+            modelMapper.map(request, entity);
             // 
-            KbaseEntity savedKb = save(entity);
-            if (savedKb == null) {
+            // entity.setName(request.getName());
+            // entity.setDescription(request.getDescription());
+            // entity.setType(request.getType());
+            // entity.setSubtype(request.getSubtype());
+            // entity.setHeadline(request.getHeadline());
+            // entity.setDescriptionHtml(request.getDescriptionHtml());
+            // entity.setFooterHtml(request.getFooterHtml());
+            // entity.setLanguage(request.getLanguage());
+            // //
+            // entity.setEmbeddingProvider(request.getEmbeddingProvider());
+            // entity.setEmbeddingModel(request.getEmbeddingModel());
+            // 
+            KbaseEntity savedKbase = save(entity);
+            if (savedKbase == null) {
                 throw new RuntimeException("knowledge_base not saved");
             }
-            //
-            return convertToResponse(savedKb);
+            return convertToResponse(savedKbase);
         } else {
             throw new RuntimeException("knowledge_base not found");
         }
