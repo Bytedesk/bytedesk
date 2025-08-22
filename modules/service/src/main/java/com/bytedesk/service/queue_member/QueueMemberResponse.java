@@ -102,13 +102,15 @@ public class QueueMemberResponse extends BaseResponse {
      * 动态更新平均响应时间和最大响应时间
      */
     @Builder.Default
-    private Integer agentAvgResponseLength = 0;  // 平均响应时间(秒)
+    private Integer agentAvgResponseLength = 0;  // 平均响应时长(秒)
     
     @Builder.Default
-    private Integer agentMaxResponseLength = 0;  // 最长响应时间(秒)
+    private Integer agentMaxResponseLength = 0;  // 最长响应时长(秒)
 
     @Builder.Default
     private Integer agentMessageCount = 0;  // 客服消息数量
+
+    private Integer agentFirstResponseLength;  // 首次响应时长(秒)
 
     private ZonedDateTime agentTimeoutAt; // 人工对话超时时间
 
@@ -224,12 +226,10 @@ public class QueueMemberResponse extends BaseResponse {
     private ZonedDateTime robotToAgentAt;
 
     // 人工转人工
-    // transfer status
     @Builder.Default
     private String transferStatus = ThreadTransferStatusEnum.NONE.name();
 
     // TODO: 可能同时邀请多个人
-    // invite status
     @Builder.Default
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 

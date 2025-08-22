@@ -320,4 +320,15 @@ public class QueueMemberEntity extends BaseEntity {
         this.robotToAgentAt = BdDateUtils.now();
     }
 
+    /**
+     * 计算首次响应时长(秒)
+     * 从访客首次发送消息到客服首次响应的时间间隔
+     */
+    public Integer getAgentFirstResponseLength() {
+        if (visitorFirstMessageAt == null || agentFirstResponseAt == null) {
+            return null;
+        }
+        return (int) Duration.between(visitorFirstMessageAt, agentFirstResponseAt).getSeconds();
+    }
+
 }

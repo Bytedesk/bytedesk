@@ -94,6 +94,10 @@ public class QueueMemberExcel extends BaseExcel {
     @ColumnWidth(25)
     private ZonedDateTime agentAcceptedAt;
 
+    @ExcelProperty(value = "首次响应时长(秒)")
+    @ColumnWidth(20)
+    private Integer agentFirstResponseLength;
+
     @ExcelProperty(value = "是否已解决")
     @ColumnWidth(20)
     private String resolved;
