@@ -46,6 +46,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 客服线程路由策略
+ * 负责处理一对一人工客服的线程创建和路由逻辑
+ * 
  * @author jackning 270580156@qq.com
  */
 @Slf4j
@@ -53,20 +56,20 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
 
+    // 默认消息常量
+    private static final String DEFAULT_WELCOME_MESSAGE = "您好，请问有什么可以帮助您？";
+    private static final String DEFAULT_OFFLINE_MESSAGE = "您好，请留言，我们会尽快回复您";
+    private static final String QUEUE_NEXT_MESSAGE = "请稍后，下一个就是您";
+    private static final String QUEUE_WAITING_MESSAGE_TEMPLATE = " 当前排队人数：%d 大约等待时间：%d  分钟";
+    private static final int ESTIMATED_WAIT_TIME_PER_PERSON = 2; // 分钟
+
     private final AgentRestService agentRestService;
-
     private final ThreadRestService threadRestService;
-
     private final VisitorThreadService visitorThreadService;
-
     private final IMessageSendService messageSendService;
-
     private final QueueService queueService;
-
     private final QueueMemberRestService queueMemberRestService;
-
     private final MessageRestService messageRestService;
-
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
@@ -74,201 +77,287 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         return createAgentThread(visitorRequest);
     }
 
-    // 一对一人工客服，不支持机器人接待
+    /**
+     * 创建客服线程
+     * 一对一人工客服，不支持机器人接待
+     */
     public MessageProtobuf createAgentThread(VisitorRequest visitorRequest) {
-        //
-        String agentUid = visitorRequest.getSid();
-        String topic = TopicUtils.formatOrgAgentThreadTopic(agentUid, visitorRequest.getUid());
-        // 获取客服信息
-        AgentEntity agentEntity = agentRestService.findByUid(agentUid)
+        // 1. 验证和获取客服信息
+        AgentEntity agentEntity = getAgentEntity(visitorRequest.getSid());
+        
+        // 2. 处理现有线程或创建新线程
+        String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
+        ThreadEntity thread = getOrCreateThread(visitorRequest, agentEntity, topic);
+        
+        // 3. 如果是已存在的线程，直接返回相应消息
+        if (isExistingActiveThread(thread)) {
+            return handleExistingThread(thread, agentEntity);
+        }
+        
+        // 4. 新线程处理：加入队列并根据客服状态路由
+        return routeNewThread(thread, agentEntity, visitorRequest);
+    }
+
+    /**
+     * 获取客服实体
+     */
+    private AgentEntity getAgentEntity(String agentUid) {
+        return agentRestService.findByUid(agentUid)
                 .orElseThrow(() -> {
-                    log.info("Agent uid {} not found", agentUid);
-                    return new RuntimeException("Agent uid " + agentUid + " not found");
+                    log.error("Agent uid {} not found", agentUid);
+                    return new IllegalArgumentException("Agent uid " + agentUid + " not found");
                 });
-        // 是否已经存在会话
-        ThreadEntity thread = null;
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-        if (threadOptional.isPresent()) {
-            //
-            if (threadOptional.get().isNew()) {
-                thread = threadOptional.get();
-            } else if ( threadOptional.get().isChatting()) {
-                thread = threadOptional.get();
-                // 重新初始化会话额外信息，例如客服状态等
-                thread = visitorThreadService.reInitAgentThreadExtra(thread, agentEntity);
-                // 返回未关闭，或 非留言状态的会话
-                log.info("Already have a processing thread {}", thread.getAgent());
-                return getAgentContinueMessage(thread);
-            } else if (threadOptional.get().isQueuing()) {
-                thread = threadOptional.get();
-                // 返回排队中的会话
-                return getAgentQueuingMessage(thread);
-            } else if (threadOptional.get().isOffline()) {
-                // 返回留言状态的会话
-                if (!agentEntity.isConnectedAndAvailable()) {
-                    thread = threadOptional.get();
-                }
+    }
+
+    /**
+     * 获取或创建线程
+     */
+    private ThreadEntity getOrCreateThread(VisitorRequest visitorRequest, AgentEntity agentEntity, String topic) {
+        Optional<ThreadEntity> existingThread = threadRestService.findFirstByTopic(topic);
+        
+        if (existingThread.isPresent()) {
+            ThreadEntity thread = existingThread.get();
+            
+            // 处理不同状态的现有线程
+            if (thread.isNew() || thread.isChatting() || thread.isQueuing()) {
+                return thread;
+            } else if (thread.isOffline() && !agentEntity.isConnectedAndAvailable()) {
+                return thread;
             }
         }
-        //
-        if (thread == null) {
-            // 不存在会话，创建会话
-            thread = visitorThreadService.createAgentThread(visitorRequest, agentEntity, topic);
+        
+        // 创建新线程
+        return visitorThreadService.createAgentThread(visitorRequest, agentEntity, topic);
+    }
+
+    /**
+     * 检查是否为已存在的活跃线程
+     */
+    private boolean isExistingActiveThread(ThreadEntity thread) {
+        return thread.isChatting() || thread.isQueuing();
+    }
+
+    /**
+     * 处理已存在的线程
+     */
+    private MessageProtobuf handleExistingThread(ThreadEntity thread, AgentEntity agentEntity) {
+        if (thread.isChatting()) {
+            // 重新初始化会话额外信息
+            ThreadEntity updatedThread = visitorThreadService.reInitAgentThreadExtra(thread, agentEntity);
+            log.info("Already have a processing thread {}", updatedThread.getAgent());
+            return getAgentContinueMessage(updatedThread);
+        } else if (thread.isQueuing()) {
+            return getAgentQueuingMessage(thread);
         }
-        // 排队计数
+        
+        throw new IllegalStateException("Unexpected thread state: " + thread.getStatus());
+    }
+
+    /**
+     * 路由新线程
+     */
+    private MessageProtobuf routeNewThread(ThreadEntity thread, AgentEntity agentEntity, VisitorRequest visitorRequest) {
+        // 加入队列
         UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
-        log.info("routeAgent Enqueued to queue {}", queueMemberEntity.getUid());
-        // 判断客服是否在线且接待状态
+        log.info("Enqueued to queue {}", queueMemberEntity.getUid());
+        
+        // 根据客服状态路由
         if (agentEntity.isConnectedAndAvailable()) {
-            // 客服在线 且 接待状态
-            // 判断是否达到最大接待人数，如果达到则进入排队
-            if (queueMemberEntity.getAgentQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
-                // 未满则接待
-                return handleAvailableAgent(thread, agentEntity, queueMemberEntity);
-            } else {
-                // 已满则排队
-                return handleQueuedAgent(thread, agentEntity, queueMemberEntity);
-            }
+            return routeOnlineAgent(thread, agentEntity, queueMemberEntity);
         } else {
-            // 客服离线或小休不接待状态，则进入留言
             return handleOfflineAgent(thread, agentEntity, queueMemberEntity);
         }
     }
 
+    /**
+     * 路由在线客服
+     */
+    private MessageProtobuf routeOnlineAgent(ThreadEntity thread, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
+        // 检查是否达到最大接待人数
+        if (queueMemberEntity.getAgentQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
+            return handleAvailableAgent(thread, agentEntity, queueMemberEntity);
+        } else {
+            return handleQueuedAgent(thread, agentEntity, queueMemberEntity);
+        }
+    }
+
+    /**
+     * 处理可用客服（客服在线且未达到最大接待人数）
+     */
     private MessageProtobuf handleAvailableAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
-        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
-        Assert.notNull(agent, "AgentEntity must not be null");
-        Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
-        // 客服在线 且 接待状态
-        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
-        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
-        // 
-        String content = agent.getServiceSettings().getWelcomeTip();
-        if (content == null || content.isEmpty()) {
-            content = "您好，请问有什么可以帮助您？";
-        }
-        ThreadEntity thread = threadOptional.get();
-        thread.setChatting().setContent(content);
-        ThreadEntity savedThread = threadRestService.save(thread);
-        if (savedThread == null) {
-            log.error("Failed to save thread {}", thread.getUid());
-            throw new RuntimeException("Failed to save thread " + thread.getUid());
-        }
-        // 更新排队状态，待优化
-        queueMemberEntity.setAgentAcceptedAt(BdDateUtils.now());
-        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
-        queueMemberRestService.save(queueMemberEntity);
-        // 
-        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-        //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);
+        validateParameters(threadFromRequest, agent, queueMemberEntity);
+        
+        // 获取并更新线程状态
+        ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+        String welcomeContent = getWelcomeMessage(agent);
+        thread.setChatting().setContent(welcomeContent);
+        
+        // 保存线程
+        ThreadEntity savedThread = saveThread(thread);
+        
+        // 更新队列成员状态
+        updateQueueMemberForAcceptance(queueMemberEntity);
+        
+        // 发布事件
+        publishThreadEvents(savedThread);
+        
+        // 发送欢迎消息
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        // 
+        
         return messageProtobuf;
     }
 
+    /**
+     * 处理排队客服（客服在线但已达到最大接待人数）
+     */
     private MessageProtobuf handleQueuedAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
 
-        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
-        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
-        ThreadEntity thread = threadOptional.get();
-        // 已满则排队
-        // String queueTip = agent.getQueueSettings().getQueueTip();
-        String content = "";
-        int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
-        if (queuingCount == 0) {
-            // 客服接待刚满员，下一个就是他，
-            content = "请稍后，下一个就是您";
-        } else {
-            // 前面有排队人数
-            content = " 当前排队人数：" + queuingCount + " 大约等待时间：" + queuingCount * 2 + "  分钟";
-        }
-        // 进入排队队列
-        thread.setQueuing().setContent(content); // .setUnreadCount(0)
-        ThreadEntity savedThread = threadRestService.save(thread);
-        if (savedThread == null) {
-            log.error("Failed to save thread {}", thread.getUid());
-            throw new RuntimeException("Failed to save thread " + thread.getUid());
-        }
-        // 
-        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-        //
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(thread);
+        // 获取并更新线程状态
+        ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+        String queueContent = generateQueueMessage(queueMemberEntity);
+        thread.setQueuing().setContent(queueContent);
+        
+        // 保存线程
+        ThreadEntity savedThread = saveThread(thread);
+        
+        // 发布事件
+        publishThreadEvents(savedThread);
+        
+        // 发送排队消息
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        // 
+        
         return messageProtobuf;
     }
 
-    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent, QueueMemberEntity queueMemberEntity) {
+    /**
+     * 处理离线客服
+     */
+    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent, 
+            QueueMemberEntity queueMemberEntity) {
         Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
-        // 
-        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadFromRequest.getUid());
-        Assert.isTrue(threadOptional.isPresent(), "Thread with uid " + threadFromRequest.getUid() + " not found");
-        // 
-        String content = agent.getMessageLeaveSettings().getMessageLeaveTip();
-        if (content == null || content.isEmpty()) {
-            content = "您好，请留言，我们会尽快回复您";
-        }
-        ThreadEntity thread = threadOptional.get();
-        // 客服离线或小休不接待状态，则进入留言
-        thread.setOffline().setContent(content); // .setUnreadCount(0)
-        ThreadEntity savedThread = threadRestService.save(thread);
-        if (savedThread == null) {
-            log.error("Failed to save thread {}", thread.getUid());
-            throw new RuntimeException("Failed to save thread " + thread.getUid());
-        }
         
-        // 如果拉取的是访客的消息，会影响前端
-        // 查询最新一条消息，如果距离当前时间不超过30分钟，则直接使用之前的消息，否则创建新的消息
-        // Optional<MessageEntity> messageOptional = messageRestService.findLatestByThreadUid(savedThread.getUid());
-        // if (messageOptional.isPresent()) {
-        //     MessageEntity message = messageOptional.get();
-        //     if (message.getCreatedAt().isAfter(BdDateUtils.now().minusMinutes(30))) {
-        //         // 距离当前时间不超过30分钟，则直接使用之前的消息
-        //         // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
-        //         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
-        //         messageSendService.sendProtobufMessage(messageProtobuf);
-        //         return messageProtobuf;
-        //     }
-        // }
-        // 
+        // 获取并更新线程状态
+        ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+        String offlineContent = getOfflineMessage(agent);
+        thread.setOffline().setContent(offlineContent);
+        
+        // 保存线程
+        ThreadEntity savedThread = saveThread(thread);
+        
+        // 更新队列状态
         queueMemberEntity.setAgentOffline(true);
         queueMemberRestService.save(queueMemberEntity);
-        // 创建新的留言消息
-        MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(content, savedThread);
+        
+        // 创建离线消息
+        MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(offlineContent, savedThread);
         messageRestService.save(message);
-        // 返回留言消息
-        // 部分用户测试的，离线状态收不到消息，以为是bug，其实不是，是离线状态不发送消息。防止此种情况，所以还是推送一下
+        
+        // 发送离线消息
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        // 
-        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-        // 
+        
+        // 发布事件
+        publishThreadEvents(savedThread);
+        
         return messageProtobuf;
     }
 
+    // ==================== 辅助方法 ====================
+
+    /**
+     * 验证参数
+     */
+    private void validateParameters(ThreadEntity thread, AgentEntity agent, QueueMemberEntity queueMember) {
+        Assert.notNull(thread, "ThreadEntity must not be null");
+        Assert.notNull(agent, "AgentEntity must not be null");
+        Assert.notNull(queueMember, "QueueMemberEntity must not be null");
+    }
+
+    /**
+     * 根据UID获取线程
+     */
+    private ThreadEntity getThreadByUid(String threadUid) {
+        return threadRestService.findByUid(threadUid)
+                .orElseThrow(() -> new IllegalArgumentException("Thread with uid " + threadUid + " not found"));
+    }
+
+    /**
+     * 保存线程并处理异常
+     */
+    private ThreadEntity saveThread(ThreadEntity thread) {
+        ThreadEntity savedThread = threadRestService.save(thread);
+        if (savedThread == null) {
+            log.error("Failed to save thread {}", thread.getUid());
+            throw new RuntimeException("Failed to save thread " + thread.getUid());
+        }
+        return savedThread;
+    }
+
+    /**
+     * 获取欢迎消息
+     */
+    private String getWelcomeMessage(AgentEntity agent) {
+        String content = agent.getServiceSettings().getWelcomeTip();
+        return (content == null || content.isEmpty()) ? DEFAULT_WELCOME_MESSAGE : content;
+    }
+
+    /**
+     * 获取离线消息
+     */
+    private String getOfflineMessage(AgentEntity agent) {
+        String content = agent.getMessageLeaveSettings().getMessageLeaveTip();
+        return (content == null || content.isEmpty()) ? DEFAULT_OFFLINE_MESSAGE : content;
+    }
+
+    /**
+     * 生成排队消息
+     */
+    private String generateQueueMessage(QueueMemberEntity queueMemberEntity) {
+        int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
+        if (queuingCount == 0) {
+            return QUEUE_NEXT_MESSAGE;
+        } else {
+            return String.format(QUEUE_WAITING_MESSAGE_TEMPLATE, queuingCount, 
+                    queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON);
+        }
+    }
+
+    /**
+     * 更新队列成员接受状态
+     */
+    private void updateQueueMemberForAcceptance(QueueMemberEntity queueMemberEntity) {
+        queueMemberEntity.setAgentAcceptedAt(BdDateUtils.now());
+        queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
+        queueMemberRestService.save(queueMemberEntity);
+    }
+
+    /**
+     * 发布线程相关事件
+     */
+    private void publishThreadEvents(ThreadEntity savedThread) {
+        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+    }
+
+    /**
+     * 获取客服继续对话消息
+     */
     private MessageProtobuf getAgentContinueMessage(ThreadEntity thread) {
-        //
-        UserProtobuf user = thread.getAgentProtobuf(); 
-        // log.info("getAgentContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
-        //
+        UserProtobuf user = thread.getAgentProtobuf();
         return ThreadMessageUtil.getThreadContinueMessage(user, thread);
     }
 
+    /**
+     * 获取客服排队消息
+     */
     private MessageProtobuf getAgentQueuingMessage(ThreadEntity thread) {
-        //
         UserProtobuf user = thread.getAgentProtobuf();
-        // log.info("getAgentQueuingMessage user: {}, agent {}", user.toString(), thread.getAgent());
-        //
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
-
-
 }
