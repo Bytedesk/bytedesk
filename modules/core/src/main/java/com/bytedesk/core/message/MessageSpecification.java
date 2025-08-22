@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 17:56:38
+ * @LastEditTime: 2025-08-22 14:24:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -117,6 +117,14 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
                 predicates.add(criteriaBuilder.or(
                     criteriaBuilder.like(root.get("content"), "%" + request.getSearchText() + "%"),
                     criteriaBuilder.like(root.get("user"), "%" + request.getSearchText() + "%")
+                ));
+            }
+            // searchDate
+            if (StringUtils.hasText(request.getSearchDate())) {
+                // 解析日期格式，假设是 yyyy-MM-dd, createdAt格式为 yyyy-MM-dd'T'HH:mm:ss.SSSX
+                predicates.add(criteriaBuilder.equal(
+                    criteriaBuilder.function("DATE_FORMAT", String.class, root.get("createdAt"), criteriaBuilder.literal("%Y-%m-%d")),
+                    request.getSearchDate()
                 ));
             }
             //
