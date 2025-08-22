@@ -87,8 +87,8 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
         entity.setUserUid(user.getUid());
         
-        // 统一设置过期时间，如果请求中没有设置过期时间，则使用JWT配置的过期时间
-        if (entity.getExpiresAt() == null) {
+        // 非永久有效，且未设置过期时间，则根据channel设置默认过期时间
+        if (!Boolean.TRUE.equals(entity.getPermanent()) && entity.getExpiresAt() == null) {
             entity.setExpiresAt(JwtUtils.calculateExpirationTime(request.getChannel()));
         }
         
