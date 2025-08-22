@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 21:16:25
+ * @LastEditTime: 2025-08-22 22:17:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,7 +18,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
@@ -80,17 +79,14 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         //
         String agentUid = visitorRequest.getSid();
         String topic = TopicUtils.formatOrgAgentThreadTopic(agentUid, visitorRequest.getUid());
+        // 获取客服信息
+        AgentEntity agentEntity = agentRestService.findByUid(agentUid)
+                .orElseThrow(() -> {
+                    log.info("Agent uid {} not found", agentUid);
+                    return new RuntimeException("Agent uid " + agentUid + " not found");
+                });
         // 是否已经存在会话
         ThreadEntity thread = null;
-        AgentEntity agentEntity = null;
-        Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-        if (agentOptional.isPresent()) {
-            agentEntity = agentOptional.get();
-        } else {
-            log.info("Agent uid {} not found", agentUid);
-            throw new RuntimeException("Agent uid " + agentUid + " not found");
-        }
-        // 是否已经存在会话
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             //
@@ -101,12 +97,12 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
                 // 重新初始化会话额外信息，例如客服状态等
                 thread = visitorThreadService.reInitAgentThreadExtra(thread, agentEntity);
                 // 返回未关闭，或 非留言状态的会话
-                log.info("Already have a processing thread {}", topic);
-                return getAgentContinueMessage(visitorRequest, thread);
+                log.info("Already have a processing thread {}", thread.getAgent());
+                return getAgentContinueMessage(thread);
             } else if (threadOptional.get().isQueuing()) {
                 thread = threadOptional.get();
                 // 返回排队中的会话
-                return getAgentQueuingMessage(visitorRequest, thread);
+                return getAgentQueuingMessage(thread);
             } else if (threadOptional.get().isOffline()) {
                 // 返回留言状态的会话
                 if (!agentEntity.isConnectedAndAvailable()) {
@@ -258,18 +254,18 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         return messageProtobuf;
     }
 
-    private MessageProtobuf getAgentContinueMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
+    private MessageProtobuf getAgentContinueMessage(ThreadEntity thread) {
         //
-        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("getAgentContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        UserProtobuf user = thread.getAgentProtobuf(); 
+        // log.info("getAgentContinueMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
         return ThreadMessageUtil.getThreadContinueMessage(user, thread);
     }
 
-    private MessageProtobuf getAgentQueuingMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
+    private MessageProtobuf getAgentQueuingMessage(ThreadEntity thread) {
         //
-        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("getAgentQueuingMessage user: {}, agent {}", user.toString(), thread.getAgent());
+        UserProtobuf user = thread.getAgentProtobuf();
+        // log.info("getAgentQueuingMessage user: {}, agent {}", user.toString(), thread.getAgent());
         //
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }

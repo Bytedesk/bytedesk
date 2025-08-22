@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 14:06:02
+ * @LastEditTime: 2025-08-22 22:19:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,6 +31,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageUtils;
@@ -184,18 +185,16 @@ public class VisitorThreadService
 
     public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
         thread.setExtra(extra);
-        if (thread.getTransfer() != null && !thread.getTransfer().isEmpty()) {
+        if (StringUtils.hasText(thread.getTransfer()) && !BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getTransfer())) {
             // 如果有转接信息，则使用转接信息
-            UserProtobuf transferUser = JSON.parseObject(thread.getTransfer(), UserProtobuf.class);
+            UserProtobuf transferUser = thread.getTransferProtobuf();
             transferUser.setType(UserTypeEnum.AGENT.name());
             thread.setAgent(transferUser.toJson());
         } else {
             UserProtobuf agentProtobuf = agent.toUserProtobuf();
-            String agentString = agentProtobuf.toJson();
-            thread.setAgent(agentString); // 人工客服
+            thread.setAgent(agentProtobuf.toJson()); // 人工客服
         }
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
@@ -209,8 +208,7 @@ public class VisitorThreadService
         //
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
