@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 12:17:59
+ * @LastEditTime: 2025-08-24 07:40:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -46,7 +46,7 @@ public class UserRestController extends BaseRestController<UserRequest, UserRest
 
     private final UserService userService;
 
-    private final PushRestService pushService;
+    private final PushRestService pushRestService;
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
@@ -138,7 +138,7 @@ public class UserRestController extends BaseRestController<UserRequest, UserRest
     public ResponseEntity<?> changeEmail(@RequestBody UserRequest userRequest, HttpServletRequest request) {
         // validate email & code
         // 验证邮箱验证码
-        if (!pushService.validateCode(userRequest.getEmail(), userRequest.getCode(), request)) {
+        if (!pushRestService.validateCode(userRequest.getEmail(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
@@ -152,7 +152,7 @@ public class UserRestController extends BaseRestController<UserRequest, UserRest
     public ResponseEntity<?> changeMobile(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
         // 验证手机验证码
-        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushRestService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 

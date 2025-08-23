@@ -21,6 +21,8 @@ import lombok.Data;
 import java.util.Arrays;
 import java.util.List;
 
+import jakarta.annotation.PostConstruct;
+
 /**
  * 文件上传安全配置
  */
@@ -37,37 +39,17 @@ public class UploadSecurityConfig {
     /**
      * 允许的文件扩展名白名单
      */
-    private List<String> allowedExtensions = Arrays.asList(
-        "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg",
-        "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt",
-        "zip", "rar", "7z", "tar", "gz",
-        "mp3", "wav", "aac", "ogg", "flac", "m4a",
-        "mp4", "avi", "mov", "wmv", "flv", "mkv", "webm"
-    );
+    private List<String> allowedExtensions = getDefaultAllowedExtensions();
 
     /**
      * 危险文件扩展名黑名单
      */
-    private List<String> dangerousExtensions = Arrays.asList(
-        "exe", "jsp", "php", "sh", "bat", "js", "html", "htm", 
-        "asp", "aspx", "dll", "com", "cgi", "jar", "war", "class",
-        "vbs", "cmd", "scr", "pif", "lnk", "reg"
-    );
+    private List<String> dangerousExtensions = getDefaultDangerousExtensions();
 
     /**
      * 允许的MIME类型
      */
-    private List<String> allowedMimeTypes = Arrays.asList(
-        "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp", "image/svg+xml",
-        "application/pdf", 
-        "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        "text/plain",
-        "application/zip", "application/x-rar-compressed", "application/x-7z-compressed",
-        "audio/mpeg", "audio/wav", "audio/aac", "audio/ogg", "audio/flac", "audio/mp4",
-        "video/mp4", "video/avi", "video/quicktime", "video/x-ms-wmv", "video/x-flv", "video/x-matroska", "video/webm"
-    );
+    private List<String> allowedMimeTypes = getDefaultAllowedMimeTypes();
 
     /**
      * 是否启用图片内容验证
@@ -98,6 +80,23 @@ public class UploadSecurityConfig {
      * 是否启用病毒扫描（预留接口）
      */
     private boolean enableVirusScan = false;
+
+    /**
+     * 初始化默认配置
+     */
+    @PostConstruct
+    public void initDefaults() {
+        // 如果配置文件中没有设置，则使用默认值
+        if (allowedExtensions == null || allowedExtensions.isEmpty()) {
+            allowedExtensions = getDefaultAllowedExtensions();
+        }
+        if (dangerousExtensions == null || dangerousExtensions.isEmpty()) {
+            dangerousExtensions = getDefaultDangerousExtensions();
+        }
+        if (allowedMimeTypes == null || allowedMimeTypes.isEmpty()) {
+            allowedMimeTypes = getDefaultAllowedMimeTypes();
+        }
+    }
 
     /**
      * 检查文件扩展名是否被允许
@@ -145,5 +144,67 @@ public class UploadSecurityConfig {
         } else {
             return maxFileSize + "B";
         }
+    }
+
+    /**
+     * 获取默认允许的文件扩展名列表
+     */
+    private static List<String> getDefaultAllowedExtensions() {
+        return Arrays.asList(
+            // 图片文件
+            "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg",
+            // 文档文件
+            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt",
+            // 压缩文件
+            "zip", "rar", "7z", "tar", "gz",
+            // 音频文件
+            "mp3", "wav", "aac", "ogg", "flac", "m4a",
+            // 视频文件
+            "mp4", "avi", "mov", "wmv", "flv", "mkv", "webm"
+        );
+    }
+
+    /**
+     * 获取默认危险文件扩展名列表
+     */
+    private static List<String> getDefaultDangerousExtensions() {
+        return Arrays.asList(
+            // 可执行文件
+            "exe", "msi", "dmg", "app", "deb", "rpm",
+            // 脚本文件
+            "jsp", "php", "asp", "aspx", "sh", "bat", "cmd", "vbs", "ps1",
+            // 网页文件
+            "js", "html", "htm", "xml", "xhtml",
+            // Java相关
+            "jar", "war", "class", "java",
+            // .NET相关
+            "dll", "exe", "msi",
+            // 其他危险文件
+            "com", "cgi", "scr", "pif", "lnk", "reg", "hta"
+        );
+    }
+
+    /**
+     * 获取默认允许的MIME类型列表
+     */
+    private static List<String> getDefaultAllowedMimeTypes() {
+        return Arrays.asList(
+            // 图片类型
+            "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp", "image/svg+xml",
+            // 文档类型
+            "application/pdf",
+            "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "text/plain",
+            // 压缩文件
+            "application/zip", "application/x-rar-compressed", "application/x-7z-compressed",
+            "application/x-tar", "application/gzip",
+            // 音频文件
+            "audio/mpeg", "audio/wav", "audio/aac", "audio/ogg", "audio/flac", "audio/mp4",
+            // 视频文件
+            "video/mp4", "video/avi", "video/quicktime", "video/x-ms-wmv", "video/x-flv", 
+            "video/x-matroska", "video/webm"
+        );
     }
 }
