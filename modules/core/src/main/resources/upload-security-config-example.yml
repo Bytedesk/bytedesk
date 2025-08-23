@@ -1,0 +1,120 @@
+# 文件上传安全配置示例
+# 在 application.yml 或 application.properties 中配置
+
+bytedesk:
+  upload:
+    security:
+      # 最大文件大小 (10MB)
+      max-file-size: 10485760
+      
+      # 允许的文件扩展名白名单
+      allowed-extensions:
+        - jpg
+        - jpeg
+        - png
+        - gif
+        - bmp
+        - webp
+        - svg
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+        - ppt
+        - pptx
+        - txt
+        - zip
+        - rar
+        - 7z
+        - tar
+        - gz
+        - mp3
+        - wav
+        - aac
+        - ogg
+        - flac
+        - m4a
+        - mp4
+        - avi
+        - mov
+        - wmv
+        - flv
+        - mkv
+        - webm
+      
+      # 危险文件扩展名黑名单
+      dangerous-extensions:
+        - exe
+        - jsp
+        - php
+        - sh
+        - bat
+        - js
+        - html
+        - htm
+        - asp
+        - aspx
+        - dll
+        - com
+        - cgi
+        - jar
+        - war
+        - class
+        - vbs
+        - cmd
+        - scr
+        - pif
+        - lnk
+        - reg
+      
+      # 允许的MIME类型
+      allowed-mime-types:
+        - image/jpeg
+        - image/png
+        - image/gif
+        - image/bmp
+        - image/webp
+        - image/svg+xml
+        - application/pdf
+        - application/msword
+        - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        - application/vnd.ms-excel
+        - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+        - application/vnd.ms-powerpoint
+        - application/vnd.openxmlformats-officedocument.presentationml.presentation
+        - text/plain
+        - application/zip
+        - application/x-rar-compressed
+        - application/x-7z-compressed
+        - audio/mpeg
+        - audio/wav
+        - audio/aac
+        - audio/ogg
+        - audio/flac
+        - audio/mp4
+        - video/mp4
+        - video/avi
+        - video/quicktime
+        - video/x-ms-wmv
+        - video/x-flv
+        - video/x-matroska
+        - video/webm
+      
+      # 是否启用图片内容验证
+      enable-image-validation: true
+      
+      # 是否启用文件名过滤
+      enable-file-name-filter: true
+      
+      # 是否强制重命名文件
+      force-rename: true
+      
+      # 文件名最大长度
+      max-file-name-length: 255
+      
+      # 是否记录上传日志
+      enable-upload-log: true
+      
+      # 是否启用病毒扫描（预留接口）
+      enable-virus-scan: false

@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import javax.imageio.ImageIO;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,10 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	private final AuthService authService;
 
 	private final UploadWatermarkService uploadWatermarkService;
+
+	private final UploadSecurityConfig uploadSecurityConfig;
+
+	private final UploadSecurityLogger uploadSecurityLogger;
 
 	@Autowired(required = false)
 	private UploadMinioService uploadMinioService;
@@ -186,6 +192,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 
 	public String store(MultipartFile file, String fileName, UploadRequest request) {
+		// 文件名再次过滤，防止绕过
+		fileName = filterAndRenameFileName(fileName);
 		// 根据当前日期创建文件夹，格式如：2021/03/15
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 		String currentDateFolder = LocalDate.now().format(formatter);
@@ -195,7 +203,23 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				throw new UploadStorageException("Failed to store empty file.");
 			}
 
-			// 构建包含日期文件夹的文件路径
+			// 文件类型白名单校验
+			String contentType = file.getContentType();
+			if (!isAllowedFileType(fileName, contentType)) {
+				throw new UploadStorageException("不支持的文件类型");
+			}
+		// 文件大小限制
+		if (!isFileSizeValid(file.getSize())) {
+			throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription());
+		}
+		// 图片内容校验
+		if (uploadSecurityConfig.isEnableImageValidation() && isImageFile(fileName, contentType)) {
+			try {
+				ImageIO.read(file.getInputStream());
+			} catch (Exception e) {
+				throw new UploadStorageException("图片内容校验失败");
+			}
+		}			// 构建包含日期文件夹的文件路径
 			Path dateFolderPath = this.uploadDir.resolve(currentDateFolder);
 			Files.createDirectories(dateFolderPath); // 创建日期文件夹（如果不存在）
 
@@ -227,7 +251,74 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 	}
 
-	public Stream<Path> loadAll() {
+    // ========== 安全辅助方法 ========== 
+    // 文件类型白名单校验 - 使用配置化的安全策略
+    private boolean isAllowedFileType(String fileName, String contentType) {
+        String ext = getFileExt(fileName);
+        
+        // 检查扩展名
+        if (!uploadSecurityConfig.isExtensionAllowed(ext)) {
+            return false;
+        }
+        
+        // 检查MIME类型
+        if (contentType != null && !uploadSecurityConfig.isMimeTypeAllowed(contentType)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    private boolean isImageFile(String fileName, String contentType) {
+        String ext = getFileExt(fileName);
+        return (contentType != null && contentType.startsWith("image/")) ||
+                ext.matches("jpg|jpeg|png|gif|bmp|webp|svg");
+    }
+
+    private String getFileExt(String fileName) {
+        if (fileName == null) return "";
+        int idx = fileName.lastIndexOf('.');
+        if (idx == -1) return "";
+        return fileName.substring(idx + 1).toLowerCase();
+    }
+
+    // 文件名过滤与重命名 - 使用配置化的安全策略
+    private String filterAndRenameFileName(String fileName) {
+        if (fileName == null) fileName = "file";
+        
+        // 检查文件名长度
+        if (fileName.length() > uploadSecurityConfig.getMaxFileNameLength()) {
+            String ext = getFileExt(fileName);
+            fileName = fileName.substring(0, uploadSecurityConfig.getMaxFileNameLength() - ext.length() - 1) + "." + ext;
+        }
+        
+        if (uploadSecurityConfig.isEnableFileNameFilter()) {
+            // 只保留字母数字下划线点横线
+            String safe = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+            // 防止目录穿越
+            safe = safe.replace("..", "_");
+            fileName = safe;
+        }
+        
+        if (uploadSecurityConfig.isForceRename()) {
+            // 重命名为时间戳+随机数+后缀
+            String ext = getFileExt(fileName);
+            String base = String.valueOf(System.currentTimeMillis()) + "_" + (int)(Math.random()*10000);
+            fileName = ext.isEmpty() ? base : (base + "." + ext);
+        }
+        
+        return fileName;
+    }
+
+    // 文件大小校验
+    private boolean isFileSizeValid(long fileSize) {
+        return uploadSecurityConfig.isFileSizeValid(fileSize);
+    }
+
+    // 获取文件大小限制描述
+    private String getFileSizeDescription() {
+        return uploadSecurityConfig.getMaxFileSizeDescription();
+    }	public Stream<Path> loadAll() {
 		try {
 			return Files.walk(this.uploadDir, 1)
 					.filter(path -> !path.equals(this.uploadDir))
@@ -324,38 +415,88 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 
 	public UploadResponse handleFileUpload(MultipartFile file, UploadRequest request) {
-		log.info("handleFileUpload fileName: {}, fileType: {}, kbType {}, extra {}", 
-		request.getFileName(), request.getFileType(), request.getKbType(), request.getExtra());
+		return handleFileUpload(file, request, null);
+	}
 
-		UserEntity user = authService.getUser();
-		UserProtobuf userProtobuf = null;
-		if (user == null) {
-			userProtobuf = UserProtobuf.builder()
-				.uid(request.getVisitorUid())
-                .nickname(request.getVisitorNickname())
-                .avatar(request.getVisitorAvatar())
-                .build();
-		} else {
-			userProtobuf = ConvertUtils.convertToUserProtobuf(user);
-			request.setUserUid(user.getUid());
-			request.setOrgUid(user.getOrgUid());
+	public UploadResponse handleFileUpload(MultipartFile file, UploadRequest request, HttpServletRequest httpRequest) {
+		log.info("handleFileUpload fileName: {}, fileType: {}, kbType {}, extra {}", 
+			request.getFileName(), request.getFileType(), request.getKbType(), request.getExtra());
+
+		try {
+			// 1. 文件类型白名单校验
+			String originalFileName = file.getOriginalFilename();
+			String safeFileName = filterAndRenameFileName(originalFileName);
+			String contentType = file.getContentType();
+			if (!isAllowedFileType(safeFileName, contentType)) {
+				uploadSecurityLogger.logSecurityThreat(file, request, "ILLEGAL_FILE_TYPE", 
+					"不支持的文件类型: " + contentType, httpRequest);
+				throw new UploadStorageException("不支持的文件类型");
+			}
+
+			// 2. 文件大小限制
+			if (!isFileSizeValid(file.getSize())) {
+				uploadSecurityLogger.logUploadFailure(file, request, 
+					"文件过大，最大支持" + getFileSizeDescription(), httpRequest);
+				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription());
+			}
+
+			// 3. 图片内容校验（防止伪造扩展名）
+			if (uploadSecurityConfig.isEnableImageValidation() && isImageFile(safeFileName, contentType)) {
+				try {
+					ImageIO.read(file.getInputStream());
+				} catch (Exception e) {
+					uploadSecurityLogger.logSecurityThreat(file, request, "FAKE_IMAGE", 
+						"图片内容校验失败", httpRequest);
+					throw new UploadStorageException("图片内容校验失败");
+				}
+			}
+
+			UserEntity user = authService.getUser();
+			UserProtobuf userProtobuf = null;
+			if (user == null) {
+				userProtobuf = UserProtobuf.builder()
+					.uid(request.getVisitorUid())
+					.nickname(request.getVisitorNickname())
+					.avatar(request.getVisitorAvatar())
+					.build();
+			} else {
+				userProtobuf = ConvertUtils.convertToUserProtobuf(user);
+				request.setUserUid(user.getUid());
+				request.setOrgUid(user.getOrgUid());
+			}
+
+			// 4. 存储时使用安全文件名
+			request.setFileName(safeFileName);
+
+			String fileUrl;
+			if (bytedeskProperties.getMinioEnabled()) {
+				log.info("MinIO 已启用，使用 MinIO 存储文件");
+				fileUrl = storeToMinio(file, safeFileName, request);
+			} else {
+				log.info("MinIO 未启用，使用本地文件系统存储文件");
+				fileUrl = store(file, safeFileName, request);
+			}
+
+			request.setFileUrl(fileUrl);
+			request.setType(request.getKbType());
+			request.setUser(userProtobuf.toJson());
+			
+			UploadResponse response = create(request);
+			
+			// 记录成功日志
+			uploadSecurityLogger.logUploadSuccess(file, request, fileUrl, httpRequest);
+			
+			return response;
+			
+		} catch (UploadStorageException e) {
+			// 记录失败日志
+			uploadSecurityLogger.logUploadFailure(file, request, e.getMessage(), httpRequest);
+			throw e;
+		} catch (Exception e) {
+			// 记录失败日志
+			uploadSecurityLogger.logUploadFailure(file, request, "系统内部错误: " + e.getMessage(), httpRequest);
+			throw new UploadStorageException("文件上传失败: " + e.getMessage(), e);
 		}
-		
-		// 根据配置选择存储方式：优先使用 MinIO，否则使用本地文件系统
-		String fileUrl;
-		if (bytedeskProperties.getMinioEnabled()) {
-			log.info("MinIO 已启用，使用 MinIO 存储文件");
-			fileUrl = storeToMinio(file, request.getFileName(), request);
-		} else {
-			log.info("MinIO 未启用，使用本地文件系统存储文件");
-			fileUrl = store(file, request.getFileName(), request);
-		}
-		
-		request.setFileUrl(fileUrl);
-		request.setType(request.getKbType());
-		request.setUser(userProtobuf.toJson());
-		// 
-		return create(request);
 	}
 
 	// ==================== MinIO 存储方法 ====================
@@ -382,6 +523,29 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		try {
 			if (file.isEmpty()) {
 				throw new UploadStorageException("Failed to store empty file.");
+			}
+
+			// 文件名再次过滤，防止绕过
+			fileName = filterAndRenameFileName(fileName);
+			
+			// 文件类型白名单校验
+			String contentType = file.getContentType();
+			if (!isAllowedFileType(fileName, contentType)) {
+				throw new UploadStorageException("不支持的文件类型");
+			}
+			
+			// 文件大小限制
+			if (!isFileSizeValid(file.getSize())) {
+				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription());
+			}
+			
+			// 图片内容校验
+			if (uploadSecurityConfig.isEnableImageValidation() && isImageFile(fileName, contentType)) {
+				try {
+					ImageIO.read(file.getInputStream());
+				} catch (Exception e) {
+					throw new UploadStorageException("图片内容校验失败");
+				}
 			}
 
 			// 根据文件类型选择存储文件夹
