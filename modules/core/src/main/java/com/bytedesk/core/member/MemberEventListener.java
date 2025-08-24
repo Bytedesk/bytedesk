@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-03 14:06:20
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-07 11:12:25
+ * @LastEditTime: 2025-08-24 09:52:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -59,17 +59,17 @@ import jakarta.transaction.Transactional;
 @AllArgsConstructor
 public class MemberEventListener {
 
-    private final MemberRestService memberService;
+    private final MemberRestService memberRestService;
 
     private final ModelMapper modelMapper;
 
-    private final DepartmentRestService departmentService;
+    private final DepartmentRestService departmentRestService;
 
     private final UidUtils uidUtils;
 
     private final TopicCacheService topicCacheService;
 
-    private final UploadRestService uploadService;
+    private final UploadRestService uploadRestService;
     
     private final MemberBatchMessageService memberBatchMessageService;
 
@@ -88,7 +88,7 @@ public class MemberEventListener {
                 .description("Description for" + DepartmentConsts.DEPT_ADMIN)
                 .orgUid(orgUid)
                 .build();
-        DepartmentResponse departmentResponse = departmentService.create(departmentRequest);
+        DepartmentResponse departmentResponse = departmentRestService.create(departmentRequest);
         //
         if (departmentResponse != null) {
             Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
@@ -103,7 +103,7 @@ public class MemberEventListener {
             memberRequest.setRoleUids(roleUids);
             memberRequest.setDeptUid(departmentResponse.getUid());
             memberRequest.setOrgUid(orgUid);
-            memberService.create(memberRequest);
+            memberRestService.create(memberRequest);
         }
     }
 
@@ -113,7 +113,7 @@ public class MemberEventListener {
         //
         if (ThreadTypeEnum.MEMBER.name().equals(thread .getType())) {
             log.info("member ThreadCreateEvent: {}", thread.getTopic());
-            memberService.createMemberReverseThread(thread);
+            memberRestService.createMemberReverseThread(thread);
         }
     }
 
@@ -145,7 +145,7 @@ public class MemberEventListener {
             log.info("MemberEventListener MEMBER: {}", fileName);
         
             // 导入Excel文件
-            Resource resource = uploadService.loadAsResource(upload.getFileName());
+            Resource resource = uploadRestService.loadAsResource(upload.getFileName());
             if (resource.exists()) {
                 String filePath = resource.getFile().getAbsolutePath();
                 log.info("UploadEventListener loadAsResource: {}", filePath);
@@ -153,7 +153,7 @@ public class MemberEventListener {
                 // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
                 EasyExcel.read(filePath,
-                        MemberExcel.class,
+                        MemberExcelExport.class,
                         new MemberExcelListener(memberBatchMessageService, upload.getOrgUid())).sheet().doRead();
             }
         }

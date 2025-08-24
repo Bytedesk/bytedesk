@@ -152,7 +152,7 @@ public class MemberRestController extends BaseRestController<MemberRequest, Memb
             request,
             response,
             memberRestService,
-            MemberExcel.class,
+            MemberExcelExport.class,
             "成员",
             "member"
         );

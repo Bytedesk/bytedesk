@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 12:52:53
+ * @LastEditTime: 2025-08-24 09:55:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
 @Slf4j
 @RequiredArgsConstructor
-public class MemberExcelListener implements ReadListener<MemberExcel> {
+public class MemberExcelListener implements ReadListener<MemberExcelImport> {
 
     private final MemberBatchMessageService memberBatchMessageService;
 
@@ -41,13 +41,13 @@ public class MemberExcelListener implements ReadListener<MemberExcel> {
     /**
      * 缓存的数据
      */
-    private List<MemberExcel> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<MemberExcelImport> cachedDataList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
     
     /**
      * 这个每一条数据解析都会来调用
      */
     @Override
-    public void invoke(MemberExcel data, AnalysisContext context) {
+    public void invoke(MemberExcelImport data, AnalysisContext context) {
         log.info("MemberExcelListener invoke: {}", JSON.toJSONString(data));
         // 直接缓存Excel数据，不再进行转换
         cachedDataList.add(data);
@@ -94,7 +94,7 @@ public class MemberExcelListener implements ReadListener<MemberExcel> {
      * 判断是否为表头行
      * 简单的判断逻辑，可以根据实际情况调整
      */
-    private boolean isHeaderRow(MemberExcel memberExcel) {
+    private boolean isHeaderRow(MemberExcelImport memberExcel) {
         return memberExcel != null && 
                ("姓名".equals(memberExcel.getNickname()) || 
                 "昵称".equals(memberExcel.getNickname()) ||

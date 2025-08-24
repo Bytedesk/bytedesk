@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-12 10:58:43
+ * @LastEditTime: 2025-08-24 09:56:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,7 @@ import lombok.Data;
 // https://github.com/alibaba/easyexcel
 // https://easyexcel.opensource.alibaba.com/docs/current/
 @Data
-public class MemberExcel {
+public class MemberExcelExport {
 
     @ExcelProperty(value = "昵称")
     @ColumnWidth(20)

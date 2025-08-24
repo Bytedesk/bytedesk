@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 21:16:38
+ * @LastEditTime: 2025-08-24 09:57:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, MemberRequest, MemberResponse, MemberExcel> {
+public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, MemberRequest, MemberResponse, MemberExcelExport> {
 
     private final UserService userService;
 
@@ -330,7 +330,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         });
     }
 
-    public MemberEntity convertExcelToMember(MemberExcel excel, String orgUid) {
+    public MemberEntity convertExcelToMember(MemberExcelImport excel, String orgUid) {
         // 去重
         if (StringUtils.hasText(excel.getEmail()) && existsByEmailAndOrgUid(excel.getEmail(), orgUid)) {
             return null;
@@ -495,8 +495,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     }
 
     @Override
-    public MemberExcel convertToExcel(MemberEntity entity) {
-        MemberExcel excel = modelMapper.map(entity, MemberExcel.class);
+    public MemberExcelExport convertToExcel(MemberEntity entity) {
+        MemberExcelExport excel = modelMapper.map(entity, MemberExcelExport.class);
         // 设置部门名称
         if (entity.getDeptUid() != null) {
             Optional<DepartmentEntity> departmentOptional = departmentRestService.findByUid(entity.getDeptUid());

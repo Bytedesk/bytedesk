@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-01 15:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-01 10:47:53
+ * @LastEditTime: 2025-08-24 09:55:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.member.MemberExcel;
+import com.bytedesk.core.member.MemberExcelImport;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +45,7 @@ public class MemberBatchMessageService {
      * @param memberExcelList Member Excel数据列表
      * @param orgUid 组织唯一标识
      */
-    public void sendBatchImportMessages(List<MemberExcel> memberExcelList, String orgUid) {
+    public void sendBatchImportMessages(List<MemberExcelImport> memberExcelList, String orgUid) {
         if (memberExcelList == null || memberExcelList.isEmpty()) {
             log.warn("Member列表为空，无需发送批量导入消息");
             return;

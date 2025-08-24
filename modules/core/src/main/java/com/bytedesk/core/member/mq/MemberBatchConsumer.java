@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-01 15:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-01 09:54:20
+ * @LastEditTime: 2025-08-24 09:57:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.core.member.MemberEntity;
-import com.bytedesk.core.member.MemberExcel;
+import com.bytedesk.core.member.MemberExcelImport;
 import com.bytedesk.core.member.MemberRestService;
 
 import jakarta.jms.JMSException;
@@ -164,7 +164,7 @@ public class MemberBatchConsumer implements MessageListener {
             }
             
             // 解析Member Excel数据
-            MemberExcel memberExcel = JSON.parseObject(batchMessage.getMemberExcelJson(), MemberExcel.class);
+            MemberExcelImport memberExcel = JSON.parseObject(batchMessage.getMemberExcelJson(), MemberExcelImport.class);
             if (memberExcel == null) {
                 log.error("无法解析Member Excel数据: 批次{}, 索引{}", 
                          batchMessage.getBatchUid(), batchMessage.getBatchIndex());
