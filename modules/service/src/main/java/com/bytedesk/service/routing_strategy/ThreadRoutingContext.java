@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-29 22:07:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 16:08:06
+ * @LastEditTime: 2025-08-24 17:53:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -177,7 +177,7 @@ public class ThreadRoutingContext {
                     strategyMap.put(type, strategy);
                     log.debug("Registered missing strategy by bean name: {} -> {}", type, beanName);
                 } catch (Exception e) {
-                    log.debug("No strategy bean found for type {}: {}", type, beanName);
+                    // log.debug("No strategy bean found for type {}: {}", type, beanName);
                 }
             }
         }

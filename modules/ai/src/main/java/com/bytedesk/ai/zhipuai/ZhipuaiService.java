@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 12:47:50
+ * @LastEditTime: 2025-08-24 17:38:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -94,18 +94,6 @@ public class ZhipuaiService extends BaseSpringAIService {
             
             return new ClientV4.Builder(apiKey)
                     .enableTokenCache()
-                    // .networkConfig(
-                    //     zhipuaiChatConfig.getConnectionTimeout(), 
-                    //     zhipuaiChatConfig.getReadTimeout(), 
-                    //     zhipuaiChatConfig.getWriteTimeout(), 
-                    //     zhipuaiChatConfig.getPingInterval(), 
-                    //     TimeUnit.SECONDS
-                    // )
-                    // .connectionPool(new okhttp3.ConnectionPool(
-                    //     zhipuaiChatConfig.getMaxIdleConnections(), 
-                    //     zhipuaiChatConfig.getKeepAliveDuration(), 
-                    //     TimeUnit.SECONDS
-                    // ))
                     .build();
         } catch (Exception e) {
             log.error("Failed to create dynamic Zhipuai client for provider {}, using default client", provider.getUid(), e);
@@ -190,263 +178,6 @@ public class ZhipuaiService extends BaseSpringAIService {
         return chatCompletionRequest;
     }
 
-    /**
-     * 手动提取智谱AI的token使用情况
-     * 从ModelApiResponse中提取token使用信息
-     * 
-     * @param response ModelApiResponse对象
-     * @return TokenUsage对象
-     */
-    private ChatTokenUsage extractZhipuaiTokenUsage(ModelApiResponse response) {
-        try {
-            if (response == null) {
-                log.warn("Zhipuai API response is null");
-                return new ChatTokenUsage(0, 0, 0);
-            }
-            
-            log.info("Zhipuai API manual token extraction - response success: {}, has data: {}", 
-                    response.isSuccess(), response.getData() != null);
-            
-            if (!response.isSuccess() || response.getData() == null) {
-                log.warn("Zhipuai API response is not successful or has no data");
-                return new ChatTokenUsage(0, 0, 0);
-            }
-            
-            // 尝试从response.getData()中获取usage信息
-            var data = response.getData();
-            log.info("Zhipuai API response data class: {}", data.getClass().getName());
-            
-            // 检查是否有usage字段
-            try {
-                java.lang.reflect.Field usageField = data.getClass().getDeclaredField("usage");
-                usageField.setAccessible(true);
-                Object usage = usageField.get(data);
-                
-                if (usage != null) {
-                    log.info("Zhipuai API found usage field: {}", usage);
-                    
-                    if (usage instanceof java.util.Map) {
-                        java.util.Map<?, ?> usageMap = (java.util.Map<?, ?>) usage;
-                        
-                        long promptTokens = 0;
-                        long completionTokens = 0;
-                        long totalTokens = 0;
-                        
-                        // 提取prompt_tokens
-                        Object promptObj = usageMap.get("prompt_tokens");
-                        if (promptObj instanceof Number) {
-                            promptTokens = ((Number) promptObj).longValue();
-                        }
-                        
-                        // 提取completion_tokens
-                        Object completionObj = usageMap.get("completion_tokens");
-                        if (completionObj instanceof Number) {
-                            completionTokens = ((Number) completionObj).longValue();
-                        }
-                        
-                        // 提取total_tokens
-                        Object totalObj = usageMap.get("total_tokens");
-                        if (totalObj instanceof Number) {
-                            totalTokens = ((Number) totalObj).longValue();
-                        }
-                        
-                        // 如果没有total_tokens，计算它
-                        if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
-                            totalTokens = promptTokens + completionTokens;
-                        }
-                        
-                        log.info("Zhipuai API manual token extraction result - prompt: {}, completion: {}, total: {}", 
-                                promptTokens, completionTokens, totalTokens);
-                        
-                        return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
-                    }
-                }
-            } catch (Exception e) {
-                log.debug("Could not get usage field via reflection: {}", e.getMessage());
-            }
-            
-            // 如果无法通过反射获取，尝试从toString()中解析
-            String dataStr = data.toString();
-            log.info("Zhipuai API parsing data string: {}", dataStr);
-            
-            // 查找usage信息
-            if (dataStr.contains("usage") || dataStr.contains("tokens")) {
-                // 提取prompt_tokens
-                int promptStart = dataStr.indexOf("prompt_tokens=");
-                if (promptStart == -1) promptStart = dataStr.indexOf("promptTokens=");
-                int promptEnd = -1;
-                if (promptStart > 0) {
-                    promptEnd = dataStr.indexOf(",", promptStart);
-                    if (promptEnd == -1) promptEnd = dataStr.indexOf("}", promptStart);
-                }
-                
-                // 提取completion_tokens
-                int completionStart = dataStr.indexOf("completion_tokens=");
-                if (completionStart == -1) completionStart = dataStr.indexOf("completionTokens=");
-                int completionEnd = -1;
-                if (completionStart > 0) {
-                    completionEnd = dataStr.indexOf(",", completionStart);
-                    if (completionEnd == -1) completionEnd = dataStr.indexOf("}", completionStart);
-                }
-                
-                // 提取total_tokens
-                int totalStart = dataStr.indexOf("total_tokens=");
-                if (totalStart == -1) totalStart = dataStr.indexOf("totalTokens=");
-                int totalEnd = -1;
-                if (totalStart > 0) {
-                    totalEnd = dataStr.indexOf("}", totalStart);
-                }
-                
-                long promptTokens = 0;
-                long completionTokens = 0;
-                long totalTokens = 0;
-                
-                if (promptStart > 0 && promptEnd > promptStart) {
-                    try {
-                        String promptStr = dataStr.substring(promptStart + 13, promptEnd);
-                        promptTokens = Long.parseLong(promptStr);
-                    } catch (NumberFormatException e) {
-                        log.warn("Could not parse prompt_tokens from: {}", dataStr.substring(promptStart + 13, promptEnd));
-                    }
-                }
-                
-                if (completionStart > 0 && completionEnd > completionStart) {
-                    try {
-                        String completionStr = dataStr.substring(completionStart + 17, completionEnd);
-                        completionTokens = Long.parseLong(completionStr);
-                    } catch (NumberFormatException e) {
-                        log.warn("Could not parse completion_tokens from: {}", dataStr.substring(completionStart + 17, completionEnd));
-                    }
-                }
-                
-                if (totalStart > 0 && totalEnd > totalStart) {
-                    try {
-                        String totalStr = dataStr.substring(totalStart + 12, totalEnd);
-                        totalTokens = Long.parseLong(totalStr);
-                    } catch (NumberFormatException e) {
-                        log.warn("Could not parse total_tokens from: {}", dataStr.substring(totalStart + 12, totalEnd));
-                    }
-                }
-                
-                // 如果没有total_tokens，计算它
-                if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
-                    totalTokens = promptTokens + completionTokens;
-                }
-                
-                log.info("Zhipuai API manual token extraction result from string parsing - prompt: {}, completion: {}, total: {}", 
-                        promptTokens, completionTokens, totalTokens);
-                
-                return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
-            }
-            
-            // 如果所有方法都失败，尝试估算token使用量
-            log.info("Zhipuai API all extraction methods failed, attempting to estimate token usage");
-            return estimateTokenUsageFromResponse(response);
-            
-        } catch (Exception e) {
-            log.error("Error in manual Zhipuai token extraction", e);
-            return new ChatTokenUsage(0, 0, 0);
-        }
-    }
-
-    /**
-     * 估算token使用量（当无法从API获取实际token信息时使用）
-     * 
-     * @param response ModelApiResponse对象
-     * @return 估算的TokenUsage对象
-     */
-    private ChatTokenUsage estimateTokenUsageFromResponse(ModelApiResponse response) {
-        try {
-            if (response == null || response.getData() == null) {
-                return new ChatTokenUsage(0, 0, 0);
-            }
-            
-            // 获取输出文本
-            String outputText = "";
-            if (response.getData().getChoices() != null && !response.getData().getChoices().isEmpty()) {
-                var choice = response.getData().getChoices().get(0);
-                if (choice.getMessage() != null && choice.getMessage().getContent() != null) {
-                    outputText = choice.getMessage().getContent().toString();
-                }
-            }
-            
-            // 由于无法从ModelApiResponse直接获取输入文本，我们使用一个保守的估算
-            // 假设输入文本长度约为输出文本的30%（这是一个常见的比例）
-            long completionTokens = estimateTokens(outputText);
-            long promptTokens = (long) (completionTokens * 0.3);
-            long totalTokens = promptTokens + completionTokens;
-            
-            log.info("Zhipuai API estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens", 
-                    outputText.length(), completionTokens, promptTokens, totalTokens);
-            
-            return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
-            
-        } catch (Exception e) {
-            log.error("Error estimating token usage", e);
-            return new ChatTokenUsage(0, 0, 0);
-        }
-    }
-    
-    /**
-     * 估算文本的token数量
-     * 
-     * @param text 输入文本
-     * @return 估算的token数量
-     */
-    private long estimateTokens(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0;
-        }
-        
-        // 简单的token估算算法
-        // 中文约1.5字符/token，英文约4字符/token
-        int chineseChars = 0;
-        int englishChars = 0;
-        
-        for (char c : text.toCharArray()) {
-            if (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN) {
-                chineseChars++;
-            } else if (Character.isLetterOrDigit(c)) {
-                englishChars++;
-            }
-        }
-        
-        // 计算估算的token数量
-        long estimatedTokens = (long) (chineseChars / 1.5 + englishChars / 4.0);
-        
-        // 确保至少返回1个token
-        return Math.max(1, estimatedTokens);
-    }
-
-    /**
-     * 从消息估算token使用量
-     * 
-     * @param message 输入消息
-     * @return 估算的TokenUsage对象
-     */
-    private ChatTokenUsage estimateTokenUsageFromMessage(String message) {
-        try {
-            if (message == null || message.isEmpty()) {
-                return new ChatTokenUsage(0, 0, 0);
-            }
-            
-            // 估算输入token数量
-            long promptTokens = estimateTokens(message);
-            
-            // 假设输出长度约为输入的2倍（这是一个常见的比例）
-            long completionTokens = promptTokens * 2;
-            long totalTokens = promptTokens + completionTokens;
-            
-            log.info("Zhipuai API estimated token usage from message - input: {} chars -> {} tokens, estimated output: {} tokens, total: {} tokens", 
-                    message.length(), promptTokens, completionTokens, totalTokens);
-            
-            return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
-            
-        } catch (Exception e) {
-            log.error("Error estimating token usage from message", e);
-            return new ChatTokenUsage(0, 0, 0);
-        }
-    }
 
     /**
      * 方式1：异步流式调用 - 实现BaseSpringAIService的抽象方法（带prompt参数）
@@ -781,6 +512,265 @@ public class ZhipuaiService extends BaseSpringAIService {
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
     }
+
+        /**
+     * 手动提取智谱AI的token使用情况
+     * 从ModelApiResponse中提取token使用信息
+     * 
+     * @param response ModelApiResponse对象
+     * @return TokenUsage对象
+     */
+    private ChatTokenUsage extractZhipuaiTokenUsage(ModelApiResponse response) {
+        try {
+            if (response == null) {
+                log.warn("Zhipuai API response is null");
+                return new ChatTokenUsage(0, 0, 0);
+            }
+            
+            log.info("Zhipuai API manual token extraction - response success: {}, has data: {}", 
+                    response.isSuccess(), response.getData() != null);
+            
+            if (!response.isSuccess() || response.getData() == null) {
+                log.warn("Zhipuai API response is not successful or has no data");
+                return new ChatTokenUsage(0, 0, 0);
+            }
+            
+            // 尝试从response.getData()中获取usage信息
+            var data = response.getData();
+            log.info("Zhipuai API response data class: {}", data.getClass().getName());
+            
+            // 检查是否有usage字段
+            try {
+                java.lang.reflect.Field usageField = data.getClass().getDeclaredField("usage");
+                usageField.setAccessible(true);
+                Object usage = usageField.get(data);
+                
+                if (usage != null) {
+                    log.info("Zhipuai API found usage field: {}", usage);
+                    
+                    if (usage instanceof java.util.Map) {
+                        java.util.Map<?, ?> usageMap = (java.util.Map<?, ?>) usage;
+                        
+                        long promptTokens = 0;
+                        long completionTokens = 0;
+                        long totalTokens = 0;
+                        
+                        // 提取prompt_tokens
+                        Object promptObj = usageMap.get("prompt_tokens");
+                        if (promptObj instanceof Number) {
+                            promptTokens = ((Number) promptObj).longValue();
+                        }
+                        
+                        // 提取completion_tokens
+                        Object completionObj = usageMap.get("completion_tokens");
+                        if (completionObj instanceof Number) {
+                            completionTokens = ((Number) completionObj).longValue();
+                        }
+                        
+                        // 提取total_tokens
+                        Object totalObj = usageMap.get("total_tokens");
+                        if (totalObj instanceof Number) {
+                            totalTokens = ((Number) totalObj).longValue();
+                        }
+                        
+                        // 如果没有total_tokens，计算它
+                        if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
+                            totalTokens = promptTokens + completionTokens;
+                        }
+                        
+                        log.info("Zhipuai API manual token extraction result - prompt: {}, completion: {}, total: {}", 
+                                promptTokens, completionTokens, totalTokens);
+                        
+                        return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("Could not get usage field via reflection: {}", e.getMessage());
+            }
+            
+            // 如果无法通过反射获取，尝试从toString()中解析
+            String dataStr = data.toString();
+            log.info("Zhipuai API parsing data string: {}", dataStr);
+            
+            // 查找usage信息
+            if (dataStr.contains("usage") || dataStr.contains("tokens")) {
+                // 提取prompt_tokens
+                int promptStart = dataStr.indexOf("prompt_tokens=");
+                if (promptStart == -1) promptStart = dataStr.indexOf("promptTokens=");
+                int promptEnd = -1;
+                if (promptStart > 0) {
+                    promptEnd = dataStr.indexOf(",", promptStart);
+                    if (promptEnd == -1) promptEnd = dataStr.indexOf("}", promptStart);
+                }
+                
+                // 提取completion_tokens
+                int completionStart = dataStr.indexOf("completion_tokens=");
+                if (completionStart == -1) completionStart = dataStr.indexOf("completionTokens=");
+                int completionEnd = -1;
+                if (completionStart > 0) {
+                    completionEnd = dataStr.indexOf(",", completionStart);
+                    if (completionEnd == -1) completionEnd = dataStr.indexOf("}", completionStart);
+                }
+                
+                // 提取total_tokens
+                int totalStart = dataStr.indexOf("total_tokens=");
+                if (totalStart == -1) totalStart = dataStr.indexOf("totalTokens=");
+                int totalEnd = -1;
+                if (totalStart > 0) {
+                    totalEnd = dataStr.indexOf("}", totalStart);
+                }
+                
+                long promptTokens = 0;
+                long completionTokens = 0;
+                long totalTokens = 0;
+                
+                if (promptStart > 0 && promptEnd > promptStart) {
+                    try {
+                        String promptStr = dataStr.substring(promptStart + 13, promptEnd);
+                        promptTokens = Long.parseLong(promptStr);
+                    } catch (NumberFormatException e) {
+                        log.warn("Could not parse prompt_tokens from: {}", dataStr.substring(promptStart + 13, promptEnd));
+                    }
+                }
+                
+                if (completionStart > 0 && completionEnd > completionStart) {
+                    try {
+                        String completionStr = dataStr.substring(completionStart + 17, completionEnd);
+                        completionTokens = Long.parseLong(completionStr);
+                    } catch (NumberFormatException e) {
+                        log.warn("Could not parse completion_tokens from: {}", dataStr.substring(completionStart + 17, completionEnd));
+                    }
+                }
+                
+                if (totalStart > 0 && totalEnd > totalStart) {
+                    try {
+                        String totalStr = dataStr.substring(totalStart + 12, totalEnd);
+                        totalTokens = Long.parseLong(totalStr);
+                    } catch (NumberFormatException e) {
+                        log.warn("Could not parse total_tokens from: {}", dataStr.substring(totalStart + 12, totalEnd));
+                    }
+                }
+                
+                // 如果没有total_tokens，计算它
+                if (totalTokens == 0 && (promptTokens > 0 || completionTokens > 0)) {
+                    totalTokens = promptTokens + completionTokens;
+                }
+                
+                log.info("Zhipuai API manual token extraction result from string parsing - prompt: {}, completion: {}, total: {}", 
+                        promptTokens, completionTokens, totalTokens);
+                
+                return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
+            }
+            
+            // 如果所有方法都失败，尝试估算token使用量
+            log.info("Zhipuai API all extraction methods failed, attempting to estimate token usage");
+            return estimateTokenUsageFromResponse(response);
+            
+        } catch (Exception e) {
+            log.error("Error in manual Zhipuai token extraction", e);
+            return new ChatTokenUsage(0, 0, 0);
+        }
+    }
+
+    /**
+     * 估算token使用量（当无法从API获取实际token信息时使用）
+     * 
+     * @param response ModelApiResponse对象
+     * @return 估算的TokenUsage对象
+     */
+    private ChatTokenUsage estimateTokenUsageFromResponse(ModelApiResponse response) {
+        try {
+            if (response == null || response.getData() == null) {
+                return new ChatTokenUsage(0, 0, 0);
+            }
+            
+            // 获取输出文本
+            String outputText = "";
+            if (response.getData().getChoices() != null && !response.getData().getChoices().isEmpty()) {
+                var choice = response.getData().getChoices().get(0);
+                if (choice.getMessage() != null && choice.getMessage().getContent() != null) {
+                    outputText = choice.getMessage().getContent().toString();
+                }
+            }
+            
+            // 由于无法从ModelApiResponse直接获取输入文本，我们使用一个保守的估算
+            // 假设输入文本长度约为输出文本的30%（这是一个常见的比例）
+            long completionTokens = estimateTokens(outputText);
+            long promptTokens = (long) (completionTokens * 0.3);
+            long totalTokens = promptTokens + completionTokens;
+            
+            log.info("Zhipuai API estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens", 
+                    outputText.length(), completionTokens, promptTokens, totalTokens);
+            
+            return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
+            
+        } catch (Exception e) {
+            log.error("Error estimating token usage", e);
+            return new ChatTokenUsage(0, 0, 0);
+        }
+    }
+    
+    /**
+     * 估算文本的token数量
+     * 
+     * @param text 输入文本
+     * @return 估算的token数量
+     */
+    private long estimateTokens(String text) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
+        
+        // 简单的token估算算法
+        // 中文约1.5字符/token，英文约4字符/token
+        int chineseChars = 0;
+        int englishChars = 0;
+        
+        for (char c : text.toCharArray()) {
+            if (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN) {
+                chineseChars++;
+            } else if (Character.isLetterOrDigit(c)) {
+                englishChars++;
+            }
+        }
+        
+        // 计算估算的token数量
+        long estimatedTokens = (long) (chineseChars / 1.5 + englishChars / 4.0);
+        
+        // 确保至少返回1个token
+        return Math.max(1, estimatedTokens);
+    }
+
+    /**
+     * 从消息估算token使用量
+     * 
+     * @param message 输入消息
+     * @return 估算的TokenUsage对象
+     */
+    private ChatTokenUsage estimateTokenUsageFromMessage(String message) {
+        try {
+            if (message == null || message.isEmpty()) {
+                return new ChatTokenUsage(0, 0, 0);
+            }
+            
+            // 估算输入token数量
+            long promptTokens = estimateTokens(message);
+            
+            // 假设输出长度约为输入的2倍（这是一个常见的比例）
+            long completionTokens = promptTokens * 2;
+            long totalTokens = promptTokens + completionTokens;
+            
+            log.info("Zhipuai API estimated token usage from message - input: {} chars -> {} tokens, estimated output: {} tokens, total: {} tokens", 
+                    message.length(), promptTokens, completionTokens, totalTokens);
+            
+            return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
+            
+        } catch (Exception e) {
+            log.error("Error estimating token usage from message", e);
+            return new ChatTokenUsage(0, 0, 0);
+        }
+    }
+
 
     /**
      * 从Prompt中提取文本内容

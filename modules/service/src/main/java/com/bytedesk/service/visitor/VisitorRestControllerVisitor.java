@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 16:13:33
+ * @LastEditTime: 2025-08-24 17:35:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -63,7 +63,7 @@ public class VisitorRestControllerVisitor {
 
     private final VisitorRestService visitorRestService;
 
-    private final MessageUnreadRestService messageUnreadService;
+    private final MessageUnreadRestService messageUnreadRestService;
 
     private final IMessageSendService messageSendService;
 
@@ -77,33 +77,33 @@ public class VisitorRestControllerVisitor {
 
     @ApiRateLimiter(value = 1, timeout = 1)
     @PostMapping("/init")
-    public ResponseEntity<?> init(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> init(@RequestBody VisitorRequest request, HttpServletRequest httpRequest) {
         //
         String ip = IpUtils.getIp(httpRequest);
         if (ip != null) {
-            visitorRequest.setIp(ip);
-            visitorRequest.setIpLocation(ipService.getIpLocation(ip));
+            request.setIp(ip);
+            request.setIpLocation(ipService.getIpLocation(ip));
         }
         // 
-        if (!StringUtils.hasText(visitorRequest.getNickname())) {
-            visitorRequest.setNickname(ipService.createVisitorNickname(httpRequest));
+        if (!StringUtils.hasText(request.getNickname())) {
+            request.setNickname(ipService.createVisitorNickname(httpRequest));
         }
         // 
-        VisitorResponse visitor = visitorRestService.create(visitorRequest);
+        VisitorResponse visitor = visitorRestService.create(request);
         //
         return ResponseEntity.ok(JsonResult.success(visitor));
     }
 
     @PostMapping("/thread")
-    public ResponseEntity<?> requestThread(@RequestBody VisitorRequest visitorRequest, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> requestThread(@RequestBody VisitorRequest request, HttpServletRequest httpRequest) {
         //
         String ip = IpUtils.getIp(httpRequest);
         if (ip != null) {
-            visitorRequest.setIp(ip);
-            visitorRequest.setIpLocation(ipService.getIpLocation(ip));
+            request.setIp(ip);
+            request.setIpLocation(ipService.getIpLocation(ip));
         }
         //
-        MessageProtobuf messageProtobuf = visitorRestService.requestThread(visitorRequest);
+        MessageProtobuf messageProtobuf = visitorRestService.requestThread(request);
         //
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
     }
@@ -113,7 +113,7 @@ public class VisitorRestControllerVisitor {
 
         visitorRestService.updateStatus(request.getUid(), VisitorStatusEnum.ONLINE.name());
 
-        long count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadRestService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("pong", count));
     }
@@ -153,7 +153,7 @@ public class VisitorRestControllerVisitor {
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(MessageUnreadRequest request) {
         
-        Page<MessageUnreadResponse> messages = messageUnreadService.queryByUser(request);
+        Page<MessageUnreadResponse> messages = messageUnreadRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
     }
@@ -162,7 +162,7 @@ public class VisitorRestControllerVisitor {
     @GetMapping("/message/unread/count")
     public ResponseEntity<?> getMessageUnreadCount(MessageUnreadRequest request) {
 
-        long count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadRestService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages count success", count));
     }
@@ -171,9 +171,9 @@ public class VisitorRestControllerVisitor {
     @PostMapping("/message/unread/clear")
     public ResponseEntity<?> clearMessageUnread(@RequestBody MessageUnreadRequest request) {
         // 
-        messageUnreadService.clearUnreadMessages(request);
+        messageUnreadRestService.clearUnreadMessages(request);
         // 看下是否清空了
-        long count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadRestService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("clear unread messages count success", count));
     }
