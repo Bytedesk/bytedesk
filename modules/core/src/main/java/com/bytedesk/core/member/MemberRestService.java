@@ -139,7 +139,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         userRequest.setAvatar(AvatarConsts.getDefaultUserAvatarUrl());
         userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
         userRequest.setOrgUid(request.getOrgUid());
-        //
+
+        // TODO: 同一个用户增加支持绑定多个组织
         UserEntity user = null;
         if (StringUtils.hasText(request.getMobile())) {
             user = userService.findByMobileAndPlatform(request.getMobile(),

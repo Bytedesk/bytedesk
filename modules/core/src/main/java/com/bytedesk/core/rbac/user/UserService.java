@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 11:02:23
+ * @LastEditTime: 2025-08-24 11:34:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -267,7 +267,7 @@ public class UserService {
         }
     }
 
-    // 管理员修改子成员用户密码
+    // 管理员修改子成员用户密码, 无需验证旧密码
     @Transactional
     public UserResponse adminChangePassword(UserRequest request) {
         Optional<UserEntity> userOptional = findByUid(request.getUid());
@@ -368,7 +368,8 @@ public class UserService {
                 .mobileVerified(false)
                 .build();
         user.setUid(uidUtils.getUid());
-        //
+
+        // 设置默认用户名，优先使用邮箱，如果没有则使用手机号
         // if (StringUtils.hasText(request.getUsername())) {
         //     user.setUsername(request.getUsername());
         // } else 
