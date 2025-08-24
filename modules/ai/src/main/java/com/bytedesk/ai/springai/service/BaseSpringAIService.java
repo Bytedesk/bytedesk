@@ -1015,23 +1015,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return true;
         }
 
-        try {
-            // 通过反射检查SseEmitter的内部状态，避免实际发送消息
-            java.lang.reflect.Field timeoutField = emitter.getClass().getDeclaredField("timeout");
-            timeoutField.setAccessible(true);
-            Long timeout = (Long) timeoutField.get(emitter);
-            
-            // 如果超时时间为null或负数，通常表示emitter已完成
-            if (timeout != null && timeout <= 0) {
-                return true;
-            }
-            
-            return false; // 假设emitter仍然活跃
-        } catch (Exception e) {
-            // 如果无法检查状态，保守地假设emitter已完成
-            log.debug("Unable to check emitter status, assuming completed: {}", e.getMessage());
-            return true;
-        }
+        return false; 
     }
 
     protected <T> T createDynamicOptions(RobotLlm llm, Function<RobotLlm, T> optionBuilder) {
