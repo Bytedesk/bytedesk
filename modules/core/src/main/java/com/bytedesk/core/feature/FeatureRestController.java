@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-19 10:17:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 23:13:02
+ * @LastEditTime: 2025-08-24 10:06:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -61,7 +61,6 @@ public class FeatureRestController extends BaseRestController<FeatureRequest, Fe
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
-
 
     @GetMapping
     public ResponseEntity<List<FeatureEntity>> getEnabledFeatures() {

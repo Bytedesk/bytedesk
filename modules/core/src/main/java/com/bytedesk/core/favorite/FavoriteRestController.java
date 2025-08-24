@@ -27,6 +27,11 @@ import lombok.AllArgsConstructor;
 @Tag(name = "Favorite Management", description = "Favorite management APIs for managing user favorites and bookmarks")
 public class FavoriteRestController extends BaseRestController<FavoriteRequest, FavoriteRestService> {
 
+    private final FavoriteRestService favoriteRestService;
 
+    @Override
+    protected FavoriteRestService getService() {
+        return favoriteRestService;
+    }
     
 }
