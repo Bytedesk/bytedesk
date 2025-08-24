@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 07:40:15
+ * @LastEditTime: 2025-08-24 11:01:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -124,11 +124,23 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         }
     }
     
+    // 用户自己修改密码
     @ActionAnnotation(title = "user", action = "changePassword", description = "changePassword")
     @PostMapping("/change/password")
     public ResponseEntity<?> changePassword(@RequestBody UserRequest userRequest) {
 
         UserResponse userResponse = userService.changePassword(userRequest);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    // 管理员修改子成员用户密码
+    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @ActionAnnotation(title = "admin", action = "changePassword", description = "changePassword")
+    @PostMapping("/admin/change/password")
+    public ResponseEntity<?> adminChangePassword(@RequestBody UserRequest userRequest) {
+
+        UserResponse userResponse = userService.adminChangePassword(userRequest);
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 13:28:03
+ * @LastEditTime: 2025-08-24 11:02:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -262,6 +262,26 @@ public class UserService {
                 // 旧密码验证失败，抛出异常或返回错误信息
                 throw new RuntimeException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG);
             }
+        } else {
+            throw new RuntimeException("User not found..!!");
+        }
+    }
+
+    // 管理员修改子成员用户密码
+    @Transactional
+    public UserResponse adminChangePassword(UserRequest request) {
+        Optional<UserEntity> userOptional = findByUid(request.getUid());
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            String newRawPassword = request.getNewPassword(); // 用户输入的新密码
+            // 设置新密码
+            String newEncryptedPassword = passwordEncoder.encode(newRawPassword);
+            user.setPassword(newEncryptedPassword); // 更新用户密码
+            // 更新密码修改时间
+            user.setPasswordModifiedAt(BdDateUtils.now());
+            user = save(user); // 保存用户信息到数据库，假设save方法已经存在
+            //
+            return ConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
         } else {
             throw new RuntimeException("User not found..!!");
         }

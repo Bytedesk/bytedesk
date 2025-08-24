@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 10:32:34
+ * @LastEditTime: 2025-08-24 11:16:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -388,6 +388,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                     .nickname(excel.getNickname())
                     .email(excel.getEmail())
                     .mobile(excel.getMobile())
+                    .password(excel.getPassword())
                     .platform(PlatformEnum.BYTEDESK.name())
                     .orgUid(orgUid) // 确保设置组织UID，避免OrganizationRepository.findByUid接收null参数
                     .build();
@@ -508,7 +509,5 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         return excel;
     }
-
-    
 
 }
