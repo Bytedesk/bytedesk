@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 14:10:46
+ * @LastEditTime: 2025-08-24 16:25:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,92 +41,214 @@ import com.bytedesk.core.thread.ThreadEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-// 工作流对话策略器人
+/**
+ * 工作流线程路由策略
+ * 
+ * <p>功能特点：
+ * - 基于工作流的自动化对话处理
+ * - 不支持转人工，完全自动化流程
+ * - 支持会话复用和状态管理
+ * 
+ * <p>处理流程：
+ * 1. 验证工作流配置
+ * 2. 检查现有会话状态
+ * 3. 创建或复用工作流会话
+ * 4. 启动工作流处理
+ * 
+ * @author jackning 270580156@qq.com
+ * @since 1.0.0
+ */
 @Slf4j
 @Component("workflowThreadStrategy")
 @AllArgsConstructor
-public class WorkflowThreadRoutingStrategy implements ThreadRoutingStrategy {
+public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
     private final WorkflowRestService workflowRestService;
-
     private final ThreadRestService threadRestService;
-
     private final VisitorThreadService visitorThreadService;
-
     private final QueueService queueService;
-
     private final QueueMemberRestService queueMemberRestService;
-
     private final ApplicationEventPublisher applicationEventPublisher;
-
     private final MessageRestService messageRestService;
 
     @Override
-    public MessageProtobuf createThread(VisitorRequest visitorRequest) {
-        return createWorkflowThread(visitorRequest);
+    protected ThreadRestService getThreadRestService() {
+        return threadRestService;
     }
 
-    // 工作流对话，不支持转人工
+    @Override
+    public MessageProtobuf createThread(VisitorRequest visitorRequest) {
+        return executeWithExceptionHandling("create workflow thread", visitorRequest.getSid(),
+                () -> createWorkflowThread(visitorRequest));
+    }
+
+    /**
+     * 创建工作流会话
+     * 
+     * @param request 访客请求
+     * @return 消息协议对象
+     */
     public MessageProtobuf createWorkflowThread(VisitorRequest request) {
-        String workflowUid = request.getSid();
-        WorkflowEntity workflowEntity = workflowRestService.findByUid(workflowUid)
-                .orElseThrow(() -> new RuntimeException("Workflow uid " + workflowUid + " not found"));
-        //
+        // 1. 验证和获取工作流配置
+        WorkflowEntity workflowEntity = getWorkflowEntity(request.getSid());
+        
+        // 2. 生成会话主题并检查现有会话
         String topic = TopicUtils.formatOrgWorkflowThreadTopic(workflowEntity.getUid(), request.getUid());
-        ThreadEntity thread = null;
+        ThreadEntity thread = getOrCreateWorkflowThread(request, workflowEntity, topic);
+        
+        // 3. 处理现有活跃会话
+        if (isExistingWorkflowThread(thread)) {
+            return handleExistingWorkflowThread(workflowEntity, thread);
+        }
+        
+        // 4. 处理新会话或重新激活的会话
+        return processNewWorkflowThread(request, thread, workflowEntity);
+    }
+
+    /**
+     * 获取工作流实体
+     */
+    private WorkflowEntity getWorkflowEntity(String workflowUid) {
+        validateUid(workflowUid, "Workflow");
+        
+        return workflowRestService.findByUid(workflowUid)
+                .orElseThrow(() -> {
+                    log.error("Workflow uid {} not found", workflowUid);
+                    return new IllegalArgumentException("Workflow uid " + workflowUid + " not found");
+                });
+    }
+
+    /**
+     * 获取或创建工作流会话
+     */
+    private ThreadEntity getOrCreateWorkflowThread(VisitorRequest request, WorkflowEntity workflowEntity, String topic) {
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        
         if (threadOptional.isPresent()) {
-            // 
-            if (threadOptional.get().isNew()) {
-                thread = threadOptional.get();
-            } else if (threadOptional.get().isChatting()) {
-                thread = threadOptional.get();
-                // 
-                thread = visitorThreadService.reInitWorkflowThreadExtra(thread, workflowEntity); // 方便测试
-                // 返回未关闭，或 非留言状态的会话
-                log.info("Already have a processing robot thread {}", topic);
-                return getWorkflowContinueMessage(workflowEntity, thread);
+            ThreadEntity existingThread = threadOptional.get();
+            
+            // 检查现有会话状态
+            if (existingThread.isNew()) {
+                log.debug("Found new workflow thread: {}", topic);
+                return existingThread;
+            } else if (existingThread.isChatting()) {
+                log.debug("Found existing chatting workflow thread: {}", topic);
+                // 重新初始化会话用于测试
+                return visitorThreadService.reInitWorkflowThreadExtra(existingThread, workflowEntity);
             }
         }
 
-        // 如果会话不存在，或者会话已经关闭，则创建新的会话
-        if (thread == null) {
-            thread = visitorThreadService.createWorkflowThread(request, workflowEntity, topic);
-        }
+        // 创建新会话
+        log.debug("Creating new workflow thread for topic: {}", topic);
+        return visitorThreadService.createWorkflowThread(request, workflowEntity, topic);
+    }
 
-        // 排队计数
+    /**
+     * 检查是否为现有的工作流会话
+     */
+    private boolean isExistingWorkflowThread(ThreadEntity thread) {
+        return thread.isChatting() && !thread.isNew();
+    }
+
+    /**
+     * 处理现有的工作流会话
+     */
+    private MessageProtobuf handleExistingWorkflowThread(WorkflowEntity workflowEntity, ThreadEntity thread) {
+        log.info("Continuing existing workflow thread: {}", thread.getUid());
+        return getWorkflowContinueMessage(workflowEntity, thread);
+    }
+
+    /**
+     * 处理新的工作流会话
+     */
+    private MessageProtobuf processNewWorkflowThread(VisitorRequest request, ThreadEntity thread, WorkflowEntity workflowEntity) {
+        // 1. 加入队列
         UserProtobuf workflowProtobuf = ConvertUtils.convertToUserProtobuf(workflowEntity);
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, workflowProtobuf, request);
-        log.info("routeWorkflow Enqueued to queue {}", queueMemberEntity.getUid());
+        log.info("Workflow enqueued to queue: {}", queueMemberEntity.getUid());
 
-        String content = "您好，请问有什么可以帮助您？";
-        thread.setChatting().setContent(content);//.setUnreadCount(0);
-        // 
+        // 2. 配置线程状态
+        String welcomeContent = getWorkflowWelcomeMessage();
+        thread.setChatting().setContent(welcomeContent);
+        
+        // 3. 设置工作流信息
         String workflowString = ConvertUtils.convertToUserProtobufString(workflowEntity);
         thread.setRobot(workflowString);
-        // 
-        ThreadEntity savedThread = threadRestService.save(thread);
-        if (savedThread == null) {
-            throw new RuntimeException("Failed to save thread");
-        }
-        // 更新排队状态
-        queueMemberEntity.robotAutoAcceptThread();
-        queueMemberRestService.save(queueMemberEntity);
-        // 
-        applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-        // 
-        MessageEntity message = ThreadMessageUtil.getThreadWorkflowWelcomeMessage(content, savedThread);
-        messageRestService.save(message);
-
-        return ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
+        
+        // 4. 保存线程
+        ThreadEntity savedThread = saveThread(thread);
+        
+        // 5. 更新队列状态
+        updateQueueMemberForWorkflow(queueMemberEntity);
+        
+        // 6. 发布事件
+        publishWorkflowThreadEvent(savedThread);
+        
+        // 7. 创建并保存欢迎消息
+        return createAndSaveWelcomeMessage(welcomeContent, savedThread);
     }
 
-    private MessageProtobuf getWorkflowContinueMessage(WorkflowEntity workflow, @Nonnull ThreadEntity thread) {
+    /**
+     * 获取工作流欢迎消息
+     * 工作流使用默认欢迎消息
+     */
+    private String getWorkflowWelcomeMessage() {
+        return DEFAULT_WELCOME_MESSAGE;
+    }
 
-        String content = "您好，请问有什么可以帮助您？";
+    /**
+     * 更新队列成员状态为工作流自动接受
+     */
+    private void updateQueueMemberForWorkflow(QueueMemberEntity queueMemberEntity) {
+        try {
+            queueMemberEntity.robotAutoAcceptThread();
+            queueMemberRestService.save(queueMemberEntity);
+            log.debug("Updated queue member status for workflow auto-accept: {}", queueMemberEntity.getUid());
+        } catch (Exception e) {
+            log.error("Failed to update queue member for workflow auto-accept: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to update queue member status", e);
+        }
+    }
+
+    /**
+     * 发布工作流线程事件
+     */
+    private void publishWorkflowThreadEvent(ThreadEntity savedThread) {
+        try {
+            applicationEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+            log.debug("Published thread process create event for workflow thread: {}", savedThread.getUid());
+        } catch (Exception e) {
+            log.warn("Failed to publish thread event for workflow thread {}: {}", savedThread.getUid(), e.getMessage());
+        }
+    }
+
+    /**
+     * 创建并保存工作流欢迎消息
+     */
+    private MessageProtobuf createAndSaveWelcomeMessage(String content, ThreadEntity thread) {
+        try {
+            MessageEntity message = ThreadMessageUtil.getThreadWorkflowWelcomeMessage(content, thread);
+            messageRestService.save(message);
+            
+            MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+            log.debug("Created workflow welcome message for thread: {}", thread.getUid());
+            
+            return messageProtobuf;
+        } catch (Exception e) {
+            log.error("Failed to create welcome message for workflow thread {}: {}", thread.getUid(), e.getMessage(), e);
+            throw new RuntimeException("Failed to create welcome message", e);
+        }
+    }
+
+    /**
+     * 获取工作流继续对话消息
+     */
+    private MessageProtobuf getWorkflowContinueMessage(WorkflowEntity workflowEntity, @Nonnull ThreadEntity thread) {
+        validateThread(thread, "get workflow continue message");
+        
+        String content = getWorkflowWelcomeMessage();
         MessageEntity message = ThreadMessageUtil.getThreadWorkflowWelcomeMessage(content, thread);
-
+        
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
-
 }

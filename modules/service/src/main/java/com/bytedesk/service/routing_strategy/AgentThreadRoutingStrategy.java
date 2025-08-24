@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-22 22:17:28
+ * @LastEditTime: 2025-08-24 16:35:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,14 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component("agentThreadStrategy")
 @AllArgsConstructor
-public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
-
-    // 默认消息常量
-    private static final String DEFAULT_WELCOME_MESSAGE = "您好，请问有什么可以帮助您？";
-    private static final String DEFAULT_OFFLINE_MESSAGE = "您好，请留言，我们会尽快回复您";
-    private static final String QUEUE_NEXT_MESSAGE = "请稍后，下一个就是您";
-    private static final String QUEUE_WAITING_MESSAGE_TEMPLATE = " 当前排队人数：%d 大约等待时间：%d  分钟";
-    private static final int ESTIMATED_WAIT_TIME_PER_PERSON = 2; // 分钟
+public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
     private final AgentRestService agentRestService;
     private final ThreadRestService threadRestService;
@@ -73,8 +66,14 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
+    protected ThreadRestService getThreadRestService() {
+        return threadRestService;
+    }
+
+    @Override
     public MessageProtobuf createThread(VisitorRequest visitorRequest) {
-        return createAgentThread(visitorRequest);
+        return executeWithExceptionHandling("create agent thread", visitorRequest.getSid(),
+                () -> createAgentThread(visitorRequest));
     }
 
     /**
@@ -96,17 +95,6 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         
         // 4. 新线程处理：加入队列并根据客服状态路由
         return routeNewThread(thread, agentEntity, visitorRequest);
-    }
-
-    /**
-     * 获取客服实体
-     */
-    private AgentEntity getAgentEntity(String agentUid) {
-        return agentRestService.findByUid(agentUid)
-                .orElseThrow(() -> {
-                    log.error("Agent uid {} not found", agentUid);
-                    return new IllegalArgumentException("Agent uid " + agentUid + " not found");
-                });
     }
 
     /**
@@ -149,7 +137,6 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
         } else if (thread.isQueuing()) {
             return getAgentQueuingMessage(thread);
         }
-        
         throw new IllegalStateException("Unexpected thread state: " + thread.getStatus());
     }
 
@@ -187,11 +174,13 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
      */
     private MessageProtobuf handleAvailableAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
-        validateParameters(threadFromRequest, agent, queueMemberEntity);
+        validateThread(threadFromRequest, "handle available agent");
+        Assert.notNull(agent, "AgentEntity must not be null");
+        Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
         
         // 获取并更新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        String welcomeContent = getWelcomeMessage(agent);
+        String welcomeContent = getAgentWelcomeMessage(agent);
         thread.setChatting().setContent(welcomeContent);
         
         // 保存线程
@@ -215,11 +204,11 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
      */
     private MessageProtobuf handleQueuedAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
-        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+        validateThread(threadFromRequest, "handle queued agent");
 
         // 获取并更新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        String queueContent = generateQueueMessage(queueMemberEntity);
+        String queueContent = generateAgentQueueMessage(queueMemberEntity);
         thread.setQueuing().setContent(queueContent);
         
         // 保存线程
@@ -240,11 +229,11 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
      */
     private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent, 
             QueueMemberEntity queueMemberEntity) {
-        Assert.notNull(threadFromRequest, "ThreadEntity must not be null");
+        validateThread(threadFromRequest, "handle offline agent");
         
         // 获取并更新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        String offlineContent = getOfflineMessage(agent);
+        String offlineContent = getAgentOfflineMessage(agent);
         thread.setOffline().setContent(offlineContent);
         
         // 保存线程
@@ -271,61 +260,40 @@ public class AgentThreadRoutingStrategy implements ThreadRoutingStrategy {
     // ==================== 辅助方法 ====================
 
     /**
-     * 验证参数
+     * 获取客服实体
      */
-    private void validateParameters(ThreadEntity thread, AgentEntity agent, QueueMemberEntity queueMember) {
-        Assert.notNull(thread, "ThreadEntity must not be null");
-        Assert.notNull(agent, "AgentEntity must not be null");
-        Assert.notNull(queueMember, "QueueMemberEntity must not be null");
+    private AgentEntity getAgentEntity(String agentUid) {
+        validateUid(agentUid, "Agent");
+        
+        return agentRestService.findByUid(agentUid)
+                .orElseThrow(() -> {
+                    log.error("Agent uid {} not found", agentUid);
+                    return new IllegalArgumentException("Agent uid " + agentUid + " not found");
+                });
     }
 
     /**
-     * 根据UID获取线程
+     * 获取客服欢迎消息
      */
-    private ThreadEntity getThreadByUid(String threadUid) {
-        return threadRestService.findByUid(threadUid)
-                .orElseThrow(() -> new IllegalArgumentException("Thread with uid " + threadUid + " not found"));
+    private String getAgentWelcomeMessage(AgentEntity agent) {
+        String customMessage = agent.getServiceSettings().getWelcomeTip();
+        return getValidWelcomeMessage(customMessage);
     }
 
     /**
-     * 保存线程并处理异常
+     * 获取客服离线消息
      */
-    private ThreadEntity saveThread(ThreadEntity thread) {
-        ThreadEntity savedThread = threadRestService.save(thread);
-        if (savedThread == null) {
-            log.error("Failed to save thread {}", thread.getUid());
-            throw new RuntimeException("Failed to save thread " + thread.getUid());
-        }
-        return savedThread;
+    private String getAgentOfflineMessage(AgentEntity agent) {
+        String customMessage = agent.getMessageLeaveSettings().getMessageLeaveTip();
+        return getValidOfflineMessage(customMessage);
     }
 
     /**
-     * 获取欢迎消息
+     * 生成客服排队消息
      */
-    private String getWelcomeMessage(AgentEntity agent) {
-        String content = agent.getServiceSettings().getWelcomeTip();
-        return (content == null || content.isEmpty()) ? DEFAULT_WELCOME_MESSAGE : content;
-    }
-
-    /**
-     * 获取离线消息
-     */
-    private String getOfflineMessage(AgentEntity agent) {
-        String content = agent.getMessageLeaveSettings().getMessageLeaveTip();
-        return (content == null || content.isEmpty()) ? DEFAULT_OFFLINE_MESSAGE : content;
-    }
-
-    /**
-     * 生成排队消息
-     */
-    private String generateQueueMessage(QueueMemberEntity queueMemberEntity) {
+    private String generateAgentQueueMessage(QueueMemberEntity queueMemberEntity) {
         int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
-        if (queuingCount == 0) {
-            return QUEUE_NEXT_MESSAGE;
-        } else {
-            return String.format(QUEUE_WAITING_MESSAGE_TEMPLATE, queuingCount, 
-                    queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON);
-        }
+        return generateQueueMessage(queuingCount);
     }
 
     /**
