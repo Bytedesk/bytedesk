@@ -56,7 +56,7 @@ public class ThreadRoutingContext {
     /**
      * 策略映射表 - 线程类型到策略的映射
      */
-    private final Map<ThreadTypeEnum, ThreadRoutingStrategy> strategyMap;
+    private final Map<ThreadTypeEnum, AbstractThreadRoutingStrategy> strategyMap;
     
     /**
      * Spring应用上下文，用于动态获取策略Bean
@@ -66,10 +66,10 @@ public class ThreadRoutingContext {
     /**
      * 构造函数 - 初始化策略映射
      * 
-     * @param strategies 所有ThreadRoutingStrategy实现类的列表
+     * @param strategies 所有AbstractThreadRoutingStrategy实现类的列表
      * @param applicationContext Spring应用上下文
      */
-    public ThreadRoutingContext(List<ThreadRoutingStrategy> strategies, ApplicationContext applicationContext) {
+    public ThreadRoutingContext(List<AbstractThreadRoutingStrategy> strategies, ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.strategyMap = new EnumMap<>(ThreadTypeEnum.class);
         initializeStrategies(strategies);
@@ -87,7 +87,7 @@ public class ThreadRoutingContext {
         ThreadTypeEnum type = visitorRequest.formatType();
         log.debug("Creating thread for type: {}", type);
         
-        ThreadRoutingStrategy strategy = getStrategy(type);
+        AbstractThreadRoutingStrategy strategy = getStrategy(type);
         if (strategy == null) {
             log.error("No strategy found for thread type: {}", type);
             throw new IllegalArgumentException("Thread type " + type.name() + " not supported");
@@ -107,7 +107,7 @@ public class ThreadRoutingContext {
      * @param type 线程类型
      * @return 对应的策略实现，如果不存在则返回null
      */
-    public ThreadRoutingStrategy getStrategy(ThreadTypeEnum type) {
+    public AbstractThreadRoutingStrategy getStrategy(ThreadTypeEnum type) {
         return strategyMap.get(type);
     }
     
@@ -135,8 +135,8 @@ public class ThreadRoutingContext {
      * 
      * @param strategies 策略列表
      */
-    private void initializeStrategies(List<ThreadRoutingStrategy> strategies) {
-        for (ThreadRoutingStrategy strategy : strategies) {
+    private void initializeStrategies(List<AbstractThreadRoutingStrategy> strategies) {
+        for (AbstractThreadRoutingStrategy strategy : strategies) {
             registerStrategy(strategy);
         }
         
@@ -149,7 +149,7 @@ public class ThreadRoutingContext {
      * 
      * @param strategy 策略实例
      */
-    private void registerStrategy(ThreadRoutingStrategy strategy) {
+    private void registerStrategy(AbstractThreadRoutingStrategy strategy) {
         try {
             String beanName = getBeanName(strategy);
             ThreadTypeEnum type = extractTypeFromBeanName(beanName);
@@ -173,7 +173,7 @@ public class ThreadRoutingContext {
             if (!strategyMap.containsKey(type)) {
                 String beanName = generateBeanName(type);
                 try {
-                    ThreadRoutingStrategy strategy = applicationContext.getBean(beanName, ThreadRoutingStrategy.class);
+                    AbstractThreadRoutingStrategy strategy = applicationContext.getBean(beanName, AbstractThreadRoutingStrategy.class);
                     strategyMap.put(type, strategy);
                     log.debug("Registered missing strategy by bean name: {} -> {}", type, beanName);
                 } catch (Exception e) {
@@ -189,7 +189,7 @@ public class ThreadRoutingContext {
      * @param strategy 策略实例
      * @return Bean名称，如果获取失败返回类名的首字母小写形式
      */
-    private String getBeanName(ThreadRoutingStrategy strategy) {
+    private String getBeanName(AbstractThreadRoutingStrategy strategy) {
         try {
             // 尝试从@Component注解获取value
             Component componentAnnotation = strategy.getClass().getAnnotation(Component.class);

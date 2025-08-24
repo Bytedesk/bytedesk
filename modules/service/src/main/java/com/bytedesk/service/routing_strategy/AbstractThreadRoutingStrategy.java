@@ -18,9 +18,11 @@ import java.util.Optional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.visitor.VisitorRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,6 +64,15 @@ public abstract class AbstractThreadRoutingStrategy {
     protected static final int MESSAGE_CACHE_MINUTES = 30;
 
     // ==================== 抽象方法 ====================
+    
+    /**
+     * 创建线程的核心方法
+     * 由具体实现类负责处理不同类型的线程创建逻辑
+     * 
+     * @param visitorRequest 访客请求信息
+     * @return 消息协议对象
+     */
+    public abstract MessageProtobuf createThread(VisitorRequest visitorRequest);
     
     /**
      * 获取线程服务实例
