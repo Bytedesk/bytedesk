@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
-import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.base.BaseRestControllerOverride;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.rbac.auth.AuthRequest;
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Tag(name = "User Management", description = "User management APIs")
 @Description("User Management Controller - User management APIs for user CRUD operations")
-public class UserRestController extends BaseRestController<UserRequest, UserRestService> {
+public class UserRestController extends BaseRestControllerOverride<UserRequest> {
 
     private final UserRestService userRestService;
 
@@ -83,10 +83,10 @@ public class UserRestController extends BaseRestController<UserRequest, UserRest
     }
 
     @ActionAnnotation(title = "user", action = "更新", description = "update user info")
-    @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody UserRequest userRequest) {
+    @Override
+    public ResponseEntity<?> update(UserRequest request) {
 
-        UserResponse userResponse = userRestService.update(userRequest);
+        UserResponse userResponse = userRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }

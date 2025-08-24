@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 09:57:41
+ * @LastEditTime: 2025-08-24 10:32:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -89,18 +89,20 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getUser();
         Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
-        if (!memberOptional.isPresent()) {
-            return null;
+        if (memberOptional.isPresent()) {
+            return convertToResponse(memberOptional.get());
+        } else {
+            throw new RuntimeException("Member not found by user: " + request.getUserUid());
         }
-        return convertToResponse(memberOptional.get());
     }
 
     public MemberResponse queryByUserUid(MemberRequest request) {
         Optional<MemberEntity> memberOptional = findByUserUid(request.getUserUid());
-        if (!memberOptional.isPresent()) {
-            return null;
+        if (memberOptional.isPresent()) {
+            return convertToResponse(memberOptional.get());
+        } else {
+            throw new RuntimeException("Member not found by userUid: " + request.getUserUid());
         }
-        return convertToResponse(memberOptional.get());
     }
 
     public Boolean existsByUid(String uid) {

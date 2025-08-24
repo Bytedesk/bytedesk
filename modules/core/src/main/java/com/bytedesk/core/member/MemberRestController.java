@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:20:17
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 11:24:15
+ * @LastEditTime: 2025-08-24 10:52:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
-import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.base.BaseRestControllerOverride;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +43,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member")
 @Tag(name = "成员管理", description = "成员管理相关接口")
-public class MemberRestController extends BaseRestController<MemberRequest, MemberRestService> {
+public class MemberRestController extends BaseRestControllerOverride<MemberRequest> {
 
     private final MemberRestService memberRestService;
 
@@ -82,9 +82,6 @@ public class MemberRestController extends BaseRestController<MemberRequest, Memb
     public ResponseEntity<?> queryByUserUid(MemberRequest request) {
         //
         MemberResponse memberResponse = memberRestService.queryByUserUid(request);
-        if (memberResponse == null) {
-            return ResponseEntity.ok(JsonResult.error("login first"));
-        }
         //
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }

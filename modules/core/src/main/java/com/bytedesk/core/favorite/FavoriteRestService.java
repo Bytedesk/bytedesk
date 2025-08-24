@@ -51,6 +51,24 @@ public class FavoriteRestService extends BaseRestService<FavoriteEntity, Favorit
         return favoriteRepository.findAll(spec, pageable);
     }
 
+    @Override
+    public Page<FavoriteResponse> queryByOrg(FavoriteRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<FavoriteEntity> spec = createSpecification(request);
+        Page<FavoriteEntity> page = executePageQuery(spec, pageable);
+        return page.map(this::convertToResponse);
+    }
+
+    @Override
+    public Page<FavoriteResponse> queryByUser(FavoriteRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
+    }
+
     @Cacheable(value = "favorite", key = "#uid", unless="#result==null")
     @Override
     public Optional<FavoriteEntity> findByUid(String uid) {
