@@ -49,6 +49,7 @@ import com.bytedesk.core.rbac.token.TokenEntity;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -124,6 +125,8 @@ public class UserService {
         if (StringUtils.hasText(request.getPassword())) {
             String encodedPassword = passwordEncoder.encode(request.getPassword());
             user.setPassword(encodedPassword);
+            // 设置密码修改时间为当前时间
+            user.setPasswordModifiedAt(BdDateUtils.now());
         }
         // 只有经过验证的邮箱，才真正执行注册
         if (StringUtils.hasText(request.getEmail())) {
@@ -158,6 +161,9 @@ public class UserService {
             }
         }
         user.setEnabled(true);
+        
+        // 设置密码修改时间为账号创建时间（当前时间）
+        user.setPasswordModifiedAt(BdDateUtils.now());
         //
         user = save(user);
         // 新注册用户添加role_user
@@ -247,6 +253,8 @@ public class UserService {
                 // 旧密码验证通过，设置新密码
                 String newEncryptedPassword = passwordEncoder.encode(newRawPassword);
                 user.setPassword(newEncryptedPassword); // 更新用户密码
+                // 更新密码修改时间
+                user.setPasswordModifiedAt(BdDateUtils.now());
                 user = save(user); // 保存用户信息到数据库，假设save方法已经存在
                 //
                 return ConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
@@ -355,6 +363,8 @@ public class UserService {
         } else {
             user.setPassword(passwordEncoder.encode(bytedeskProperties.getMemberDefaultPassword()));
         }
+        // 设置密码修改时间为账号创建时间
+        user.setPasswordModifiedAt(BdDateUtils.now());
         //
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(request.getOrgUid());
         if (!orgOptional.isPresent()) {

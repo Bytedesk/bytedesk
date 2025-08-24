@@ -101,6 +101,10 @@ public class ConvertUtils {
         
         Set<GrantedAuthority> authorities = filterUserGrantedAuthorities(user);
         userResponse.setAuthorities(authorities);
+        
+        // 设置密码修改时间
+        userResponse.setPasswordModifiedAt(user.getPasswordModifiedAtString());
+        
         return userResponse;
     }
 

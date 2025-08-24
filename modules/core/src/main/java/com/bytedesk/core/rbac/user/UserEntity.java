@@ -1,5 +1,6 @@
 package com.bytedesk.core.rbac.user;
 
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -148,6 +149,14 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Builder.Default
 	@Column(name = "is_mobile_verified")
 	private boolean mobileVerified = false;
+
+	/**
+	 * Password last modified time for security compliance
+	 * Used for tracking password changes and prompting users to update passwords
+	 * Defaults to account creation time when user is created
+	 */
+	@Column(name = "password_modified_at")
+	private ZonedDateTime passwordModifiedAt;
 
 	// TODO: 一个用户可以属于多个组织
 
@@ -331,6 +340,17 @@ public class UserEntity extends BaseEntityNoOrg {
 			return BytedeskConsts.EMPTY_STRING;
 		}
 		return this.currentOrganization.getUid();
+	}
+
+	/**
+	 * Get formatted password modification time for display
+	 * @return formatted date string
+	 */
+	public String getPasswordModifiedAtString() {
+		if (this.passwordModifiedAt == null) {
+			return BytedeskConsts.EMPTY_STRING;
+		}
+		return BdDateUtils.formatDatetimeToString(this.passwordModifiedAt);
 	}
 
 	// 定义性别枚举

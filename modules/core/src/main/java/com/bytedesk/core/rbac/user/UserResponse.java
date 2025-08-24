@@ -54,6 +54,11 @@ public class UserResponse extends BaseResponse {
     private Boolean superUser;
     private Boolean emailVerified;
     private Boolean mobileVerified;
+    
+    /**
+     * Password last modified time for security compliance tracking
+     */
+    private String passwordModifiedAt;
     //
     private OrganizationResponseSimple currentOrganization;
     private Set<RoleResponse> currentRoles;
