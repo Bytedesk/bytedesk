@@ -76,6 +76,41 @@
         "webUrl": "https://openai.com/",
         "status": "PRODUCTION"
     },
+    "coze": {
+        "nickname": "Coze",
+        "logo": "coze.png",
+        "apiUrl": "https://api.coze.cn",
+        "webUrl": "https://www.coze.cn/",
+        "status": "PRODUCTION"
+    },
+    "dify": {
+        "nickname": "Dify",
+        "logo": "dify.png",
+        "apiUrl": "https://api.dify.ai",
+        "webUrl": "https://www.dify.ai/",
+        "status": "PRODUCTION"
+    },
+    "maxkb": {
+        "nickname": "MaxKB",
+        "logo": "maxkb.png",
+        "apiUrl": "https://api.maxkb.cn",
+        "webUrl": "https://www.maxkb.cn/",
+        "status": "PRODUCTION"
+    },
+    "n8n": {
+        "nickname": "n8n",
+        "logo": "n8n.png",
+        "apiUrl": "https://api.n8n.io",
+        "webUrl": "https://n8n.io/",
+        "status": "PRODUCTION"
+    },
+    "ragflow": {
+        "nickname": "Ragflow",
+        "logo": "ragflow.png",
+        "apiUrl": "https://api.ragflow.io",
+        "webUrl": "https://www.ragflow.io/",
+        "status": "PRODUCTION"
+    },
     "openrouter": {
         "nickname": "OpenRouter",
         "logo": "openrouter.png",
