@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-22 08:35:37
+ * @LastEditTime: 2025-08-25 14:04:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,6 +43,13 @@ public class LlmConsts {
 
     // 自定义模型提供商
     public static final String CUSTOM = "custom";
+
+    // 第三方知识库
+    public static final String COZE = "coze";
+    public static final String DIFY = "dify";
+    public static final String N8N = "n8n";
+    public static final String MAXKB = "maxkb";
+    public static final String RAGFLOW = "ragflow";
 
     // 默认 智谱AI
     // 默认文字对话模型提供商

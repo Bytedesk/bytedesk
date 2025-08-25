@@ -21,7 +21,8 @@
 		<ollama4j.version>1.0.100</ollama4j.version>
 		<jsonp.version>1.18.3</jsonp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
-		<ai.djl.version>0.32.0</ai.djl.version>
+		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
+		<coze.version>0.4.1</coze.version>
 	</properties>
 
 	<dependencies>
@@ -199,6 +200,15 @@
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>${jsonp.version}</version>
+		</dependency>
+
+		<!-- https://github.com/coze-dev/coze-java -->
+		<!-- https://mvnrepository.com/artifact/com.coze/coze-api -->
+		<!--Secret token: pat_DOcxDcCkw8Q7xMAEGX9TFCkidJTivRHSU5sfJF5pStvh96rm5KPjNcQPsqgpnyK6 -->
+		<dependency>
+			<groupId>com.coze</groupId>
+			<artifactId>coze-api</artifactId>
+			<version>${coze.version}</version>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->

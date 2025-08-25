@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-04-29 10:31:05
+ * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-25 14:10:48
+ * @LastEditTime: 2025-02-25 10:01:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,7 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-@NonNullApi
-package com.bytedesk.ai.springai.providers.bedrock;
+package com.bytedesk.ai.springai.providers.n8n.event;
 
-import org.springframework.lang.NonNullApi;
+import org.springframework.context.ApplicationEvent;
+
+import com.bytedesk.ai.springai.providers.n8n.N8nEntity;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class N8nUpdateEvent extends ApplicationEvent {
+
+    private static final long serialVersionUID = 1L;
+
+    private N8nEntity n8n;
+
+    public N8nUpdateEvent(N8nEntity n8n) {
+        super(n8n);
+        this.n8n = n8n;
+    }
+
+}
