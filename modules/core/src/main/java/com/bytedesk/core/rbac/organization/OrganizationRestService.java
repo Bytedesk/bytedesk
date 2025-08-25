@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.organization;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -283,6 +284,11 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         
         // 转换为响应对象
         return convertToResponse(updatedOrganization);
+    }
+
+
+    public List<OrganizationEntity> findAll() {
+        return organizationRepository.findByDeletedFalse();
     }
 
     @Cacheable(value = "organization", key = "#uid", unless = "#result == null")

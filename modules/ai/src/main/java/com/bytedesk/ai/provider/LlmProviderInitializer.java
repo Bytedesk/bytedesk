@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:10:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 14:42:12
+ * @LastEditTime: 2025-08-25 15:37:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,8 +23,9 @@ import com.bytedesk.ai.model.LlmModelJsonLoader;
 import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.ai.model.LlmModelRestService;
 import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,8 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
     private final LlmModelRestService llmModelRestService;
 
     private final LlmModelJsonLoader llmModelJsonService;
+
+    private final OrganizationRestService organizationRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -95,7 +98,7 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
             }
         }
         //
-        // init super admin providers, models will be created in LlmModelEventListener
+        // 查询所有组织，复制平台级别的provider和model
         level = LevelEnum.ORGANIZATION.name();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
             String providerName = entry.getKey();
@@ -104,8 +107,13 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
             String status = providerJson.getStatus();
             if (LlmProviderStatusEnum.PRODUCTION.name().equalsIgnoreCase(status)) {
                 if (!llmProviderRestService.existsByNameAndLevelAndStatus(providerName, level, status)) {
-                    String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-                    llmProviderRestService.createFromProviderJson(providerName, providerJson, level, orgUid);
+                    // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+                    // llmProviderRestService.createFromProviderJson(providerName, providerJson, level, orgUid);
+                    List<OrganizationEntity> organizationList = organizationRestService.findAll();
+                    for (OrganizationEntity organizationEntity : organizationList) {
+                        String orgUid = organizationEntity.getUid();
+                        llmProviderRestService.createFromProviderJson(providerName, providerJson, level, orgUid);
+                    }
                 } else {
                     // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
                     List<LlmProviderEntity> providerList = llmProviderRestService.findByName(providerName, level);
