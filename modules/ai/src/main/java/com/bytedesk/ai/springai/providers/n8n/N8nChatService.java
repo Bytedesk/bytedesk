@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * RAGFlow Chat Service - 基于 RAGFlow API 的对话服务
+ * N8N Chat Service - 基于 N8N API 的对话服务
  * https://n8n.io/docs/dev/http_api_reference
  */
 @Slf4j
@@ -65,20 +65,20 @@ public class N8nChatService {
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-            log.info("Sending chat completion to RAGFlow API: {}", url);
+            log.info("Sending chat completion to N8N API: {}", url);
             log.debug("Request body: {}", objectMapper.writeValueAsString(requestBody));
 
             ResponseEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.POST, request, String.class);
 
-            log.info("RAGFlow API response status: {}", response.getStatusCode());
-            log.debug("RAGFlow API response body: {}", response.getBody());
+            log.info("N8N API response status: {}", response.getStatusCode());
+            log.debug("N8N API response body: {}", response.getBody());
 
             return response.getBody();
 
         } catch (Exception e) {
-            log.error("Error creating chat completion with RAGFlow API", e);
-            throw new RuntimeException("Failed to create chat completion with RAGFlow API", e);
+            log.error("Error creating chat completion with N8N API", e);
+            throw new RuntimeException("Failed to create chat completion with N8N API", e);
         }
     }
 
@@ -108,20 +108,20 @@ public class N8nChatService {
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-            log.info("Sending agent completion to RAGFlow API: {}", url);
+            log.info("Sending agent completion to N8N API: {}", url);
             log.debug("Request body: {}", objectMapper.writeValueAsString(requestBody));
 
             ResponseEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.POST, request, String.class);
 
-            log.info("RAGFlow API response status: {}", response.getStatusCode());
-            log.debug("RAGFlow API response body: {}", response.getBody());
+            log.info("N8N API response status: {}", response.getStatusCode());
+            log.debug("N8N API response body: {}", response.getBody());
 
             return response.getBody();
 
         } catch (Exception e) {
-            log.error("Error creating agent completion with RAGFlow API", e);
-            throw new RuntimeException("Failed to create agent completion with RAGFlow API", e);
+            log.error("Error creating agent completion with N8N API", e);
+            throw new RuntimeException("Failed to create agent completion with N8N API", e);
         }
     }
 
@@ -145,8 +145,8 @@ public class N8nChatService {
             return createChatCompletion(chatId, "model", messages, stream);
 
         } catch (Exception e) {
-            log.error("Error sending message to RAGFlow API", e);
-            throw new RuntimeException("Failed to send message to RAGFlow API", e);
+            log.error("Error sending message to N8N API", e);
+            throw new RuntimeException("Failed to send message to N8N API", e);
         }
     }
 
@@ -170,8 +170,8 @@ public class N8nChatService {
             return createAgentCompletion(agentId, "model", messages, stream);
 
         } catch (Exception e) {
-            log.error("Error sending agent message to RAGFlow API", e);
-            throw new RuntimeException("Failed to send agent message to RAGFlow API", e);
+            log.error("Error sending agent message to N8N API", e);
+            throw new RuntimeException("Failed to send agent message to N8N API", e);
         }
     }
 

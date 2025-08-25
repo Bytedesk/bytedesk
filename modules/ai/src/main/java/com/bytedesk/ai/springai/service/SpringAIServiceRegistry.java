@@ -20,12 +20,17 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
+import com.bytedesk.ai.springai.providers.coze.SpringAICozeService;
 import com.bytedesk.ai.springai.providers.custom.SpringAICustomService;
 import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
+import com.bytedesk.ai.springai.providers.dify.SpringAIDifyService;
 import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
+import com.bytedesk.ai.springai.providers.maxkb.SpringAIMaxkbService;
 import com.bytedesk.ai.springai.providers.minimax.SpringAIMinimaxService;
+import com.bytedesk.ai.springai.providers.n8n.SpringAIN8nService;
 import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
+import com.bytedesk.ai.springai.providers.ragflow.SpringAIRagflowService;
 import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
 import com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService;
@@ -56,28 +61,36 @@ public class SpringAIServiceRegistry {
     private final Optional<SpringAIBaiduService> springAIBaiduService;
     private final Optional<SpringAIVolcengineService> springAIVolcengineService;
     private final Optional<SpringAIMinimaxService> springAIMinimaxService;
+    private final Optional<SpringAICozeService> springAICozeService;
+    private final Optional<SpringAIDifyService> springAIDifyService;
+    private final Optional<SpringAIMaxkbService> springAIMaxkbService;
+    private final Optional<SpringAIRagflowService> springAIRagflowService;
+    private final Optional<SpringAIN8nService> springAIN8nService;
     // 自定义服务，用于处理未知或未注册的提供商，兼容OpenAI
     private final Optional<SpringAICustomService> springAICustomService;
 
     // 服务注册表，用于存储各种AI服务提供商的实现
     private final Map<String, SpringAIService> serviceRegistry = new HashMap<>();
 
-    @PostConstruct
-    public void init() {
-        // 在初始化时注册所有可用的服务
-        registerService(LlmConsts.DEEPSEEK, springAIDeepseekService.orElse(null));
-        // registerService(LlmConsts.ZHIPUAI, springAIZhipuaiService.orElse(null));
-        registerService(LlmConsts.ZHIPUAI, zhipuaiService.orElse(null));
-        registerService(LlmConsts.DASHSCOPE, springAIDashscopeService.orElse(null));
-        registerService(LlmConsts.OLLAMA, springAIOllamaService.orElse(null));
-        registerService(LlmConsts.SILICONFLOW, springAISiliconFlowService.orElse(null));
-        registerService(LlmConsts.GITEE, springAIGiteeService.orElse(null));
-        registerService(LlmConsts.TENCENT, springAITencentService.orElse(null));
-        registerService(LlmConsts.BAIDU, springAIBaiduService.orElse(null));
-        registerService(LlmConsts.VOLCENGINE, springAIVolcengineService.orElse(null));
-        registerService(LlmConsts.MINIMAX, springAIMinimaxService.orElse(null));
-        
-        log.info("SpringAI服务注册表初始化完成，注册了{}个服务", serviceRegistry.size());
+        @PostConstruct
+    public void registerServices() {
+        //
+        springAIDashscopeService.ifPresent(service -> registerService(LlmConsts.DASHSCOPE, service));
+        zhipuaiService.ifPresent(service -> registerService(LlmConsts.ZHIPUAI, service));
+        springAIDeepseekService.ifPresent(service -> registerService(LlmConsts.DEEPSEEK, service));
+        springAIMinimaxService.ifPresent(service -> registerService(LlmConsts.MINIMAX, service));
+        springAIBaiduService.ifPresent(service -> registerService(LlmConsts.BAIDU, service));
+        springAIOllamaService.ifPresent(service -> registerService(LlmConsts.OLLAMA, service));
+        springAISiliconFlowService.ifPresent(service -> registerService(LlmConsts.SILICONFLOW, service));
+        springAIGiteeService.ifPresent(service -> registerService(LlmConsts.GITEE, service));
+        springAITencentService.ifPresent(service -> registerService(LlmConsts.TENCENT, service));
+        springAIVolcengineService.ifPresent(service -> registerService(LlmConsts.VOLCENGINE, service));
+        springAICozeService.ifPresent(service -> registerService(LlmConsts.COZE, service));
+        springAIDifyService.ifPresent(service -> registerService(LlmConsts.DIFY, service));
+        springAIMaxkbService.ifPresent(service -> registerService(LlmConsts.MAXKB, service));
+        springAIRagflowService.ifPresent(service -> registerService(LlmConsts.RAGFLOW, service));
+        springAIN8nService.ifPresent(service -> registerService(LlmConsts.N8N, service));
+        springAICustomService.ifPresent(service -> registerService(LlmConsts.CUSTOM, service));
     }
 
     /**

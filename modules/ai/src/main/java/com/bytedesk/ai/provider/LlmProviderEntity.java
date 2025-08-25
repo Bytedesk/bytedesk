@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-19 15:27:37
+ * @LastEditTime: 2025-08-25 14:57:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,9 +56,16 @@ public class LlmProviderEntity extends BaseEntity {
     // private String type;
 
     // 
-    private String apiUrl;
-    private String apiKey;
     private String webUrl;
+
+    // 
+    private String apiUrl;
+    
+    private String apiKey;
+
+    // 关联的Coze Bot
+    private String cozeBotId;
+
     // 
     @Builder.Default
     private String status = LlmProviderStatusEnum.DEVELOPMENT.name();

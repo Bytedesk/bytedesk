@@ -152,8 +152,8 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                     log.info("Chat stream completed");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.DEEPSEEK;
-                    recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "minimax-chat";
+                    recordAiTokenUsage(robot, LlmConsts.MINIMAX, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -204,8 +204,8 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
-                    ? robot.getLlm().getTextModel() : LlmConsts.DEEPSEEK;
-            recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
+                    ? robot.getLlm().getTextModel() : "minimax-chat";
+            recordAiTokenUsage(robot, LlmConsts.MINIMAX, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -270,11 +270,11 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                     log.info("Minimax API SSE complete");
                     // 发送流结束消息，包含token使用情况
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.DEEPSEEK, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.DEEPSEEK);
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.MINIMAX, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "minimax-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmConsts.DEEPSEEK;
-                    recordAiTokenUsage(robot, LlmConsts.DEEPSEEK, modelType, 
+                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "minimax-chat";
+                    recordAiTokenUsage(robot, LlmConsts.MINIMAX, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
