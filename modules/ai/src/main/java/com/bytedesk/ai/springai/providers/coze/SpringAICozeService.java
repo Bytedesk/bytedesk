@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-08-25 00:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-25 00:00:00
+ * @LastEditTime: 2025-08-25 15:04:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -52,7 +51,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "bytedesk.coze.enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAICozeService extends BaseSpringAIService {
 
     @Autowired

@@ -46,18 +46,18 @@ public class CozeChatController {
 
     // http://localhost:9003/coze/chat?content=what%20can%20you%20do?&userUid=123456
     @GetMapping("/chat")
-    public ResponseEntity<?> chat(CozeRequest request) {
-
-        ChatPoll chatPoll = cozeChatService.Chat(request.getContent(), request.getUserUid());
+    public ResponseEntity<?> chat(String content, String userUid) {
+        
+        ChatPoll chatPoll = cozeChatService.Chat(content, userUid);
 
         return ResponseEntity.ok(JsonResult.success(chatPoll));
     }
 
     // http://localhost:9003/coze/chatWithImage?imagePath=xxx&userUid=123456
     @GetMapping("/cha/image")
-    public ResponseEntity<?> chatWithImage(CozeRequest request) {
+    public ResponseEntity<?> chatWithImage(String imagePath, String userUid) {
         
-        cozeChatService.ChatWithImage(request.getContent(), request.getUserUid());
+        cozeChatService.ChatWithImage(imagePath, userUid);
 
         return ResponseEntity.ok(JsonResult.success(""));
     }
@@ -65,12 +65,12 @@ public class CozeChatController {
     // chat stream - SSE方式
     // http://localhost:9003/coze/chat/stream?content=what%20can%20you%20do?&userUid=123456
     @GetMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter chatStream(CozeRequest request) {
+    public SseEmitter chatStream(String content, String userUid) {
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
         
         // 验证请求参数
-        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
+        if (content == null || content.trim().isEmpty()) {
             try {
                 emitter.send(SseEmitter.event()
                         .name("error")
@@ -82,7 +82,7 @@ public class CozeChatController {
             return emitter;
         }
         
-        if (request.getUserUid() == null || request.getUserUid().trim().isEmpty()) {
+        if (userUid == null || userUid.trim().isEmpty()) {
             try {
                 emitter.send(SseEmitter.event()
                         .name("error")
@@ -102,7 +102,7 @@ public class CozeChatController {
                         .data("Starting conversation..."));
                 
                 // 调用Coze聊天服务
-                cozeChatService.ChatStream(request.getContent(), request.getUserUid(), emitter);
+                cozeChatService.ChatStream(content, userUid, emitter);
                 
             } catch (Exception e) {
                 log.error("Error processing SSE chat stream request", e);
