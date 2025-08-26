@@ -44,4 +44,7 @@ public class RedisConsts {
     // 推送验证码发送频率控制相关常量
     public static final String PUSH_CODE_IP_PREFIX = BYTEDESK_REDIS_PREFIX + "push:code:ip:";
 
+    // 验证码相关常量
+    public static final String KAPTCHA_PREFIX = BYTEDESK_REDIS_PREFIX + "kaptcha:";
+
 }

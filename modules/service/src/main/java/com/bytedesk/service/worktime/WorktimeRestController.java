@@ -27,5 +27,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Description("Worktime Management Controller - Agent working hours and schedule management APIs")
 public class WorktimeRestController extends BaseRestController<WorktimeRequest, WorktimeRestService> {
+
+    private final WorktimeRestService worktimeRestService;
+
+    @Override
+    protected WorktimeRestService getService() {
+        return worktimeRestService;
+    }
     
 }

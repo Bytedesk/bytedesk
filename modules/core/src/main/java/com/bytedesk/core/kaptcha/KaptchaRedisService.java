@@ -39,15 +39,15 @@ public class KaptchaRedisService {
     private final BytedeskProperties bytedeskProperties;
 
     public void putKaptcha(String key, String value) {
-        stringRedisTemplate.opsForValue().set(RedisConsts.BYTEDESK_REDIS_PREFIX + key, value, EXPIRE_TIME, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(RedisConsts.KAPTCHA_PREFIX + key, value, EXPIRE_TIME, TimeUnit.MINUTES);
     }
 
     public Boolean hasKaptcha(String key) {
-        return stringRedisTemplate.hasKey(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
+        return stringRedisTemplate.hasKey(RedisConsts.KAPTCHA_PREFIX + key);
     }
 
     public String getKaptcha(String key) {
-        return stringRedisTemplate.opsForValue().get(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
+        return stringRedisTemplate.opsForValue().get(RedisConsts.KAPTCHA_PREFIX + key);
     }
 
     public Boolean checkKaptcha(String key, String value, @NonNull String channel) {
@@ -60,12 +60,12 @@ public class KaptchaRedisService {
             return true;
         }
         // log.info("checkKaptcha key: " + key + ", value: " + value);
-        String cachedValue = stringRedisTemplate.opsForValue().get(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
+        String cachedValue = stringRedisTemplate.opsForValue().get(RedisConsts.KAPTCHA_PREFIX + key);
         return cachedValue != null && cachedValue.equals(value);
     }
 
     public void removeKaptcha(String key) {
-        stringRedisTemplate.delete(RedisConsts.BYTEDESK_REDIS_PREFIX + key);
+        stringRedisTemplate.delete(RedisConsts.KAPTCHA_PREFIX + key);
     }
 
 }

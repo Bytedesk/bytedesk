@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-18 14:46:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 17:08:35
+ * @LastEditTime: 2025-08-26 18:08:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -34,18 +37,33 @@ public class WorktimeRestService extends BaseRestService<WorktimeEntity, Worktim
 
     private final UidUtils uidUtils;
 
-    // private final ModelMapper modelMapper;
+    @Override
+    protected Specification<WorktimeEntity> createSpecification(WorktimeRequest request) {
+        return WorktimeSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<WorktimeEntity> executePageQuery(Specification<WorktimeEntity> spec, Pageable pageable) {
+        return worktimeRepository.findAll(pageable);
+    }
 
     @Override
     public Page<WorktimeResponse> queryByOrg(WorktimeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
+        Pageable pageable = request.getPageable();
+        Specification<WorktimeEntity> spec = createSpecification(request);
+        Page<WorktimeEntity> page = executePageQuery(spec, pageable);
+        return page.map(this::convertToResponse);
     }
 
     @Override
     public Page<WorktimeResponse> queryByUser(WorktimeRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getCurrentUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
     }
 
     @Override
@@ -153,14 +171,6 @@ public class WorktimeRestService extends BaseRestService<WorktimeEntity, Worktim
         return worktimeResponse.getUid();
     }
 
-    @Override
-    protected Specification<WorktimeEntity> createSpecification(WorktimeRequest request) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.and();
-    }
-
-    @Override
-    protected Page<WorktimeEntity> executePageQuery(Specification<WorktimeEntity> spec, Pageable pageable) {
-        return worktimeRepository.findAll(pageable);
-    }
+   
 
 }
