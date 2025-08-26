@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.ai.mcp.spec.McpPrompt;
-import org.springframework.ai.mcp.spec.McpResource;
-import org.springframework.ai.mcp.spec.McpTool;
+// 使用本地定义的类替代 Spring AI MCP 中缺失的类
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,8 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.springai.mcp_server.McpServerService.ServerStatus;
-import com.bytedesk.ai.springai.mcp_server.McpServerService.ToolCallRequest;
-import com.bytedesk.ai.springai.mcp_server.McpServerService.ToolCallResponse;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -180,9 +176,9 @@ public class McpServerRestController extends BaseRestController<McpServerRequest
         try {
             ToolCallResponse response = future.get();
             if (response.isSuccess()) {
-                return ResponseEntity.ok(JsonResult.success(response.getResult()));
+                return ResponseEntity.ok(JsonResult.success(response.getData()));
             } else {
-                return ResponseEntity.ok(JsonResult.error("Tool call failed: " + response.getError()));
+                return ResponseEntity.ok(JsonResult.error("Tool call failed: " + response.getErrorMessage()));
             }
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error("Tool call failed: " + e.getMessage()));
