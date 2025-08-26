@@ -64,7 +64,8 @@ public class McpServerEntity extends BaseEntity {
      * Type of MCP server
      */
     @Builder.Default
-    private String serverType = McpServerTypeEnum.KNOWLEDGE.name();
+    @Column(name = "server_type")
+    private String type = McpServerTypeEnum.KNOWLEDGE.name();
 
     /**
      * MCP Server version

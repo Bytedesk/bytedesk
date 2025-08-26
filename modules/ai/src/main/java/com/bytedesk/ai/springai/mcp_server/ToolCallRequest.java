@@ -11,6 +11,11 @@ import java.util.Map;
 public class ToolCallRequest {
     
     /**
+     * 服务器UID
+     */
+    private String serverUid;
+    
+    /**
      * 工具名称
      */
     private String toolName;
@@ -41,5 +46,11 @@ public class ToolCallRequest {
         this.toolName = toolName;
         this.arguments = arguments;
         this.requestId = requestId;
+    }
+    
+    public ToolCallRequest(String serverUid, String toolName, Map<String, Object> arguments) {
+        this.serverUid = serverUid;
+        this.toolName = toolName;
+        this.arguments = arguments;
     }
 }

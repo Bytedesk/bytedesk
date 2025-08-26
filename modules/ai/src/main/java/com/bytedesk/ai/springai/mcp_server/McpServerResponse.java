@@ -35,7 +35,7 @@ public class McpServerResponse extends BaseResponse {
 
     private String description;
 
-    private String serverType;
+    private String type;
 
     private String serverVersion;
 

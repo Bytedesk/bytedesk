@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 10:51:01
+ * @LastEditTime: 2025-08-26 13:45:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -149,23 +149,23 @@ public class McpServerRestController extends BaseRestController<McpServerRequest
         }
     }
 
-    @ActionAnnotation(title = "McpServer", action = "断开连接", description = "disconnect from MCP server")
-    @Operation(summary = "Disconnect from MCP Server", description = "Disconnect from a MCP server")
-    @PostMapping("/disconnect/{serverUid}")
-    public ResponseEntity<?> disconnectFromServer(@PathVariable String serverUid) {
-        CompletableFuture<Boolean> future = mcpServerService.disconnectFromServer(serverUid);
+    // @ActionAnnotation(title = "McpServer", action = "断开连接", description = "disconnect from MCP server")
+    // @Operation(summary = "Disconnect from MCP Server", description = "Disconnect from a MCP server")
+    // @PostMapping("/disconnect/{serverUid}")
+    // public ResponseEntity<?> disconnectFromServer(@PathVariable String serverUid) {
+    //     CompletableFuture<Boolean> future = mcpServerService.disconnectFromServer(serverUid);
         
-        try {
-            Boolean disconnected = future.get();
-            if (disconnected) {
-                return ResponseEntity.ok(JsonResult.success("Disconnected from MCP server successfully"));
-            } else {
-                return ResponseEntity.ok(JsonResult.error("Failed to disconnect from MCP server"));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.ok(JsonResult.error("Disconnection failed: " + e.getMessage()));
-        }
-    }
+    //     try {
+    //         Boolean disconnected = future.get();
+    //         if (disconnected) {
+    //             return ResponseEntity.ok(JsonResult.success("Disconnected from MCP server successfully"));
+    //         } else {
+    //             return ResponseEntity.ok(JsonResult.error("Failed to disconnect from MCP server"));
+    //         }
+    //     } catch (Exception e) {
+    //         return ResponseEntity.ok(JsonResult.error("Disconnection failed: " + e.getMessage()));
+    //     }
+    // }
 
     @ActionAnnotation(title = "McpServer", action = "调用工具", description = "call MCP tool")
     @Operation(summary = "Call MCP Tool", description = "Execute a tool on the MCP server")
