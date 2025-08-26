@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-08-25 00:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 07:27:49
+ * @LastEditTime: 2025-08-26 17:13:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -426,42 +426,6 @@ public class SpringAICozeService extends BaseSpringAIService {
             if (cozeApi != null) {
                 cozeApi.shutdownExecutor();
             }
-        }
-    }
-
-    /**
-     * 同步聊天（非流式）
-     */
-    public ChatPoll chat(String question, String userID, RobotLlm llm) {
-        CozeAPI cozeApi = createDynamicCozeApi(llm);
-        if (cozeApi == null) {
-            return null;
-        }
-
-        try {
-            CreateChatReq req = createChatRequest(llm, question, userID);
-            return cozeApi.chat().createAndPoll(req);
-        } catch (Exception e) {
-            log.error("Error in Coze chat", e);
-            return null;
-        } finally {
-            cozeApi.shutdownExecutor();
-        }
-    }
-
-    /**
-     * 检查服务健康状态
-     */
-    public boolean isHealthy() {
-        log.info("Coze API health check started");
-        
-        try {
-            // 创建一个简单的测试请求来检查服务状态
-            // 这里可以添加具体的健康检查逻辑
-            return true;
-        } catch (Exception e) {
-            log.error("Coze API health check failed", e);
-            return false;
         }
     }
 
