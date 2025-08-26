@@ -471,14 +471,17 @@ public class McpServerService {
             McpTransport transport;
             
             // 根据协议创建不同的传输方式
-            if ("sse".equalsIgnoreCase(server.getProtocol()) || "http".equalsIgnoreCase(server.getProtocol())) {
+            if (McpServerProtocolEnum.SSE.equals(server.getProtocol()) || 
+                McpServerProtocolEnum.HTTP.equals(server.getProtocol()) || 
+                McpServerProtocolEnum.HTTPS.equals(server.getProtocol())) {
                 // 使用 SSE 传输
                 WebClient webClient = webClientBuilder
                     .baseUrl(server.getServerUrl())
                     .defaultHeaders(headers -> {
                         if (StringUtils.hasText(server.getAuthToken())) {
-                            String authType = StringUtils.hasText(server.getAuthType()) ? server.getAuthType() : "Bearer";
-                            headers.set("Authorization", authType + " " + server.getAuthToken());
+                            String authType = server.getAuthType() != null ? 
+                                server.getAuthType().getSchemePrefix() : McpServerAuthTypeEnum.BEARER.getSchemePrefix();
+                            headers.set("Authorization", authType + server.getAuthToken());
                         }
                         // 添加额外的认证头
                         if (StringUtils.hasText(server.getAuthHeaders())) {

@@ -45,9 +45,9 @@ public class McpServerResponse extends BaseResponse {
 
     private Integer port;
 
-    private String protocol;
+    private McpServerProtocolEnum protocol;
 
-    private String authType;
+    private McpServerAuthTypeEnum authType;
 
     private Integer connectionTimeout;
 

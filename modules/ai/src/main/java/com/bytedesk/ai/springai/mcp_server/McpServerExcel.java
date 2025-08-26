@@ -58,11 +58,11 @@ public class McpServerExcel {
 
     @ExcelProperty(index = 7, value = "协议")
     @ColumnWidth(10)
-    private String protocol;
+    private McpServerProtocolEnum protocol;
 
     @ExcelProperty(index = 8, value = "认证类型")
     @ColumnWidth(15)
-    private String authType;
+    private McpServerAuthTypeEnum authType;
 
     @ExcelProperty(index = 9, value = "连接超时(ms)")
     @ColumnWidth(15)

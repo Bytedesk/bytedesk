@@ -43,11 +43,11 @@ public class McpServerRequest extends BaseRequest {
 
     private Integer port;
 
-    private String protocol;
+    private McpServerProtocolEnum protocol;
 
     private String authToken;
 
-    private String authType;
+    private McpServerAuthTypeEnum authType;
 
     private String authHeaders;
 

@@ -91,7 +91,8 @@ public class McpServerEntity extends BaseEntity {
      * Connection protocol (http, https, websocket, etc.)
      */
     @Builder.Default
-    private String protocol = "http";
+    @Enumerated(EnumType.STRING)
+    private McpServerProtocolEnum protocol = McpServerProtocolEnum.HTTP;
 
     /**
      * Authentication token for server access
@@ -102,7 +103,8 @@ public class McpServerEntity extends BaseEntity {
      * Authentication type (bearer, basic, api_key, etc.)
      */
     @Builder.Default
-    private String authType = "bearer";
+    @Enumerated(EnumType.STRING)
+    private McpServerAuthTypeEnum authType = McpServerAuthTypeEnum.BEARER;
 
     /**
      * Additional authentication headers in JSON format
