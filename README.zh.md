@@ -93,6 +93,12 @@
 
 ## 快速开始
 
+```bash
+git clone https://github.com/Bytedesk/bytedesk.git
+cd bytedesk/deploy/docker
+docker compose -p bytedesk -f docker-compose.yaml up -d
+```
+
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
 - [源码启动](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
