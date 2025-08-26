@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:41:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 15:57:43
+ * @LastEditTime: 2025-08-26 16:39:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,8 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.ip.IpService;
-import com.bytedesk.core.push.sms.PushServiceImplSms;
+import com.bytedesk.core.push.email.PushServiceEmail;
+import com.bytedesk.core.push.sms.PushServiceSms;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.rbac.user.UserService;
@@ -55,9 +56,9 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
 
     private final UidUtils uidUtils;
 
-    private final PushServiceImplEmail pushServiceImplEmail;
+    private final PushServiceEmail pushServiceEmail;
 
-    private final PushServiceImplSms pushServiceImplSms;
+    private final PushServiceSms pushServiceSms;
 
     private final UserService userService;
 
@@ -73,6 +74,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         String ip = IpUtils.getClientIp(request);
         String type = authRequest.getType();
         String receiver = authRequest.getReceiver();
+        String country = authRequest.getCountry();
         String platform = authRequest.getPlatform();
         // 
         // 验证限制同一个ip发送数量、频率
@@ -126,30 +128,20 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         }
 
         if (authRequest.isEmail()) {
-            pushServiceImplEmail.send(receiver, code, request);
+            pushServiceEmail.send(receiver, code, request);
         } else if (authRequest.isMobile()) {
-            pushServiceImplSms.send(receiver, code, request);
+            pushServiceSms.send(receiver, country, code, request);
         } else {
             return false;
         }
 
         String ipLocation = ipService.getIpLocation(ip);
         //
-        // PushRequest pushRequest = new PushRequest();
         PushRequest pushRequest = modelMapper.map(authRequest, PushRequest.class);
-        // pushRequest.setType(type);
         pushRequest.setSender(TypeConsts.TYPE_SYSTEM);
         pushRequest.setContent(code);
-        // pushRequest.setReceiver(receiver);
-        // pushRequest.setChannel(client);
-        // pushRequest.setPlatform(platform);
         pushRequest.setIp(ip);
         pushRequest.setIpLocation(ipLocation);
-        // pushRequest.setDeviceUid(authRequest.getDeviceUid());
-        // if (StringUtils.hasText(authRequest.getUserUid())) {
-        //     pushRequest.setUserUid(authRequest.getUserUid());
-        // }
-        // pushRequest.setOrgUid(orgUid);
         create(pushRequest);
 
         // 更新IP最后发送验证码的时间
@@ -180,12 +172,10 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         Optional<PushEntity> pushOptional = findByDeviceUid(pushRequest.getDeviceUid());
         if (pushOptional.isPresent()) {
             PushEntity push = pushOptional.get();
-            // 
             if (pushRequest.getForceRefresh().booleanValue()) {
                 push.setStatus(PushStatusEnum.PENDING.name());
                 save(push);
             }
-            // 
             return convertToResponse(push);
         }
 
@@ -193,8 +183,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         String ipLocation = ipService.getIpLocation(ip);
         //
         PushEntity push = modelMapper.map(pushRequest, PushEntity.class);
-        push.setUid(uidUtils.getCacheSerialUid());
-        // push.setType(TypeConsts.TYPE_SCAN);
+        push.setUid(uidUtils.getUid());
         push.setType(AuthTypeEnum.SCAN_LOGIN.name());
         push.setSender(TypeConsts.TYPE_SYSTEM);
         push.setContent(Utils.getRandomCode());

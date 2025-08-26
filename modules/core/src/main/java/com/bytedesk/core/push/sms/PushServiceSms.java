@@ -2,14 +2,14 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 15:25:48
+ * @LastEditTime: 2025-08-26 16:39:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
  *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.push.sms;
 
@@ -28,7 +28,6 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.message.MessageEntity;
-import com.bytedesk.core.push.PushNotifier;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class PushServiceImplSms extends PushNotifier {
+public class PushServiceSms {
 
     @Value("${aliyun.region.id:cn-hangzhou}")
     private String regionId;
@@ -83,16 +82,14 @@ public class PushServiceImplSms extends PushNotifier {
     private BytedeskProperties bytedeskProperties;
 
     @Async
-    @Override
     public void notify(MessageEntity e) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'notify'");
     }
 
     @Async
-    @Override
-    public void send(String mobile, String content, HttpServletRequest request) {
-        log.info("send sms to {}, content: {}", mobile, content);
+    public void send(String mobile, String country, String content, HttpServletRequest request) {
+        log.info("send sms to {}, country: {}, content: {}", mobile, country, content);
 
         // 测试手机号不发送验证码
         if (Utils.isTestMobile(mobile)) {
@@ -109,11 +106,11 @@ public class PushServiceImplSms extends PushNotifier {
         //     return;
         // }
 
-        sendValidateCode(mobile, content);
+        sendValidateCode(mobile, country, content);
     }
 
-    public void sendValidateCode(String phone, String code) {
-        log.info("sendValidateCode sms to {}, code: {}", phone, code);
+    public void sendValidateCode(String mobile, String country, String code) {
+        log.info("sendValidateCode sms to {}, country: {}, code: {}", mobile, country, code);
 
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
         IAcsClient client = new DefaultAcsClient(profile);
@@ -124,7 +121,7 @@ public class PushServiceImplSms extends PushNotifier {
         request.setSysVersion("2017-05-25");
         request.setSysAction("SendSms");
         request.putQueryParameter("RegionId", regionId);
-        request.putQueryParameter("PhoneNumbers", phone);
+        request.putQueryParameter("PhoneNumbers", mobile);
         // 已在init方法中处理了编码问题，此处直接使用
         log.debug("配置文件签名：{}", signName);
         request.putQueryParameter("SignName", signName);

@@ -41,4 +41,7 @@ public class RedisConsts {
     public static final String REDIS_KEYEVENT_EXPIRED_CHANNEL = "__keyevent@0__:expired";
     public static final String REDIS_KEYEVENT_EXPIRED_PATTERN = "__keyevent@*__:expired";
 
+    // 推送验证码发送频率控制相关常量
+    public static final String PUSH_CODE_IP_PREFIX = BYTEDESK_REDIS_PREFIX + "push:code:ip:";
+
 }

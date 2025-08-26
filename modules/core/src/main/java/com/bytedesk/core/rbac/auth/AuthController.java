@@ -253,6 +253,7 @@ public class AuthController {
         if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())) {
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getMobile());
+            userRequest.setCountry(authRequest.getCountry());
             userRequest.setNum(authRequest.getMobile());
             userRequest.setMobile(authRequest.getMobile());
             userRequest.setPlatform(authRequest.getPlatform());

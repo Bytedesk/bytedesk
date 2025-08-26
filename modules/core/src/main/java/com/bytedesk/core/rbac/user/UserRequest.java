@@ -55,8 +55,6 @@ public class UserRequest extends BaseRequest {
 
 	private String country;
 	
-	// country prefix, e.g. +86
-	// @Digits(message = "phone length error", fraction = 0, integer = 11)
 	private String mobile;
 	
 	private String code;

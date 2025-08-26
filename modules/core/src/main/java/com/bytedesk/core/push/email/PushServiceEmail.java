@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-01 10:43:39
+ * @LastEditTime: 2025-08-26 16:37:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.push;
+package com.bytedesk.core.push.email;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class PushServiceImplEmail extends PushNotifier {
+public class PushServiceEmail {
 
     @Autowired
     private BytedeskProperties bytedeskProperties;
@@ -64,14 +64,12 @@ public class PushServiceImplEmail extends PushNotifier {
 
 
     @Async
-    @Override
     public void notify(MessageEntity e) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'notify'");
     }
 
     @Async
-    @Override
     public void send(String email, String content, HttpServletRequest request) {
         // log.info("send email to {}, content {}", email, content);
 
