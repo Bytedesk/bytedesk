@@ -63,7 +63,7 @@ public class MqttMessageIdServiceTest {
         // 测试消息ID在有效范围内（1-65535）
         for (int i = 0; i < 1000; i++) {
             int messageId = messageIdService.getNextMessageId();
-            assertTrue(messageId >= 1 && messageId <= 65535, 
+            assertTrue(messageId >= 1 &amp;amp;& messageId <= 65535, 
                       "Message ID " + messageId + " is out of valid range");
         }
     }

@@ -99,8 +99,7 @@ public class ThreadExecutionListener implements ExecutionListener {
      * 安全地设置流程变量，避免在流程已结束时引发外键约束异常
      * 
      * @param execution 执行实例
-     * @param variableName 变量名
-     * @param variableValue 变量值
+     * @param execution 执行上下文
      */
     // private void safeSetVariable(DelegateExecution execution, String variableName, Object variableValue) {
     //     try {

@@ -38,7 +38,7 @@ public abstract class BaseContent implements Serializable {
     
     /**
      * 通用的JSON反序列化方法
-     * @param <T> 返回类型，必须是BaseContent的子类
+     * @param <T&amp;amp;gt; 返回类型，必须是BaseContent的子类
      * @param json JSON字符串
      * @param clazz 目标类类型
      * @return 反序列化后的对象

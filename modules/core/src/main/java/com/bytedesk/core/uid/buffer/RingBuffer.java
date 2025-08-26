@@ -23,15 +23,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 /**
- * Represents a ring buffer based on array.<br>
+ * Represents a ring buffer based on array.<br&gt;
  * Using array could improve read element performance due to the CUP cache line. To prevent 
- * the side effect of False Sharing, {@link PaddedAtomicLong} is using on 'tail' and 'cursor'<p>
+ * the side effect of False Sharing, {@link PaddedAtomicLong} is using on 'tail' and 'cursor'<p&gt;
  * 
  * A ring buffer is consisted of:
- * <li><b>slots:</b> each element of the array is a slot, which is be set with a UID
- * <li><b>flags:</b> flag array corresponding the same index with the slots, indicates whether can take or put slot
- * <li><b>tail:</b> a sequence of the max slot position to produce 
- * <li><b>cursor:</b> a sequence of the min slot position to consume
+ * <li><b>slots:</b&gt; each element of the array is a slot, which is be set with a UID
+ * <li><b>flags:</b&gt; flag array corresponding the same index with the slots, indicates whether can take or put slot
+ * <li><b>tail:</b&gt; a sequence of the max slot position to produce 
+ * <li><b>cursor:</b&gt; a sequence of the min slot position to consume
  * 
  * @author yutianbao
  */
@@ -69,7 +69,7 @@ public class RingBuffer {
     /**
      * Constructor with buffer size, paddingFactor default as {@value #DEFAULT_PADDING_PERCENT}
      * 
-     * @param bufferSize must be positive & a power of 2
+     * @param bufferSize must be positive &amp; a power of 2
      */
     public RingBuffer(int bufferSize) {
         this(bufferSize, DEFAULT_PADDING_PERCENT);
@@ -96,10 +96,10 @@ public class RingBuffer {
     }
 
     /**
-     * Put an UID in the ring and tail moved<br>
-     * We use 'synchronized' to guarantee the UID fill in slot and publish new tail sequence as atomic operations<br>
+     * Put an UID in the ring and tail moved<br&gt;
+     * We use 'synchronized' to guarantee the UID fill in slot and publish new tail sequence as atomic operations<br&gt;
      * 
-     * <b>Note that: </b> It is recommended to put UID in a serialize way, cause we once batch generate a series UIDs and put
+     * <b>Note that: </b&gt; It is recommended to put UID in a serialize way, cause we once batch generate a series UIDs and put
      * the one by one into the buffer, so it is unnecessary put in multi-threads
      *
      * @param uid
@@ -136,11 +136,11 @@ public class RingBuffer {
     }
 
     /**
-     * Take an UID of the ring at the next cursor, this is a lock free operation by using atomic cursor<p>
+     * Take an UID of the ring at the next cursor, this is a lock free operation by using atomic cursor<p&gt;
      * 
      * Before getting the UID, we also check whether reach the padding threshold, 
-     * the padding buffer operation will be triggered in another thread<br>
-     * If there is no more available UID to be taken, the specified {@link RejectedTakeBufferHandler} will be applied<br>
+     * the padding buffer operation will be triggered in another thread<br&gt;
+     * If there is no more available UID to be taken, the specified {@link RejectedTakeBufferHandler} will be applied<br&gt;
      * 
      * @return UID
      * @throws IllegalStateException if the cursor moved back

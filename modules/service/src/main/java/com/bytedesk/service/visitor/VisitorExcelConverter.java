@@ -53,7 +53,7 @@ package com.bytedesk.service.visitor;
 //         }
 //         // excel.setStatus(response.getStatus());
 //         // 标签列表转换为字符串
-//         // if (response.getTagList() != null && !response.getTagList().isEmpty()) {
+//         // if (response.getTagList() != null &amp;amp;& !response.getTagList().isEmpty()) {
 //         //     excel.setTags(String.join(", ", response.getTagList()));
 //         // }
 //         // excel.setExtra(response.getExtra());

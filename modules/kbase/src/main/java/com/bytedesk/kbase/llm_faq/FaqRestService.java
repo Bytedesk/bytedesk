@@ -539,7 +539,8 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
      * 导入FAQ数据
      * 从JSON文件加载数据并存储到数据库
      * 
-     * @return 导入的FAQ数量
+     * @param orgUid 组织ID
+     * @param kbUid 知识库ID
      */
     @Transactional
     public void importFaqs(String orgUid, String kbUid) {

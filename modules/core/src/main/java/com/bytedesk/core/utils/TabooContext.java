@@ -33,7 +33,7 @@ public class TabooContext {
      */
     public static boolean isMessageBlocked() {
         Boolean blocked = MESSAGE_BLOCKED.get();
-        return blocked != null && blocked;
+        return blocked != null &amp;amp;& blocked;
     }
     
     /**

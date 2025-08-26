@@ -3,12 +3,11 @@
  * 
  * 本包提供了基于 DeepSeek API 的 AI 能力集成，主要包括聊天补全、文本生成、FAQ生成等功能。
  * 
- * <p>主要组件：</p>
+ * <p>主要组件：</p&gt;
  * <ul>
- *   <li>{@link com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepSeekService} - DeepSeek AI 服务实现，提供对话生成、FAQ生成等核心功能</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepSeekConfig} - DeepSeek AI 服务配置类，包含API密钥和模型设置</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepSeekController} - DeepSeek AI 服务的REST API控制器</li>
- *   <li>{@link com.bytedesk.ai.springai.providers.deepseek.DeepSeekApi} - 与DeepSeek AI API交互的底层接口</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService} - DeepSeek AI 服务实现，提供对话生成、FAQ生成等核心功能</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekChatConfig} - DeepSeek AI 服务配置类，包含API密钥和模型设置</li>
+ *   <li>{@link com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekChatController} - DeepSeek AI 服务的REST API控制器</li>
  * </ul>
  * 
  * <p>使用方法：</p>

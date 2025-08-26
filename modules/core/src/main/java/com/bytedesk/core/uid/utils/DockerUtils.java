@@ -32,7 +32,7 @@
 //     private static final String ENV_KEY_PORT = "JPAAS_HTTP_PORT";
 //     private static final String ENV_KEY_PORT_ORIGINAL = "JPAAS_HOST_PORT_8080";
 
-//     /** Docker host & port */
+//     /** Docker host &amp; port */
 //     private static String DOCKER_HOST = "";
 //     private static String DOCKER_PORT = "";
 
@@ -71,7 +71,7 @@
 //     }
 
 //     /**
-//      * Retrieve host & port from environment
+//      * Retrieve host &amp; port from environment
 //      */
 //     private static void retrieveFromEnv() {
 //         // retrieve host & port from environment

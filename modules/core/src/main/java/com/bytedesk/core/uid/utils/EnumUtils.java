@@ -48,7 +48,7 @@ public abstract class EnumUtils {
     /**
      * Null-safe valueOf function
      * 
-     * @param <T>
+     * @param <T&gt;
      * @param enumType
      * @param name
      * @return

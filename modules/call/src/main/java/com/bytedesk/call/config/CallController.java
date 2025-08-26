@@ -60,7 +60,7 @@ public class CallController {
     }
 
     /**
-     * http://127.0.0.1:9003/test/api/freeswitch/call/originate?caller=sip:1001@14.103.165.199&destination=sip:1002@14.103.165.199
+     * http://127.0.0.1:9003/test/api/freeswitch/call/originate?caller=sip:1001@14.103.165.199&amp;amp;amp;destination=sip:1002@14.103.165.199
      * 发起呼叫
      */
     @PostMapping("/call/originate")

@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
  *    ButtonContent gameButton = ButtonContent.createGamePlayButtonWithPlayer("开始游戏", "{\"game_id\":\"123\"}", "player_456");
  * 
  * 5. 验证按钮配置：
- *    List<ButtonContent> buttons = Arrays.asList(webButton, postbackButton, phoneButton);
+ *    List<ButtonContent&gt; buttons = Arrays.asList(webButton, postbackButton, phoneButton);
  *    ButtonContent.ValidationResult result = ButtonContent.validateButtons(buttons);
  *    if (result.isValid()) {
  *        // 按钮配置有效

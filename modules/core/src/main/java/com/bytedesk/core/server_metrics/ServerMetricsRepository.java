@@ -32,14 +32,14 @@ public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEnti
     /**
      * Find metrics by UID
      * @param uid metrics UID
-     * @return Optional<ServerMetricsEntity>
+     * @return Optional<ServerMetricsEntity&amp;amp;gt;
      */
     Optional<ServerMetricsEntity> findByUid(String uid);
 
     /**
      * Find metrics by server UID
      * @param serverUid server UID
-     * @return List<ServerMetricsEntity>
+     * @return List<ServerMetricsEntity&gt;
      */
     List<ServerMetricsEntity> findByServerUidAndDeletedFalseOrderByTimestampDesc(String serverUid);
 
@@ -48,7 +48,7 @@ public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEnti
      * @param serverUid server UID
      * @param startTime start time
      * @param endTime end time
-     * @return List<ServerMetricsEntity>
+     * @return List<ServerMetricsEntity&gt;
      */
     @Query("SELECT m FROM ServerMetricsEntity m WHERE m.deleted = false " +
            "AND m.serverUid = :serverUid " +
@@ -75,7 +75,7 @@ public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEnti
      * @param diskThreshold disk usage threshold
      * @param startTime start time
      * @param endTime end time
-     * @return List<ServerMetricsEntity>
+     * @return List<ServerMetricsEntity&gt;
      */
     @Query("SELECT m FROM ServerMetricsEntity m WHERE m.deleted = false " +
            "AND m.timestamp BETWEEN :startTime AND :endTime " +

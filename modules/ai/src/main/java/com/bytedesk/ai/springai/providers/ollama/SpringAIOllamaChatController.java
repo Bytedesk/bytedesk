@@ -53,7 +53,7 @@ public class SpringAIOllamaChatController {
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/ollama/chat/sync?message=hello&apiUrl=&model=llama3
+     * http://127.0.0.1:9003/api/v1/ollama/chat/sync?message=hello&amp;amp;amp;apiUrl=&amp;model=llama3
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(OllamaRequest request) {
@@ -73,7 +73,7 @@ public class SpringAIOllamaChatController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/ollama/chat/stream?message=hello&apiUrl=&model=llama3
+     * http://127.0.0.1:9003/api/v1/ollama/chat/stream?message=hello&amp;amp;amp;apiUrl=&amp;model=llama3
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(OllamaRequest request) {
@@ -92,7 +92,7 @@ public class SpringAIOllamaChatController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/ollama/chat/sse?message=hello&apiUrl=&model=llama3
+     * http://127.0.0.1:9003/api/v1/ollama/chat/sse?message=hello&amp;amp;amp;apiUrl=&amp;model=llama3
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(OllamaRequest request) {
@@ -123,7 +123,7 @@ public class SpringAIOllamaChatController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/api/v1/ollama/chat/custom?message=hello&apiUrl=&model=llama3
+     * http://127.0.0.1:9003/api/v1/ollama/chat/custom?message=hello&amp;amp;amp;apiUrl=&amp;model=llama3
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(OllamaRequest request) {

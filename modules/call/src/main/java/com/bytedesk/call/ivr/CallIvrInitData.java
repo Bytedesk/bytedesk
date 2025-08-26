@@ -45,7 +45,7 @@ public class CallIvrInitData {
     };
 
     /**
-     * Complaint & Suggestion CallIvrs
+     * Complaint &amp; Suggestion CallIvrs
      * 投诉与建议标签
      */
     public static final String[] COMPLAINT_SUGGESTION = {
@@ -54,7 +54,7 @@ public class CallIvrInitData {
     };
 
     /**
-     * Operation & Maintenance CallIvrs
+     * Operation &amp; Maintenance CallIvrs
      * 运维标签
      */
     public static final String[] OPERATION_MAINTENANCE = {

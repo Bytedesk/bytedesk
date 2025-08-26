@@ -69,7 +69,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      * 根据accessToken查找Token实体
      * 
      * @param accessToken JWT访问令牌
-     * @return Optional<TokenEntity>
+     * @return Optional<TokenEntity&gt;
      */
     @Cacheable(cacheNames = "token", key = "#accessToken", unless = "#result == null")
     public Optional<TokenEntity> findByAccessToken(String accessToken) {

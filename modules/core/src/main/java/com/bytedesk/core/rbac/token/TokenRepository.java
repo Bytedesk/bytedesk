@@ -27,7 +27,7 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
     /**
      * 通过访问令牌查找Token实体
      * @param accessToken 访问令牌
-     * @return Optional<TokenEntity>
+     * @return Optional<TokenEntity&amp;amp;gt;
      */
     Optional<TokenEntity> findFirstByAccessTokenAndRevokedFalseAndDeletedFalse(String accessToken);
     

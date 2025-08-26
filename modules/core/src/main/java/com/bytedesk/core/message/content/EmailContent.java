@@ -163,6 +163,6 @@ public class EmailContent extends BaseContent {
      * @return 是否有附件
      */
     public boolean hasAttachments() {
-        return attachments != null && !attachments.isEmpty();
+        return attachments != null &amp;amp;& !attachments.isEmpty();
     }
 }

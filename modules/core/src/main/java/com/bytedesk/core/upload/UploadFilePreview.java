@@ -48,12 +48,16 @@ public class UploadFilePreview {
 	private final UploadRestService uploadService;
 
 	/**
-	 * 浏览器预览文件，或放到 <img src> 标签中在线展示
+	 * 浏览器预览文件，或放到 <img src&gt; 标签中在线展示
 	 * http://127.0.0.1:9003/file/2024/09/16/20240916144702_身份证-背面.jpg
 	 * 
 	 * @param filename
-	 * @return
-	 * @throws IOException
+	 * @param year 年份
+	 * @param month 月份
+	 * @param day 日期
+	 * @param filename 文件名
+	 * @param response HTTP响应对象
+	 * @throws IOException IO异常
 	 */
 	@Operation(summary = "Preview File", description = "Preview file in browser or display in img tag")
 	@GetMapping("/{yyyy}/{MM}/{dd}/{filename:.+}")

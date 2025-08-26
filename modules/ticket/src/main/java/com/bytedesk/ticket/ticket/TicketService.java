@@ -71,7 +71,7 @@ public class TicketService {
 
     /**
      * 认领工单
-     * NEW -> CLAIMED (认领)
+     * NEW -&gt; CLAIMED (认领)
      */
     @Transactional
     public TicketResponse claimTicket(TicketRequest request) {
@@ -203,7 +203,7 @@ public class TicketService {
 
     /**
      * 开始处理工单
-     * CLAIMED/REOPENED -> PROCESSING (开始处理)
+     * CLAIMED/REOPENED -&gt; PROCESSING (开始处理)
      */
     @Transactional
     public TicketResponse startTicket(TicketRequest request) {
@@ -283,7 +283,7 @@ public class TicketService {
 
     /**
      * 退回工单
-     * CLAIMED -> UNCLAIMED (退回)
+     * CLAIMED -&gt; UNCLAIMED (退回)
      */
     @Transactional
     public TicketResponse unclaimTicket(TicketRequest request) {
@@ -356,7 +356,7 @@ public class TicketService {
 
     /**
      * 转派工单: TRANSFERRED
-     * CLAIMED -> CLAIMED (转派)
+     * CLAIMED -&gt; CLAIMED (转派)
      */
     @Transactional
     public TicketResponse transferTicket(TicketRequest request) {
@@ -407,7 +407,7 @@ public class TicketService {
 
     /**
      * 挂起工单
-     * PROCESSING -> HOLDING (挂起)
+     * PROCESSING -&gt; HOLDING (挂起)
      */
     @Transactional
     public TicketResponse holdTicket(TicketRequest request) {
@@ -459,7 +459,7 @@ public class TicketService {
 
     /**
      * 恢复工单
-     * HOLDING -> RESUMED (恢复)
+     * HOLDING -&gt; RESUMED (恢复)
      */
     @Transactional
     public TicketResponse resumeTicket(TicketRequest request) {
@@ -511,7 +511,7 @@ public class TicketService {
 
     /**
      * 待回应工单
-     * PROCESSING -> PENDING (待回应)
+     * PROCESSING -&gt; PENDING (待回应)
      */
     @Transactional
     public TicketResponse pendTicket(TicketRequest request) {
@@ -563,7 +563,7 @@ public class TicketService {
 
     /**
      * 重新打开工单
-     * CLOSED/CANCELLED -> REOPENED -> PROCESSING (重新打开)
+     * CLOSED/CANCELLED -&gt; REOPENED -&gt; PROCESSING (重新打开)
      */
     @Transactional
     public TicketResponse reopenTicket(TicketRequest request) {
@@ -616,7 +616,7 @@ public class TicketService {
 
     /**
      * 升级工单
-     * PROCESSING -> ESCALATED (升级)
+     * PROCESSING -&gt; ESCALATED (升级)
      */
     @Transactional
     public TicketResponse escalateTicket(TicketRequest request) {
@@ -737,7 +737,7 @@ public class TicketService {
 
     /**
      * 客户验证工单
-     * RESOLVED -> CLOSED/REOPENED (验证通过/不通过)
+     * RESOLVED -&gt; CLOSED/REOPENED (验证通过/不通过)
      */
     @Transactional
     public TicketResponse verifyTicket(TicketRequest request) {
@@ -815,7 +815,7 @@ public class TicketService {
 
     /**
      * 关闭工单
-     * PROCESSING/RESUMED -> CLOSED (关闭)
+     * PROCESSING/RESUMED -&gt; CLOSED (关闭)
      */
     @Transactional
     public TicketResponse closeTicket(TicketRequest request) {
@@ -869,7 +869,7 @@ public class TicketService {
 
     /**
      * 取消工单
-     * PROCESSING -> CANCELLED (取消)
+     * PROCESSING -&gt; CANCELLED (取消)
      */
     @Transactional
     public TicketResponse cancelTicket(TicketRequest request) {

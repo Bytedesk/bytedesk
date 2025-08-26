@@ -45,8 +45,8 @@ public class CookieController {
      * v_vid = visitor_vid
      * http://127.0.0.1:9003/cookie/
      * 
-     * @param username
-     * @return
+     * @param vid 访客ID
+     * @return 包含访客ID的响应
      */
     @Operation(summary = "Get Cookie", description = "Retrieve visitor ID from cookie")
     @GetMapping({"", "/"})

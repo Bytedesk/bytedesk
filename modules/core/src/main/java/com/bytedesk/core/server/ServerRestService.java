@@ -128,7 +128,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
 
     /**
      * Find all servers
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     public List<ServerEntity> findAllServers() {
         return serverRepository.findByDeletedFalseOrderByCreatedAtDesc();
@@ -137,7 +137,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     /**
      * Find servers by type
      * @param type server type
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     public List<ServerEntity> findByType(String type) {
         return serverRepository.findByTypeAndDeletedFalse(type);
@@ -146,7 +146,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     /**
      * Find servers by status
      * @param status server status
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     public List<ServerEntity> findByStatus(String status) {
         return serverRepository.findByStatusAndDeletedFalse(status);
@@ -154,7 +154,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
 
     /**
      * Find servers with high resource usage
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     public List<ServerEntity> findServersWithHighUsage() {
         return serverRepository.findServersWithHighUsage(80.0, 80.0, 85.0);
@@ -163,7 +163,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
     /**
      * Find servers without recent heartbeat
      * @param minutesThreshold minutes threshold for heartbeat
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     public List<ServerEntity> findServersWithoutRecentHeartbeat(int minutesThreshold) {
         ZonedDateTime cutoffTime = ZonedDateTime.now().minusMinutes(minutesThreshold);

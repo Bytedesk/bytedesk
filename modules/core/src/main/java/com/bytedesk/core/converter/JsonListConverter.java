@@ -25,7 +25,7 @@ import jakarta.persistence.Converter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 将 List<String> 转换为 JSON 数组字符串进行存储
+ * 将 List<String&amp;amp;gt; 转换为 JSON 数组字符串进行存储
  * 专门用于存储包含 JSON 的列表，避免使用逗号分隔导致的问题
  */
 @Slf4j

@@ -45,8 +45,8 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
     private UidGereratorRepository workerNodeDAO;
 
     /**
-     * Assign worker id base on database.<p>
-     * If there is host name and port in the environment, we considered that the node runs in Docker container<br>
+     * Assign worker id base on database.<p&gt;
+     * If there is host name and port in the environment, we considered that the node runs in Docker container<br&gt;
      * Otherwise, the node runs on an actual machine.
      *
      * @return assigned worker id

@@ -34,17 +34,17 @@ import com.bytedesk.core.uid.buffer.RingBuffer;
 
 /**
  * Represents a cached implementation of {@link UidGeneratorService} extends
- * from {@link DefaultUidGenerator}, based on a lock free {@link RingBuffer}<p>
- * <p>
- * The spring properties you can specified as below:<br>
- * <li><b>boostPower:</b> RingBuffer size boost for a power of 2, Sample: boostPower is 3, it means the buffer size
+ * from {@link DefaultUidGenerator}, based on a lock free {@link RingBuffer}<p&gt;
+ * <p&gt;
+ * The spring properties you can specified as below:<br&gt;
+ * <li><b>boostPower:</b&gt; RingBuffer size boost for a power of 2, Sample: boostPower is 3, it means the buffer size
  * will be {@code getMaxSequence() + 1}
- * <li><b>paddingFactor:</b> Represents a percent value of (0 - 100). When the count of rest available UIDs reach the
+ * <li><b>paddingFactor:</b&gt; Represents a percent value of (0 - 100). When the count of rest available UIDs reach the
  * threshold, it will trigger padding buffer. Default as{@link RingBuffer#DEFAULT_PADDING_PERCENT}
  * Sample: paddingFactor=20, bufferSize=1000 -&gt; threshold=1000 * 20 /100, padding buffer will be triggered when tail-cursor &lt; threshold
- * <li><b>scheduleInterval:</b> Padding buffer in a schedule, specify padding buffer interval, Unit as second
- * <li><b>rejectedPutBufferHandler:</b> Policy for rejected put buffer. Default as discard put request, just do logging
- * <li><b>rejectedTakeBufferHandler:</b> Policy for rejected take buffer. Default as throwing up an exception
+ * <li><b>scheduleInterval:</b&gt; Padding buffer in a schedule, specify padding buffer interval, Unit as second
+ * <li><b>rejectedPutBufferHandler:</b&gt; Policy for rejected put buffer. Default as discard put request, just do logging
+ * <li><b>rejectedTakeBufferHandler:</b&gt; Policy for rejected take buffer. Default as throwing up an exception
  *
  * @author yutianbao
  * @author wujun
@@ -62,7 +62,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
     private Integer boostPower = DEFAULT_BOOST_POWER;
     /**
      * 指定何时向RingBuffer中填充UID, 取值为百分比(0, 100), 默认为50
-     * 举例: bufferSize=1024, paddingFactor=50 -> threshold=1024 * 50 / 100 = 512.
+     * 举例: bufferSize=1024, paddingFactor=50 -&gt; threshold=1024 * 50 / 100 = 512.
      * 当环上可用UID数量 &lt; 512时, 将自动对RingBuffer进行填充补全
      */
     private Integer paddingFactor = RingBuffer.DEFAULT_PADDING_PERCENT;
@@ -127,7 +127,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
      * Get the UIDs in the same specified second under the max sequence
      *
      * @param currentSecond
-     * @return UID list, size of {@link BitsAllocator#getMaxSequence()} + 1
+     * @return UID list, size of (max sequence + 1)
      */
     protected List<Long> nextIdsForOneSecond(long currentSecond) {
         // Initialize result list size of (max sequence + 1)

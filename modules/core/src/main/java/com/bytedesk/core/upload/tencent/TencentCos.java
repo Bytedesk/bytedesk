@@ -17,10 +17,10 @@ import java.net.URL;
  * 腾讯云COS对象存储服务工具类
  *
  * 参考
- * @see <a href="https://console.cloud.tencent.com/cos5/bucket">腾讯云后台</a>
+ * @see <a href="https://console.cloud.tencent.com/cos5/bucket">腾讯云后台</a&gt;
  *
  *      腾讯云官方文档
- * @see <a href="https://cloud.tencent.com/document/product/436/10199">腾讯云COS Java SDK</a>
+ * @see <a href="https://cloud.tencent.com/document/product/436/10199">腾讯云COS Java SDK</a&gt;
  *
  * @author bytedesk.com
  */

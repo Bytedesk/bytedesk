@@ -68,7 +68,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
             // 二级分类
             List<CategoryEntity> secondCategoriesSet = categoryRepository.findByParentAndPlatformAndDeletedOrderByOrderAsc(category,
                     platform, false);
-            if (secondCategoriesSet != null && !secondCategoriesSet.isEmpty()) {
+            if (secondCategoriesSet != null &amp;amp;& !secondCategoriesSet.isEmpty()) {
                 category.setChildren(secondCategoriesSet);
             }
         }

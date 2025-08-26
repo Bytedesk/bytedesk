@@ -98,7 +98,7 @@ public class KbaseRequest extends BaseRequest {
 
     /**
      * 知识库描述
-     * 输入一两句话简单介绍您的论坛。这将会显示为 <meta name="description"> 描述标签，一般为 160
+     * 输入一两句话简单介绍您的论坛。这将会显示为 <meta name="description"&gt; 描述标签，一般为 160
      * 字的文本，用于介绍网页的内容。平常多被搜索引擎截取网页简介用。
      */
     @Builder.Default

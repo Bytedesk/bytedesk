@@ -122,7 +122,7 @@ public class Ollama4jService {
      * https://ollama4j.github.io/ollama4j/apis-model-management/get-model-details
      * 
      * @{OllamaModelType}
-     * @param OllamaModelType
+     * @param modelType
      * @return
      */
     public ModelDetail getModelDetails(OllamaRequest request) {

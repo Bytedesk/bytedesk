@@ -173,8 +173,8 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     /**
      * 通用导出Excel模板方法
      * 
-     * @param <E> Excel实体类型
-     * @param <SVC> Service类型
+     * @param <E&gt; Excel实体类型
+     * @param <SVC&gt; Service类型
      * @param request 请求参数
      * @param response HTTP响应
      * @param service 服务对象

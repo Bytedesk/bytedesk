@@ -111,7 +111,7 @@ public class QueueMemberEventListener {
 
     /**
      * 从topic中提取前三个部分作为搜索前缀
-     * 例如：org/agent/{agent_uid}/{visitor_uid} -> org/agent/{agent_uid}
+     * 例如：org/agent/{agent_uid}/{visitor_uid} -&gt; org/agent/{agent_uid}
      */
     private String extractTopicPrefix(String topic) {
         if (topic == null || topic.isEmpty()) {

@@ -124,7 +124,7 @@ public class CallCallRequest extends BaseRequest {
      * 获取通话时长（秒）
      */
     public int getDuration() {
-        if (endTime > 0 && startTime > 0) {
+        if (endTime > 0 &amp;amp;& startTime > 0) {
             return (int) ((endTime - startTime) / 1000);
         }
         return 0;

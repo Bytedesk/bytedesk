@@ -72,7 +72,7 @@ public class JwtUtils {
         long jwtExpirationMs = Long.parseLong(getBytedeskProperties().getJwt().getExpiration());
         
         // 根据渠道类型调整过期时间
-        if (channel != null && channel.toLowerCase().contains("web")) {
+        if (channel != null &amp;amp;& channel.toLowerCase().contains("web")) {
             // Web端使用JWT配置的过期时间（默认30天）
             return jwtExpirationMs;
         } else {

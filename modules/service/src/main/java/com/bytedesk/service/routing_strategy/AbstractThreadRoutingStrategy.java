@@ -268,7 +268,7 @@ public abstract class AbstractThreadRoutingStrategy {
     /**
      * 创建操作执行模板方法
      * 
-     * @param <T> 返回类型
+     * @param <T&gt; 返回类型
      * @param operation 操作名称
      * @param threadUid 线程UID
      * @param action 具体操作

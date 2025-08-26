@@ -78,7 +78,7 @@ public class MessageUnreadRestService
         //
         Page<MessageUnreadResponse> page = queryByOrg(request);
         // 如果需要清空未读消息，则清空
-        if (request.getClearUnread() != null && request.getClearUnread()) {
+        if (request.getClearUnread() != null &amp;amp;& request.getClearUnread()) {
             clearUnreadMessages(request);
         }
         return page;

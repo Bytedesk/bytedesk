@@ -45,7 +45,7 @@ public class TagInitData {
     };
 
     /**
-     * Complaint & Suggestion Tags
+     * Complaint &amp; Suggestion Tags
      * 投诉与建议标签
      */
     public static final String[] COMPLAINT_SUGGESTION = {
@@ -54,7 +54,7 @@ public class TagInitData {
     };
 
     /**
-     * Operation & Maintenance Tags
+     * Operation &amp; Maintenance Tags
      * 运维标签
      */
     public static final String[] OPERATION_MAINTENANCE = {

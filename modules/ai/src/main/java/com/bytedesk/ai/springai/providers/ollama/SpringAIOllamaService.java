@@ -324,7 +324,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
     /**
      * 检查模型是否存在
      * 
-     * @param modelName 模型名称
+     * @param model 模型名称
      * @return 如果模型存在返回true，否则返回false
      */
     public Boolean isModelExists(OllamaRequest request) {

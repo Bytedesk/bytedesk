@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 /**
- * Represents an executor for padding {@link RingBuffer}<br>
+ * Represents an executor for padding {@link RingBuffer}<br&gt;
  * There are two kinds of executors: one for scheduled padding, the other for padding immediately.
  * 
  * @author yutianbao

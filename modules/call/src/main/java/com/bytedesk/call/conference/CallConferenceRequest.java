@@ -91,6 +91,6 @@ public class CallConferenceRequest extends BaseRequest {
      * 检查是否设置了密码保护
      */
     public Boolean getPasswordProtected() {
-        return password != null && !password.trim().isEmpty();
+        return password != null &amp;amp;& !password.trim().isEmpty();
     }
 }

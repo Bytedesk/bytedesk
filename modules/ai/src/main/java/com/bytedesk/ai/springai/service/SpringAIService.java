@@ -28,13 +28,13 @@ public interface SpringAIService {
      * 发送websocket消息
      * @param query 用户查询
      * @param robot 机器人实体
-     * @param messageProtobuf 消息协议
+     * @param messageRequest 消息协议
      */
     void sendWebsocketMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,  MessageProtobuf messageProtobufReply);
     
     /**
      * 发送Sse消息
-     * @param message 消息
+     * @param messageRequest 消息
      * @param emitter SseEmitter
      */
     void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,  MessageProtobuf messageProtobufReply, SseEmitter emitter);
@@ -53,7 +53,7 @@ public interface SpringAIService {
      * 主要用于RobotAgentService中的processLlmRequest方法
      * 
      * @param query 用户查询
-     * @param prompt 提示词
+     * @param messageRequest 提示词
      * @param robot 机器人配置
      * @return 大模型生成的回复内容
      */

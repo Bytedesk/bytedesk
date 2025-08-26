@@ -59,7 +59,7 @@ import lombok.extern.slf4j.Slf4j;
  * RAG知识库问答
  * https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html
  * https://mp.weixin.qq.com/s/ETmbEAE7lNligcM_A_GF8A
- * https://www.xiaohongshu.com/explore/67b422600000000029008c9f?note_flow_source=wechat&xsec_token=CBKBzlIFWDRmY2lKlLXYLivyqzKeFCE-9sd-_DNTLH-rM=
+ * https://www.xiaohongshu.com/explore/67b422600000000029008c9f?note_flow_source=wechat&amp;amp;amp;xsec_token=CBKBzlIFWDRmY2lKlLXYLivyqzKeFCE-9sd-_DNTLH-rM=
  */
 @Slf4j
 @RestController

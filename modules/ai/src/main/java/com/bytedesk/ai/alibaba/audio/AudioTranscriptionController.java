@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * spring ai alibaba 1.0.0.3 待发布，暂时无法使用
  * 
  * @author yuluo
- * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
+ * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a&gt;
  */
 
 @RestController

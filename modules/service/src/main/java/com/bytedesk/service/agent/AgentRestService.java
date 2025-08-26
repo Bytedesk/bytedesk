@@ -105,7 +105,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     @Transactional
     public AgentResponse create(AgentRequest request) {
         //
-        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+        if (StringUtils.hasText(request.getUid()) &amp;amp;& existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
         //

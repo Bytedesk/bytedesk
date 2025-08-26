@@ -55,7 +55,7 @@ public class TicketCategories {
     };
 
     /**
-     * Complaint & Suggestion Categories
+     * Complaint &amp; Suggestion Categories
      * 投诉与建议类
      */
     public static final String[] COMPLAINT_SUGGESTION = {
@@ -66,7 +66,7 @@ public class TicketCategories {
     };
 
     /**
-     * Operation & Maintenance Categories
+     * Operation &amp; Maintenance Categories
      * 运维类
      */
     public static final String[] OPERATION_MAINTENANCE = {

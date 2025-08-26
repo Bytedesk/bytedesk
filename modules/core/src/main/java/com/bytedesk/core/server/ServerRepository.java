@@ -32,34 +32,34 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
     /**
      * Find server by UID
      * @param uid server UID
-     * @return Optional<ServerEntity>
+     * @return Optional<ServerEntity&amp;amp;gt;
      */
     Optional<ServerEntity> findByUid(String uid);
 
     /**
      * Find server by server name
      * @param serverName server name
-     * @return Optional<ServerEntity>
+     * @return Optional<ServerEntity&gt;
      */
     Optional<ServerEntity> findByServerNameAndDeletedFalse(String serverName);
 
     /**
      * Find all servers
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     List<ServerEntity> findByDeletedFalseOrderByCreatedAtDesc();
 
     /**
      * Find servers by type
      * @param type server type
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     List<ServerEntity> findByTypeAndDeletedFalse(String type);
 
     /**
      * Find servers by status
      * @param status server status
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     List<ServerEntity> findByStatusAndDeletedFalse(String status);
 
@@ -68,7 +68,7 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
      * @param cpuThreshold CPU usage threshold
      * @param memoryThreshold memory usage threshold
      * @param diskThreshold disk usage threshold
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     @Query("SELECT s FROM ServerEntity s WHERE s.deleted = false " +
            "AND (s.cpuUsage >= :cpuThreshold OR s.memoryUsage >= :memoryThreshold OR s.diskUsage >= :diskThreshold)")
@@ -79,7 +79,7 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
     /**
      * Find servers that haven't sent heartbeat recently
      * @param cutoffTime cutoff time for heartbeat
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     @Query("SELECT s FROM ServerEntity s WHERE s.deleted = false " +
            "AND (s.lastHeartbeat IS NULL OR s.lastHeartbeat < :cutoffTime)")
@@ -102,14 +102,14 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
     /**
      * Find servers by environment
      * @param environment environment (DEV, TEST, PROD, etc.)
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     List<ServerEntity> findByEnvironmentAndDeletedFalse(String environment);
 
     /**
      * Find servers by location
      * @param location server location
-     * @return List<ServerEntity>
+     * @return List<ServerEntity&gt;
      */
     List<ServerEntity> findByLocationAndDeletedFalse(String location);
 } 

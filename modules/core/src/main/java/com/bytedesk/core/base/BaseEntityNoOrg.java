@@ -45,7 +45,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 /**
- * Date -> ZonedDateTime ？
+ * Date -&amp;amp;gt; ZonedDateTime ？
  * spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
  * spring.jackson.time-zone=GMT+8
  * 

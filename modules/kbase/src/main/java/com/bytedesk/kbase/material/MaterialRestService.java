@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 15:22:26
+ * @LastEditTime: 2025-08-27 07:49:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,12 +24,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -160,18 +156,6 @@ public class MaterialRestService extends BaseRestServiceWithExport<MaterialEntit
     
     public void initMaterials(String orgUid) {
         // log.info("initThreadMaterial");
-        for (String material : MaterialInitData.getAllMaterials()) {
-            MaterialRequest materialRequest = MaterialRequest.builder()
-                    .uid(Utils.formatUid(orgUid, material))
-                    .name(material)
-                    .order(0)
-                    .type(MaterialTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            create(materialRequest);
-        }
     }
     
 }

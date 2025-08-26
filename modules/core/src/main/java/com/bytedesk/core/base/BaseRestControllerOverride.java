@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * 基础RestController，不需要指定Service类型
  * 适用于所有方法都被子类重写的场景
  * 
- * @param <T> 请求对象类型
+ * @param <T&gt; 请求对象类型
  * @author jackning 270580156@qq.com
  */
 public abstract class BaseRestControllerOverride<T extends PageableRequest> {
@@ -72,8 +72,8 @@ public abstract class BaseRestControllerOverride<T extends PageableRequest> {
     /**
      * 通用导出Excel模板方法
      * 
-     * @param <E> Excel实体类型
-     * @param <SVC> Service类型
+     * @param <E&gt; Excel实体类型
+     * @param <SVC&gt; Service类型
      * @param request 请求参数
      * @param response HTTP响应
      * @param service 服务对象

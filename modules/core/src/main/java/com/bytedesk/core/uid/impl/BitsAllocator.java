@@ -19,8 +19,8 @@ import lombok.Data;
 import lombok.ToString;
 
 /**
- * Allocate 64 bits for the UID(long)<br>
- * sign (fixed 1bit) -> deltaSecond -> workerId -> sequence(within the same second)
+ * Allocate 64 bits for the UID(long)<br&amp;amp;gt;
+ * sign (fixed 1bit) -&gt; deltaSecond -> workerId -> sequence(within the same second)
  * 
  * @author yutianbao
  */
@@ -33,7 +33,7 @@ public class BitsAllocator {
     public static final int TOTAL_BITS = 1 << 6;
 
     /**
-     * Bits for [sign-> second-> workId-> sequence]
+     * Bits for [sign-&gt; second-&gt; workId-> sequence]
      */
     private Integer signBits = 1;
     private final int timestampBits;
@@ -54,8 +54,8 @@ public class BitsAllocator {
     private final int workerIdShift;
 
     /**
-     * Constructor with timestampBits, workerIdBits, sequenceBits<br>
-     * The highest bit used for sign, so <code>63</code> bits for timestampBits, workerIdBits, sequenceBits
+     * Constructor with timestampBits, workerIdBits, sequenceBits<br&gt;
+     * The highest bit used for sign, so <code>63</code&gt; bits for timestampBits, workerIdBits, sequenceBits
      */
     public BitsAllocator(int timestampBits, int workerIdBits, int sequenceBits) {
         // make sure allocated 64 bits
@@ -78,7 +78,7 @@ public class BitsAllocator {
     }
 
     /**
-     * Allocate bits for UID according to delta seconds  workerId  sequence<br>
+     * Allocate bits for UID according to delta seconds  workerId  sequence<br&gt;
      * <b>Note that: </b>The highest bit will always be 0 for sign
      * 
      * @param deltaSeconds

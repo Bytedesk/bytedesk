@@ -44,7 +44,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * @author Jackning <270580156@qq.com>
+ * @author Jackning &lt;270580156@qq.com&gt;
  * 
  * 这些统计数据将有助于客服质量监控和绩效评估，也可用于实时监控会话状态。
  */

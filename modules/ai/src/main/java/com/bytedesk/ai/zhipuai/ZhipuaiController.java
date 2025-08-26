@@ -126,7 +126,7 @@ public class ZhipuaiController {
 
     /**
      * 角色扮演
-     * GET http://127.0.0.1:9003/zhipuai/roleplay?message=hello&userInfo=...&botInfo=...&botName=...&userName=...
+     * GET http://127.0.0.1:9003/zhipuai/roleplay?message=hello&amp;amp;amp;userInfo=...&amp;botInfo=...&amp;botName=...&userName=...
      */
     @GetMapping("/roleplay")
     public ResponseEntity<JsonResult<?>> rolePlayChat(
@@ -314,7 +314,7 @@ public class ZhipuaiController {
 
     /**
      * 示例：查询航班信息的 Function Calling
-     * GET http://127.0.0.1:9003/zhipuai/flight?from=成都&to=北京
+     * GET http://127.0.0.1:9003/zhipuai/flight?from=成都&amp;amp;amp;to=北京
      */
     @GetMapping("/flight")
     public ResponseEntity<JsonResult<?>> flightFunctionCall(
