@@ -136,17 +136,17 @@
 		spring-ai-starter-mcp-client-webflux-->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client-webflux -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency> -->
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-mcp-server</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency> -->
+		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 

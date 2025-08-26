@@ -35,7 +35,60 @@ public class McpServerResponse extends BaseResponse {
 
     private String description;
 
-    private String type;
+    private String serverType;
 
+    private String serverVersion;
+
+    private String serverUrl;
+
+    private String host;
+
+    private Integer port;
+
+    private String protocol;
+
+    private String authType;
+
+    private Integer connectionTimeout;
+
+    private Integer readTimeout;
+
+    private Integer maxRetries;
+
+    private String capabilities;
+
+    private String availableTools;
+
+    private String availableResources;
+
+    private String availablePrompts;
+
+    private String configJson;
+
+    private String environmentVars;
+
+    private String status;
+
+    private Boolean enabled;
+
+    private Boolean autoStart;
+
+    private String healthCheckUrl;
+
+    private Integer healthCheckInterval;
+
+    private java.time.ZonedDateTime lastHealthCheck;
+
+    private java.time.ZonedDateTime lastConnected;
+
+    private String lastError;
+
+    private Integer priority;
+
+    private String tags;
+
+    private String metadata;
+
+    private String usageStats;
 
 }
