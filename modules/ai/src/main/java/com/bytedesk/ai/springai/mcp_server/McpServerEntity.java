@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 11:38:07
+ * @LastEditTime: 2025-08-26 14:07:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -92,8 +92,7 @@ public class McpServerEntity extends BaseEntity {
      * Connection protocol (http, https, websocket, etc.)
      */
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private McpServerProtocolEnum protocol = McpServerProtocolEnum.HTTP;
+    private String protocol = McpServerProtocolEnum.HTTP.name();
 
     /**
      * Authentication token for server access
@@ -104,8 +103,7 @@ public class McpServerEntity extends BaseEntity {
      * Authentication type (bearer, basic, api_key, etc.)
      */
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private McpServerAuthTypeEnum authType = McpServerAuthTypeEnum.BEARER;
+    private String authType = McpServerAuthTypeEnum.BEARER.name();
 
     /**
      * Additional authentication headers in JSON format
@@ -171,8 +169,7 @@ public class McpServerEntity extends BaseEntity {
      * Server status (ACTIVE, INACTIVE, ERROR, CONNECTING, etc.)
      */
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private McpServerStatusEnum status = McpServerStatusEnum.INACTIVE;
+    private String status = McpServerStatusEnum.INACTIVE.name();
 
     /**
      * Whether the server is enabled
