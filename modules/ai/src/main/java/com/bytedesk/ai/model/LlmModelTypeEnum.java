@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-17 14:44:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 11:08:09
+ * @LastEditTime: 2025-08-26 10:40:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ package com.bytedesk.ai.model;
 public enum LlmModelTypeEnum {
     TEXT("text"), // 文本对型
     EMBEDDING("embedding"), // 向量嵌入模型
-    RERANK("rerank"), // 排序模型
+    RERANK("rerank"), // 重排序模型
     VISION("vision"), // 视觉模型
     CODE("code"),  // 代码模型
     REASONING("reasoning"), // 推理模型
