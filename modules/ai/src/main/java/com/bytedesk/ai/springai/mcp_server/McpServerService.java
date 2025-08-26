@@ -464,7 +464,7 @@ public class McpServerService {
     }
 
     private void updateEntityStatus(McpServerEntity server, McpServerStatusEnum status, String error) {
-        server.setStatus(status);
+        server.setStatus(status.name());
         server.setLastError(error);
         if (McpServerStatusEnum.ACTIVE.equals(status)) {
             server.setLastConnected(ZonedDateTime.now());
