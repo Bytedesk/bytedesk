@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  *    }
  * 
  * 6. 转换为Map格式（用于API调用）：
- *    List<Map<String, Object>> buttonMaps = ButtonContent.toMapList(buttons);
+ *    List&lt;Map&lt;String, Object&gt;&gt; buttonMaps = ButtonContent.toMapList(buttons);
  *    metaMessageService.sendButtonTemplateMessage(pageId, recipientId, text, buttonMaps, token);
  * 
  * 7. 使用Builder模式创建复杂按钮：

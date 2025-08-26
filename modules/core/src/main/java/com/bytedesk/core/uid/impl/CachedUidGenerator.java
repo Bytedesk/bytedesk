@@ -144,7 +144,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
     }
 
     /**
-     * Initialize RingBuffer & RingBufferPaddingExecutor
+     * Initialize RingBuffer &amp; RingBufferPaddingExecutor
      */
     private void initRingBuffer() {
         // initialize RingBuffer

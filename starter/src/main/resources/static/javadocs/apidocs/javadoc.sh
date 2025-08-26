@@ -1,1 +1,0 @@
-/Library/Java/JavaVirtualMachines/jdk-17.0.4.jdk/Contents/Home/bin/javadoc -J-Xmx512m -J-Xms128m -J-Duser.language= -J-Duser.country= @options @packages
