@@ -36,7 +36,5 @@ public class McpServerRequest extends BaseRequest {
     // @Builder.Default
     // private String type = McpServerTypeEnum.CUSTOMER.name();
 
-    private String color;
 
-    private Integer order;
 }
