@@ -67,7 +67,7 @@ public class McpServerResponse extends BaseResponse {
 
     private String environmentVars;
 
-    private String status;
+    private McpServerStatusEnum status;
 
     private Boolean enabled;
 

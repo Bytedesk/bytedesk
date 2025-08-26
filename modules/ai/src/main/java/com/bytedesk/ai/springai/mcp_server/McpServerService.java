@@ -186,7 +186,7 @@ public class McpServerService {
                 if (initialized) {
                     clientCache.put(serverUid, client);
                     updateServerStatus(serverUid, true, null);
-                    updateEntityStatus(server, "ACTIVE", null);
+                    updateEntityStatus(server, McpServerStatusEnum.ACTIVE, null);
                     
                     // 异步加载服务器能力
                     loadServerCapabilities(serverUid, client);
@@ -196,7 +196,7 @@ public class McpServerService {
             } catch (Exception e) {
                 log.error("Failed to connect to MCP server {}: {}", serverUid, e.getMessage(), e);
                 updateServerStatus(serverUid, false, e.getMessage());
-                updateEntityStatus(serverUid, "ERROR", e.getMessage());
+                updateEntityStatus(serverUid, McpServerStatusEnum.ERROR, e.getMessage());
                 return false;
             }
         });
@@ -214,7 +214,7 @@ public class McpServerService {
                 }
                 
                 serverStatusCache.remove(serverUid);
-                updateEntityStatus(serverUid, "INACTIVE", null);
+                updateEntityStatus(serverUid, McpServerStatusEnum.INACTIVE, null);
                 
                 log.info("Disconnected from MCP server: {}", serverUid);
                 return true;
@@ -434,7 +434,7 @@ public class McpServerService {
                 }
 
                 // 更新状态
-                String status = isHealthy ? "ACTIVE" : "INACTIVE";
+                McpServerStatusEnum status = isHealthy ? McpServerStatusEnum.ACTIVE : McpServerStatusEnum.INACTIVE;
                 String error = isHealthy ? null : "Health check failed";
                 
                 updateServerStatus(serverUid, isHealthy, error);
@@ -444,7 +444,7 @@ public class McpServerService {
             } catch (Exception e) {
                 log.error("Health check failed for server {}: {}", serverUid, e.getMessage(), e);
                 updateServerStatus(serverUid, false, e.getMessage());
-                updateEntityStatus(serverUid, "ERROR", e.getMessage());
+                updateEntityStatus(serverUid, McpServerStatusEnum.ERROR, e.getMessage());
                 return false;
             }
         });
@@ -604,16 +604,16 @@ public class McpServerService {
         status.setLastError(error);
     }
 
-    private void updateEntityStatus(McpServerEntity server, String status, String error) {
+    private void updateEntityStatus(McpServerEntity server, McpServerStatusEnum status, String error) {
         server.setStatus(status);
         server.setLastError(error);
-        if ("ACTIVE".equals(status)) {
+        if (McpServerStatusEnum.ACTIVE.equals(status)) {
             server.setLastConnected(ZonedDateTime.now());
         }
         mcpServerRestService.save(server);
     }
 
-    private void updateEntityStatus(String serverUid, String status, String error) {
+    private void updateEntityStatus(String serverUid, McpServerStatusEnum status, String error) {
         Optional<McpServerEntity> serverOpt = mcpServerRestService.findByUid(serverUid);
         if (serverOpt.isPresent()) {
             updateEntityStatus(serverOpt.get(), status, error);

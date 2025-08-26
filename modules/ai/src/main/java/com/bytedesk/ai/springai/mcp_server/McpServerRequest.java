@@ -69,7 +69,7 @@ public class McpServerRequest extends BaseRequest {
 
     private String environmentVars;
 
-    private String status;
+    private McpServerStatusEnum status;
 
     private Boolean enabled;
 

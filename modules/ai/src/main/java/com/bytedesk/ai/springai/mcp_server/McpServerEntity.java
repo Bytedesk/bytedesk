@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 11:05:11
+ * @LastEditTime: 2025-08-26 11:38:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -18,8 +18,11 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -58,10 +61,10 @@ public class McpServerEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of MCP server (THREAD, CUSTOMER, TICKET, etc.)
+     * Type of MCP server
      */
     @Builder.Default
-    private String serverType = McpServerTypeEnum.THREAD.name();
+    private String serverType = McpServerTypeEnum.KNOWLEDGE.name();
 
     /**
      * MCP Server version
@@ -165,7 +168,8 @@ public class McpServerEntity extends BaseEntity {
      * Server status (ACTIVE, INACTIVE, ERROR, CONNECTING, etc.)
      */
     @Builder.Default
-    private String status = "INACTIVE";
+    @Enumerated(EnumType.STRING)
+    private McpServerStatusEnum status = McpServerStatusEnum.INACTIVE;
 
     /**
      * Whether the server is enabled
@@ -193,12 +197,12 @@ public class McpServerEntity extends BaseEntity {
     /**
      * Last health check time
      */
-    private java.time.ZonedDateTime lastHealthCheck;
+    private ZonedDateTime lastHealthCheck;
 
     /**
      * Last connection time
      */
-    private java.time.ZonedDateTime lastConnected;
+    private ZonedDateTime lastConnected;
 
     /**
      * Last error message

@@ -78,7 +78,7 @@ public class McpServerExcel {
 
     @ExcelProperty(index = 12, value = "状态")
     @ColumnWidth(10)
-    private String status;
+    private McpServerStatusEnum status;
 
     @ExcelProperty(index = 13, value = "是否启用")
     @ColumnWidth(10)
