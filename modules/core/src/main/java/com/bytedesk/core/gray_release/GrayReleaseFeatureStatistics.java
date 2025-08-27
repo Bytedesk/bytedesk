@@ -45,6 +45,6 @@ public class GrayReleaseFeatureStatistics {
 
     // 判断是否达到稳定状态（可以继续放量）
     public Boolean isStable() {
-        return totalUsage >= 100 &amp;amp;& successRate >= 0.95;
+        return totalUsage >= 100 && successRate >= 0.95;
     }
 } 

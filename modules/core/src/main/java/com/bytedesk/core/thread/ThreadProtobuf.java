@@ -69,7 +69,7 @@ public class ThreadProtobuf implements Serializable {
     // ROBOTING
     public Boolean isRoboting() {
         // return ThreadProcessStatusEnum.ROBOTING.equals(getStatus());
-        return isRobotType() &amp;amp;& isChatting();
+        return isRobotType() && isChatting();
     }   
 
     // LLMING

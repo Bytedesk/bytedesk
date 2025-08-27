@@ -105,7 +105,7 @@ public class CallConferenceResponse extends BaseResponse {
                 .creator(entity.getCreator())
                 .configJson(entity.getConfigJson())
                 .remarks(entity.getRemarks())
-                .passwordProtected(entity.getPassword() != null &amp;amp;& !entity.getPassword().isEmpty())
+                .passwordProtected(entity.getPassword() != null && !entity.getPassword().isEmpty())
                 .build();
     }
 }

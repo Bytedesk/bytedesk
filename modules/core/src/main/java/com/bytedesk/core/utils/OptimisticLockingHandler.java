@@ -55,7 +55,7 @@ public class OptimisticLockingHandler {
                 }
 
                 try {
-                    Thread.sleep(RETRY_DELAY_MS * (1 <&lt; (retryCount - 1)));
+                    Thread.sleep(RETRY_DELAY_MS * (1 << (retryCount - 1)));
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException("Interrupted while retrying", ie);

@@ -60,7 +60,7 @@ public class RedisLoginRetryService {
         }
         String key = RedisConsts.LOGIN_FAILED_PREFIX + username;
         Long count = redisTemplate.opsForValue().increment(key);
-        if (count != null &amp;amp;& count == 1) {
+        if (count != null && count == 1) {
             // 第一次失败，设置过期时间
             redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
         }

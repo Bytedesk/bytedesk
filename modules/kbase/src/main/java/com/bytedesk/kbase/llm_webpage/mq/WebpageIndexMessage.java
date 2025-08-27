@@ -56,7 +56,7 @@ public class WebpageIndexMessage implements Serializable {
      * 检查是否需要更新Elastic索引
      */
     public boolean isUpdateElasticIndex() {
-        return updateElasticIndex != null &amp;amp;& updateElasticIndex;
+        return updateElasticIndex != null && updateElasticIndex;
     }
     
     /**

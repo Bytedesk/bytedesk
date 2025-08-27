@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 09:26:17
+ * @LastEditTime: 2025-08-27 09:13:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,34 +32,34 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
     /**
      * Find server by UID
      * @param uid server UID
-     * @return Optional<ServerEntity&amp;amp;gt;
+     * @return Optional&ltServerEntity&amp;amp;gt;
      */
     Optional<ServerEntity> findByUid(String uid);
 
     /**
      * Find server by server name
      * @param serverName server name
-     * @return Optional<ServerEntity&gt;
+     * @return Optional&ltServerEntity&gt;
      */
     Optional<ServerEntity> findByServerNameAndDeletedFalse(String serverName);
 
     /**
      * Find all servers
-     * @return List<ServerEntity&gt;
+     * @return List&ltServerEntity&gt;
      */
     List<ServerEntity> findByDeletedFalseOrderByCreatedAtDesc();
 
     /**
      * Find servers by type
      * @param type server type
-     * @return List<ServerEntity&gt;
+     * @return List&ltServerEntity&gt;
      */
     List<ServerEntity> findByTypeAndDeletedFalse(String type);
 
     /**
      * Find servers by status
      * @param status server status
-     * @return List<ServerEntity&gt;
+     * @return List&ltServerEntity&gt;
      */
     List<ServerEntity> findByStatusAndDeletedFalse(String status);
 
@@ -68,7 +68,7 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
      * @param cpuThreshold CPU usage threshold
      * @param memoryThreshold memory usage threshold
      * @param diskThreshold disk usage threshold
-     * @return List<ServerEntity&gt;
+     * @return List&ltServerEntity&gt;
      */
     @Query("SELECT s FROM ServerEntity s WHERE s.deleted = false " +
            "AND (s.cpuUsage >= :cpuThreshold OR s.memoryUsage >= :memoryThreshold OR s.diskUsage >= :diskThreshold)")
@@ -79,7 +79,7 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
     /**
      * Find servers that haven't sent heartbeat recently
      * @param cutoffTime cutoff time for heartbeat
-     * @return List<ServerEntity&gt;
+     * @return List&ltServerEntity&gt;
      */
     @Query("SELECT s FROM ServerEntity s WHERE s.deleted = false " +
            "AND (s.lastHeartbeat IS NULL OR s.lastHeartbeat < :cutoffTime)")
@@ -102,14 +102,14 @@ public interface ServerRepository extends JpaRepository<ServerEntity, Long>, Jpa
     /**
      * Find servers by environment
      * @param environment environment (DEV, TEST, PROD, etc.)
-     * @return List<ServerEntity&gt;
+     * @return List&ltServerEntity&gt;
      */
     List<ServerEntity> findByEnvironmentAndDeletedFalse(String environment);
 
     /**
      * Find servers by location
      * @param location server location
-     * @return List<ServerEntity&gt;
+     * @return List&ltServerEntity&gt;
      */
     List<ServerEntity> findByLocationAndDeletedFalse(String location);
 } 
