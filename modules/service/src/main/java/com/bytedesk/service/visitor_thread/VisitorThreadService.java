@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:08:52
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-22 22:19:48
+ * @LastEditTime: 2025-08-27 11:56:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,8 +51,7 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.core.utils.ConvertUtils;
-import com.bytedesk.core.workflow.WorkflowEntity;
+import com.bytedesk.ai.workflow.WorkflowEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -249,7 +248,7 @@ public class VisitorThreadService
 
     public ThreadEntity createWorkflowThread(VisitorRequest visitorRequest, WorkflowEntity workflow, String topic) {
         //
-        String workflowString = ConvertUtils.convertToUserProtobufString(workflow);
+        String workflowString = ServiceConvertUtils.convertToUserProtobufString(workflow);
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         //
         ThreadEntity thread = ThreadEntity.builder()
@@ -271,7 +270,7 @@ public class VisitorThreadService
 
     public ThreadEntity reInitWorkflowThreadExtra(ThreadEntity thread, WorkflowEntity workflow) {
         //
-        String workflowString = ConvertUtils.convertToUserProtobufString(workflow);
+        String workflowString = ServiceConvertUtils.convertToUserProtobufString(workflow);
         thread.setRobot(workflowString); // 工作流
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);

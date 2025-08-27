@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 16:25:46
+ * @LastEditTime: 2025-08-27 11:56:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,9 +24,8 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.core.utils.ConvertUtils;
-import com.bytedesk.core.workflow.WorkflowEntity;
-import com.bytedesk.core.workflow.WorkflowRestService;
+import com.bytedesk.ai.workflow.WorkflowEntity;
+import com.bytedesk.ai.workflow.WorkflowRestService;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
@@ -163,7 +162,7 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
      */
     private MessageProtobuf processNewWorkflowThread(VisitorRequest request, ThreadEntity thread, WorkflowEntity workflowEntity) {
         // 1. 加入队列
-        UserProtobuf workflowProtobuf = ConvertUtils.convertToUserProtobuf(workflowEntity);
+        UserProtobuf workflowProtobuf = ServiceConvertUtils.convertToUserProtobuf(workflowEntity);
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, workflowProtobuf, request);
         log.info("Workflow enqueued to queue: {}", queueMemberEntity.getUid());
 
@@ -172,7 +171,7 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         thread.setChatting().setContent(welcomeContent);
         
         // 3. 设置工作流信息
-        String workflowString = ConvertUtils.convertToUserProtobufString(workflowEntity);
+        String workflowString = ServiceConvertUtils.convertToUserProtobufString(workflowEntity);
         thread.setRobot(workflowString);
         
         // 4. 保存线程

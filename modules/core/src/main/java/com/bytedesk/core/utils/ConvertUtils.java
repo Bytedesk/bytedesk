@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-01 17:20:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-27 11:52:09
+ * @LastEditTime: 2025-08-27 11:55:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,17 +132,6 @@ public class ConvertUtils {
     public static UserProtobuf convertToUserProtobuf(UserEntity user) {
         return getModelMapper().map(user, UserProtobuf.class);
     }
-
-    // public static UserProtobuf convertToUserProtobuf(WorkflowEntity workflow) {
-    //     UserProtobuf userProtobuf = getModelMapper().map(workflow, UserProtobuf.class);
-    //     userProtobuf.setType(UserTypeEnum.WORKFLOW.name());
-    //     return userProtobuf;
-    // }
-
-    // public static String convertToUserProtobufString(WorkflowEntity workflow) {
-    //     UserProtobuf userProtobuf = convertToUserProtobuf(workflow);
-    //     return JSON.toJSONString(userProtobuf);
-    // }
 
     public static String convertToUserProtobufString(UserEntity user) {
         UserProtobuf userProtobuf = convertToUserProtobuf(user);

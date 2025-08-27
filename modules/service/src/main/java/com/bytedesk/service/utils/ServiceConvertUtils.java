@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-04 11:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 20:33:43
+ * @LastEditTime: 2025-08-27 11:55:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,6 +22,7 @@ import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.ai.workflow.WorkflowEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -69,6 +70,17 @@ public class ServiceConvertUtils {
         VisitorProtobuf userProtobuf = getModelMapper().map(visitorRequest, VisitorProtobuf.class);
         userProtobuf.setType(UserTypeEnum.VISITOR.name());
         return userProtobuf;
+    }
+
+    public static UserProtobuf convertToUserProtobuf(WorkflowEntity workflow) {
+        UserProtobuf userProtobuf = getModelMapper().map(workflow, UserProtobuf.class);
+        userProtobuf.setType(UserTypeEnum.WORKFLOW.name());
+        return userProtobuf;
+    }
+
+    public static String convertToUserProtobufString(WorkflowEntity workflow) {
+        UserProtobuf userProtobuf = convertToUserProtobuf(workflow);
+        return JSON.toJSONString(userProtobuf);
     }
 
     public static String convertToVisitorProtobufJSONString(VisitorRequest visitorRequest) {

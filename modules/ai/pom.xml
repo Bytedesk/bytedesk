@@ -23,6 +23,7 @@
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
 		<coze.version>0.4.1</coze.version>
+		<zhipuai.oapi-java-sdk.version>release-V4-2.4.3</zhipuai.oapi-java-sdk.version>
 	</properties>
 
 	<dependencies>
@@ -81,13 +82,6 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-zhipuai -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-zhipuai</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
-		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-deepseek -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -101,7 +95,13 @@
 			<artifactId>spring-ai-starter-model-minimax</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-zhipuai -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-zhipuai</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
 		<!-- spring ai 官方无法正常统计 token 使用量，使用这个zhipuai 官方库 -->
 		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
 		<!-- https://bigmodel.cn/dev/api/devguide/sdk-install -->
@@ -109,7 +109,7 @@
 		<dependency>
 			<groupId>cn.bigmodel.openapi</groupId>
 			<artifactId>oapi-java-sdk</artifactId>
-			<version>release-V4-2.4.3</version>
+			<version>${zhipuai.oapi-java-sdk.version}</version>
 		</dependency>
 
 		<!-- vector store -->

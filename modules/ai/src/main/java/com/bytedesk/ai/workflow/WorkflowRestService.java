@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 14:47:59
+ * @LastEditTime: 2025-08-27 12:10:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,7 +52,6 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     protected Page<WorkflowEntity> executePageQuery(Specification<WorkflowEntity> spec, Pageable pageable) {
         return workflowRepository.findAll(spec, pageable);
     }
-
     
     @Cacheable(value = "workflow", key = "#uid", unless="#result==null")
     @Override
