@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 14:45:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 11:05:15
+ * @LastEditTime: 2025-08-27 13:24:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -34,7 +34,8 @@ import com.bytedesk.kbase.llm_text.TextRestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Text向量检索服务
@@ -44,7 +45,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
+// @ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
+@ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class TextVectorService {
     
     private final ElasticsearchVectorStore vectorStore;

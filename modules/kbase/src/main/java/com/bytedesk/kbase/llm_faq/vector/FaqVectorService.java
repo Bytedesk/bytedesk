@@ -23,6 +23,7 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ import com.bytedesk.kbase.llm_faq.FaqStatusEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 /**
  * FAQ向量检索服务
@@ -46,7 +47,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
+// @ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
+@ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class FaqVectorService {
 
     private final ElasticsearchVectorStore vectorStore;

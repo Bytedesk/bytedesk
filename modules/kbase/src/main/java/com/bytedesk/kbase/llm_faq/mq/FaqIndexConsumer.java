@@ -37,14 +37,22 @@ import lombok.extern.slf4j.Slf4j;
 public class FaqIndexConsumer {
 
     private final FaqElasticService faqElasticService;
-    @Autowired(required = false)
-    private FaqVectorService faqVectorService;
+    private final FaqVectorService faqVectorService;
     private final FaqRestService faqRestService;
     private final Random random = new Random();
 
-    public FaqIndexConsumer(FaqElasticService faqElasticService, FaqRestService faqRestService) {
+    public FaqIndexConsumer(FaqElasticService faqElasticService, FaqRestService faqRestService, 
+                           @Autowired(required = false) FaqVectorService faqVectorService) {
         this.faqElasticService = faqElasticService;
         this.faqRestService = faqRestService;
+        this.faqVectorService = faqVectorService;
+        
+        // 在构造函数中检查并记录向量服务状态
+        if (faqVectorService == null) {
+            log.warn("向量存储服务未启用。如需启用，请检查配置: spring.ai.vectorstore.elasticsearch.enabled=true 并确保 Elasticsearch 正常运行");
+        } else {
+            log.info("向量存储服务已启用并可用");
+        }
     }
 
     /**
@@ -152,9 +160,14 @@ public class FaqIndexConsumer {
         // 执行向量索引 - 独立事务
         if (message.getUpdateVectorIndex()) {
             try {
-                log.debug("为FAQ创建向量索引: {}", faq.getUid());
-                // 在单独的事务中处理向量索引
-                processVectorIndex(faq);
+                // 检查向量服务是否可用
+                if (faqVectorService == null) {
+                    log.warn("向量服务不可用，跳过向量索引处理: {}", faq.getUid());
+                } else {
+                    log.debug("为FAQ创建向量索引: {}", faq.getUid());
+                    // 在单独的事务中处理向量索引
+                    processVectorIndex(faq);
+                }
                 vectorSuccess = true;
             } catch (Exception e) {
                 log.error("FAQ向量索引创建失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
@@ -202,6 +215,12 @@ public class FaqIndexConsumer {
     // 不使用事务注解，让内部方法管理自己的事务，并添加乐观锁重试机制
     public void processVectorIndex(FaqEntity faq) {
         try {
+            // 检查向量服务是否可用
+            if (faqVectorService == null) {
+                log.warn("向量服务不可用，跳过向量索引处理: {}", faq.getUid());
+                return;
+            }
+            
             log.info("开始处理FAQ向量索引: {}, 当前状态: {}", faq.getUid(), faq.getVectorStatus());
 
             // 先尝试删除旧的向量索引
@@ -260,6 +279,12 @@ public class FaqIndexConsumer {
     @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public Boolean deleteFaqVector(FaqEntity faq) {
         try {
+            // 检查向量服务是否可用
+            if (faqVectorService == null) {
+                log.warn("向量服务不可用，跳过向量索引删除: {}", faq.getUid());
+                return true; // 返回true表示操作完成（虽然没有实际删除，但不是错误）
+            }
+            
             log.debug("在完全独立事务中删除向量索引: {}", faq.getUid());
             return faqVectorService.deleteFaqVector(faq);
         } catch (Exception e) {
@@ -295,11 +320,17 @@ public class FaqIndexConsumer {
         // 从向量索引中删除 - 独立事务
         if (message.getUpdateVectorIndex()) {
             try {
-                log.debug("从向量索引中删除FAQ: {}", faq.getUid());
-                // 在单独的事务中处理
-                vectorSuccess = processVectorDelete(faq);
-                if (!vectorSuccess) {
-                    log.warn("从向量存储中删除FAQ索引失败: {}", faq.getUid());
+                // 检查向量服务是否可用
+                if (faqVectorService == null) {
+                    log.warn("向量服务不可用，跳过向量索引删除: {}", faq.getUid());
+                    vectorSuccess = true; // 虽然没有删除，但不是错误
+                } else {
+                    log.debug("从向量索引中删除FAQ: {}", faq.getUid());
+                    // 在单独的事务中处理
+                    vectorSuccess = processVectorDelete(faq);
+                    if (!vectorSuccess) {
+                        log.warn("从向量存储中删除FAQ索引失败: {}", faq.getUid());
+                    }
                 }
             } catch (Exception e) {
                 log.error("从向量索引中删除FAQ失败: {}, 错误: {}", faq.getUid(), e.getMessage(), e);
@@ -345,6 +376,12 @@ public class FaqIndexConsumer {
      */
     @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public Boolean processVectorDelete(FaqEntity faq) {
+        // 检查向量服务是否可用
+        if (faqVectorService == null) {
+            log.warn("向量服务不可用，跳过向量索引删除: {}", faq.getUid());
+            return true; // 返回true表示操作完成（虽然没有实际删除，但不是错误）
+        }
+        
         log.debug("在独立事务中处理向量索引删除: {}", faq.getUid());
         return faqVectorService.deleteFaqVector(faq);
     }

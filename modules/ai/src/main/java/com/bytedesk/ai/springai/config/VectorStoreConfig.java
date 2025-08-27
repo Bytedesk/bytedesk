@@ -31,7 +31,7 @@ public class VectorStoreConfig {
      * 只有当 embedding 模型可用且 elasticsearch 启用时才创建
      */
     @Bean("elasticsearchVectorStore")
-    @ConditionalOnProperty(name = "spring.ai.vectorstore.elasticsearch.enabled", havingValue = "true", matchIfMissing = false)
+    @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
     @ConditionalOnBean(EmbeddingModel.class)
     public ElasticsearchVectorStore elasticsearchVectorStore(RestClient restClient, EmbeddingModel embeddingModel) {
         

@@ -38,17 +38,26 @@ import lombok.extern.slf4j.Slf4j;
 public class WebpageIndexConsumer {
 
     private final WebpageElasticService webpageElasticService;
-    @Autowired(required = false)
-    private WebpageVectorService webpageVectorService;
+    private final WebpageVectorService webpageVectorService;
     private final WebpageRestService webpageRestService;
     private final WebpageCrawlerService webpageCrawlerService;
+    private final Random random = new Random();
 
-    public WebpageIndexConsumer(WebpageElasticService webpageElasticService, WebpageRestService webpageRestService, WebpageCrawlerService webpageCrawlerService) {
+    public WebpageIndexConsumer(WebpageElasticService webpageElasticService, WebpageRestService webpageRestService, 
+                               WebpageCrawlerService webpageCrawlerService,
+                               @Autowired(required = false) WebpageVectorService webpageVectorService) {
         this.webpageElasticService = webpageElasticService;
         this.webpageRestService = webpageRestService;
         this.webpageCrawlerService = webpageCrawlerService;
+        this.webpageVectorService = webpageVectorService;
+        
+        // 在构造函数中检查并记录向量服务状态
+        if (webpageVectorService == null) {
+            log.warn("网页向量存储服务未启用。如需启用，请检查配置: spring.ai.vectorstore.elasticsearch.enabled=true 并确保 Elasticsearch 正常运行");
+        } else {
+            log.info("网页向量存储服务已启用并可用");
+        }
     }
-    private final Random random = new Random();
 
     /**
      * 处理网页索引队列中的消息
@@ -221,6 +230,12 @@ public class WebpageIndexConsumer {
      */
     private void processVectorIndex(WebpageEntity webpage) {
         try {
+            // 检查向量服务是否可用
+            if (webpageVectorService == null) {
+                log.warn("网页向量服务不可用，跳过向量索引处理: {}", webpage.getUid());
+                return;
+            }
+            
             log.debug("开始处理网页向量索引: {}", webpage.getUid());
             webpageVectorService.indexWebpageVector(webpage);
             log.debug("成功完成网页向量索引: {}", webpage.getUid());
@@ -253,6 +268,12 @@ public class WebpageIndexConsumer {
      */
     private void processVectorDelete(WebpageEntity webpage) {
         try {
+            // 检查向量服务是否可用
+            if (webpageVectorService == null) {
+                log.warn("网页向量服务不可用，跳过向量索引删除: {}", webpage.getUid());
+                return;
+            }
+            
             log.debug("开始删除网页向量索引: {}", webpage.getUid());
             webpageVectorService.deleteWebpageVector(webpage);
             log.debug("成功删除网页向量索引: {}", webpage.getUid());
