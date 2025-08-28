@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 18:18:27
+ * @LastEditTime: 2025-08-28 12:03:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,14 +39,14 @@ public class StompDisconnectListener implements ApplicationListener<SessionDisco
 
     @Override
     public void onApplicationEvent(@NonNull SessionDisconnectEvent event) {
-        log.debug("stomp sessionDisconnectEvent {}", event.toString());
+        // log.debug("stomp sessionDisconnectEvent {}", event.toString());
         StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
         if (headerAccessor != null) {
             String login = headerAccessor.getLogin();
             log.info("stomp disconnection with uid:  {}", login);
             // 处理 login 值，例如存储到数据库或日志记录
         } else {
-            log.info("stomp disconnection without uid");
+            // log.info("stomp disconnection without uid");
         }
         // TODO: 访客离线，通知客服端
         
