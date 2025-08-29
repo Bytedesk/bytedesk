@@ -26,8 +26,7 @@ import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.EdgeAction;
 import com.alibaba.cloud.ai.graph.observation.GraphObservationLifecycleListener;
 import io.micrometer.observation.ObservationRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,11 +34,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/customer")
 public class CustomerServiceController {
-
-	private static final Logger logger = LoggerFactory.getLogger(CustomerServiceController.class);
 
 	private CompiledGraph compiledGraph;
 
@@ -51,9 +49,9 @@ public class CustomerServiceController {
 			.build());
 	}
 
-	// http://localhost:18080/customer/chat?query=我收到的产品有快递破损，需要退换货？
-	// http://localhost:18080/customer/chat?query=我的产品不能正常工作了，要怎么去做维修？
-	// http://localhost:18080/customer/chat?query=商品收到了，非常好，下次还会买。
+	// http://localhost:9003/customer/chat?query=我收到的产品有快递破损，需要退换货？
+	// http://localhost:9003/customer/chat?query=我的产品不能正常工作了，要怎么去做维修？
+	// http://localhost:9003/customer/chat?query=商品收到了，非常好，下次还会买。
 	@GetMapping("/chat")
 	public String simpleChat(String query) throws Exception {
 
@@ -66,7 +64,7 @@ public class CustomerServiceController {
 		public String apply(OverAllState state) throws Exception {
 
 			String classifierOutput = (String) state.value("classifier_output").orElse("");
-			logger.info("classifierOutput: {}", classifierOutput);
+			log.info("classifierOutput: {}", classifierOutput);
 
 			if (classifierOutput.contains("positive")) {
 				return "positive";
@@ -82,7 +80,7 @@ public class CustomerServiceController {
 		public String apply(OverAllState state) throws Exception {
 
 			String classifierOutput = (String) state.value("classifier_output").orElse("");
-			logger.info("classifierOutput: {}", classifierOutput);
+			log.info("classifierOutput: {}", classifierOutput);
 
 			Map<String, String> classifierMap = new HashMap<>();
 			classifierMap.put("after-sale", "after-sale");
