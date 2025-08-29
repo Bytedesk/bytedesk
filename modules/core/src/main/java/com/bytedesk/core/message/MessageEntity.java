@@ -97,6 +97,26 @@ public class MessageEntity extends AbstractMessageEntity {
     }
 
     /**
+     * 获取消息扩展信息
+     */
+    public MessageExtra getMessageExtra() {
+        String extraJson = getExtra();
+        if (extraJson != null && !extraJson.trim().isEmpty() && !extraJson.equals("{}")) {
+            return MessageExtra.fromJson(extraJson);
+        }
+        return MessageExtra.builder().build();
+    }
+
+    /**
+     * 设置消息扩展信息
+     */
+    public void setMessageExtra(MessageExtra messageExtra) {
+        if (messageExtra != null) {
+            setExtra(messageExtra.toJson());
+        }
+    }
+
+    /**
      * 重写toString方法避免循环引用
      */
     @Override
