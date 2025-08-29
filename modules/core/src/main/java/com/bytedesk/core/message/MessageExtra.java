@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-09 09:24:07
+ * @LastEditTime: 2025-08-29 09:41:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -35,9 +35,10 @@ public class MessageExtra extends BaseExtra {
     // 例如：企业内部员工之间的消息，true: 内部消息，false: 外部消息
     @Builder.Default
     private Boolean isInternal = false; // 设置默认值为false
+
+    private String translatedText; // 翻译后的文本
     
-    // 企业id
-    private String orgUid;
+    private String orgUid; // 组织UID
 
     public static MessageExtra fromJson(String json) {
         MessageExtra result = BaseExtra.fromJson(json, MessageExtra.class);
