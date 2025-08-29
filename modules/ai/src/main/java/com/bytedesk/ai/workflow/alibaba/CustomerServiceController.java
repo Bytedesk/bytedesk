@@ -51,6 +51,9 @@ public class CustomerServiceController {
 			.build());
 	}
 
+	// http://localhost:18080/customer/chat?query=我收到的产品有快递破损，需要退换货？
+	// http://localhost:18080/customer/chat?query=我的产品不能正常工作了，要怎么去做维修？
+	// http://localhost:18080/customer/chat?query=商品收到了，非常好，下次还会买。
 	@GetMapping("/chat")
 	public String simpleChat(String query) throws Exception {
 
