@@ -481,6 +481,9 @@ services:
       # api-docs
       SPRINGDOC_API_DOCS_ENABLED: "true"
       SPRINGDOC_API_DOCS_PATH: /v3/api-docs
+      # 百度翻译 https://fanyi-api.baidu.com/doc/21
+      BYTEDESK_TRANSLATE_BAIDU_APPID: placeholder
+      BYTEDESK_TRANSLATE_BAIDU_KEY: placeholder
     ports:
       - 9003:9003
       - 9885:9885
