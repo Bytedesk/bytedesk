@@ -1,17 +1,15 @@
 /*
- * Copyright 2024-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-08-14 11:17:19
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-08-29 16:21:47
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.workflow.alibaba;
 
@@ -20,12 +18,10 @@ import java.util.Map;
 
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RecordingNode implements NodeAction {
-
-	private static final Logger logger = LoggerFactory.getLogger(RecordingNode.class);
 
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
@@ -34,11 +30,11 @@ public class RecordingNode implements NodeAction {
 
 		Map<String, Object> updatedState = new HashMap<>();
 		if (feedback.contains("positive")) {
-			logger.info("Received positive feedback: {}", feedback);
+			log.info("Received positive feedback: {}", feedback);
 			updatedState.put("solution", "Praise, no action taken.");
 		}
 		else {
-			logger.info("Received negative feedback: {}", feedback);
+			log.info("Received negative feedback: {}", feedback);
 			updatedState.put("solution", feedback);
 		}
 
