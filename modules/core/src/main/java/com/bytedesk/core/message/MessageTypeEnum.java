@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 17:56:56
+ * @LastEditTime: 2025-08-30 09:34:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,14 +81,15 @@ public enum MessageTypeEnum {
     FAQ_QUESTION, // 常见问题问题
     FAQ_ANSWER, // 常见问题答案
     //
-    ROBOT, // 机器人
+    ROBOT, // 机器人消息
     ROBOT_QUESTION, // 机器人问题
     ROBOT_ANSWER, // 机器人答案
+    ROBOT_UP, // 点赞
+    ROBOT_DOWN, // 点踩
+    // 
     STREAM, // 流式消息TEXT，大模型回复
     STREAM_START, // 流式消息开始
     STREAM_END, // 流式消息结束
-    // ROBOT_UP, // 机器人答案评价:UP
-    // ROBOT_DOWN, // 机器人答案评价:DOWN
     ARTICLE, // 文章
     // 
     RATE, // 访客主动评价
@@ -98,7 +99,6 @@ public enum MessageTypeEnum {
     // 
     AUTO_CLOSED, // 自动关闭
     AGENT_CLOSED, // 客服关闭
-    //     
     // 
     TRANSFER, // 转接
     TRANSFER_REJECT, // 转接拒绝
