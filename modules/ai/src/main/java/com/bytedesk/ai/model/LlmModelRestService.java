@@ -110,6 +110,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
                 .nickname(modelJson.getNickname())
                 .description(modelJson.getDescription())
                 .type(modelJson.getType())
+                .enabled(true)
                 .level(level)
                 .orgUid(orgUid)
                 .build();
