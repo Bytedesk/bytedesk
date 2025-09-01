@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-29 13:00:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:49:04
+ * @LastEditTime: 2025-09-01 13:47:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -66,83 +66,22 @@ public class VisitorThreadEventListener {
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
         log.info("visitor onThreadCloseEvent: {}", thread.getUid());
-        String topic = thread.getTopic();
-        String content = "会话已结束";
-        if (thread.getAutoClose()) {
-            // 自动关闭会话
-            Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
-            if (queueMemberOptional.isPresent()) {
-                QueueMemberEntity queueMember = queueMemberOptional.get();
-                queueMember.setSystemClosedAt(BdDateUtils.now());
-                queueMember.setSystemClose(true);
-                queueMemberRestService.save(queueMember);
-                if (queueMember.getAgentOffline()) {
-                    // 客服离线，自动关闭会话，不发送自动关闭消息
-                    return;
-                }
-            }
-            // 自动关闭，根据会话类型显示提示语
-            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
-                Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
-                if (workgroupOptional.isPresent()) {
-                    WorkgroupEntity workgroup = workgroupOptional.get();
-                    content = workgroup.getServiceSettings().getAutoCloseTip();
-                } else {
-                    content = I18Consts.I18N_AUTO_CLOSE_TIP;// "会话已结束，感谢您的咨询，祝您生活愉快！";
-                }
-            } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
-                String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
-                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-                if (agentOptional.isPresent()) {
-                    AgentEntity agent = agentOptional.get();
-                    content = agent.getServiceSettings().getAutoCloseTip();
-                } else {
-                    content = I18Consts.I18N_AUTO_CLOSE_TIP;// "会话已结束，感谢您的咨询，祝您生活愉快！";
-                }
-            } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
-                String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
-                Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
-                if (robotOptional.isPresent()) {
-                    RobotEntity robot = robotOptional.get();
-                    content = robot.getServiceSettings().getAutoCloseTip();
-                } else {
-                    content = I18Consts.I18N_AUTO_CLOSE_TIP;// "会话已结束，感谢您的咨询，祝您生活愉快！";
-                }
-            }
-        } else {
-            // 手动关闭会话
-            Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
-            if (queueMemberOptional.isPresent()) {
-                QueueMemberEntity queueMember = queueMemberOptional.get();
-                queueMember.setAgentClosedAt(BdDateUtils.now());
-                queueMember.setAgentClose(true);
-                queueMemberRestService.save(queueMember);
-            }
-            // 非自动关闭，客服手动关闭，显示客服关闭提示语
-            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
-                Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
-                if (workgroupOptional.isPresent()) {
-                    WorkgroupEntity workgroup = workgroupOptional.get();
-                    content = workgroup.getServiceSettings().getAgentCloseTip();
-                } else {
-                    content = I18Consts.I18N_AGENT_CLOSE_TIP;// "会话已结束，感谢您的咨询，祝您生活愉快！";
-                }
-            } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
-                String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
-                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-                if (agentOptional.isPresent()) {
-                    AgentEntity agent = agentOptional.get();
-                    content = agent.getServiceSettings().getAgentCloseTip();
-                } else {
-                    content = I18Consts.I18N_AGENT_CLOSE_TIP;// "会话已结束，感谢您的咨询，祝您生活愉快！";
-                }
-            }
+        
+        boolean autoClose = thread.getAutoClose();
+        
+        // 更新队列成员状态
+        updateQueueMemberOnClose(thread, autoClose);
+        
+        // 如果是自动关闭且客服离线，不发送消息
+        if (autoClose && isAgentOffline(thread)) {
+            return;
         }
-
+        
+        // 获取关闭提示语
+        String content = getCloseTip(thread, autoClose);
+        
         // 发送消息
-        MessageProtobuf messageProtobuf = thread.getAutoClose()
+        MessageProtobuf messageProtobuf = autoClose
                 ? MessageUtils.createAutoCloseMessage(thread, content)
                 : MessageUtils.createAgentCloseMessage(thread, content);
         messageSendService.sendProtobufMessage(messageProtobuf);
@@ -152,72 +91,204 @@ public class VisitorThreadEventListener {
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
         // log.info("visitor_thread quartz one min event: " + event);
         List<ThreadEntity> threads = threadRestService.findServiceThreadStateStarted();
-        // auto close thread
+        
+        // 自动关闭线程
         visitorThreadService.autoRemindAgentOrCloseThread(threads);
-        // 触发器逻辑
-        // 查找所有未关闭的会话，如果超过一定时间未回复，则判断是否触发自动回复
-        threads.forEach(thread -> {
-            // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
-            long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
-            long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
-            // 移除Math.abs()，确保时间顺序正确
-            long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
-            // 如果updatedAt在未来，说明时间有问题，跳过处理
-            if (diffInMilliseconds < 0) {
-                log.warn("Thread {} updatedAt is in the future, skipping proactive trigger check", thread.getUid());
-                return;
+        
+        // 处理主动触发逻辑
+        threads.forEach(this::processProactiveTrigger);
+    }
+
+    /**
+     * 处理单个线程的主动触发逻辑
+     */
+    private void processProactiveTrigger(ThreadEntity thread) {
+        // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
+        long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
+        long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
+        
+        // 移除Math.abs()，确保时间顺序正确
+        long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
+        
+        // 如果updatedAt在未来，说明时间有问题，跳过处理
+        if (diffInMilliseconds < 0) {
+            log.warn("Thread {} updatedAt is in the future, skipping proactive trigger check", thread.getUid());
+            return;
+        }
+        
+        // Convert to seconds
+        long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
+        
+        // 处理主动触发
+        handleProactiveTrigger(thread, diffInSeconds);
+    }
+    
+
+    /**
+     * 更新队列成员状态
+     */
+    private void updateQueueMemberOnClose(ThreadEntity thread, boolean autoClose) {
+        Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+        if (queueMemberOptional.isPresent()) {
+            QueueMemberEntity queueMember = queueMemberOptional.get();
+            if (autoClose) {
+                queueMember.setSystemClosedAt(BdDateUtils.now());
+                queueMember.setSystemClose(true);
+            } else {
+                queueMember.setAgentClosedAt(BdDateUtils.now());
+                queueMember.setAgentClose(true);
             }
-            // Convert to seconds
-            long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
-            String topic = thread.getTopic();
-            // log.info("visitor_thread quartz one min event thread: " + thread.getUid());
-            if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
-                Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
-                if (workgroupOptional.isPresent()) {
-                    WorkgroupEntity workgroup = workgroupOptional.get();
-                    if (workgroup.getServiceSettings().getEnableProactiveTrigger()
-                            && diffInSeconds > workgroup.getServiceSettings().getNoResponseTimeout()) {
-                        // 触发自动回复
-                        log.info("visitor_thread quartz one min event thread: " + thread.getUid()
-                                + " trigger workgroup proactive message");
-                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                                workgroup.getServiceSettings().getProactiveMessage());
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    }
-                }
-            } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
-                String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
-                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-                if (agentOptional.isPresent()) {
-                    AgentEntity agent = agentOptional.get();
-                    if (agent.getServiceSettings().getEnableProactiveTrigger()
-                            && diffInSeconds > agent.getServiceSettings().getNoResponseTimeout()) {
-                        // 触发自动回复
-                        log.info("visitor_thread quartz one min event thread: " + thread.getUid()
-                                + " trigger agent proactive message");
-                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                                agent.getServiceSettings().getProactiveMessage());
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    }
-                }
-            } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
-                String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
-                Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
-                if (robotOptional.isPresent()) {
-                    RobotEntity robot = robotOptional.get();
-                    if (robot.getServiceSettings().getEnableProactiveTrigger()
-                            && diffInSeconds > robot.getServiceSettings().getNoResponseTimeout()) {
-                        // 触发自动回复
-                        log.info("visitor_thread quartz one min event thread: " + thread.getUid()
-                                + " trigger robot proactive message");
-                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                                robot.getServiceSettings().getProactiveMessage());
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    }
-                }
+            queueMemberRestService.save(queueMember);
+        }
+    }
+
+    /**
+     * 检查客服是否离线
+     */
+    private boolean isAgentOffline(ThreadEntity thread) {
+        Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+        return queueMemberOptional.isPresent() && queueMemberOptional.get().getAgentOffline();
+    }
+
+    /**
+     * 获取关闭提示语
+     */
+    private String getCloseTip(ThreadEntity thread, boolean autoClose) {
+        String topic = thread.getTopic();
+        
+        if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+            return getWorkgroupCloseTip(topic, autoClose);
+        } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
+            return getAgentCloseTip(topic, autoClose);
+        } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
+            return getRobotCloseTip(topic);
+        }
+        
+        return "会话已结束";
+    }
+
+    /**
+     * 获取工作组关闭提示语
+     */
+    private String getWorkgroupCloseTip(String topic, boolean autoClose) {
+        String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
+        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+        
+        if (workgroupOptional.isPresent()) {
+            WorkgroupEntity workgroup = workgroupOptional.get();
+            return autoClose 
+                ? workgroup.getServiceSettings().getAutoCloseTip()
+                : workgroup.getServiceSettings().getAgentCloseTip();
+        }
+        
+        return autoClose ? I18Consts.I18N_AUTO_CLOSE_TIP : I18Consts.I18N_AGENT_CLOSE_TIP;
+    }
+
+    /**
+     * 获取客服关闭提示语
+     */
+    private String getAgentCloseTip(String topic, boolean autoClose) {
+        String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
+        Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+        
+        if (agentOptional.isPresent()) {
+            AgentEntity agent = agentOptional.get();
+            return autoClose 
+                ? agent.getServiceSettings().getAutoCloseTip()
+                : agent.getServiceSettings().getAgentCloseTip();
+        }
+        
+        return autoClose ? I18Consts.I18N_AUTO_CLOSE_TIP : I18Consts.I18N_AGENT_CLOSE_TIP;
+    }
+
+    /**
+     * 获取机器人关闭提示语
+     */
+    private String getRobotCloseTip(String topic) {
+        String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
+        Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
+        
+        if (robotOptional.isPresent()) {
+            RobotEntity robot = robotOptional.get();
+            return robot.getServiceSettings().getAutoCloseTip();
+        }
+        
+        return I18Consts.I18N_AUTO_CLOSE_TIP;
+    }
+
+    /**
+     * 处理主动触发消息
+     */
+    private void handleProactiveTrigger(ThreadEntity thread, long diffInSeconds) {
+        String topic = thread.getTopic();
+        
+        if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
+            handleWorkgroupProactiveTrigger(thread, topic, diffInSeconds);
+        } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
+            handleAgentProactiveTrigger(thread, topic, diffInSeconds);
+        } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
+            handleRobotProactiveTrigger(thread, topic, diffInSeconds);
+        }
+    }
+
+    /**
+     * 处理工作组主动触发
+     */
+    private void handleWorkgroupProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
+        String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
+        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+        
+        if (workgroupOptional.isPresent()) {
+            WorkgroupEntity workgroup = workgroupOptional.get();
+            if (workgroup.getServiceSettings().getEnableProactiveTrigger()
+                    && diffInSeconds > workgroup.getServiceSettings().getNoResponseTimeout()) {
+                log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message", 
+                    thread.getUid());
+                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
+                        workgroup.getServiceSettings().getProactiveMessage());
+                messageSendService.sendProtobufMessage(messageProtobuf);
             }
-        });
+        }
+    }
+
+    /**
+     * 处理客服主动触发
+     */
+    private void handleAgentProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
+        String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
+        Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+        
+        if (agentOptional.isPresent()) {
+            AgentEntity agent = agentOptional.get();
+            if (agent.getServiceSettings().getEnableProactiveTrigger()
+                    && diffInSeconds > agent.getServiceSettings().getNoResponseTimeout()) {
+                log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message", 
+                    thread.getUid());
+                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
+                        agent.getServiceSettings().getProactiveMessage());
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            }
+        }
+    }
+
+    /**
+     * 处理机器人主动触发
+     */
+    private void handleRobotProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
+        String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
+        Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
+        
+        if (robotOptional.isPresent()) {
+            RobotEntity robot = robotOptional.get();
+            if (robot.getServiceSettings().getEnableProactiveTrigger()
+                    && diffInSeconds > robot.getServiceSettings().getNoResponseTimeout()) {
+                log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message", 
+                    thread.getUid());
+                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
+                        robot.getServiceSettings().getProactiveMessage());
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            }
+        }
     }
 
 }
