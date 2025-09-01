@@ -30,6 +30,10 @@ import lombok.experimental.SuperBuilder;
 // @AllArgsConstructor
 @NoArgsConstructor
 public class RobotStreamContent extends BaseContent {
+
+
+    private String question;
     
-    private String content;
+    private String answer;
+    
 }
