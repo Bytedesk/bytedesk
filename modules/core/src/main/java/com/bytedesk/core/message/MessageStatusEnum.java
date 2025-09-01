@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-25 10:33:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 17:11:26
+ * @LastEditTime: 2025-09-01 13:02:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -69,11 +69,13 @@ public enum MessageStatusEnum {
     INVITE_GROUP_REJECTED, // 拒绝群邀请
     INVITE_GROUP_TIMEOUT, // 群邀请超时
     INVITE_GROUP_CANCELED, // 取消群邀请
+    // 
     INVITE_KBASE_PENDING, // 邀请知识库处理
     INVITE_KBASE_ACCEPTED, // 接受知识库邀请
     INVITE_KBASE_REJECTED, // 拒绝知识库邀请
     INVITE_KBASE_TIMEOUT, // 知识库邀请超时
     INVITE_KBASE_CANCELED, // 取消知识库邀请
+    // 
     INVITE_ORGANIZATION_PENDING, // 邀请组织处理
     INVITE_ORGANIZATION_ACCEPTED, // 接受组织邀请
     INVITE_ORGANIZATION_REJECTED, // 拒绝组织邀请
