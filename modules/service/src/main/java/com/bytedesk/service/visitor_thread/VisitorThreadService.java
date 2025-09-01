@@ -312,70 +312,143 @@ public class VisitorThreadService
     @Async
     public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
         // log.info("autoCloseThread size {}", threads.size());
-        threads.forEach(thread -> {
-            // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
-            long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
-            long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
-            // 移除Math.abs()，确保时间顺序正确
-            long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
-            // 如果updatedAt在未来，说明时间有问题，跳过处理
-            if (diffInMilliseconds < 0) {
-                log.warn("Thread {} updatedAt is in the future, skipping auto close check", thread.getUid());
-                return;
-            }
-            // 转换为分钟
-            long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
+        threads.forEach(this::processThreadTimeout);
+    }
 
-            // 添加空值检查，防止 NullPointerException
-            ServiceSettingsResponseVisitor settings = null;
-            if (StringUtils.hasText(thread.getExtra())) {
-                try {
-                    settings = JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
-                } catch (Exception e) {
-                    log.warn("Failed to parse thread extra JSON for thread {}: {}", thread.getUid(), e.getMessage());
-                }
-            }
-            
-            Double autoCloseMinutes = (settings != null) ? settings.getAutoCloseMin() : null;
-            // 添加空值检查，如果为null则使用默认值30分钟
-            double autoCloseValue = (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
-            if (diffInMinutes > autoCloseValue) {
-                threadRestService.autoClose(thread);
-            }
+    /**
+     * 处理单个线程的超时逻辑
+     */
+    private void processThreadTimeout(ThreadEntity thread) {
+        long diffInMinutes = calculateThreadTimeoutMinutes(thread);
+        if (diffInMinutes < 0) {
+            return; // 时间异常，跳过处理
+        }
 
-            // 查询超时未回复会话, 发送会话超时提醒。
-            UserProtobuf agentProtobuf = thread.getAgentProtobuf();
-            if (agentProtobuf != null && StringUtils.hasText(agentProtobuf.getUid())) {
-                Optional<AgentEntity> agentOpt = agentRestService.findByUid(agentProtobuf.getUid());
-                if (agentOpt.isPresent()) {
-                    AgentEntity agent = agentOpt.get();
-                    // 判断是否超时未回复
-                    if (diffInMinutes > agent.getTimeoutRemindTime()) {
-                        // 更新会话超时提醒时间
-                        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService
-                                .findByThreadUid(thread.getUid());
-                        if (queueMemberOpt.isPresent()) {
-                            QueueMemberEntity queueMember = queueMemberOpt.get();
-                            // 判断是否首次超时
-                            if (!queueMember.getAgentTimeout()) {
-                                // 判断 visitorLastMessageAt; 访客最后发送消息时间 和 agentLastMessageAt; 客服最后回复时间
-                                // 如果 访客最后发送消息时间不为空，但是客服最后回复时间为空，则认为超时未回复
-                                if (queueMember.getVisitorLastMessageAt() != null && (queueMember.getAgentLastResponseAt() == null)) {
-                                    // 发送会话超时提醒
-                                    sendRemindMessage(queueMember, thread, agent);
-                                } else if (queueMember.getVisitorLastMessageAt() != null && queueMember.getAgentLastResponseAt() != null) {
-                                    // 如果访客最后发送消息时间 大于 客服最后回复时间，则认为超时未回复
-                                    if (queueMember.getVisitorLastMessageAt().isAfter(queueMember.getAgentLastResponseAt())) {
-                                        // 发送会话超时提醒
-                                        sendRemindMessage(queueMember, thread, agent);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        // 处理自动关闭
+        handleAutoClose(thread, diffInMinutes);
+        
+        // 处理超时提醒
+        handleTimeoutReminder(thread, diffInMinutes);
+    }
+
+    /**
+     * 计算线程超时分钟数
+     */
+    private long calculateThreadTimeoutMinutes(ThreadEntity thread) {
+        // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
+        long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
+        long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
+        
+        // 移除Math.abs()，确保时间顺序正确
+        long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
+        
+        // 如果updatedAt在未来，说明时间有问题，跳过处理
+        if (diffInMilliseconds < 0) {
+            log.warn("Thread {} updatedAt is in the future, skipping auto close check", thread.getUid());
+            return -1;
+        }
+        
+        // 转换为分钟
+        return TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
+    }
+
+    /**
+     * 处理自动关闭逻辑
+     */
+    private void handleAutoClose(ThreadEntity thread, long diffInMinutes) {
+        ServiceSettingsResponseVisitor settings = parseThreadSettings(thread);
+        double autoCloseValue = getAutoCloseMinutes(settings);
+        
+        if (diffInMinutes > autoCloseValue) {
+            threadRestService.autoClose(thread);
+        }
+    }
+
+    /**
+     * 解析线程设置
+     */
+    private ServiceSettingsResponseVisitor parseThreadSettings(ThreadEntity thread) {
+        if (!StringUtils.hasText(thread.getExtra())) {
+            return null;
+        }
+        
+        try {
+            return JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
+        } catch (Exception e) {
+            log.warn("Failed to parse thread extra JSON for thread {}: {}", thread.getUid(), e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取自动关闭分钟数
+     */
+    private double getAutoCloseMinutes(ServiceSettingsResponseVisitor settings) {
+        if (settings == null) {
+            return 30.0; // 默认30分钟
+        }
+        
+        Double autoCloseMinutes = settings.getAutoCloseMin();
+        return (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
+    }
+
+    /**
+     * 处理超时提醒逻辑
+     */
+    private void handleTimeoutReminder(ThreadEntity thread, long diffInMinutes) {
+        UserProtobuf agentProtobuf = thread.getAgentProtobuf();
+        if (agentProtobuf == null || !StringUtils.hasText(agentProtobuf.getUid())) {
+            return;
+        }
+
+        Optional<AgentEntity> agentOpt = agentRestService.findByUid(agentProtobuf.getUid());
+        if (!agentOpt.isPresent()) {
+            return;
+        }
+
+        AgentEntity agent = agentOpt.get();
+        if (diffInMinutes <= agent.getTimeoutRemindTime()) {
+            return;
+        }
+
+        processAgentTimeoutReminder(thread, agent);
+    }
+
+    /**
+     * 处理客服超时提醒
+     */
+    private void processAgentTimeoutReminder(ThreadEntity thread, AgentEntity agent) {
+        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+        if (!queueMemberOpt.isPresent()) {
+            return;
+        }
+
+        QueueMemberEntity queueMember = queueMemberOpt.get();
+        if (queueMember.getAgentTimeout()) {
+            return; // 已经超时，不再处理
+        }
+
+        if (shouldSendTimeoutReminder(queueMember)) {
+            sendRemindMessage(queueMember, thread, agent);
+        }
+    }
+
+    /**
+     * 判断是否应该发送超时提醒
+     */
+    private boolean shouldSendTimeoutReminder(QueueMemberEntity queueMember) {
+        // 访客最后发送消息时间为空，不需要提醒
+        if (queueMember.getVisitorLastMessageAt() == null) {
+            return false;
+        }
+
+        // 客服最后回复时间为空，需要提醒
+        if (queueMember.getAgentLastResponseAt() == null) {
+            return true;
+        }
+
+        // 访客最后发送消息时间 大于 客服最后回复时间，需要提醒
+        return queueMember.getVisitorLastMessageAt().isAfter(queueMember.getAgentLastResponseAt());
     }
 
     private void sendRemindMessage(QueueMemberEntity queueMember, ThreadEntity thread, AgentEntity agent) {
