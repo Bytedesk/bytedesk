@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-01 13:33:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-01 13:33:27
+ * @LastEditTime: 2025-09-01 13:41:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,4 +31,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class LeaveMsgContent extends BaseContent {
     
+    private String content;
+    
+    private String status;
 }
