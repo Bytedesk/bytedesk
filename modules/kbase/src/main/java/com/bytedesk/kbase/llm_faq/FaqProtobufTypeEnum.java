@@ -17,4 +17,5 @@ public enum FaqProtobufTypeEnum {
     FAQ,
     TEXT,
     CHUNK,
+    ARTICLE,
 }

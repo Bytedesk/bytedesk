@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 17:30:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-03 16:00:04
+ * @LastEditTime: 2025-09-01 16:15:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,11 +30,10 @@ import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.ArticleRequest;
-import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * 文章向量检索服务
@@ -45,7 +44,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@ConditionalOnBean(org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore.class)
+@ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ArticleVectorService {
 
     private final ElasticsearchVectorStore vectorStore;
@@ -113,7 +112,6 @@ public class ArticleVectorService {
             currentArticle.setDocIdList(docIdList);
 
             // 设置向量索引状态为成功
-            // currentArticle.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
             currentArticle.setVectorSuccess();
 
             // 更新文章实体 - 使用明确的事务保证状态更新和保存原子性
@@ -125,7 +123,7 @@ public class ArticleVectorService {
             log.error("文章向量索引失败: {}, 错误: {}", currentArticle.getTitle(), e.getMessage(), e);
 
             // 设置向量索引状态为失败
-            currentArticle.setVectorStatus(ChunkStatusEnum.ERROR.name());
+            currentArticle.setVectorError();
             try {
                 log.info("保存文章实体更新，设置向量索引状态为失败: {}", currentArticle.getUid());
                 articleRestService.save(currentArticle);

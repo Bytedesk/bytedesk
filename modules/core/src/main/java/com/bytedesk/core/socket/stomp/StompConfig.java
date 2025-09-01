@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-22 18:14:13
+ * @LastEditTime: 2025-09-01 17:27:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,9 +64,9 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
                 .setStreamBytesLimit(512 * 1024)
                 .setHttpMessageCacheSize(1000)
                 .setHeartbeatTime(5 * 1000)
-                .setDisconnectDelay(30 * 1000)
+                .setDisconnectDelay(30 * 1000);
                 // https://docs.spring.io/spring-framework/reference/web/websocket/fallback.html
-                .setClientLibraryUrl("https://cdn.bytedesk.com/js/vendor/sockjs/1.1.4/sockjs.min.js"); //
+                // .setClientLibraryUrl("https://cdn.weiyuai.cn/js/vendor/sockjs/1.1.4/sockjs.min.js"); //
         // for mini program
         stompEndpointRegistry.addEndpoint("/mini")
                 .setAllowedOriginPatterns("*");

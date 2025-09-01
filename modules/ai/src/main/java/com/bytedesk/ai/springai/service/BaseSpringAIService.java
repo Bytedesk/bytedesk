@@ -41,6 +41,12 @@ import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVector;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorSearchResult;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
+import com.bytedesk.kbase.article.elastic.ArticleElastic;
+import com.bytedesk.kbase.article.elastic.ArticleElasticSearchResult;
+import com.bytedesk.kbase.article.elastic.ArticleElasticService;
+import com.bytedesk.kbase.article.vector.ArticleVector;
+import com.bytedesk.kbase.article.vector.ArticleVectorSearchResult;
+import com.bytedesk.kbase.article.vector.ArticleVectorService;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElastic;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticSearchResult;
@@ -77,6 +83,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     @Autowired(required = false)
     protected ChunkVectorService chunkVectorService;
+
+    @Autowired
+    protected ArticleElasticService articleElasticService;
+
+    @Autowired(required = false)
+    protected ArticleVectorService articleVectorService;
 
     @Autowired
     protected IMessageSendService messageSendService;
@@ -541,6 +553,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
             FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
             searchResultList.add(faqProtobuf);
         }
+        //
+        List<ArticleElasticSearchResult> articleResults = articleElasticService.searchArticle(query, kbUid, null, null);
+        for (ArticleElasticSearchResult withScore : articleResults) {
+            ArticleElastic article = withScore.getArticleElastic();
+            //
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromArticle(article);
+            searchResultList.add(faqProtobuf);
+        }
     }
 
     private void executeVectorSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
@@ -586,6 +606,21 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 }
             } catch (Exception e) {
                 log.warn("ChunkVectorService search failed: {}", e.getMessage());
+            }
+        }
+        //
+        // 检查 ArticleVectorService 是否可用
+        if (articleVectorService != null) {
+            try {
+                List<ArticleVectorSearchResult> articleResults = articleVectorService.searchArticleVector(query, kbUid, null, null, 5);
+                for (ArticleVectorSearchResult withScore : articleResults) {
+                    ArticleVector articleVector = withScore.getArticleVector();
+                    //
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromArticleVector(articleVector);
+                    searchResultList.add(faqProtobuf);
+                }
+            } catch (Exception e) {
+                log.warn("ArticleVectorService search failed: {}", e.getMessage());
             }
         }
     }

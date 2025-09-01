@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.kbase.article.elastic.ArticleElastic;
+import com.bytedesk.kbase.article.vector.ArticleVector;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElastic;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVector;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElastic;
@@ -108,6 +110,25 @@ public class FaqProtobuf implements Serializable {
                 .question(chunk.getName())
                 .answer(chunk.getContent())
                 .type(FaqProtobufTypeEnum.CHUNK.name())
+                .build();
+    }
+
+    public static FaqProtobuf fromArticle(ArticleElastic article) {
+        return FaqProtobuf.builder()
+                .uid(article.getUid())
+                .question(article.getTitle())
+                .answer(article.getContentMarkdown() != null ? article.getContentMarkdown() : article.getSummary())
+                .type(FaqProtobufTypeEnum.ARTICLE.name())
+                .build();
+    }
+
+    // from article vector
+    public static FaqProtobuf fromArticleVector(ArticleVector article) {
+        return FaqProtobuf.builder()
+                .uid(article.getUid())
+                .question(article.getTitle())
+                .answer(article.getContentMarkdown() != null ? article.getContentMarkdown() : article.getSummary())
+                .type(FaqProtobufTypeEnum.ARTICLE.name())
                 .build();
     }
     
