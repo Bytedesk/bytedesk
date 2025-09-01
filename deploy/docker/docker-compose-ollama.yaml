@@ -216,6 +216,8 @@ services:
       # BYTEDESK_TESTING_ACCOUNT_PASSWORD: password
       BYTEDESK_TESTING_DISABLE_CAPTCHA: "false"
       BYTEDESK_TESTING_DISABLE_IP_FILTER: "false"
+      # whitelist ip for performance testing
+      BYTEDESK_TESTING_IP_WHITELIST: 127.0.0.1,127.0.0.2
       # Organization config
       BYTEDESK_ORGANIZATION_NAME: MyCompany
       BYTEDESK_ORGANIZATION_CODE: bytedesk
