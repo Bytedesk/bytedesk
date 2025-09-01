@@ -492,10 +492,10 @@ services:
       SPRINGDOC_SHOW_ACTUATOR: false
       # swagger-ui
       # http://服务器ip:9003/swagger-ui/index.html
-      SPRINGDOC_SWAGGER_UI_ENABLED: true
+      SPRINGDOC_SWAGGER_UI_ENABLED: "false"
       SPRINGDOC_SWAGGER_UI_PATH: /index.html
       # api-docs
-      SPRINGDOC_API_DOCS_ENABLED: true
+      SPRINGDOC_API_DOCS_ENABLED: "false"
       SPRINGDOC_API_DOCS_PATH: /v3/api-docs
       # 百度翻译 https://fanyi-api.baidu.com/doc/21
       BYTEDESK_TRANSLATE_BAIDU_APPID: placeholder

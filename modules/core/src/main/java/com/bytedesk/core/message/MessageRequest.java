@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-21 10:00:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-22 14:20:01
+ * @LastEditTime: 2025-09-01 10:41:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,4 +45,27 @@ public class MessageRequest extends BaseRequest {
     private String componentType;
 
     private String searchDate;
+
+
+    /**
+     * 判断是否为客服类型会话
+     */
+    public boolean isCustomerServiceType() {
+        return "AGENT".equals(threadType) || "WORKGROUP".equals(threadType) || 
+               "ROBOT".equals(threadType) || "UNIFIED".equals(threadType);
+    }
+
+    /**
+     * 判断是否为成员类型会话
+     */
+    public boolean isMemberType() {
+        return "MEMBER".equals(threadType);
+    }
+
+    /**
+     * 判断是否为群聊类型会话
+     */
+    public boolean isGroupType() {
+        return "GROUP".equals(threadType);
+    }
 }
