@@ -99,6 +99,14 @@ public class RobotMessageEntity extends AbstractMessageEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String prompt = "";
 
+    // 召回率
+    @Builder.Default
+    private Double recall = 0.0;
+
+    // 准确率
+    @Builder.Default
+    private Double accuracy = 0.0;
+
     // 大模型提供商（如：openai、zhipuai、baidu等）
     @Builder.Default
     @Column(name = "ai_provider", length = 50)
