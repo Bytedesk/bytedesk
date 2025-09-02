@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 10:23:22
+ * @LastEditTime: 2025-09-02 12:49:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,10 +13,14 @@
  */
 package com.bytedesk.ai.workflow_edge;
 
+import com.bytedesk.ai.workflow.WorkflowEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -62,5 +66,10 @@ public class WorkflowEdgeEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "workflow_edge_type")
     private String type = WorkflowEdgeTypeEnum.CUSTOMER.name();
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflow_id")
+    private WorkflowEntity workflow;
 
 }

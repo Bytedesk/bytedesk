@@ -13,10 +13,14 @@
  */
 package com.bytedesk.ai.workflow_node;
 
+import com.bytedesk.ai.workflow.WorkflowEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -62,5 +66,9 @@ public class WorkflowNodeEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "workflow_node_type")
     private String type = WorkflowNodeTypeEnum.CUSTOMER.name();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflow_id")
+    private WorkflowEntity workflow;
 
 }

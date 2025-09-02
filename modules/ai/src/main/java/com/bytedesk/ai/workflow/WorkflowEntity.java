@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 09:54:36
+ * @LastEditTime: 2025-09-02 12:50:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,20 @@
  */
 package com.bytedesk.ai.workflow;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bytedesk.ai.workflow_edge.WorkflowEdgeEntity;
+import com.bytedesk.ai.workflow_node.WorkflowNodeEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.TypeConsts;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +58,14 @@ public class WorkflowEntity extends BaseEntity {
 
     @Column(name = "workflow_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String schema;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<WorkflowNodeEntity> nodes = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<WorkflowEdgeEntity> edges = new ArrayList<>();
 
     @Builder.Default
     @Column(name = "workflow_type")
