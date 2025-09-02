@@ -9,7 +9,7 @@
 
 ![weiyu](./images/nin1.png)
 
-## 管理端
+## 管理后台
 
 ![chat](./images/admin/chat_zh.png)
 
@@ -17,7 +17,11 @@
 
 ![channel](./images/admin/channel.png)
 
-## 客服端
+## 大模型+智能体
+
+![llm_agent](./images/admin/llm_agent.png)
+
+## 客服工作台
 
 ![agent](./images/agent/agent_chat.png)
 
