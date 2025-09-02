@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-27 11:56:05
+ * @LastEditTime: 2025-09-02 17:36:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -93,6 +93,7 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         
         // 2. 生成会话主题并检查现有会话
         String topic = TopicUtils.formatOrgWorkflowThreadTopic(workflowEntity.getUid(), request.getUid());
+        // 
         ThreadEntity thread = getOrCreateWorkflowThread(request, workflowEntity, topic);
         
         // 3. 处理现有活跃会话
