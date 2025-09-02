@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import java.time.ZonedDateTime;
 
@@ -25,7 +25,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class WorkflowResultExcel {
+public class WorkflowLogExcel {
 
     @ExcelProperty(index = 0, value = "标签名称")
     @ColumnWidth(20)

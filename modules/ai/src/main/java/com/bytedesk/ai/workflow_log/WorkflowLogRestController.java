@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,36 +28,36 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/workflow/result")
+@RequestMapping("/api/v1/workflow/log")
 @AllArgsConstructor
-public class WorkflowResultRestController extends BaseRestController<WorkflowResultRequest, WorkflowResultRestService> {
+public class WorkflowLogRestController extends BaseRestController<WorkflowLogRequest, WorkflowLogRestService> {
 
-    private final WorkflowResultRestService workflowResultRestService;
+    private final WorkflowLogRestService workflowResultRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
     @Override
-    public ResponseEntity<?> queryByOrg(WorkflowResultRequest request) {
+    public ResponseEntity<?> queryByOrg(WorkflowLogRequest request) {
         
-        Page<WorkflowResultResponse> tags = workflowResultRestService.queryByOrg(request);
+        Page<WorkflowLogResponse> tags = workflowResultRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
     @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
     @Override
-    public ResponseEntity<?> queryByUser(WorkflowResultRequest request) {
+    public ResponseEntity<?> queryByUser(WorkflowLogRequest request) {
         
-        Page<WorkflowResultResponse> tags = workflowResultRestService.queryByUser(request);
+        Page<WorkflowLogResponse> tags = workflowResultRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
     @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
     @Override
-    public ResponseEntity<?> queryByUid(WorkflowResultRequest request) {
+    public ResponseEntity<?> queryByUid(WorkflowLogRequest request) {
         
-        WorkflowResultResponse tag = workflowResultRestService.queryByUid(request);
+        WorkflowLogResponse tag = workflowResultRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
@@ -65,9 +65,9 @@ public class WorkflowResultRestController extends BaseRestController<WorkflowRes
     @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(WorkflowResultRequest request) {
+    public ResponseEntity<?> create(WorkflowLogRequest request) {
         
-        WorkflowResultResponse tag = workflowResultRestService.create(request);
+        WorkflowLogResponse tag = workflowResultRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
@@ -75,9 +75,9 @@ public class WorkflowResultRestController extends BaseRestController<WorkflowRes
     @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(WorkflowResultRequest request) {
+    public ResponseEntity<?> update(WorkflowLogRequest request) {
         
-        WorkflowResultResponse tag = workflowResultRestService.update(request);
+        WorkflowLogResponse tag = workflowResultRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
@@ -85,7 +85,7 @@ public class WorkflowResultRestController extends BaseRestController<WorkflowRes
     @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(WorkflowResultRequest request) {
+    public ResponseEntity<?> delete(WorkflowLogRequest request) {
         
         workflowResultRestService.delete(request);
 
@@ -96,12 +96,12 @@ public class WorkflowResultRestController extends BaseRestController<WorkflowRes
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
-    public Object export(WorkflowResultRequest request, HttpServletResponse response) {
+    public Object export(WorkflowLogRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
             workflowResultRestService,
-            WorkflowResultExcel.class,
+            WorkflowLogExcel.class,
             "标签",
             "tag"
         );

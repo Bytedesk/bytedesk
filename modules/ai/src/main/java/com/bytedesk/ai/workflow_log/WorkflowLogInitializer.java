@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class WorkflowResultInitializer implements SmartInitializingSingleton {
+public class WorkflowLogInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -29,7 +29,7 @@ public class WorkflowResultInitializer implements SmartInitializingSingleton {
 
     private void initPermissions() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = WorkflowResultPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = WorkflowLogPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

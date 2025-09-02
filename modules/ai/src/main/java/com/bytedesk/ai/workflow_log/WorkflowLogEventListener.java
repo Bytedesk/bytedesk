@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class WorkflowResultEventListener {
+public class WorkflowLogEventListener {
  
 }
 

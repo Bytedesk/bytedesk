@@ -11,15 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
+import com.bytedesk.ai.workflow_log.event.WorkflowLogCreateEvent;
+import com.bytedesk.ai.workflow_log.event.WorkflowLogUpdateEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.ai.workflow_result.event.WorkflowResultCreateEvent;
-import com.bytedesk.ai.workflow_result.event.WorkflowResultUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -28,24 +28,24 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class WorkflowResultEntityListener {
+public class WorkflowLogEntityListener {
 
     @PostPersist
-    public void onPostPersist(WorkflowResultEntity tag) {
+    public void onPostPersist(WorkflowLogEntity tag) {
         log.info("onPostPersist: {}", tag);
-        WorkflowResultEntity cloneWorkflowResult = SerializationUtils.clone(tag);
+        WorkflowLogEntity cloneWorkflowLog = SerializationUtils.clone(tag);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new WorkflowResultCreateEvent(cloneWorkflowResult));
+        bytedeskEventPublisher.publishEvent(new WorkflowLogCreateEvent(cloneWorkflowLog));
     }
 
     @PostUpdate
-    public void onPostUpdate(WorkflowResultEntity tag) {
+    public void onPostUpdate(WorkflowLogEntity tag) {
         log.info("onPostUpdate: {}", tag);
-        WorkflowResultEntity cloneWorkflowResult = SerializationUtils.clone(tag);
+        WorkflowLogEntity cloneWorkflowLog = SerializationUtils.clone(tag);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new WorkflowResultUpdateEvent(cloneWorkflowResult));
+        bytedeskEventPublisher.publishEvent(new WorkflowLogUpdateEvent(cloneWorkflowLog));
     }
     
 }

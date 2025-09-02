@@ -11,20 +11,20 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface WorkflowResultRepository extends JpaRepository<WorkflowResultEntity, Long>, JpaSpecificationExecutor<WorkflowResultEntity> {
+public interface WorkflowLogRepository extends JpaRepository<WorkflowLogEntity, Long>, JpaSpecificationExecutor<WorkflowLogEntity> {
 
-    Optional<WorkflowResultEntity> findByUid(String uid);
+    Optional<WorkflowLogEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 
-    Optional<WorkflowResultEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+    Optional<WorkflowLogEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
     // Boolean existsByPlatform(String platform);
 }

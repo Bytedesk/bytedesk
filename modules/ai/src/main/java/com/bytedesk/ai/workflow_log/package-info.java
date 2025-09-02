@@ -1,5 +1,5 @@
 
 @NonNullApi
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import org.springframework.lang.NonNullApi;

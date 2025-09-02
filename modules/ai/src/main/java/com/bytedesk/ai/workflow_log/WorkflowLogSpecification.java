@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.workflow_result;
+package com.bytedesk.ai.workflow_log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class WorkflowResultSpecification extends BaseSpecification<WorkflowResultEntity, WorkflowResultRequest> {
+public class WorkflowLogSpecification extends BaseSpecification<WorkflowLogEntity, WorkflowLogRequest> {
     
-    public static Specification<WorkflowResultEntity> search(WorkflowResultRequest request, AuthService authService) {
+    public static Specification<WorkflowLogEntity> search(WorkflowLogRequest request, AuthService authService) {
         log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
             request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
