@@ -34,6 +34,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
@@ -111,7 +112,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
         // 创建动态chatModel
         MiniMaxChatModel chatModel = createMinimaxChatModel(llm);
         if (chatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "Minimax服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -145,7 +146,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                 },
                 error -> {
                     log.error("Minimax API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -194,12 +195,12 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
             } catch (Exception e) {
                 log.error("Minimax API call error: ", e);
                 success = false;
-                return "服务暂时不可用，请稍后重试";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
         } catch (Exception e) {
             log.error("Minimax API sync error: ", e);
             success = false;
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -225,7 +226,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;

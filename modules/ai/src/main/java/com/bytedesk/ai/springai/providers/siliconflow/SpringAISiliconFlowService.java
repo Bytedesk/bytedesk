@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 14:39:27
+ * @LastEditTime: 2025-09-02 14:57:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -110,7 +111,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         // 创建动态chatModel
         OpenAiChatModel chatModel = createSiliconFlowChatModel(llm);
         if (chatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "SiliconFlow服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -144,7 +145,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                 },
                 error -> {
                     log.error("siliconFlow API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -172,7 +173,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
             // 创建动态chatModel
             OpenAiChatModel chatModel = createSiliconFlowChatModel(robot.getLlm());
             if (chatModel == null) {
-                return "siliconFlow service is not available";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
 
             try {
@@ -197,12 +198,12 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
             } catch (Exception e) {
                 log.error("siliconFlow API call error: ", e);
                 success = false;
-                return "服务暂时不可用，请稍后重试";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
         } catch (Exception e) {
             log.error("siliconFlow API sync error: ", e);
             success = false;
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -229,7 +230,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);

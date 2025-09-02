@@ -71,7 +71,7 @@ public class SpringAIOpenaiChatService extends BaseSpringAIService {
         log.info("OpenAI API websocket fullPromptContent: {}", fullPromptContent);
         
         if (openaiChatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "OpenAI服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -180,7 +180,7 @@ public class SpringAIOpenaiChatService extends BaseSpringAIService {
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);

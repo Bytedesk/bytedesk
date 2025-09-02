@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-08-21 15:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 14:30:17
+ * @LastEditTime: 2025-09-02 15:05:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,6 +34,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 
@@ -139,14 +140,14 @@ public class SpringAICustomService extends BaseSpringAIService {
         log.info("{} API websocket fullPromptContent: {}", providerName, fullPromptContent);
         
         if (llm == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + "服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
 
         // 获取适当的模型实例
         OpenAiChatModel chatModel = createChatModel(llm);
         if (chatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + "服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -186,7 +187,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                     },
                     error -> {
                         log.error("{} API error: ", providerName, error);
-                        sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                        sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                         success[0] = false;
                     },
                     () -> {
@@ -210,7 +211,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                     });
         } catch (Exception e) {
             log.error("{} API websocket error: ", providerName, e);
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             // 记录失败的token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
@@ -265,7 +266,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         } catch (Exception e) {
             log.error("{} API sync error: ", providerName, e);
             success = false;
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -301,7 +302,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);

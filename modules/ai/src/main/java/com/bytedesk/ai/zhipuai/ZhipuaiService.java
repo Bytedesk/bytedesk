@@ -28,6 +28,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.zhipu.oapi.ClientV4;
@@ -295,7 +296,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                         })
                         .doOnError(error -> {
                             log.error("Zhipuai API websocket stream error: ", error);
-                            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                             success[0] = false;
                         })
                         .lastElement()
@@ -303,11 +304,11 @@ public class ZhipuaiService extends BaseSpringAIService {
                 
             } else {
                 log.error("Zhipuai API websocket error: {}", response.getError());
-                sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             }
         } catch (Exception e) {
             log.error("Error in processPromptWebsocket", e);
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
         }
     }
 
@@ -375,7 +376,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         if (robot == null || robot.getLlm() == null || robot.getLlm().getTextModel() == null) {
             log.error("Robot or RobotLlm is null, cannot process prompt SSE");
-            sendSseMessage("服务暂时不可用，请稍后重试", robot, messageProtobufQuery, messageProtobufReply, emitter);
+            sendSseMessage(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, robot, messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
         // if (robot)
@@ -385,7 +386,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         log.info("Zhipuai API SSE fullPromptContent: {}", fullPromptContent);
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
@@ -786,11 +787,11 @@ public class ZhipuaiService extends BaseSpringAIService {
             String content = message.getText();
             if (content != null && !content.trim().isEmpty()) {
                 if (message instanceof org.springframework.ai.chat.messages.SystemMessage) {
-                    fullPrompt.append("[系统] ").append(content).append("\n");
+                    fullPrompt.append(I18Consts.I18N_SYSTEM_PREFIX).append(content).append("\n");
                 } else if (message instanceof org.springframework.ai.chat.messages.UserMessage) {
-                    fullPrompt.append("[用户] ").append(content).append("\n");
+                    fullPrompt.append(I18Consts.I18N_USER_PREFIX).append(content).append("\n");
                 } else if (message instanceof org.springframework.ai.chat.messages.AssistantMessage) {
-                    fullPrompt.append("[助手] ").append(content).append("\n");
+                    fullPrompt.append(I18Consts.I18N_ASSISTANT_PREFIX).append(content).append("\n");
                 } else {
                     fullPrompt.append(content).append("\n");
                 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 13:37:40
+ * @LastEditTime: 2025-09-02 14:55:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,7 +70,7 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         
         if (baiduChatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "百度服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
 
@@ -197,13 +197,13 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
 
         if (baiduChatModel == null) {
-            handleSseError(new RuntimeException("Baidu service not available"), messageProtobufQuery,
+            handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);

@@ -35,6 +35,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 
@@ -145,7 +146,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
                     },
                     error -> {
                         log.error("Ollama API error: ", error);
-                        sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                        sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                         success[0] = false;
                     },
                     () -> {
@@ -160,7 +161,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
                     });
         } catch (Exception e) {
             log.error("Error processing Ollama prompt", e);
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             success[0] = false;
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -212,13 +213,13 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
             } catch (Exception e) {
                 log.error("Ollama API sync error", e);
                 success = false;
-                return "服务暂时不可用，请稍后重试";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
 
         } catch (Exception e) {
             log.error("Ollama API sync error", e);
             success = false;
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -264,7 +265,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
 
         try {
             // 发送初始消息，告知用户请求已收到，正在处理
-            sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+            sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
             chatModel.stream(prompt).subscribe(
                     response -> {

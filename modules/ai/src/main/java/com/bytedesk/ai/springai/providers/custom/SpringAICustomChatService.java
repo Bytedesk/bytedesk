@@ -31,6 +31,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.constant.I18Consts;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +78,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
         log.info("Custom API websocket fullPromptContent: {}", fullPromptContent);
         
         if (customChatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "Custom服务不可用", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -104,7 +105,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                 },
                 error -> {
                     log.error("Custom API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
@@ -144,11 +145,11 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                 return extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Custom API call error: ", e);
-                return "服务暂时不可用，请稍后重试";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
         } catch (Exception e) {
             log.error("Custom API sync error: ", e);
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         }
     }
 
@@ -164,7 +165,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;

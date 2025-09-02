@@ -341,7 +341,19 @@ public class I18Consts {
     public static final String I18N_CANT_ANSWER = "您的这个问题我不能回答，请提问其他问题。"; 
 
     public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
-    public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "服务暂时不可用，请稍后重试"; // 服务暂时不可用，请稍后重试
+    public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "请首先在管理后台配置大模型apiUrl和apiKey"; // 服务暂时不可用，请稍后重试
+
+    // AI 服务相关常量
+    public static final String I18N_THINKING = "正在思考中..."; // 正在思考中...
+    public static final String I18N_SORRY_LLM_DISABLED = "抱歉，大模型功能未启用"; // 抱歉，大模型功能未启用
+    public static final String I18N_SORRY_SERVICE_UNAVAILABLE = "抱歉，服务暂时不可用，请稍后再试。"; // 抱歉，服务暂时不可用，请稍后再试。
+    public static final String I18N_CONTEXT_BASED_ANSWER = "请根据以下上下文回答问题：\n\n"; // 请根据以下上下文回答问题：
+    public static final String I18N_CONTEXT_LABEL = "上下文：\n"; // 上下文：
+    public static final String I18N_QUESTION_LABEL = "问题：\n"; // 问题：
+    public static final String I18N_SEARCH_RESULT_PREFIX = "搜索结果: "; // 搜索结果: 
+    public static final String I18N_SYSTEM_PREFIX = "[系统] "; // [系统] 
+    public static final String I18N_USER_PREFIX = "[用户] "; // [用户] 
+    public static final String I18N_ASSISTANT_PREFIX = "[助手] "; // [助手] 
 
 
 

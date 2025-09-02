@@ -29,6 +29,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.coze.openapi.client.chat.CreateChatReq;
@@ -204,7 +205,7 @@ public class SpringAICozeService extends BaseSpringAIService {
                             },
                             error -> {
                                 log.error("Coze API error: ", error);
-                                sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                                sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                                 success[0] = false;
                             },
                             () -> {
@@ -219,7 +220,7 @@ public class SpringAICozeService extends BaseSpringAIService {
                             });
         } catch (Exception e) {
             log.error("Error processing Coze prompt", e);
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             success[0] = false;
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -283,12 +284,12 @@ public class SpringAICozeService extends BaseSpringAIService {
                 return "Coze响应成功，但未获取到具体内容";
             } else {
                 success = false;
-                return "服务暂时不可用，请稍后重试";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
         } catch (Exception e) {
             log.error("Coze API sync error", e);
             success = false;
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         } finally {
             // 关闭API连接
             if (cozeApi != null) {
@@ -333,7 +334,7 @@ public class SpringAICozeService extends BaseSpringAIService {
 
         try {
             // 发送初始消息，告知用户请求已收到，正在处理
-            sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+            sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
             String userID = messageProtobufQuery.getThread() != null ? 
                 messageProtobufQuery.getThread().getUid() : "default-user-" + System.currentTimeMillis();

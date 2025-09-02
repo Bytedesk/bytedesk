@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 12:46:21
+ * @LastEditTime: 2025-09-02 14:58:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -33,6 +33,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
@@ -107,7 +108,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         log.info("Dashscope API websocket fullPromptContent: {}", fullPromptContent);
         if (llm == null) {
             log.info("Dashscope API not available");
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "Dashscope service is not available", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
 
@@ -115,7 +116,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         DashScopeChatModel chatModel = createDashscopeChatModel(llm);
         if (chatModel == null) {
             log.info("Dashscope API not available");
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "Dashscope service is not available", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -143,7 +144,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                     },
                     error -> {
                         log.error("Dashscope API error: ", error);
-                        sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                        sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                         success[0] = false;
                     },
                     () -> {
@@ -156,7 +157,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                     });
         } catch (Exception e) {
             log.error("Error processing Dashscope prompt", e);
-            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             success[0] = false;
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -209,13 +210,13 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
             } catch (Exception e) {
                 log.error("Dashscope API sync error", e);
                 success = false;
-                return "服务暂时不可用，请稍后重试";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
 
         } catch (Exception e) {
             log.error("Dashscope API sync error", e);
             success = false;
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
@@ -259,7 +260,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
         try {
             // 发送初始消息，告知用户请求已收到，正在处理
-            sendStreamStartMessage(messageProtobufReply, emitter, "正在思考中...");
+            sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
             chatModel.stream(prompt).subscribe(
                     response -> {

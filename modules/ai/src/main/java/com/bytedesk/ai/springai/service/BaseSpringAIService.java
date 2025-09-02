@@ -437,7 +437,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 检查是否启用大模型
         if (robot.getLlm() == null || !robot.getLlm().getEnabled()) {
             log.warn("LLM未启用，无法处理直接LLM请求");
-            return "抱歉，大模型功能未启用";
+            return I18Consts.I18N_SORRY_LLM_DISABLED;
         }
 
         String prompt = robot.getLlm().getPrompt();
@@ -453,18 +453,18 @@ public abstract class BaseSpringAIService implements SpringAIService {
             aiPrompt.append(prompt);
         } else {
             // 如果未提供提示词，使用默认提示词
-            aiPrompt.append("请根据以下上下文回答问题：\n\n");
+            aiPrompt.append(I18Consts.I18N_CONTEXT_BASED_ANSWER);
         }
         
         // 如果有搜索结果，添加为上下文
         if (!searchResultList.isEmpty()) {
             String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
             log.info("processDirectLlmRequest context {}", context);
-            aiPrompt.append("上下文：\n").append(context).append("\n\n");
+            aiPrompt.append(I18Consts.I18N_CONTEXT_LABEL).append(context).append("\n\n");
         }
         
         // 添加用户查询
-        aiPrompt.append("问题：\n").append(query);
+        aiPrompt.append(I18Consts.I18N_QUESTION_LABEL).append(query);
         
         // 获取完整的prompt内容用于存储
         String fullPromptContent = aiPrompt.toString();
@@ -482,7 +482,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return response;
         } catch (Exception e) {
             log.error("处理LLM请求失败", e);
-            return "抱歉，服务暂时不可用，请稍后再试。";
+            return I18Consts.I18N_SORRY_SERVICE_UNAVAILABLE;
         }
     }
 
@@ -669,7 +669,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 添加搜索结果作为上下文
         if (StringUtils.hasText(context)) {
-            messages.add(new SystemMessage("搜索结果: " + context));
+            messages.add(new SystemMessage(I18Consts.I18N_SEARCH_RESULT_PREFIX + context));
         }
         
         // 添加用户查询
@@ -732,7 +732,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 3. 添加当前查询的上下文信息
         if (StringUtils.hasText(context)) {
-            messages.add(new SystemMessage("搜索结果: " + context));
+            messages.add(new SystemMessage(I18Consts.I18N_SEARCH_RESULT_PREFIX + context));
         }
         
         // 4. 最后添加当前用户查询
@@ -796,7 +796,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         
         // 3. 添加当前查询的上下文信息
         if (StringUtils.hasText(context)) {
-            messages.add(new SystemMessage("搜索结果: " + context));
+            messages.add(new SystemMessage(I18Consts.I18N_SEARCH_RESULT_PREFIX + context));
         }
         
         // 4. 最后添加当前用户查询
@@ -1403,11 +1403,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
             String content = message.getText();
             if (content != null && !content.trim().isEmpty()) {
                 if (message instanceof SystemMessage) {
-                    fullPrompt.append("[系统] ").append(content).append("\n");
+                    fullPrompt.append(I18Consts.I18N_SYSTEM_PREFIX).append(content).append("\n");
                 } else if (message instanceof UserMessage) {
-                    fullPrompt.append("[用户] ").append(content).append("\n");
+                    fullPrompt.append(I18Consts.I18N_USER_PREFIX).append(content).append("\n");
                 } else if (message instanceof AssistantMessage) {
-                    fullPrompt.append("[助手] ").append(content).append("\n");
+                    fullPrompt.append(I18Consts.I18N_ASSISTANT_PREFIX).append(content).append("\n");
                 } else {
                     fullPrompt.append(content).append("\n");
                 }
