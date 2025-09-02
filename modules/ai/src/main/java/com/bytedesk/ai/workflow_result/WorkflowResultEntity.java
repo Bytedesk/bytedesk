@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-27 11:50:32
+ * @LastEditTime: 2025-09-02 15:48:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,4 +46,7 @@ public class WorkflowResultEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "workflow_type")
     private String type = WorkflowResultTypeEnum.CUSTOMER.name();
+
+    // 
+    private String workflowUid;
 }
