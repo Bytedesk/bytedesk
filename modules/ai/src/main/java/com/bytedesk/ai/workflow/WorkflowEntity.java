@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-27 11:49:41
+ * @LastEditTime: 2025-09-02 09:54:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,7 +52,7 @@ public class WorkflowEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "workflow_type")
-    private String type = WorkflowTypeEnum.WORKFLOW.name();
+    private String type = WorkflowTypeEnum.CHATBOT.name();
 
     @Builder.Default
     @Column(name = "workflow_status")

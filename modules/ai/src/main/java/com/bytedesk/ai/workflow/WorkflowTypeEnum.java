@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 19:00:37
+ * @LastEditTime: 2025-09-02 09:55:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,24 +29,6 @@ package com.bytedesk.ai.workflow;
  *   WORKFLOW: 一般工作流
  */
 public enum WorkflowTypeEnum {
-    
-    /**
-     * 在线客服
-     * 处理客户咨询、问题解答等客服相关流程
-     */
-    SERVICE,
-    
-    /**
-     * 工单系统
-     * 处理问题报告、任务分配、工单跟踪等流程
-     */
-    TICKET,
-    
-    /**
-     * 呼叫中心
-     * 处理电话咨询、呼叫转接、语音服务等流程
-     */
-    CALLCENTER,
     
     /**
      * 聊天机器人
