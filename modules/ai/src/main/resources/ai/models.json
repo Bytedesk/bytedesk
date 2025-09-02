@@ -5,7 +5,7 @@
             "name": "deepseek-chat",
             "nickname": "DeepSeek-V3",
             "description": "深度求索推出的通用大语言模型，擅长自然语言理解与生成",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "deepseek-reasoner",
@@ -19,49 +19,49 @@
             "name": "glm-zero-preview",
             "nickname": "GLM-Zero-Preview",
             "description": "智谱最新推出的基础大模型，实现更强大的认知理解和推理能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-0520",
             "nickname": "GLM-4-0520",
             "description": "智谱GLM-4系列模型，具备通用对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-long",
             "nickname": "GLM-4-Long",
             "description": "支持更长上下文的GLM-4变体，适合长文本处理场景",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-plus",
             "nickname": "GLM-4-Plus",
             "description": "GLM-4的增强版本，具有更强的理解能力和生成质量",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-air",
             "nickname": "GLM-4-Air",
             "description": "轻量级GLM-4变体，适合快速响应的对话场景",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-airx",
             "nickname": "GLM-4-AirX",
             "description": "GLM-4-Air的扩展版本，支持更多功能",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-flash",
             "nickname": "GLM-4-Flash(免费)",
             "description": "免费使用的快速响应GLM-4变体",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-flashx",
             "nickname": "GLM-4-FlashX",
             "description": "GLM-4-Flash的增强版本，保持快速响应的同时提供更好的输出质量",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4v",
@@ -99,19 +99,19 @@
             "name": "qwen-turbo",
             "nickname": "Qwen Turbo",
             "description": "通义千问的快速响应版本，提供高效率的对话体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "qwen-plus",
             "nickname": "Qwen Plus",
             "description": "通义千问的增强版本，具有更强的理解能力和生成质量",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "qwen-max",
             "nickname": "Qwen Max",
             "description": "通义千问的最高规格版本，提供最佳的能力和性能",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "silicon": [
@@ -119,31 +119,31 @@
             "name": "Qwen/QwQ-32B",
             "nickname": "Qwen/QwQ-32B",
             "description": "基于32B参数量的通义千问模型变体，专注于对话生成能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Qwen/Qwen2-7B-Instruct",
             "nickname": "Qwen2-7B-Instruct",
             "description": "通义千问第二代7B指令微调模型，适合一般对话和指令执行任务",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Qwen/Qwen2-72B-Instruct",
             "nickname": "Qwen2-72B-Instruct",
             "description": "通义千问第二代72B参数量的大规模模型，提供强大的对话和推理能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "THUDM/glm-4-9b-chat",
             "nickname": "GLM-4-9B-Chat",
             "description": "清华大学开发的GLM-4系列9B参数量聊天模型，平衡性能和效率",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "deepseek-ai/DeepSeek-V2-Chat",
             "nickname": "DeepSeek-V2-Chat",
             "description": "深度求索第二代对话模型，提供自然流畅的交互体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "deepseek-ai/DeepSeek-Coder-V2-Instruct",
@@ -181,7 +181,7 @@
             "name": "DeepSeek-V3",
             "nickname": "DeepSeek-V3",
             "description": "深度求索第三代大模型，全面提升理解和生成能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "DeepSeek-R1",
@@ -199,31 +199,31 @@
             "name": "Qwen2.5-72B-Instruct",
             "nickname": "Qwen2.5-72B-Instruct",
             "description": "通义千问2.5版72B参数规模的指令微调模型，具备强大的通用能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Qwen2.5-14B-Instruct",
             "nickname": "Qwen2.5-14B-Instruct",
             "description": "通义千问2.5版14B参数规模的指令微调模型，平衡性能和资源",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Qwen2-7B-Instruct",
             "nickname": "Qwen2-7B-Instruct",
             "description": "通义千问第二代7B参数量的指令微调模型，适合一般对话任务",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Qwen2.5-32B-Instruct",
             "nickname": "Qwen2.5-32B-Instruct",
             "description": "通义千问2.5版32B参数规模的指令微调模型，较大规模通用对话模型",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Qwen2-72B-Instruct",
             "nickname": "Qwen2-72B-Instruct",
             "description": "通义千问第二代72B参数量的大规模模型，提供强大的对话和推理能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Qwen2-VL-72B",
@@ -235,19 +235,19 @@
             "name": "QwQ-32B-Preview",
             "nickname": "QwQ-32B-Preview",
             "description": "通义千问开发的预览版32B模型，提供新一代对话体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Yi-34B-Chat",
             "nickname": "Yi-34B-Chat",
             "description": "01.AI推出的34B参数量聊天模型，提供全面的对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "glm-4-9b-chat",
             "nickname": "glm-4-9b-chat",
             "description": "智谱GLM-4系列9B参数量聊天模型，平衡性能和资源消耗",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "codegeex4-all-9b",
@@ -303,25 +303,25 @@
             "name": "hunyuan-pro",
             "nickname": "hunyuan-pro",
             "description": "腾讯混元专业版大模型，提供高质量的对话和理解能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "hunyuan-standard",
             "nickname": "hunyuan-standard",
             "description": "腾讯混元标准版大模型，适合一般对话和内容生成任务",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "hunyuan-lite",
             "nickname": "hunyuan-lite",
             "description": "腾讯混元轻量版大模型，优化速度和资源消耗",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "hunyuan-standard-256k",
             "nickname": "hunyuan-standard-256k",
             "description": "支持256K超长上下文的混元标准版，适合长文本处理场景",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "hunyuan-vision",
@@ -339,19 +339,19 @@
             "name": "hunyuan-role",
             "nickname": "hunyuan-role",
             "description": "腾讯混元角色扮演大模型，支持多种角色和场景模拟",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "hunyuan-turbo",
             "nickname": "hunyuan-turbo",
             "description": "腾讯混元高速版，提供快速响应的对话体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "hunyuan-turbos-latest",
             "nickname": "hunyuan-turbos-latest",
             "description": "腾讯混元最新高速版，提供更快响应速度和优化体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "hunyuan-embedding",
@@ -371,31 +371,31 @@
             "name": "deepseek-v3",
             "nickname": "DeepSeek V3",
             "description": "百度提供的深度求索V3模型，第三代通用对话模型",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "ernie-4.0-8k-latest",
             "nickname": "ERNIE-4.0",
             "description": "百度文心一言4.0版本，支持8K上下文，提供全面的对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "ernie-4.0-turbo-8k-latest",
             "nickname": "ERNIE 4.0 Trubo",
             "description": "百度文心一言4.0高速版，提供更快的响应速度",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "ernie-speed-8k",
             "nickname": "ERNIE Speed",
             "description": "百度文心一言优化速度版本，支持8K上下文和快速响应",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "ernie-lite-8k",
             "nickname": "ERNIE Lite",
             "description": "百度文心一言轻量版，平衡性能和资源消耗",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "bge-large-zh",
@@ -421,19 +421,19 @@
             "name": "doubao-1-5-pro-32k-250115",
             "nickname": "doubao-1.5-pro-32k",
             "description": "火山引擎豆包1.5专业版，支持32K上下文的对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-1-5-pro-32k-character-250228",
             "nickname": "doubao-1.5-pro-32k-character",
             "description": "火山引擎豆包1.5角色扮演专业版，支持32K上下文",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-1-5-pro-256k-250115",
             "nickname": "Doubao-1.5-pro-256k",
             "description": "火山引擎豆包1.5专业版，支持256K超长上下文的对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "deepseek-r1-250120",
@@ -457,13 +457,13 @@
             "name": "deepseek-v3-250324",
             "nickname": "DeepSeek-V3",
             "description": "火山引擎提供的深度求索V3模型，第三代通用对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-pro-32k-241215",
             "nickname": "Doubao-pro-32k",
             "description": "火山引擎豆包专业版，支持32K上下文的对话模型",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-pro-32k-functioncall-241028",
@@ -475,43 +475,43 @@
             "name": "doubao-pro-32k-character-241215",
             "nickname": "Doubao-pro-32k-character-241215",
             "description": "支持角色扮演的豆包专业版，适合定制化对话场景",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-pro-256k-241115",
             "nickname": "Doubao-pro-256k",
             "description": "火山引擎豆包专业版，支持256K超长上下文的对话模型",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-lite-4k-character-240828",
             "nickname": "Doubao-lite-4k-character-240828",
             "description": "轻量级角色扮演豆包模型，支持4K上下文",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-lite-32k-240828",
             "nickname": "Doubao-lite-32k",
             "description": "火山引擎豆包轻量版，支持32K上下文的高效对话模型",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-lite-32k-character-241015",
             "nickname": "Doubao-lite-32k-character-241015",
             "description": "轻量级角色扮演豆包模型，支持32K上下文",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-lite-128k-240828",
             "nickname": "Doubao-lite-128k",
             "description": "火山引擎豆包轻量版，支持128K上下文的对话模型",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-1-5-lite-32k-250115",
             "nickname": "Doubao-1.5-lite-32k",
             "description": "火山引擎豆包1.5轻量版，支持32K上下文的对话模型",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "doubao-embedding-large-text-240915",
@@ -543,25 +543,25 @@
             "name": "abab6.5s-chat",
             "nickname": "abab6.5s",
             "description": "MiniMax的abab 6.5标准版聊天模型，提供全面对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "abab6.5g-chat",
             "nickname": "abab6.5g",
             "description": "MiniMax的abab 6.5高级版聊天模型，提供增强对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "abab6.5t-chat",
             "nickname": "abab6.5t",
             "description": "MiniMax的abab 6.5旗舰版聊天模型，提供最强对话体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "abab5.5s-chat",
             "nickname": "abab5.5s",
             "description": "MiniMax的abab 5.5标准版聊天模型，经典稳定的对话能力",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "openai": [
@@ -581,13 +581,13 @@
             "name": "gpt-4-turbo",
             "nickname": " GPT-4 Turbo",
             "description": "GPT-4的优化版本，提供更快的响应速度和更新的知识",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "gpt-4",
             "nickname": " GPT-4",
             "description": "OpenAI强大的大型语言模型，具备卓越的理解和生成能力",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "openrouter": [
@@ -595,31 +595,31 @@
             "name": "google/gemma-2-9b-it:free",
             "nickname": "Google: Gemma 2 9B",
             "description": "Google Gemma 2 9B指令微调模型，平衡性能和资源消耗",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "microsoft/phi-3-mini-128k-instruct:free",
             "nickname": "Phi-3 Mini 128K Instruct",
             "description": "Microsoft的Phi-3 Mini模型，支持128K上下文的轻量级选择",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "microsoft/phi-3-medium-128k-instruct:free",
             "nickname": "Phi-3 Medium 128K Instruct",
             "description": "Microsoft的Phi-3 Medium模型，支持128K上下文的中型选择",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "meta-llama/llama-3-8b-instruct:free",
             "nickname": "Meta: Llama 3 8B Instruct",
             "description": "Meta的Llama 3 8B指令微调模型，高效开源选择",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "mistralai/mistral-7b-instruct:free",
             "nickname": "Mistral: Mistral 7B Instruct",
             "description": "Mistral AI的7B指令微调模型，高性能开源选择",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "gemini": [
@@ -627,13 +627,13 @@
             "name": "gemini-1.5-flash",
             "nickname": "Gemini 1.5 Flash",
             "description": "Google Gemini 1.5系列的快速响应版本，平衡速度和性能",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "gemini-1.5-pro-exp-0801",
             "nickname": "Gemini 1.5 Pro Experimental 0801",
             "description": "Google Gemini 1.5 Pro的实验版本，提供前沿AI能力",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "anthropic": [
@@ -641,25 +641,25 @@
             "name": "claude-3-5-sonnet-20240620",
             "nickname": "Claude 3.5 Sonnet",
             "description": "Anthropic最新的Claude 3.5 Sonnet模型，平衡性能和效率",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "claude-3-opus-20240229",
             "nickname": "Claude 3 Opus",
             "description": "Anthropic最强大的Claude 3 Opus模型，提供顶级对话体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "claude-3-sonnet-20240229",
             "nickname": "Claude 3 Sonnet",
             "description": "Claude 3中端版本，平衡性能和响应速度",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "claude-3-haiku-20240307",
             "nickname": "Claude 3 Haiku",
             "description": "Claude 3轻量版，提供快速响应和高效对话",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "yi": [
@@ -667,13 +667,13 @@
             "name": "yi-large",
             "nickname": "Yi-Large",
             "description": "01.AI的大规模Yi模型，提供强大的对话和理解能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "yi-large-turbo",
             "nickname": "Yi-Large-Turbo",
             "description": "Yi大模型的高速版本，提供更快的响应体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "yi-large-rag",
@@ -685,19 +685,19 @@
             "name": "yi-medium",
             "nickname": "Yi-Medium",
             "description": "01.AI的中型Yi模型，平衡性能和资源消耗",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "yi-medium-200k",
             "nickname": "Yi-Medium-200k",
             "description": "支持200K超长上下文的中型Yi模型，适合长文本处理",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "yi-spark",
             "nickname": "Yi-Spark",
             "description": "Yi系列的轻量快速版本，提供即时响应的对话体验",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "moonshot": [
@@ -705,19 +705,19 @@
             "name": "moonshot-v1-8k",
             "nickname": "Moonshot V1 8k",
             "description": "Moonshot AI的基础模型，支持8K上下文窗口",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "moonshot-v1-32k",
             "nickname": "Moonshot V1 32k",
             "description": "支持32K上下文的Moonshot模型，适合处理更长文本",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "moonshot-v1-128k",
             "nickname": "Moonshot V1 128k",
             "description": "支持128K超长上下文的Moonshot模型，适合大规模文本分析",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "baichuan": [
@@ -725,19 +725,19 @@
             "name": "Baichuan4",
             "nickname": "Baichuan4",
             "description": "百川智能第四代大语言模型，全面提升理解和生成能力",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Baichuan3-Turbo",
             "nickname": "Baichuan3 Turbo",
             "description": "百川智能第三代加速版模型，提供快速响应的对话体验",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "Baichuan3-Turbo-128k",
             "nickname": "Baichuan3 Turbo 128k",
             "description": "支持128K上下文的百川3加速版，适合长文本处理",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "stepfun": [
@@ -745,13 +745,13 @@
             "name": "step-1-8k",
             "nickname": "Step 1 8K",
             "description": "Step函数团队开发的基础大模型，支持8K上下文窗口",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "step-1-flash",
             "nickname": "Step 1 Flash",
             "description": "Step函数团队的快速响应模型，优化速度和效率",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "aihubmix": [
@@ -765,7 +765,7 @@
             "name": "aihubmix-Llama-3-70B-Instruct",
             "nickname": "Llama 3 70B Instruct",
             "description": "AIHubMix提供的Meta Llama 3 70B指令微调版本，强大的开源模型",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ],
     "groq": [
@@ -773,25 +773,25 @@
             "name": "llama3-8b-8192",
             "nickname": "LLaMA3 8B",
             "description": "Groq加速的Meta Llama 3 8B模型，支持8192上下文",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "llama3-70b-8192",
             "nickname": "LLaMA3 70B",
             "description": "Groq加速的Meta Llama 3 70B大型模型，支持8192上下文",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "mixtral-8x7b-32768",
             "nickname": "Mixtral 8x7B",
             "description": "Groq加速的Mixtral 8x7B混合专家模型，支持32768上下文",
-            "type": "CHAT"
+            "type": "TEXT"
         },
         {
             "name": "gemma-7b-it",
             "nickname": "Gemma 7B",
             "description": "Groq加速的Google Gemma 7B指令微调模型，高效开源选择",
-            "type": "CHAT"
+            "type": "TEXT"
         }
     ]
 }
