@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -44,18 +45,6 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractThreadRoutingStrategy {
 
     // ==================== 常量定义 ====================
-    
-    /** 默认欢迎消息 */
-    protected static final String DEFAULT_WELCOME_MESSAGE = "您好，请问有什么可以帮助您？";
-    
-    /** 默认离线消息 */
-    protected static final String DEFAULT_OFFLINE_MESSAGE = "您好，请留言，我们会尽快回复您";
-    
-    /** 排队等待消息 - 下一个 */
-    protected static final String QUEUE_NEXT_MESSAGE = "请稍后，下一个就是您";
-    
-    /** 排队等待消息模板 */
-    protected static final String QUEUE_WAITING_MESSAGE_TEMPLATE = "当前排队人数：%d 大约等待时间：%d 分钟";
     
     /** 每人预估等待时间（分钟） */
     protected static final int ESTIMATED_WAIT_TIME_PER_PERSON = 2;
@@ -192,7 +181,7 @@ public abstract class AbstractThreadRoutingStrategy {
      * @return 有效的欢迎消息，如果自定义消息为空则返回默认消息
      */
     protected String getValidWelcomeMessage(String customMessage) {
-        return StringUtils.hasText(customMessage) ? customMessage : DEFAULT_WELCOME_MESSAGE;
+        return StringUtils.hasText(customMessage) ? customMessage : I18Consts.I18N_DEFAULT_WELCOME_MESSAGE;
     }
     
     /**
@@ -202,7 +191,7 @@ public abstract class AbstractThreadRoutingStrategy {
      * @return 有效的离线消息，如果自定义消息为空则返回默认消息
      */
     protected String getValidOfflineMessage(String customMessage) {
-        return StringUtils.hasText(customMessage) ? customMessage : DEFAULT_OFFLINE_MESSAGE;
+        return StringUtils.hasText(customMessage) ? customMessage : I18Consts.I18N_DEFAULT_OFFLINE_MESSAGE;
     }
     
     /**
@@ -213,11 +202,11 @@ public abstract class AbstractThreadRoutingStrategy {
      */
     protected String generateQueueMessage(int queueingCount) {
         if (queueingCount <= 0) {
-            return QUEUE_NEXT_MESSAGE;
+            return I18Consts.I18N_QUEUE_NEXT_MESSAGE;
         }
         
         int estimatedWaitTime = queueingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
-        return String.format(QUEUE_WAITING_MESSAGE_TEMPLATE, queueingCount, estimatedWaitTime);
+        return String.format(I18Consts.I18N_QUEUE_WAITING_MESSAGE_TEMPLATE, queueingCount, estimatedWaitTime);
     }
     
     /**

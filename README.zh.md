@@ -1,6 +1,6 @@
 # 微语 - 重复工作自动化
 
-企业级多租户团队协作工具，免费开源N件套：企业IM、在线客服、企业知识库/帮助文档、客户之声、工单系统、AI对话、工作流、呼叫中心、视频客服、开放平台。
+基于AI全新打造的一款开源企业级多租户团队协作工具，集成多种功能于一体：[企业IM](./modules/team/readme.zh.md)、[在线客服](./modules/service/readme.zh.md)、[企业知识库/帮助文档](./modules/kbase/readme.zh.md)、[客户之声](./modules/voc/readme.zh.md)、[工单系统](./modules/ticket/readme.zh.md)、[AI对话](./modules/ai/readme.zh.md)、[工作流](./modules/core/readme.workflow.md)、[呼叫中心](./plugins/freeswitch/readme.zh.md)、[视频客服](./plugins/webrtc/readme.zh.md)、[开放平台](./plugins/readme.md)。
 
 ## 语言
 

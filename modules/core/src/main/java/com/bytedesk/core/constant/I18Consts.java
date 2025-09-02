@@ -355,7 +355,18 @@ public class I18Consts {
     public static final String I18N_USER_PREFIX = "[用户] "; // [用户] 
     public static final String I18N_ASSISTANT_PREFIX = "[助手] "; // [助手] 
 
-
+    // 线程路由策略相关常量
+    /** 默认欢迎消息 */
+    public static final String I18N_DEFAULT_WELCOME_MESSAGE = "您好，请问有什么可以帮助您？";
+    
+    /** 默认离线消息 */
+    public static final String I18N_DEFAULT_OFFLINE_MESSAGE = "您好，请留言，我们会尽快回复您";
+    
+    /** 排队等待消息 - 下一个 */
+    public static final String I18N_QUEUE_NEXT_MESSAGE = "请稍后，下一个就是您";
+    
+    /** 排队等待消息模板 */
+    public static final String I18N_QUEUE_WAITING_MESSAGE_TEMPLATE = "当前排队人数：%d 大约等待时间：%d 分钟";
 
     // 
 }

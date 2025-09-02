@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:33
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 17:36:09
+ * @LastEditTime: 2025-09-02 17:55:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,8 @@ import java.util.Optional;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
@@ -193,7 +195,7 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
      * 工作流使用默认欢迎消息
      */
     private String getWorkflowWelcomeMessage() {
-        return DEFAULT_WELCOME_MESSAGE;
+        return I18Consts.I18N_DEFAULT_WELCOME_MESSAGE;
     }
 
     /**

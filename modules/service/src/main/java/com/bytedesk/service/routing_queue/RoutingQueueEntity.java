@@ -28,6 +28,7 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * 路由队列：提前计算好工作组的接待客服队列，直接读取下一个接待客服，减少每次分配客服时的计算量
+ * 将客服分配队列可视化
  */
 @Entity
 @Data
