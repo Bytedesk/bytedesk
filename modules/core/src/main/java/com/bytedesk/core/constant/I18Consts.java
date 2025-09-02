@@ -341,6 +341,7 @@ public class I18Consts {
     public static final String I18N_CANT_ANSWER = "您的这个问题我不能回答，请提问其他问题。"; 
 
     public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
+    public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "服务暂时不可用，请稍后重试"; // 服务暂时不可用，请稍后重试
 
 
 

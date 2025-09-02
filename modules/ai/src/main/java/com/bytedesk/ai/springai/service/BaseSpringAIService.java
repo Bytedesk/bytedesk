@@ -24,6 +24,7 @@ import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
 import com.bytedesk.ai.springai.event.LlmTokenUsageEvent;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -319,7 +320,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
         } catch (Exception e) {
             log.error("Error in sendSyncMessage", e);
-            String errorMessage = "服务暂时不可用，请稍后重试";
+            String errorMessage = I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             messageProtobufReply.setContent(errorMessage);
             messageProtobufReply.setType(MessageTypeEnum.ERROR);
             
@@ -893,7 +894,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 检查emitter是否已完成
             if (emitter != null && !isEmitterCompleted(emitter)) {
                 messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                messageProtobufReply.setContent(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE);
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, true);
                 String messageJson = messageProtobufReply.toJson();
@@ -913,7 +914,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 log.warn("SSE emitter already completed, skipping sending error message");
                 // 仍然需要持久化消息
                 messageProtobufReply.setType(MessageTypeEnum.ERROR);
-                messageProtobufReply.setContent("服务暂时不可用，请稍后重试");
+                messageProtobufReply.setContent(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE);
                 persistMessage(messageProtobufQuery, messageProtobufReply, true);
             }
         } catch (Exception e) {

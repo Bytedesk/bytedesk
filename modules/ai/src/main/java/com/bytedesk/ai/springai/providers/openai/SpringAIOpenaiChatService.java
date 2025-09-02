@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -104,7 +105,7 @@ public class SpringAIOpenaiChatService extends BaseSpringAIService {
                 },
                 error -> {
                     log.error("Openai API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂时不可用，请稍后重试", messageProtobufReply);
+                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -152,12 +153,12 @@ public class SpringAIOpenaiChatService extends BaseSpringAIService {
             } catch (Exception e) {
                 log.error("Openai API call error: ", e);
                 success = false;
-                return "服务暂时不可用，请稍后重试";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
         } catch (Exception e) {
             log.error("Openai API sync error: ", e);
             success = false;
-            return "服务暂时不可用，请稍后重试";
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
