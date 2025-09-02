@@ -11,15 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.agent_template;
+package com.bytedesk.service.settings_template;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.service.agent_template.event.AgentTemplateCreateEvent;
-import com.bytedesk.service.agent_template.event.AgentTemplateUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.service.settings_template.event.SettingsTemplateCreateEvent;
+import com.bytedesk.service.settings_template.event.SettingsTemplateUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -28,24 +28,24 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class AgentTemplateEntityListener {
+public class SettingsTemplateEntityListener {
 
     @PostPersist
-    public void onPostPersist(AgentTemplateEntity agentTemplate) {
+    public void onPostPersist(SettingsTemplateEntity agentTemplate) {
         log.info("onPostPersist: {}", agentTemplate);
-        AgentTemplateEntity cloneAgentTemplate = SerializationUtils.clone(agentTemplate);
+        SettingsTemplateEntity cloneSettingsTemplate = SerializationUtils.clone(agentTemplate);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new AgentTemplateCreateEvent(cloneAgentTemplate));
+        bytedeskEventPublisher.publishEvent(new SettingsTemplateCreateEvent(cloneSettingsTemplate));
     }
 
     @PostUpdate
-    public void onPostUpdate(AgentTemplateEntity agentTemplate) {
+    public void onPostUpdate(SettingsTemplateEntity agentTemplate) {
         log.info("onPostUpdate: {}", agentTemplate);
-        AgentTemplateEntity cloneAgentTemplate = SerializationUtils.clone(agentTemplate);
+        SettingsTemplateEntity cloneSettingsTemplate = SerializationUtils.clone(agentTemplate);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new AgentTemplateUpdateEvent(cloneAgentTemplate));
+        bytedeskEventPublisher.publishEvent(new SettingsTemplateUpdateEvent(cloneSettingsTemplate));
     }
     
 }

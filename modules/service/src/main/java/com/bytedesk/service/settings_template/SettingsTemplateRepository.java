@@ -11,20 +11,20 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.agent_template;
+package com.bytedesk.service.settings_template;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface AgentTemplateRepository extends JpaRepository<AgentTemplateEntity, Long>, JpaSpecificationExecutor<AgentTemplateEntity> {
+public interface SettingsTemplateRepository extends JpaRepository<SettingsTemplateEntity, Long>, JpaSpecificationExecutor<SettingsTemplateEntity> {
 
-    Optional<AgentTemplateEntity> findByUid(String uid);
+    Optional<SettingsTemplateEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 
-    Optional<AgentTemplateEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+    Optional<SettingsTemplateEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
     // Boolean existsByPlatform(String platform);
 }

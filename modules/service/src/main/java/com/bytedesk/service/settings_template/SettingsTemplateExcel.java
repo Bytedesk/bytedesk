@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.agent_template;
+package com.bytedesk.service.settings_template;
 
 import java.time.ZonedDateTime;
 
@@ -25,7 +25,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class AgentTemplateExcel {
+public class SettingsTemplateExcel {
 
     @ExcelProperty(index = 0, value = "标签名称")
     @ColumnWidth(20)

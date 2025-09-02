@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.agent_template;
+package com.bytedesk.service.settings_template;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AgentTemplateSpecification extends BaseSpecification<AgentTemplateEntity, AgentTemplateRequest> {
+public class SettingsTemplateSpecification extends BaseSpecification<SettingsTemplateEntity, SettingsTemplateRequest> {
     
-    public static Specification<AgentTemplateEntity> search(AgentTemplateRequest request, AuthService authService) {
+    public static Specification<SettingsTemplateEntity> search(SettingsTemplateRequest request, AuthService authService) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
         //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {

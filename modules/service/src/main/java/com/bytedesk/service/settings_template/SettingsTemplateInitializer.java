@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.agent_template;
+package com.bytedesk.service.settings_template;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
@@ -20,21 +20,21 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class AgentTemplateInitializer implements SmartInitializingSingleton {
+public class SettingsTemplateInitializer implements SmartInitializingSingleton {
 
-    // private final AgentTemplateRestService agentTemplateRestService;
+    // private final SettingsTemplateRestService agentTemplateRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
         // 创建默认的工单分类
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // agentTemplateRestService.initAgentTemplates(orgUid);
+        // agentTemplateRestService.initSettingsTemplates(orgUid);
     }
 
     private void initPermissions() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = AgentTemplatePermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = SettingsTemplatePermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

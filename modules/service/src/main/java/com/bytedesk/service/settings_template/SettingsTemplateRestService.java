@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.agent_template;
+package com.bytedesk.service.settings_template;
 
 import java.util.Optional;
 
@@ -34,9 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AgentTemplateRestService extends BaseRestServiceWithExport<AgentTemplateEntity, AgentTemplateRequest, AgentTemplateResponse, AgentTemplateExcel> {
+public class SettingsTemplateRestService extends BaseRestServiceWithExport<SettingsTemplateEntity, SettingsTemplateRequest, SettingsTemplateResponse, SettingsTemplateExcel> {
 
-    private final AgentTemplateRepository agentTemplateRepository;
+    private final SettingsTemplateRepository agentTemplateRepository;
 
     private final ModelMapper modelMapper;
 
@@ -45,23 +45,23 @@ public class AgentTemplateRestService extends BaseRestServiceWithExport<AgentTem
     private final AuthService authService;
 
     @Override
-    protected Specification<AgentTemplateEntity> createSpecification(AgentTemplateRequest request) {
-        return AgentTemplateSpecification.search(request, authService);
+    protected Specification<SettingsTemplateEntity> createSpecification(SettingsTemplateRequest request) {
+        return SettingsTemplateSpecification.search(request, authService);
     }
 
     @Override
-    protected Page<AgentTemplateEntity> executePageQuery(Specification<AgentTemplateEntity> spec, Pageable pageable) {
+    protected Page<SettingsTemplateEntity> executePageQuery(Specification<SettingsTemplateEntity> spec, Pageable pageable) {
         return agentTemplateRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "agentTemplate", key = "#uid", unless="#result==null")
     @Override
-    public Optional<AgentTemplateEntity> findByUid(String uid) {
+    public Optional<SettingsTemplateEntity> findByUid(String uid) {
         return agentTemplateRepository.findByUid(uid);
     }
 
     @Cacheable(value = "agentTemplate", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<AgentTemplateEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
+    public Optional<SettingsTemplateEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
         return agentTemplateRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
 
@@ -71,14 +71,14 @@ public class AgentTemplateRestService extends BaseRestServiceWithExport<AgentTem
 
     @Transactional
     @Override
-    public AgentTemplateResponse create(AgentTemplateRequest request) {
+    public SettingsTemplateResponse create(SettingsTemplateRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
         if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<AgentTemplateEntity> agentTemplate = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+            Optional<SettingsTemplateEntity> agentTemplate = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
             if (agentTemplate.isPresent()) {
                 return convertToResponse(agentTemplate.get());
             }
@@ -89,12 +89,12 @@ public class AgentTemplateRestService extends BaseRestServiceWithExport<AgentTem
             request.setUserUid(user.getUid());
         }
         // 
-        AgentTemplateEntity entity = modelMapper.map(request, AgentTemplateEntity.class);
+        SettingsTemplateEntity entity = modelMapper.map(request, SettingsTemplateEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
         // 
-        AgentTemplateEntity savedEntity = save(entity);
+        SettingsTemplateEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create agentTemplate failed");
         }
@@ -103,34 +103,34 @@ public class AgentTemplateRestService extends BaseRestServiceWithExport<AgentTem
 
     @Transactional
     @Override
-    public AgentTemplateResponse update(AgentTemplateRequest request) {
-        Optional<AgentTemplateEntity> optional = agentTemplateRepository.findByUid(request.getUid());
+    public SettingsTemplateResponse update(SettingsTemplateRequest request) {
+        Optional<SettingsTemplateEntity> optional = agentTemplateRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            AgentTemplateEntity entity = optional.get();
+            SettingsTemplateEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            AgentTemplateEntity savedEntity = save(entity);
+            SettingsTemplateEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update agentTemplate failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("AgentTemplate not found");
+            throw new RuntimeException("SettingsTemplate not found");
         }
     }
 
     @Override
-    protected AgentTemplateEntity doSave(AgentTemplateEntity entity) {
+    protected SettingsTemplateEntity doSave(SettingsTemplateEntity entity) {
         return agentTemplateRepository.save(entity);
     }
 
     @Override
-    public AgentTemplateEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AgentTemplateEntity entity) {
+    public SettingsTemplateEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, SettingsTemplateEntity entity) {
         try {
-            Optional<AgentTemplateEntity> latest = agentTemplateRepository.findByUid(entity.getUid());
+            Optional<SettingsTemplateEntity> latest = agentTemplateRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                AgentTemplateEntity latestEntity = latest.get();
+                SettingsTemplateEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
@@ -147,34 +147,34 @@ public class AgentTemplateRestService extends BaseRestServiceWithExport<AgentTem
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<AgentTemplateEntity> optional = agentTemplateRepository.findByUid(uid);
+        Optional<SettingsTemplateEntity> optional = agentTemplateRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
             // agentTemplateRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("AgentTemplate not found");
+            throw new RuntimeException("SettingsTemplate not found");
         }
     }
 
     @Override
-    public void delete(AgentTemplateRequest request) {
+    public void delete(SettingsTemplateRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public AgentTemplateResponse convertToResponse(AgentTemplateEntity entity) {
-        return modelMapper.map(entity, AgentTemplateResponse.class);
+    public SettingsTemplateResponse convertToResponse(SettingsTemplateEntity entity) {
+        return modelMapper.map(entity, SettingsTemplateResponse.class);
     }
 
     @Override
-    public AgentTemplateExcel convertToExcel(AgentTemplateEntity entity) {
-        return modelMapper.map(entity, AgentTemplateExcel.class);
+    public SettingsTemplateExcel convertToExcel(SettingsTemplateEntity entity) {
+        return modelMapper.map(entity, SettingsTemplateExcel.class);
     }
     
-    public void initAgentTemplates(String orgUid) {
-        // log.info("initThreadAgentTemplate");
+    public void initSettingsTemplates(String orgUid) {
+        // log.info("initThreadSettingsTemplate");
     }
 
     

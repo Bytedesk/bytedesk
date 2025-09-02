@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 15:43:36
+ * @LastEditTime: 2025-09-02 17:48:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.agent_template;
+package com.bytedesk.service.settings_template;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -38,9 +38,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({AgentTemplateEntityListener.class})
-@Table(name = "bytedesk_service_agent_template")
-public class AgentTemplateEntity extends BaseEntity {
+// @EntityListeners({SettingsTemplateEntityListener.class})
+@Table(name = "bytedesk_service_settings_template")
+public class SettingsTemplateEntity extends BaseEntity {
 
     /**
      * Name of the agentTemplate
@@ -57,7 +57,7 @@ public class AgentTemplateEntity extends BaseEntity {
      * Type of agentTemplate (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "agent_template_type")
-    private String type = AgentTemplateTypeEnum.CUSTOMER.name();
+    @Column(name = "template_type")
+    private String type = SettingsTemplateTypeEnum.CUSTOMER.name();
 
 }
