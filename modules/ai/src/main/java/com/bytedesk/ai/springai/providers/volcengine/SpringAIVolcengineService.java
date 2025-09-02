@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 14:57:56
+ * @LastEditTime: 2025-09-02 16:35:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -164,7 +164,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
             // 创建动态chatModel
             OpenAiChatModel chatModel = createVolcengineChatModel(robot.getLlm());
             if (chatModel == null) {
-                return "Volcengine service is not available";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
 
             try {
@@ -216,7 +216,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         // 创建动态chatModel
         OpenAiChatModel chatModel = createVolcengineChatModel(llm);
         if (chatModel == null) {
-            handleSseError(new RuntimeException("Volcengine service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 

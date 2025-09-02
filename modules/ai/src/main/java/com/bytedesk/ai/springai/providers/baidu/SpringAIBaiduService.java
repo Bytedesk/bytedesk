@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 15:20:02
+ * @LastEditTime: 2025-09-02 16:34:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -186,13 +186,13 @@ public class SpringAIBaiduService extends BaseSpringAIService {
             // 从robot中获取llm配置
             RobotLlm llm = robot.getLlm();
             if (llm == null) {
-                return "Baidu service is not available";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
 
             // 获取适当的模型实例
             OpenAiChatModel baiduChatModel = createBaiduChatModel(llm);
             if (baiduChatModel == null) {
-                return "Baidu service is not available";
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
 
             try {
@@ -245,7 +245,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
 
         if (llm == null) {
-            handleSseError(new RuntimeException("Baidu service not available"), messageProtobufQuery,
+            handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
         }
@@ -253,7 +253,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         // 获取适当的模型实例
         OpenAiChatModel baiduChatModel = createBaiduChatModel(llm);
         if (baiduChatModel == null) {
-            handleSseError(new RuntimeException("Baidu service not available"), messageProtobufQuery,
+            handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
         }

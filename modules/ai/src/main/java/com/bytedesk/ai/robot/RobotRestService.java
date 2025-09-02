@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 13:20:46
+ * @LastEditTime: 2025-09-02 16:19:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -637,7 +637,12 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setType(RobotTypeEnum.LLM.name());
         // robot.setDefaultReply(I18Consts.I18N_ROBOT_DEFAULT_REPLY);
         //
-        RobotLlm llm = RobotLlm.builder().prompt(request.getLlm().getPrompt()).build();
+        RobotLlm llm = RobotLlm.builder()
+            .prompt(request.getLlm().getPrompt())
+            .textProvider(request.getLlm().getTextProvider())
+            .textProviderUid(request.getLlm().getTextProviderUid())
+            .textModel(request.getLlm().getTextModel())
+        .build();
         robot.setLlm(llm);
         //
         RobotEntity savedRobot = save(robot);
@@ -666,6 +671,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         RobotLlm llm = robot.getLlm();
         llm.setPrompt(request.getLlm().getPrompt());
         llm.setTextProvider(request.getLlm().getTextProvider());
+        llm.setTextProviderUid(request.getLlm().getTextProviderUid());
         llm.setTextModel(request.getLlm().getTextModel());
         robot.setLlm(llm);
         //

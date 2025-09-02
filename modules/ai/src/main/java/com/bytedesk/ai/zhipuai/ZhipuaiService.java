@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 17:38:54
+ * @LastEditTime: 2025-09-02 16:35:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -198,6 +198,11 @@ public class ZhipuaiService extends BaseSpringAIService {
 
         // 获取适当的client实例
         ClientV4 chatClient = createDynamicClient(llm);
+        if (chatClient == null) {
+            log.error("Failed to create Zhipuai client, cannot process websocket request");
+            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            return;
+        }
 
         try {
             ChatCompletionRequest chatCompletionRequest = createDynamicRequestFromPrompt(llm, prompt, true);
@@ -333,6 +338,10 @@ public class ZhipuaiService extends BaseSpringAIService {
         
         // 获取适当的client实例
         ClientV4 chatClient = createDynamicClient(llm);
+        if (chatClient == null) {
+            log.error("Failed to create Zhipuai client, cannot process sync request");
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+        }
         
         try {
             ChatCompletionRequest chatCompletionRequest = createDynamicRequest(llm, message, false);
@@ -396,6 +405,12 @@ public class ZhipuaiService extends BaseSpringAIService {
 
         // 获取适当的client实例
         ClientV4 chatClient = createDynamicClient(llm);
+        if (chatClient == null) {
+            log.error("Failed to create Zhipuai client, cannot process SSE request");
+            handleSseError(new Exception("Failed to create Zhipuai client"), 
+                    messageProtobufQuery, messageProtobufReply, emitter);
+            return;
+        }
 
         try {
             ChatCompletionRequest chatCompletionRequest = createDynamicRequestFromPrompt(llm, prompt, true);
@@ -976,129 +991,6 @@ public class ZhipuaiService extends BaseSpringAIService {
         } catch (Exception e) {
             log.error("Error extracting token usage from accumulator", e);
             return new ChatTokenUsage(0, 0, 0);
-        }
-    }
-
-    
-    /**
-     * 简单流式测试 - 完全按照官方示例代码实现
-     * 用于调试流式响应问题
-     */
-    // public void testSimpleStream() {
-    //     // 使用默认client进行简单测试
-    //     ClientV4 chatClient = client;
-        
-    //     try {
-    //         log.info("Zhipuai API testing simple stream response...");
-            
-    //         // 完全按照官方示例代码实现
-    //         List<ChatMessage> messages = new ArrayList<>();
-    //         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
-    //         messages.add(chatMessage);
-            
-    //         String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
-    //         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-    //                 .model(Constants.ModelChatGLM4)
-    //                 .stream(Boolean.TRUE)
-    //                 .messages(messages)
-    //                 .requestId(requestId)
-    //                 .build();
-            
-    //         log.info("Zhipuai API making simple stream test call with requestId: {}", requestId);
-            
-    //         ModelApiResponse sseModelApiResp = chatClient.invokeModelApi(chatCompletionRequest);
-            
-    //         if (sseModelApiResp.isSuccess()) {
-    //             log.info("Zhipuai API simple stream test response success");
-                
-    //             // java.util.concurrent.atomic.AtomicBoolean isFirst = new java.util.concurrent.atomic.AtomicBoolean(true);
-    //             final int[] messageCount = {0};
-                
-    //             mapStreamToAccumulator(sseModelApiResp.getFlowable())
-    //                     .doOnNext(accumulator -> {
-    //                         messageCount[0]++;
-    //                         log.info("Zhipuai API simple stream test message #{}: accumulator: {}", messageCount[0], accumulator);
-                            
-    //                         Object delta = accumulator.getDelta();
-    //                         log.info("Zhipuai API simple stream test message #{}: delta: {}", messageCount[0], delta);
-                            
-    //                         if (delta instanceof com.zhipu.oapi.service.v4.model.ChatMessage) {
-    //                             Object content = ((com.zhipu.oapi.service.v4.model.ChatMessage) delta).getContent();
-    //                             log.info("Zhipuai API simple stream test message #{}: content: {}", messageCount[0], content);
-    //                         }
-    //                     })
-    //                     .doOnComplete(() -> {
-    //                         log.info("Zhipuai API simple stream test completed, total messages: {}", messageCount[0]);
-    //                     })
-    //                     .doOnError(error -> {
-    //                         log.error("Zhipuai API simple stream test error: ", error);
-    //                     })
-    //                     .subscribe();
-    //         } else {
-    //             log.error("Zhipuai API simple stream test failed: {}", sseModelApiResp.getError());
-    //         }
-            
-    //     } catch (Exception e) {
-    //         log.error("Zhipuai API test simple stream error", e);
-    //     }
-    // }
-
-    /**
-     * 测试content提取功能
-     */
-    public void testContentExtraction() {
-        log.info("Zhipuai API testing content extraction...");
-        
-        // 测试用例1：标准的JSON格式
-        String test1 = "{\"role\":\"assistant\",\"content\":\"的\",\"tool_calls\":[]}";
-        String result1 = extractContentFromDeltaString(test1);
-        log.info("Test 1 - Input: {}, Result: {}", test1, result1);
-        
-        // 测试用例2：content为空的情况
-        String test2 = "{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]}";
-        String result2 = extractContentFromDeltaString(test2);
-        log.info("Test 2 - Input: {}, Result: {}", test2, result2);
-        
-        // 测试用例3：content为null的情况
-        String test3 = "{\"role\":\"assistant\",\"content\":null,\"tool_calls\":[]}";
-        String result3 = extractContentFromDeltaString(test3);
-        log.info("Test 3 - Input: {}, Result: {}", test3, result3);
-        
-        // 测试用例4：包含特殊字符的content
-        String test4 = "{\"role\":\"assistant\",\"content\":\"Hello, world! 你好世界！\",\"tool_calls\":[]}";
-        String result4 = extractContentFromDeltaString(test4);
-        log.info("Test 4 - Input: {}, Result: {}", test4, result4);
-        
-        // 测试用例5：不是JSON格式的字符串
-        String test5 = "Hello, world!";
-        String result5 = extractContentFromDeltaString(test5);
-        log.info("Test 5 - Input: {}, Result: {}", test5, result5);
-        
-        // 测试用例6：null输入
-        String result6 = extractContentFromDeltaString(null);
-        log.info("Test 6 - Input: null, Result: {}", result6);
-        
-        // 测试用例7：空字符串
-        String result7 = extractContentFromDeltaString("");
-        log.info("Test 7 - Input: empty string, Result: {}", result7);
-    }
-
-    /**
-     * 检查服务健康状态
-     */
-    public boolean isHealthy() {
-        log.info("Zhipuai API health check started");
-        
-        try {
-            // 发送一个简单的测试请求
-            String response = processPromptSync("Hello", null, "");
-            boolean isHealthy = response != null && !response.startsWith("Error");
-            
-            log.info("Zhipuai API health check result: {}", isHealthy);
-            return isHealthy;
-        } catch (Exception e) {
-            log.error("Zhipuai API health check failed", e);
-            return false;
         }
     }
 

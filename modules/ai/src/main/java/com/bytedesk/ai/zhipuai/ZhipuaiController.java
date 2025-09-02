@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 12:38:11
+ * @LastEditTime: 2025-09-02 16:32:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -148,25 +148,7 @@ public class ZhipuaiController {
             return ResponseEntity.ok(JsonResult.error("Error: " + e.getMessage()));
         }
     }
-
-    /**
-     * 健康检查
-     */
-    @GetMapping("/health")
-    public ResponseEntity<JsonResult<?>> health() {
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Zhipuai service is not available"));
-        }
-        
-        try {
-            boolean healthy = zhipuaiService.isHealthy();
-            return ResponseEntity.ok(JsonResult.success(healthy ? "ok" : "fail"));
-        } catch (Exception e) {
-            log.error("Error in health check", e);
-            return ResponseEntity.ok(JsonResult.error("Error: " + e.getMessage()));
-        }
-    }
-
+    
     /**
      * Function Calling 同步调用
      * POST http://127.0.0.1:9003/zhipuai/function-call
