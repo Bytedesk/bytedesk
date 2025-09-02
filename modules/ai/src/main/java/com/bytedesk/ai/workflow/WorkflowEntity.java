@@ -56,9 +56,6 @@ public class WorkflowEntity extends BaseEntity {
 
     private String description;
 
-    @Column(name = "workflow_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String schema;
-
     @Builder.Default
     @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<WorkflowNodeEntity> nodes = new ArrayList<>();
@@ -66,6 +63,9 @@ public class WorkflowEntity extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "workflow", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<WorkflowEdgeEntity> edges = new ArrayList<>();
+
+    @Column(name = "workflow_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String schema;
 
     @Builder.Default
     @Column(name = "workflow_type")
