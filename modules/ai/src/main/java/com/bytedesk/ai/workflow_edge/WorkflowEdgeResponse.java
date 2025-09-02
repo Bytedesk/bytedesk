@@ -37,8 +37,5 @@ public class WorkflowEdgeResponse extends BaseResponse {
 
     private String type;
 
-    private String color;
-
-    private Integer order;
 
 }

@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/workflow_node")
+@RequestMapping("/api/v1/workflow/node")
 @AllArgsConstructor
 @Tag(name = "WorkflowNode Management", description = "WorkflowNode management APIs for organizing and categorizing content with workflow_nodes")
 @Description("WorkflowNode Management Controller - Content workflow_node and categorization APIs")
@@ -39,7 +39,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
 
     private final WorkflowNodeRestService workflow_nodeRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query workflow_node by org")
+    @ActionAnnotation(title = "Workflow Node", action = "组织查询", description = "query workflow_node by org")
     @Operation(summary = "Query WorkflowNodes by Organization", description = "Retrieve workflow_nodes for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(WorkflowNodeRequest request) {
@@ -49,7 +49,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_nodes));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query workflow_node by user")
+    @ActionAnnotation(title = "Workflow Node", action = "用户查询", description = "query workflow_node by user")
     @Operation(summary = "Query WorkflowNodes by User", description = "Retrieve workflow_nodes for the current user")
     @Override
     public ResponseEntity<?> queryByUser(WorkflowNodeRequest request) {
@@ -59,7 +59,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_nodes));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query workflow_node by uid")
+    @ActionAnnotation(title = "Workflow Node", action = "查询详情", description = "query workflow_node by uid")
     @Operation(summary = "Query WorkflowNode by UID", description = "Retrieve a specific workflow_node by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(WorkflowNodeRequest request) {
@@ -69,7 +69,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_node));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create workflow_node")
+    @ActionAnnotation(title = "Workflow Node", action = "新建", description = "create workflow_node")
     @Operation(summary = "Create WorkflowNode", description = "Create a new workflow_node")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +80,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_node));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update workflow_node")
+    @ActionAnnotation(title = "Workflow Node", action = "更新", description = "update workflow_node")
     @Operation(summary = "Update WorkflowNode", description = "Update an existing workflow_node")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +91,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_node));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete workflow_node")
+    @ActionAnnotation(title = "Workflow Node", action = "删除", description = "delete workflow_node")
     @Operation(summary = "Delete WorkflowNode", description = "Delete a workflow_node")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +102,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export workflow_node")
+    @ActionAnnotation(title = "Workflow Node", action = "导出", description = "export workflow_node")
     @Operation(summary = "Export WorkflowNodes", description = "Export workflow_nodes to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,7 +113,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
             response,
             workflow_nodeRestService,
             WorkflowNodeExcel.class,
-            "标签",
+            "Workflow Node",
             "workflow_node"
         );
     }

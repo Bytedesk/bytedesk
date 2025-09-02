@@ -31,15 +31,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/workflow_edge")
+@RequestMapping("/api/v1/workflow/edge")
 @AllArgsConstructor
 @Tag(name = "WorkflowEdge Management", description = "WorkflowEdge management APIs for organizing and categorizing content with workflow_edges")
-@Description("WorkflowEdge Management Controller - Content workflow_edgeging and categorization APIs")
+@Description("WorkflowEdge Management Controller - Content workflow_edge and categorization APIs")
 public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeRequest, WorkflowEdgeRestService> {
 
     private final WorkflowEdgeRestService workflow_edgeRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query workflow_edge by org")
+    @ActionAnnotation(title = "Workflow Edge", action = "组织查询", description = "query workflow_edge by org")
     @Operation(summary = "Query WorkflowEdges by Organization", description = "Retrieve workflow_edges for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(WorkflowEdgeRequest request) {
@@ -49,7 +49,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
         return ResponseEntity.ok(JsonResult.success(workflow_edges));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query workflow_edge by user")
+    @ActionAnnotation(title = "Workflow Edge", action = "用户查询", description = "query workflow_edge by user")
     @Operation(summary = "Query WorkflowEdges by User", description = "Retrieve workflow_edges for the current user")
     @Override
     public ResponseEntity<?> queryByUser(WorkflowEdgeRequest request) {
@@ -59,7 +59,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
         return ResponseEntity.ok(JsonResult.success(workflow_edges));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query workflow_edge by uid")
+    @ActionAnnotation(title = "Workflow Edge", action = "查询详情", description = "query workflow_edge by uid")
     @Operation(summary = "Query WorkflowEdge by UID", description = "Retrieve a specific workflow_edge by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(WorkflowEdgeRequest request) {
@@ -69,7 +69,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
         return ResponseEntity.ok(JsonResult.success(workflow_edge));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create workflow_edge")
+    @ActionAnnotation(title = "Workflow Edge", action = "新建", description = "create workflow_edge")
     @Operation(summary = "Create WorkflowEdge", description = "Create a new workflow_edge")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +80,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
         return ResponseEntity.ok(JsonResult.success(workflow_edge));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update workflow_edge")
+    @ActionAnnotation(title = "Workflow Edge", action = "更新", description = "update workflow_edge")
     @Operation(summary = "Update WorkflowEdge", description = "Update an existing workflow_edge")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +91,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
         return ResponseEntity.ok(JsonResult.success(workflow_edge));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete workflow_edge")
+    @ActionAnnotation(title = "Workflow Edge", action = "删除", description = "delete workflow_edge")
     @Operation(summary = "Delete WorkflowEdge", description = "Delete a workflow_edge")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +102,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export workflow_edge")
+    @ActionAnnotation(title = "Workflow Edge", action = "导出", description = "export workflow_edge")
     @Operation(summary = "Export WorkflowEdges", description = "Export workflow_edges to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,7 +113,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
             response,
             workflow_edgeRestService,
             WorkflowEdgeExcel.class,
-            "标签",
+            "Workflow Edge",
             "workflow_edge"
         );
     }

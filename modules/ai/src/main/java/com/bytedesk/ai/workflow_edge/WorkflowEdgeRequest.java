@@ -36,7 +36,4 @@ public class WorkflowEdgeRequest extends BaseRequest {
     // @Builder.Default
     // private String type = WorkflowEdgeTypeEnum.CUSTOMER.name();
 
-    private String color;
-
-    private Integer order;
 }

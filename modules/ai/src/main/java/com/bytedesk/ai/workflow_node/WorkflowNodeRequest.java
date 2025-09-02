@@ -36,7 +36,4 @@ public class WorkflowNodeRequest extends BaseRequest {
     // @Builder.Default
     // private String type = WorkflowNodeTypeEnum.CUSTOMER.name();
 
-    private String color;
-
-    private Integer order;
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-04 15:35:31
+ * @LastEditTime: 2025-09-02 10:21:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * WorkflowNode entity for content categorization and organization
- * Provides workflow_nodeging functionality for various system entities
+ * Provides workflow_node functionality for various system entities
  * 
  * Database Table: bytedesk_core_workflow_node
  * Purpose: Stores workflow_node definitions, colors, and organization settings
@@ -42,7 +42,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({WorkflowNodeEntityListener.class})
-@Table(name = "bytedesk_core_workflow_node")
+@Table(name = "bytedesk_ai_workflow_node")
 public class WorkflowNodeEntity extends BaseEntity {
 
     /**
@@ -63,17 +63,4 @@ public class WorkflowNodeEntity extends BaseEntity {
     @Column(name = "workflow_node_type")
     private String type = WorkflowNodeTypeEnum.CUSTOMER.name();
 
-    /**
-     * Color theme for the workflow_node display
-     */
-    @Builder.Default
-    @Column(name = "workflow_node_color")
-    private String color = "red";
-
-    /**
-     * Display order of the workflow_node
-     */
-    @Builder.Default
-    @Column(name = "workflow_node_order")
-    private Integer order = 0;
 }
