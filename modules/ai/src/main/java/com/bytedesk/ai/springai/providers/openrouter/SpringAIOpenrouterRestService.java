@@ -47,48 +47,47 @@ public class SpringAIOpenrouterRestService {
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getModels(OpenrouterRequest request) {
         try {
-            String apiUrl = StringUtils.hasText(request.getApiUrl()) 
-                    ? request.getApiUrl() 
+            String apiUrl = StringUtils.hasText(request.getApiUrl())
+                    ? request.getApiUrl()
                     : DEFAULT_OPENROUTER_API_URL;
-            
+
             String modelsUrl = apiUrl + "/models";
-            
+
             // 创建HTTP请求头（无需认证）
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
-            
+
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            
+
             // 发送HTTP GET请求（匿名访问）
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.exchange(
-                modelsUrl, 
-                HttpMethod.GET, 
-                entity, 
-                String.class
-            );
-            
+                    modelsUrl,
+                    HttpMethod.GET,
+                    entity,
+                    String.class);
+
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 // 解析JSON响应
                 ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, Object> responseMap = objectMapper.readValue(
-                    response.getBody(), 
-                    new TypeReference<Map<String, Object>>() {}
-                );
-                
+                        response.getBody(),
+                        new TypeReference<Map<String, Object>>() {
+                        });
+
                 // OpenRouter API 返回的结构是 {"data": [...]}
                 Object dataObj = responseMap.get("data");
                 if (dataObj instanceof List) {
                     return (List<Map<String, Object>>) dataObj;
                 }
-                
+
                 log.warn("Unexpected response structure from OpenRouter models API");
                 return List.of();
             } else {
                 log.warn("Failed to get models from OpenRouter API. Status: {}", response.getStatusCode());
                 return List.of();
             }
-            
+
         } catch (Exception e) {
             log.error("Failed to get OpenRouter models: {}", e.getMessage(), e);
             // 作为备用方案，返回一些常用模型
@@ -101,9 +100,15 @@ public class SpringAIOpenrouterRestService {
      * 返回 OpenrouterModel 对象列表，便于强类型使用
      */
     public List<OpenrouterModel> getModelsStructured(OpenrouterRequest request) {
-        List<Map<String, Object>> rawModels = getModels(request);
-        return rawModels.stream()
-                .map(OpenrouterModel::fromMap)
-                .toList();
-    }    
+        try {
+            List<Map<String, Object>> rawModels = getModels(request);
+            return rawModels.stream()
+                    .map(OpenrouterModel::fromMap)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Failed to get OpenRouter structured models", e);
+            return List.of();
+        }
+
+    }
 }
