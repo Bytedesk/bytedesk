@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-01 13:32:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-01 13:41:43
+ * @LastEditTime: 2025-09-02 09:25:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,6 @@ import lombok.experimental.SuperBuilder;
 // @AllArgsConstructor
 @NoArgsConstructor
 public class RobotStreamContent extends BaseContent {
-
 
     private String question;
     
