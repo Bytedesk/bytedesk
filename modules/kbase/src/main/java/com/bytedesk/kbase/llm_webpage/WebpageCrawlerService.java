@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-28 09:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 12:09:09
+ * @LastEditTime: 2025-09-03 09:00:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,15 +11,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.llm_webpage.service;
+package com.bytedesk.kbase.llm_webpage;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import com.bytedesk.kbase.llm_webpage.WebpageEntity;
-import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WebpageCrawlerService {
 
-    private final WebpageRestService webpageRestService;
+    private final WebpageRepository webpageRepository;
 
     /**
      * 抓取网页内容并更新实体
@@ -83,7 +80,7 @@ public class WebpageCrawlerService {
             }
             
             // 保存更新后的实体
-            WebpageEntity savedWebpage = webpageRestService.save(webpage);
+            WebpageEntity savedWebpage = webpageRepository.save(webpage);
             
             log.info("成功抓取并更新网页内容: {} (内容长度: {})", 
                 webpage.getUrl(), content.length());

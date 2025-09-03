@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-19 15:03:09
+ * @LastEditTime: 2025-09-03 08:36:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,9 +35,9 @@ public class WebpageSpecification extends BaseSpecification<WebpageEntity, Webpa
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
 
             // categoryUid
-            if (StringUtils.hasText(request.getCategoryUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
-            }
+            // if (StringUtils.hasText(request.getCategoryUid())) {
+            //     predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
+            // }
             // kbUid
             if (StringUtils.hasText(request.getKbUid())) {
                 // 修改为通过kbaseEntity关联对象的uid进行查询，而不是直接查询kbUid字段

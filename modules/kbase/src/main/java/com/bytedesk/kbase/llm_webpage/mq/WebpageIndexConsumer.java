@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-28 09:40:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 19:47:03
+ * @LastEditTime: 2025-09-03 08:28:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,11 +20,11 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.jms.JmsArtemisConsts;
+import com.bytedesk.kbase.llm_webpage.WebpageCrawlerService;
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
-import com.bytedesk.kbase.llm_webpage.service.WebpageCrawlerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
@@ -43,14 +43,15 @@ public class WebpageIndexConsumer {
     private final WebpageCrawlerService webpageCrawlerService;
     private final Random random = new Random();
 
-    public WebpageIndexConsumer(WebpageElasticService webpageElasticService, WebpageRestService webpageRestService, 
-                               WebpageCrawlerService webpageCrawlerService,
-                               @Autowired(required = false) WebpageVectorService webpageVectorService) {
+    public WebpageIndexConsumer(WebpageElasticService webpageElasticService,
+            WebpageRestService webpageRestService,
+            WebpageCrawlerService webpageCrawlerService,
+            @Autowired(required = false) WebpageVectorService webpageVectorService) {
         this.webpageElasticService = webpageElasticService;
         this.webpageRestService = webpageRestService;
         this.webpageCrawlerService = webpageCrawlerService;
         this.webpageVectorService = webpageVectorService;
-        
+
         // 在构造函数中检查并记录向量服务状态
         if (webpageVectorService == null) {
             log.warn("网页向量存储服务未启用。如需启用，请检查配置: spring.ai.vectorstore.elasticsearch.enabled=true 并确保 Elasticsearch 正常运行");
@@ -65,14 +66,14 @@ public class WebpageIndexConsumer {
      * 增强了对乐观锁冲突的处理
      * 
      * @param jmsMessage JMS原始消息
-     * @param message 网页索引消息
+     * @param message    网页索引消息
      */
     @JmsListener(destination = JmsArtemisConsts.QUEUE_WEBPAGE_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "3-10")
     public void processIndexMessage(jakarta.jms.Message jmsMessage, WebpageIndexMessage message) {
         boolean success = false;
         int maxRetryAttempts = 3; // 最大重试次数
         int currentAttempt = 1;
-        
+
         while (currentAttempt <= maxRetryAttempts && !success) {
             try {
                 if (currentAttempt > 1) {
@@ -80,39 +81,39 @@ public class WebpageIndexConsumer {
                 } else {
                     log.debug("接收到网页索引请求: {}", message.getWebpageUid());
                 }
-                
+
                 // 引入随机延迟，避免并发冲突，重试时增加延迟
                 int baseDelay = 50 + random.nextInt(200); // 基础随机延迟
                 int retryDelay = baseDelay * currentAttempt; // 根据重试次数增加延迟
                 Thread.sleep(retryDelay);
-                
+
                 // 获取网页实体
                 Optional<WebpageEntity> optionalWebpage = webpageRestService.findByUid(message.getWebpageUid());
-                
+
                 if (!optionalWebpage.isPresent()) {
                     log.warn("无法找到要索引的网页: {}", message.getWebpageUid());
                     // 消息处理完成，但没有找到实体，也认为是成功的（避免重复处理已删除的实体）
                     success = true;
                     break;
                 }
-                
+
                 WebpageEntity webpage = optionalWebpage.get();
-                
+
                 // 根据操作类型执行相应的操作
                 if ("delete".equals(message.getOperationType())) {
                     handleDeleteOperation(webpage, message);
                 } else {
                     handleIndexOperation(webpage, message);
                 }
-                
+
                 // 成功处理消息
                 success = true;
                 log.debug("成功处理网页索引消息: {}", message.getWebpageUid());
-                
+
             } catch (org.springframework.orm.ObjectOptimisticLockingFailureException e) {
                 // 乐观锁冲突，特殊处理
                 log.warn("处理网页索引时发生乐观锁冲突: {}, 尝试次数: {}", message.getWebpageUid(), currentAttempt);
-                
+
                 if (currentAttempt == maxRetryAttempts) {
                     log.error("达到最大重试次数，乐观锁冲突无法解决: {}", message.getWebpageUid());
                     // 最后一次尝试失败，标记为成功以避免消息无限重试
@@ -128,10 +129,10 @@ public class WebpageIndexConsumer {
                     break;
                 }
             }
-            
+
             currentAttempt++;
         }
-        
+
         // 根据处理结果确认或拒绝消息
         if (success) {
             acknowledgeMessage(jmsMessage);
@@ -152,29 +153,29 @@ public class WebpageIndexConsumer {
             if (webpageCrawlerService.needsCrawling(webpage)) {
                 log.info("网页需要抓取内容，开始抓取: {}", webpage.getUrl());
                 webpage = webpageCrawlerService.crawlAndUpdateContent(webpage);
-                
+
                 // 验证抓取到的内容是否有效
                 if (!webpageCrawlerService.isValidContent(webpage.getContent())) {
                     log.warn("网页内容无效或为空，跳过索引操作: {}", webpage.getUrl());
                     return;
                 }
-                
-                log.info("成功抓取网页内容，继续索引操作: {} (内容长度: {})", 
-                    webpage.getUrl(), webpage.getContent().length());
+
+                log.info("成功抓取网页内容，继续索引操作: {} (内容长度: {})",
+                        webpage.getUrl(), webpage.getContent().length());
             } else {
                 log.debug("网页已有内容或不需要抓取，直接进行索引: {}", webpage.getUrl());
             }
-            
+
             // 处理Elastic搜索索引
             if (message.isUpdateElasticIndex()) {
                 processElasticIndex(webpage);
             }
-            
+
             // 处理向量索引
             if (message.isUpdateVectorIndex()) {
                 processVectorIndex(webpage);
             }
-            
+
             log.debug("成功完成网页索引操作: {}", webpage.getUid());
         } catch (Exception e) {
             log.error("处理网页索引操作失败: {}, 错误: {}", webpage.getUid(), e.getMessage(), e);
@@ -194,12 +195,12 @@ public class WebpageIndexConsumer {
             if (message.isUpdateElasticIndex()) {
                 processElasticDelete(webpage);
             }
-            
+
             // 处理向量索引删除
             if (message.isUpdateVectorIndex()) {
                 processVectorDelete(webpage);
             }
-            
+
             log.debug("成功完成网页删除操作: {}", webpage.getUid());
         } catch (Exception e) {
             log.error("处理网页删除操作失败: {}, 错误: {}", webpage.getUid(), e.getMessage(), e);
@@ -235,7 +236,7 @@ public class WebpageIndexConsumer {
                 log.warn("网页向量服务不可用，跳过向量索引处理: {}", webpage.getUid());
                 return;
             }
-            
+
             log.debug("开始处理网页向量索引: {}", webpage.getUid());
             webpageVectorService.indexWebpageVector(webpage);
             log.debug("成功完成网页向量索引: {}", webpage.getUid());
@@ -273,7 +274,7 @@ public class WebpageIndexConsumer {
                 log.warn("网页向量服务不可用，跳过向量索引删除: {}", webpage.getUid());
                 return;
             }
-            
+
             log.debug("开始删除网页向量索引: {}", webpage.getUid());
             webpageVectorService.deleteWebpageVector(webpage);
             log.debug("成功删除网页向量索引: {}", webpage.getUid());

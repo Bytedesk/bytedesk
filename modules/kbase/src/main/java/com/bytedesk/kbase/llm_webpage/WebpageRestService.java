@@ -44,6 +44,8 @@ public class WebpageRestService
 
     private final KbaseRestService kbaseRestService;
 
+    private final WebpageCrawlerService webpageCrawlerService;
+
     @Override
     protected Specification<WebpageEntity> createSpecification(WebpageRequest request) {
         return WebpageSpecification.search(request, authService);
@@ -170,6 +172,19 @@ public class WebpageRestService
                 throw new RuntimeException("Update webpage failed");
             }
             return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("Webpage not found");
+        }
+    }
+
+    // crawl webpage content
+    public WebpageResponse crawlContent(WebpageRequest request) {
+        Optional<WebpageEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            WebpageEntity entity = optional.get();
+            // 使用爬虫服务抓取内容并更新实体
+            WebpageEntity updatedEntity = webpageCrawlerService.crawlAndUpdateContent(entity);
+            return convertToResponse(updatedEntity);
         } else {
             throw new RuntimeException("Webpage not found");
         }

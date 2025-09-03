@@ -15,14 +15,8 @@ package com.bytedesk.kbase.llm_webpage;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.ArrayList;
-
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
-import com.bytedesk.core.utils.BdDateUtils;
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -43,27 +37,21 @@ public class WebpageRequest extends BaseRequest {
 
     private String description;
 
-    @Builder.Default
-    private String elasticStatus = ChunkStatusEnum.NEW.name();
+    private String elasticStatus;
 
-    @Builder.Default
-    private String vectorStatus = ChunkStatusEnum.NEW.name();
+    private String vectorStatus;
 
-    @Builder.Default
-    private List<String> tagList = new ArrayList<>();
+    private List<String> tagList;
     
     // 是否启用，状态：启用/禁用
-    @Builder.Default
-    private Boolean enabled = true;
+    private Boolean enabled;
 
     // 有效开始日期
-    @Builder.Default
-    private ZonedDateTime startDate = BdDateUtils.now();
+    private ZonedDateTime startDate;
 
     // 有效结束日期
     // 当前 + 100 年
-    @Builder.Default
-    private ZonedDateTime endDate = BdDateUtils.now().plusYears(100);
+    private ZonedDateTime endDate;
 
     private String categoryUid; // 所属分类
 
