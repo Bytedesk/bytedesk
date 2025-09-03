@@ -166,7 +166,7 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
     private MessageProtobuf processNewWorkflowThread(VisitorRequest request, ThreadEntity thread, WorkflowEntity workflowEntity) {
         // 1. 加入队列
         UserProtobuf workflowProtobuf = ServiceConvertUtils.convertToUserProtobuf(workflowEntity);
-        QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, workflowProtobuf, request);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkflow(thread, workflowProtobuf, request);
         log.info("Workflow enqueued to queue: {}", queueMemberEntity.getUid());
 
         // 2. 配置线程状态
