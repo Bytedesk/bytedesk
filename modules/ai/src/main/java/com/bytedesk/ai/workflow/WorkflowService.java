@@ -16,6 +16,7 @@ package com.bytedesk.ai.workflow;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
@@ -33,6 +34,7 @@ public class WorkflowService {
     private final WorkflowRestService workflowRestService;
 
     // execute workflow
+    @Transactional
     public WorkflowResponse execute(WorkflowRequest request) {
         log.debug("Executing workflow with UID: {}", request.getUid());
         
