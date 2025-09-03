@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-20 15:52:40
+ * @LastEditTime: 2025-09-03 16:29:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,9 +19,12 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.util.StringUtils;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,21 +47,21 @@ public class JwtUtils {
      * 
      * @param username 用户名
      * @param platform 平台
-     * @param channel 渠道类型（web/mobile等）
+     * @param channel  渠道类型（web/mobile等）
      * @return JWT token字符串
      */
     public String generateJwtToken(String username, String platform, String channel) {
         JwtSubject jwtSubject = new JwtSubject(username.toLowerCase(), platform.toLowerCase());
-        
+
         // 根据渠道类型计算过期时间
         long expirationMs = calculateExpirationMs(channel);
-        
+
         return Jwts.builder()
-            .subject(jwtSubject.toJson())
-            .issuedAt(new Date())
-            .expiration(new Date((new Date()).getTime() + expirationMs))
-            .signWith(secretKey())
-            .compact();
+                .subject(jwtSubject.toJson())
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + expirationMs))
+                .signWith(secretKey())
+                .compact();
     }
 
     /**
@@ -70,7 +73,7 @@ public class JwtUtils {
     private long calculateExpirationMs(String channel) {
         // 获取JWT配置的过期时间（毫秒）
         long jwtExpirationMs = Long.parseLong(getBytedeskProperties().getJwt().getExpiration());
-        
+
         // 根据渠道类型调整过期时间
         if (channel != null && channel.toLowerCase().contains("web")) {
             // Web端使用JWT配置的过期时间（默认30天）
@@ -91,7 +94,7 @@ public class JwtUtils {
     public static ZonedDateTime calculateExpirationTime(String channel) {
         // 获取JWT配置的过期时间（毫秒）
         long jwtExpirationMs = Long.parseLong(getBytedeskProperties().getJwt().getExpiration());
-        
+
         // 根据渠道类型调整过期时间
         if (channel != null && channel.toLowerCase().contains("web")) {
             // Web端使用JWT配置的过期时间（默认30天）
@@ -106,9 +109,9 @@ public class JwtUtils {
         try {
             // 这一步会验证token的签名和过期时间，如果token已过期会抛出ExpiredJwtException
             Jwts.parser()
-                .verifyWith(secretKey())
-                .build()
-                .parse(authToken);
+                    .verifyWith(secretKey())
+                    .build()
+                    .parse(authToken);
             return true;
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
@@ -125,14 +128,34 @@ public class JwtUtils {
 
     public String getSubjectFromJwtToken(String token) {
         return Jwts.parser()
-            .verifyWith(secretKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload()
-            .getSubject();
+                .verifyWith(secretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
     }
 
     private SecretKey secretKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(getBytedeskProperties().getJwt().getSecretKey()));
+    }
+
+    /**
+     * 从请求中解析 accessToken
+     * 优先从 Authorization header 中读取，格式为 "Bearer token"
+     * 如果没有，则从 URL 参数中读取
+     */
+    public String parseAccessToken(HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+        // read post header
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7);
+        }
+        // read url get parameter
+        headerAuth = request.getParameter("accessToken");
+        if (StringUtils.hasText(headerAuth)) {
+            // log.info("accessToken from request param: {}", headerAuth);
+            return headerAuth;
+        }
+        return null;
     }
 }

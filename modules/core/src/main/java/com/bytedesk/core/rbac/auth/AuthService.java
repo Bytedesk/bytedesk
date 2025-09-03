@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 09:47:28
+ * @LastEditTime: 2025-09-03 17:43:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.token.TokenEntity;
@@ -109,7 +110,7 @@ public class AuthService {
         return new AuthToken(userDetails);
     }
 
-    public AuthResponse formatResponse(Authentication authentication) {
+    public AuthResponse formatResponse(AuthRequest authRequest, Authentication authentication) {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -118,16 +119,15 @@ public class AuthService {
         UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
 
         // 登录成功后，将生成的accessToken同时保存到数据库中
-        String channel = userDetails.getChannel();
-        if (channel == null || channel.isEmpty()) {
-            // 如果UserDetailsImpl中没有client信息，使用默认值
+        String channel = authRequest.getChannel();
+        if (!StringUtils.hasText(channel)) {
             channel = ChannelEnum.WEB.name();
         }
 
         String accessToken = JwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform(), channel);
         
-        String device = userDetails.getDevice();
-        if (device == null || device.isEmpty()) {
+        String device = authRequest.getDevice();
+        if (!StringUtils.hasText(device)) {
             // 如果没有设备信息，使用一个描述性值
             device = "Unknown Device";
         }
@@ -135,7 +135,7 @@ public class AuthService {
         // 使用create接口创建保存token
         TokenRequest tokenRequest = TokenRequest.builder()
             .name("Login Token")
-            .description("User login authentication token")
+            .description("login token")
             .accessToken(accessToken)
             .type(TokenTypeEnum.BEARER.name())
             .revoked(false)

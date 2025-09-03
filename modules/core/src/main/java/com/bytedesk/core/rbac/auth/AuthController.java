@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 16:54:43
+ * @LastEditTime: 2025-09-03 17:43:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -211,7 +211,7 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error("Password or password hash is required", -1, false));
         }
         //
-        AuthResponse authResponse = authService.formatResponse(authentication);
+        AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
@@ -279,7 +279,7 @@ public class AuthController {
                 authRequest.getChannel(),
                 authRequest.getDevice());
         //
-        AuthResponse authResponse = authService.formatResponse(authentication);
+        AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
 
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
@@ -340,7 +340,7 @@ public class AuthController {
                 authRequest.getChannel(),
                 authRequest.getDevice());
         //
-        AuthResponse authResponse = authService.formatResponse(authentication);
+        AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
 
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
@@ -362,7 +362,7 @@ public class AuthController {
         Authentication authentication = authService.getAuthentication(request, subject);
         
         // Format response similar to other login methods
-        AuthResponse authResponse = authService.formatResponse(authentication);
+        AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
         
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }

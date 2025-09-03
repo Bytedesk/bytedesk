@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 11:34:33
+ * @LastEditTime: 2025-09-03 16:41:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,13 +39,11 @@ import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.rbac.auth.AuthService;
-// import com.bytedesk.core.rbac.auth.AuthUser;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleRestService;
-import com.bytedesk.core.rbac.token.TokenEntity;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
@@ -648,16 +646,13 @@ public class UserService {
 
     public void logout(String accessToken) {
         log.debug("logout {}", accessToken);
-        
-        // 删除token
-        Optional<TokenEntity> token = tokenRestService.findByAccessToken(accessToken);
-        if (token.isPresent()) {
-            token.get().setRevoked(true);
-            tokenRestService.save(token.get());
-        }
 
+        // 发布用户登出事件
         UserEntity user = authService.getUser();
         bytedeskEventPublisher.publishEvent(new UserLogoutEvent(this, user));
+
+        // 将token设置为已撤销状态
+        tokenRestService.revokeAccessToken(accessToken);
     }
 
     // TODO: 待完善

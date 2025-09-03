@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 11:01:53
+ * @LastEditTime: 2025-09-03 16:30:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,7 +23,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestControllerOverride;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.push.PushRestService;
-import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -33,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Description;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.JwtUtils;
 
 @Slf4j
 @RestController
@@ -175,16 +175,18 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
     @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGOUT, description = "logout")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody AuthRequest request) {
-        log.debug("logout {}", request.getAccessToken());
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String accessToken = JwtUtils.parseAccessToken(request);
+        log.debug("logout {}", accessToken);
 
-        if (!StringUtils.hasText(request.getAccessToken())) {
+        if (!StringUtils.hasText(accessToken)) {
             return ResponseEntity.ok().body(JsonResult.error("accessToken is empty", -1, false));
         }
 
-        userService.logout(request.getAccessToken());
+        userService.logout(accessToken);
 
         return ResponseEntity.ok().body(JsonResult.success());
     }
+
     
 }

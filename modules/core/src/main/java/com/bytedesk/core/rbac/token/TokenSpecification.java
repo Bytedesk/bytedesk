@@ -42,7 +42,10 @@ public class TokenSpecification extends BaseSpecification<TokenEntity, TokenRequ
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
-
+            // userUid
+            if (StringUtils.hasText(request.getUserUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
+            }
             // Add more predicates based on request fields
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

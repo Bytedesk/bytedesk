@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-24 15:53:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-24 17:02:28
+ * @LastEditTime: 2025-09-03 14:35:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,6 +30,7 @@ public class WorkflowCommentNode extends WorkflowBaseNode {
 
     // 注释节点特有的字段
     private Map<String, Object> size; // width, height
+    
     private String note;
     
     public static WorkflowCommentNode fromJson(String json) {

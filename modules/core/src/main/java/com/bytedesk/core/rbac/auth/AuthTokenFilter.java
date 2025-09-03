@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-30 09:52:19
+ * @LastEditTime: 2025-09-03 16:30:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.bytedesk.core.rbac.token.TokenEntity;
@@ -50,7 +49,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
     try {
-      String accessToken = parseAccessToken(request);
+      String accessToken = JwtUtils.parseAccessToken(request);
       // log.debug("accessToken {}", accessToken);
       if (accessToken != null && JwtUtils.validateJwtToken(accessToken)) {
         // 从数据库验证token是否有效（未被撤销且未过期）
@@ -71,18 +70,5 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  private String parseAccessToken(HttpServletRequest request) {
-    String headerAuth = request.getHeader("Authorization");
-    // read post header
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-      return headerAuth.substring(7);
-    }
-    // read url get parameter
-    headerAuth = request.getParameter("accessToken");
-    if (StringUtils.hasText(headerAuth)) {
-      // log.info("accessToken from request param: {}", headerAuth);
-      return headerAuth;
-    }
-    return null;
-  }
+  
 }

@@ -76,6 +76,15 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         return tokenRepository.findFirstByAccessTokenAndRevokedFalseAndDeletedFalse(accessToken);
     }
 
+    public void revokeAccessToken(String accessToken) {
+        Optional<TokenEntity> optional = findByAccessToken(accessToken);
+        if (optional.isPresent()) {
+            TokenEntity entity = optional.get();
+            entity.setRevoked(true);
+            save(entity);
+        }
+    }
+
     @Override
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
@@ -166,6 +175,12 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         return modelMapper.map(entity, TokenResponse.class);
     }
 
+    /**
+     * 生成JWT访问令牌
+     * 
+     * @param request TokenRequest 请求参数
+     * @return String 生成的访问令牌
+     */
     public String generateAccessToken(TokenRequest request) {
         UserEntity user = authService.getCurrentUser();
         if (user == null) {
