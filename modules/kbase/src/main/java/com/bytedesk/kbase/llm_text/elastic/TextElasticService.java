@@ -114,7 +114,7 @@ public class TextElasticService {
             }
 
             // 将索引结果保存到数据库中
-            text.setSuccess();
+            text.setElasticSuccess();
             textRestService.save(text);
 
         } catch (Exception e) {

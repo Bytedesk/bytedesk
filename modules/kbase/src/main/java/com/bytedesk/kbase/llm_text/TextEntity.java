@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:28:14
+ * @LastEditTime: 2025-09-03 09:29:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,14 +100,26 @@ public class TextEntity extends BaseEntity {
 
 
     // set Success
-    public TextEntity setSuccess() {
+    public TextEntity setElasticSuccess() {
         this.setElasticStatus(ChunkStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
-    public TextEntity setError() {
+    public TextEntity setElasticError() {
         this.setElasticStatus(ChunkStatusEnum.ERROR.name());
+        return this;
+    }
+
+    // set Vector Success
+    public TextEntity setVectorSuccess() {
+        this.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+        return this;
+    }
+
+    // set Vector Error
+    public TextEntity setVectorError() {
+        this.setVectorStatus(ChunkStatusEnum.ERROR.name());
         return this;
     }
 

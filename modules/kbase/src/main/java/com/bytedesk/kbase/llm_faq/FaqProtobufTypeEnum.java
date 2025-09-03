@@ -18,4 +18,5 @@ public enum FaqProtobufTypeEnum {
     TEXT,
     CHUNK,
     ARTICLE,
+    WEBPAGE,
 }

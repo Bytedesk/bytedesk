@@ -80,6 +80,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected ChunkVectorService chunkVectorService;
 
     // @Autowired
+    // protected WebpageElasticService webpageElasticService;
+
+    // @Autowired(required = false)
+    // protected WebpageVectorService webpageVectorService;
+
+    // @Autowired
     // protected ArticleElasticService articleElasticService;
 
     // @Autowired(required = false)
@@ -549,6 +555,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchResultList.add(faqProtobuf);
         }
         //
+        // List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null);
+        // for (WebpageElasticSearchResult withScore : webpageResults) {
+        //     WebpageElastic webpage = withScore.getWebpageElastic();
+        //     //
+        //     FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
+        //     searchResultList.add(faqProtobuf);
+        // }
+        //
         // List<ArticleElasticSearchResult> articleResults = articleElasticService.searchArticle(query, kbUid, null, null);
         // for (ArticleElasticSearchResult withScore : articleResults) {
         //     ArticleElastic article = withScore.getArticleElastic();
@@ -603,6 +617,21 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 log.warn("ChunkVectorService search failed: {}", e.getMessage());
             }
         }
+        //
+        // 检查 WebpageVectorService 是否可用
+        // if (webpageVectorService != null) {
+        //     try {
+        //         List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid, null, null, 5);
+        //         for (WebpageVectorSearchResult withScore : webpageResults) {
+        //             WebpageVector webpageVector = withScore.getWebpageVector();
+        //             //
+        //             FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);
+        //             searchResultList.add(faqProtobuf);
+        //         }
+        //     } catch (Exception e) {
+        //         log.warn("WebpageVectorService search failed: {}", e.getMessage());
+        //     }
+        // }
         //
         // 检查 ArticleVectorService 是否可用
         // if (articleVectorService != null) {

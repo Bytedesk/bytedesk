@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 09:25:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:48:17
+ * @LastEditTime: 2025-09-03 09:27:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -94,10 +94,15 @@ public class WebpageElasticService {
             
             // 保存到Elasticsearch
             elasticsearchOperations.save(webpageElastic);
+
+            webpage.setElasticSuccess();
+            webpageRestService.save(webpage);
             
             log.info("成功索引网页: {}", webpage.getTitle());
         } catch (Exception e) {
             log.error("索引网页时发生错误: {}, 错误消息: {}", webpage.getUid(), e.getMessage(), e);
+            webpage.setElasticError();
+            webpageRestService.save(webpage);
         }
     }
     

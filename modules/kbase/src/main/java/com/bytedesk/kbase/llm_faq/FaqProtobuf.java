@@ -26,6 +26,8 @@ import com.bytedesk.kbase.llm_faq.elastic.FaqElastic;
 import com.bytedesk.kbase.llm_faq.vector.FaqVector;
 import com.bytedesk.kbase.llm_text.elastic.TextElastic;
 import com.bytedesk.kbase.llm_text.vector.TextVector;
+import com.bytedesk.kbase.llm_webpage.elastic.WebpageElastic;
+import com.bytedesk.kbase.llm_webpage.vector.WebpageVector;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -129,6 +131,25 @@ public class FaqProtobuf implements Serializable {
                 .question(article.getTitle())
                 .answer(article.getContentMarkdown() != null ? article.getContentMarkdown() : article.getSummary())
                 .type(FaqProtobufTypeEnum.ARTICLE.name())
+                .build();
+    }
+
+    public static FaqProtobuf fromWebpage(WebpageElastic webpage) {
+        return FaqProtobuf.builder()
+                .uid(webpage.getUid())
+                .question(webpage.getTitle())
+                .answer(webpage.getContent())
+                .type(FaqProtobufTypeEnum.WEBPAGE.name())
+                .build();
+    }
+
+    // from webpage vector
+    public static FaqProtobuf fromWebpageVector(WebpageVector webpage) {
+        return FaqProtobuf.builder()
+                .uid(webpage.getUid())
+                .question(webpage.getTitle())
+                .answer(webpage.getContent())
+                .type(FaqProtobufTypeEnum.WEBPAGE.name())
                 .build();
     }
     

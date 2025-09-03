@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-31 09:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-27 13:24:58
+ * @LastEditTime: 2025-09-03 09:30:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.kbase.config.KbaseConst;
-import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
@@ -117,7 +116,7 @@ public class WebpageVectorService {
             currentWebpage.setDocIdList(docIdList);
 
             // 设置向量索引状态为成功
-            currentWebpage.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+            currentWebpage.setVectorSuccess();
 
             // 更新网页实体 - 使用明确的事务保证状态更新和保存原子性
             log.info("准备保存网页实体更新，设置向量索引状态为成功: {}", currentWebpage.getUid());
@@ -128,7 +127,7 @@ public class WebpageVectorService {
             log.error("网页向量索引失败: {}, 错误: {}", currentWebpage.getTitle(), e.getMessage(), e);
 
             // 设置向量索引状态为失败
-            currentWebpage.setVectorStatus(ChunkStatusEnum.ERROR.name());
+            currentWebpage.setVectorError();
             try {
                 log.info("保存网页实体更新，设置向量索引状态为失败: {}", currentWebpage.getUid());
                 webpageRestService.save(currentWebpage);
