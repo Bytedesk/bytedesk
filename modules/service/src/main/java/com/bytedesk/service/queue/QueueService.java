@@ -106,6 +106,7 @@ public class QueueService {
             case ROBOT:
             case AGENT:
             case WORKFLOW:
+            case UNIFIED:
                 nickname = agent.getNickname();
                 primaryQueue = getQueue(threadEntity, nickname);
                 break;
@@ -131,6 +132,7 @@ public class QueueService {
         switch (queueType) {
             case ROBOT:
             case WORKFLOW:
+            case UNIFIED:
                 memberBuilder.robotQueue(primaryQueue);
                 break;
             case AGENT:
