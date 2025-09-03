@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-22 15:42:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-22 07:08:38
+ * @LastEditTime: 2025-09-03 18:05:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -74,15 +75,6 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     @Cacheable(cacheNames = "token", key = "#accessToken", unless = "#result == null")
     public Optional<TokenEntity> findByAccessToken(String accessToken) {
         return tokenRepository.findFirstByAccessTokenAndRevokedFalseAndDeletedFalse(accessToken);
-    }
-
-    public void revokeAccessToken(String accessToken) {
-        Optional<TokenEntity> optional = findByAccessToken(accessToken);
-        if (optional.isPresent()) {
-            TokenEntity entity = optional.get();
-            entity.setRevoked(true);
-            save(entity);
-        }
     }
 
     @Override
@@ -228,6 +220,22 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         } catch (Exception e) {
             log.error("Error validating access token: {}", e.getMessage());
             return false;
+        }
+    }
+
+
+    /**
+     * 撤销指定的accessToken，使其失效
+     * 
+     * @param accessToken JWT访问令牌
+     */
+    public void revokeAccessToken(@NonNull String accessToken, String reason) {
+        Optional<TokenEntity> optional = findByAccessToken(accessToken);
+        if (optional.isPresent()) {
+            TokenEntity entity = optional.get();
+            entity.setRevoked(true);
+            entity.setRevokeReason(reason);
+            save(entity);
         }
     }
 
