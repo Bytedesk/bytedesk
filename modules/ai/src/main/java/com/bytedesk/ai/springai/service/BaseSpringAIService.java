@@ -55,6 +55,12 @@ import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.vector.TextVector;
 import com.bytedesk.kbase.llm_text.vector.TextVectorSearchResult;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
+import com.bytedesk.kbase.llm_webpage.elastic.WebpageElastic;
+import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticSearchResult;
+import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
+import com.bytedesk.kbase.llm_webpage.vector.WebpageVector;
+import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorSearchResult;
+import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,11 +85,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Autowired(required = false)
     protected ChunkVectorService chunkVectorService;
 
-    // @Autowired
-    // protected WebpageElasticService webpageElasticService;
+    @Autowired
+    protected WebpageElasticService webpageElasticService;
 
-    // @Autowired(required = false)
-    // protected WebpageVectorService webpageVectorService;
+    @Autowired(required = false)
+    protected WebpageVectorService webpageVectorService;
 
     // @Autowired
     // protected ArticleElasticService articleElasticService;
@@ -554,14 +560,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
             FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
             searchResultList.add(faqProtobuf);
         }
-        //
-        // List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null);
-        // for (WebpageElasticSearchResult withScore : webpageResults) {
-        //     WebpageElastic webpage = withScore.getWebpageElastic();
-        //     //
-        //     FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
-        //     searchResultList.add(faqProtobuf);
-        // }
+        
+        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null);
+        for (WebpageElasticSearchResult withScore : webpageResults) {
+            WebpageElastic webpage = withScore.getWebpageElastic();
+            //
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
+            searchResultList.add(faqProtobuf);
+        }
         //
         // List<ArticleElasticSearchResult> articleResults = articleElasticService.searchArticle(query, kbUid, null, null);
         // for (ArticleElasticSearchResult withScore : articleResults) {
@@ -619,19 +625,19 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
         //
         // 检查 WebpageVectorService 是否可用
-        // if (webpageVectorService != null) {
-        //     try {
-        //         List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid, null, null, 5);
-        //         for (WebpageVectorSearchResult withScore : webpageResults) {
-        //             WebpageVector webpageVector = withScore.getWebpageVector();
-        //             //
-        //             FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);
-        //             searchResultList.add(faqProtobuf);
-        //         }
-        //     } catch (Exception e) {
-        //         log.warn("WebpageVectorService search failed: {}", e.getMessage());
-        //     }
-        // }
+        if (webpageVectorService != null) {
+            try {
+                List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid, null, null, 5);
+                for (WebpageVectorSearchResult withScore : webpageResults) {
+                    WebpageVector webpageVector = withScore.getWebpageVector();
+                    //
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);
+                    searchResultList.add(faqProtobuf);
+                }
+            } catch (Exception e) {
+                log.warn("WebpageVectorService search failed: {}", e.getMessage());
+            }
+        }
         //
         // 检查 ArticleVectorService 是否可用
         // if (articleVectorService != null) {
