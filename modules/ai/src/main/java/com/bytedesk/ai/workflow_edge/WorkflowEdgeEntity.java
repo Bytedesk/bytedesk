@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 12:49:49
+ * @LastEditTime: 2025-09-03 13:52:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,8 @@ package com.bytedesk.ai.workflow_edge;
 import com.bytedesk.ai.workflow.WorkflowEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,7 +37,7 @@ import lombok.experimental.SuperBuilder;
  * WorkflowEdge entity for content categorization and organization
  * Provides workflow_edge functionality for various system entities
  * 
- * Database Table: bytedesk_core_workflow_edge
+ * Database Table: bytedesk_ai_workflow_edge
  * Purpose: Stores workflow_edge definitions, colors, and organization settings
  */
 @Entity
@@ -64,9 +66,13 @@ public class WorkflowEdgeEntity extends BaseEntity {
      * Type of workflow_edge (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "workflow_edge_type")
+    @Column(name = "edge_type")
     private String type = WorkflowEdgeTypeEnum.CUSTOMER.name();
 
+    // 
+    @Column(name = "edge_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String schema;
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflow_id")

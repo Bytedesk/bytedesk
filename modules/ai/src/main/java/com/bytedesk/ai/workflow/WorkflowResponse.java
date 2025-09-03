@@ -13,6 +13,10 @@
  */
 package com.bytedesk.ai.workflow;
 
+import java.util.List;
+
+import com.bytedesk.ai.workflow_edge.WorkflowEdgeResponse;
+import com.bytedesk.ai.workflow_node.WorkflowNodeResponse;
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -37,6 +41,10 @@ public class WorkflowResponse extends BaseResponse {
     private String description;
 
     private String schema;
+
+    private List<WorkflowNodeResponse> nodes;
+
+    private List<WorkflowEdgeResponse> edges;
 
     private String type;
 

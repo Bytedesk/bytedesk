@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ai.workflow;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +38,10 @@ public class WorkflowRequest extends BaseRequest {
     private String description;
 
     private String schema;
+
+    private List<String> nodeUids;
+
+    private List<String> edgeUids;
 
     private String currentNode;
 
