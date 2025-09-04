@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 14:13:08
+ * @LastEditTime: 2025-09-04 12:23:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,7 +20,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
-import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -96,20 +95,20 @@ public class McpServerEntity extends BaseEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String serverConfig;
 
-    /**
-     * Last health check time
-     */
-    private ZonedDateTime lastHealthCheck;
+    // /**
+    //  * Last health check time
+    //  */
+    // private ZonedDateTime lastHealthCheck;
 
-    /**
-     * Last connection time
-     */
-    private ZonedDateTime lastConnected;
+    // /**
+    //  * Last connection time
+    //  */
+    // private ZonedDateTime lastConnected;
 
-    /**
-     * Last error message
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String lastError;
+    // /**
+    //  * Last error message
+    //  */
+    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    // private String lastError;
 
 }
