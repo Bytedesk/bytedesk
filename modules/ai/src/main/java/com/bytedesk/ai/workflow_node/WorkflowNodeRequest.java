@@ -13,8 +13,13 @@
  */
 package com.bytedesk.ai.workflow_node;
 
+import com.bytedesk.ai.workflow.node.WorkflowNodeTypeEnum;
+import com.bytedesk.ai.workflow.node.WorkflowNodeStatusEnum;
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.I18Consts;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -29,11 +34,64 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class WorkflowNodeRequest extends BaseRequest {
 
+    /**
+     * 节点名称
+     */
     private String name;
 
-    private String description;
+    /**
+     * 节点描述
+     */
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
-    // @Builder.Default
-    // private String type = WorkflowNodeTypeEnum.CUSTOMER.name();
+    /**
+     * 节点类型 (START, END, CONDITION, LOOP, LLM, TEXT, COMMENT, GROUP)
+     */
+    @Builder.Default
+    private String nodeType = WorkflowNodeTypeEnum.START.getValue();
+
+    /**
+     * 节点状态 (IDLE, RUNNING, SUCCESS, FAILED, WAITING)
+     */
+    @Builder.Default
+    private String nodeStatus = WorkflowNodeStatusEnum.IDLE.name();
+
+    /**
+     * 节点在工作流中的执行顺序
+     */
+    @Builder.Default
+    private Integer sortOrder = 0;
+
+    /**
+     * 父节点UID（用于组织节点层次结构）
+     */
+    private String parentNodeUid;
+
+    /**
+     * 节点完整配置数据（JSON格式存储WorkflowBaseNode及其子类的完整数据）
+     */
+    private String nodeData;
+
+    /**
+     * 节点执行结果数据（JSON格式）
+     */
+    private String executionResult;
+
+    /**
+     * 节点执行错误信息
+     */
+    private String errorMessage;
+
+    /**
+     * 是否启用该节点
+     */
+    @Builder.Default
+    private Boolean enabled = true;
+
+    /**
+     * 关联的工作流UID
+     */
+    private String workflowUid;
 
 }

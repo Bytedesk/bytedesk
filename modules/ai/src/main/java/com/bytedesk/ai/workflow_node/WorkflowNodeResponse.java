@@ -13,10 +13,15 @@
  */
 package com.bytedesk.ai.workflow_node;
 
+import java.time.ZonedDateTime;
 
+import com.bytedesk.ai.workflow.node.WorkflowNodeTypeEnum;
+import com.bytedesk.ai.workflow.node.WorkflowNodeStatusEnum;
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.constant.I18Consts;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,11 +36,99 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class WorkflowNodeResponse extends BaseResponse {
 
+    /**
+     * 节点名称
+     */
     private String name;
 
-    private String description;
+    /**
+     * 节点描述
+     */
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
-    private String type;
+    /**
+     * 节点类型 (START, END, CONDITION, LOOP, LLM, TEXT, COMMENT, GROUP)
+     */
+    @Builder.Default
+    private String nodeType = WorkflowNodeTypeEnum.START.getValue();
 
+    /**
+     * 节点状态 (IDLE, RUNNING, SUCCESS, FAILED, WAITING)
+     */
+    @Builder.Default
+    private String nodeStatus = WorkflowNodeStatusEnum.IDLE.name();
+
+    /**
+     * 节点在工作流中的执行顺序
+     */
+    @Builder.Default
+    private Integer sortOrder = 0;
+
+    /**
+     * 父节点UID（用于组织节点层次结构）
+     */
+    private String parentNodeUid;
+
+    /**
+     * 节点完整配置数据（JSON格式存储WorkflowBaseNode及其子类的完整数据）
+     */
+    private String nodeData;
+
+    /**
+     * 节点执行结果数据（JSON格式）
+     */
+    private String executionResult;
+
+    /**
+     * 节点执行开始时间
+     */
+    private ZonedDateTime executionStartTime;
+
+    /**
+     * 节点执行结束时间
+     */
+    private ZonedDateTime executionEndTime;
+
+    /**
+     * 节点执行错误信息
+     */
+    private String errorMessage;
+
+    /**
+     * 是否启用该节点
+     */
+    @Builder.Default
+    private Boolean enabled = true;
+
+    /**
+     * 关联的工作流UID
+     */
+    private String workflowUid;
+
+    /**
+     * 执行耗时（毫秒）
+     */
+    private Long executionDurationMillis;
+
+    /**
+     * 执行耗时（秒）
+     */
+    private Double executionDurationSeconds;
+
+    /**
+     * 是否为容器节点（GROUP, LOOP）
+     */
+    private Boolean isContainerNode;
+
+    /**
+     * 是否为控制节点（START, END, CONDITION）
+     */
+    private Boolean isControlNode;
+
+    /**
+     * 是否为处理节点（LLM, TEXT）
+     */
+    private Boolean isProcessingNode;
 
 }

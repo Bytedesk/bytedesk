@@ -76,9 +76,9 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
-        // 检查name+orgUid+type是否已经存在
-        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<WorkflowNodeEntity> workflow_node = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+        // 检查name+orgUid+nodeType是否已经存在
+        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getNodeType())) {
+            Optional<WorkflowNodeEntity> workflow_node = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getNodeType());
             if (workflow_node.isPresent()) {
                 return convertToResponse(workflow_node.get());
             }
@@ -89,7 +89,7 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
             request.setUserUid(user.getUid());
         }
         // 
-        WorkflowNodeEntity entity = modelMapper.map(request, WorkflowNodeEntity.class);
+        WorkflowNodeEntity entity = WorkflowNodeConvert.toEntity(request, null);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
@@ -107,7 +107,7 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
         Optional<WorkflowNodeEntity> optional = workflow_nodeRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             WorkflowNodeEntity entity = optional.get();
-            modelMapper.map(request, entity);
+            WorkflowNodeConvert.updateEntity(entity, request);
             //
             WorkflowNodeEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -165,7 +165,7 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
 
     @Override
     public WorkflowNodeResponse convertToResponse(WorkflowNodeEntity entity) {
-        return modelMapper.map(entity, WorkflowNodeResponse.class);
+        return WorkflowNodeConvert.toResponse(entity);
     }
 
     @Override
