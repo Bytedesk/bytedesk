@@ -37,4 +37,8 @@ public class FormResponse extends BaseResponse {
     private String description;
 
     private String type;
+
+    private String status;
+
+    private String schema;
 }

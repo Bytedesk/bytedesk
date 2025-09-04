@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[2804],{73625:function(e,n,r){r.r(n);var c=r(31549);n.default=function(){return(0,c.jsx)("div",{children:(0,c.jsx)("h1",{children:"McpServers"})})}}}]);
