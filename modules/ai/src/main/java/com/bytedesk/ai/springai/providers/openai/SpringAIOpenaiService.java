@@ -23,6 +23,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -46,6 +47,10 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired(required = false)
+    @Qualifier("openaiChatModel")
+    private OpenAiChatModel defaultChatModel;
 
     public SpringAIOpenaiService() {
         super(); // 调用基类的无参构造函数
@@ -81,23 +86,40 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
      * @return 配置了特定模型的OpenAiChatModel
      */
     private OpenAiChatModel createOpenaiChatModel(RobotLlm llm) {
+        if (llm == null || llm.getTextProviderUid() == null) {
+            log.warn("RobotLlm or textProviderUid is null, using default chat model");
+            return defaultChatModel;
+        }
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+            log.warn("LlmProvider with uid {} not found, using default chat model", llm.getTextProviderUid());
+            return defaultChatModel;
         }
-        // 使用动态的OpenAiApi实例
+
         LlmProviderEntity provider = llmProviderOptional.get();
-        OpenAiApi openaiApi = createOpenaiApi(provider.getApiUrl(), provider.getApiKey());
-        OpenAiChatOptions options = createOpenaiOptions(llm);
-        if (options == null) {
-            return null;
+        if (provider.getApiKey() == null || provider.getApiKey().trim().isEmpty()) {
+            log.warn("API key is not configured for provider {}, using default chat model", provider.getUid());
+            return defaultChatModel;
         }
-        return OpenAiChatModel.builder()
-                .openAiApi(openaiApi)
-                .defaultOptions(options)
-                .build();
+
+        try {
+            log.info("Creating dynamic OpenAI chat model with provider: {} ({})", provider.getName(), provider.getUid());
+            // 使用动态的OpenAiApi实例
+            OpenAiApi openaiApi = createOpenaiApi(provider.getApiUrl(), provider.getApiKey());
+            OpenAiChatOptions options = createOpenaiOptions(llm);
+            if (options == null) {
+                log.warn("Failed to create OpenAI options, using default chat model");
+                return defaultChatModel;
+            }
+            return OpenAiChatModel.builder()
+                    .openAiApi(openaiApi)
+                    .defaultOptions(options)
+                    .build();
+        } catch (Exception e) {
+            log.error("Failed to create dynamic OpenAI chat model for provider {}, using default chat model", provider.getUid(), e);
+            return defaultChatModel;
+        }
     }
 
     @Override
@@ -114,7 +136,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
         // 获取适当的模型实例
         OpenAiChatModel chatModel = createOpenaiChatModel(llm);
         if (chatModel == null) {
-            log.info("OpenAI API not available");
+            log.error("Failed to create OpenAI chat model and no default chat model available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }

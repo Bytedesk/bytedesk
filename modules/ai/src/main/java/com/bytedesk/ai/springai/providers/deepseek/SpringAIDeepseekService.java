@@ -23,6 +23,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -46,6 +47,10 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired(required = false)
+    @Qualifier("deepseekChatModel")
+    private OpenAiChatModel defaultChatModel;
 
     public SpringAIDeepseekService() {
         super(); // 调用基类的无参构造函数
@@ -81,23 +86,40 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
      * @return 配置了特定模型的OpenAiChatModel
      */
     private OpenAiChatModel createDeepseekChatModel(RobotLlm llm) {
+        if (llm == null || llm.getTextProviderUid() == null) {
+            log.warn("RobotLlm or textProviderUid is null, using default chat model");
+            return defaultChatModel;
+        }
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+            log.warn("LlmProvider with uid {} not found, using default chat model", llm.getTextProviderUid());
+            return defaultChatModel;
         }
-        // 使用动态的OpenAiApi实例
+
         LlmProviderEntity provider = llmProviderOptional.get();
-        OpenAiApi deepseekApi = createDeepseekApi(provider.getApiUrl(), provider.getApiKey());
-        OpenAiChatOptions options = createDeepseekOptions(llm);
-        if (options == null) {
-            return null;
+        if (provider.getApiKey() == null || provider.getApiKey().trim().isEmpty()) {
+            log.warn("API key is not configured for provider {}, using default chat model", provider.getUid());
+            return defaultChatModel;
         }
-        return OpenAiChatModel.builder()
-                .openAiApi(deepseekApi)
-                .defaultOptions(options)
-                .build();
+
+        try {
+            log.info("Creating dynamic Deepseek chat model with provider: {} ({})", provider.getName(), provider.getUid());
+            // 使用动态的OpenAiApi实例
+            OpenAiApi deepseekApi = createDeepseekApi(provider.getApiUrl(), provider.getApiKey());
+            OpenAiChatOptions options = createDeepseekOptions(llm);
+            if (options == null) {
+                log.warn("Failed to create Deepseek options, using default chat model");
+                return defaultChatModel;
+            }
+            return OpenAiChatModel.builder()
+                    .openAiApi(deepseekApi)
+                    .defaultOptions(options)
+                    .build();
+        } catch (Exception e) {
+            log.error("Failed to create dynamic Deepseek chat model for provider {}, using default chat model", provider.getUid(), e);
+            return defaultChatModel;
+        }
     }
 
     @Override
@@ -115,7 +137,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         // 获取适当的模型实例
         OpenAiChatModel chatModel = createDeepseekChatModel(llm);
         if (chatModel == null) {
-            log.info("Deepseek API not available");
+            log.error("Failed to create Deepseek chat model and no default chat model available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, "Deepseek service is not available", messageProtobufReply);
             return;
         }
@@ -246,7 +268,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         OpenAiChatModel chatModel = createDeepseekChatModel(llm);
 
         if (chatModel == null) {
-            log.info("Deepseek API not available");
+            log.error("Failed to create Deepseek chat model and no default chat model available");
             // 使用sendStreamEndMessage方法替代重复的代码
             sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
                     LlmConsts.DEEPSEEK,

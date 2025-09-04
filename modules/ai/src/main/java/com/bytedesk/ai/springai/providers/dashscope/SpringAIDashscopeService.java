@@ -20,6 +20,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -46,6 +47,10 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired(required = false)
+    @Qualifier("bytedeskDashscopeChatModel")
+    private DashScopeChatModel defaultChatModel;
 
     public SpringAIDashscopeService() {
         super(); // 调用基类的无参构造函数
@@ -81,23 +86,40 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
      * @return 配置了特定模型的DashScopeChatModel
      */
     private DashScopeChatModel createDashscopeChatModel(RobotLlm llm) {
+        if (llm == null || llm.getTextProviderUid() == null) {
+            log.warn("RobotLlm or textProviderUid is null, using default chat model");
+            return defaultChatModel;
+        }
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+            log.warn("LlmProvider with uid {} not found, using default chat model", llm.getTextProviderUid());
+            return defaultChatModel;
         }
-        // 使用动态的DashScopeApi实例
+
         LlmProviderEntity provider = llmProviderOptional.get();
-        DashScopeApi dashscopeApi = createDashscopeApi(provider.getApiUrl(), provider.getApiKey());
-        DashScopeChatOptions options = createDashscopeOptions(llm);
-        if (options == null) {
-            return null;
+        if (provider.getApiKey() == null || provider.getApiKey().trim().isEmpty()) {
+            log.warn("API key is not configured for provider {}, using default chat model", provider.getUid());
+            return defaultChatModel;
         }
-        return DashScopeChatModel.builder()
-                .dashScopeApi(dashscopeApi)
-                .defaultOptions(options)
-                .build();
+
+        try {
+            log.info("Creating dynamic Dashscope chat model with provider: {} ({})", provider.getName(), provider.getUid());
+            // 使用动态的DashScopeApi实例
+            DashScopeApi dashscopeApi = createDashscopeApi(provider.getApiUrl(), provider.getApiKey());
+            DashScopeChatOptions options = createDashscopeOptions(llm);
+            if (options == null) {
+                log.warn("Failed to create Dashscope options, using default chat model");
+                return defaultChatModel;
+            }
+            return DashScopeChatModel.builder()
+                    .dashScopeApi(dashscopeApi)
+                    .defaultOptions(options)
+                    .build();
+        } catch (Exception e) {
+            log.error("Failed to create dynamic Dashscope chat model for provider {}, using default chat model", provider.getUid(), e);
+            return defaultChatModel;
+        }
     }
 
     @Override
@@ -115,7 +137,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         // 获取适当的模型实例
         DashScopeChatModel chatModel = createDashscopeChatModel(llm);
         if (chatModel == null) {
-            log.info("Dashscope API not available");
+            log.error("Failed to create Dashscope chat model and no default chat model available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
@@ -246,7 +268,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         DashScopeChatModel chatModel = createDashscopeChatModel(llm);
 
         if (chatModel == null) {
-            log.info("Dashscope API not available");
+            log.error("Failed to create Dashscope chat model and no default chat model available");
             // 使用sendStreamEndMessage方法替代重复的代码
             sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
                     LlmConsts.DASHSCOPE,

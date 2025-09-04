@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 // import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -54,6 +55,10 @@ public class ZhipuaiService extends BaseSpringAIService {
     @Autowired
     private LlmProviderRestService llmProviderRestService;
 
+    @Autowired(required = false)
+    @Qualifier("zhipuaiChatClient")
+    private ClientV4 defaultClient;
+
     /**
      * 构造函数
      */
@@ -70,15 +75,13 @@ public class ZhipuaiService extends BaseSpringAIService {
     private ClientV4 createDynamicClient(RobotLlm llm) {
         if (llm == null || llm.getTextProviderUid() == null) {
             log.warn("RobotLlm or textProviderUid is null, using default client");
-            // return client; // 使用默认的注入client
-            return null;
+            return defaultClient;
         }
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
             log.warn("LlmProvider with uid {} not found, using default client", llm.getTextProviderUid());
-            // return client; // 使用默认的注入client
-            return null;
+            return defaultClient;
         }
 
         LlmProviderEntity provider = llmProviderOptional.get();
@@ -86,8 +89,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         
         if (apiKey == null || apiKey.trim().isEmpty()) {
             log.warn("API key is not configured for provider {}, using default client", provider.getUid());
-            // return client; // 使用默认的注入client
-            return null;
+            return defaultClient;
         }
 
         try {
@@ -98,8 +100,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                     .build();
         } catch (Exception e) {
             log.error("Failed to create dynamic Zhipuai client for provider {}, using default client", provider.getUid(), e);
-            // return client; // 使用默认的注入client
-            return null;
+            return defaultClient;
         }
     }
 
@@ -199,7 +200,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         // 获取适当的client实例
         ClientV4 chatClient = createDynamicClient(llm);
         if (chatClient == null) {
-            log.error("Failed to create Zhipuai client, cannot process websocket request");
+            log.error("Failed to create Zhipuai client and no default client available, cannot process websocket request");
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
@@ -339,7 +340,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         // 获取适当的client实例
         ClientV4 chatClient = createDynamicClient(llm);
         if (chatClient == null) {
-            log.error("Failed to create Zhipuai client, cannot process sync request");
+            log.error("Failed to create Zhipuai client and no default client available, cannot process sync request");
             return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         }
         
@@ -406,7 +407,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         // 获取适当的client实例
         ClientV4 chatClient = createDynamicClient(llm);
         if (chatClient == null) {
-            log.error("Failed to create Zhipuai client, cannot process SSE request");
+            log.error("Failed to create Zhipuai client and no default client available, cannot process SSE request");
             handleSseError(new Exception("Failed to create Zhipuai client"), 
                     messageProtobufQuery, messageProtobufReply, emitter);
             return;
