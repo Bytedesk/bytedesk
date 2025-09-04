@@ -24,6 +24,7 @@ import org.springframework.ai.minimax.MiniMaxChatModel;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.minimax.api.MiniMaxApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -47,6 +48,10 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired(required = false)
+    @Qualifier("minimaxChatModel")
+    private MiniMaxChatModel defaultChatModel;
 
     public SpringAIMinimaxService() {
         super(); // 调用基类的无参构造函数
@@ -75,30 +80,40 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
      * @return 配置了特定模型的MiniMaxChatModel
      */
     private MiniMaxChatModel createMinimaxChatModel(RobotLlm llm) {
+        if (llm == null || llm.getTextProviderUid() == null) {
+            log.warn("RobotLlm or textProviderUid is null, using default chat model");
+            return defaultChatModel;
+        }
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+            log.warn("LlmProvider with uid {} not found, using default chat model", llm.getTextProviderUid());
+            return defaultChatModel;
         }
         
         LlmProviderEntity provider = llmProviderOptional.get();
+        if (provider.getApiKey() == null || provider.getApiKey().trim().isEmpty()) {
+            log.warn("API key is not configured for provider {}, using default chat model", provider.getUid());
+            return defaultChatModel;
+        }
         
         try {
+            log.info("Creating dynamic Minimax chat model with provider: {} ({})", provider.getName(), provider.getUid());
             // 尝试使用 MiniMaxApi 构造函数而不是 builder
             MiniMaxApi miniMaxApi = new MiniMaxApi(provider.getApiUrl(), provider.getApiKey());
             
             // 创建选项
             MiniMaxChatOptions options = createDynamicOptions(llm);
             if (options == null) {
-                return null;
+                log.warn("Failed to create Minimax options, using default chat model");
+                return defaultChatModel;
             }
             
             // 使用构造函数创建 MiniMaxChatModel
             return new MiniMaxChatModel(miniMaxApi, options);
         } catch (Exception e) {
-            log.error("Failed to create MiniMax chat model", e);
-            return null;
+            log.error("Failed to create dynamic Minimax chat model for provider {}, using default chat model", provider.getUid(), e);
+            return defaultChatModel;
         }
     }
 

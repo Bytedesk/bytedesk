@@ -23,6 +23,7 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -49,6 +50,10 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired(required = false)
+    @Qualifier("bytedeskOllamaChatModel")
+    private OllamaChatModel defaultChatModel;
 
     public SpringAIOllamaService() {
         super(); // 调用基类的无参构造函数
@@ -86,18 +91,25 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
             log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+            return defaultChatModel;
         }
-        // 使用默认的OllamaApi实例
-        OllamaApi ollamaApi = createOllamaApi(llmProviderOptional.get().getApiUrl());
-        OllamaOptions options = createOllamaOptions(llm);
-        if (options == null) {
-            return null;
+        
+        try {
+            // 使用默认的OllamaApi实例
+            OllamaApi ollamaApi = createOllamaApi(llmProviderOptional.get().getApiUrl());
+            OllamaOptions options = createOllamaOptions(llm);
+            if (options == null) {
+                log.warn("Failed to create Ollama options, using default chat model");
+                return defaultChatModel;
+            }
+            return OllamaChatModel.builder()
+                    .ollamaApi(ollamaApi)
+                    .defaultOptions(options)
+                    .build();
+        } catch (Exception e) {
+            log.error("Failed to create dynamic Ollama chat model for provider {}, using default chat model", llmProviderOptional.get().getUid(), e);
+            return defaultChatModel;
         }
-        return OllamaChatModel.builder()
-                .ollamaApi(ollamaApi)
-                .defaultOptions(options)
-                .build();
     }
 
     @Override

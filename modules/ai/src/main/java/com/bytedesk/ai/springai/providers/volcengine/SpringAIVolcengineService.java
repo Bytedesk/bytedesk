@@ -23,6 +23,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -44,6 +45,10 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired(required = false)
+    @Qualifier("volcengineChatModel")
+    private OpenAiChatModel defaultChatModel;
 
     public SpringAIVolcengineService() {
         super(); // 调用基类的无参构造函数
@@ -76,24 +81,30 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
             log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+            return defaultChatModel;
         }
         
         LlmProviderEntity provider = llmProviderOptional.get();
         
-        // 创建 OpenAiApi 实例
-        OpenAiApi openAiApi = VolcengineApi.create(provider.getApiUrl(), provider.getApiKey());
-        
-        // 创建选项
-        OpenAiChatOptions options = createDynamicOptions(llm);
-        if (options == null) {
-            return null;
+        try {
+            // 创建 OpenAiApi 实例
+            OpenAiApi openAiApi = VolcengineApi.create(provider.getApiUrl(), provider.getApiKey());
+            
+            // 创建选项
+            OpenAiChatOptions options = createDynamicOptions(llm);
+            if (options == null) {
+                log.warn("Failed to create Volcengine options, using default chat model");
+                return defaultChatModel;
+            }
+            
+            return OpenAiChatModel.builder()
+                    .openAiApi(openAiApi)
+                    .defaultOptions(options)
+                    .build();
+        } catch (Exception e) {
+            log.error("Failed to create dynamic Volcengine chat model for provider {}, using default chat model", provider.getUid(), e);
+            return defaultChatModel;
         }
-        
-        return OpenAiChatModel.builder()
-                .openAiApi(openAiApi)
-                .defaultOptions(options)
-                .build();
     }
 
     @Override

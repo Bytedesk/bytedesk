@@ -266,7 +266,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
         OpenAiChatModel chatModel = createOpenaiChatModel(llm);
 
         if (chatModel == null) {
-            log.info("OpenAI API not available");
+            log.error("Failed to create OpenAI chat model and no default chat model available");
             // 使用sendStreamEndMessage方法替代重复的代码
             sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
                     LlmConsts.OPENAI,

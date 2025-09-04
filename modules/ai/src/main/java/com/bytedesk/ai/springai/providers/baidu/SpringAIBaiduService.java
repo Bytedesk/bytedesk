@@ -23,6 +23,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -45,6 +46,10 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired(required = false)
+    @Qualifier("baiduChatModel")
+    private OpenAiChatModel defaultChatModel;
 
     public SpringAIBaiduService() {
         super(); // 调用基类的无参构造函数
@@ -71,28 +76,43 @@ public class SpringAIBaiduService extends BaseSpringAIService {
      * @return 配置了特定模型的OpenAiChatModel
      */
     private OpenAiChatModel createBaiduChatModel(RobotLlm llm) {
+        if (llm == null || llm.getTextProviderUid() == null) {
+            log.warn("RobotLlm or textProviderUid is null, using default chat model");
+            return defaultChatModel;
+        }
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
-            return null;
+            log.warn("LlmProvider with uid {} not found, using default chat model", llm.getTextProviderUid());
+            return defaultChatModel;
         }
         
         LlmProviderEntity provider = llmProviderOptional.get();
-        
-        // 创建 OpenAiApi 实例
-        OpenAiApi openAiApi = BaiduApi.create(provider.getApiUrl(), provider.getApiKey());
-        
-        // 创建选项
-        OpenAiChatOptions options = createDynamicOptions(llm);
-        if (options == null) {
-            return null;
+        if (provider.getApiKey() == null || provider.getApiKey().trim().isEmpty()) {
+            log.warn("API key is not configured for provider {}, using default chat model", provider.getUid());
+            return defaultChatModel;
         }
-        
-        return OpenAiChatModel.builder()
-                .openAiApi(openAiApi)
-                .defaultOptions(options)
-                .build();
+
+        try {
+            log.info("Creating dynamic Baidu chat model with provider: {} ({})", provider.getName(), provider.getUid());
+            // 创建 OpenAiApi 实例
+            OpenAiApi openAiApi = BaiduApi.create(provider.getApiUrl(), provider.getApiKey());
+            
+            // 创建选项
+            OpenAiChatOptions options = createDynamicOptions(llm);
+            if (options == null) {
+                log.warn("Failed to create Baidu options, using default chat model");
+                return defaultChatModel;
+            }
+            
+            return OpenAiChatModel.builder()
+                    .openAiApi(openAiApi)
+                    .defaultOptions(options)
+                    .build();
+        } catch (Exception e) {
+            log.error("Failed to create dynamic Baidu chat model for provider {}, using default chat model", provider.getUid(), e);
+            return defaultChatModel;
+        }
     }
 
     @Override
@@ -110,6 +130,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         // 获取适当的模型实例
         OpenAiChatModel baiduChatModel = createBaiduChatModel(llm);
         if (baiduChatModel == null) {
+            log.error("Failed to create Baidu chat model and no default chat model available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
