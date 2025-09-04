@@ -31,7 +31,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi allApis() {
         return GroupedOpenApi.builder()
                 .group("all-apis")
-                .displayName("所有接口")
+                .displayName("All APIs")
                 .pathsToMatch("/api/v1/**")
                 .build();
     }
@@ -43,7 +43,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi groupApis() {
         return GroupedOpenApi.builder()
                 .group("group-apis")
-                .displayName("群组接口")
+                .displayName("Group Management APIs")
                 .pathsToMatch( "/api/v1/group/**")
                 .build();
     }
@@ -55,7 +55,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi departmentApis() {
         return GroupedOpenApi.builder()
                 .group("department-apis")
-                .displayName("部门接口")
+                .displayName("Department Management APIs")
                 .pathsToMatch("/api/v1/department/**")
                 .build();
     }
@@ -67,7 +67,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi memberApis() {
         return GroupedOpenApi.builder()
                 .group("member-apis")
-                .displayName("成员接口")
+                .displayName("Member Management APIs")
                 .pathsToMatch("/api/v1/member/**")
                 .build();
     }
@@ -79,7 +79,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi authApis() {
         return GroupedOpenApi.builder()
                 .group("auth-apis")
-                .displayName("认证接口")
+                .displayName("Authentication APIs")
                 .pathsToMatch("/auth/v1/**")
                 .build();
     }
@@ -91,7 +91,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi userApis() {
         return GroupedOpenApi.builder()
                 .group("user-apis")
-                .displayName("用户接口")
+                .displayName("User Management APIs")
                 .pathsToMatch("/api/v1/user/**")
                 .build();
     }
@@ -103,7 +103,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi organizationApis() {
         return GroupedOpenApi.builder()
                 .group("organization-apis")
-                .displayName("组织接口")
+                .displayName("Organization Management APIs")
                 .pathsToMatch("/api/v1/org/**")
                 .build();
     }
@@ -115,7 +115,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi roleApis() {
         return GroupedOpenApi.builder()
                 .group("role-apis")
-                .displayName("角色接口")
+                .displayName("Role Management APIs")
                 .pathsToMatch("/api/v1/role/**")
                 .build();
     }
@@ -127,7 +127,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi authorityApis() {
         return GroupedOpenApi.builder()
                 .group("authority-apis")
-                .displayName("权限接口")
+                .displayName("Authority Management APIs")
                 .pathsToMatch("/api/v1/authority/**")
                 .build();
     }
@@ -139,7 +139,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi tokenApis() {
         return GroupedOpenApi.builder()
                 .group("token-apis")
-                .displayName("Token接口")
+                .displayName("Token Management APIs")
                 .pathsToMatch("/api/v1/token/**")
                 .build();
     }
@@ -151,7 +151,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi articleApis() {
         return GroupedOpenApi.builder()
                 .group("article-apis")
-                .displayName("文章接口")
+                .displayName("Article Management APIs")
                 .pathsToMatch("/api/v1/article/**")
                 .build();
     }
@@ -163,7 +163,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi autoReplyFixedApis() {
         return GroupedOpenApi.builder()
                 .group("auto-reply-fixed-apis")
-                .displayName("固定回复接口")
+                .displayName("Auto Reply Fixed APIs")
                 .pathsToMatch("/api/v1/autoreply/fixed/**")
                 .build();
     }
@@ -175,7 +175,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi autoReplyKeywordApis() {
         return GroupedOpenApi.builder()
                 .group("auto-reply-keyword-apis")
-                .displayName("关键词回复接口")
+                .displayName("Auto Reply Keyword APIs")
                 .pathsToMatch("/api/v1/autoreply/keyword/**")
                 .build();
     }
@@ -187,7 +187,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi faqApis() {
         return GroupedOpenApi.builder()
                 .group("faq-apis")
-                .displayName("常见问题接口")
+                .displayName("FAQ Management APIs")
                 .pathsToMatch("/api/v1/faq/**")
                 .build();
     }
@@ -199,7 +199,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi kbaseApis() {
         return GroupedOpenApi.builder()
                 .group("kbase-apis")
-                .displayName("知识库接口")
+                .displayName("Knowledge Base Management APIs")
                 .pathsToMatch("/api/v1/kbase/**")
                 .build();
     }
@@ -211,7 +211,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi chunkApis() {
         return GroupedOpenApi.builder()
                 .group("chunk-apis")
-                .displayName("文件分块接口")
+                .displayName("File Chunk Management APIs")
                 .pathsToMatch("/api/v1/llm/chunk/**")
                 .build();
     }
@@ -223,7 +223,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi fileApis() {
         return GroupedOpenApi.builder()
                 .group("file-apis")
-                .displayName("文件管理接口")
+                .displayName("File Management APIs")
                 .pathsToMatch("/api/v1/llm/file/**")
                 .build();
     }
@@ -235,7 +235,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi textApis() {
         return GroupedOpenApi.builder()
                 .group("text-apis")
-                .displayName("文本管理接口")
+                .displayName("Text Management APIs")
                 .pathsToMatch("/api/v1/llm/text/**")
                 .build();
     }
@@ -247,7 +247,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi websiteApis() {
         return GroupedOpenApi.builder()
                 .group("website-apis")
-                .displayName("网站管理接口")
+                .displayName("Website Management APIs")
                 .pathsToMatch("/api/v1/llm/website/**")
                 .build();
     }
@@ -259,7 +259,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi quickReplyApis() {
         return GroupedOpenApi.builder()
                 .group("quick-reply-apis")
-                .displayName("快捷回复接口")
+                .displayName("Quick Reply Management APIs")
                 .pathsToMatch("/api/v1/quickreply/**")
                 .build();
     }
@@ -271,7 +271,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi tabooApis() {
         return GroupedOpenApi.builder()
                 .group("taboo-apis")
-                .displayName("敏感词管理接口")
+                .displayName("Taboo Word Management APIs")
                 .pathsToMatch("/api/v1/taboo/**")
                 .build();
     }
@@ -283,7 +283,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi agentApis() {
         return GroupedOpenApi.builder()
                 .group("agent-apis")
-                .displayName("客服接口")
+                .displayName("Agent Management APIs")
                 .pathsToMatch("/api/v1/agent/**")
                 .build();
     }
@@ -295,7 +295,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi customerApis() {
         return GroupedOpenApi.builder()
                 .group("customer-apis")
-                .displayName("客户接口")
+                .displayName("Customer Management APIs")
                 .pathsToMatch("/api/v1/crm/**")
                 .build();
     }
@@ -307,7 +307,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi messageFeedbackApis() {
         return GroupedOpenApi.builder()
                 .group("message-feedback-apis")
-                .displayName("消息反馈接口")
+                .displayName("Message Feedback APIs")
                 .pathsToMatch("/api/v1/message/feedback/**")
                 .build();
     }
@@ -319,7 +319,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi messageLeaveApis() {
         return GroupedOpenApi.builder()
                 .group("message-leave-apis")
-                .displayName("留言消息接口")
+                .displayName("Leave Message APIs")
                 .pathsToMatch("/api/v1/message/leave/**")
                 .build();
     }
@@ -331,7 +331,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi messageParsedApis() {
         return GroupedOpenApi.builder()
                 .group("message-parsed-apis")
-                .displayName("消息解析接口")
+                .displayName("Message Parsed APIs")
                 .pathsToMatch("/api/v1/message/parsed/**")
                 .build();
     }
@@ -343,7 +343,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi messageRatingApis() {
         return GroupedOpenApi.builder()
                 .group("message-rating-apis")
-                .displayName("消息评价接口")
+                .displayName("Message Rating APIs")
                 .pathsToMatch("/api/v1/message/rating/**")
                 .build();
     }
@@ -355,7 +355,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi messageUnansweredApis() {
         return GroupedOpenApi.builder()
                 .group("message-unanswered-apis")
-                .displayName("未回复消息接口")
+                .displayName("Unanswered Message APIs")
                 .pathsToMatch("/api/v1/message/unanswered/**")
                 .build();
     }
@@ -367,7 +367,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi messageUnreadApis() {
         return GroupedOpenApi.builder()
                 .group("message-unread-apis")
-                .displayName("未读消息接口")
+                .displayName("Unread Message APIs")
                 .pathsToMatch("/api/v1/message/unread/**")
                 .build();
     }
@@ -379,7 +379,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi queueApis() {
         return GroupedOpenApi.builder()
                 .group("queue-apis")
-                .displayName("队列接口")
+                .displayName("Queue Management APIs")
                 .pathsToMatch("/api/v1/queue/**")
                 .build();
     }
@@ -391,7 +391,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi queueMemberApis() {
         return GroupedOpenApi.builder()
                 .group("queue-member-apis")
-                .displayName("队列成员接口")
+                .displayName("Queue Member APIs")
                 .pathsToMatch("/api/v1/queue/member/**")
                 .build();
     }
@@ -403,7 +403,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi threadInviteApis() {
         return GroupedOpenApi.builder()
                 .group("thread-invite-apis")
-                .displayName("会话邀请接口")
+                .displayName("Thread Invitation APIs")
                 .pathsToMatch("/api/v1/thread/invite/**")
                 .build();
     }
@@ -415,7 +415,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi threadRatingApis() {
         return GroupedOpenApi.builder()
                 .group("thread-rating-apis")
-                .displayName("会话评价接口")
+                .displayName("Thread Rating APIs")
                 .pathsToMatch("/api/v1/thread/rating/**")
                 .build();
     }
@@ -427,7 +427,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi threadSummaryApis() {
         return GroupedOpenApi.builder()
                 .group("thread-summary-apis")
-                .displayName("会话小结接口")
+                .displayName("Thread Summary APIs")
                 .pathsToMatch("/api/v1/thread/summary/**")
                 .build();
     }
@@ -439,7 +439,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi threadTransferApis() {
         return GroupedOpenApi.builder()
                 .group("thread-transfer-apis")
-                .displayName("会话转接接口")
+                .displayName("Thread Transfer APIs")
                 .pathsToMatch("/api/v1/thread/transfer/**")
                 .build();
     }
@@ -451,7 +451,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi transferKeywordApis() {
         return GroupedOpenApi.builder()
                 .group("transfer-keyword-apis")
-                .displayName("转接关键词接口")
+                .displayName("Transfer Keyword APIs")
                 .pathsToMatch("/api/v1/transfer/keyword/**")
                 .build();
     }
@@ -463,7 +463,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi visitorApis() {
         return GroupedOpenApi.builder()
                 .group("visitor-apis")
-                .displayName("访客接口")
+                .displayName("Visitor Management APIs")
                 .pathsToMatch("/api/v1/visitor/**")
                 .build();
     }
@@ -475,7 +475,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi workgroupApis() {
         return GroupedOpenApi.builder()
                 .group("workgroup-apis")
-                .displayName("工作组接口")
+                .displayName("Workgroup Management APIs")
                 .pathsToMatch("/api/v1/workgroup/**")
                 .build();
     }
@@ -487,7 +487,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi ticketApis() {
         return GroupedOpenApi.builder()
                 .group("ticket-apis")
-                .displayName("工单接口")
+                .displayName("Ticket Management APIs")
                 .pathsToMatch("/api/v1/ticket/**")
                 .build();
     }
@@ -499,7 +499,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi browseApis() {
         return GroupedOpenApi.builder()
                 .group("browse-apis")
-                .displayName("浏览记录接口")
+                .displayName("Browse Record APIs")
                 .pathsToMatch("/api/v1/browse/**")
                 .build();
     }
@@ -511,7 +511,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi blackApis() {
         return GroupedOpenApi.builder()
                 .group("black-apis")
-                .displayName("黑名单接口")
+                .displayName("Blacklist Management APIs")
                 .pathsToMatch("/api/v1/black/**")
                 .build();
     }
@@ -523,7 +523,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi threadApis() {
         return GroupedOpenApi.builder()
                 .group("thread-apis")
-                .displayName("会话管理接口")
+                .displayName("Thread Management APIs")
                 .pathsToMatch("/api/v1/thread/**")
                 .build();
     }
@@ -535,7 +535,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi messageApis() {
         return GroupedOpenApi.builder()
                 .group("message-apis")
-                .displayName("消息管理接口")
+                .displayName("Message Management APIs")
                 .pathsToMatch("/api/v1/message/**")
                 .build();
     }
@@ -547,7 +547,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi robotApis() {
         return GroupedOpenApi.builder()
                 .group("robot-apis")
-                .displayName("机器人接口")
+                .displayName("Robot Management APIs")
                 .pathsToMatch("/api/v1/robot/**")
                 .build();
     }
@@ -559,7 +559,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi llmProviderApis() {
         return GroupedOpenApi.builder()
                 .group("llm-provider-apis")
-                .displayName("LLM提供商接口")
+                .displayName("LLM Provider Management APIs")
                 .pathsToMatch("/api/v1/provider/**")
                 .build();
     }
@@ -571,7 +571,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi llmModelApis() {
         return GroupedOpenApi.builder()
                 .group("llm-model-apis")
-                .displayName("LLM模型接口")
+                .displayName("LLM Model Management APIs")
                 .pathsToMatch("/api/v1/model/**")
                 .build();
     }
@@ -583,7 +583,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi workflowApis() {
         return GroupedOpenApi.builder()
                 .group("workflow-apis")
-                .displayName("工作流接口")
+                .displayName("Workflow Management APIs")
                 .pathsToMatch("/api/v1/workflow/**")
                 .build();
     }
@@ -595,7 +595,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi commentApis() {
         return GroupedOpenApi.builder()
                 .group("comment-apis")
-                .displayName("评论接口")
+                .displayName("Comment Management APIs")
                 .pathsToMatch("/api/v1/comment/**")
                 .build();
     }
@@ -607,7 +607,7 @@ public class SwaggerApiConfig {
     public GroupedOpenApi uploadApis() {
         return GroupedOpenApi.builder()
                 .group("upload-apis")
-                .displayName("文件上传接口")
+                .displayName("File Upload APIs")
                 .pathsToMatch("/api/v1/upload/**")
                 .build();
     }
@@ -1161,6 +1161,594 @@ public class SwaggerApiConfig {
                 .group("taboo-message-apis")
                 .displayName("Taboo Message Management APIs")
                 .pathsToMatch("/api/v1/taboo/message/**")
+                .build();
+    }
+
+    /**
+     * 知识库统计管理接口
+     */
+    @Bean
+    public GroupedOpenApi kbaseStatisticApis() {
+        return GroupedOpenApi.builder()
+                .group("kbase-statistic-apis")
+                .displayName("KbaseStatistic Management APIs")
+                .pathsToMatch("/api/v1/kbase/statistic/**")
+                .build();
+    }
+
+    /**
+     * Janus音频管理接口
+     */
+    @Bean
+    public GroupedOpenApi janusAudioApis() {
+        return GroupedOpenApi.builder()
+                .group("janus-audio-apis")
+                .displayName("JanusAudio Management APIs")
+                .pathsToMatch("/api/v1/janus/audio/**")
+                .build();
+    }
+
+    /**
+     * Janus视频管理接口
+     */
+    @Bean
+    public GroupedOpenApi janusVideoApis() {
+        return GroupedOpenApi.builder()
+                .group("janus-video-apis")
+                .displayName("JanusVideo Management APIs")
+                .pathsToMatch("/api/v1/janus/video/**")
+                .build();
+    }
+
+    /**
+     * 统一消息管理接口（企业版）
+     */
+    @Bean
+    public GroupedOpenApi unifiedMessageApis() {
+        return GroupedOpenApi.builder()
+                .group("unified-message-apis")
+                .displayName("Unified Message Management APIs")
+                .pathsToMatch("/api/v1/message/unified/**")
+                .build();
+    }
+
+    /**
+     * 质量申诉管理接口
+     */
+    @Bean
+    public GroupedOpenApi qualityAppealApis() {
+        return GroupedOpenApi.builder()
+                .group("quality-appeal-apis")
+                .displayName("QualityAppeal Management APIs")
+                .pathsToMatch("/api/v1/quality/appeal/**")
+                .build();
+    }
+
+    /**
+     * 屏幕管理接口
+     */
+    @Bean
+    public GroupedOpenApi screenApis() {
+        return GroupedOpenApi.builder()
+                .group("screen-apis")
+                .displayName("Screen Management APIs")
+                .pathsToMatch("/api/v1/screen/**")
+                .build();
+    }
+
+    /**
+     * 设置模板管理接口
+     */
+    @Bean
+    public GroupedOpenApi settingsTemplateApis() {
+        return GroupedOpenApi.builder()
+                .group("settings-template-apis")
+                .displayName("SettingsTemplate Management APIs")
+                .pathsToMatch("/api/v1/settings/template/**")
+                .build();
+    }
+
+    /**
+     * 表单结果管理接口
+     */
+    @Bean
+    public GroupedOpenApi formResultApis() {
+        return GroupedOpenApi.builder()
+                .group("form-result-apis")
+                .displayName("Form Result Management APIs")
+                .pathsToMatch("/api/v1/form/result/**")
+                .build();
+    }
+
+    /**
+     * 表单管理接口
+     */
+    @Bean
+    public GroupedOpenApi formApis() {
+        return GroupedOpenApi.builder()
+                .group("form-apis")
+                .displayName("Form Management APIs")
+                .pathsToMatch("/api/v1/form/**")
+                .build();
+    }
+
+    /**
+     * 客服状态设置管理接口
+     */
+    @Bean
+    public GroupedOpenApi agentStatusSettingApis() {
+        return GroupedOpenApi.builder()
+                .group("agent-status-setting-apis")
+                .displayName("Agent Status Setting Management APIs")
+                .pathsToMatch("/api/v1/agent/status/setting/**")
+                .build();
+    }
+
+    /**
+     * 客服状态管理接口
+     */
+    @Bean
+    public GroupedOpenApi agentStatusApis() {
+        return GroupedOpenApi.builder()
+                .group("agent-status-apis")
+                .displayName("Agent Status Management APIs")
+                .pathsToMatch("/api/v1/agent/status/**")
+                .build();
+    }
+
+    /**
+     * 主题管理接口
+     */
+    @Bean
+    public GroupedOpenApi topicApis() {
+        return GroupedOpenApi.builder()
+                .group("topic-apis")
+                .displayName("Topic Management APIs")
+                .pathsToMatch("/api/v1/topic/**")
+                .build();
+    }
+
+    /**
+     * 访客消息管理接口
+     */
+    @Bean
+    public GroupedOpenApi visitorMessageApis() {
+        return GroupedOpenApi.builder()
+                .group("visitor-message-apis")
+                .displayName("Visitor Message Management APIs")
+                .pathsToMatch("/api/v1/visitor/message/**")
+                .build();
+    }
+
+    /**
+     * 追踪管理接口
+     */
+    @Bean
+    public GroupedOpenApi traceApis() {
+        return GroupedOpenApi.builder()
+                .group("trace-apis")
+                .displayName("Trace Management APIs")
+                .pathsToMatch("/api/v1/trace/**")
+                .build();
+    }
+
+    /**
+     * MinIO存储管理接口
+     */
+    @Bean
+    public GroupedOpenApi minioStorageApis() {
+        return GroupedOpenApi.builder()
+                .group("minio-storage-apis")
+                .displayName("MinIO Storage APIs")
+                .pathsToMatch("/api/v1/minio/**")
+                .build();
+    }
+
+    /**
+     * MaxKB聊天接口
+     */
+    @Bean
+    public GroupedOpenApi maxkbChatApis() {
+        return GroupedOpenApi.builder()
+                .group("maxkb-chat-apis")
+                .displayName("MaxKB Chat API")
+                .pathsToMatch("/api/v1/maxkb/chat/**")
+                .build();
+    }
+
+    /**
+     * 工作流节点管理接口
+     */
+    @Bean
+    public GroupedOpenApi workflowNodeApis() {
+        return GroupedOpenApi.builder()
+                .group("workflow-node-apis")
+                .displayName("WorkflowNode Management APIs")
+                .pathsToMatch("/api/v1/workflow/node/**")
+                .build();
+    }
+
+    /**
+     * 消息纠错管理接口
+     */
+    @Bean
+    public GroupedOpenApi messageCorrectionApis() {
+        return GroupedOpenApi.builder()
+                .group("message-correction-apis")
+                .displayName("Message Correction Management APIs")
+                .pathsToMatch("/api/v1/message/correction/**")
+                .build();
+    }
+
+    /**
+     * 质量计划管理接口
+     */
+    @Bean
+    public GroupedOpenApi qualityPlanApis() {
+        return GroupedOpenApi.builder()
+                .group("quality-plan-apis")
+                .displayName("QualityPlan Management APIs")
+                .pathsToMatch("/api/v1/quality/plan/**")
+                .build();
+    }
+
+    /**
+     * Token统计管理接口
+     */
+    @Bean
+    public GroupedOpenApi statisticTokenApis() {
+        return GroupedOpenApi.builder()
+                .group("statistic-token-apis")
+                .displayName("StatisticToken Management APIs")
+                .pathsToMatch("/api/v1/statistic/token/**")
+                .build();
+    }
+
+    /**
+     * 路由规则管理接口
+     */
+    @Bean
+    public GroupedOpenApi routingRuleApis() {
+        return GroupedOpenApi.builder()
+                .group("routing-rule-apis")
+                .displayName("Routing Rule Management APIs")
+                .pathsToMatch("/api/v1/routing/rule/**")
+                .build();
+    }
+
+    /**
+     * AI统计管理接口
+     */
+    @Bean
+    public GroupedOpenApi aiStatisticApis() {
+        return GroupedOpenApi.builder()
+                .group("ai-statistic-apis")
+                .displayName("AiStatistic Management APIs")
+                .pathsToMatch("/api/v1/ai/statistic/**")
+                .build();
+    }
+
+    /**
+     * 呼叫MRCP管理接口
+     */
+    @Bean
+    public GroupedOpenApi callMrcpApis() {
+        return GroupedOpenApi.builder()
+                .group("call-mrcp-apis")
+                .displayName("CallMrcp Management APIs")
+                .pathsToMatch("/api/v1/call/mrcp/**")
+                .build();
+    }
+
+    /**
+     * 呼叫IVR管理接口
+     */
+    @Bean
+    public GroupedOpenApi callIvrApis() {
+        return GroupedOpenApi.builder()
+                .group("call-ivr-apis")
+                .displayName("CallIvr Management APIs")
+                .pathsToMatch("/api/v1/call/ivr/**")
+                .build();
+    }
+
+    /**
+     * 质量检查管理接口
+     */
+    @Bean
+    public GroupedOpenApi qualityCheckApis() {
+        return GroupedOpenApi.builder()
+                .group("quality-check-apis")
+                .displayName("QualityCheck Management APIs")
+                .pathsToMatch("/api/v1/quality/check/**")
+                .build();
+    }
+
+    /**
+     * 质量流程管理接口
+     */
+    @Bean
+    public GroupedOpenApi qualityFlowApis() {
+        return GroupedOpenApi.builder()
+                .group("quality-flow-apis")
+                .displayName("QualityFlow Management APIs")
+                .pathsToMatch("/api/v1/quality/flow/**")
+                .build();
+    }
+
+    /**
+     * 购物管理接口
+     */
+    @Bean
+    public GroupedOpenApi shoppingApis() {
+        return GroupedOpenApi.builder()
+                .group("shopping-apis")
+                .displayName("Shopping Management APIs")
+                .pathsToMatch("/api/v1/shopping/**")
+                .build();
+    }
+
+    /**
+     * 工单模板管理接口
+     */
+    @Bean
+    public GroupedOpenApi ticketTemplateApis() {
+        return GroupedOpenApi.builder()
+                .group("ticket-template-apis")
+                .displayName("TicketTemplate Management APIs")
+                .pathsToMatch("/api/v1/ticket/template/**")
+                .build();
+    }
+
+    /**
+     * 服务器指标管理接口
+     */
+    @Bean
+    public GroupedOpenApi serverMetricsApis() {
+        return GroupedOpenApi.builder()
+                .group("server-metrics-apis")
+                .displayName("Server Metrics Management APIs")
+                .pathsToMatch("/api/v1/server/metrics/**")
+                .build();
+    }
+
+    /**
+     * 时刻管理接口
+     */
+    @Bean
+    public GroupedOpenApi momentApis() {
+        return GroupedOpenApi.builder()
+                .group("moment-apis")
+                .displayName("Moment Management APIs")
+                .pathsToMatch("/api/v1/moment/**")
+                .build();
+    }
+
+    /**
+     * 质量统计管理接口
+     */
+    @Bean
+    public GroupedOpenApi qualityStatisticApis() {
+        return GroupedOpenApi.builder()
+                .group("quality-statistic-apis")
+                .displayName("QualityStatistic Management APIs")
+                .pathsToMatch("/api/v1/quality/statistic/**")
+                .build();
+    }
+
+    /**
+     * 关系管理接口
+     */
+    @Bean
+    public GroupedOpenApi relationApis() {
+        return GroupedOpenApi.builder()
+                .group("relation-apis")
+                .displayName("Relation Management APIs")
+                .pathsToMatch("/api/v1/relation/**")
+                .build();
+    }
+
+    /**
+     * 服务器管理接口
+     */
+    @Bean
+    public GroupedOpenApi serverApis() {
+        return GroupedOpenApi.builder()
+                .group("server-apis")
+                .displayName("Server Management APIs")
+                .pathsToMatch("/api/v1/server/**")
+                .build();
+    }
+
+    /**
+     * MCP服务器管理接口
+     */
+    @Bean
+    public GroupedOpenApi mcpServerApis() {
+        return GroupedOpenApi.builder()
+                .group("mcp-server-apis")
+                .displayName("McpServer Management APIs")
+                .pathsToMatch("/api/v1/mcp/server/**")
+                .build();
+    }
+
+    /**
+     * 微信公众号用户管理接口
+     */
+    @Bean
+    public GroupedOpenApi wechatMpUserApis() {
+        return GroupedOpenApi.builder()
+                .group("wechat-mp-user-apis")
+                .displayName("WeChat MP User Management APIs")
+                .pathsToMatch("/api/v1/wechat/mp/user/**")
+                .build();
+    }
+
+    /**
+     * 微信公众号标签管理接口
+     */
+    @Bean
+    public GroupedOpenApi wechatMpTagApis() {
+        return GroupedOpenApi.builder()
+                .group("wechat-mp-tag-apis")
+                .displayName("WeChat MP Tag Management APIs")
+                .pathsToMatch("/api/v1/wechat/mp/tag/**")
+                .build();
+    }
+
+    /**
+     * 微信公众号菜单管理接口
+     */
+    @Bean
+    public GroupedOpenApi wechatMpMenuApis() {
+        return GroupedOpenApi.builder()
+                .group("wechat-mp-menu-apis")
+                .displayName("WeChat MP Menu Management APIs")
+                .pathsToMatch("/api/v1/wechat/mp/menu/**")
+                .build();
+    }
+
+    /**
+     * 企业微信管理接口
+     */
+    @Bean
+    public GroupedOpenApi wechatWorkApis() {
+        return GroupedOpenApi.builder()
+                .group("wechat-work-apis")
+                .displayName("WeChat Work Management APIs")
+                .pathsToMatch("/api/v1/wechat/work/**")
+                .build();
+    }
+
+    /**
+     * Webhook管理接口
+     */
+    @Bean
+    public GroupedOpenApi webhookApis() {
+        return GroupedOpenApi.builder()
+                .group("webhook-apis")
+                .displayName("Webhook Management APIs")
+                .pathsToMatch("/api/v1/webhook/**")
+                .build();
+    }
+
+    /**
+     * 邮件管理接口
+     */
+    @Bean
+    public GroupedOpenApi emailApis() {
+        return GroupedOpenApi.builder()
+                .group("email-apis")
+                .displayName("Email Management APIs")
+                .pathsToMatch("/api/v1/email/**")
+                .build();
+    }
+
+    /**
+     * 邮件模板管理接口
+     */
+    @Bean
+    public GroupedOpenApi emailTemplateApis() {
+        return GroupedOpenApi.builder()
+                .group("email-template-apis")
+                .displayName("Email Template Management APIs")
+                .pathsToMatch("/api/v1/email/template/**")
+                .build();
+    }
+
+    /**
+     * 抖音管理接口
+     */
+    @Bean
+    public GroupedOpenApi douyinApis() {
+        return GroupedOpenApi.builder()
+                .group("douyin-apis")
+                .displayName("Douyin Management APIs")
+                .pathsToMatch("/api/v1/douyin/**")
+                .build();
+    }
+
+    /**
+     * Telegram管理接口
+     */
+    @Bean
+    public GroupedOpenApi telegramApis() {
+        return GroupedOpenApi.builder()
+                .group("telegram-apis")
+                .displayName("Telegram Management APIs")
+                .pathsToMatch("/api/v1/telegram/**")
+                .build();
+    }
+
+    /**
+     * 任务管理接口
+     */
+    @Bean
+    public GroupedOpenApi taskApis() {
+        return GroupedOpenApi.builder()
+                .group("task-apis")
+                .displayName("Task Management APIs")
+                .pathsToMatch("/api/v1/task/**")
+                .build();
+    }
+
+    /**
+     * 项目管理接口
+     */
+    @Bean
+    public GroupedOpenApi projectApis() {
+        return GroupedOpenApi.builder()
+                .group("project-apis")
+                .displayName("Project Management APIs")
+                .pathsToMatch("/api/v1/project/**")
+                .build();
+    }
+
+    /**
+     * 产品管理接口
+     */
+    @Bean
+    public GroupedOpenApi productApis() {
+        return GroupedOpenApi.builder()
+                .group("product-apis")
+                .displayName("Product Management APIs")
+                .pathsToMatch("/api/v1/product/**")
+                .build();
+    }
+
+    /**
+     * 商店应用管理接口
+     */
+    @Bean
+    public GroupedOpenApi shopAppApis() {
+        return GroupedOpenApi.builder()
+                .group("shop-app-apis")
+                .displayName("Shop App Management APIs")
+                .pathsToMatch("/api/v1/shop/app/**")
+                .build();
+    }
+
+    /**
+     * 服务统计管理接口
+     */
+    @Bean
+    public GroupedOpenApi serviceStatisticApis() {
+        return GroupedOpenApi.builder()
+                .group("service-statistic-apis")
+                .displayName("Service Statistic Management APIs")
+                .pathsToMatch("/api/v1/service/statistic/**")
+                .build();
+    }
+
+    /**
+     * 许可证管理接口
+     */
+    @Bean
+    public GroupedOpenApi licenseApis() {
+        return GroupedOpenApi.builder()
+                .group("license-apis")
+                .displayName("License Management APIs")
+                .pathsToMatch("/api/v1/license/**")
                 .build();
     }
 }
