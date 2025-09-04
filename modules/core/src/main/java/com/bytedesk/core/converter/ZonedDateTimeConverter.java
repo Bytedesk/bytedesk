@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-07-04 18:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 18:10:00
+ * @LastEditTime: 2025-09-04 14:10:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,17 +14,19 @@
 package com.bytedesk.core.converter;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+// import java.time.format.DateTimeFormatter;
 
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.converters.WriteConverterContext;
 import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.data.WriteCellData;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * ZonedDateTime类型的Excel转换器
  * 
  * 用于处理ZonedDateTime类型的字段导出到Excel时的转换
+ * 使用与BdDateUtils.formatDatetimeToString相同的时区转换逻辑
  * 
  * @author jackning
  * @version 1.0
@@ -32,7 +34,7 @@ import com.alibaba.excel.metadata.data.WriteCellData;
  */
 public class ZonedDateTimeConverter implements Converter<ZonedDateTime> {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    // private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public Class<?> supportJavaTypeKey() {
@@ -50,6 +52,9 @@ public class ZonedDateTimeConverter implements Converter<ZonedDateTime> {
         if (value == null) {
             return new WriteCellData<>("");
         }
-        return new WriteCellData<>(value.format(FORMATTER));
+        
+        // 使用BdDateUtils.formatDatetimeToString的转换逻辑
+        String formattedDateTime = BdDateUtils.formatDatetimeToString(value);
+        return new WriteCellData<>(formattedDateTime);
     }
 }

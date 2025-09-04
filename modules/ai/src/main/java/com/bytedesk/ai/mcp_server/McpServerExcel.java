@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-01 06:18:10
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 18:00:51
+ * @LastEditTime: 2025-09-04 13:59:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,34 +36,22 @@ public class McpServerExcel {
     @ColumnWidth(30)
     private String description;
 
-    @ExcelProperty(index = 2, value = "服务器类型")
-    @ColumnWidth(15)
-    private String type;
-
-    @ExcelProperty(index = 3, value = "状态")
-    @ColumnWidth(10)
-    private McpServerStatusEnum status;
-
-    @ExcelProperty(index = 4, value = "是否启用")
-    @ColumnWidth(10)
+    @ExcelProperty(index = 2, value = "是否启用")
+    @ColumnWidth(30)
     private Boolean enabled;
 
-    @ExcelProperty(index = 5, value = "服务器配置")
+    @ExcelProperty(index = 3, value = "服务器配置")
     @ColumnWidth(50)
     private String serverConfig;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(index = 6, value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
+    @ExcelProperty(index = 4, value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
     private ZonedDateTime createdAt;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(index = 7, value = "最后连接时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
+    @ExcelProperty(index = 5, value = "修改时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
-    private ZonedDateTime lastConnected;
-
-    @ExcelProperty(index = 8, value = "最后错误")
-    @ColumnWidth(30)
-    private String lastError;
+    private ZonedDateTime updatedAt;
 
 }

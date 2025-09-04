@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 15:44:34
+ * @LastEditTime: 2025-09-04 13:37:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -58,6 +58,11 @@ public class McpServerSpecification extends BaseSpecification<McpServerEntity, M
             // enabled
             if (request.getEnabled() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("enabled"), request.getEnabled()));
+            }
+
+            // categoryUid
+            if (StringUtils.hasText(request.getCategoryUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
             
             // userUid
