@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-04 11:22:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-16 11:57:15
+ * @LastEditTime: 2025-09-04 17:59:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -140,7 +140,6 @@ public class NoticeService {
     private void validateNoticeRequest(NoticeRequest request) {
         Assert.notNull(request, "Notice request cannot be null");
         Assert.hasText(request.getUserUid(), "User UID cannot be null or empty");
-        Assert.hasText(request.getOrgUid(), "Organization UID cannot be null or empty");
     }
 
     /**
