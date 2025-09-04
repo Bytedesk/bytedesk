@@ -13,10 +13,13 @@
  */
 package com.bytedesk.ai.workflow_edge;
 
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.constant.I18Consts;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,11 +34,103 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class WorkflowEdgeResponse extends BaseResponse {
 
+    /**
+     * 边名称
+     */
     private String name;
 
-    private String description;
+    /**
+     * 边描述
+     */
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
-    private String type;
+    /**
+     * 边类型 (DEFAULT, CONDITION, LOOP, DATA, CONTROL, ERROR, etc.)
+     */
+    @Builder.Default
+    private String edgeType = WorkflowEdgeTypeEnum.DEFAULT.getValue();
 
+    /**
+     * 源节点ID
+     */
+    private String sourceNodeId;
+
+    /**
+     * 目标节点ID
+     */
+    private String targetNodeId;
+
+    /**
+     * 源端口ID（可选，用于多端口节点）
+     */
+    private String sourcePortId;
+
+    /**
+     * 目标端口ID（可选，用于多端口节点）
+     */
+    private String targetPortId;
+
+    /**
+     * 边的权重或优先级
+     */
+    @Builder.Default
+    private Integer weight = 0;
+
+    /**
+     * 条件表达式（用于条件边）
+     */
+    private String conditionExpression;
+
+    /**
+     * 边完整配置数据（JSON格式）
+     */
+    private String edgeData;
+
+    /**
+     * 边执行结果数据（JSON格式）
+     */
+    private String executionResult;
+
+    /**
+     * 边最后执行时间
+     */
+    private ZonedDateTime lastExecutionTime;
+
+    /**
+     * 边执行次数
+     */
+    private Long executionCount;
+
+    /**
+     * 是否启用该边
+     */
+    @Builder.Default
+    private Boolean enabled = true;
+
+    /**
+     * 边的样式配置（JSON格式）
+     */
+    private String styleConfig;
+
+    /**
+     * 关联的工作流UID
+     */
+    private String workflowUid;
+
+    /**
+     * 是否为条件边
+     */
+    private Boolean isConditionalEdge;
+
+    /**
+     * 是否为控制边
+     */
+    private Boolean isControlEdge;
+
+    /**
+     * 是否为数据边
+     */
+    private Boolean isDataEdge;
 
 }

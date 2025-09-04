@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 11:01:40
+ * @LastEditTime: 2025-09-04 12:12:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,58 +37,30 @@ public class McpServerResponse extends BaseResponse {
 
     private String type;
 
-    private String serverVersion;
-
-    private String serverUrl;
-
-    private String host;
-
-    private Integer port;
-
-    private McpServerProtocolEnum protocol;
-
-    private McpServerAuthTypeEnum authType;
-
-    private Integer connectionTimeout;
-
-    private Integer readTimeout;
-
-    private Integer maxRetries;
-
-    private String capabilities;
-
-    private String availableTools;
-
-    private String availableResources;
-
-    private String availablePrompts;
-
-    private String configJson;
-
-    private String environmentVars;
-
     private McpServerStatusEnum status;
 
     private Boolean enabled;
 
-    private Boolean autoStart;
+    private String categoryUid;
 
-    private String healthCheckUrl;
-
-    private Integer healthCheckInterval;
+    /**
+     * Server configuration in JSON format
+     * Contains all server-specific configuration including:
+     * - serverVersion, serverUrl, host, port, protocol
+     * - authToken, authType, authHeaders
+     * - connectionTimeout, readTimeout, maxRetries
+     * - capabilities, availableTools, availableResources, availablePrompts
+     * - environmentVars, healthCheckUrl, healthCheckInterval
+     * - priority, tags, metadata, usageStats
+     * - autoStart and other settings
+     */
+    private String serverConfig;
+    
 
     private java.time.ZonedDateTime lastHealthCheck;
 
     private java.time.ZonedDateTime lastConnected;
 
     private String lastError;
-
-    private Integer priority;
-
-    private String tags;
-
-    private String metadata;
-
-    private String usageStats;
 
 }

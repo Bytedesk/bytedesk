@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkflowNodeService {
 
     @Autowired
-    private WorkflowNodeRepository workflowNodeRepository;
+    private WorkflowNodeRestService workflowNodeRestService;
 
     /**
      * 创建工作流节点
@@ -46,7 +46,7 @@ public class WorkflowNodeService {
     @Transactional
     public WorkflowNodeEntity createNode(WorkflowEntity workflow, WorkflowBaseNode node) {
         // 检查节点UID是否已存在
-        if (workflowNodeRepository.existsByUidAndDeletedFalse(node.getId())) {
+        if (workflowNodeRestService.nodeExistsByUid(node.getId())) {
             throw new IllegalArgumentException("Node with UID " + node.getId() + " already exists");
         }
 
@@ -57,7 +57,7 @@ public class WorkflowNodeService {
             entity.setEnabled(true);
         }
 
-        return workflowNodeRepository.save(entity);
+        return workflowNodeRestService.createNode(entity);
     }
 
     /**
@@ -77,7 +77,7 @@ public class WorkflowNodeService {
     public WorkflowNodeEntity updateNode(String uid, WorkflowBaseNode node) {
         WorkflowNodeEntity entity = findByUid(uid);
         entity.fromWorkflowNode(node);
-        return workflowNodeRepository.save(entity);
+        return workflowNodeRestService.updateNode(entity);
     }
 
     /**
@@ -88,36 +88,39 @@ public class WorkflowNodeService {
                                              String result, String error) {
         WorkflowNodeEntity entity = findByUid(uid);
         entity.updateExecutionStatus(status, result, error);
-        return workflowNodeRepository.save(entity);
+        return workflowNodeRestService.updateNode(entity);
     }
 
     /**
      * 根据节点UID查找节点
      */
     public WorkflowNodeEntity findByUid(String uid) {
-        return workflowNodeRepository.findByUidAndDeletedFalse(uid)
-                .orElseThrow(() -> new NotFoundException("WorkflowNode not found with UID: " + uid));
+        WorkflowNodeEntity entity = workflowNodeRestService.findByUidAndDeletedFalse(uid);
+        if (entity == null) {
+            throw new NotFoundException("WorkflowNode not found with UID: " + uid);
+        }
+        return entity;
     }
 
     /**
-     * 查找工作流的所有节点
+     * 查找工作流的所有节点（按排序字段升序）
      */
     public List<WorkflowNodeEntity> findByWorkflow(WorkflowEntity workflow) {
-        return workflowNodeRepository.findByWorkflowOrderBySortOrderAsc(workflow);
+        return workflowNodeRestService.findByWorkflowOrderBySortOrderAsc(workflow);
     }
 
     /**
      * 查找工作流的特定类型节点
      */
     public List<WorkflowNodeEntity> findByWorkflowAndType(WorkflowEntity workflow, WorkflowNodeTypeEnum type) {
-        return workflowNodeRepository.findByWorkflowAndType(workflow, type.getValue());
+        return workflowNodeRestService.findByWorkflowAndType(workflow, type.getValue());
     }
 
     /**
      * 查找工作流的启用节点
      */
     public List<WorkflowNodeEntity> findEnabledNodesByWorkflow(WorkflowEntity workflow) {
-        return workflowNodeRepository.findByWorkflowAndEnabledTrueOrderBySortOrderAsc(workflow);
+        return workflowNodeRestService.findByWorkflowAndEnabledTrueOrderBySortOrderAsc(workflow);
     }
 
     /**
@@ -155,7 +158,7 @@ public class WorkflowNodeService {
      * 获取处理中的节点
      */
     public List<WorkflowNodeEntity> findProcessingNodes(WorkflowEntity workflow) {
-        return workflowNodeRepository.findByWorkflowAndStatus(workflow, WorkflowNodeStatusEnum.PROCESSING.name());
+        return workflowNodeRestService.findByWorkflowAndStatus(workflow, WorkflowNodeStatusEnum.PROCESSING.name());
     }
 
     /**
@@ -165,7 +168,7 @@ public class WorkflowNodeService {
     public WorkflowNodeEntity toggleNodeEnabled(String uid, boolean enabled) {
         WorkflowNodeEntity entity = findByUid(uid);
         entity.setEnabled(enabled);
-        return workflowNodeRepository.save(entity);
+        return workflowNodeRestService.updateNode(entity);
     }
 
     /**
@@ -174,7 +177,7 @@ public class WorkflowNodeService {
     @Transactional
     public void deleteNode(String uid) {
         WorkflowNodeEntity entity = findByUid(uid);
-        workflowNodeRepository.delete(entity);
+        workflowNodeRestService.deleteNodeEntity(entity);
     }
 
     /**
@@ -183,7 +186,7 @@ public class WorkflowNodeService {
     @Transactional
     public void deleteNodesByWorkflow(WorkflowEntity workflow) {
         List<WorkflowNodeEntity> nodes = findByWorkflow(workflow);
-        workflowNodeRepository.deleteAll(nodes);
+        workflowNodeRestService.deleteAllNodes(nodes);
     }
 
     /**
@@ -212,7 +215,7 @@ public class WorkflowNodeService {
             node.setExecutionStartTime(null);
             node.setExecutionEndTime(null);
         });
-        workflowNodeRepository.saveAll(nodes);
+        workflowNodeRestService.saveAllNodes(nodes);
     }
 
     /**
@@ -233,5 +236,46 @@ public class WorkflowNodeService {
         
         // 创建新节点
         return createNodes(workflow, nodes);
+    }
+
+    /**
+     * 获取工作流节点的统计信息
+     */
+    public WorkflowNodeStats getWorkflowNodeStats(WorkflowEntity workflow) {
+        List<WorkflowNodeEntity> allNodes = findByWorkflow(workflow);
+        
+        long totalNodes = allNodes.size();
+        long enabledNodes = allNodes.stream().filter(WorkflowNodeEntity::getEnabled).count();
+        long startNodes = allNodes.stream().filter(node -> 
+                node.getNodeTypeEnum() == WorkflowNodeTypeEnum.START).count();
+        long endNodes = allNodes.stream().filter(node -> 
+                node.getNodeTypeEnum() == WorkflowNodeTypeEnum.END).count();
+        long processingNodes = allNodes.stream().filter(node -> 
+                WorkflowNodeStatusEnum.PROCESSING.name().equals(node.getStatus())).count();
+        
+        return WorkflowNodeStats.builder()
+                .totalNodes(totalNodes)
+                .enabledNodes(enabledNodes)
+                .disabledNodes(totalNodes - enabledNodes)
+                .startNodes(startNodes)
+                .endNodes(endNodes)
+                .processingNodes(processingNodes)
+                .build();
+    }
+
+    /**
+     * 工作流节点统计信息
+     */
+    @lombok.Data
+    @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class WorkflowNodeStats {
+        private long totalNodes;
+        private long enabledNodes;
+        private long disabledNodes;
+        private long startNodes;
+        private long endNodes;
+        private long processingNodes;
     }
 }

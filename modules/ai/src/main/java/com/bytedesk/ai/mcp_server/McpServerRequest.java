@@ -33,56 +33,25 @@ public class McpServerRequest extends BaseRequest {
 
     private String description;
 
-    // private String type;
-
-    private String serverVersion;
-
-    private String serverUrl;
-
-    private String host;
-
-    private Integer port;
-
-    private McpServerProtocolEnum protocol;
-
-    private String authToken;
-
-    private McpServerAuthTypeEnum authType;
-
-    private String authHeaders;
-
-    private Integer connectionTimeout;
-
-    private Integer readTimeout;
-
-    private Integer maxRetries;
-
-    private String capabilities;
-
-    private String availableTools;
-
-    private String availableResources;
-
-    private String availablePrompts;
-
-    private String configJson;
-
-    private String environmentVars;
+    private String serverType;
 
     private McpServerStatusEnum status;
 
     private Boolean enabled;
 
-    private Boolean autoStart;
+    private String categoryUid;
 
-    private String healthCheckUrl;
-
-    private Integer healthCheckInterval;
-
-    private Integer priority;
-
-    private String tags;
-
-    private String metadata;
+    /**
+     * Server configuration in JSON format
+     * Contains all server-specific configuration including:
+     * - serverVersion, serverUrl, host, port, protocol
+     * - authToken, authType, authHeaders
+     * - connectionTimeout, readTimeout, maxRetries
+     * - capabilities, availableTools, availableResources, availablePrompts
+     * - environmentVars, healthCheckUrl, healthCheckInterval
+     * - priority, tags, metadata, usageStats
+     * - autoStart and other settings
+     */
+    private String serverConfig;
 
 }

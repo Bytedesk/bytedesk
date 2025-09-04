@@ -66,104 +66,6 @@ public class McpServerEntity extends BaseEntity {
     private String type = McpServerTypeEnum.KNOWLEDGE.name();
 
     /**
-     * MCP Server version
-     */
-    @Builder.Default
-    private String serverVersion = "1.0.0";
-
-    /**
-     * Connection URI/URL for the MCP server
-     */
-    private String serverUrl;
-
-    /**
-     * Server host/hostname
-     */
-    private String host;
-
-    /**
-     * Server port
-     */
-    private Integer port;
-
-    /**
-     * Connection protocol (http, https, websocket, etc.)
-     */
-    @Builder.Default
-    private String protocol = McpServerProtocolEnum.HTTP.name();
-
-    /**
-     * Authentication token for server access
-     */
-    private String authToken;
-
-    /**
-     * Authentication type (bearer, basic, api_key, etc.)
-     */
-    @Builder.Default
-    private String authType = McpServerAuthTypeEnum.BEARER.name();
-
-    /**
-     * Additional authentication headers in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String authHeaders;
-
-    /**
-     * Connection timeout in milliseconds
-     */
-    @Builder.Default
-    private Integer connectionTimeout = 30000;
-
-    /**
-     * Read timeout in milliseconds
-     */
-    @Builder.Default
-    private Integer readTimeout = 60000;
-
-    /**
-     * Maximum number of retry attempts
-     */
-    @Builder.Default
-    private Integer maxRetries = 3;
-
-    /**
-     * Server capabilities in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String capabilities;
-
-    /**
-     * Available tools/functions in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String availableTools;
-
-    /**
-     * Available resources in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String availableResources;
-
-    /**
-     * Available prompts in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String availablePrompts;
-
-    /**
-     * Server configuration in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String configJson;
-
-    /**
-     * Environment variables for the server in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String environmentVars;
-
-    /**
      * Server status (ACTIVE, INACTIVE, ERROR, CONNECTING, etc.)
      */
     @Builder.Default
@@ -176,21 +78,23 @@ public class McpServerEntity extends BaseEntity {
     private Boolean enabled = false;
 
     /**
-     * Whether to auto-start the server
+     * Category UID for organizing servers (optional)
      */
-    @Builder.Default
-    private Boolean autoStart = false;
+    private String categoryUid;
 
     /**
-     * Health check URL
+     * Server configuration in JSON format
+     * Contains all server-specific configuration including:
+     * - serverVersion, serverUrl, host, port, protocol
+     * - authToken, authType, authHeaders
+     * - connectionTimeout, readTimeout, maxRetries
+     * - capabilities, availableTools, availableResources, availablePrompts
+     * - environmentVars, healthCheckUrl, healthCheckInterval
+     * - priority, tags, metadata, usageStats
+     * - autoStart and other settings
      */
-    private String healthCheckUrl;
-
-    /**
-     * Health check interval in seconds
-     */
-    @Builder.Default
-    private Integer healthCheckInterval = 60;
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String serverConfig;
 
     /**
      * Last health check time
@@ -207,28 +111,5 @@ public class McpServerEntity extends BaseEntity {
      */
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String lastError;
-
-    /**
-     * Priority for server selection (higher number = higher priority)
-     */
-    @Builder.Default
-    private Integer priority = 0;
-
-    /**
-     * Tags for categorization and filtering
-     */
-    private String tags;
-
-    /**
-     * Additional metadata in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String metadata;
-
-    /**
-     * Usage statistics in JSON format
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String usageStats;
 
 }

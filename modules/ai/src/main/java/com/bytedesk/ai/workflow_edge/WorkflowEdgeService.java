@@ -14,7 +14,6 @@
 package com.bytedesk.ai.workflow_edge;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkflowEdgeService {
 
     @Autowired
-    private WorkflowEdgeRepository workflowEdgeRepository;
+    private WorkflowEdgeRestService workflowEdgeRestService;
 
     /**
      * 创建工作流边
@@ -44,7 +43,7 @@ public class WorkflowEdgeService {
     @Transactional
     public WorkflowEdgeEntity createEdge(WorkflowEntity workflow, WorkflowEdge edge) {
         // 检查边UID是否已存在
-        if (workflowEdgeRepository.existsByUidAndDeletedFalse(edge.getId())) {
+        if (workflowEdgeRestService.edgeExistsByUid(edge.getId())) {
             throw new IllegalArgumentException("Edge with UID " + edge.getId() + " already exists");
         }
 
@@ -53,7 +52,7 @@ public class WorkflowEdgeService {
 
         WorkflowEdgeEntity entity = WorkflowEdgeEntity.of(workflow, edge);
         
-        return workflowEdgeRepository.save(entity);
+        return workflowEdgeRestService.createEdge(entity);
     }
 
     /**
@@ -73,7 +72,7 @@ public class WorkflowEdgeService {
     public WorkflowEdgeEntity updateEdge(String uid, WorkflowEdge edge) {
         WorkflowEdgeEntity entity = findByUid(uid);
         entity.fromWorkflowEdge(edge);
-        return workflowEdgeRepository.save(entity);
+        return workflowEdgeRestService.updateEdge(entity);
     }
 
     /**
@@ -84,65 +83,67 @@ public class WorkflowEdgeService {
         WorkflowEdgeEntity entity = findByUid(uid);
         entity.updateExecutionStats();
         entity.setExecutionResult(result);
-        return workflowEdgeRepository.save(entity);
+        return workflowEdgeRestService.updateEdge(entity);
     }
 
     /**
      * 根据边UID查找边
      */
     public WorkflowEdgeEntity findByUid(String uid) {
-        return workflowEdgeRepository.findByUidAndDeletedFalse(uid)
-                .orElseThrow(() -> new NotFoundException("WorkflowEdge not found with UID: " + uid));
+        WorkflowEdgeEntity entity = workflowEdgeRestService.findEdgeByUid(uid);
+        if (entity == null) {
+            throw new NotFoundException("WorkflowEdge not found with UID: " + uid);
+        }
+        return entity;
     }
 
     /**
      * 查找工作流的所有边
      */
     public List<WorkflowEdgeEntity> findByWorkflow(WorkflowEntity workflow) {
-        return workflowEdgeRepository.findByWorkflowAndDeletedFalse(workflow);
+        return workflowEdgeRestService.findByWorkflow(workflow);
     }
 
     /**
      * 查找工作流的特定类型边
      */
     public List<WorkflowEdgeEntity> findByWorkflowAndType(WorkflowEntity workflow, WorkflowEdgeTypeEnum type) {
-        return workflowEdgeRepository.findByWorkflowAndTypeAndDeletedFalse(workflow, type.getValue());
+        return workflowEdgeRestService.findByWorkflowAndType(workflow, type.getValue());
     }
 
     /**
      * 查找工作流的启用边
      */
     public List<WorkflowEdgeEntity> findEnabledEdgesByWorkflow(WorkflowEntity workflow) {
-        return workflowEdgeRepository.findByWorkflowAndEnabledTrueAndDeletedFalse(workflow);
+        return workflowEdgeRestService.findEnabledEdgesByWorkflow(workflow);
     }
 
     /**
      * 查找连接指定节点的所有边
      */
     public List<WorkflowEdgeEntity> findEdgesConnectingNode(WorkflowEntity workflow, String nodeId) {
-        return workflowEdgeRepository.findEdgesConnectingNode(workflow, nodeId);
+        return workflowEdgeRestService.findEdgesConnectingNode(workflow, nodeId);
     }
 
     /**
      * 查找从指定节点出发的边
      */
     public List<WorkflowEdgeEntity> findEdgesFromNode(WorkflowEntity workflow, String sourceNodeId) {
-        return workflowEdgeRepository.findByWorkflowAndSourceNodeIdAndDeletedFalse(workflow, sourceNodeId);
+        return workflowEdgeRestService.findEdgesFromNode(workflow, sourceNodeId);
     }
 
     /**
      * 查找到达指定节点的边
      */
     public List<WorkflowEdgeEntity> findEdgesToNode(WorkflowEntity workflow, String targetNodeId) {
-        return workflowEdgeRepository.findByWorkflowAndTargetNodeIdAndDeletedFalse(workflow, targetNodeId);
+        return workflowEdgeRestService.findEdgesToNode(workflow, targetNodeId);
     }
 
     /**
      * 查找连接两个特定节点的边
      */
     public List<WorkflowEdgeEntity> findEdgesBetweenNodes(WorkflowEntity workflow, String sourceNodeId, String targetNodeId) {
-        return workflowEdgeRepository.findByWorkflowAndSourceNodeIdAndTargetNodeIdAndDeletedFalse(
-                workflow, sourceNodeId, targetNodeId);
+        return workflowEdgeRestService.findEdgesBetweenNodes(workflow, sourceNodeId, targetNodeId);
     }
 
     /**
@@ -168,7 +169,7 @@ public class WorkflowEdgeService {
     public WorkflowEdgeEntity toggleEdgeEnabled(String uid, boolean enabled) {
         WorkflowEdgeEntity entity = findByUid(uid);
         entity.setEnabled(enabled);
-        return workflowEdgeRepository.save(entity);
+        return workflowEdgeRestService.updateEdge(entity);
     }
 
     /**
@@ -177,7 +178,7 @@ public class WorkflowEdgeService {
     @Transactional
     public void deleteEdge(String uid) {
         WorkflowEdgeEntity entity = findByUid(uid);
-        workflowEdgeRepository.delete(entity);
+        workflowEdgeRestService.deleteEdgeEntity(entity);
     }
 
     /**
@@ -186,7 +187,7 @@ public class WorkflowEdgeService {
     @Transactional
     public void deleteEdgesConnectingNode(WorkflowEntity workflow, String nodeId) {
         List<WorkflowEdgeEntity> edges = findEdgesConnectingNode(workflow, nodeId);
-        workflowEdgeRepository.deleteAll(edges);
+        workflowEdgeRestService.deleteAllEdges(edges);
     }
 
     /**
@@ -195,7 +196,7 @@ public class WorkflowEdgeService {
     @Transactional
     public void deleteEdgesByWorkflow(WorkflowEntity workflow) {
         List<WorkflowEdgeEntity> edges = findByWorkflow(workflow);
-        workflowEdgeRepository.deleteAll(edges);
+        workflowEdgeRestService.deleteAllEdges(edges);
     }
 
     /**

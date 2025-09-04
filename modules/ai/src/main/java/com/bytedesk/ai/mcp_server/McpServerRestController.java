@@ -17,10 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-// 使用本地定义的类替代 Spring AI MCP 中缺失的类
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +46,7 @@ import lombok.AllArgsConstructor;
 public class McpServerRestController extends BaseRestController<McpServerRequest, McpServerRestService> {
 
     private final McpServerRestService mcpServerRestService;
+    
     private final McpServerService mcpServerService;
 
     @ActionAnnotation(title = "McpServer", action = "组织查询", description = "query mcpServer by org")

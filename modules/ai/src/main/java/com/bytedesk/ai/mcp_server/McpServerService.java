@@ -354,8 +354,15 @@ public class McpServerService {
                 boolean isHealthy = Boolean.TRUE.equals(connected);
                 
                 // 如果有健康检查 URL，使用它
-                if (StringUtils.hasText(server.getHealthCheckUrl())) {
-                    isHealthy = performHttpHealthCheck(server);
+                String serverConfigJson = server.getServerConfig();
+                if (StringUtils.hasText(serverConfigJson)) {
+                    // 从 serverConfig JSON 中解析健康检查 URL
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> config = JSON.parseObject(serverConfigJson, Map.class);
+                    String healthCheckUrl = (String) config.get("healthCheckUrl");
+                    if (StringUtils.hasText(healthCheckUrl)) {
+                        isHealthy = performHttpHealthCheck(server, healthCheckUrl);
+                    }
                 }
 
                 // 更新状态
@@ -399,14 +406,24 @@ public class McpServerService {
      */
     private boolean performConnection(McpServerEntity server) {
         try {
-            // 当前为模拟实现 - 检查服务器 URL 是否有效
-            if (!StringUtils.hasText(server.getServerUrl())) {
+            // 当前为模拟实现 - 检查服务器配置是否有效
+            String serverConfigJson = server.getServerConfig();
+            if (!StringUtils.hasText(serverConfigJson)) {
+                return false;
+            }
+            
+            // 解析配置
+            @SuppressWarnings("unchecked")
+            Map<String, Object> config = JSON.parseObject(serverConfigJson, Map.class);
+            String serverUrl = (String) config.get("serverUrl");
+            if (!StringUtils.hasText(serverUrl)) {
                 return false;
             }
             
             // 可以添加简单的 HTTP 检查
-            if (StringUtils.hasText(server.getHealthCheckUrl())) {
-                return performHttpHealthCheck(server);
+            String healthCheckUrl = (String) config.get("healthCheckUrl");
+            if (StringUtils.hasText(healthCheckUrl)) {
+                return performHttpHealthCheck(server, healthCheckUrl);
             }
             
             // 如果没有健康检查 URL，假设连接成功
@@ -441,17 +458,29 @@ public class McpServerService {
         if (serverOpt.isPresent()) {
             McpServerEntity server = serverOpt.get();
             
-            // 更新能力信息
-            if (!status.getTools().isEmpty()) {
-                server.setAvailableTools(JSON.toJSONString(status.getTools()));
-            }
-            if (!status.getResources().isEmpty()) {
-                server.setAvailableResources(JSON.toJSONString(status.getResources()));
-            }
-            if (!status.getPrompts().isEmpty()) {
-                server.setAvailablePrompts(JSON.toJSONString(status.getPrompts()));
+            // 更新 serverConfig 中的能力信息
+            String configJson = server.getServerConfig();
+            Map<String, Object> config;
+            if (StringUtils.hasText(configJson)) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> parsedConfig = JSON.parseObject(configJson, Map.class);
+                config = parsedConfig;
+            } else {
+                config = new HashMap<>();
             }
             
+            // 更新能力信息
+            if (!status.getTools().isEmpty()) {
+                config.put("availableTools", status.getTools());
+            }
+            if (!status.getResources().isEmpty()) {
+                config.put("availableResources", status.getResources());
+            }
+            if (!status.getPrompts().isEmpty()) {
+                config.put("availablePrompts", status.getPrompts());
+            }
+            
+            server.setServerConfig(JSON.toJSONString(config));
             mcpServerRestService.save(server);
         }
     }
@@ -479,16 +508,29 @@ public class McpServerService {
         }
     }
 
-    private boolean performHttpHealthCheck(McpServerEntity server) {
+    private boolean performHttpHealthCheck(McpServerEntity server, String healthCheckUrl) {
         try {
+            // 从 serverConfig 中获取连接超时配置
+            String configJson = server.getServerConfig();
+            int connectionTimeout = 30000; // 默认值
+            
+            if (StringUtils.hasText(configJson)) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> config = JSON.parseObject(configJson, Map.class);
+                Object timeoutObj = config.get("connectionTimeout");
+                if (timeoutObj instanceof Integer) {
+                    connectionTimeout = (Integer) timeoutObj;
+                }
+            }
+            
             WebClient webClient = webClientBuilder
-                .baseUrl(server.getHealthCheckUrl())
+                .baseUrl(healthCheckUrl)
                 .build();
                 
             String response = webClient.get()
                 .retrieve()
                 .bodyToMono(String.class)
-                .timeout(Duration.ofMillis(server.getConnectionTimeout()))
+                .timeout(Duration.ofMillis(connectionTimeout))
                 .block();
                 
             return StringUtils.hasText(response);

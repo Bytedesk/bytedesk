@@ -14,7 +14,10 @@
 package com.bytedesk.ai.workflow_edge;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.I18Consts;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -29,11 +32,78 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class WorkflowEdgeRequest extends BaseRequest {
 
+    /**
+     * 边名称
+     */
     private String name;
 
-    private String description;
+    /**
+     * 边描述
+     */
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
-    // @Builder.Default
-    // private String type = WorkflowEdgeTypeEnum.CUSTOMER.name();
+    /**
+     * 边类型 (DEFAULT, CONDITION, LOOP, DATA, CONTROL, ERROR, etc.)
+     */
+    @Builder.Default
+    private String edgeType = WorkflowEdgeTypeEnum.DEFAULT.getValue();
+
+    /**
+     * 源节点ID
+     */
+    private String sourceNodeId;
+
+    /**
+     * 目标节点ID
+     */
+    private String targetNodeId;
+
+    /**
+     * 源端口ID（可选，用于多端口节点）
+     */
+    private String sourcePortId;
+
+    /**
+     * 目标端口ID（可选，用于多端口节点）
+     */
+    private String targetPortId;
+
+    /**
+     * 边的权重或优先级
+     */
+    @Builder.Default
+    private Integer weight = 0;
+
+    /**
+     * 条件表达式（用于条件边）
+     */
+    private String conditionExpression;
+
+    /**
+     * 边完整配置数据（JSON格式）
+     */
+    private String edgeData;
+
+    /**
+     * 边执行结果数据（JSON格式）
+     */
+    private String executionResult;
+
+    /**
+     * 是否启用该边
+     */
+    @Builder.Default
+    private Boolean enabled = true;
+
+    /**
+     * 边的样式配置（JSON格式）
+     */
+    private String styleConfig;
+
+    /**
+     * 关联的工作流UID
+     */
+    private String workflowUid;
 
 }

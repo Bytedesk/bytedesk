@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 10:15:43
+ * @LastEditTime: 2025-09-04 11:31:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.workflow_node;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -24,6 +25,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import com.bytedesk.ai.workflow.WorkflowEntity;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -36,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowNodeEntity, WorkflowNodeRequest, WorkflowNodeResponse, WorkflowNodeExcel> {
 
-    private final WorkflowNodeRepository workflow_nodeRepository;
+    private final WorkflowNodeRepository workflowNodeRepository;
 
     private final ModelMapper modelMapper;
 
@@ -51,22 +53,22 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
 
     @Override
     protected Page<WorkflowNodeEntity> executePageQuery(Specification<WorkflowNodeEntity> spec, Pageable pageable) {
-        return workflow_nodeRepository.findAll(spec, pageable);
+        return workflowNodeRepository.findAll(spec, pageable);
     }
 
     @Cacheable(value = "workflow_node", key = "#uid", unless="#result==null")
     @Override
     public Optional<WorkflowNodeEntity> findByUid(String uid) {
-        return workflow_nodeRepository.findByUid(uid);
+        return workflowNodeRepository.findByUid(uid);
     }
 
     @Cacheable(value = "workflow_node", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
     public Optional<WorkflowNodeEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return workflow_nodeRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+        return workflowNodeRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
 
     public Boolean existsByUid(String uid) {
-        return workflow_nodeRepository.existsByUid(uid);
+        return workflowNodeRepository.existsByUid(uid);
     }
 
     @Transactional
@@ -104,7 +106,7 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
     @Transactional
     @Override
     public WorkflowNodeResponse update(WorkflowNodeRequest request) {
-        Optional<WorkflowNodeEntity> optional = workflow_nodeRepository.findByUid(request.getUid());
+        Optional<WorkflowNodeEntity> optional = workflowNodeRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             WorkflowNodeEntity entity = optional.get();
             WorkflowNodeConvert.updateEntity(entity, request);
@@ -122,20 +124,20 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
 
     @Override
     protected WorkflowNodeEntity doSave(WorkflowNodeEntity entity) {
-        return workflow_nodeRepository.save(entity);
+        return workflowNodeRepository.save(entity);
     }
 
     @Override
     public WorkflowNodeEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, WorkflowNodeEntity entity) {
         try {
-            Optional<WorkflowNodeEntity> latest = workflow_nodeRepository.findByUid(entity.getUid());
+            Optional<WorkflowNodeEntity> latest = workflowNodeRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 WorkflowNodeEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
-                return workflow_nodeRepository.save(latestEntity);
+                return workflowNodeRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -147,7 +149,7 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<WorkflowNodeEntity> optional = workflow_nodeRepository.findByUid(uid);
+        Optional<WorkflowNodeEntity> optional = workflowNodeRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -172,7 +174,7 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
     public WorkflowNodeExcel convertToExcel(WorkflowNodeEntity entity) {
         return modelMapper.map(entity, WorkflowNodeExcel.class);
     }
-    
+
     public void initWorkflowNodes(String orgUid) {
         // log.info("initThreadWorkflowNode");
         // for (String workflow_node : WorkflowNodeInitData.getAllWorkflowNodes()) {
@@ -188,7 +190,69 @@ public class WorkflowNodeRestService extends BaseRestServiceWithExport<WorkflowN
         //     create(workflow_nodeRequest);
         // }
     }
-
     
+    // Service层需要的业务方法
+    @Transactional
+    public WorkflowNodeEntity createNode(WorkflowNodeEntity node) {
+        return save(node);
+    }
+    
+    @Transactional
+    public WorkflowNodeEntity updateNode(WorkflowNodeEntity node) {
+        return save(node);
+    }
+    
+    @Transactional
+    public void deleteNode(String uid) {
+        deleteByUid(uid);
+    }
+    
+    public WorkflowNodeEntity findNodeByUid(String uid) {
+        return findByUid(uid).orElse(null);
+    }
+    
+    public boolean nodeExistsByUid(String uid) {
+        return existsByUid(uid);
+    }
+    
+    // 支持WorkflowNodeService的复杂查询方法
+    public boolean existsByUidAndDeletedFalse(String uid) {
+        return workflowNodeRepository.existsByUidAndDeletedFalse(uid);
+    }
+    
+    public WorkflowNodeEntity findByUidAndDeletedFalse(String uid) {
+        return workflowNodeRepository.findByUidAndDeletedFalse(uid).orElse(null);
+    }
+    
+    public List<WorkflowNodeEntity> findByWorkflowOrderBySortOrderAsc(WorkflowEntity workflow) {
+        return workflowNodeRepository.findByWorkflowOrderBySortOrderAsc(workflow);
+    }
+    
+    public List<WorkflowNodeEntity> findByWorkflowAndType(WorkflowEntity workflow, String type) {
+        return workflowNodeRepository.findByWorkflowAndType(workflow, type);
+    }
+    
+    public List<WorkflowNodeEntity> findByWorkflowAndEnabledTrueOrderBySortOrderAsc(WorkflowEntity workflow) {
+        return workflowNodeRepository.findByWorkflowAndEnabledTrueOrderBySortOrderAsc(workflow);
+    }
+    
+    public List<WorkflowNodeEntity> findByWorkflowAndStatus(WorkflowEntity workflow, String status) {
+        return workflowNodeRepository.findByWorkflowAndStatus(workflow, status);
+    }
+    
+    @Transactional
+    public void deleteNodeEntity(WorkflowNodeEntity entity) {
+        workflowNodeRepository.delete(entity);
+    }
+    
+    @Transactional
+    public void deleteAllNodes(List<WorkflowNodeEntity> nodes) {
+        workflowNodeRepository.deleteAll(nodes);
+    }
+    
+    @Transactional
+    public void saveAllNodes(List<WorkflowNodeEntity> nodes) {
+        workflowNodeRepository.saveAll(nodes);
+    }
     
 }
