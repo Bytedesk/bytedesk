@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 13:48:36
+ * @LastEditTime: 2025-09-04 15:52:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,16 +27,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.bytedesk.ai.robot.agent.RobotAgentService;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
@@ -46,8 +41,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.message.MessageEntity;
-import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -72,11 +65,11 @@ import com.bytedesk.core.topic.TopicUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, TicketRequest, TicketResponse, TicketExcel> {
+public class TicketRestService
+        extends BaseRestServiceWithExport<TicketEntity, TicketRequest, TicketResponse, TicketExcel> {
 
     private final TaskService taskService;
 
@@ -100,9 +93,7 @@ public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, T
 
     private final CategoryRestService categoryService;
 
-    private final RobotAgentService robotAgentService;
-
-    private final MessageRestService messageRestService;
+    
 
     @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
@@ -125,17 +116,17 @@ public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, T
         // 默认是工作组工单，暂不启用一对一
         ticket.setType(TicketTypeEnum.DEPARTMENT.name());
         ticket.setOwner(owner); // 创建人
-        // 
+        //
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());
         //
-        if (StringUtils.hasText(request.getAssigneeJson()) 
-            && StringUtils.hasText(request.getAssignee().getUid())) {
+        if (StringUtils.hasText(request.getAssigneeJson())
+                && StringUtils.hasText(request.getAssignee().getUid())) {
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
         } else {
             ticket.setStatus(TicketStatusEnum.NEW.name());
         }
-        // 
+        //
         ticket.setReporter(request.getReporterJson());
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
@@ -157,7 +148,7 @@ public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, T
             }
         }
         savedTicket.setAttachments(attachments);
-        
+
         // 未绑定客服会话的情况下，创建工单客服会话
         if (!StringUtils.hasText(ticket.getThreadUid())) {
             // 如果创建工单的时候没有绑定会话，则创建会话
@@ -167,7 +158,7 @@ public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, T
                 ticket.setThreadUid(thread.getUid());
             }
         }
-        
+
         // 保存工单
         savedTicket = save(savedTicket);
         if (savedTicket == null) {
@@ -271,7 +262,7 @@ public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, T
         if (owner == null) {
             throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
-        // 
+        //
         if (ticket.getDepartmentUid() == null || ticket.getDepartmentUid().isEmpty()) {
             ticket.setDepartmentUid("all");
         }
@@ -426,67 +417,6 @@ public class TicketRestService extends BaseRestServiceWithExport<TicketEntity, T
         return modelMapper.map(entity, TicketExcel.class);
     }
 
-    public TicketRequest autoFillTicket(TicketRequest request) {
-        // 
-        String content = "";
-        String orgUid = request.getOrgUid();
-        List<MessageEntity> messages = messageRestService.findByThreadUid(request.getThreadUid());
-        for (MessageEntity message : messages) {
-            content += message.getContent() + "\n";
-        }
-        // 
-        String jsonResponse = robotAgentService.autoFillTicket(content, orgUid);
-        
-        // 处理返回的JSON字符串，去除可能的前缀和后缀
-        if (jsonResponse != null) {
-            jsonResponse = jsonResponse.replace("```json", "").replace("```", "").trim();
-        }
-        
-        try {
-            // 使用Jackson库解析JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-            
-            // 构建TicketRequest对象
-            TicketRequest ticketRequest = new TicketRequest();
-            
-            // 设置原始请求的信息
-            ticketRequest.setOrgUid(request.getOrgUid());
-            // ticketRequest.setThreadUid(request.getThreadUid());
-            // ticketRequest.setDepartmentUid(request.getDepartmentUid());
-            // ticketRequest.setAssignee(request.getAssignee());
-            
-            // 从JSON填充字段
-            if (jsonNode.has("title")) {
-                ticketRequest.setTitle(jsonNode.get("title").asText());
-            }
-            
-            if (jsonNode.has("description")) {
-                ticketRequest.setDescription(jsonNode.get("description").asText());
-            }
-            
-            if (jsonNode.has("status")) {
-                ticketRequest.setStatus(jsonNode.get("status").asText());
-            }
-            
-            if (jsonNode.has("priority")) {
-                ticketRequest.setPriority(jsonNode.get("priority").asText());
-            }
-            
-            if (jsonNode.has("category")) {
-                // 通过类别名称查询对应的类别UID
-                String categoryName = jsonNode.get("category").asText();
-                // 这里需要实现查找类别UID的逻辑，暂时留空
-                // ticketRequest.setCategoryUid(findCategoryUidByName(categoryName, orgUid));
-                ticketRequest.setCategoryUid(categoryName);
-            }
-            
-            return ticketRequest;
-        } catch (Exception e) {
-            log.error("解析自动填充工单JSON失败", e);
-            return request; // 解析失败时返回原始请求
-        }
-    }
 
     @Override
     protected Specification<TicketEntity> createSpecification(TicketRequest request) {

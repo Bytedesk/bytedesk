@@ -349,14 +349,6 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(activities));
     }
 
-    // 智能填写工单
-    @PostMapping("/auto/fill")
-    public ResponseEntity<?> autoFillTicket(@RequestBody TicketRequest request) {
-        //
-        TicketRequest filledTicket = ticketRestService.autoFillTicket(request);
-        log.info("智能填写工单：{}", filledTicket);
-
-        return ResponseEntity.ok(JsonResult.success(filledTicket));
-    }
+    
 
 }
