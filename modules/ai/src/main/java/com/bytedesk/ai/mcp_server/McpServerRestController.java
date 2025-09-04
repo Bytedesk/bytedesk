@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.mcp_server;
+package com.bytedesk.ai.mcp_server;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
-import com.bytedesk.ai.springai.mcp_server.McpServerService.ServerStatus;
+import com.bytedesk.ai.mcp_server.McpServerService.ServerStatus;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;

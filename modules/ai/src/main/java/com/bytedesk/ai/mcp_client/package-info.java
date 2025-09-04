@@ -1,4 +1,4 @@
 @NonNullApi
-package com.bytedesk.ai.springai.mcp_server;
+package com.bytedesk.ai.mcp_client;
 
 import org.springframework.lang.NonNullApi;

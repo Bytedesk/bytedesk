@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.mcp_server;
+package com.bytedesk.ai.mcp_server;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;

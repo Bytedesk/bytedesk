@@ -11,14 +11,14 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.mcp_server;
+package com.bytedesk.ai.mcp_server;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.ai.springai.mcp_server.event.McpServerCreateEvent;
-import com.bytedesk.ai.springai.mcp_server.event.McpServerUpdateEvent;
+import com.bytedesk.ai.mcp_server.event.McpServerCreateEvent;
+import com.bytedesk.ai.mcp_server.event.McpServerUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;

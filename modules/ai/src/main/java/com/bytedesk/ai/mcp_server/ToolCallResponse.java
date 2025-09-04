@@ -1,4 +1,4 @@
-package com.bytedesk.ai.springai.mcp_server;
+package com.bytedesk.ai.mcp_server;
 
 import lombok.Data;
 import java.util.Map;

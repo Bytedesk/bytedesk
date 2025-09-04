@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:04
+ * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 14:02:22
+ * @LastEditTime: 2025-08-26 11:01:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,9 +11,11 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.mcp_server;
+package com.bytedesk.ai.mcp_server;
 
-import com.bytedesk.core.base.BaseRequest;
+
+import com.bytedesk.core.base.BaseResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,16 +26,16 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class McpServerRequest extends BaseRequest {
+public class McpServerResponse extends BaseResponse {
 
     private String name;
 
     private String description;
 
-    // private String type;
+    private String type;
 
     private String serverVersion;
 
@@ -45,11 +47,7 @@ public class McpServerRequest extends BaseRequest {
 
     private McpServerProtocolEnum protocol;
 
-    private String authToken;
-
     private McpServerAuthTypeEnum authType;
-
-    private String authHeaders;
 
     private Integer connectionTimeout;
 
@@ -79,10 +77,18 @@ public class McpServerRequest extends BaseRequest {
 
     private Integer healthCheckInterval;
 
+    private java.time.ZonedDateTime lastHealthCheck;
+
+    private java.time.ZonedDateTime lastConnected;
+
+    private String lastError;
+
     private Integer priority;
 
     private String tags;
 
     private String metadata;
+
+    private String usageStats;
 
 }
