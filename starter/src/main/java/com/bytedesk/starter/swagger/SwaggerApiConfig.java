@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-24 11:10:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 23:14:32
+ * @LastEditTime: 2025-09-04 09:31:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Swagger 分组和国际化支持配置
+ * http://127.0.0.1:9003/swagger-ui/index.html
  */
 @Configuration
 public class SwaggerApiConfig {

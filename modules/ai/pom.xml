@@ -37,7 +37,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>io.swagger.core.v3</groupId>
-					<artifactId>swagger-annotations</artifactId>
+					<artifactId>swagger-annotations-jakarta</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -54,7 +54,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>io.swagger.core.v3</groupId>
-					<artifactId>swagger-annotations</artifactId>
+					<artifactId>swagger-annotations-jakarta</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
