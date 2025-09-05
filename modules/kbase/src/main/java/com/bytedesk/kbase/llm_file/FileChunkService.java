@@ -16,6 +16,8 @@ package com.bytedesk.kbase.llm_file;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.ai.document.Document;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkTypeEnum;
+import com.bytedesk.kbase.llm_file.mq.FileChunkAsyncService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,12 +41,31 @@ import lombok.extern.slf4j.Slf4j;
 public class FileChunkService {
 
     private final ChunkRestService chunkRestService;
+    
+    private final FileChunkAsyncService asyncService;
 
     /**
-     * 处理文件chunk切分
+     * 处理文件chunk切分 - 同步版本
+     * 直接处理文档，不进行大小判断
      */
     public List<String> processFileChunks(List<Document> documents, FileResponse fileResponse) {
-        log.info("FileChunkProcessService processFileChunks: {}", fileResponse.getFileName());
+        log.info("同步处理文件chunk切分: {}, 文档数量: {}", fileResponse.getFileName(), documents.size());
+        return processFileChunksInternal(documents, fileResponse);
+    }
+    
+    /**
+     * 处理文件chunk切分 - 异步版本（推荐用于大文件）
+     */
+    public CompletableFuture<List<String>> processFileChunksAsync(List<Document> documents, FileResponse fileResponse) {
+        log.info("开始异步处理文件chunk切分: {}, 文档数量: {}", fileResponse.getFileName(), documents.size());
+        return asyncService.processFileChunksAsync(documents, fileResponse);
+    }
+    
+    /**
+     * 内部同步处理方法 - 被异步服务调用
+     * 专注于核心的文档切分和存储逻辑
+     */
+    public List<String> processFileChunksInternal(List<Document> documents, FileResponse fileResponse) {
         
         // 使用更安全的文本分割逻辑
         List<Document> docList = new ArrayList<>();
@@ -54,13 +76,18 @@ public class FileChunkService {
             log.info("TokenTextSplitter 分割成功，生成 {} 个文档块", docList.size());
         } catch (UnsupportedOperationException e) {
             log.warn("TokenTextSplitter 分割失败，使用替代方案: {}", e.getMessage());
+            log.info("开始执行fallback分割，输入文档数量: {}", documents.size());
             // 使用简单的字符数分割作为备选方案
             docList = fallbackSplitDocuments(documents);
+            log.info("fallback分割执行完成");
         } catch (Exception e) {
             log.error("文档分割过程中发生错误: {}", e.getMessage(), e);
+            log.info("开始执行fallback分割，输入文档数量: {}", documents.size());
             // 使用简单的字符数分割作为备选方案
             docList = fallbackSplitDocuments(documents);
+            log.info("fallback分割执行完成");
         }
+        log.info("最终生成 {} 个文档块", docList.size());
         
         // 创建chunk记录
         List<String> docIdList = new ArrayList<>();
@@ -95,51 +122,154 @@ public class FileChunkService {
      * 当TokenTextSplitter失败时使用
      */
     private List<Document> fallbackSplitDocuments(List<Document> documents) {
+        log.info("开始执行fallback分割，输入文档数量: {}", documents.size());
         List<Document> result = new ArrayList<>();
-        int maxChunkSize = 2000; // 每个块的最大字符数
-        int overlap = 200; // 重叠字符数
+        int maxChunkSize = 1000; // 减小每个块的最大字符数，避免内存问题
+        int overlap = 100; // 减小重叠字符数
+        
+        int docIndex = 0;
+        int totalChunks = 0;
         
         for (Document doc : documents) {
-            String text = doc.getText();
-            if (text == null || text.trim().isEmpty()) {
-                continue;
-            }
+            docIndex++;
+            log.info("处理第 {} 个文档，文档ID: {}", docIndex, doc.getId());
             
-            // 清理文本中可能导致问题的特殊字符
-            text = cleanSpecialCharacters(text);
-            
-            if (text.length() <= maxChunkSize) {
-                // 如果文档足够小，直接添加
-                Document newDoc = new Document(text, doc.getMetadata());
-                result.add(newDoc);
-            } else {
-                // 分割大文档
-                int start = 0;
-                while (start < text.length()) {
-                    int end = Math.min(start + maxChunkSize, text.length());
-                    
-                    // 尝试在句子边界处分割
-                    if (end < text.length()) {
-                        int lastSentence = findLastSentenceBoundary(text, start, end);
-                        if (lastSentence > start + maxChunkSize / 2) {
-                            end = lastSentence + 1;
-                        }
-                    }
-                    
-                    String chunk = text.substring(start, end);
-                    if (!chunk.trim().isEmpty()) {
-                        Document newDoc = new Document(chunk, doc.getMetadata());
-                        result.add(newDoc);
-                    }
-                    
-                    start = end - overlap; // 保持重叠
-                    if (start >= text.length()) break;
+            try {
+                String text = doc.getText();
+                if (text == null || text.trim().isEmpty()) {
+                    log.debug("第 {} 个文档内容为空，跳过", docIndex);
+                    continue;
                 }
+                
+                int originalLength = text.length();
+                log.info("第 {} 个文档原始长度: {} 字符", docIndex, originalLength);
+                
+                // 如果文档太大，先进行预处理以减少内存使用
+                if (originalLength > 50000) {
+                    log.warn("第 {} 个文档过大 ({} 字符)，进行预处理", docIndex, originalLength);
+                    text = preprocessLargeText(text);
+                    log.info("第 {} 个文档预处理后长度: {} 字符", docIndex, text.length());
+                }
+                
+                // 清理文本中可能导致问题的特殊字符
+                text = cleanSpecialCharacters(text);
+                log.debug("第 {} 个文档清理后长度: {} 字符", docIndex, text.length());
+                
+                // 分割文档
+                List<Document> chunks = splitSingleDocument(text, doc.getMetadata(), maxChunkSize, overlap);
+                result.addAll(chunks);
+                totalChunks += chunks.size();
+                
+                log.info("第 {} 个文档分割完成，生成 {} 个块，累计 {} 个块", docIndex, chunks.size(), totalChunks);
+                
+                // 强制垃圾回收以释放内存
+                if (docIndex % 10 == 0) {
+                    System.gc();
+                    log.debug("已处理 {} 个文档，执行垃圾回收", docIndex);
+                }
+                
+            } catch (Exception e) {
+                log.error("处理第 {} 个文档时发生错误: {}", docIndex, e.getMessage(), e);
+                // 继续处理下一个文档
+                continue;
             }
         }
         
-        log.info("fallback分割完成，生成 {} 个文档块", result.size());
+        log.info("fallback分割完成，总共处理 {} 个文档，生成 {} 个文档块", docIndex, result.size());
         return result;
+    }
+    
+    /**
+     * 预处理大文本，移除多余的空白和重复内容
+     */
+    private String preprocessLargeText(String text) {
+        if (text == null) return "";
+        
+        return text
+            // 移除多余的空行
+            .replaceAll("\\n\\s*\\n\\s*\\n", "\n\n")
+            // 移除多余的空格
+            .replaceAll(" +", " ")
+            // 移除行首行尾的空格
+            .replaceAll("(?m)^\\s+|\\s+$", "")
+            .trim();
+    }
+    
+    /**
+     * 分割单个文档
+     */
+    private List<Document> splitSingleDocument(String text, java.util.Map<String, Object> metadata, int maxChunkSize, int overlap) {
+        log.debug("开始分割单个文档，原始长度: {} 字符，最大块大小: {}，重叠: {}", text.length(), maxChunkSize, overlap);
+        List<Document> chunks = new ArrayList<>();
+        
+        if (text.length() <= maxChunkSize) {
+            // 如果文档足够小，直接添加
+            log.debug("文档长度 {} <= 最大块大小 {}，直接创建单个块", text.length(), maxChunkSize);
+            Document newDoc = new Document(text, metadata);
+            chunks.add(newDoc);
+            log.debug("创建单个块完成，块ID: {}", newDoc.getId());
+        } else {
+            // 分割大文档
+            log.info("文档过大 ({} 字符)，开始分割处理", text.length());
+            int start = 0;
+            int chunkIndex = 0;
+            
+            while (start < text.length()) {
+                chunkIndex++;
+                int end = Math.min(start + maxChunkSize, text.length());
+                log.debug("处理第 {} 个块，起始位置: {}，预计结束位置: {}", chunkIndex, start, end);
+                
+                // 尝试在句子边界处分割
+                if (end < text.length()) {
+                    int originalEnd = end;
+                    int lastSentence = findLastSentenceBoundary(text, start, end);
+                    if (lastSentence > start + maxChunkSize / 2) {
+                        end = lastSentence + 1;
+                        log.debug("第 {} 个块在句子边界调整：{} -> {}", chunkIndex, originalEnd, end);
+                    } else {
+                        log.debug("第 {} 个块未找到合适的句子边界，保持原结束位置: {}", chunkIndex, end);
+                    }
+                }
+                
+                String chunk = text.substring(start, end);
+                int chunkLength = chunk.length();
+                log.debug("第 {} 个块提取完成，长度: {} 字符", chunkIndex, chunkLength);
+                
+                if (!chunk.trim().isEmpty()) {
+                    Document newDoc = new Document(chunk, metadata);
+                    chunks.add(newDoc);
+                    log.debug("第 {} 个块创建成功，块ID: {}，累计块数: {}", chunkIndex, newDoc.getId(), chunks.size());
+                } else {
+                    log.debug("第 {} 个块内容为空，跳过", chunkIndex);
+                }
+                
+                int newStart = end - overlap;
+                log.debug("第 {} 个块处理完成，下一个起始位置: {} (当前结束: {}，重叠: {})", chunkIndex, newStart, end, overlap);
+                start = newStart;
+                
+                if (start >= text.length()) {
+                    log.debug("已到达文档末尾，停止分割");
+                    break;
+                }
+                
+                // 防止无限循环
+                if (chunkIndex > 1000) {
+                    log.warn("文档分割块数过多 ({}块)，停止分割以防止内存问题", chunkIndex);
+                    break;
+                }
+                
+                // 每50个块输出一次进度
+                if (chunkIndex % 50 == 0) {
+                    log.info("分割进度：已处理 {} 个块，当前位置: {}/{} ({:.2f}%)", 
+                            chunkIndex, start, text.length(), (double)start/text.length()*100);
+                }
+            }
+            
+            log.info("大文档分割完成，总共生成 {} 个块", chunks.size());
+        }
+        
+        log.debug("splitSingleDocument 完成，返回 {} 个文档块", chunks.size());
+        return chunks;
     }
     
     /**

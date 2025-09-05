@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-13 15:16:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:47:40
+ * @LastEditTime: 2025-09-05 13:20:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -59,8 +59,6 @@ public class ChunkElasticService {
         }
     }
 
-    
-
     // update all elasticsearch index
     public void updateAllIndex(ChunkRequest request) {
         List<ChunkEntity> chunkList = chunkRestService.findByKbUid(request.getKbUid());
@@ -114,7 +112,7 @@ public class ChunkElasticService {
             }
 
             // 将索引结果保存到数据库中
-            chunk.setSuccess();
+            chunk.setElasticSuccess();
             chunkRestService.save(chunk);
 
         } catch (Exception e) {
