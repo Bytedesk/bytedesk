@@ -16,7 +16,7 @@ package com.bytedesk.kbase.llm_website.crawl;
 /**
  * 抓取任务状态枚举
  */
-public enum CrawlStatus {
+public enum WebsiteCrawlStatus {
     
     /**
      * 等待中

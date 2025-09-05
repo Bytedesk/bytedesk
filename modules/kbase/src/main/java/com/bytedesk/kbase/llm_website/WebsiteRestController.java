@@ -15,6 +15,8 @@ package com.bytedesk.kbase.llm_website;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlConfig;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlTask;
 import com.bytedesk.core.annotation.ActionAnnotation;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -125,6 +129,113 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     public ResponseEntity<?> queryByUid(WebsiteRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    }
+    
+    // ==================== 网站抓取相关API ====================
+    
+    @PostMapping("/crawl/start")
+    @Operation(summary = "开始整站抓取", description = "使用指定配置开始整站抓取")
+    public ResponseEntity<?> startCrawl(@RequestBody WebsiteCrawlRequest request) {
+        try {
+            WebsiteCrawlConfig config = request.getConfig() != null ? request.getConfig() : WebsiteCrawlConfig.getDefault();
+            websiteRestService.startCrawl(request.getWebsiteUid(), config);
+            return ResponseEntity.ok(JsonResult.success("抓取任务已启动"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/crawl/start/fast")
+    @Operation(summary = "快速抓取", description = "使用快速配置开始抓取（较少页面和深度）")
+    public ResponseEntity<?> startFastCrawl(@RequestBody WebsiteCrawlRequest request) {
+        try {
+            websiteRestService.startFastCrawl(request.getWebsiteUid());
+            return ResponseEntity.ok(JsonResult.success("快速抓取任务已启动"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/crawl/start/deep")
+    @Operation(summary = "深度抓取", description = "使用深度配置开始抓取（更多页面和深度）")
+    public ResponseEntity<?> startDeepCrawl(@RequestBody WebsiteCrawlRequest request) {
+        try {
+            websiteRestService.startDeepCrawl(request.getWebsiteUid());
+            return ResponseEntity.ok(JsonResult.success("深度抓取任务已启动"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/crawl/stop")
+    @Operation(summary = "停止抓取", description = "停止正在运行的抓取任务")
+    public ResponseEntity<?> stopCrawl(@RequestBody WebsiteCrawlRequest request) {
+        try {
+            boolean stopped = websiteRestService.stopCrawl(request.getWebsiteUid());
+            if (stopped) {
+                return ResponseEntity.ok(JsonResult.success("抓取任务已停止"));
+            } else {
+                return ResponseEntity.ok(JsonResult.error("没有正在运行的抓取任务"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/crawl/tasks/{websiteUid}")
+    @Operation(summary = "获取抓取任务列表", description = "获取指定网站的所有抓取任务")
+    public ResponseEntity<?> getCrawlTasks(@PathVariable String websiteUid) {
+        try {
+            var tasks = websiteRestService.getCrawlTasks(websiteUid);
+            return ResponseEntity.ok(JsonResult.success(tasks));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/crawl/task/status/{taskId}")
+    @Operation(summary = "获取抓取任务状态", description = "获取指定任务的实时状态")
+    public ResponseEntity<?> getCrawlTaskStatus(@PathVariable String taskId) {
+        try {
+            WebsiteCrawlTask task = websiteRestService.getCrawlTaskStatus(taskId);
+            return ResponseEntity.ok(JsonResult.success(task));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/crawl/sitemap/{websiteUid}")
+    @Operation(summary = "解析站点地图", description = "解析网站的sitemap.xml获取URL列表")
+    public ResponseEntity<?> parseSitemap(@PathVariable String websiteUid) {
+        try {
+            var urls = websiteRestService.parseSitemap(websiteUid);
+            return ResponseEntity.ok(JsonResult.success(urls));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/crawl/config")
+    @Operation(summary = "更新抓取配置", description = "更新网站的抓取配置")
+    public ResponseEntity<?> updateCrawlConfig(@RequestBody WebsiteCrawlConfigRequest request) {
+        try {
+            WebsiteResponse response = websiteRestService.updateCrawlConfig(
+                request.getWebsiteUid(), request.getConfig());
+            return ResponseEntity.ok(JsonResult.success(response));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/crawl/config/{websiteUid}")
+    @Operation(summary = "获取抓取配置", description = "获取网站的抓取配置")
+    public ResponseEntity<?> getCrawlConfig(@PathVariable String websiteUid) {
+        try {
+            WebsiteCrawlConfig config = websiteRestService.getCrawlConfig(websiteUid);
+            return ResponseEntity.ok(JsonResult.success(config));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
     }
     
 }

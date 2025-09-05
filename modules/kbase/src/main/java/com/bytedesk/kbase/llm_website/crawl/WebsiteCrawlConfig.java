@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrawlConfig {
+public class WebsiteCrawlConfig {
     
     /**
      * 抓取深度（1-5层）
@@ -143,15 +143,15 @@ public class CrawlConfig {
     /**
      * 获取默认配置
      */
-    public static CrawlConfig getDefault() {
-        return CrawlConfig.builder().build();
+    public static WebsiteCrawlConfig getDefault() {
+        return WebsiteCrawlConfig.builder().build();
     }
     
     /**
      * 获取快速配置（较少深度和页面数）
      */
-    public static CrawlConfig getFast() {
-        return CrawlConfig.builder()
+    public static WebsiteCrawlConfig getFast() {
+        return WebsiteCrawlConfig.builder()
             .maxDepth(2)
             .maxPages(100)
             .concurrentThreads(2)
@@ -162,8 +162,8 @@ public class CrawlConfig {
     /**
      * 获取深度配置（更大深度和页面数）
      */
-    public static CrawlConfig getDeep() {
-        return CrawlConfig.builder()
+    public static WebsiteCrawlConfig getDeep() {
+        return WebsiteCrawlConfig.builder()
             .maxDepth(5)
             .maxPages(5000)
             .concurrentThreads(5)

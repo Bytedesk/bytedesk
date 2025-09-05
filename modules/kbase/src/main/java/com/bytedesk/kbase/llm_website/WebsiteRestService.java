@@ -30,10 +30,10 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
-import com.bytedesk.kbase.llm_website.crawl.CrawlConfig;
-import com.bytedesk.kbase.llm_website.crawl.CrawlResult;
-import com.bytedesk.kbase.llm_website.crawl.CrawlTask;
-import com.bytedesk.kbase.llm_website.crawl.CrawlTaskRepository;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlConfig;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlResult;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlTask;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlTaskRepository;
 import com.bytedesk.kbase.llm_website.service.WebsiteCrawlerService;
 
 import lombok.AllArgsConstructor;
@@ -53,7 +53,7 @@ public class WebsiteRestService
     
     private final WebsiteCrawlerService websiteCrawlerService;
     
-    private final CrawlTaskRepository crawlTaskRepository;
+    private final WebsiteCrawlTaskRepository crawlTaskRepository;
 
     @Override
     protected Specification<WebsiteEntity> createSpecification(WebsiteRequest request) {
@@ -201,14 +201,14 @@ public class WebsiteRestService
     /**
      * 开始整站抓取
      */
-    public CompletableFuture<CrawlResult> startCrawl(String websiteUid, CrawlConfig config) {
+    public CompletableFuture<WebsiteCrawlResult> startCrawl(String websiteUid, WebsiteCrawlConfig config) {
         // 验证网站是否存在
         WebsiteEntity website = websiteRepository.findByUid(websiteUid)
             .orElseThrow(() -> new RuntimeException("Website not found: " + websiteUid));
         
         // 检查是否已有正在运行的抓取任务
-        List<CrawlTask> activeTasks = crawlTaskRepository.findByWebsiteUidAndStatusOrderByCreatedAtDesc(
-            websiteUid, com.bytedesk.kbase.llm_website.crawl.CrawlStatus.RUNNING);
+        List<WebsiteCrawlTask> activeTasks = crawlTaskRepository.findByWebsiteUidAndStatusOrderByCreatedAtDesc(
+            websiteUid, com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlStatus.RUNNING);
         
         if (!activeTasks.isEmpty()) {
             throw new RuntimeException("网站已有正在运行的抓取任务");
@@ -225,22 +225,22 @@ public class WebsiteRestService
     /**
      * 使用默认配置开始抓取
      */
-    public CompletableFuture<CrawlResult> startCrawlWithDefaultConfig(String websiteUid) {
-        return startCrawl(websiteUid, CrawlConfig.getDefault());
+    public CompletableFuture<WebsiteCrawlResult> startCrawlWithDefaultConfig(String websiteUid) {
+        return startCrawl(websiteUid, WebsiteCrawlConfig.getDefault());
     }
     
     /**
      * 使用快速配置开始抓取
      */
-    public CompletableFuture<CrawlResult> startFastCrawl(String websiteUid) {
-        return startCrawl(websiteUid, CrawlConfig.getFast());
+    public CompletableFuture<WebsiteCrawlResult> startFastCrawl(String websiteUid) {
+        return startCrawl(websiteUid, WebsiteCrawlConfig.getFast());
     }
     
     /**
      * 使用深度配置开始抓取
      */
-    public CompletableFuture<CrawlResult> startDeepCrawl(String websiteUid) {
-        return startCrawl(websiteUid, CrawlConfig.getDeep());
+    public CompletableFuture<WebsiteCrawlResult> startDeepCrawl(String websiteUid) {
+        return startCrawl(websiteUid, WebsiteCrawlConfig.getDeep());
     }
     
     /**
@@ -248,14 +248,14 @@ public class WebsiteRestService
      */
     public boolean stopCrawl(String websiteUid) {
         // 查找正在运行的任务
-        List<CrawlTask> activeTasks = crawlTaskRepository.findByWebsiteUidAndStatusOrderByCreatedAtDesc(
-            websiteUid, com.bytedesk.kbase.llm_website.crawl.CrawlStatus.RUNNING);
+        List<WebsiteCrawlTask> activeTasks = crawlTaskRepository.findByWebsiteUidAndStatusOrderByCreatedAtDesc(
+            websiteUid, com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlStatus.RUNNING);
         
         if (activeTasks.isEmpty()) {
             return false;
         }
         
-        CrawlTask task = activeTasks.get(0);
+        WebsiteCrawlTask task = activeTasks.get(0);
         boolean stopped = websiteCrawlerService.stopCrawlTask(task.getTaskId());
         
         if (stopped) {
@@ -273,21 +273,21 @@ public class WebsiteRestService
     /**
      * 获取抓取任务状态
      */
-    public CrawlTask getCrawlTaskStatus(String taskId) {
+    public WebsiteCrawlTask getCrawlTaskStatus(String taskId) {
         return websiteCrawlerService.getCrawlTaskStatus(taskId);
     }
     
     /**
      * 获取网站的抓取任务列表
      */
-    public List<CrawlTask> getCrawlTasks(String websiteUid) {
+    public List<WebsiteCrawlTask> getCrawlTasks(String websiteUid) {
         return crawlTaskRepository.findByWebsiteUidOrderByCreatedAtDesc(websiteUid);
     }
     
     /**
      * 获取网站的最新抓取任务
      */
-    public Optional<CrawlTask> getLatestCrawlTask(String websiteUid) {
+    public Optional<WebsiteCrawlTask> getLatestCrawlTask(String websiteUid) {
         return crawlTaskRepository.findLatestByWebsiteUid(websiteUid);
     }
     
@@ -319,7 +319,7 @@ public class WebsiteRestService
     /**
      * 更新网站抓取配置
      */
-    public WebsiteResponse updateCrawlConfig(String websiteUid, CrawlConfig config) {
+    public WebsiteResponse updateCrawlConfig(String websiteUid, WebsiteCrawlConfig config) {
         Optional<WebsiteEntity> optional = websiteRepository.findByUid(websiteUid);
         if (optional.isPresent()) {
             WebsiteEntity entity = optional.get();
@@ -342,7 +342,7 @@ public class WebsiteRestService
     /**
      * 获取网站抓取配置
      */
-    public CrawlConfig getCrawlConfig(String websiteUid) {
+    public WebsiteCrawlConfig getCrawlConfig(String websiteUid) {
         Optional<WebsiteEntity> optional = websiteRepository.findByUid(websiteUid);
         if (optional.isPresent()) {
             WebsiteEntity entity = optional.get();
@@ -350,14 +350,14 @@ public class WebsiteRestService
             if (entity.getCrawlConfigJson() != null) {
                 try {
                     com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                    return mapper.readValue(entity.getCrawlConfigJson(), CrawlConfig.class);
+                    return mapper.readValue(entity.getCrawlConfigJson(), WebsiteCrawlConfig.class);
                 } catch (Exception e) {
                     // 返回默认配置
                 }
             }
         }
         
-        return CrawlConfig.getDefault();
+        return WebsiteCrawlConfig.getDefault();
     }
 
 }

@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrawlResult {
+public class WebsiteCrawlResult {
     
     /**
      * 是否成功
@@ -70,8 +70,8 @@ public class CrawlResult {
     /**
      * 创建成功结果
      */
-    public static CrawlResult success(int successPages, int failedPages) {
-        return CrawlResult.builder()
+    public static WebsiteCrawlResult success(int successPages, int failedPages) {
+        return WebsiteCrawlResult.builder()
             .success(true)
             .totalPages(successPages + failedPages)
             .successPages(successPages)
@@ -82,8 +82,8 @@ public class CrawlResult {
     /**
      * 创建失败结果
      */
-    public static CrawlResult failure(String errorMessage) {
-        return CrawlResult.builder()
+    public static WebsiteCrawlResult failure(String errorMessage) {
+        return WebsiteCrawlResult.builder()
             .success(false)
             .errorMessage(errorMessage)
             .build();

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-05 16:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-05 16:30:00
+ * @LastEditTime: 2025-09-05 16:53:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,16 +37,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRepository;
 import com.bytedesk.kbase.llm_website.WebsiteEntity;
 import com.bytedesk.kbase.llm_website.WebsiteRepository;
-import com.bytedesk.kbase.llm_website.crawl.CrawlConfig;
-import com.bytedesk.kbase.llm_website.crawl.CrawlResult;
-import com.bytedesk.kbase.llm_website.crawl.CrawlStatus;
-import com.bytedesk.kbase.llm_website.crawl.CrawlTask;
-import com.bytedesk.kbase.llm_website.crawl.CrawlTaskRepository;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlConfig;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlResult;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlStatus;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlTask;
+import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlTaskRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,14 +61,14 @@ public class WebsiteCrawlerService {
 
     private final WebsiteRepository websiteRepository;
     private final WebpageRepository webpageRepository;
-    private final CrawlTaskRepository crawlTaskRepository;
+    private final WebsiteCrawlTaskRepository crawlTaskRepository;
     private final UidUtils uidUtils;
 
     // 线程池，用于并发抓取
     private final ExecutorService crawlExecutor = Executors.newFixedThreadPool(5);
     
     // 存储正在进行的抓取任务
-    private final ConcurrentHashMap<String, CrawlTask> activeTasks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, WebsiteCrawlTask> activeTasks = new ConcurrentHashMap<>();
 
     /**
      * 开始整站抓取
@@ -79,23 +78,23 @@ public class WebsiteCrawlerService {
      * @return 抓取任务
      */
     @Async
-    public CompletableFuture<CrawlResult> startCrawl(String websiteUid, CrawlConfig config) {
+    public CompletableFuture<WebsiteCrawlResult> startCrawl(String websiteUid, WebsiteCrawlConfig config) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 WebsiteEntity website = websiteRepository.findByUid(websiteUid)
                     .orElseThrow(() -> new RuntimeException("Website not found: " + websiteUid));
                 
                 // 创建抓取任务
-                CrawlTask task = createCrawlTask(website, config);
+                WebsiteCrawlTask task = createCrawlTask(website, config);
                 activeTasks.put(task.getTaskId(), task);
                 
                 log.info("开始整站抓取: {} (任务ID: {})", website.getUrl(), task.getTaskId());
                 
                 // 执行抓取
-                CrawlResult result = performCrawl(website, task, config);
+                WebsiteCrawlResult result = performCrawl(website, task, config);
                 
                 // 更新任务状态
-                task.setStatus(result.isSuccess() ? CrawlStatus.COMPLETED : CrawlStatus.FAILED);
+                task.setStatus(result.isSuccess() ? WebsiteCrawlStatus.COMPLETED : WebsiteCrawlStatus.FAILED);
                 task.setEndTime(System.currentTimeMillis());
                 saveCrawlTask(task);
                 
@@ -108,7 +107,7 @@ public class WebsiteCrawlerService {
                 
             } catch (Exception e) {
                 log.error("整站抓取失败", e);
-                return CrawlResult.failure("抓取失败: " + e.getMessage());
+                return WebsiteCrawlResult.failure("抓取失败: " + e.getMessage());
             }
         }, crawlExecutor);
     }
@@ -116,7 +115,7 @@ public class WebsiteCrawlerService {
     /**
      * 执行抓取任务
      */
-    private CrawlResult performCrawl(WebsiteEntity website, CrawlTask task, CrawlConfig config) {
+    private WebsiteCrawlResult performCrawl(WebsiteEntity website, WebsiteCrawlTask task, WebsiteCrawlConfig config) {
         try {
             Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
             Set<String> urlsToVisit = Collections.synchronizedSet(new HashSet<>());
@@ -186,11 +185,11 @@ public class WebsiteCrawlerService {
                 urlsToVisit.removeAll(visitedUrls);
             }
             
-            return CrawlResult.success(successCount.get(), failureCount.get());
+            return WebsiteCrawlResult.success(successCount.get(), failureCount.get());
             
         } catch (Exception e) {
             log.error("执行抓取任务失败", e);
-            return CrawlResult.failure("执行抓取失败: " + e.getMessage());
+            return WebsiteCrawlResult.failure("执行抓取失败: " + e.getMessage());
         }
     }
 
@@ -199,7 +198,7 @@ public class WebsiteCrawlerService {
      */
     private boolean crawlSinglePage(String url, WebsiteEntity website, 
                                   Set<String> visitedUrls, Set<String> urlsToVisit, 
-                                  CrawlConfig config) {
+                                  WebsiteCrawlConfig config) {
         try {
             if (visitedUrls.contains(url)) {
                 return false;
@@ -281,7 +280,7 @@ public class WebsiteCrawlerService {
      * 提取页面链接
      */
     private void extractLinks(Document doc, String currentUrl, String baseUrl, 
-                            Set<String> urlsToVisit, CrawlConfig config) {
+                            Set<String> urlsToVisit, WebsiteCrawlConfig config) {
         try {
             URL base = new URL(baseUrl);
             URL current = new URL(currentUrl);
@@ -326,7 +325,7 @@ public class WebsiteCrawlerService {
     /**
      * 判断URL是否应该被抓取
      */
-    private boolean shouldCrawlUrl(String url, URL baseUrl, CrawlConfig config) {
+    private boolean shouldCrawlUrl(String url, URL baseUrl, WebsiteCrawlConfig config) {
         try {
             URL urlObj = new URL(url);
             
@@ -378,7 +377,7 @@ public class WebsiteCrawlerService {
     /**
      * 验证内容是否有效
      */
-    private boolean isValidContent(String content, CrawlConfig config) {
+    private boolean isValidContent(String content, WebsiteCrawlConfig config) {
         if (!StringUtils.hasText(content)) {
             return false;
         }
@@ -451,17 +450,19 @@ public class WebsiteCrawlerService {
     /**
      * 创建抓取任务
      */
-    private CrawlTask createCrawlTask(WebsiteEntity website, CrawlConfig config) {
-        CrawlTask task = CrawlTask.builder()
+    private WebsiteCrawlTask createCrawlTask(WebsiteEntity website, WebsiteCrawlConfig config) {
+        WebsiteCrawlTask task = WebsiteCrawlTask.builder()
             .taskId(uidUtils.getUid())
             .websiteUid(website.getUid())
             .websiteUrl(website.getUrl())
-            .status(CrawlStatus.RUNNING)
+            .status(WebsiteCrawlStatus.RUNNING)
             .startTime(System.currentTimeMillis())
-            .config(config)
             .totalPages(0)
             .processedPages(0)
             .build();
+        
+        // 设置配置
+        task.setConfig(config);
         
         return saveCrawlTask(task);
     }
@@ -469,14 +470,14 @@ public class WebsiteCrawlerService {
     /**
      * 保存抓取任务
      */
-    private CrawlTask saveCrawlTask(CrawlTask task) {
+    private WebsiteCrawlTask saveCrawlTask(WebsiteCrawlTask task) {
         return crawlTaskRepository.save(task);
     }
 
     /**
      * 获取抓取任务状态
      */
-    public CrawlTask getCrawlTaskStatus(String taskId) {
+    public WebsiteCrawlTask getCrawlTaskStatus(String taskId) {
         return activeTasks.get(taskId);
     }
 
@@ -484,9 +485,9 @@ public class WebsiteCrawlerService {
      * 停止抓取任务
      */
     public boolean stopCrawlTask(String taskId) {
-        CrawlTask task = activeTasks.get(taskId);
+        WebsiteCrawlTask task = activeTasks.get(taskId);
         if (task != null) {
-            task.setStatus(CrawlStatus.STOPPED);
+            task.setStatus(WebsiteCrawlStatus.STOPPED);
             activeTasks.remove(taskId);
             return true;
         }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-05 16:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-05 16:30:00
+ * @LastEditTime: 2025-09-05 17:02:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,8 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "bytedesk_kbase_crawl_task")
-public class CrawlTask extends BaseEntity {
+@Table(name = "bytedesk_kbase_llm_website_crawl_task")
+public class WebsiteCrawlTask extends BaseEntity {
     
     /**
      * 任务ID
@@ -71,7 +71,7 @@ public class CrawlTask extends BaseEntity {
      */
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private CrawlStatus status = CrawlStatus.PENDING;
+    private WebsiteCrawlStatus status = WebsiteCrawlStatus.PENDING;
     
     /**
      * 抓取配置（JSON格式存储）
@@ -136,7 +136,7 @@ public class CrawlTask extends BaseEntity {
     /**
      * 设置抓取配置
      */
-    public void setConfig(CrawlConfig config) {
+    public void setConfig(WebsiteCrawlConfig config) {
         try {
             this.configJson = objectMapper.writeValueAsString(config);
         } catch (JsonProcessingException e) {
@@ -147,21 +147,21 @@ public class CrawlTask extends BaseEntity {
     /**
      * 获取抓取配置
      */
-    public CrawlConfig getConfig() {
+    public WebsiteCrawlConfig getConfig() {
         try {
             if (configJson != null) {
-                return objectMapper.readValue(configJson, CrawlConfig.class);
+                return objectMapper.readValue(configJson, WebsiteCrawlConfig.class);
             }
         } catch (JsonProcessingException e) {
             log.error("反序列化抓取配置失败", e);
         }
-        return CrawlConfig.getDefault();
+        return WebsiteCrawlConfig.getDefault();
     }
     
     /**
      * 设置抓取结果
      */
-    public void setResult(CrawlResult result) {
+    public void setResult(WebsiteCrawlResult result) {
         try {
             this.resultJson = objectMapper.writeValueAsString(result);
         } catch (JsonProcessingException e) {
@@ -172,10 +172,10 @@ public class CrawlTask extends BaseEntity {
     /**
      * 获取抓取结果
      */
-    public CrawlResult getResult() {
+    public WebsiteCrawlResult getResult() {
         try {
             if (resultJson != null) {
-                return objectMapper.readValue(resultJson, CrawlResult.class);
+                return objectMapper.readValue(resultJson, WebsiteCrawlResult.class);
             }
         } catch (JsonProcessingException e) {
             log.error("反序列化抓取结果失败", e);
@@ -219,13 +219,13 @@ public class CrawlTask extends BaseEntity {
      * 是否正在运行
      */
     public boolean isRunning() {
-        return status == CrawlStatus.RUNNING;
+        return status == WebsiteCrawlStatus.RUNNING;
     }
     
     /**
      * 是否已完成
      */
     public boolean isCompleted() {
-        return status == CrawlStatus.COMPLETED || status == CrawlStatus.FAILED || status == CrawlStatus.STOPPED;
+        return status == WebsiteCrawlStatus.COMPLETED || status == WebsiteCrawlStatus.FAILED || status == WebsiteCrawlStatus.STOPPED;
     }
 }
