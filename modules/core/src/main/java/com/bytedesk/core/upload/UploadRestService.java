@@ -367,6 +367,49 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 	}
 
+	/**
+	 * 根据指定的日期路径和文件名加载资源
+	 * @param datePath 日期路径，格式如：2025/09/05
+	 * @param filename 文件名
+	 * @return Resource
+	 */
+	public Resource loadAsResourceByPath(String datePath, String filename) {
+		log.info("Loading file from path: {}/{}", datePath, filename);
+		
+		// 构建文件夹路径
+		Path dateFolderPath = this.uploadDir.resolve(datePath);
+
+		// 创建日期文件夹（如果不存在）
+		try {
+			Files.createDirectories(dateFolderPath);
+		} catch (IOException e) {
+			log.error("Failed to create directory: {}", dateFolderPath, e);
+		}
+
+		// 构建完整的文件路径
+		Path filePath = dateFolderPath.resolve(filename);
+		log.info("Full file path: {}", filePath);
+
+		try {
+			if (Files.exists(filePath)) {
+				Resource resource = new UrlResource(filePath.toUri());
+				if (resource.exists() || resource.isReadable()) {
+					log.info("Successfully loaded resource: {}", filePath);
+					return resource;
+				} else {
+					throw new UploadStorageFileNotFoundException(
+							"Could not read file: " + filename);
+				}
+			} else {
+				log.error("File does not exist: {}", filePath);
+				throw new UploadStorageFileNotFoundException(
+						"File not found: " + filename);
+			}
+		} catch (MalformedURLException e) {
+			throw new UploadStorageFileNotFoundException("Could not read file: " + filename, e);
+		}
+	}
+
 	public void initUploadDir() {
 		try {
 			Files.createDirectories(uploadDir);
@@ -465,9 +508,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				request.setOrgUid(user.getOrgUid());
 			}
 
-			// 4. 存储时使用安全文件名
-			request.setFileName(safeFileName);
-
+			// 4. 存储文件并获取实际的文件URL
 			String fileUrl;
 			if (bytedeskProperties.getMinioEnabled()) {
 				log.info("MinIO 已启用，使用 MinIO 存储文件");
@@ -477,7 +518,13 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				fileUrl = store(file, safeFileName, request);
 			}
 
-			request.setFileUrl(fileUrl);
+			// 5. 从fileUrl中提取实际存储的文件名（用于日志记录）
+			String actualStoredFileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+			log.info("实际存储的文件名: {}, 原始文件名: {}", actualStoredFileName, originalFileName);
+			
+			// 6. 设置到request中：fileName保留原始文件名，fileUrl包含安全处理后的路径
+			request.setFileName(originalFileName);  // 保留原始文件名供前端显示
+			request.setFileUrl(fileUrl);            // 实际存储路径（可能包含安全重命名）
 			request.setType(request.getKbType());
 			request.setUser(userProtobuf.toJson());
 			

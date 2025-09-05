@@ -48,12 +48,11 @@ public class FileEventListener {
             log.info("UploadEventListener LLM_FILE: {}", upload.getFileName());
             // 
             List<Document> documents = fileChunkService.parseFileContent(upload);
-            // 提取文本内容
-            StringBuilder contentBuilder = new StringBuilder();
-            for (Document doc : documents) {
-                contentBuilder.append(doc.getText()).append("\n");
-            }
-            String content = contentBuilder.toString();
+            
+            // 使用智能摘要提取方法
+            int maxContentLength = 60000; // 设置最大内容长度，预留一些空间
+            String content = fileChunkService.extractContentSummary(documents, maxContentLength);
+            
             // 
             UserProtobuf userProtobuf = UserProtobuf.fromJson(upload.getUser());
             // FileUploadExtra extra = FileUploadExtra.fromJson(upload.getExtra());

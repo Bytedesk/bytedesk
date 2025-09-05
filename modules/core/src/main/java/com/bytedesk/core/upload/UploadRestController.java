@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-25 09:26:17
+ * @LastEditTime: 2025-09-05 09:52:54
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -82,9 +82,6 @@ public class UploadRestController extends BaseRestController<UploadRequest, Uplo
 	public ResponseEntity<?> queryByUid(UploadRequest request) {
 		
 		UploadResponse response = uploadRestService.queryByUid(request);
-		if (response == null) {
-			return ResponseEntity.ok(JsonResult.error("not found"));
-		}
 
 		return ResponseEntity.ok(JsonResult.success(response));
 	}
