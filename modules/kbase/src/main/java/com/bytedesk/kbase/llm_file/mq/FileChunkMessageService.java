@@ -32,11 +32,6 @@ public class FileChunkMessageService {
     @Autowired
     private JmsTemplate jmsTemplate;
     
-    // 定义队列名称常量
-    private static final String QUEUE_FILE_CHUNK_PROCESS = "queue.file.chunk.process";
-    private static final String QUEUE_FILE_CHUNK_RETRY = "queue.file.chunk.retry";
-    private static final String QUEUE_FILE_CHUNK_COMPLETE = "queue.file.chunk.complete";
-    
     /**
      * 发送文件chunk处理请求到队列
      * 
@@ -52,7 +47,7 @@ public class FileChunkMessageService {
                     .createTime(System.currentTimeMillis())
                     .build();
             
-            jmsTemplate.convertAndSend(QUEUE_FILE_CHUNK_PROCESS, message);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FILE_CHUNK_PROCESS, message);
             log.debug("文件chunk处理消息已发送: {}", fileUid);
             
         } catch (Exception e) {
@@ -92,7 +87,7 @@ public class FileChunkMessageService {
                 return jmsMessage;
             };
             
-            jmsTemplate.convertAndSend(QUEUE_FILE_CHUNK_RETRY, message, postProcessor);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FILE_CHUNK_RETRY, message, postProcessor);
             log.debug("chunk重试消息已发送: {}", fileUid);
             
         } catch (Exception e) {
@@ -117,7 +112,7 @@ public class FileChunkMessageService {
                     .createTime(System.currentTimeMillis())
                     .build();
             
-            jmsTemplate.convertAndSend(QUEUE_FILE_CHUNK_COMPLETE, message);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FILE_CHUNK_COMPLETE, message);
             log.info("文件chunk处理完成通知已发送: fileUid={}, chunkCount={}", fileUid, chunkCount);
             
         } catch (Exception e) {
@@ -203,8 +198,8 @@ public class FileChunkMessageService {
                     return jmsMessage;
                 };
                 
-                // 发送到chunk索引队列（可以复用FAQ的索引队列或创建新的）
-                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FAQ_INDEX, message, postProcessor);
+                // 发送到文件chunk索引队列
+                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_FILE_CHUNK_INDEX, message, postProcessor);
                 
             } catch (Exception e) {
                 log.error("发送chunk索引消息失败: {}, 错误: {}", chunkUid, e.getMessage(), e);

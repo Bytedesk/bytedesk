@@ -26,4 +26,6 @@ public interface ChunkRepository extends JpaRepository<ChunkEntity, Long>, JpaSp
     Optional<ChunkEntity> findByDocId(String docId);
 
     List<ChunkEntity> findByKbase_UidAndDeletedFalse(String kbUid);
+    
+    List<ChunkEntity> findByFile_UidAndDeletedFalse(String fileUid);
 }

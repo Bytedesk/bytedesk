@@ -35,6 +35,10 @@ public class JmsArtemisConsts {
 
     // FAQ索引队列
     public static final String QUEUE_FAQ_INDEX = QUEUE_PREFIX + "faq.index";
+    // Chunk索引队列
+    public static final String QUEUE_CHUNK_INDEX = QUEUE_PREFIX + "chunk.index";
+    // Chunk处理完成队列
+    public static final String QUEUE_CHUNK_COMPLETE = QUEUE_PREFIX + "chunk.complete";
     // Article索引队列
     public static final String QUEUE_ARTICLE_INDEX = QUEUE_PREFIX + "article.index";
     // Webpage索引队列
@@ -45,4 +49,13 @@ public class JmsArtemisConsts {
     public static final String QUEUE_MEMBER_UPDATE = QUEUE_PREFIX + "member.update";
     // Member批量导入队列
     public static final String QUEUE_MEMBER_BATCH_IMPORT = QUEUE_PREFIX + "member.batch.import";
+    
+    // 文件Chunk处理队列
+    public static final String QUEUE_FILE_CHUNK_PROCESS = QUEUE_PREFIX + "file.chunk.process";
+    // 文件Chunk重试队列
+    public static final String QUEUE_FILE_CHUNK_RETRY = QUEUE_PREFIX + "file.chunk.retry";
+    // 文件Chunk处理完成队列
+    public static final String QUEUE_FILE_CHUNK_COMPLETE = QUEUE_PREFIX + "file.chunk.complete";
+    // 文件Chunk索引队列
+    public static final String QUEUE_FILE_CHUNK_INDEX = QUEUE_PREFIX + "file.chunk.index";
 }

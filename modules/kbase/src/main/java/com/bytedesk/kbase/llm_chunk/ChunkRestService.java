@@ -76,6 +76,12 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
     public List<ChunkEntity> findByKbUid(String kbUid) {
         return chunkRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
+    
+    // findByFileUid
+    @Cacheable(value = "chunk", key = "#fileUid", unless = "#result==null")
+    public List<ChunkEntity> findByFileUid(String fileUid) {
+        return chunkRepository.findByFile_UidAndDeletedFalse(fileUid);
+    }
 
     @Override
     public ChunkResponse create(ChunkRequest request) {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-05 11:00:00
+ * @LastEditTime: 2025-09-05 14:50:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,80 +16,68 @@ package com.bytedesk.kbase.llm_chunk;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.event.ChunkCreateEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkDeleteEvent;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
-import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
+import com.bytedesk.kbase.llm_chunk.mq.ChunkMessageService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class ChunkEventListener {
 
-    private final ChunkElasticService chunkElasticService;
+    private final ChunkMessageService chunkMessageService;
 
-    @Autowired(required = false)
-    private ChunkVectorService chunkVectorService;
-
-    public ChunkEventListener(ChunkElasticService chunkElasticService) {
-        this.chunkElasticService = chunkElasticService;
-    }
-
-    // Chunk仅用于全文搜索
+    // 使用MQ异步处理Chunk索引，解决大文件处理时的并发问题
     @EventListener
     public void onChunkCreateEvent(ChunkCreateEvent event) {
         ChunkEntity chunk = event.getChunk();
-        log.info("ChunkEventListener onChunkCreateEvent: {}", chunk.getName());
-        // 仅做全文索引
-        chunkElasticService.indexChunk(chunk);
-        /// 索引向量
-        if (chunkVectorService != null) {
-            try {
-                chunkVectorService.indexChunkVector(chunk);
-            } catch (Exception e) {
-                log.error("Chunk向量索引失败: {}, 错误: {}", chunk.getName(), e.getMessage());
-            }
+        log.info("ChunkEventListener onChunkCreateEvent: {} - 发送到MQ队列异步处理", chunk.getName());
+        
+        try {
+            // 发送到MQ队列异步处理，避免直接阻塞事件处理
+            String fileUid = chunk.getFile() != null ? chunk.getFile().getUid() : null;
+            chunkMessageService.sendToIndexQueue(chunk.getUid(), fileUid);
+            log.debug("Chunk索引消息已发送到队列: {}", chunk.getUid());
+        } catch (Exception e) {
+            log.error("发送Chunk索引消息到队列失败: {}, 错误: {}", chunk.getName(), e.getMessage(), e);
+            // 这里不抛出异常，避免影响主流程
         }
     }
 
-    // Chunk仅用于全文搜索
+    // 使用MQ异步处理Chunk更新索引
     @EventListener
     public void onChunkUpdateDocEvent(ChunkUpdateDocEvent event) {
         ChunkEntity chunk = event.getChunk();
-        log.info("ChunkEventListener ChunkUpdateDocEvent: {}", chunk.getName());
-        // 更新全文索引
-        chunkElasticService.indexChunk(chunk);
-        // 更新向量索引
-        if (chunkVectorService != null) {
-            try {
-                // 先删除旧的向量索引
-                chunkVectorService.deleteChunkVector(chunk);
-                // 再创建新的向量索引
-                chunkVectorService.indexChunkVector(chunk);
-                
-            } catch (Exception e) {
-                log.error("文本向量索引更新失败: {}, 错误: {}", chunk.getContent(), e.getMessage());
-            }
+        log.info("ChunkEventListener ChunkUpdateDocEvent: {} - 发送到MQ队列异步处理", chunk.getName());
+        
+        try {
+            // 发送到MQ队列异步处理
+            String fileUid = chunk.getFile() != null ? chunk.getFile().getUid() : null;
+            chunkMessageService.sendToIndexQueue(chunk.getUid(), fileUid);
+            log.debug("Chunk更新索引消息已发送到队列: {}", chunk.getUid());
+        } catch (Exception e) {
+            log.error("发送Chunk更新索引消息到队列失败: {}, 错误: {}", chunk.getName(), e.getMessage(), e);
+            // 这里不抛出异常，避免影响主流程
         }
     }
 
     @EventListener
     public void onChunkDeleteEvent(ChunkDeleteEvent event) {
         ChunkEntity chunk = event.getChunk();
-        log.info("ChunkEventListener onChunkDeleteEvent: {}", chunk.getName());
-        // 从全文索引中删除
-        boolean deleted = chunkElasticService.deleteChunk(chunk.getUid());
-        if (!deleted) {
-            log.warn("从Elasticsearch中删除Chunk索引失败: {}", chunk.getUid());
-            // 可以考虑添加重试逻辑或者其他错误处理
-        }
+        log.info("ChunkEventListener onChunkDeleteEvent: {} - 发送到MQ队列异步处理", chunk.getName());
+        
         try {
-            chunkVectorService.deleteChunkVector(chunk);
+            // 发送到MQ队列异步处理删除
+            String fileUid = chunk.getFile() != null ? chunk.getFile().getUid() : null;
+            chunkMessageService.sendToDeleteQueue(chunk.getUid(), fileUid);
+            log.debug("Chunk删除消息已发送到队列: {}", chunk.getUid());
         } catch (Exception e) {
-            log.error("删除Chunk向量索引失败: {}, 错误: {}", chunk.getName(), e.getMessage());
+            log.error("发送Chunk删除消息到队列失败: {}, 错误: {}", chunk.getName(), e.getMessage(), e);
+            // 这里不抛出异常，避免影响主流程
         }
     }
 }

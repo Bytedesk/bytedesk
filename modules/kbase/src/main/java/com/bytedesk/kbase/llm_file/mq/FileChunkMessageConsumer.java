@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_file.FileRestService;
 
@@ -39,7 +40,7 @@ public class FileChunkMessageConsumer {
     /**
      * 处理文件块重试消息
      */
-    @JmsListener(destination = "kbase.file.chunk.retry")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_FILE_CHUNK_RETRY, containerFactory = "jmsArtemisQueueFactory")
     public void handleChunkRetry(String chunkId) {
         log.info("Processing chunk retry for chunkId: {}", chunkId);
         
@@ -65,7 +66,7 @@ public class FileChunkMessageConsumer {
     /**
      * 处理文件块处理完成消息
      */
-    @JmsListener(destination = "kbase.file.chunk.complete")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_FILE_CHUNK_COMPLETE, containerFactory = "jmsArtemisQueueFactory")
     public void handleChunkComplete(String fileId) {
         log.info("Processing chunk complete notification for fileId: {}", fileId);
         
@@ -78,7 +79,7 @@ public class FileChunkMessageConsumer {
             }
             
             var fileEntity = fileEntityOpt.get();
-            fileEntity.setSuccess(); // 设置为成功状态
+            fileEntity.setElasticSuccess(); // 设置为成功状态
             fileRestService.save(fileEntity);
             
             log.info("Successfully updated file status to COMPLETED for fileId: {}", fileId);
@@ -90,7 +91,7 @@ public class FileChunkMessageConsumer {
     /**
      * 处理文件块索引消息
      */
-    @JmsListener(destination = "kbase.file.chunk.index")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_FILE_CHUNK_INDEX, containerFactory = "jmsArtemisQueueFactory")
     public void handleChunkIndex(String chunkIds) {
         log.info("Processing chunk index for chunk IDs: {}", chunkIds);
         

@@ -309,13 +309,15 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
                     log.info("重新切分异步处理完成: {}, 生成chunks: {}", file.getFileName(), docIdList.size());
                     // 更新文件的docIdList
                     savedFile.setDocIdList(docIdList);
+                    savedFile.setElasticSuccess();
+                    savedFile.setVectorSuccess();
                     save(savedFile);
                 })
                 .exceptionally(throwable -> {
                     log.error("重新切分异步处理失败: {}", throwable.getMessage(), throwable);
                     // 标记文件处理失败
-                    savedFile.setElasticStatus(ChunkStatusEnum.ERROR.name());
-                    savedFile.setVectorStatus(ChunkStatusEnum.ERROR.name());
+                    savedFile.setElasticError();
+                    savedFile.setVectorError();
                     save(savedFile);
                     return null;
                 });

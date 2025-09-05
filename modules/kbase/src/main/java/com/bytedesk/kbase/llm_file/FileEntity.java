@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 21:34:46
+ * @LastEditTime: 2025-09-05 14:17:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -103,14 +103,26 @@ public class FileEntity extends BaseEntity {
     private List<String> docIdList = new ArrayList<>();
 
     // set Success
-    public FileEntity setSuccess() {
+    public FileEntity setElasticSuccess() {
         this.setElasticStatus(ChunkStatusEnum.SUCCESS.name());
         return this;
     }
 
     // set Error
-    public FileEntity setError() {
+    public FileEntity setElasticError() {
         this.setElasticStatus(ChunkStatusEnum.ERROR.name());
+        return this;
+    }
+
+    // set vector Success
+    public FileEntity setVectorSuccess() {
+        this.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
+        return this;
+    }
+
+    // set vector Error
+    public FileEntity setVectorError() {
+        this.setVectorStatus(ChunkStatusEnum.ERROR.name());
         return this;
     }
     
