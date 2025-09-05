@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-15 11:35:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 14:47:30
+ * @LastEditTime: 2025-09-05 10:48:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -328,53 +328,36 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 	}
 
-	public Resource loadAsResource(String filename) {
-		// filename格式为：20240916144702_身份证-背面.jpg
-		// 提取日期部分
-		String dateString = filename.substring(0, 8);
-		// 将日期字符串转换为路径格式
-		String folderDatePart = dateString.substring(0, 4) + "/" + dateString.substring(4, 6) + "/"
-				+ dateString.substring(6, 8);
-		// 构建文件夹路径
-		Path dateFolderPath = this.uploadDir.resolve(folderDatePart);
-
-		// 创建日期文件夹（如果不存在）
-		try {
-			Files.createDirectories(dateFolderPath);
-		} catch (IOException e) {
-			// 处理异常
-			e.printStackTrace();
-		}
-
-		// 构建完整的文件路径
-		Path filePath = dateFolderPath.resolve(filename);
-
-		try {
-			if (Files.exists(filePath)) {
-				Resource resource = new UrlResource(filePath.toUri());
-				if (resource.exists() || resource.isReadable()) {
-					return resource;
-				} else {
-					throw new UploadStorageFileNotFoundException(
-							"Could not read file: " + filename);
-				}
-			} else {
-				throw new UploadStorageFileNotFoundException(
-						"File not found: " + filename);
-			}
-		} catch (MalformedURLException e) {
-			throw new UploadStorageFileNotFoundException("Could not read file: " + filename, e);
-		}
-	}
-
 	/**
-	 * 根据指定的日期路径和文件名加载资源
-	 * @param datePath 日期路径，格式如：2025/09/05
-	 * @param filename 文件名
+	 * 加载文件资源
+	 * Resource resource2 = uploadRestService.loadAsResource("2025/09/05/1757039824330_8577.pdf");
+	 * 
+	 * @param filenameOrPath 文件名（如：20240916144702_身份证-背面.jpg）或完整路径（如：2025/09/05/1757039824330_8577.pdf）
 	 * @return Resource
 	 */
-	public Resource loadAsResourceByPath(String datePath, String filename) {
-		log.info("Loading file from path: {}/{}", datePath, filename);
+	public Resource loadAsResource(String filenameOrPath) {
+		String datePath;
+		String filename;
+		
+		// 判断是否包含路径分隔符
+		if (filenameOrPath.contains("/")) {
+			// 包含路径分隔符，说明是完整路径格式：2025/09/05/filename.ext
+			int lastSlashIndex = filenameOrPath.lastIndexOf("/");
+			datePath = filenameOrPath.substring(0, lastSlashIndex);
+			filename = filenameOrPath.substring(lastSlashIndex + 1);
+			log.info("Loading file from full path: {}, datePath: {}, filename: {}", filenameOrPath, datePath, filename);
+		} else {
+			// 不包含路径分隔符，说明是文件名格式：20240916144702_身份证-背面.jpg
+			// 提取日期部分（前8位）
+			if (filenameOrPath.length() < 8) {
+				throw new UploadStorageFileNotFoundException("Invalid filename format: " + filenameOrPath);
+			}
+			String dateString = filenameOrPath.substring(0, 8);
+			// 将日期字符串转换为路径格式
+			datePath = dateString.substring(0, 4) + "/" + dateString.substring(4, 6) + "/" + dateString.substring(6, 8);
+			filename = filenameOrPath;
+			log.info("Loading file from filename: {}, extracted datePath: {}", filenameOrPath, datePath);
+		}
 		
 		// 构建文件夹路径
 		Path dateFolderPath = this.uploadDir.resolve(datePath);

@@ -28,7 +28,7 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_file.FileEntity;
-import com.bytedesk.kbase.llm_file.FileRestService;
+import com.bytedesk.kbase.llm_file.FileRepository;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
@@ -51,7 +51,7 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
 
     private final KbaseRestService kbaseRestService;
 
-    private final FileRestService fileRestService;
+    private final FileRepository fileRepository;
     
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
@@ -108,7 +108,7 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
             throw new RuntimeException("kbaseUid not found");
         }
         // 
-        Optional<FileEntity> file = fileRestService.findByUid(request.getFileUid());
+        Optional<FileEntity> file = fileRepository.findByUid(request.getFileUid());
         if (file.isPresent()) {
             entity.setFile(file.get());
         } else {

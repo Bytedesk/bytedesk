@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 20:58:14
+ * @LastEditTime: 2025-09-05 11:22:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,23 +25,27 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.ai.document.Document;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.utils.ConvertUtils;
-import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.kbase.llm_file.event.FileUpdateDocEvent;
+// import com.bytedesk.core.config.BytedeskEventPublisher;
+// import com.bytedesk.kbase.llm_file.event.FileUpdateDocEvent;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileRequest, FileResponse, FileExcel> {
 
     private final FileRepository fileRepository;
@@ -54,7 +58,11 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
 
     private final UploadRestService uploadRestService;
     
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final FileService fileService;
+
+    private final ChunkRestService chunkRestService;
+
+    private final FileChunkService fileChunkProcessService;
 
     @Override
     protected Specification<FileEntity> createSpecification(FileRequest request) {
@@ -79,10 +87,8 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
 
     @Override
     public FileResponse create(FileRequest request) {
-
         FileEntity entity = modelMapper.map(request, FileEntity.class);
         entity.setUid(uidUtils.getUid());
-
         //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
         if (kbase.isPresent()) {
@@ -112,11 +118,11 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
             FileEntity entity = optional.get();
             
             // 判断文件内容是否有变化，如果有变化，发布UpdateDocEvent事件
-            if (entity.hasChanged(request)) {
-                // 发布事件，更新文档
-                FileUpdateDocEvent fileUpdateDocEvent = new FileUpdateDocEvent(entity);
-                bytedeskEventPublisher.publishEvent(fileUpdateDocEvent);
-            }
+            // if (entity.hasChanged(request)) {
+            //     // 发布事件，更新文档
+            //     FileUpdateDocEvent fileUpdateDocEvent = new FileUpdateDocEvent(entity);
+            //     bytedeskEventPublisher.publishEvent(fileUpdateDocEvent);
+            // }
             
             // modelMapper.map(request, entity);
             entity.setFileName(request.getFileName());
@@ -186,7 +192,6 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // fileRepository.delete(optional.get());
         } else {
             throw new RuntimeException("File not found");
         }
@@ -248,6 +253,57 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
         excel.setStatus(ChunkStatusEnum.toChineseDisplay(file.getElasticStatus()));
         excel.setVectorStatus(ChunkStatusEnum.toChineseDisplay(file.getVectorStatus()));
         return excel;
+    }
+
+    /**
+     * 重新对文件进行chunk切分
+     * @param fileUid 文件UID
+     * @return 切分结果
+     */
+    public FileResponse rechunkFile(String fileUid) {
+        Optional<FileEntity> fileOptional = findByUid(fileUid);
+        if (!fileOptional.isPresent()) {
+            throw new RuntimeException("File not found: " + fileUid);
+        }
+        
+        FileEntity file = fileOptional.get();
+        
+        // 删除原有的chunk记录
+        if (file.getDocIdList() != null && !file.getDocIdList().isEmpty()) {
+            chunkRestService.deleteByDocList(file.getDocIdList());
+        }
+        
+        // 重新解析文件内容
+        UploadEntity upload = file.getUpload();
+        if (upload == null) {
+            throw new RuntimeException("Upload entity not found for file: " + fileUid);
+        }
+        
+        // 重新解析文档
+        List<Document> documents = fileService.parseFileContent(upload);
+        
+        // 更新文件内容
+        int maxContentLength = 60000; // 设置最大内容长度
+        String content = fileService.extractContentSummary(documents, maxContentLength);
+        file.setContent(content);
+        
+        // 重置状态
+        file.setElasticStatus(ChunkStatusEnum.NEW.name());
+        file.setVectorStatus(ChunkStatusEnum.NEW.name());
+        file.setDocIdList(null);
+        
+        // 保存文件
+        FileEntity savedFile = save(file);
+        
+        // 重新进行chunk切分
+        FileResponse fileResponse = convertToResponse(savedFile);
+        List<String> docIdList = fileChunkProcessService.processFileChunks(documents, fileResponse);
+        
+        // 更新文件的docIdList
+        savedFile.setDocIdList(docIdList);
+        save(savedFile);
+        
+        return convertToResponse(savedFile);
     }
 
     public void initFile(String kbUid, String orgUid) {

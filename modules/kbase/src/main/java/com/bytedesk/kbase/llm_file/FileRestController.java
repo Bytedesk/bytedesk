@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 12:52:03
+ * @LastEditTime: 2025-09-05 11:00:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -141,10 +141,16 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         );
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(FileRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+    @Operation(summary = "重新chunk文件", description = "重新对文件进行chunk切分")
+    @ApiResponse(responseCode = "200", description = "重新chunk成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = FileResponse.class)))
+    @PostMapping("/rechunk")
+    public ResponseEntity<?> rechunkFile(@RequestBody FileRequest request) {
+        
+        FileResponse file = fileRestService.rechunkFile(request.getUid());
+        
+        return ResponseEntity.ok(JsonResult.success(file));
     }
 
     @Operation(summary = "更新文件索引", description = "更新文件的Elasticsearch索引")

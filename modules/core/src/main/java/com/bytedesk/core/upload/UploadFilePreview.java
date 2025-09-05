@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-19 17:02:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 23:01:40
+ * @LastEditTime: 2025-09-05 10:33:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,7 +36,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 
+ * file preview and download
  */
 @Slf4j
 @RestController
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "File Preview and Download", description = "File preview and download APIs for displaying and downloading uploaded files")
 public class UploadFilePreview {
 
-	private final UploadRestService uploadService;
+	private final UploadRestService uploadRestService;
 
 	/**
 	 * 浏览器预览文件，或放到 <img src&gt; 标签中在线展示
@@ -69,7 +69,9 @@ public class UploadFilePreview {
 			@PathVariable String filename,
 			HttpServletResponse response) throws IOException {
 		log.info("year {}, month {}, day {}, filename: {}", year, month, day, filename);
-		Resource fileResource = uploadService.loadAsResource(filename);
+		// 拼接完整路径
+		String fullPath = year + "/" + month + "/" + day + "/" + filename;
+		Resource fileResource = uploadRestService.loadAsResource(fullPath);
 
 		// 文件预览
 		File file = fileResource.getFile();
@@ -107,7 +109,9 @@ public class UploadFilePreview {
 			@PathVariable(name = "dd") String day,
 			@PathVariable String filename) throws UnsupportedEncodingException {
 		log.info("year {}, month {}, day {}, filename: {}", year, month, day, filename);
-		Resource fileResource = uploadService.loadAsResource(filename);
+		// 拼接完整路径
+		String fullPath = year + "/" + month + "/" + day + "/" + filename;
+		Resource fileResource = uploadRestService.loadAsResource(fullPath);
 		if (fileResource == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -120,57 +124,5 @@ public class UploadFilePreview {
 		return ResponseEntity.ok().headers(headers).body(fileResource);
 	}
 
-	/////////////// 旧版本
-
-	// http://127.0.0.1:9003/file/download/20240319162820_img-service2.png
-	// @Deprecated
-	// @GetMapping("/download/{filename:.+}")
-	// @ResponseBody
-	// public ResponseEntity<Resource> downloadOld(@PathVariable String filename) throws UnsupportedEncodingException {
-	// 	Resource fileResource = uploadService.loadAsResource(filename);
-
-	// 	if (fileResource == null) {
-	// 		return ResponseEntity.notFound().build();
-	// 	}
-
-	// 	// 对文件名进行URL编码，以确保中文字符能够正确传输
-	// 	String encodedFilename = URLEncoder.encode(fileResource.getFilename(), "UTF-8").replace("+", "%20");
-
-	// 	// 设置HTTP响应头，包含经过编码的文件名
-	// 	HttpHeaders headers = new HttpHeaders();
-	// 	headers.setContentDispositionFormData("attachment", encodedFilename);
-
-	// 	return ResponseEntity.ok().headers(headers).body(fileResource);
-	// }
-
-	// // http://127.0.0.1:9003/file/20240319162820_img-service2.png
-	// @Deprecated
-	// @GetMapping("/{filename:.+}")
-	// @ResponseBody
-	// public void previewOld(
-	// 		@PathVariable String filename,
-	// 		HttpServletResponse response) throws IOException {
-	// 	log.info("filename: {}", filename);
-
-	// 	Resource fileResource = uploadService.loadAsResourceOld(filename);
-
-	// 	// 文件预览
-	// 	File file = fileResource.getFile();
-	// 	FileInputStream fileInputStream = new FileInputStream(file);
-	// 	// 清空response
-	// 	response.reset();
-	// 	// 2、设置文件下载方式
-	// 	response.setCharacterEncoding("utf-8");
-	// 	// response.setContentType("application/pdf");
-	// 	OutputStream outputStream = response.getOutputStream();
-	// 	int count = 0;
-	// 	byte[] buffer = new byte[1024 * 1024];
-	// 	while ((count = fileInputStream.read(buffer)) != -1) {
-	// 		outputStream.write(buffer, 0, count);
-	// 	}
-	// 	outputStream.flush();
-	// 	outputStream.close();
-	// 	fileInputStream.close();
-	// }
 
 }
