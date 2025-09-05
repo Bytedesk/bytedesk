@@ -29,7 +29,6 @@ import org.springframework.ai.reader.tika.TikaDocumentReader;
 // import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
@@ -44,31 +43,24 @@ public class FileService {
 
     private final UploadRestService uploadRestService;
 
-    /**
+	/**
 	 * https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html
 	 */
 	public List<Document> parseFileContent(UploadEntity upload) {
-		String fileUrl = upload.getFileUrl();
-		log.info("Loading document from URL: {}", fileUrl);
-		Assert.hasText(fileUrl, "File URL must not be empty");
-		Assert.isTrue(fileUrl.startsWith("http"), String.format("File URL must start with http, got %s", fileUrl));
-
-		// 从URL中提取实际的文件名和路径
-		String filePathList[] = fileUrl.split("/");
-		String actualFileName = filePathList[filePathList.length - 1];
-		log.info("actualFileName from URL: {}, original fileName: {}", actualFileName, upload.getFileName());
+		log.info("Loading document from upload: fileUrl={}, fileName={}", upload.getFileUrl(), upload.getFileName());
 		
-		// 从URL中提取日期路径部分，例如：2025/09/05
-		// URL格式：http://127.0.0.1:9003/file/2025/09/05/1757037537985_5810.pdf
-		String datePath = filePathList[filePathList.length - 4] + "/" + 
-						 filePathList[filePathList.length - 3] + "/" + 
-						 filePathList[filePathList.length - 2];
+		// 使用新的简化方法直接从UploadEntity加载资源
+		Resource resource = uploadRestService.loadAsResource(upload);
 		
-		// 使用合并后的 loadAsResource 方法，传入完整路径
-		String fullPath = datePath + "/" + actualFileName;
-        Resource resource = uploadRestService.loadAsResource(fullPath);
-
-		List<Document> documents;
+		// 从fileUrl或fileName中提取实际的文件名用于类型判断
+		String actualFileName;
+		if (upload.getFileUrl() != null && !upload.getFileUrl().isEmpty()) {
+			String[] filePathList = upload.getFileUrl().split("/");
+			actualFileName = filePathList[filePathList.length - 1];
+		} else {
+			actualFileName = upload.getFileName();
+		}
+		log.info("Using fileName for type detection: {}", actualFileName);		List<Document> documents;
 		if (actualFileName.toLowerCase().endsWith(".pdf")) {
 			documents = readPdfPage(resource);
 		} else if (actualFileName.toLowerCase().endsWith(".json")) {

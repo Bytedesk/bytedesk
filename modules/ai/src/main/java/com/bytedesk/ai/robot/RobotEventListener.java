@@ -70,7 +70,7 @@ public class RobotEventListener {
             log.info("RobotEventListener Robot: {}", fileName);
 
             try {
-                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+                Resource resource = uploadRestService.loadAsResource(upload);
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("RobotEventListener loadAsResource: {}", filePath);

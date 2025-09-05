@@ -329,6 +329,52 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 
 	/**
+	 * 从 UploadEntity 加载文件资源
+	 * 优先使用 fileUrl，如果 fileUrl 为空则使用 fileName
+	 * 
+	 * @param upload UploadEntity 对象
+	 * @return Resource
+	 */
+	public Resource loadAsResource(UploadEntity upload) {
+		if (upload.getFileUrl() != null && !upload.getFileUrl().isEmpty()) {
+			// 从 fileUrl 中提取相对路径
+			String relativePath = extractRelativePathFromUrl(upload.getFileUrl());
+			if (relativePath != null) {
+				return loadAsResource(relativePath);
+			}
+		}
+		// 如果 fileUrl 为空或提取失败，则使用 fileName
+		return loadAsResource(upload.getFileName());
+	}
+
+	/**
+	 * 从文件URL中提取相对路径
+	 * 例如：http://127.0.0.1:9003/file/2025/09/05/1757039824330_8577.pdf 
+	 * 提取为：2025/09/05/1757039824330_8577.pdf
+	 * 
+	 * @param fileUrl 完整的文件URL
+	 * @return 相对路径，如果提取失败返回null
+	 */
+	private String extractRelativePathFromUrl(String fileUrl) {
+		if (fileUrl == null || fileUrl.isEmpty()) {
+			return null;
+		}
+		
+		try {
+			// 查找 "/file/" 的位置
+			int fileIndex = fileUrl.indexOf("/file/");
+			if (fileIndex != -1) {
+				// 提取 "/file/" 之后的部分
+				return fileUrl.substring(fileIndex + 6); // 6 是 "/file/".length()
+			}
+		} catch (Exception e) {
+			log.warn("Failed to extract relative path from URL: {}", fileUrl, e);
+		}
+		
+		return null;
+	}
+
+	/**
 	 * 加载文件资源
 	 * Resource resource2 = uploadRestService.loadAsResource("2025/09/05/1757039824330_8577.pdf");
 	 * 

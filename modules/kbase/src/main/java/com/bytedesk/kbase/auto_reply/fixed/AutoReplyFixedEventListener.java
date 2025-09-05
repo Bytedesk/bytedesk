@@ -52,7 +52,7 @@ public class AutoReplyFixedEventListener {
         log.info("AutoReplyFixedEventListener UploadEventListener create: {}", upload.toString());
 
         try {
-            Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+            Resource resource = uploadRestService.loadAsResource(upload);
             if (resource.exists()) {
                 String filePath = resource.getFile().getAbsolutePath();
                 log.info("UploadEventListener loadAsResource: {}", filePath);

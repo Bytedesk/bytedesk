@@ -67,7 +67,7 @@ public class QuickReplyEventListener {
 
             try {
                 // 导入Excel文件
-                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+                Resource resource = uploadRestService.loadAsResource(upload);
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("UploadEventListener loadAsResource: {}", filePath);

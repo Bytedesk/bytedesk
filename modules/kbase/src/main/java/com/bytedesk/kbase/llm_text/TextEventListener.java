@@ -64,7 +64,7 @@ public class TextEventListener {
 
             // 导入
             try {
-                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+                Resource resource = uploadRestService.loadAsResource(upload);
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("TextEventListener loadAsResource: {}", filePath);

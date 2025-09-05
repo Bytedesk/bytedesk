@@ -56,7 +56,7 @@ public class FaqEventListener {
             log.info("FaqEventListener FAQ: {}", fileName);
 
             try {
-                Resource resource = uploadRestService.loadAsResource(upload.getFileName());
+                Resource resource = uploadRestService.loadAsResource(upload);
                 if (resource.exists()) {
                     String filePath = resource.getFile().getAbsolutePath();
                     log.info("UploadEventListener loadAsResource: {}", filePath);
