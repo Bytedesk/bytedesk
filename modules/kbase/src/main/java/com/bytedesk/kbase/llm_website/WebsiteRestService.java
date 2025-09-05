@@ -13,8 +13,10 @@
  */
 package com.bytedesk.kbase.llm_website;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +30,11 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.llm_website.crawl.CrawlConfig;
+import com.bytedesk.kbase.llm_website.crawl.CrawlResult;
+import com.bytedesk.kbase.llm_website.crawl.CrawlTask;
+import com.bytedesk.kbase.llm_website.crawl.CrawlTaskRepository;
+import com.bytedesk.kbase.llm_website.service.WebsiteCrawlerService;
 
 import lombok.AllArgsConstructor;
 
@@ -43,6 +50,10 @@ public class WebsiteRestService
     private final UidUtils uidUtils;
 
     private final KbaseRestService kbaseRestService;
+    
+    private final WebsiteCrawlerService websiteCrawlerService;
+    
+    private final CrawlTaskRepository crawlTaskRepository;
 
     @Override
     protected Specification<WebsiteEntity> createSpecification(WebsiteRequest request) {
@@ -183,6 +194,170 @@ public class WebsiteRestService
     @Override
     public WebsiteExcel convertToExcel(WebsiteEntity website) {
         return modelMapper.map(website, WebsiteExcel.class);
+    }
+
+    // ==================== 网站抓取相关方法 ====================
+    
+    /**
+     * 开始整站抓取
+     */
+    public CompletableFuture<CrawlResult> startCrawl(String websiteUid, CrawlConfig config) {
+        // 验证网站是否存在
+        WebsiteEntity website = websiteRepository.findByUid(websiteUid)
+            .orElseThrow(() -> new RuntimeException("Website not found: " + websiteUid));
+        
+        // 检查是否已有正在运行的抓取任务
+        List<CrawlTask> activeTasks = crawlTaskRepository.findByWebsiteUidAndStatusOrderByCreatedAtDesc(
+            websiteUid, com.bytedesk.kbase.llm_website.crawl.CrawlStatus.RUNNING);
+        
+        if (!activeTasks.isEmpty()) {
+            throw new RuntimeException("网站已有正在运行的抓取任务");
+        }
+        
+        // 更新网站状态
+        website.setCrawlStatus("CRAWLING");
+        websiteRepository.save(website);
+        
+        // 开始抓取
+        return websiteCrawlerService.startCrawl(websiteUid, config);
+    }
+    
+    /**
+     * 使用默认配置开始抓取
+     */
+    public CompletableFuture<CrawlResult> startCrawlWithDefaultConfig(String websiteUid) {
+        return startCrawl(websiteUid, CrawlConfig.getDefault());
+    }
+    
+    /**
+     * 使用快速配置开始抓取
+     */
+    public CompletableFuture<CrawlResult> startFastCrawl(String websiteUid) {
+        return startCrawl(websiteUid, CrawlConfig.getFast());
+    }
+    
+    /**
+     * 使用深度配置开始抓取
+     */
+    public CompletableFuture<CrawlResult> startDeepCrawl(String websiteUid) {
+        return startCrawl(websiteUid, CrawlConfig.getDeep());
+    }
+    
+    /**
+     * 停止抓取任务
+     */
+    public boolean stopCrawl(String websiteUid) {
+        // 查找正在运行的任务
+        List<CrawlTask> activeTasks = crawlTaskRepository.findByWebsiteUidAndStatusOrderByCreatedAtDesc(
+            websiteUid, com.bytedesk.kbase.llm_website.crawl.CrawlStatus.RUNNING);
+        
+        if (activeTasks.isEmpty()) {
+            return false;
+        }
+        
+        CrawlTask task = activeTasks.get(0);
+        boolean stopped = websiteCrawlerService.stopCrawlTask(task.getTaskId());
+        
+        if (stopped) {
+            // 更新网站状态
+            Optional<WebsiteEntity> website = websiteRepository.findByUid(websiteUid);
+            if (website.isPresent()) {
+                website.get().setCrawlStatus("STOPPED");
+                websiteRepository.save(website.get());
+            }
+        }
+        
+        return stopped;
+    }
+    
+    /**
+     * 获取抓取任务状态
+     */
+    public CrawlTask getCrawlTaskStatus(String taskId) {
+        return websiteCrawlerService.getCrawlTaskStatus(taskId);
+    }
+    
+    /**
+     * 获取网站的抓取任务列表
+     */
+    public List<CrawlTask> getCrawlTasks(String websiteUid) {
+        return crawlTaskRepository.findByWebsiteUidOrderByCreatedAtDesc(websiteUid);
+    }
+    
+    /**
+     * 获取网站的最新抓取任务
+     */
+    public Optional<CrawlTask> getLatestCrawlTask(String websiteUid) {
+        return crawlTaskRepository.findLatestByWebsiteUid(websiteUid);
+    }
+    
+    /**
+     * 从sitemap开始抓取
+     */
+    public List<String> parseSitemap(String websiteUid) {
+        WebsiteEntity website = websiteRepository.findByUid(websiteUid)
+            .orElseThrow(() -> new RuntimeException("Website not found: " + websiteUid));
+        
+        // 尝试常见的sitemap路径
+        String[] sitemapPaths = {"/sitemap.xml", "/sitemap_index.xml", "/robots.txt"};
+        
+        for (String path : sitemapPaths) {
+            try {
+                String sitemapUrl = website.getUrl() + path;
+                List<String> urls = websiteCrawlerService.parseSitemap(sitemapUrl);
+                if (!urls.isEmpty()) {
+                    return urls;
+                }
+            } catch (Exception e) {
+                // 继续尝试下一个路径
+            }
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * 更新网站抓取配置
+     */
+    public WebsiteResponse updateCrawlConfig(String websiteUid, CrawlConfig config) {
+        Optional<WebsiteEntity> optional = websiteRepository.findByUid(websiteUid);
+        if (optional.isPresent()) {
+            WebsiteEntity entity = optional.get();
+            
+            // 序列化配置为JSON
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                entity.setCrawlConfigJson(mapper.writeValueAsString(config));
+            } catch (Exception e) {
+                throw new RuntimeException("序列化抓取配置失败: " + e.getMessage());
+            }
+            
+            WebsiteEntity savedEntity = save(entity);
+            return convertToResponse(savedEntity);
+        } else {
+            throw new RuntimeException("Website not found");
+        }
+    }
+    
+    /**
+     * 获取网站抓取配置
+     */
+    public CrawlConfig getCrawlConfig(String websiteUid) {
+        Optional<WebsiteEntity> optional = websiteRepository.findByUid(websiteUid);
+        if (optional.isPresent()) {
+            WebsiteEntity entity = optional.get();
+            
+            if (entity.getCrawlConfigJson() != null) {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    return mapper.readValue(entity.getCrawlConfigJson(), CrawlConfig.class);
+                } catch (Exception e) {
+                    // 返回默认配置
+                }
+            }
+        }
+        
+        return CrawlConfig.getDefault();
     }
 
 }

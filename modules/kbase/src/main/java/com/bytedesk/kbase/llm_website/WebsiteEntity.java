@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 10:39:25
+ * @LastEditTime: 2025-09-05 16:41:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -98,13 +98,47 @@ public class WebsiteEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private KbaseEntity kbase;
 
-    // 对应 uploadEntity 的 uid
-    // private String uploadUid;
 
     // vector store id
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> docIdList = new ArrayList<>();
+    
+    // 网站抓取相关字段
+    
+    // 抓取状态
+    @Builder.Default
+    private String crawlStatus = "NEW"; // NEW, CRAWLING, COMPLETED, FAILED
+    
+    // 最后抓取时间
+    private ZonedDateTime lastCrawlTime;
+    
+    // 抓取页面总数
+    @Builder.Default
+    private Integer totalPages = 0;
+    
+    // 抓取成功页面数
+    @Builder.Default
+    private Integer successPages = 0;
+    
+    // 抓取失败页面数
+    @Builder.Default
+    private Integer failedPages = 0;
+    
+    // 当前抓取任务ID
+    private String currentCrawlTaskId;
+    
+    // 抓取配置JSON
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String crawlConfigJson;
+    
+    // 是否启用自动抓取
+    @Builder.Default
+    private Boolean autoRecrawl = false;
+    
+    // 自动抓取间隔（小时）
+    @Builder.Default
+    private Integer recrawlInterval = 24;
 
 }
