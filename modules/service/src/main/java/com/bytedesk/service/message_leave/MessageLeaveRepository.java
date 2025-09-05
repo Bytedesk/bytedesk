@@ -17,8 +17,13 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface MessageLeaveRepository extends JpaRepository<MessageLeaveEntity, Long>, JpaSpecificationExecutor<MessageLeaveEntity> {
 
     Optional<MessageLeaveEntity> findByUid(String uid);
+
+    @Query("SELECT COUNT(m) FROM MessageLeaveEntity m WHERE m.orgUid = :orgUid AND m.status = :status AND m.deleted = false")
+    long countByOrgUidAndStatusAndDeletedFalse(@Param("orgUid") String orgUid, @Param("status") String status);
 }

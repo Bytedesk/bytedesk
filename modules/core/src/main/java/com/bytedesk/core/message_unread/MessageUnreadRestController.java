@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-01 12:38:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 17:22:57
+ * @LastEditTime: 2025-09-05 17:58:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -35,13 +35,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "未读消息管理", description = "未读消息管理相关接口")
 public class MessageUnreadRestController extends BaseRestController<MessageUnreadRequest, MessageUnreadRestService> {
 
-    private final MessageUnreadRestService messageUnreadService;
+    private final MessageUnreadRestService messageUnreadRestService;
 
     @Override
     @Operation(summary = "根据组织查询未读消息")
     public ResponseEntity<?> queryByOrg(MessageUnreadRequest request) {
         
-        Page<MessageUnreadResponse> messagePage = messageUnreadService.queryByOrg(request);
+        Page<MessageUnreadResponse> messagePage = messageUnreadRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messagePage));
     }
@@ -50,7 +50,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Operation(summary = "根据用户查询未读消息")
     public ResponseEntity<?> queryByUser(MessageUnreadRequest request) {
 
-        Page<MessageUnreadResponse> messagePage = messageUnreadService.queryByUser(request);
+        Page<MessageUnreadResponse> messagePage = messageUnreadRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messagePage));
     }
@@ -59,7 +59,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Operation(summary = "根据用户ID查询未读消息")
     public ResponseEntity<?> queryByUid(MessageUnreadRequest request) {
         
-        MessageUnreadResponse messageUnread = messageUnreadService.queryByUid(request);
+        MessageUnreadResponse messageUnread = messageUnreadRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread message success", messageUnread));
     }
@@ -68,7 +68,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Operation(summary = "创建未读消息")
     public ResponseEntity<?> create(MessageUnreadRequest request) {
         
-        MessageUnreadResponse messageUnread = messageUnreadService.create(request);
+        MessageUnreadResponse messageUnread = messageUnreadRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success("create unread message success", messageUnread));
     }
@@ -77,7 +77,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Operation(summary = "更新未读消息")
     public ResponseEntity<?> update(MessageUnreadRequest request) {
         
-        MessageUnreadResponse messageUnread = messageUnreadService.update(request);
+        MessageUnreadResponse messageUnread = messageUnreadRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success("update unread message success", messageUnread));
     }
@@ -86,7 +86,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Operation(summary = "删除未读消息")
     public ResponseEntity<?> delete(MessageUnreadRequest request) {
         
-        messageUnreadService.delete(request);
+        messageUnreadRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete unread message success"));
     }
@@ -105,7 +105,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Operation(summary = "获取未读消息总数")
     public ResponseEntity<?> getMessageUnreadCount(MessageUnreadRequest request) {
 
-        long count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadRestService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages count success", count));
     }
@@ -115,9 +115,9 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     @Operation(summary = "清空当前用户所有未读消息")
     public ResponseEntity<?> clearMessageUnread(@RequestBody MessageUnreadRequest request) {
         // 
-        messageUnreadService.clearUnreadMessages(request);
+        messageUnreadRestService.clearUnreadMessages(request);
         // 看下是否清空了
-        long count = messageUnreadService.getUnreadCount(request);
+        long count = messageUnreadRestService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("clear unread messages count success", count));
     }

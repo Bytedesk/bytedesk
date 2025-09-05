@@ -76,6 +76,16 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    // 查询当前组织未处理的留言数量
+    @GetMapping("/count/pending")
+    @Operation(summary = "查询当前组织未处理的留言数量")
+    public ResponseEntity<?> countPendingByOrg(MessageLeaveRequest request) {
+        
+        long count = messageLeaveRestService.countPendingByOrg(request.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success(count));
+    }
+
     @Override
     @Operation(summary = "创建留言消息")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {

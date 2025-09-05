@@ -84,6 +84,19 @@ public class MessageLeaveRestService extends
         return queryByOrg(request);
     }
 
+    // 查询当前组织未处理的留言数量
+    public long countPendingByOrg(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            UserEntity user = authService.getUser();
+            if (user != null && StringUtils.hasText(user.getOrgUid())) {
+                orgUid = user.getOrgUid();
+            } else {
+                throw new RuntimeException("orgUid is required");
+            }
+        }
+        return messageLeaveRepository.countByOrgUidAndStatusAndDeletedFalse(orgUid, MessageLeaveStatusEnum.PENDING.name());
+    }
+
     @Override
     public MessageLeaveResponse queryByUid(MessageLeaveRequest request) {
         Optional<MessageLeaveEntity> messageLeaveOptional = findByUid(request.getUid());
