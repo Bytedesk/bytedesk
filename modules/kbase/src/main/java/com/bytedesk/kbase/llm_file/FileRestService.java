@@ -62,7 +62,7 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
 
     private final ChunkRestService chunkRestService;
 
-    private final FileChunkService fileChunkProcessService;
+    private final FileChunkService fileChunkService;
 
     @Override
     protected Specification<FileEntity> createSpecification(FileRequest request) {
@@ -297,11 +297,45 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
         
         // 重新进行chunk切分
         FileResponse fileResponse = convertToResponse(savedFile);
-        List<String> docIdList = fileChunkProcessService.processFileChunks(documents, fileResponse);
         
-        // 更新文件的docIdList
-        savedFile.setDocIdList(docIdList);
-        save(savedFile);
+        // 根据文档数量选择处理方式
+        if (FileChunkUtils.shouldUseAsyncProcessing(documents)) {
+            // 大文件使用异步处理
+            log.info("重新切分大文件({} 个文档)使用异步处理: {}", 
+                    documents.size(), file.getFileName());
+            
+            fileChunkService.processFileChunksAsync(documents, fileResponse)
+                .thenAccept(docIdList -> {
+                    log.info("重新切分异步处理完成: {}, 生成chunks: {}", file.getFileName(), docIdList.size());
+                    // 更新文件的docIdList
+                    savedFile.setDocIdList(docIdList);
+                    save(savedFile);
+                })
+                .exceptionally(throwable -> {
+                    log.error("重新切分异步处理失败: {}", throwable.getMessage(), throwable);
+                    // 标记文件处理失败
+                    savedFile.setElasticStatus(ChunkStatusEnum.ERROR.name());
+                    savedFile.setVectorStatus(ChunkStatusEnum.ERROR.name());
+                    save(savedFile);
+                    return null;
+                });
+            
+            // 对于异步处理，返回处理中状态
+            savedFile.setElasticStatus(ChunkStatusEnum.PROCESSING.name());
+            savedFile.setVectorStatus(ChunkStatusEnum.PROCESSING.name());
+            save(savedFile);
+            
+        } else {
+            // 小文件使用同步处理
+            log.info("重新切分小文件({} 个文档)使用同步处理: {}", 
+                    documents.size(), file.getFileName());
+            
+            List<String> docIdList = fileChunkService.processFileChunks(documents, fileResponse);
+            
+            // 更新文件的docIdList
+            savedFile.setDocIdList(docIdList);
+            save(savedFile);
+        }
         
         return convertToResponse(savedFile);
     }

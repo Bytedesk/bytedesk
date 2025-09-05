@@ -68,7 +68,7 @@ public class FileEventListener {
             FileResponse fileResponse = fileRestService.create(fileRequest);
             
             // 根据文档数量选择处理方式
-            if (shouldUseAsyncProcessing(documents)) {
+            if (FileChunkUtils.shouldUseAsyncProcessing(documents)) {
                 // 大文件使用异步批处理
                 log.info("大文件({} 个文档)使用异步批处理: {}", 
                         documents.size(), upload.getFileName());
@@ -154,43 +154,6 @@ public class FileEventListener {
         } else {
             log.warn("标记失败时文件实体不存在: {}", fileUid);
         }
-    }
-    
-    /**
-     * 判断是否应该使用异步处理
-     * 基于文档数量和内容复杂度
-     */
-    private boolean shouldUseAsyncProcessing(List<Document> documents) {
-        // 文档数量阈值
-        int LARGE_FILE_THRESHOLD = 30;
-        
-        // 基础判断：文档数量
-        if (documents.size() > LARGE_FILE_THRESHOLD) {
-            return true;
-        }
-        
-        // 高级判断：文档总内容长度
-        int totalContentLength = documents.stream()
-            .mapToInt(doc -> doc.getText() != null ? doc.getText().length() : 0)
-            .sum();
-        
-        // 如果总内容超过100KB，使用异步处理
-        int LARGE_CONTENT_THRESHOLD = 100000;
-        if (totalContentLength > LARGE_CONTENT_THRESHOLD) {
-            log.info("文档总内容长度过大({} 字符)，使用异步处理", totalContentLength);
-            return true;
-        }
-        
-        // 检查是否有单个超大文档
-        boolean hasLargeDocument = documents.stream()
-            .anyMatch(doc -> doc.getText() != null && doc.getText().length() > 20000);
-        
-        if (hasLargeDocument) {
-            log.info("存在超大文档，使用异步处理");
-            return true;
-        }
-        
-        return false;
     }
 
 
