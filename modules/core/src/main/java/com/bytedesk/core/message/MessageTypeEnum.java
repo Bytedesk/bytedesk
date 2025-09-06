@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-30 09:34:38
+ * @LastEditTime: 2025-09-06 11:11:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -100,13 +100,13 @@ public enum MessageTypeEnum {
     AUTO_CLOSED, // 自动关闭
     AGENT_CLOSED, // 客服关闭
     // 
-    TRANSFER, // 转接
+    TRANSFER, // 会话转接
     TRANSFER_REJECT, // 转接拒绝
     TRANSFER_ACCEPT, // 转接接受
     TRANSFER_TIMEOUT, // 转接超时
     TRANSFER_CANCEL, // 转接取消    
     // 
-    INVITE, // 邀请
+    INVITE, // 会话邀请
     INVITE_REJECT, // 邀请拒绝
     INVITE_ACCEPT, // 邀请接受
     INVITE_TIMEOUT, // 邀请超时
