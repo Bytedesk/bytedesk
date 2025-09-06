@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-04 15:52:03
+ * @LastEditTime: 2025-09-06 09:55:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -92,8 +92,6 @@ public class TicketRestService
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final CategoryRestService categoryService;
-
-    
 
     @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
