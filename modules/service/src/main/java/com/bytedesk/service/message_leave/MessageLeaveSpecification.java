@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-02 14:20:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-06 10:30:03
+ * @LastEditTime: 2025-09-06 10:49:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,8 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.utils.BdDateUtils;
+
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,22 +61,26 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
                 Predicate contentPredicate = criteriaBuilder.like(root.get("content"), searchText);
                 predicates.add(criteriaBuilder.or(contactPredicate, contentPredicate));
             }
-            // 时间范围过滤
+            // 时间范围过滤 - 使用BdDateUtils进行时间解析和转换
             if (StringUtils.hasText(request.getCreatedAtStart())) {
                 try {
-                    java.time.LocalDateTime startDateTime = java.time.LocalDateTime.parse(request.getCreatedAtStart() + "T00:00:00");
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDateTime));
+                    java.time.ZonedDateTime startDateTime = BdDateUtils.parseStartDate(request.getCreatedAtStart());
+                    if (startDateTime != null) {
+                        predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDateTime));
+                    }
                 } catch (Exception e) {
-                    log.warn("Invalid startDate format: {}", request.getCreatedAtStart());
+                    log.warn("Invalid createdAtStart format: {}", request.getCreatedAtStart());
                 }
             }
 
             if (StringUtils.hasText(request.getCreatedAtEnd())) {
                 try {
-                    java.time.LocalDateTime endDateTime = java.time.LocalDateTime.parse(request.getCreatedAtEnd() + "T23:59:59");
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDateTime));
+                    java.time.ZonedDateTime endDateTime = BdDateUtils.parseEndDate(request.getCreatedAtEnd());
+                    if (endDateTime != null) {
+                        predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDateTime));
+                    }
                 } catch (Exception e) {
-                    log.warn("Invalid endDate format: {}", request.getCreatedAtEnd());
+                    log.warn("Invalid createdAtEnd format: {}", request.getCreatedAtEnd());
                 }
             }
             //
