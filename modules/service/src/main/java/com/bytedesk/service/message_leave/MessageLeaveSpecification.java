@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-02 14:20:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 06:55:06
+ * @LastEditTime: 2025-09-06 10:30:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,7 +32,10 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
-            //
+            // nickname
+            if (StringUtils.hasText(request.getNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
+            }
             if (StringUtils.hasText(request.getContact())) {
                 predicates.add(criteriaBuilder.like(root.get("contact"), "%" + request.getContact() + "%"));
             }
@@ -55,6 +58,24 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
                 Predicate contactPredicate = criteriaBuilder.like(root.get("contact"), searchText);
                 Predicate contentPredicate = criteriaBuilder.like(root.get("content"), searchText);
                 predicates.add(criteriaBuilder.or(contactPredicate, contentPredicate));
+            }
+            // 时间范围过滤
+            if (StringUtils.hasText(request.getCreatedAtStart())) {
+                try {
+                    java.time.LocalDateTime startDateTime = java.time.LocalDateTime.parse(request.getCreatedAtStart() + "T00:00:00");
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDateTime));
+                } catch (Exception e) {
+                    log.warn("Invalid startDate format: {}", request.getCreatedAtStart());
+                }
+            }
+
+            if (StringUtils.hasText(request.getCreatedAtEnd())) {
+                try {
+                    java.time.LocalDateTime endDateTime = java.time.LocalDateTime.parse(request.getCreatedAtEnd() + "T23:59:59");
+                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDateTime));
+                } catch (Exception e) {
+                    log.warn("Invalid endDate format: {}", request.getCreatedAtEnd());
+                }
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

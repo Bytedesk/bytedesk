@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 23:05:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-03 09:34:40
+ * @LastEditTime: 2025-09-06 10:29:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -132,4 +132,9 @@ public class MessageLeaveRequest extends BaseRequest {
     // 拒绝相关字段
     private String rejectUser;
     private ZonedDateTime rejectedAt;
+
+
+    // 前端根据创建时间范围查询
+    private String createdAtStart;
+    private String createdAtEnd;
 }

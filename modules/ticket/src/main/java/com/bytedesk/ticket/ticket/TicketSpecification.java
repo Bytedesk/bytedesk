@@ -54,6 +54,25 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
 
+            // 时间范围过滤
+            if (StringUtils.hasText(request.getCreatedAtStart())) {
+                try {
+                    java.time.LocalDateTime startDateTime = java.time.LocalDateTime.parse(request.getCreatedAtStart() + "T00:00:00");
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDateTime));
+                } catch (Exception e) {
+                    log.warn("Invalid startDate format: {}", request.getCreatedAtStart());
+                }
+            }
+
+            if (StringUtils.hasText(request.getCreatedAtEnd())) {
+                try {
+                    java.time.LocalDateTime endDateTime = java.time.LocalDateTime.parse(request.getCreatedAtEnd() + "T23:59:59");
+                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDateTime));
+                } catch (Exception e) {
+                    log.warn("Invalid endDate format: {}", request.getCreatedAtEnd());
+                }
+            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
