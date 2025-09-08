@@ -14,13 +14,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.push.service.CodeSendService;
-import com.bytedesk.core.push.service.PushCoreService;
-import com.bytedesk.core.push.service.ScanLoginService;
-import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
-
-import jakarta.servlet.http.HttpServletRequest;
+import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,69 +26,63 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
 
     private final PushRepository pushRepository;
     private final ModelMapper modelMapper;
-    
-    // 重构后的服务组件
-    private final CodeSendService codeSendService;
-    private final PushCoreService pushCoreService;
-    private final ScanLoginService scanLoginService;
+    private final UidUtils uidUtils;
+
+    // =============== CRUD 增删改查方法 ===============
 
     /**
-     * 发送验证码 - 委托给专门的服务处理
+     * 创建推送记录
      */
-    public Boolean sendCode(AuthRequest authRequest, HttpServletRequest request) {
-        return codeSendService.sendCode(authRequest, request);
-    }
-
-    /**
-     * 验证验证码 - 委托给核心服务处理
-     */
-    public Boolean validateCode(String receiver, String code, HttpServletRequest request) {
-        return pushCoreService.validateCode(receiver, code, request);
-    }
-
-    /**
-     * 扫码查询 - 委托给扫码登录服务处理
-     */
-    public PushResponse scanQuery(PushRequest pushRequest, HttpServletRequest request) {
-        return scanLoginService.scanQuery(pushRequest, request);
-    }
-
-    /**
-     * 扫码确认 - 委托给扫码登录服务处理
-     */
-    public PushResponse scan(PushRequest pushRequest, HttpServletRequest request) {
-        return scanLoginService.scan(pushRequest, request);
-    }
-
-    /**
-     * 扫码登录确认 - 委托给扫码登录服务处理
-     */
-    public PushResponse scanConfirm(PushRequest pushRequest, HttpServletRequest request) {
-        return scanLoginService.scanConfirm(pushRequest, request);
-    }
-
-    /**
-     * 创建推送记录 - 委托给核心服务处理
-     */
+    @Override
     public PushResponse create(PushRequest pushRequest) {
-        return pushCoreService.create(pushRequest);
+        
+        Assert.notNull(pushRequest, "PushRequest cannot be null");
+        log.info("pushRequest {}", pushRequest.toString());
+        
+        PushEntity push = modelMapper.map(pushRequest, PushEntity.class);
+        push.setUid(uidUtils.getUid());
+        push.setChannel(pushRequest.getChannel());
+
+        PushEntity savedPush = save(push);
+        if (savedPush == null) {
+            throw new RuntimeException("create push failed");
+        }
+        
+        return convertToResponse(savedPush);
     }
 
-    // =============== 原有的查询和数据访问方法保持不变 ===============
-    
+    /**
+     * 根据状态、接收者和内容查找
+     */
     public Optional<PushEntity> findByStatusAndReceiverAndContent(PushStatusEnum status, String receiver,
             String content) {
         return pushRepository.findByStatusAndReceiverAndContent(status.name(), receiver, content);
     }
 
+    /**
+     * 根据设备UID查找
+     */
     public Optional<PushEntity> findByDeviceUid(String deviceUid) {
         return pushRepository.findByDeviceUid(deviceUid);
     }
 
+    /**
+     * 检查是否存在指定状态、类型和接收者的记录
+     */
     public Boolean existsByStatusAndTypeAndReceiver(PushStatusEnum status, String type, String receiver) {
         return pushRepository.existsByStatusAndTypeAndReceiver(status.name(), type, receiver);
     }
 
+    /**
+     * 查找待处理状态的记录
+     */
+    public List<PushEntity> findStatusPending() {
+        return pushRepository.findByStatus(PushStatusEnum.PENDING.name());
+    }
+
+    /**
+     * 保存实体（带缓存）
+     */
     @Caching(put = {
             @CachePut(value = "push", key = "#push.receiver"),
     })
@@ -124,9 +113,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         return null;
     }
 
-    public List<PushEntity> findStatusPending() {
-        return pushRepository.findByStatus(PushStatusEnum.PENDING.name());
-    }
+    // =============== 定时任务方法 ===============
 
     /**
      * 自动过期验证码和扫码记录
@@ -172,22 +159,48 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
 
     @Override
     public Optional<PushEntity> findByUid(String uid) {
-        throw new UnsupportedOperationException("Unimplemented method 'findByUid'");
+        return pushRepository.findByUid(uid);
     }
 
     @Override
     public PushResponse update(PushRequest request) {
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Assert.notNull(request, "PushRequest cannot be null");
+        Assert.hasText(request.getUid(), "PushRequest uid cannot be null or empty");
+        
+        Optional<PushEntity> existingEntity = findByUid(request.getUid());
+        if (existingEntity.isEmpty()) {
+            throw new RuntimeException("Push entity not found with uid: " + request.getUid());
+        }
+        
+        PushEntity push = existingEntity.get();
+        // 更新允许修改的字段
+        if (request.getStatus() != null) {
+            push.setStatus(request.getStatus());
+        }
+        if (request.getContent() != null) {
+            push.setContent(request.getContent());
+        }
+        
+        PushEntity savedPush = save(push);
+        return convertToResponse(savedPush);
     }
 
     @Override
     public void deleteByUid(String uid) {
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUid'");
+        Assert.hasText(uid, "Uid cannot be null or empty");
+        
+        Optional<PushEntity> entity = findByUid(uid);
+        if (entity.isPresent()) {
+            pushRepository.delete(entity.get());
+        }
     }
 
     @Override
     public void delete(PushRequest entity) {
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        Assert.notNull(entity, "PushRequest cannot be null");
+        Assert.hasText(entity.getUid(), "PushRequest uid cannot be null or empty");
+        
+        deleteByUid(entity.getUid());
     }
 
     @Override

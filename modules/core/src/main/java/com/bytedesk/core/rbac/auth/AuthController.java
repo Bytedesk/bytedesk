@@ -26,7 +26,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
-import com.bytedesk.core.push.PushRestService;
+import com.bytedesk.core.push.service.PushService;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
@@ -56,7 +56,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    private final PushRestService pushRestService;
+    private final PushService pushService;
 
     private final KaptchaRedisService kaptchaRestService;
 
@@ -77,7 +77,7 @@ public class AuthController {
         }
 
         // validate sms code
-        if (!pushRestService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
@@ -226,7 +226,7 @@ public class AuthController {
         }
 
         // send mobile code
-        Boolean result = pushRestService.sendCode(authRequest, request);
+        Boolean result = pushService.sendCode(authRequest, request);
         if (!result) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
         }
@@ -244,7 +244,7 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // validate mobile & code
-        if (!pushRestService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
+        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
@@ -293,7 +293,7 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // send email code
-        Boolean result = pushRestService.sendCode(authRequest, request);
+        Boolean result = pushService.sendCode(authRequest, request);
         if (!result) {
             return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
         }
@@ -307,7 +307,7 @@ public class AuthController {
         log.debug("login email {}", authRequest.toString());
 
         // validate email & code
-        if (!pushRestService.validateCode(authRequest.getEmail(), authRequest.getCode(), request)) {
+        if (!pushService.validateCode(authRequest.getEmail(), authRequest.getCode(), request)) {
             return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 

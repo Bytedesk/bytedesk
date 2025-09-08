@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestControllerOverride;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.push.PushRestService;
+import com.bytedesk.core.push.service.PushService;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -46,7 +46,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
     private final UserService userService;
 
-    private final PushRestService pushRestService;
+    private final PushService pushService;
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
@@ -150,7 +150,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     public ResponseEntity<?> changeEmail(@RequestBody UserRequest userRequest, HttpServletRequest request) {
         // validate email & code
         // 验证邮箱验证码
-        if (!pushRestService.validateCode(userRequest.getEmail(), userRequest.getCode(), request)) {
+        if (!pushService.validateCode(userRequest.getEmail(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
@@ -164,7 +164,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     public ResponseEntity<?> changeMobile(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
         // 验证手机验证码
-        if (!pushRestService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 

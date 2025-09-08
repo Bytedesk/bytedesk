@@ -20,6 +20,8 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.push.PushRequest;
 import com.bytedesk.core.push.PushResponse;
+import com.bytedesk.core.push.PushRestService;
+import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.push.email.PushServiceEmail;
 import com.bytedesk.core.push.sms.PushServiceSms;
 import com.bytedesk.core.push.strategy.AuthValidationStrategy;
@@ -47,7 +49,8 @@ public class CodeSendService {
     private final BytedeskProperties bytedeskProperties;
     private final IpService ipService;
     private final PushFilterService pushFilterService;
-    private final PushCoreService pushCoreService;
+    private final PushRestService pushRestService;
+    private final PushRestService pushRestService;
 
     public Boolean sendCode(AuthRequest authRequest, HttpServletRequest request) {
         
@@ -77,7 +80,7 @@ public class CodeSendService {
         }
         
         // 检查是否已发送验证码
-        if (pushCoreService.existsByStatusAndTypeAndReceiver(type, receiver)) {
+        if (pushRestService.existsByStatusAndTypeAndReceiver(PushStatusEnum.PENDING, type, receiver)) {
             return false;
         }
 
@@ -131,6 +134,6 @@ public class CodeSendService {
         pushRequest.setIp(ip);
         pushRequest.setIpLocation(ipLocation);
         
-        pushCoreService.create(pushRequest);
+        pushRestService.create(pushRequest);
     }
 }

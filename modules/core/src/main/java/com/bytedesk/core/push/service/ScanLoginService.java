@@ -21,6 +21,7 @@ import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.push.PushEntity;
 import com.bytedesk.core.push.PushRequest;
 import com.bytedesk.core.push.PushResponse;
+import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -38,7 +39,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ScanLoginService {
     
-    private final PushCoreService pushCoreService;
+    private final PushRestService pushRestService;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     private final IpService ipService;
@@ -50,14 +51,14 @@ public class ScanLoginService {
         Assert.notNull(request, "HttpServletRequest cannot be null");
         Assert.hasText(pushRequest.getDeviceUid(), "PushRequest deviceUid cannot be null or empty");
 
-        Optional<PushEntity> pushOptional = pushCoreService.findByDeviceUid(pushRequest.getDeviceUid());
+        Optional<PushEntity> pushOptional = pushRestService.findByDeviceUid(pushRequest.getDeviceUid());
         if (pushOptional.isPresent()) {
             PushEntity push = pushOptional.get();
             if (pushRequest.getForceRefresh().booleanValue()) {
                 push.setStatus(PushStatusEnum.PENDING.name());
-                pushCoreService.save(push);
+                pushRestService.save(push);
             }
-            return pushCoreService.convertToResponse(push);
+            return pushRestService.convertToResponse(push);
         }
 
         return createNewScanQuery(pushRequest, request);
@@ -70,16 +71,16 @@ public class ScanLoginService {
         Assert.notNull(request, "HttpServletRequest cannot be null");
         Assert.hasText(pushRequest.getDeviceUid(), "PushRequest deviceUid cannot be null or empty");
         
-        PushEntity push = pushCoreService.findByDeviceUid(pushRequest.getDeviceUid())
+        PushEntity push = pushRestService.findByDeviceUid(pushRequest.getDeviceUid())
                 .orElseThrow(() -> new RuntimeException("scan deviceUid " + pushRequest.getDeviceUid() + " not found"));
         
         push.setStatus(PushStatusEnum.SCANNED.name());
         
-        PushEntity savedPush = pushCoreService.save(push);
+        PushEntity savedPush = pushRestService.save(push);
         if (savedPush == null) {
             throw new RuntimeException("scan save failed");
         }
-        return pushCoreService.convertToResponse(savedPush);
+        return pushRestService.convertToResponse(savedPush);
     }
 
     public PushResponse scanConfirm(PushRequest pushRequest, HttpServletRequest request) {
@@ -90,17 +91,17 @@ public class ScanLoginService {
         Assert.hasText(pushRequest.getDeviceUid(), "PushRequest deviceUid cannot be null or empty");
         Assert.hasText(pushRequest.getReceiver(), "PushRequest receiver cannot be null or empty");
 
-        PushEntity push = pushCoreService.findByDeviceUid(pushRequest.getDeviceUid())
+        PushEntity push = pushRestService.findByDeviceUid(pushRequest.getDeviceUid())
                 .orElseThrow(() -> new RuntimeException(
                         "scanConfirm deviceUid " + pushRequest.getDeviceUid() + " not found"));
         push.setReceiver(pushRequest.getReceiver());
         push.setStatus(PushStatusEnum.CONFIRMED.name());
         
-        PushEntity savedPush = pushCoreService.save(push);
+        PushEntity savedPush = pushRestService.save(push);
         if (savedPush == null) {
             throw new RuntimeException("scanConfirm save failed");
         }
-        return pushCoreService.convertToResponse(savedPush);
+        return pushRestService.convertToResponse(savedPush);
     }
 
     private PushResponse createNewScanQuery(PushRequest pushRequest, HttpServletRequest request) {
@@ -115,10 +116,10 @@ public class ScanLoginService {
         push.setIp(ip);
         push.setIpLocation(ipLocation);
         
-        PushEntity savedPush = pushCoreService.save(push);
+        PushEntity savedPush = pushRestService.save(push);
         if (savedPush == null) {
             throw new RuntimeException("scan query failed");
         }
-        return pushCoreService.convertToResponse(savedPush);
+        return pushRestService.convertToResponse(savedPush);
     }
 }
