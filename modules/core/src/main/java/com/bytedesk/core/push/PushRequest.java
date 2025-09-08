@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-25 15:42:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 12:48:03
+ * @LastEditTime: 2025-09-08 21:57:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,8 +44,7 @@ public class PushRequest extends BaseRequest {
     private Boolean forceRefresh; // 强制刷新
     private String deviceUid; // 设备唯一标识
 
-    // @Builder.Default
-    // private String status = PushStatusEnum.PENDING.name();
+    private String status;
 
     // @Builder.Default
     // private String platform = PlatformEnum.BYTEDESK.name();
