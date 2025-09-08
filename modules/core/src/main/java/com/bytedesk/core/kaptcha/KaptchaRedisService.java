@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 17:48:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-07 14:57:19
+ * @LastEditTime: 2025-09-08 11:30:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,7 +52,7 @@ public class KaptchaRedisService {
 
     public Boolean checkKaptcha(String key, String value, @NonNull String channel) {
         // flutter手机端验证码暂时不做校验
-        if (ChannelEnum.FLUTTER.name().equalsIgnoreCase(channel)) {
+        if (channel != null && channel.toLowerCase().contains(ChannelEnum.FLUTTER.name().toLowerCase())) {
             return true;
         }
         // 如果禁用验证码，则直接返回true
