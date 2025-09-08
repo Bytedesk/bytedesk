@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-03 17:43:31
+ * @LastEditTime: 2025-09-08 14:39:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,7 +26,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
-import com.bytedesk.core.push.service.PushService;
+import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;

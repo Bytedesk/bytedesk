@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-08 10:00:00
+ * @LastEditTime: 2025-09-08 14:40:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,6 @@ import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.push.PushRequest;
-import com.bytedesk.core.push.PushResponse;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.push.email.PushServiceEmail;
@@ -49,7 +48,6 @@ public class CodeSendService {
     private final BytedeskProperties bytedeskProperties;
     private final IpService ipService;
     private final PushFilterService pushFilterService;
-    private final PushRestService pushRestService;
     private final PushRestService pushRestService;
 
     public Boolean sendCode(AuthRequest authRequest, HttpServletRequest request) {
