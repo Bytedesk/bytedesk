@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-09 12:28:07
+ * @LastEditTime: 2025-09-09 13:11:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,16 +53,16 @@ public class AuthController {
 
     private final PushService pushService;
 
-    private final KaptchaRedisService kaptchaRestService;
+    private final KaptchaRedisService kaptchaRedisService;
 
     private final TokenRestService tokenRestService;
 
-    private final AuthLoginRetryHelper loginRetryHelper;
+    private final AuthLoginRetryHelper authLoginRetryHelper;
 
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
-        if (!kaptchaRestService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(),
+        if (!kaptchaRedisService.checkKaptcha(userRequest.getCaptchaUid(), userRequest.getCaptchaCode(),
                 userRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
@@ -82,14 +82,14 @@ public class AuthController {
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
         log.debug("login {}", authRequest.toString());
 
-        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
         try {
             // 预登录检查
-            loginRetryHelper.performPreLoginChecks(authRequest.getUsername());
+            authLoginRetryHelper.performPreLoginChecks(authRequest.getUsername());
 
             Authentication authentication;
             // 判断是否使用密码哈希登录
@@ -98,7 +98,7 @@ public class AuthController {
                 log.debug("Using plain password authentication");
                 authentication = authService.authenticateWithPlainPassword(authRequest);
                 if (authentication == null) {
-                    return loginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
+                    return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
                 }
                 
             } else if (StringUtils.hasText(authRequest.getPasswordHash())
@@ -107,7 +107,7 @@ public class AuthController {
                 log.debug("Using password hash authentication with AES decryption for user: {}", authRequest.getUsername());
                 authentication = authService.authenticateWithPasswordHash(authRequest);
                 if (authentication == null) {
-                    return loginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
+                    return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
                 }
                 
             } else {
@@ -115,7 +115,7 @@ public class AuthController {
             }
             
             // 登录成功，重置失败次数
-            loginRetryHelper.resetLoginFailedCount(authRequest.getUsername());
+            authLoginRetryHelper.resetLoginFailedCount(authRequest.getUsername());
             
             // 格式化并返回成功响应
             AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
@@ -126,7 +126,7 @@ public class AuthController {
             if (StringUtils.hasText(authRequest.getPasswordHash())) {
                 return ResponseEntity.ok().body(JsonResult.error("密码解密失败，请检查密码格式", -1, false));
             }
-            return loginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
+            return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
         }
     }
 
@@ -135,7 +135,7 @@ public class AuthController {
         log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getChannel(),
                 authRequest.getType());
 
-        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
@@ -154,7 +154,7 @@ public class AuthController {
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
 
-        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
@@ -203,7 +203,7 @@ public class AuthController {
     public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
 
-        if (!kaptchaRestService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+        if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
