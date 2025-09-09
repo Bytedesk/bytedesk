@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-16 18:19:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-26 17:00:29
+ * @LastEditTime: 2025-09-09 12:43:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -91,12 +91,6 @@ public class WebSecurityConfig {
         //
         return http.build();
     }
-
-    // 注释掉单独的 UserDetailsService bean，因为它已经在 DaoAuthenticationProvider 中使用
-    // @Bean
-    // public UserDetailsService userDetailsService() {
-    //     return new UserDetailsServiceImpl();
-    // }
 
     @Bean
     public AuthTokenFilter authTokenFilter() {

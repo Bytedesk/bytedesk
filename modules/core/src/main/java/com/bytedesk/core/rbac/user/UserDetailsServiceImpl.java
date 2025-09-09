@@ -70,6 +70,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(userOptional.get());
 	}
 
+	public UserDetailsImpl loadUserByUsernameAndPlatform(String username, String platform) {
+		log.debug("loadUserByUsernameAndPlatform username: {}, platform: {}", username, platform);
+		//
+		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, platform);
+		if (!userOptional.isPresent()) {
+			throw new UsernameNotFoundException("username " + username + " is not found");
+		}
+		if (!userOptional.get().isEnabled()) {
+			throw new UserDisabledException("username " + username + " is not enabled");
+		}
+		return UserDetailsImpl.build(userOptional.get());
+	}
+
 	public UserDetails loadUserByUsernameAndPlatform(String subject) {
 		String username = JSON.parseObject(subject, JwtSubject.class).getUsername();
 		String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();

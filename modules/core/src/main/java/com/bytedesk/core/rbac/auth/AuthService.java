@@ -36,6 +36,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.utils.PasswordCryptoUtils;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -163,6 +164,49 @@ public class AuthService {
     }
 
     /**
+     * 通用的密码验证逻辑
+     */
+    private Authentication authenticateWithPassword(UserDetailsImpl userDetails, String password, String username) {
+        try {
+            // 验证密码与数据库中存储的BCrypt密码
+            String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
+            boolean isValid = passwordEncoder.matches(password, dbPassword);
+            
+            if (!isValid) {
+                log.warn("Password verification failed for user: {}", username);
+                return null;
+            }
+
+            // 密码验证成功，构造认证对象
+            log.info("Password authentication successful for user: {}", username);
+            return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            
+        } catch (Exception e) {
+            log.error("Password authentication error for user: {}: {}", username, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 明文密码登录 - 直接验证明文密码
+     * 参考 authenticateWithPasswordHash 逻辑，去掉AES解密过程
+     */
+    public Authentication authenticateWithPlainPassword(AuthRequest authRequest) {
+        // 1. 查询用户，传入平台信息
+        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsernameAndPlatform(authRequest.getUsername(), authRequest.getPlatform());
+        if (userDetails == null) {
+            log.warn("User not found: {}", authRequest.getUsername());
+            return null;
+        }
+
+        // 2. 直接使用明文密码验证（无需AES解密）
+        String plainPassword = authRequest.getPassword();
+        log.debug("Using plain password authentication for user: {}", authRequest.getUsername());
+
+        return authenticateWithPassword(userDetails, plainPassword, authRequest.getUsername());
+    }
+
+    /**
      * 密码哈希登录 - 支持AES解密
      * 前端使用AES加密密码，后端解密后验证
      */
@@ -173,7 +217,7 @@ public class AuthService {
             log.warn("User not found: {}", authRequest.getUsername());
             return null;
         }
-        // 实际情况：现在支持AES解密前端加密的密码
+        
         try {
             // 2. 使用AES解密前端发送的加密密码
             String decryptedPassword = PasswordCryptoUtils.decryptPassword(
@@ -182,18 +226,7 @@ public class AuthService {
             );
             log.debug("Password decrypted successfully for user: {}", authRequest.getUsername());
 
-            // 3. 验证解密后的密码与数据库中存储的BCrypt密码
-            String dbPassword = userDetails.getPassword(); // 数据库存储的BCrypt加密密码
-            boolean isValid = passwordEncoder.matches(decryptedPassword, dbPassword);
-            // 密码验证失败
-            if (!isValid) {
-                log.warn("Password verification failed for user: {}", authRequest.getUsername());
-                return null;
-            }
-
-            // 4. 密码验证成功，构造认证对象
-            log.info("Password hash authentication successful for user: {}", authRequest.getUsername());
-            return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            return authenticateWithPassword(userDetails, decryptedPassword, authRequest.getUsername());
             
         } catch (Exception e) {
             log.error("Password hash authentication error for user: {}: {}", authRequest.getUsername(), e.getMessage());
