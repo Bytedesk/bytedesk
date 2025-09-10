@@ -88,7 +88,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         
         try {
             // 创建 OpenAiApi 实例
-            OpenAiApi openAiApi = VolcengineApi.create(provider.getApiUrl(), provider.getApiKey());
+            OpenAiApi openAiApi = VolcengineApi.create(provider.getBaseUrl(), provider.getApiKey());
             
             // 创建选项
             OpenAiChatOptions options = createDynamicOptions(llm);

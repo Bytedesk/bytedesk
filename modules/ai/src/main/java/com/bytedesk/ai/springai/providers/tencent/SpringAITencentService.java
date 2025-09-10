@@ -89,10 +89,10 @@ public class SpringAITencentService extends BaseSpringAIService {
         try {
             // 创建 OpenAiApi 实例
             OpenAiApi openAiApi = OpenAiApi.builder()
-                    .baseUrl(provider.getApiUrl())
+                    .baseUrl(provider.getBaseUrl())
                     .apiKey(provider.getApiKey())
                     .build();
-            log.info("Creating Tencent OpenAiApi with baseUrl: {}, apiKey: {}", provider.getApiUrl(), provider.getApiKey(), llm.getTextModel());
+            log.info("Creating Tencent OpenAiApi with baseUrl: {}, apiKey: {}", provider.getBaseUrl(), provider.getApiKey(), llm.getTextModel());
 
             // 创建选项
             OpenAiChatOptions options = createDynamicOptions(llm);

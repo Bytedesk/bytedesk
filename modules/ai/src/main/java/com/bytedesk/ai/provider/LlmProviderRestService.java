@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 14:41:57
+ * @LastEditTime: 2025-09-10 13:17:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -115,7 +115,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
                 .name(providerName)
                 .nickname(providerJson.getNickname())
                 .logo(AvatarConsts.getLlmThreadDefaultAvatarBaseUrl() + providerJson.getLogo())
-                .apiUrl(providerJson.getApiUrl())
+                .baseUrl(providerJson.getBaseUrl())
                 .webUrl(providerJson.getWebUrl())
                 .status(providerJson.getStatus())
                 .orgUid(orgUid)

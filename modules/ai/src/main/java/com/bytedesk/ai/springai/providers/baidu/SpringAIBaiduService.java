@@ -96,7 +96,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic Baidu chat model with provider: {} ({})", provider.getName(), provider.getUid());
             // 创建 OpenAiApi 实例
-            OpenAiApi openAiApi = BaiduApi.create(provider.getApiUrl(), provider.getApiKey());
+            OpenAiApi openAiApi = BaiduApi.create(provider.getBaseUrl(), provider.getApiKey());
             
             // 创建选项
             OpenAiChatOptions options = createDynamicOptions(llm);

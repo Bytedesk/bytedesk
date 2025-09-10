@@ -106,7 +106,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic OpenAI chat model with provider: {} ({})", provider.getName(), provider.getUid());
             // 使用动态的OpenAiApi实例
-            OpenAiApi openaiApi = createOpenaiApi(provider.getApiUrl(), provider.getApiKey());
+            OpenAiApi openaiApi = createOpenaiApi(provider.getBaseUrl(), provider.getApiKey());
             OpenAiChatOptions options = createOpenaiOptions(llm);
             if (options == null) {
                 log.warn("Failed to create OpenAI options, using default chat model");

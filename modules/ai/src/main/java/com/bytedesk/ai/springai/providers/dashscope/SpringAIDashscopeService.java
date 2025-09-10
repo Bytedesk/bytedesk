@@ -106,7 +106,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic Dashscope chat model with provider: {} ({})", provider.getName(), provider.getUid());
             // 使用动态的DashScopeApi实例
-            DashScopeApi dashscopeApi = createDashscopeApi(provider.getApiUrl(), provider.getApiKey());
+            DashScopeApi dashscopeApi = createDashscopeApi(provider.getBaseUrl(), provider.getApiKey());
             DashScopeChatOptions options = createDashscopeOptions(llm);
             if (options == null) {
                 log.warn("Failed to create Dashscope options, using default chat model");

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-24 15:26:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-17 14:49:14
+ * @LastEditTime: 2025-09-10 13:17:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -55,7 +55,7 @@ public class LlmProviderJsonLoader {
     public static class ProviderJson {
         private String nickname;
         private String logo;
-        private String apiUrl;
+        private String baseUrl;
         private String webUrl;
         private String status;
     }

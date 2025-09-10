@@ -106,7 +106,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic Deepseek chat model with provider: {} ({})", provider.getName(), provider.getUid());
             // 使用动态的OpenAiApi实例
-            OpenAiApi deepseekApi = createDeepseekApi(provider.getApiUrl(), provider.getApiKey());
+            OpenAiApi deepseekApi = createDeepseekApi(provider.getBaseUrl(), provider.getApiKey());
             OpenAiChatOptions options = createDeepseekOptions(llm);
             if (options == null) {
                 log.warn("Failed to create Deepseek options, using default chat model");

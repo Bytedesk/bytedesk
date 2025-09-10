@@ -96,7 +96,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         
         try {
             // 使用默认的OllamaApi实例
-            OllamaApi ollamaApi = createOllamaApi(llmProviderOptional.get().getApiUrl());
+            OllamaApi ollamaApi = createOllamaApi(llmProviderOptional.get().getBaseUrl());
             OllamaOptions options = createOllamaOptions(llm);
             if (options == null) {
                 log.warn("Failed to create Ollama options, using default chat model");
@@ -341,7 +341,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
      * @return 如果模型存在返回true，否则返回false
      */
     public Boolean isModelExists(OllamaRequest request) {
-        OllamaApi ollamaApi = createOllamaApi(request.getApiUrl());
+        OllamaApi ollamaApi = createOllamaApi(request.getBaseUrl());
         String modelName = request.getModel();
         Assert.hasText(modelName, "Model name must not be null or empty");
         try {

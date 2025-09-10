@@ -92,7 +92,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         try {
             // 创建 OpenAiApi 实例
             OpenAiApi openAiApi = OpenAiApi.builder()
-                    .baseUrl(provider.getApiUrl())
+                    .baseUrl(provider.getBaseUrl())
                     .apiKey(provider.getApiKey())
                     .build();
             

@@ -58,7 +58,7 @@ public class SpringAIOllamaChatController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(OllamaRequest request) {
         // 
-        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getApiUrl()).build();
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
         OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model == null) {
@@ -80,7 +80,7 @@ public class SpringAIOllamaChatController {
 
         Prompt prompt = new Prompt(new UserMessage(request.getMessage()));
         // 
-        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getApiUrl()).build();
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
         OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model != null) {
@@ -128,7 +128,7 @@ public class SpringAIOllamaChatController {
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(OllamaRequest request) {
 
-        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getApiUrl()).build();
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
         OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model == null) {

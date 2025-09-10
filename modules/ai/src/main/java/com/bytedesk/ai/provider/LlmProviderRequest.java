@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:50:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 11:32:22
+ * @LastEditTime: 2025-09-10 13:16:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,7 +45,7 @@ public class LlmProviderRequest extends BaseRequest {
     // private String type;
 
     //
-    private String apiUrl;
+    private String baseUrl;
     private String apiKey;
     private String webUrl;
     // 

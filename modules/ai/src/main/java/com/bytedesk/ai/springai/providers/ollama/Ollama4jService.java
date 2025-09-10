@@ -31,7 +31,7 @@ public class Ollama4jService {
      * @return OllamaAPI 实例
      */
     public OllamaAPI createOllamaAPI(OllamaRequest request) {
-        String apiUrl = request.getApiUrl();
+        String apiUrl = request.getBaseUrl();
         if (apiUrl == null || apiUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("apiUrl is required in OllamaRequest");
         }

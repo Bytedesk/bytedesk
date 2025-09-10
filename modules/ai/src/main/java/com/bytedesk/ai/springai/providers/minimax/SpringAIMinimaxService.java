@@ -100,7 +100,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic Minimax chat model with provider: {} ({})", provider.getName(), provider.getUid());
             // 尝试使用 MiniMaxApi 构造函数而不是 builder
-            MiniMaxApi miniMaxApi = new MiniMaxApi(provider.getApiUrl(), provider.getApiKey());
+            MiniMaxApi miniMaxApi = new MiniMaxApi(provider.getBaseUrl(), provider.getApiKey());
             
             // 创建选项
             MiniMaxChatOptions options = createDynamicOptions(llm);

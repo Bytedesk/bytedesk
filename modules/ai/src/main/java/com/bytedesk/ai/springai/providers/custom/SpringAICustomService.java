@@ -122,7 +122,7 @@ public class SpringAICustomService extends BaseSpringAIService {
 
         try {
             // 创建 OpenAiApi 实例
-            OpenAiApi openAiApi = createOpenAiApi(provider.getApiUrl(), provider.getApiKey());
+            OpenAiApi openAiApi = createOpenAiApi(provider.getBaseUrl(), provider.getApiKey());
 
             // 创建选项
             OpenAiChatOptions options = createDynamicOptions(llm);
