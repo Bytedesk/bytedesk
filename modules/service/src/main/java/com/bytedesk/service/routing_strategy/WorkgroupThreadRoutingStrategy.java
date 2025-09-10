@@ -291,6 +291,25 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 路由到人工客服
      */
     private MessageProtobuf routeToAgent(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+        // 检查是否在工作时间内
+        boolean isInServiceTime = workgroup.getMessageLeaveSettings().isInServiceTime();
+        if (!isInServiceTime) {
+            log.info("Not in service time, routing to offline message");
+            // 选择离线留言接待客服
+            AgentEntity messageLeaveAgent = workgroup.getMessageLeaveAgent();
+            if (messageLeaveAgent == null) {
+                log.error("离线留言接待客服不存在，请配置工作组留言接待客服");
+                throw new IllegalStateException("Workgroup message leave agent not found");
+            }
+            
+            // 加入队列（用于统计和管理）
+            UserProtobuf agent = messageLeaveAgent.toUserProtobuf();
+            QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+            
+            // 直接返回离线留言消息
+            return getOfflineMessage(visitorRequest, thread, messageLeaveAgent, workgroup, queueMemberEntity);
+        }
+        
         // 选择客服
         AgentEntity agentEntity = selectAgent(workgroup, thread);
         
