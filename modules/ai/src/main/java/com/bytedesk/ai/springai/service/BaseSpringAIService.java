@@ -35,7 +35,6 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotStreamContent;
-import com.bytedesk.core.message.content.SourceTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElastic;
@@ -734,7 +733,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             
             // 创建FAQ源引用
             RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType("faq")
+                    .sourceType(RobotStreamContent.SourceTypeEnum.FAQ)
                     .sourceUid(faq.getUid())
                     .sourceName(faq.getQuestion())
                     .contentSummary(getContentSummary(faq.getAnswer(), 200))
@@ -752,7 +751,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             
             // 创建文本源引用
             RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType("text")
+                    .sourceType(RobotStreamContent.SourceTypeEnum.TEXT)
                     .sourceUid(text.getUid())
                     .sourceName(text.getTitle())
                     .contentSummary(getContentSummary(text.getContent(), 200))
@@ -770,7 +769,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             
             // 创建Chunk源引用，包含文件信息
             RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType("chunk")
+                    .sourceType(RobotStreamContent.SourceTypeEnum.CHUNK)
                     .sourceUid(chunk.getUid())
                     .sourceName(chunk.getName())
                     .fileName(chunk.getFileName())
@@ -791,7 +790,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             
             // 创建网页源引用
             RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType("webpage")
+                    .sourceType(RobotStreamContent.SourceTypeEnum.WEBPAGE)
                     .sourceUid(webpage.getUid())
                     .sourceName(webpage.getTitle())
                     .contentSummary(getContentSummary(webpage.getContent(), 200))
@@ -817,7 +816,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     
                     // 创建FAQ向量源引用
                     RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType("faq")
+                            .sourceType(RobotStreamContent.SourceTypeEnum.FAQ)
                             .sourceUid(faqVector.getUid())
                             .sourceName(faqVector.getQuestion())
                             .contentSummary(getContentSummary(faqVector.getAnswer(), 200))
@@ -842,7 +841,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     
                     // 创建文本向量源引用
                     RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType("text")
+                            .sourceType(RobotStreamContent.SourceTypeEnum.TEXT)
                             .sourceUid(textVector.getUid())
                             .sourceName(textVector.getTitle())
                             .contentSummary(getContentSummary(textVector.getContent(), 200))
@@ -867,7 +866,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     
                     // 创建Chunk向量源引用，包含文件信息
                     RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType("chunk")
+                            .sourceType(RobotStreamContent.SourceTypeEnum.CHUNK)
                             .sourceUid(chunkVector.getUid())
                             .sourceName(chunkVector.getName())
                             .fileName(chunkVector.getFileName())
@@ -895,7 +894,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     
                     // 创建网页向量源引用
                     RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType("webpage")
+                            .sourceType(RobotStreamContent.SourceTypeEnum.WEBPAGE)
                             .sourceUid(webpageVector.getUid())
                             .sourceName(webpageVector.getTitle())
                             .contentSummary(getContentSummary(webpageVector.getContent(), 200))

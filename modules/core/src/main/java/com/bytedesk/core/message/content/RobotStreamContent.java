@@ -3,6 +3,8 @@ package com.bytedesk.core.message.content;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseContent;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,6 +40,75 @@ public class RobotStreamContent extends BaseContent {
     // 机器人UID，用于重新生成
     private String robotUid;
     
+    /**
+     * 源引用类型枚举
+     * 用于标识AI回答中引用内容的来源类型
+     */
+    public enum SourceTypeEnum {
+        
+        FAQ("faq", "常见问题"),
+        TEXT("text", "文本内容"),
+        CHUNK("chunk", "文档片段"),
+        WEBPAGE("webpage", "网页内容"),
+        FILE("file", "文件内容"),
+        DOCUMENT("document", "文档"),
+        ARTICLE("article", "文章"),
+        IMAGE("image", "图片"),
+        VIDEO("video", "视频"),
+        AUDIO("audio", "音频");
+        
+        private final String code;
+        private final String description;
+        
+        SourceTypeEnum(String code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+        
+        /**
+         * 用于 JSON 序列化
+         */
+        @JsonValue
+        public String getCode() {
+            return code;
+        }
+        
+        public String getDescription() {
+            return description;
+        }
+        
+        /**
+         * 根据代码获取枚举值，用于 JSON 反序列化
+         * @param code 代码
+         * @return 对应的枚举值，如果没有找到则返回null
+         */
+        @JsonCreator
+        public static SourceTypeEnum fromCode(String code) {
+            if (code == null) {
+                return null;
+            }
+            for (SourceTypeEnum type : SourceTypeEnum.values()) {
+                if (type.code.equalsIgnoreCase(code)) {
+                    return type;
+                }
+            }
+            return null;
+        }
+        
+        /**
+         * 检查代码是否有效
+         * @param code 代码
+         * @return 是否有效
+         */
+        public static boolean isValidCode(String code) {
+            return fromCode(code) != null;
+        }
+        
+        @Override
+        public String toString() {
+            return code;
+        }
+    }
     /**
      * 来源引用信息
      */
