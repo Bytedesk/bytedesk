@@ -77,6 +77,14 @@ public class ChunkVector {
     @Field(type = FieldType.Keyword)
     private String fileUid;
     
+    // 文件名
+    @Field(type = FieldType.Keyword)
+    private String fileName;
+    
+    // 文件链接
+    @Field(type = FieldType.Keyword)
+    private String fileUrl;
+    
     // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
     // private ZonedDateTime startDate;
 
@@ -97,6 +105,8 @@ public class ChunkVector {
     public static ChunkVector fromChunkEntity(ChunkEntity chunk) {
         String kbUid = "";
         String fileUid = "";
+        String fileName = "";
+        String fileUrl = "";
         
         if (chunk.getKbase() != null) {
             kbUid = chunk.getKbase().getUid();
@@ -104,6 +114,8 @@ public class ChunkVector {
         
         if (chunk.getFile() != null) {
             fileUid = chunk.getFile().getUid();
+            fileName = chunk.getFile().getFileName();
+            fileUrl = chunk.getFile().getFileUrl();
         }
         
         return ChunkVector.builder()
@@ -118,6 +130,8 @@ public class ChunkVector {
             .enabled(chunk.getEnabled())
             .docId(chunk.getDocId())
             .fileUid(fileUid)
+            .fileName(fileName)
+            .fileUrl(fileUrl)
             // .startDate(chunk.getStartDate())
             // .endDate(chunk.getEndDate())
             .status(chunk.getElasticStatus())

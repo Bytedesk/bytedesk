@@ -34,6 +34,8 @@ import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.RobotStreamContent;
+import com.bytedesk.core.message.content.SourceTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElastic;
@@ -121,6 +123,27 @@ public abstract class BaseSpringAIService implements SpringAIService {
     @Autowired
     protected ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * 搜索结果和源引用的封装类
+     */
+    public static class SearchResultWithSources {
+        private final List<FaqProtobuf> searchResults;
+        private final List<RobotStreamContent.SourceReference> sourceReferences;
+        
+        public SearchResultWithSources(List<FaqProtobuf> searchResults, List<RobotStreamContent.SourceReference> sourceReferences) {
+            this.searchResults = searchResults;
+            this.sourceReferences = sourceReferences;
+        }
+        
+        public List<FaqProtobuf> getSearchResults() {
+            return searchResults;
+        }
+        
+        public List<RobotStreamContent.SourceReference> getSourceReferences() {
+            return sourceReferences;
+        }
+    }
+
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
     // 保留一个无参构造函数，或者只接收特定的必需依赖
@@ -207,8 +230,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         // 根据是否启用LLM决定如何处理结果
         if (robot.getLlm().getEnabled()) {
-            // 启用大模型
-            processLlmResponse(query, searchResultList, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            // 启用大模型，使用新的带源引用的格式
+            processLlmResponseWithSources(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
         } else {
             // 未开启大模型，使用搜索结果直接回复
             processDirectResponse(query, searchResultList, robot, messageProtobufQuery, messageProtobufReply, emitter);
@@ -536,6 +559,50 @@ public abstract class BaseSpringAIService implements SpringAIService {
         return searchResultList;
     }
 
+    /**
+     * 搜索知识库并收集源引用信息
+     * @param query 查询内容
+     * @param robot 机器人配置
+     * @return 包含源引用信息的搜索结果
+     */
+    protected SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot) {
+        // 如果知识库未启用，直接返回空结果
+        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) {
+            log.info("知识库未启用或未指定知识库UID");
+            return new SearchResultWithSources(new ArrayList<>(), new ArrayList<>());
+        }
+        
+        // 创建搜索结果列表和源引用列表
+        List<FaqProtobuf> searchResultList = new ArrayList<>();
+        List<RobotStreamContent.SourceReference> sourceReferences = new ArrayList<>();
+        
+        // 根据搜索类型执行相应的搜索
+        String searchType = robot.getLlm().getSearchType();
+        if (searchType == null) {
+            searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
+        }
+        
+        // 执行搜索并收集源引用
+        switch (RobotSearchTypeEnum.valueOf(searchType)) {
+            case VECTOR:
+                log.info("使用向量搜索");
+                executeVectorSearchWithSources(query, robot.getKbUid(), searchResultList, sourceReferences);
+                break;
+            case MIXED:
+                log.info("使用混合搜索");
+                executeFulltextSearchWithSources(query, robot.getKbUid(), searchResultList, sourceReferences);
+                executeVectorSearchWithSources(query, robot.getKbUid(), searchResultList, sourceReferences);
+                break;
+            case FULLTEXT:
+            default:
+                log.info("使用全文搜索");
+                executeFulltextSearchWithSources(query, robot.getKbUid(), searchResultList, sourceReferences);
+                break;
+        }
+        
+        return new SearchResultWithSources(searchResultList, sourceReferences);
+    }
+
     private void executeFulltextSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
         List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
         for (FaqElasticSearchResult withScore : searchResults) {
@@ -655,25 +722,418 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // }
     }
 
-    // 3. LLM 处理相关方法
-    private void processLlmResponse(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
+    /**
+     * 执行全文搜索并收集源引用信息
+     */
+    private void executeFulltextSearchWithSources(String query, String kbUid, List<FaqProtobuf> searchResultList, List<RobotStreamContent.SourceReference> sourceReferences) {
+        List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
+        for (FaqElasticSearchResult withScore : searchResults) {
+            FaqElastic faq = withScore.getFaqElastic();
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
+            searchResultList.add(faqProtobuf);
+            
+            // 创建FAQ源引用
+            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                    .sourceType("faq")
+                    .sourceUid(faq.getUid())
+                    .sourceName(faq.getQuestion())
+                    .contentSummary(getContentSummary(faq.getAnswer(), 200))
+                    .score((double) withScore.getScore())
+                    .highlighted(false)
+                    .build();
+            sourceReferences.add(sourceRef);
+        }
+        
+        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null);
+        for (TextElasticSearchResult withScore : textResults) {
+            TextElastic text = withScore.getTextElastic();
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
+            searchResultList.add(faqProtobuf);
+            
+            // 创建文本源引用
+            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                    .sourceType("text")
+                    .sourceUid(text.getUid())
+                    .sourceName(text.getTitle())
+                    .contentSummary(getContentSummary(text.getContent(), 200))
+                    .score((double) withScore.getScore())
+                    .highlighted(false)
+                    .build();
+            sourceReferences.add(sourceRef);
+        }
+        
+        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
+        for (ChunkElasticSearchResult withScore : chunkResults) {
+            ChunkElastic chunk = withScore.getChunkElastic();
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
+            searchResultList.add(faqProtobuf);
+            
+            // 创建Chunk源引用，包含文件信息
+            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                    .sourceType("chunk")
+                    .sourceUid(chunk.getUid())
+                    .sourceName(chunk.getName())
+                    .fileName(chunk.getFileName())
+                    .fileUrl(chunk.getFileUrl())
+                    .fileUid(chunk.getFileUid())
+                    .contentSummary(getContentSummary(chunk.getContent(), 200))
+                    .score((double) withScore.getScore())
+                    .highlighted(false)
+                    .build();
+            sourceReferences.add(sourceRef);
+        }
+        
+        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null);
+        for (WebpageElasticSearchResult withScore : webpageResults) {
+            WebpageElastic webpage = withScore.getWebpageElastic();
+            FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
+            searchResultList.add(faqProtobuf);
+            
+            // 创建网页源引用
+            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                    .sourceType("webpage")
+                    .sourceUid(webpage.getUid())
+                    .sourceName(webpage.getTitle())
+                    .contentSummary(getContentSummary(webpage.getContent(), 200))
+                    .score((double) withScore.getScore())
+                    .highlighted(false)
+                    .build();
+            sourceReferences.add(sourceRef);
+        }
+    }
+
+    /**
+     * 执行向量搜索并收集源引用信息
+     */
+    private void executeVectorSearchWithSources(String query, String kbUid, List<FaqProtobuf> searchResultList, List<RobotStreamContent.SourceReference> sourceReferences) {
+        // 检查 FaqVectorService 是否可用
+        if (faqVectorService != null) {
+            try {
+                List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
+                for (FaqVectorSearchResult withScore : searchResults) {
+                    FaqVector faqVector = withScore.getFaqVector();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
+                    searchResultList.add(faqProtobuf);
+                    
+                    // 创建FAQ向量源引用
+                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                            .sourceType("faq")
+                            .sourceUid(faqVector.getUid())
+                            .sourceName(faqVector.getQuestion())
+                            .contentSummary(getContentSummary(faqVector.getAnswer(), 200))
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            } catch (Exception e) {
+                log.warn("FaqVectorService search failed: {}", e.getMessage());
+            }
+        }
+        
+        // 检查 TextVectorService 是否可用
+        if (textVectorService != null) {
+            try {
+                List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null, 5);
+                for (TextVectorSearchResult withScore : textResults) {
+                    TextVector textVector = withScore.getTextVector();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
+                    searchResultList.add(faqProtobuf);
+                    
+                    // 创建文本向量源引用
+                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                            .sourceType("text")
+                            .sourceUid(textVector.getUid())
+                            .sourceName(textVector.getTitle())
+                            .contentSummary(getContentSummary(textVector.getContent(), 200))
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            } catch (Exception e) {
+                log.warn("TextVectorService search failed: {}", e.getMessage());
+            }
+        }
+        
+        // 检查 ChunkVectorService 是否可用
+        if (chunkVectorService != null) {
+            try {
+                List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null, null, 5);
+                for (ChunkVectorSearchResult withScore : chunkResults) {
+                    ChunkVector chunkVector = withScore.getChunkVector();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
+                    searchResultList.add(faqProtobuf);
+                    
+                    // 创建Chunk向量源引用，包含文件信息
+                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                            .sourceType("chunk")
+                            .sourceUid(chunkVector.getUid())
+                            .sourceName(chunkVector.getName())
+                            .fileName(chunkVector.getFileName())
+                            .fileUrl(chunkVector.getFileUrl())
+                            .fileUid(chunkVector.getFileUid())
+                            .contentSummary(getContentSummary(chunkVector.getContent(), 200))
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            } catch (Exception e) {
+                log.warn("ChunkVectorService search failed: {}", e.getMessage());
+            }
+        }
+        
+        // 检查 WebpageVectorService 是否可用
+        if (webpageVectorService != null) {
+            try {
+                List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid, null, null, 5);
+                for (WebpageVectorSearchResult withScore : webpageResults) {
+                    WebpageVector webpageVector = withScore.getWebpageVector();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);
+                    searchResultList.add(faqProtobuf);
+                    
+                    // 创建网页向量源引用
+                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
+                            .sourceType("webpage")
+                            .sourceUid(webpageVector.getUid())
+                            .sourceName(webpageVector.getTitle())
+                            .contentSummary(getContentSummary(webpageVector.getContent(), 200))
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            } catch (Exception e) {
+                log.warn("WebpageVectorService search failed: {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 获取内容摘要
+     * @param content 内容
+     * @param maxLength 最大长度
+     * @return 摘要
+     */
+    private String getContentSummary(String content, int maxLength) {
+        if (content == null || content.length() <= maxLength) {
+            return content;
+        }
+        return content.substring(0, maxLength) + "...";
+    }
+
+    /**
+     * 创建包含源引用的回答内容
+     * @param question 问题
+     * @param answer AI回答
+     * @param sourceReferences 源引用列表
+     * @param robot 机器人配置
+     * @return RobotStreamContent JSON字符串
+     */
+    protected String createRobotStreamContentAnswer(String question, String answer, 
+            List<RobotStreamContent.SourceReference> sourceReferences, RobotProtobuf robot) {
+        // 构建上下文信息用于重新生成答案
+        StringBuilder contextBuilder = new StringBuilder();
+        for (RobotStreamContent.SourceReference source : sourceReferences) {
+            contextBuilder.append("Source: ").append(source.getSourceName()).append("\n");
+            contextBuilder.append("Content: ").append(source.getContentSummary()).append("\n\n");
+        }
+        
+        RobotStreamContent streamContent = RobotStreamContent.builder()
+                .question(question)
+                .answer(answer)
+                .sources(sourceReferences)
+                .regenerationContext(contextBuilder.toString())
+                .kbUid(robot.getKbUid())
+                .robotUid(robot.getUid())
+                .build();
+                
+        return streamContent.toJson();
+    }
+
+    /**
+     * 使用新格式处理LLM响应（SSE版本）
+     */
+    private void processLlmResponseWithSources(String query, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
             SseEmitter emitter) {
-        log.info("BaseSpringAIService processLlmResponse searchContentList {}", searchResultList.size());
-        //
+        log.info("BaseSpringAIService processLlmResponseWithSources");
+        
+        // 搜索知识库并获取源引用
+        SearchResultWithSources searchResult = searchKnowledgeBaseWithSources(query, robot);
+        List<FaqProtobuf> searchResultList = searchResult.getSearchResults();
+        List<RobotStreamContent.SourceReference> sourceReferences = searchResult.getSourceReferences();
+        
         if (searchResultList.isEmpty()) {
-            // 直接返回未找到相关问题答案
+            // 未找到相关内容，使用默认回复
             String answer = robot.getLlm().getDefaultReply();
-            processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
-                    emitter);
+            String robotStreamContent = createRobotStreamContentAnswer(query, answer, new ArrayList<>(), robot);
+            processAnswerMessage(robotStreamContent, MessageTypeEnum.ROBOT_STREAM, robot, messageProtobufQuery, messageProtobufReply, true, emitter);
             return;
         }
-        //
-        String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
-        // 使用通用方法处理提示词和SSE消息
-        createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
+
+        // 构建上下文用于LLM
+        StringBuilder contextBuilder = new StringBuilder();
+        for (FaqProtobuf faq : searchResultList) {
+            if (faq.getAnswer() != null) {
+                contextBuilder.append(faq.getAnswer()).append("\n\n");
+            }
+        }
+        String context = contextBuilder.toString();
+        
+        // 使用LLM处理
+        createAndProcessPromptWithSources(query, context, sourceReferences, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
+
+    /**
+     * 创建并处理包含源引用的提示词
+     */
+    private void createAndProcessPromptWithSources(String query, String context, 
+            List<RobotStreamContent.SourceReference> sourceReferences,
+            RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply,
+            SseEmitter emitter) {
+
+        // 创建系统提示信息，包含知识库上下文
+        String systemPrompt = robot.getLlm().getPrompt();
+        
+        // 初始化消息列表
+        List<Message> messages = new ArrayList<>();
+        
+        // 1. 先添加系统消息（不包含用户当前查询）
+        messages.add(new SystemMessage(systemPrompt));
+        
+        // 2. 根据配置，拉取并添加历史聊天记录
+        if (robot.getLlm() != null && robot.getLlm().getContextMsgCount() > 0) {
+            String threadTopic = messageProtobufQuery.getThread().getTopic();
+            int limit = robot.getLlm().getContextMsgCount();
+            List<MessageEntity> recentMessages = messageRestService.getRecentMessages(threadTopic, limit);
+            
+            if (!recentMessages.isEmpty()) {
+                log.info("添加 {} 条历史聊天记录", recentMessages.size());
+                
+                for (MessageEntity messageEntity : recentMessages) {
+                    // 处理消息内容，移除<think>标签
+                    String content = messageEntity.getContent();
+                    if (content != null && content.contains("<think>")) {
+                        log.debug("替换前的内容: {}", content);
+                        content = content.replaceAll("(?s)<think>.*?</think>", "");
+                        log.debug("替换后的内容: {}", content);
+                    }
+                    
+                    if (MessageTypeEnum.TEXT.name().equals(messageEntity.getType())) {
+                        messages.add(new UserMessage(content));
+                    } else if (MessageTypeEnum.TEXT.name().equals(messageEntity.getType()) ||
+                               MessageTypeEnum.STREAM.name().equals(messageEntity.getType()) ||
+                               MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
+                        // 对于机器人回复，提取实际的回答文本
+                        if (MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
+                            try {
+                                RobotStreamContent robotContent = RobotStreamContent.fromJson(content, RobotStreamContent.class);
+                                if (robotContent != null && robotContent.getAnswer() != null) {
+                                    content = robotContent.getAnswer();
+                                }
+                            } catch (Exception e) {
+                                log.debug("解析RobotStreamContent失败，使用原始内容: {}", e.getMessage());
+                            }
+                        }
+                        messages.add(new AssistantMessage(content));
+                    }
+                }
+            }
+        }
+        
+        // 3. 如果有上下文信息，添加相关的上下文消息
+        if (StringUtils.hasText(context)) {
+            messages.add(new SystemMessage(I18Consts.I18N_SEARCH_RESULT_PREFIX + context));
+        }
+        
+        // 4. 最后添加当前用户查询
+        messages.add(new UserMessage(query));
+        
+        // 记录消息，用于调试
+        log.info("BaseSpringAIService createAndProcessPromptWithSources messages {}", messages);
+        
+        // 创建并处理提示
+        Prompt aiPrompt = new Prompt(messages);
+        
+        // 提取完整的prompt内容用于存储
+        String fullPromptContent = extractFullPromptContent(messages);
+        log.info("BaseSpringAIService createAndProcessPromptWithSources fullPromptContent: {}", fullPromptContent);
+        
+        processPromptSseWithSources(aiPrompt, sourceReferences, robot, messageProtobufQuery, messageProtobufReply, emitter, fullPromptContent);
+    }
+
+    /**
+     * 处理SSE流式响应，包含源引用信息
+     * 
+     * 这个方法提供了一个默认实现，处理带有源引用的流式响应
+     * 子类可以重写此方法以提供特定AI服务的优化实现
+     */
+    protected void processPromptSseWithSources(Prompt prompt, List<RobotStreamContent.SourceReference> sourceReferences,
+            RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        
+        try {
+            // 调用原始的processPromptSse来获取AI响应
+            // 子类应该重写这个方法来实际处理流式响应和源引用
+            log.info("processPromptSseWithSources: 调用抽象的processPromptSse方法");
+            
+            // 由于这是抽象方法，我们需要在具体的子类中实现
+            // 这里提供一个基础的实现框架，但实际的AI流处理需要在子类中完成
+            processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, fullPromptContent);
+            
+        } catch (Exception e) {
+            log.error("processPromptSseWithSources处理失败", e);
+            // 出错时发送错误消息
+            String errorMessage = "处理请求时发生错误，请稍后重试";
+            String robotStreamContent = createRobotStreamContentAnswer(
+                messageProtobufQuery.getContent(), 
+                errorMessage, 
+                sourceReferences, 
+                robot
+            );
+            
+            messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
+            messageProtobufReply.setContent(robotStreamContent);
+            messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
+            
+            try {
+                if (!isEmitterCompleted(emitter)) {
+                    emitter.send(SseEmitter.event()
+                            .data(messageProtobufReply.toJson())
+                            .id(messageProtobufReply.getUid())
+                            .name("message"));
+                    emitter.complete();
+                }
+            } catch (Exception sseException) {
+                log.error("发送错误消息失败", sseException);
+            }
+        }
+    }
+
+    // 3. LLM 处理相关方法
+    // private void processLlmResponse(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
+    //         MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply,
+    //         SseEmitter emitter) {
+    //     log.info("BaseSpringAIService processLlmResponse searchContentList {}", searchResultList.size());
+    //     //
+    //     if (searchResultList.isEmpty()) {
+    //         // 直接返回未找到相关问题答案
+    //         String answer = robot.getLlm().getDefaultReply();
+    //         processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
+    //                 emitter);
+    //         return;
+    //     }
+    //     //
+    //     String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+    //     // 使用通用方法处理提示词和SSE消息
+    //     createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
+    // }
 
     protected void processLlmResponseWebsocket(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
@@ -1043,6 +1503,118 @@ public abstract class BaseSpringAIService implements SpringAIService {
             log.debug("SSE connection no longer usable during stream end: {}", e.getMessage());
         } catch (Exception e) {
             log.error("Error sending stream end message", e);
+        }
+    }
+
+    /**
+     * 发送带有源引用的流式开始消息
+     */
+    protected void sendStreamStartMessageWithSources(MessageProtobuf messageProtobufReply, SseEmitter emitter,
+            String fullPromptContent, List<RobotStreamContent.SourceReference> sourceReferences, RobotProtobuf robot) {
+        
+        // 创建带有源引用的开始消息
+        String robotStreamContent = createRobotStreamContentAnswer(
+            fullPromptContent, 
+            "", // 开始时还没有答案
+            sourceReferences, 
+            robot
+        );
+        
+        messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
+        messageProtobufReply.setContent(robotStreamContent);
+        messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
+        log.info("BaseSpringAIService sendStreamStartMessageWithSources messageProtobufReply {}", messageProtobufReply);
+        
+        try {
+            if (!isEmitterCompleted(emitter)) {
+                emitter.send(SseEmitter.event()
+                        .data(messageProtobufReply.toJson())
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+            } else {
+                log.debug("SSE emitter already completed, skipping stream start message with sources");
+            }
+        } catch (Exception e) {
+            log.error("sendStreamStartMessageWithSources failed", e);
+        }
+    }
+
+    /**
+     * 发送带有源引用的流式消息
+     */
+    protected void sendStreamMessageWithSources(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, 
+            SseEmitter emitter, String content, List<RobotStreamContent.SourceReference> sourceReferences, 
+            RobotProtobuf robot, String query) {
+        
+        log.info("BaseSpringAIService sendStreamMessageWithSources content {}", content);
+        try {
+            if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
+                // 创建带有源引用的流式消息
+                String robotStreamContent = createRobotStreamContentAnswer(query, content, sourceReferences, robot);
+                
+                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
+                messageProtobufReply.setContent(robotStreamContent);
+                messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
+                
+                // 保存消息到数据库
+                persistMessage(messageProtobufQuery, messageProtobufReply, false);
+                
+                // 发送SSE事件
+                emitter.send(SseEmitter.event()
+                        .data(messageProtobufReply.toJson())
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+            } else {
+                log.debug("SSE emitter already completed or empty content, skipping stream message with sources");
+            }
+        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+            log.debug("SSE connection no longer usable during stream message with sources: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("sendStreamMessageWithSources failed", e);
+        }
+    }
+
+    /**
+     * 发送带有源引用的流式结束消息
+     */
+    protected void sendStreamEndMessageWithSources(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            SseEmitter emitter, List<RobotStreamContent.SourceReference> sourceReferences, RobotProtobuf robot,
+            String query, String finalAnswer, long promptTokens, long completionTokens, long totalTokens, 
+            String prompt, String aiProvider, String aiModel) {
+        
+        log.info("BaseSpringAIService sendStreamEndMessageWithSources final answer: {}", finalAnswer);
+        try {
+            if (!isEmitterCompleted(emitter)) {
+                // 创建最终的带有源引用的消息
+                String robotStreamContent = createRobotStreamContentAnswer(query, finalAnswer, sourceReferences, robot);
+                
+                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
+                messageProtobufReply.setContent(robotStreamContent);
+                
+                // 保存消息到数据库，包含token使用情况、prompt内容和AI模型信息
+                persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
+                
+                // 发送最终消息
+                emitter.send(SseEmitter.event()
+                        .data(messageProtobufReply.toJson())
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+                
+                // 发送结束标记
+                messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                messageProtobufReply.setContent("");
+                
+                emitter.send(SseEmitter.event()
+                        .data(messageProtobufReply.toJson())
+                        .id(messageProtobufReply.getUid())
+                        .name("message"));
+                        
+                emitter.complete();
+            }
+        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+            log.debug("SSE connection no longer usable during stream end with sources: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Error sending stream end message with sources", e);
         }
     }
 

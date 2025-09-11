@@ -70,6 +70,12 @@ public class ChunkElastic {
     private String fileUid;
     
     @Field(type = FieldType.Keyword)
+    private String fileName;
+    
+    @Field(type = FieldType.Keyword)
+    private String fileUrl;
+    
+    @Field(type = FieldType.Keyword)
     private String categoryUid;
     
     @Field(type = FieldType.Keyword)
@@ -98,6 +104,8 @@ public class ChunkElastic {
                 // .endDate(entity.getEndDate())
                 .docId(entity.getDocId())
                 .fileUid(entity.getFile() != null ? entity.getFile().getUid() : null)
+                .fileName(entity.getFile() != null ? entity.getFile().getFileName() : null)
+                .fileUrl(entity.getFile() != null ? entity.getFile().getFileUrl() : null)
                 .categoryUid(entity.getCategoryUid())
                 .kbaseUid(entity.getKbase() != null ? entity.getKbase().getUid() : null)
                 .build();

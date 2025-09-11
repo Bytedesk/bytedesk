@@ -69,18 +69,19 @@ public class ChunkVectorService {
             String tags = String.join(",", chunk.getTagList());
             
             // 元数据
-            Map<String, Object> metadata = Map.of(
-                "uid", chunk.getUid(),
-                "name", chunk.getName(),
-                KbaseConst.KBASE_KB_UID, chunk.getKbase() != null ? chunk.getKbase().getUid() : "",
-                "categoryUid", chunk.getCategoryUid() != null ? chunk.getCategoryUid() : "",
-                "orgUid", chunk.getOrgUid(),
-                "enabled", Boolean.toString(chunk.getEnabled()),
-                "tags", tags,
-                "type", chunk.getType(),
-                "docId", chunk.getDocId() != null ? chunk.getDocId() : "",
-                "fileUid", chunk.getFile() != null ? chunk.getFile().getUid() : ""
-            );
+            Map<String, Object> metadata = new java.util.HashMap<>();
+            metadata.put("uid", chunk.getUid());
+            metadata.put("name", chunk.getName());
+            metadata.put(KbaseConst.KBASE_KB_UID, chunk.getKbase() != null ? chunk.getKbase().getUid() : "");
+            metadata.put("categoryUid", chunk.getCategoryUid() != null ? chunk.getCategoryUid() : "");
+            metadata.put("orgUid", chunk.getOrgUid());
+            metadata.put("enabled", Boolean.toString(chunk.getEnabled()));
+            metadata.put("tags", tags);
+            metadata.put("type", chunk.getType());
+            metadata.put("docId", chunk.getDocId() != null ? chunk.getDocId() : "");
+            metadata.put("fileUid", chunk.getFile() != null ? chunk.getFile().getUid() : "");
+            metadata.put("fileName", chunk.getFile() != null ? chunk.getFile().getFileName() : "");
+            metadata.put("fileUrl", chunk.getFile() != null ? chunk.getFile().getFileUrl() : "");
             
             // 创建文档
             Document document = new Document(id, content, metadata);
@@ -286,6 +287,8 @@ public class ChunkVectorService {
                 String organization = (String) metadata.getOrDefault("orgUid", "");
                 String document = (String) metadata.getOrDefault("docId", "");
                 String file = (String) metadata.getOrDefault("fileUid", "");
+                String fileName = (String) metadata.getOrDefault("fileName", "");
+                String fileUrl = (String) metadata.getOrDefault("fileUrl", "");
                 boolean enabled = Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true"));
                 
                 // 处理标签
@@ -306,6 +309,8 @@ public class ChunkVectorService {
                     .orgUid(organization)
                     .docId(document)
                     .fileUid(file)
+                    .fileName(fileName)
+                    .fileUrl(fileUrl)
                     .enabled(enabled)
                     .tagList(tagsList)
                     .build();
