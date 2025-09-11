@@ -114,6 +114,29 @@ public class RobotLlm {
     @Column(name = "llm_rerank_model")
     private String rerankModel = LlmConsts.DEFAULT_RERANK_MODEL;
 
+    // rewrite
+    @Builder.Default
+    @Column(name = "llm_rewrite_enabled")
+    private Boolean rewriteEnabled = false;
+
+    // rewrite model provider
+    @Builder.Default
+    @Column(name = "llm_rewrite_provider")
+    private String rewriteProvider = LlmConsts.DEFAULT_REWRITE_PROVIDER;
+
+    @Column(name = "llm_rewrite_provider_uid")
+    private String rewriteProviderUid;
+
+    // rewrite model name
+    @Builder.Default
+    @Column(name = "llm_rewrite_model")
+    private String rewriteModel = LlmConsts.DEFAULT_REWRITE_MODEL;
+
+    // rewrite prompt
+    @Builder.Default
+    @Column(name = "llm_rewrite_prompt")
+    private String rewritePrompt = RobotConsts.ROBOT_LLM_DEFAULT_REWRITE_PROMPT;
+
     // search type
     @Builder.Default
     @Column(name = "llm_search_type")

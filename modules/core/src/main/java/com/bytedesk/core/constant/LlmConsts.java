@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-25 14:04:19
+ * @LastEditTime: 2025-09-11 10:14:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -72,6 +72,10 @@ public class LlmConsts {
     public static final String DEFAULT_RERANK_PROVIDER = ZHIPUAI;
     // 默认Rerank模型
     public static final String DEFAULT_RERANK_MODEL = "linux6200/bge-reranker-v2-m3:latest";
+    // 默认rewrite提供商
+    public static final String DEFAULT_REWRITE_PROVIDER = ZHIPUAI;
+    // 默认rewrite模型
+    public static final String DEFAULT_REWRITE_MODEL = "glm-4-flash";
     
     
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-23 17:18:50
+ * @LastEditTime: 2025-09-11 10:17:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -86,7 +86,8 @@ public class RobotConsts {
   public static final String ROBOT_NAME_TEXT_CORRECTION = "text_correction"; // 文本纠错
   public static final String ROBOT_NAME_TEXT_CLASSIFICATION = "text_classification"; // 文本分类
   public static final String ROBOT_NAME_FAQ_SIMILAR_QUESTIONS = "faq_similar_questions"; // FAQ相似问题生成
-  //
+  
+  // 默认客服问答提示词
   public static final String ROBOT_LLM_DEFAULT_PROMPT = """
       角色：资深客服专家;
       背景：有专业客服经验;
@@ -98,6 +99,88 @@ public class RobotConsts {
       4. 严禁回答政治、暴力、色情等违法违规问题;
       5. 仅根据上下文内容回答问题，不要添加其他内容;
       6. 如果上下文内容不完整，无法回答问题，直接回答“未查找到相关问题答案”，不要猜测;
+      """;
+
+  // 默认知识库对话提示词
+  public static final String ROBOT_LLM_CHAT_PROMPT = """
+      你是一个专业、友好的AI助手。现在用户提出的问题超出了你的知识库范围，你需要生成一个礼貌且有帮助的回复。
+
+      ## 回复要求
+      - 诚实承认你无法提供准确答案
+      - 简洁友好，不要过度道歉
+      - 可以提供相关的建议或替代方案
+      - 回复控制在50字以内
+      - 使用礼貌、专业的语气
+
+      ## Few-shot示例
+
+      用户问题: 今天杭州西湖的游客数量是多少？
+      回复: 抱歉，我无法获取实时的杭州西湖游客数据。您可以通过杭州旅游官网或相关APP查询这一信息。
+
+      用户问题: 张教授的新论文发表了吗？
+      回复: 我没有张教授的最新论文信息。建议您查询学术数据库或直接联系张教授获取最新动态。
+
+      用户问题: 我的银行卡号是多少？
+      回复: 作为AI助手，我无法获取您的个人银行信息。请登录您的银行APP或联系银行客服获取相关信息。
+
+      ## 用户当前的问题是:
+      {{.Query}}
+      """;
+
+  // 默认重写提示词
+  public static final String ROBOT_LLM_DEFAULT_REWRITE_PROMPT = """
+      你是一个专注于指代消解和省略补全的智能助手，你的任务是根据历史对话上下文，清晰识别用户问题中的代词并替换为明确的主语，同时补全省略的关键信息。
+
+      ## 改写目标
+      请根据历史对话，对当前用户问题进行改写，目标是：
+      - 进行指代消解，将"它"、"这个"、"那个"、"他"、"她"、"它们"、"他们"、"她们"等代词替换为明确的主语
+      - 补全省略的关键信息，确保问题语义完整
+      - 保持问题的原始含义和表达方式不变
+      - 改写后必须也是一个问题
+      - 改写后的问题字数控制在30字以内
+      - 仅输出改写后的问题，不要输出任何解释，更不要尝试回答该问题，后面有其他助手回去解答此问题
+
+      ## Few-shot示例
+
+      示例1:
+      历史对话:
+      用户: 微信支付有哪些功能？
+      助手: 微信支付的主要功能包括转账、付款码、收款、信用卡还款等多种支付服务。
+
+      用户问题: 它的安全性
+      改写后: 微信支付的安全性
+
+      示例2:
+      历史对话:
+      用户: 苹果手机电池不耐用怎么办？
+      助手: 您可以通过降低屏幕亮度、关闭后台应用和定期更新系统来延长电池寿命。
+
+      用户问题: 这样会影响使用体验吗？
+      改写后: 降低屏幕亮度和关闭后台应用是否影响使用体验
+
+      示例3:
+      历史对话:
+      用户: 如何制作红烧肉？
+      助手: 红烧肉的制作需要先将肉块焯水，然后加入酱油、糖等调料慢炖。
+
+      用户问题: 需要炖多久？
+      改写后: 红烧肉需要炖多久
+
+      示例4:
+      历史对话:
+      用户: 北京到上海的高铁票价是多少？
+      助手: 北京到上海的高铁票价根据车次和座位类型不同，二等座约为553元，一等座约为933元。
+
+      用户问题: 时间呢？
+      改写后: 北京到上海的高铁时长
+
+      示例5:
+      历史对话:
+      用户: 如何注册微信账号？
+      助手: 注册微信账号需要下载微信APP，输入手机号，接收验证码，然后设置昵称和密码。
+
+      用户问题: 国外手机号可以吗？
+      改写后: 国外手机号是否可以注册微信账号
       """;
 
   public static final String PROMPT_LLM_faq_generate_TEMPLATE = """
