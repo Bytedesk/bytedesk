@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-11 10:17:55
+ * @LastEditTime: 2025-09-11 10:26:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -183,7 +183,7 @@ public class RobotConsts {
       改写后: 国外手机号是否可以注册微信账号
       """;
 
-  public static final String PROMPT_LLM_faq_generate_TEMPLATE = """
+  public static final String PROMPT_LLM_FAQ_GENERATE_TEMPLATE = """
       基于以下给定的文本，生成一组高质量的问答对。请遵循以下指南:
 
       1. 问题部分：
