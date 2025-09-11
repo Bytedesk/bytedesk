@@ -114,7 +114,7 @@ services:
     image: 'openzipkin/zipkin:latest'
     container_name: zipkin-bytedesk
     ports:
-      - '9411:9411'
+      - '19411:9411'
     volumes:
       - zipkin_data:/data
     networks:

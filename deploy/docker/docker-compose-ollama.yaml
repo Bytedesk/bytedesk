@@ -113,7 +113,7 @@ services:
     image: 'openzipkin/zipkin:latest'
     container_name: zipkin-bytedesk
     ports:
-      - '9411:9411'
+      - '19411:9411'
     volumes:
       - zipkin_data:/data
     networks:
@@ -292,18 +292,18 @@ services:
       SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_USERNAME: admin@email.com
       SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_PASSWORD: admin
       # Actuator security configuration
-      MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT: false
+      MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT: "false"
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ''
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_EXCLUDE: '*'
-      MANAGEMENT_ENDPOINT_HEALTH_ENABLED: false
-      MANAGEMENT_ENDPOINT_INFO_ENABLED: false
+      MANAGEMENT_ENDPOINT_HEALTH_ENABLED: "false"
+      MANAGEMENT_ENDPOINT_INFO_ENABLED: "false"
       MANAGEMENT_SERVER_PORT: -1
       MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
       SPRING_SECURITY_BASIC_ENABLED: true
       # Zipkin Tracing Configuration
-      MANAGEMENT_TRACING_ENABLED: false
-      MANAGEMENT_ZIPKIN_TRACING_ENABLED: false
-      # MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:9411/api/v2/spans
+      MANAGEMENT_TRACING_ENABLED: "false"
+      MANAGEMENT_ZIPKIN_TRACING_ENABLED: "false"
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:19411/api/v2/spans
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
       # ai config
       # 默认对话配置

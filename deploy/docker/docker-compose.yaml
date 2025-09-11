@@ -96,7 +96,7 @@ services:
     image: 'openzipkin/zipkin:latest'
     container_name: zipkin-bytedesk
     ports:
-      - '9411:9411'
+      - '19411:9411'
     volumes:
       - zipkin_data:/data
     networks:
@@ -284,7 +284,7 @@ services:
       # Zipkin Tracing Configuration
       MANAGEMENT_TRACING_ENABLED: "false"
       MANAGEMENT_ZIPKIN_TRACING_ENABLED: "false"
-      # MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:9411/api/v2/spans
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:19411/api/v2/spans
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
       # ai config
       # 默认对话配置
