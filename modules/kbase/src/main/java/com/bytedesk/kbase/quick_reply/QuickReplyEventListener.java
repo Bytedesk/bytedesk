@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-20 14:31:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-12 11:30:33
+ * @LastEditTime: 2025-09-12 17:00:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,7 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
-import com.bytedesk.core.utils.BdFileUtils;
+import com.bytedesk.core.utils.BdUploadUtils;
 import com.alibaba.excel.EasyExcel;
 
 import lombok.RequiredArgsConstructor;
@@ -37,21 +37,6 @@ public class QuickReplyEventListener {
 
     private final QuickReplyRestService quickReplyService;
 
-    // 迁移到kbaseInitializer中
-    // @Order(7)
-    // @EventListener
-    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
-    //     // User user = organization.getUser();
-    //     log.info("quick_reply - organization created: {}", organization.getName());
-    //     // 为保证执行顺序，迁移到KbaseEventListener中
-    //     // String orgUid = organization.getUid();
-    //     // 创建快捷用语
-    //     // quickReplyRestService.initQuickReply(orgUid);
-    //     // 创建快捷用语分类
-    //     // quickReplyRestService.initQuickReplyCategory(orgUid);
-    // }
-
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
@@ -59,7 +44,7 @@ public class QuickReplyEventListener {
         if (UploadTypeEnum.QUICKREPLY.name().equalsIgnoreCase(upload.getType())) {
             // 检查文件类型是否为Excel
             String fileName = upload.getFileName();
-            if (!BdFileUtils.isExcelFile(fileName)) {
+            if (!BdUploadUtils.isExcelFile(fileName)) {
                 log.warn("不是Excel文件，无法导入常见问题: {}", fileName);
                 return;
             }

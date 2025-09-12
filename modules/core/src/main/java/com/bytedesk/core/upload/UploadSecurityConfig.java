@@ -152,15 +152,29 @@ public class UploadSecurityConfig {
     private static List<String> getDefaultAllowedExtensions() {
         return Arrays.asList(
             // 图片文件
-            "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg",
+            "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "ico", "tiff", "tif",
+            // iOS相机图片格式
+            "heic", "heif", "raw", "dng",
             // 文档文件
-            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt",
+            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "rtf", "pages", "numbers", "keynote",
             // 压缩文件
             "zip", "rar", "7z", "tar", "gz",
             // 音频文件
             "mp3", "wav", "aac", "ogg", "flac", "m4a",
+            // iOS音频格式
+            "caf", "aiff", "alac",
+            // Android音频格式
+            "amr", "3gp", "opus",
             // 视频文件
-            "mp4", "avi", "mov", "wmv", "flv", "mkv", "webm"
+            "mp4", "avi", "mov", "wmv", "flv", "mkv", "webm",
+            // 移动端视频格式
+            "3gp", "3g2", "m4v",
+            // iOS视频格式（ProRes等）
+            "prores",
+            // 其他移动端常见格式
+            "vcf", // 联系人文件
+            "gpx", // GPS轨迹文件
+            "kml", "kmz" // 地图文件
         );
     }
 
@@ -191,20 +205,35 @@ public class UploadSecurityConfig {
         return Arrays.asList(
             // 图片类型
             "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp", "image/svg+xml",
+            "image/x-icon", "image/tiff", "image/vnd.adobe.photoshop",
+            // iOS图片格式
+            "image/heic", "image/heif", "image/x-canon-cr2", "image/x-adobe-dng",
             // 文档类型
             "application/pdf",
             "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "text/plain",
+            "text/plain", "application/rtf",
+            // iWork文档格式
+            "application/vnd.apple.pages", "application/vnd.apple.numbers", "application/vnd.apple.keynote",
             // 压缩文件
             "application/zip", "application/x-rar-compressed", "application/x-7z-compressed",
             "application/x-tar", "application/gzip",
             // 音频文件
             "audio/mpeg", "audio/wav", "audio/aac", "audio/ogg", "audio/flac", "audio/mp4",
+            // iOS音频格式
+            "audio/x-caf", "audio/x-aiff", "audio/x-m4a",
+            // Android音频格式
+            "audio/amr", "audio/3gpp", "audio/opus",
             // 视频文件
             "video/mp4", "video/avi", "video/quicktime", "video/x-ms-wmv", "video/x-flv", 
-            "video/x-matroska", "video/webm"
+            "video/x-matroska", "video/webm",
+            // 移动端视频格式
+            "video/3gpp", "video/3gpp2", "video/x-m4v",
+            // 其他移动端格式
+            "text/vcard", "text/x-vcard", // 联系人文件
+            "application/gpx+xml", // GPS轨迹文件
+            "application/vnd.google-earth.kml+xml", "application/vnd.google-earth.kmz" // 地图文件
         );
     }
 }

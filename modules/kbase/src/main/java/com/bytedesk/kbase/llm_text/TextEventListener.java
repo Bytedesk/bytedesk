@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:44:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-14 14:37:12
+ * @LastEditTime: 2025-09-12 17:00:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
-import com.bytedesk.core.utils.BdFileUtils;
+import com.bytedesk.core.utils.BdUploadUtils;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.event.TextCreateEvent;
@@ -56,7 +56,7 @@ public class TextEventListener {
         if (UploadTypeEnum.LLM_TEXT.name().equalsIgnoreCase(upload.getType())) {
             // 检查文件类型是否为Excel
             String fileName = upload.getFileName();
-            if (!BdFileUtils.isExcelFile(fileName)) {
+            if (!BdUploadUtils.isExcelFile(fileName)) {
                 log.warn("不是Excel文件，无法导入: {}", fileName);
                 return;
             }

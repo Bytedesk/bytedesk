@@ -349,7 +349,9 @@ public class BdFileUtils {
      * 
      * @param fileName 文件名
      * @return 如果是Excel文件返回true，否则返回false
+     * @deprecated 请使用 {@link BdUploadUtils#isExcelFile(String)} 代替
      */
+    @Deprecated
     public static boolean isExcelFile(String fileName) {
         if (fileName == null || fileName.isEmpty()) {
             return false;

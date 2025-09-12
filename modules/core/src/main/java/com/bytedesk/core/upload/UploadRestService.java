@@ -51,6 +51,7 @@ import com.bytedesk.core.upload.minio.UploadMinioService;
 import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.utils.BdUploadUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -270,16 +271,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
     }
 
     private boolean isImageFile(String fileName, String contentType) {
-        String ext = getFileExt(fileName);
-        return (contentType != null && contentType.startsWith("image/")) ||
-                ext.matches("jpg|jpeg|png|gif|bmp|webp|svg");
+        return BdUploadUtils.isImageFile(fileName, contentType);
     }
 
     private String getFileExt(String fileName) {
-        if (fileName == null) return "";
-        int idx = fileName.lastIndexOf('.');
-        if (idx == -1) return "";
-        return fileName.substring(idx + 1).toLowerCase();
+        return BdUploadUtils.getFileExtension(fileName);
     }
 
     // 文件名过滤与重命名 - 使用配置化的安全策略
@@ -288,23 +284,15 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
         
         // 检查文件名长度
         if (fileName.length() > uploadSecurityConfig.getMaxFileNameLength()) {
-            String ext = getFileExt(fileName);
-            fileName = fileName.substring(0, uploadSecurityConfig.getMaxFileNameLength() - ext.length() - 1) + "." + ext;
+            fileName = BdUploadUtils.truncateFileName(fileName, uploadSecurityConfig.getMaxFileNameLength());
         }
         
         if (uploadSecurityConfig.isEnableFileNameFilter()) {
-            // 只保留字母数字下划线点横线
-            String safe = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
-            // 防止目录穿越
-            safe = safe.replace("..", "_");
-            fileName = safe;
+            fileName = BdUploadUtils.sanitizeFileName(fileName);
         }
         
         if (uploadSecurityConfig.isForceRename()) {
-            // 重命名为时间戳+随机数+后缀
-            String ext = getFileExt(fileName);
-            String base = String.valueOf(System.currentTimeMillis()) + "_" + (int)(Math.random()*10000);
-            fileName = ext.isEmpty() ? base : (base + "." + ext);
+            fileName = BdUploadUtils.generateSafeFileName(fileName);
         }
         
         return fileName;
@@ -356,22 +344,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 相对路径，如果提取失败返回null
 	 */
 	private String extractRelativePathFromUrl(String fileUrl) {
-		if (fileUrl == null || fileUrl.isEmpty()) {
-			return null;
-		}
-		
-		try {
-			// 查找 "/file/" 的位置
-			int fileIndex = fileUrl.indexOf("/file/");
-			if (fileIndex != -1) {
-				// 提取 "/file/" 之后的部分
-				return fileUrl.substring(fileIndex + 6); // 6 是 "/file/".length()
-			}
-		} catch (Exception e) {
-			log.warn("Failed to extract relative path from URL: {}", fileUrl, e);
-		}
-		
-		return null;
+		return BdUploadUtils.extractRelativePathFromUrl(fileUrl);
 	}
 
 	/**
@@ -394,13 +367,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			log.info("Loading file from full path: {}, datePath: {}, filename: {}", filenameOrPath, datePath, filename);
 		} else {
 			// 不包含路径分隔符，说明是文件名格式：20240916144702_身份证-背面.jpg
-			// 提取日期部分（前8位）
-			if (filenameOrPath.length() < 8) {
+			// 使用工具类提取日期路径
+			datePath = BdUploadUtils.extractDatePathFromTimestampFileName(filenameOrPath);
+			if (datePath == null) {
 				throw new UploadStorageFileNotFoundException("Invalid filename format: " + filenameOrPath);
 			}
-			String dateString = filenameOrPath.substring(0, 8);
-			// 将日期字符串转换为路径格式
-			datePath = dateString.substring(0, 4) + "/" + dateString.substring(4, 6) + "/" + dateString.substring(6, 8);
 			filename = filenameOrPath;
 			log.info("Loading file from filename: {}, extracted datePath: {}", filenameOrPath, datePath);
 		}
@@ -725,24 +696,22 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		String contentType = file.getContentType();
 		String fileName = file.getOriginalFilename();
 		
-		if (contentType != null) {
-			if (contentType.startsWith("image/")) {
-				return "images";
-			} else if (contentType.startsWith("audio/")) {
-				return "audios";
-			} else if (contentType.startsWith("video/")) {
-				return "videos";
-			} else if (contentType.equals("application/pdf") || 
-					   contentType.contains("document") || 
-					   contentType.contains("word") || 
-					   contentType.contains("excel") || 
-					   contentType.contains("powerpoint")) {
-				return "documents";
+		// 使用工具类根据文件类型获取文件夹
+		String folder = BdUploadUtils.getFileFolderByType(fileName, contentType);
+		
+		// 根据请求类型进行特殊处理
+		if (request != null && request.getKbType() != null) {
+			switch (request.getKbType().toLowerCase()) {
+				case "avatar":
+					return "avatars";
+				case "attachment":
+					return "attachments";
+				default:
+					break;
 			}
 		}
 		
-		// 根据文件名扩展名判断
-		return getMinioFolderByFileName(fileName, request);
+		return folder;
 	}
 
 	/**
@@ -753,51 +722,10 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 存储文件夹路径
 	 */
 	private String getMinioFolderByFileName(String fileName, UploadRequest request) {
-		if (fileName == null) {
-			return "others";
-		}
+		// 使用工具类根据文件类型获取文件夹
+		String folder = BdUploadUtils.getFileFolderByType(fileName, null);
 		
-		String lowerFileName = fileName.toLowerCase();
-		
-		// 图片文件
-		if (lowerFileName.endsWith(".jpg") || lowerFileName.endsWith(".jpeg") || 
-			lowerFileName.endsWith(".png") || lowerFileName.endsWith(".gif") || 
-			lowerFileName.endsWith(".webp") || lowerFileName.endsWith(".bmp") || 
-			lowerFileName.endsWith(".svg")) {
-			return "images";
-		}
-		
-		// 音频文件
-		if (lowerFileName.endsWith(".mp3") || lowerFileName.endsWith(".wav") || 
-			lowerFileName.endsWith(".aac") || lowerFileName.endsWith(".ogg") || 
-			lowerFileName.endsWith(".flac") || lowerFileName.endsWith(".m4a")) {
-			return "audios";
-		}
-		
-		// 视频文件
-		if (lowerFileName.endsWith(".mp4") || lowerFileName.endsWith(".avi") || 
-			lowerFileName.endsWith(".mov") || lowerFileName.endsWith(".wmv") || 
-			lowerFileName.endsWith(".flv") || lowerFileName.endsWith(".mkv") || 
-			lowerFileName.endsWith(".webm")) {
-			return "videos";
-		}
-		
-		// 文档文件
-		if (lowerFileName.endsWith(".pdf") || lowerFileName.endsWith(".doc") || 
-			lowerFileName.endsWith(".docx") || lowerFileName.endsWith(".xls") || 
-			lowerFileName.endsWith(".xlsx") || lowerFileName.endsWith(".ppt") || 
-			lowerFileName.endsWith(".pptx") || lowerFileName.endsWith(".txt")) {
-			return "documents";
-		}
-		
-		// 压缩文件
-		if (lowerFileName.endsWith(".zip") || lowerFileName.endsWith(".rar") || 
-			lowerFileName.endsWith(".7z") || lowerFileName.endsWith(".tar") || 
-			lowerFileName.endsWith(".gz")) {
-			return "archives";
-		}
-		
-		// 根据请求类型判断
+		// 根据请求类型进行特殊处理
 		if (request != null && request.getKbType() != null) {
 			switch (request.getKbType().toLowerCase()) {
 				case "avatar":
@@ -817,7 +745,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			}
 		}
 		
-		return "others";
+		return folder;
 	}
 
 	/**
