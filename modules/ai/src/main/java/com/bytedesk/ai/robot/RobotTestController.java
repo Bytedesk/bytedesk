@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-12 16:20:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 11:00:06
+ * @LastEditTime: 2025-09-12 11:50:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -50,7 +50,7 @@ public class RobotTestController {
 
     /**
      * 备用回复服务测试接口
-     * http://localhost:9003/test/api/v1/robot/fallback-response
+     * http://127.0.0.1:9003/test/api/v1/robot/fallback-response
      */
     @Operation(summary = "备用回复测试", description = "测试AI备用回复生成功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
@@ -79,6 +79,7 @@ public class RobotTestController {
 
     /**
      * 查询重写服务测试接口
+     * http://127.0.0.1:9003/test/api/v1/robot/query-rewrite
      */
     @Operation(summary = "查询重写测试", description = "测试AI查询重写功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
@@ -107,6 +108,7 @@ public class RobotTestController {
 
     /**
      * 摘要生成服务测试接口
+     * http://127.0.0.1:9003/test/api/v1/robot/summary-generation
      */
     @Operation(summary = "摘要生成测试", description = "测试AI摘要生成功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
@@ -135,6 +137,7 @@ public class RobotTestController {
 
     /**
      * 会话标题生成服务测试接口
+     * http://127.0.0.1:9003/test/api/v1/robot/session-title-generation
      */
     @Operation(summary = "会话标题生成测试", description = "测试AI会话标题生成功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
@@ -163,6 +166,7 @@ public class RobotTestController {
 
     /**
      * 上下文模板摘要服务测试接口
+     * http://127.0.0.1:9003/test/api/v1/robot/context-template-summary
      */
     @Operation(summary = "上下文模板摘要测试", description = "测试AI上下文模板摘要功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
@@ -191,6 +195,7 @@ public class RobotTestController {
 
     /**
      * 实体提取服务测试接口
+     * http://127.0.0.1:9003/test/api/v1/robot/entity-extraction
      */
     @Operation(summary = "实体提取测试", description = "测试AI实体提取功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
@@ -219,6 +224,7 @@ public class RobotTestController {
 
     /**
      * 关系提取服务测试接口
+     * http://127.0.0.1:9003/test/api/v1/robot/relationship-extraction
      */
     @Operation(summary = "关系提取测试", description = "测试AI关系提取功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
