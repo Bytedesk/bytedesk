@@ -1121,26 +1121,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    // 3. LLM 处理相关方法
-    // private void processLlmResponse(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
-    //         MessageProtobuf messageProtobufQuery,
-    //         MessageProtobuf messageProtobufReply,
-    //         SseEmitter emitter) {
-    //     log.info("BaseSpringAIService processLlmResponse searchContentList {}", searchResultList.size());
-    //     //
-    //     if (searchResultList.isEmpty()) {
-    //         // 直接返回未找到相关问题答案
-    //         String answer = robot.getLlm().getDefaultReply();
-    //         processAnswerMessage(answer, MessageTypeEnum.TEXT, robot, messageProtobufQuery, messageProtobufReply, true,
-    //                 emitter);
-    //         return;
-    //     }
-    //     //
-    //     String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
-    //     // 使用通用方法处理提示词和SSE消息
-    //     createAndProcessPrompt(query, context, robot, messageProtobufQuery, messageProtobufReply, emitter);
-    // }
-
     protected void processLlmResponseWebsocket(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         log.info("BaseSpringAIService processLlmResponseWebsocket searchContentList {}", searchResultList.size());
