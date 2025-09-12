@@ -761,6 +761,15 @@ public class ThreadRestService
         return threadRepository.findRecentAgentThreadsByVisitorUid(visitorUid);
     }
 
+    /**
+     * 根据访客UID分页查询其相关的会话列表
+     * 通过判断user字段中是否包含访客uid来查询
+     */
+    public Page<ThreadResponse> queryByVisitorUid(String visitorUid, Pageable pageable) {
+        Page<ThreadEntity> threadPage = threadRepository.findByVisitorUidInUserField(visitorUid, pageable);
+        return threadPage.map(this::convertToResponse);
+    }
+
     public List<ThreadEntity> findServiceThreadStateStarted() {
         List<String> types = Arrays.asList(new String[] { ThreadTypeEnum.AGENT.name(), ThreadTypeEnum.WORKGROUP.name(),
                 ThreadTypeEnum.ROBOT.name() });

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 10:58:12
+ * @LastEditTime: 2025-09-12 15:07:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,6 +43,8 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message_unread.MessageUnreadRequest;
 import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.message_unread.MessageUnreadRestService;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -69,6 +71,8 @@ public class VisitorRestControllerVisitor {
 
     private final MessageRestService messageRestService;
 
+    private final ThreadRestService threadRestService;
+
     private final IpService ipService;
 
     private final RobotService robotService;
@@ -84,11 +88,11 @@ public class VisitorRestControllerVisitor {
             request.setIp(ip);
             request.setIpLocation(ipService.getIpLocation(ip));
         }
-        // 
+        //
         if (!StringUtils.hasText(request.getNickname())) {
             request.setNickname(ipService.createVisitorNickname(httpRequest));
         }
-        // 
+        //
         VisitorResponse visitor = visitorRestService.create(request);
         //
         return ResponseEntity.ok(JsonResult.success(visitor));
@@ -149,10 +153,11 @@ public class VisitorRestControllerVisitor {
     }
 
     // 访客拉取未读消息
-    // @VisitorAnnotation(title = "visitor", action = "getMessageUnread", description = "get unread messages")
+    // @VisitorAnnotation(title = "visitor", action = "getMessageUnread",
+    // description = "get unread messages")
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(MessageUnreadRequest request) {
-        
+
         Page<MessageUnreadResponse> messages = messageUnreadRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messages));
@@ -170,12 +175,28 @@ public class VisitorRestControllerVisitor {
     // 清空当前用户所有未读消息
     @PostMapping("/message/unread/clear")
     public ResponseEntity<?> clearMessageUnread(@RequestBody MessageUnreadRequest request) {
-        // 
+        //
         messageUnreadRestService.clearUnreadMessages(request);
         // 看下是否清空了
         long count = messageUnreadRestService.getUnreadCount(request);
 
         return ResponseEntity.ok(JsonResult.success("clear unread messages count success", count));
+    }
+
+    /**
+     * 根据访客UID分页查询其会话列表
+     * 
+     * @param visitorUid 访客UID
+     * @param page       页码（从0开始）
+     * @param size       每页大小
+     * @return 分页会话列表
+     */
+    @GetMapping("/threads")
+    public ResponseEntity<?> getThreadsByVisitorUid(VisitorRequest request) {
+
+        Page<ThreadResponse> threads = threadRestService.queryByVisitorUid(request.getUid(), request.getPageable());
+        
+        return ResponseEntity.ok(JsonResult.success("查询成功", threads));
     }
 
     // 访客发送http消息
@@ -185,11 +206,11 @@ public class VisitorRestControllerVisitor {
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
-        // 
+        //
         String json = (String) map.get("json");
         log.debug("json {}", json);
         messageSendService.sendJsonMessage(json);
-        
+
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
@@ -197,12 +218,12 @@ public class VisitorRestControllerVisitor {
     @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {
-        
+
         // 延长超时时间至10分钟
         SseEmitter emitter = new SseEmitter(600_000L);
         // 添加心跳机制，每30秒发送一个保活消息
         // KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
-        
+
         executorService.execute(() -> {
             try {
                 robotService.processSseMemberMessage(message, emitter);
@@ -212,12 +233,12 @@ public class VisitorRestControllerVisitor {
                 try {
                     emitter.completeWithError(e);
                 } catch (Exception completeException) {
-                    log.debug("SSE emitter completion failed, connection may already be closed: {}", 
+                    log.debug("SSE emitter completion failed, connection may already be closed: {}",
                             completeException.getMessage());
                 }
             }
         });
-        
+
         // 添加超时和完成时的回调
         emitter.onTimeout(() -> {
             log.warn("sendSseMemberMessage SSE connection timed out");
@@ -227,12 +248,12 @@ public class VisitorRestControllerVisitor {
                 log.debug("SSE emitter timeout completion failed: {}", e.getMessage());
             }
         });
-        
+
         emitter.onCompletion(() -> {
             log.info("sendSseMemberMessage SSE connection completed");
             // KeepAliveHelper.removeKeepAliveEvent(emitter);
         });
-        
+
         // 添加错误处理回调
         emitter.onError((e) -> {
             log.warn("sendSseMemberMessage SSE connection error: {}", e.getMessage());
@@ -242,7 +263,7 @@ public class VisitorRestControllerVisitor {
                 log.debug("SSE emitter error completion failed: {}", completeException.getMessage());
             }
         });
-        
+
         return emitter;
     }
 
@@ -252,12 +273,12 @@ public class VisitorRestControllerVisitor {
     @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
-        
+
         // 延长超时时间至10分钟
         SseEmitter emitter = new SseEmitter(600_000L);
         // 添加心跳机制，每30秒发送一个保活消息
         // KeepAliveHelper.addKeepAliveEvent(emitter, 30000);
-        
+
         executorService.execute(() -> {
             try {
                 robotService.processSseVisitorMessage(message, emitter);
@@ -267,12 +288,12 @@ public class VisitorRestControllerVisitor {
                 try {
                     emitter.completeWithError(e);
                 } catch (Exception completeException) {
-                    log.debug("SSE emitter completion failed, connection may already be closed: {}", 
+                    log.debug("SSE emitter completion failed, connection may already be closed: {}",
                             completeException.getMessage());
                 }
             }
         });
-        
+
         // 添加超时和完成时的回调
         emitter.onTimeout(() -> {
             log.warn("sendSseVisitorMessage SSE connection timed out");
@@ -282,12 +303,12 @@ public class VisitorRestControllerVisitor {
                 log.debug("SSE emitter timeout completion failed: {}", e.getMessage());
             }
         });
-        
+
         emitter.onCompletion(() -> {
             log.info("sendSseVisitorMessage SSE connection completed");
             // KeepAliveHelper.removeKeepAliveEvent(emitter);
         });
-        
+
         // 添加错误处理回调
         emitter.onError((e) -> {
             log.warn("sendSseVisitorMessage SSE connection error: {}", e.getMessage());
@@ -297,7 +318,7 @@ public class VisitorRestControllerVisitor {
                 log.debug("SSE emitter error completion failed: {}", completeException.getMessage());
             }
         });
-        
+
         return emitter;
     }
 
@@ -309,10 +330,10 @@ public class VisitorRestControllerVisitor {
     @VisitorAnnotation(title = "visitor", action = "sync", description = "sync visitor message")
     @PostMapping("/message/sync")
     public ResponseEntity<?> sync(@RequestBody Map<String, String> map) {
-        // 
+        //
         String json = (String) map.get("json");
         log.debug("sync json {}", json);
-        
+
         try {
             MessageProtobuf response = robotService.processSyncVisitorMessage(json);
             return ResponseEntity.ok(JsonResult.success("sync success", response));

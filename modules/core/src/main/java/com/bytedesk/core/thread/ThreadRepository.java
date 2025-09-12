@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-11 09:26:39
+ * @LastEditTime: 2025-09-12 15:04:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -44,8 +44,8 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         Optional<ThreadEntity> findFirstByTopicAndStatusNotContainingAndDeleted(String topic, String status, Boolean deleted);
 
-        // @Query(value = "select * from core_thread t where t.topic like ?1 and t.status not in ?2 and t.is_deleted = ?3", nativeQuery = true)
-        @Query(value = "select * from core_thread t where t.topic = ?1 and t.status not in ?2 and t.is_deleted = ?3 LIMIT 1", nativeQuery = true)
+        // @Query(value = "select * from bytedesk_core_thread t where t.topic like ?1 and t.status not in ?2 and t.is_deleted = ?3", nativeQuery = true)
+        @Query(value = "select * from bytedesk_core_thread t where t.topic = ?1 and t.status not in ?2 and t.is_deleted = ?3 LIMIT 1", nativeQuery = true)
         Optional<ThreadEntity> findTopicAndStatusesNotInAndDeleted(String topicWithWildcard,
                         List<String> statuses,
                         Boolean deleted);
@@ -91,7 +91,14 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
          * 根据访客ID查找最近的客服会话记录
          * 查找访客与客服的最近一次会话，按更新时间倒序排列
          */
-        @Query(value = "SELECT * FROM core_thread t WHERE t.thread_user LIKE %:visitorUid% AND t.thread_type IN ('AGENT', 'WORKGROUP', 'ROBOT') AND t.is_deleted = false ORDER BY t.updated_at DESC", nativeQuery = true)
+        @Query(value = "SELECT * FROM bytedesk_core_thread t WHERE t.thread_user LIKE %:visitorUid% AND t.thread_type IN ('AGENT', 'WORKGROUP', 'ROBOT') AND t.is_deleted = false ORDER BY t.updated_at DESC", nativeQuery = true)
         List<ThreadEntity> findRecentAgentThreadsByVisitorUid(@Param("visitorUid") String visitorUid);
+
+        /**
+         * 根据访客UID分页查询其相关的会话列表
+         * 通过判断user字段中是否包含访客uid来查询
+         */
+        @Query(value = "SELECT * FROM bytedesk_core_thread t WHERE t.thread_user LIKE %:visitorUid% AND t.is_deleted = false ORDER BY t.updated_at DESC", nativeQuery = true)
+        Page<ThreadEntity> findByVisitorUidInUserField(@Param("visitorUid") String visitorUid, Pageable pageable);
 
 }
