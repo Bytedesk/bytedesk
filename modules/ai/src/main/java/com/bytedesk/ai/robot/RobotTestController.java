@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-12 16:20:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 10:50:57
+ * @LastEditTime: 2025-09-12 11:00:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,7 @@ package com.bytedesk.ai.robot;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,13 +50,14 @@ public class RobotTestController {
 
     /**
      * 备用回复服务测试接口
+     * http://localhost:9003/test/api/v1/robot/fallback-response
      */
     @Operation(summary = "备用回复测试", description = "测试AI备用回复生成功能")
     @ApiResponse(responseCode = "200", description = "测试成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = String.class)))
     @ApiRateLimiter(value = 5.0, timeout = 1)
-    @PreAuthorize("hasAuthority('ROBOT_TEST')")
+    // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "备用回复", description = "fallback response test")
     @PostMapping("/fallback-response")
     public ResponseEntity<?> testFallbackResponse(@RequestBody Map<String, String> request) {
@@ -84,7 +85,7 @@ public class RobotTestController {
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = String.class)))
     @ApiRateLimiter(value = 5.0, timeout = 1)
-    @PreAuthorize("hasAuthority('ROBOT_TEST')")
+    // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "查询重写", description = "query rewrite test")
     @PostMapping("/query-rewrite")
     public ResponseEntity<?> testQueryRewrite(@RequestBody Map<String, String> request) {
@@ -112,7 +113,7 @@ public class RobotTestController {
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = String.class)))
     @ApiRateLimiter(value = 5.0, timeout = 1)
-    @PreAuthorize("hasAuthority('ROBOT_TEST')")
+    // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "摘要生成", description = "summary generation test")
     @PostMapping("/summary-generation")
     public ResponseEntity<?> testSummaryGeneration(@RequestBody Map<String, String> request) {
@@ -140,7 +141,7 @@ public class RobotTestController {
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = String.class)))
     @ApiRateLimiter(value = 5.0, timeout = 1)
-    @PreAuthorize("hasAuthority('ROBOT_TEST')")
+    // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "会话标题生成", description = "session title generation test")
     @PostMapping("/session-title-generation")
     public ResponseEntity<?> testSessionTitleGeneration(@RequestBody Map<String, String> request) {
@@ -168,7 +169,7 @@ public class RobotTestController {
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = String.class)))
     @ApiRateLimiter(value = 5.0, timeout = 1)
-    @PreAuthorize("hasAuthority('ROBOT_TEST')")
+    // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "上下文模板摘要", description = "context template summary test")
     @PostMapping("/context-template-summary")
     public ResponseEntity<?> testContextTemplateSummary(@RequestBody Map<String, String> request) {
@@ -196,7 +197,7 @@ public class RobotTestController {
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = String.class)))
     @ApiRateLimiter(value = 5.0, timeout = 1)
-    @PreAuthorize("hasAuthority('ROBOT_TEST')")
+    // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "实体提取", description = "entity extraction test")
     @PostMapping("/entity-extraction")
     public ResponseEntity<?> testEntityExtraction(@RequestBody Map<String, String> request) {
@@ -224,7 +225,7 @@ public class RobotTestController {
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = String.class)))
     @ApiRateLimiter(value = 5.0, timeout = 1)
-    @PreAuthorize("hasAuthority('ROBOT_TEST')")
+    // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "关系提取", description = "relationship extraction test")
     @PostMapping("/relationship-extraction")
     public ResponseEntity<?> testRelationshipExtraction(@RequestBody Map<String, String> request) {

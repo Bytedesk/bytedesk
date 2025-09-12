@@ -17,9 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
@@ -27,7 +27,6 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,115 +56,223 @@ public class RobotService extends AbstractRobotService {
     // 处理内部成员SSE请求消息
     public void processSseMemberMessage(String messageJson, SseEmitter emitter) {
         log.info("processSseMemberMessage: messageJson: {}", messageJson);
-        Assert.notNull(messageJson, "messageJson is null");
         Assert.notNull(emitter, "emitter is null");
-        //
-        messageJson = messageService.processMessageJson(messageJson);
-        MessageProtobuf messageProtobufQuery = MessageProtobuf.fromJson(messageJson);
-        MessageTypeEnum messageType = messageProtobufQuery.getType();
-        //
-        String query = messageProtobufQuery.getContent();
+        
+        // 使用公共方法验证和解析消息
+        MessageValidationResult validationResult = validateAndParseMessage(messageJson);
+        String query = validationResult.getQuery();
         log.info("robot processSseMessage {}", query);
-        ThreadProtobuf threadProtobuf = messageProtobufQuery.getThread();
-        if (threadProtobuf == null) {
-            throw new RuntimeException("thread is null");
-        }
-        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
-        if (!messageType.equals(MessageTypeEnum.TEXT) &&
-                !messageType.equals(MessageTypeEnum.ROBOT_QUESTION)) {
-            log.info("processSseMemberMessage messageType is not TEXT or ROBOT_QUESTION, skip");
-            throw new RuntimeException("暂不支持此消息类型");
-        }
-        //
-        String threadTopic = threadProtobuf.getTopic();
-        // 仅处理员工/客服消息
-        ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
-                .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
-                        " not found"));
-        Assert.notNull(thread.getRobot(), "thread agent is null, threadTopic:" + threadTopic);
-        // 
-        RobotProtobuf robot = RobotProtobuf.fromJson(thread.getRobot());
-        if (robot == null) {
-            throw new RuntimeException("robot is null, threadTopic:" + threadTopic);
-        }
+        
+        // 使用公共方法获取机器人
+        RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
         log.info("processSseMemberMessage thread reply");
-        //
-        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(threadProtobuf, robot,
-                messageProtobufQuery);
+        
+        // 创建机器人回复消息
+        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(
+                validationResult.getThreadProtobuf(), 
+                robot,
+                validationResult.getMessageProtobuf());
+        
         // 处理LLM消息
-        processSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        processAIWithFallback(query, robot, validationResult.getMessageProtobuf(), 
+                messageProtobufReply, emitter);
     }
 
     // 处理访客端SSE请求消息
     public void processSseVisitorMessage(String messageJson, SseEmitter emitter) {
         log.info("processSseVisitorMessage: messageJson: {}", messageJson);
-        Assert.notNull(messageJson, "messageJson is null");
         Assert.notNull(emitter, "emitter is null");
-        //
-        messageJson = messageService.processMessageJson(messageJson);
-        //
-        MessageProtobuf messageProtobufQuery = MessageProtobuf.fromJson(messageJson);
-        MessageTypeEnum messageType = messageProtobufQuery.getType();
-        String query = messageProtobufQuery.getContent();
+        
+        // 使用公共方法验证和解析消息
+        MessageValidationResult validationResult = validateAndParseMessage(messageJson);
+        String query = validationResult.getQuery();
         log.info("processSseVisitorMessage robot processSseMessage {}", query);
-        ThreadProtobuf threadProtobuf = messageProtobufQuery.getThread();
-        Assert.notNull(threadProtobuf, "thread is null");
-        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
-        if (!messageType.equals(MessageTypeEnum.TEXT) &&
-                !messageType.equals(MessageTypeEnum.ROBOT_QUESTION)) {
-            log.info("processSseMemberMessage messageType is not TEXT or ROBOT_QUESTION, skip");
-            throw new RuntimeException("暂不支持此消息类型");
-        }
-        String threadTopic = threadProtobuf.getTopic();
-        // 仅处理访客端消息
-        ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
-                .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic +
-                        " not found"));
-        Assert.notNull(thread.getRobot(), "thread agent is null, threadTopic:" + threadTopic);
-        //
-        RobotProtobuf robot = RobotProtobuf.fromJson(thread.getRobot());
-        if (robot == null) {
-            throw new RuntimeException("robot is null, threadTopic:" + threadTopic);
-        }
+        
+        // 使用公共方法获取机器人
+        RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
         log.info("processSseVisitorMessage thread reply");
+        
         // 机器人回复访客消息
-        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(threadProtobuf, robot,
-                messageProtobufQuery);
+        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(
+                validationResult.getThreadProtobuf(), 
+                robot,
+                validationResult.getMessageProtobuf());
+        
         // 处理LLM消息
-        processSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        processAIWithFallback(query, robot, validationResult.getMessageProtobuf(), 
+                messageProtobufReply, emitter);
     }
 
     // 处理访客端同步请求消息，机器人设置为stream=false的情况，用于微信公众号等平台
     public MessageProtobuf processSyncVisitorMessage(String messageJson) {
-        MessageProtobuf messageProtobuf = JSON.parseObject(messageJson, MessageProtobuf.class);
-        MessageTypeEnum messageType = messageProtobuf.getType();
-        String query = messageProtobuf.getContent();
-        log.info("robot processSyncMessage {}", query);
-        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
-        if (threadProtobuf == null) {
-            throw new RuntimeException("thread is null");
-        }
-        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
-        if (!messageType.equals(MessageTypeEnum.TEXT)) {
-            return null;
-        }
-        // String threadTopic = threadProtobuf.getTopic();
-        if (!threadProtobuf.getType().equals(ThreadTypeEnum.ROBOT)) {
-            return null;
-        }
-
-        return messageProtobuf;
+        log.info("processSyncVisitorMessage: messageJson: {}", messageJson);
+        
+        // 使用公共方法验证和解析消息
+        MessageValidationResult validationResult = validateAndParseMessage(messageJson);
+        String query = validationResult.getQuery();
+        log.info("processSyncVisitorMessage robot processSyncMessage {}", query);
+        
+        // 使用公共方法获取机器人
+        RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
+        log.info("processSyncVisitorMessage thread reply");
+        
+        // 机器人回复访客消息
+        MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(
+                validationResult.getThreadProtobuf(), 
+                robot,
+                validationResult.getMessageProtobuf());
+        
+        // 使用公共方法处理AI消息
+        String aiResponse = processSyncAIWithFallback(query, robot, 
+                validationResult.getMessageProtobuf(), messageProtobufReply);
+        
+        // 设置AI回复内容
+        messageProtobufReply.setContent(aiResponse);
+        return messageProtobufReply;
     }
 
-    // 提取的公共方法，用于处理不同LLM提供商的消息
-    private void processSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+    // ==================== 新增的 7 个服务方法 ====================
+
+    /**
+     * 备用回复服务 - 可能需要查询知识库作为备用答案
+     */
+    public String fallbackResponse(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, true);
+    }
+
+    /**
+     * 查询重写服务 - 纯文本处理，不需要知识库
+     */
+    public String queryRewrite(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    /**
+     * 摘要生成服务 - 纯文本处理，不需要知识库
+     */
+    public String summaryGeneration(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    /**
+     * 会话标题生成服务 - 纯文本处理，不需要知识库
+     */
+    public String sessionTitleGeneration(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_SESSION_TITLE_GENERATION, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    /**
+     * 上下文模板摘要服务 - 纯文本处理，不需要知识库
+     */
+    public String contextTemplateSummary(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    /**
+     * 实体提取服务 - 纯文本处理，不需要知识库
+     */
+    public String entityExtraction(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    /**
+     * 关系提取服务 - 纯文本处理，不需要知识库
+     */
+    public String relationshipExtraction(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    // ==================== 私有辅助方法 ====================
+
+    /**
+     * 消息验证和解析的通用方法
+     */
+    private static class MessageValidationResult {
+        private final MessageProtobuf messageProtobuf;
+        private final String query;
+        private final ThreadProtobuf threadProtobuf;
+        private final String threadTopic;
+
+        public MessageValidationResult(MessageProtobuf messageProtobuf, String query, 
+                ThreadProtobuf threadProtobuf, String threadTopic) {
+            this.messageProtobuf = messageProtobuf;
+            this.query = query;
+            this.threadProtobuf = threadProtobuf;
+            this.threadTopic = threadTopic;
+        }
+
+        public MessageProtobuf getMessageProtobuf() { return messageProtobuf; }
+        public String getQuery() { return query; }
+        public ThreadProtobuf getThreadProtobuf() { return threadProtobuf; }
+        public String getThreadTopic() { return threadTopic; }
+    }
+
+    /**
+     * 验证和解析消息的公共方法
+     */
+    private MessageValidationResult validateAndParseMessage(String messageJson) {
+        Assert.notNull(messageJson, "messageJson is null");
         
-        // 获取提供商名称，默认为智谱AI
+        // 处理消息JSON
+        String processedJson = messageService.processMessageJson(messageJson);
+        MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(processedJson);
+        MessageTypeEnum messageType = messageProtobuf.getType();
+        String query = messageProtobuf.getContent();
+        
+        ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
+        Assert.notNull(threadProtobuf, "thread is null");
+        
+        // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
+        if (!messageType.equals(MessageTypeEnum.TEXT) &&
+                !messageType.equals(MessageTypeEnum.ROBOT_QUESTION)) {
+            throw new RuntimeException("暂不支持此消息类型");
+        }
+        
+        String threadTopic = threadProtobuf.getTopic();
+        return new MessageValidationResult(messageProtobuf, query, threadProtobuf, threadTopic);
+    }
+
+    /**
+     * 获取机器人的公共方法
+     */
+    private RobotProtobuf getRobotByThreadTopic(String threadTopic) {
+        ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
+                .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic + " not found"));
+        Assert.notNull(thread.getRobot(), "thread robot is null, threadTopic:" + threadTopic);
+        
+        RobotProtobuf robot = RobotProtobuf.fromJson(thread.getRobot());
+        if (robot == null) {
+            throw new RuntimeException("robot is null, threadTopic:" + threadTopic);
+        }
+        
+        return robot;
+    }
+
+    /**
+     * AI提供商选择和处理的公共方法
+     */
+    private String getAIProviderName(RobotProtobuf robot) {
         String provider = LlmConsts.ZHIPUAI;
         if (robot.getLlm() != null) {
             provider = robot.getLlm().getTextProvider().toLowerCase();
         }
+        return provider;
+    }
+
+    /**
+     * 通用的AI消息处理方法，包含fallback逻辑
+     */
+    private void processAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        
+        String provider = getAIProviderName(robot);
         
         try {
             // 使用SpringAIServiceRegistry获取对应的服务
@@ -184,62 +291,29 @@ public class RobotService extends AbstractRobotService {
         }
     }
 
-    // ==================== 新增的 7 个服务方法 ====================
-
     /**
-     * 备用回复服务 - 可能需要查询知识库作为备用答案
+     * 通用的同步AI消息处理方法，包含fallback逻辑
      */
-    public String fallbackResponse(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content, 
-                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", true);
-    }
-
-    /**
-     * 查询重写服务 - 纯文本处理，不需要知识库
-     */
-    public String queryRewrite(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content, 
-                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
-    }
-
-    /**
-     * 摘要生成服务 - 纯文本处理，不需要知识库
-     */
-    public String summaryGeneration(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content, 
-                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
-    }
-
-    /**
-     * 会话标题生成服务 - 纯文本处理，不需要知识库
-     */
-    public String sessionTitleGeneration(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_SESSION_TITLE_GENERATION, orgUid, content, 
-                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
-    }
-
-    /**
-     * 上下文模板摘要服务 - 纯文本处理，不需要知识库
-     */
-    public String contextTemplateSummary(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content, 
-                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
-    }
-
-    /**
-     * 实体提取服务 - 纯文本处理，不需要知识库
-     */
-    public String entityExtraction(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content, 
-                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
-    }
-
-    /**
-     * 关系提取服务 - 纯文本处理，不需要知识库
-     */
-    public String relationshipExtraction(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content, 
-                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
+    private String processSyncAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply) {
+        
+        String provider = getAIProviderName(robot);
+        
+        try {
+            // 使用SpringAIServiceRegistry获取对应的服务进行同步处理
+            return springAIServiceRegistry.getServiceByProviderName(provider)
+                .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
+        } catch (IllegalArgumentException e) {
+            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmConsts.ZHIPUAI);
+            // 如果找不到指定的提供商，尝试使用默认的智谱AI
+            try {
+                return springAIServiceRegistry.getServiceByProviderName(LlmConsts.ZHIPUAI)
+                    .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
+            } catch (Exception ex) {
+                log.error("使用默认AI服务提供商失败", ex);
+                throw new RuntimeException("无法处理AI消息，所有提供商服务均不可用");
+            }
+        }
     }
 
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 10:50:26
+ * @LastEditTime: 2025-09-12 10:58:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -308,12 +308,19 @@ public class VisitorRestControllerVisitor {
     @ApiRateLimiter(value = 10.0, timeout = 1)
     @VisitorAnnotation(title = "visitor", action = "sync", description = "sync visitor message")
     @PostMapping("/message/sync")
-    public ResponseEntity<?> sync(@RequestBody VisitorRequest visitorRequest) {
-
-        return ResponseEntity.ok(JsonResult.success("sync success"));
+    public ResponseEntity<?> sync(@RequestBody Map<String, String> map) {
+        // 
+        String json = (String) map.get("json");
+        log.debug("sync json {}", json);
+        
+        try {
+            MessageProtobuf response = robotService.processSyncVisitorMessage(json);
+            return ResponseEntity.ok(JsonResult.success("sync success", response));
+        } catch (Exception e) {
+            log.error("Error processing sync visitor message", e);
+            return ResponseEntity.ok(JsonResult.error("处理消息失败：" + e.getMessage()));
+        }
     }
-
-
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
