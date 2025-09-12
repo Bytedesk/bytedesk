@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 09:31:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 18:17:42
+ * @LastEditTime: 2025-09-12 15:42:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -133,7 +133,6 @@ public class GlobalControllerAdvice {
         // 方便测试，打印异常堆栈信息
         e.printStackTrace();
         log.error("not handled exception 1:", e.getMessage());
-        // e.printStackTrace();
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 

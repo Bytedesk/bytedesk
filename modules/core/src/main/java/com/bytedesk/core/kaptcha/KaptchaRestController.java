@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-18 19:17:59
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-15 00:04:07
+ * @LastEditTime: 2025-09-12 15:47:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,7 +16,6 @@ package com.bytedesk.core.kaptcha;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
@@ -29,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.annotation.ApiRateLimiter;
+import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.Utils;
 import com.google.code.kaptcha.Producer;
@@ -80,13 +80,13 @@ public class KaptchaRestController {
     // 验证验证码
     @ApiRateLimiter(value = 1, timeout = 1)
     @PostMapping("/check")
-    public ResponseEntity<?> checkKaptcha(@RequestBody Map<String, String> map) {
+    public ResponseEntity<?> checkKaptcha(@RequestBody UserRequest userRequest) {
         //
-        String captchaUid = map.get("captchaUid");
-        String captchaCode = map.get("captchaCode");
-        String client = map.get("client");
+        String captchaUid = userRequest.getCaptchaUid();
+        String captchaCode = userRequest.getCaptchaCode();
+        String channel = userRequest.getChannel();
         log.info("checkKaptcha captchaUid {} captchaCode {}", captchaUid, captchaCode);
-        if (kaptchaCacheService.checkKaptcha(captchaUid, captchaCode, client)) {
+        if (kaptchaCacheService.checkKaptcha(captchaUid, captchaCode, channel)) {
             return ResponseEntity.ok(JsonResult.success("kaptcha success"));
         } else {
             return ResponseEntity.ok(JsonResult.error("kaptcha check failed", -1));
