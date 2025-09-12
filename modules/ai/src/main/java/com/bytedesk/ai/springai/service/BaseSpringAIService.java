@@ -467,7 +467,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Override
-    public String processDirectLlmRequest(String query, RobotProtobuf robot) {
+    public String processSyncRequest(String query, RobotProtobuf robot, boolean searchKnowledgeBase) {
         // 检查是否启用大模型
         if (robot.getLlm() == null || !robot.getLlm().getEnabled()) {
             log.warn("LLM未启用，无法处理直接LLM请求");
@@ -475,11 +475,18 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         String prompt = robot.getLlm().getPrompt();
-        log.info("处理直接LLM请求: query={}, prompt={}, robot={}", query, prompt, robot.getUid());
+        log.info("处理直接LLM请求: query={}, prompt={}, robot={}, searchKnowledgeBase={}", 
+                query, prompt, robot.getUid(), searchKnowledgeBase);
         
-        // 使用通用方法处理知识库搜索和响应生成
-        List<FaqProtobuf> searchResultList = searchKnowledgeBase(query, robot);
-        log.info("processDirectLlmRequest searchResultList {}", searchResultList);
+        List<FaqProtobuf> searchResultList = new ArrayList<>();
+        
+        // 根据参数决定是否查询知识库
+        if (searchKnowledgeBase) {
+            searchResultList = searchKnowledgeBase(query, robot);
+            log.info("processDirectLlmRequest searchResultList {}", searchResultList);
+        } else {
+            log.info("跳过知识库查询，直接使用提示词处理");
+        }
         
         // 构建提示词
         StringBuilder aiPrompt = new StringBuilder();

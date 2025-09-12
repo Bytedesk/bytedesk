@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-21 14:20:23
+ * @LastEditTime: 2025-09-12 10:27:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -37,11 +37,22 @@ import org.springframework.context.annotation.Description;
 @Service
 @RequiredArgsConstructor
 @Description("Robot Service - AI robot message processing and LLM integration service")
-public class RobotService {
+public class RobotService extends AbstractRobotService {
 
     private final SpringAIServiceRegistry springAIServiceRegistry;
     private final ThreadRestService threadRestService;
     private final MessageService messageService;
+    private final RobotRestService robotRestService;
+
+    @Override
+    protected RobotRestService getRobotRestService() {
+        return robotRestService;
+    }
+
+    @Override
+    protected SpringAIServiceRegistry getSpringAIServiceRegistry() {
+        return springAIServiceRegistry;
+    }
 
     // 处理内部成员SSE请求消息
     public void processSseMemberMessage(String messageJson, SseEmitter emitter) {
@@ -82,7 +93,7 @@ public class RobotService {
         MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(threadProtobuf, robot,
                 messageProtobufQuery);
         // 处理LLM消息
-        processLlmMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        processSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
     // 处理访客端SSE请求消息
@@ -121,7 +132,7 @@ public class RobotService {
         MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(threadProtobuf, robot,
                 messageProtobufQuery);
         // 处理LLM消息
-        processLlmMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        processSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
     }
 
     // 处理访客端同步请求消息，机器人设置为stream=false的情况，用于微信公众号等平台
@@ -147,7 +158,7 @@ public class RobotService {
     }
 
     // 提取的公共方法，用于处理不同LLM提供商的消息
-    private void processLlmMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    private void processSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         
         // 获取提供商名称，默认为智谱AI
@@ -176,78 +187,59 @@ public class RobotService {
     // ==================== 新增的 7 个服务方法 ====================
 
     /**
-     * 备用回复服务
+     * 备用回复服务 - 可能需要查询知识库作为备用答案
      */
     public String fallbackResponse(String content, String orgUid) {
-        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content);
+        return processSyncRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content, 
+                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", true);
     }
 
     /**
-     * 查询重写服务
+     * 查询重写服务 - 纯文本处理，不需要知识库
      */
     public String queryRewrite(String content, String orgUid) {
-        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content);
+        return processSyncRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content, 
+                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
     }
 
     /**
-     * 摘要生成服务
+     * 摘要生成服务 - 纯文本处理，不需要知识库
      */
     public String summaryGeneration(String content, String orgUid) {
-        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content);
+        return processSyncRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content, 
+                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
     }
 
     /**
-     * 会话标题生成服务
+     * 会话标题生成服务 - 纯文本处理，不需要知识库
      */
     public String sessionTitleGeneration(String content, String orgUid) {
-        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_SESSION_TITLE_GENERATION, orgUid, content);
+        return processSyncRequest(RobotConsts.ROBOT_NAME_SESSION_TITLE_GENERATION, orgUid, content, 
+                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
     }
 
     /**
-     * 上下文模板摘要服务
+     * 上下文模板摘要服务 - 纯文本处理，不需要知识库
      */
     public String contextTemplateSummary(String content, String orgUid) {
-        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content);
+        return processSyncRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content, 
+                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
     }
 
     /**
-     * 实体提取服务
+     * 实体提取服务 - 纯文本处理，不需要知识库
      */
     public String entityExtraction(String content, String orgUid) {
-        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content);
+        return processSyncRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content, 
+                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
     }
 
     /**
-     * 关系提取服务
+     * 关系提取服务 - 纯文本处理，不需要知识库
      */
     public String relationshipExtraction(String content, String orgUid) {
-        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content);
-    }
-
-    /**
-     * 通用的直接调用 LLM 方法，参考企业模块的 processLlmRequest 实现
-     */
-    private String processDirectLlmRequest(String robotName, String orgUid, String query) {
-        Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
-        if (robotOptional.isPresent()) {
-            RobotLlm llm = robotOptional.get().getLlm();
-            String provider = llm.getTextProvider();
-
-            try {
-                // Get the appropriate service from registry
-                SpringAIService service = springAIServiceRegistry.getServiceByProviderName(provider);
-
-                // 使用新添加的接口方法直接调用大模型并获取结果
-                RobotProtobuf robot = RobotProtobuf.convertFromRobotEntity(robotOptional.get());
-                //
-                return service.processDirectLlmRequest(query, robot);
-
-            } catch (IllegalArgumentException e) {
-                log.warn("Provider {} not found, falling back to OpenAI", provider);
-                throw new RuntimeException("请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型");
-            }
-        }
-        return "Robot not found";
+        return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content, 
+                "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型", false);
     }
 
 }

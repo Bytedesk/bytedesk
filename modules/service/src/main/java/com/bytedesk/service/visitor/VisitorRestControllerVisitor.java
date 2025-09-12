@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 17:35:28
+ * @LastEditTime: 2025-09-12 10:50:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -312,6 +312,8 @@ public class VisitorRestControllerVisitor {
 
         return ResponseEntity.ok(JsonResult.success("sync success"));
     }
+
+
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
