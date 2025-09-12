@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:26:47
+ * @LastEditTime: 2025-09-12 11:29:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -61,9 +61,7 @@ public class I18Consts {
     // public static final String I18N_TOP_TIP = I18N_PREFIX + "top.tip"; // 置顶提示
     // public static final String I18N_LEAVEMSG_TIP = I18N_PREFIX + "leavemsg.tip"; // 留言提示
     public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip"; // 重新进入提示
-    public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型"; // 大模型配置提示
-    public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》工单生成提示词 大模型"; // 工单大模型配置提示
-    public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
+    
     // public static final String I18N_QUEUE_TIP = I18N_PREFIX + "queue.tip"; // 排队提示
     // public static final String I18N_QUEUE_MESSAGE_TEMPLATE = I18N_PREFIX + "queue.message.template"; // 您前面还有{0}人排队
     // public static final String I18N_AUTO_CLOSE_TIP = I18N_PREFIX + "auto.close.tip"; // 会话已自动关闭
@@ -345,7 +343,10 @@ public class I18Consts {
 
     public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
     public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "请首先在管理后台配置大模型apiUrl和apiKey"; // 服务暂时不可用，请稍后重试
-
+    public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型"; // 大模型配置提示
+    public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》工单生成提示词 大模型"; // 工单大模型配置提示
+    public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
+    
     // AI 服务相关常量
     public static final String I18N_THINKING = "正在思考中..."; // 正在思考中...
     public static final String I18N_SORRY_LLM_DISABLED = "抱歉，大模型功能未启用"; // 抱歉，大模型功能未启用

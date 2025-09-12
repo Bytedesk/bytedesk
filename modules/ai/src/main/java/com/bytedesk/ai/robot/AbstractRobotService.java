@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-12 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 10:48:45
+ * @LastEditTime: 2025-09-12 11:30:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import com.bytedesk.ai.springai.service.SpringAIService;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+import com.bytedesk.core.constant.I18Consts;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,7 +44,7 @@ public abstract class AbstractRobotService {
      * 统一了企业模块和核心模块的 processLlmRequest 实现
      */
     protected String processSyncRequest(String robotName, String orgUid, String query) {
-        return processSyncRequest(robotName, orgUid, query, "请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型");
+        return processSyncRequest(robotName, orgUid, query, I18Consts.I18N_LLM_CONFIG_TIP);
     }
 
     /**

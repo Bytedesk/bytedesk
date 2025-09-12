@@ -2071,25 +2071,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         public String getFullPromptContent() { return fullPromptContent; }
     }
 
-    /**
-     * Token usage data class
-     */
-    // protected static class TokenUsage {
-    //     private final long promptTokens;
-    //     private final long completionTokens;
-    //     private final long totalTokens;
-
-    //     public TokenUsage(long promptTokens, long completionTokens, long totalTokens) {
-    //         this.promptTokens = promptTokens;
-    //         this.completionTokens = completionTokens;
-    //         this.totalTokens = totalTokens;
-    //     }
-
-    //     public long getPromptTokens() { return promptTokens; }
-    //     public long getCompletionTokens() { return completionTokens; }
-    //     public long getTotalTokens() { return totalTokens; }
-    // }
-
     // 带prompt参数的抽象方法重载
     protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, String fullPromptContent);
