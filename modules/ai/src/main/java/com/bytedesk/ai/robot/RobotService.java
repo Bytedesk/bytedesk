@@ -173,5 +173,81 @@ public class RobotService {
         }
     }
 
+    // ==================== 新增的 7 个服务方法 ====================
+
+    /**
+     * 备用回复服务
+     */
+    public String fallbackResponse(String content, String orgUid) {
+        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content);
+    }
+
+    /**
+     * 查询重写服务
+     */
+    public String queryRewrite(String content, String orgUid) {
+        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content);
+    }
+
+    /**
+     * 摘要生成服务
+     */
+    public String summaryGeneration(String content, String orgUid) {
+        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content);
+    }
+
+    /**
+     * 会话标题生成服务
+     */
+    public String sessionTitleGeneration(String content, String orgUid) {
+        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_SESSION_TITLE_GENERATION, orgUid, content);
+    }
+
+    /**
+     * 上下文模板摘要服务
+     */
+    public String contextTemplateSummary(String content, String orgUid) {
+        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content);
+    }
+
+    /**
+     * 实体提取服务
+     */
+    public String entityExtraction(String content, String orgUid) {
+        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content);
+    }
+
+    /**
+     * 关系提取服务
+     */
+    public String relationshipExtraction(String content, String orgUid) {
+        return processDirectLlmRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content);
+    }
+
+    /**
+     * 通用的直接调用 LLM 方法，参考企业模块的 processLlmRequest 实现
+     */
+    private String processDirectLlmRequest(String robotName, String orgUid, String query) {
+        Optional<RobotEntity> robotOptional = robotRestService.findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
+        if (robotOptional.isPresent()) {
+            RobotLlm llm = robotOptional.get().getLlm();
+            String provider = llm.getTextProvider();
+
+            try {
+                // Get the appropriate service from registry
+                SpringAIService service = springAIServiceRegistry.getServiceByProviderName(provider);
+
+                // 使用新添加的接口方法直接调用大模型并获取结果
+                RobotProtobuf robot = RobotProtobuf.convertFromRobotEntity(robotOptional.get());
+                //
+                return service.processDirectLlmRequest(query, robot);
+
+            } catch (IllegalArgumentException e) {
+                log.warn("Provider {} not found, falling back to OpenAI", provider);
+                throw new RuntimeException("请首先在管理后台配置大模型apiUrl和apiKey，修改：AI助手-》提示词-》大模型");
+            }
+        }
+        return "Robot not found";
+    }
 
 }

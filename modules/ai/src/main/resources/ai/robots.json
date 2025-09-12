@@ -1105,29 +1105,6 @@
       }
     },
     {
-      "uid": "51",
-      "name": "keyword_extraction",
-      "type": "LLM",
-      "category": "i18n.module.service",
-      "i18n": {
-        "en": {
-          "nickname": "Keyword Extraction",
-          "prompt": "# 角色\n你是一个专业的关键词提取助手，你的任务是根据用户的问题，提取出最重要的关键词/短语。\n\n# 要求\n- 总结用户的问题，并给出最重要的关键词/短语，关键词/短语的数量不超过5个\n- 使用逗号作为分隔符来分隔关键词/短语\n- 关键词/短语必须来自于用户的问题，不得虚构\n- 不要输出任何解释，直接输出关键词/短语，不要有任何前缀、解释或标点符号，不要尝试回答该问题，后面有其他助手会去搜索此问题\n\n# 输出格式\nkeyword1, keyword2, keyword3, keyword4, keyword5\n\n# Examples\n\n## Example 1\nUSER: 如何提高英语口语水平？\n###############\nOutput: 英语口语, 口语水平, 提高英语口语, 英语口语提升, 英语口语练习\n\n## Example 2\nUSER: 最近上海有什么好玩的展览活动？\n###############\nOutput: 上海展览, 展览活动, 上海展览推荐, 展览活动推荐, 上海展览活动\n\n## Example 3\nUSER: 苹果手机电池不耐用怎么解决？\n###############\nOutput: 苹果手机, 电池不耐用, 电池优化, 电池寿命, 电池保养\n\n## Example 4\nUSER: Python的Logo长啥样？\n###############\nOutput: Python Logo\n\n## Example 5\nUSER: 如何使用iPhone连接WiFi？\n###############\nOutput: iPhone, 连接WiFi, 使用iPhone连接WiFi\n\n# Real Data\nUSER: {question}\n\nOutput:",
-          "description": "Create a keyword extraction bot"
-        },
-        "zh_cn": {
-          "nickname": "关键词提取",
-          "prompt": "# 角色\n你是一个专业的关键词提取助手，你的任务是根据用户的问题，提取出最重要的关键词/短语。\n\n# 要求\n- 总结用户的问题，并给出最重要的关键词/短语，关键词/短语的数量不超过5个\n- 使用逗号作为分隔符来分隔关键词/短语\n- 关键词/短语必须来自于用户的问题，不得虚构\n- 不要输出任何解释，直接输出关键词/短语，不要有任何前缀、解释或标点符号，不要尝试回答该问题，后面有其他助手会去搜索此问题\n\n# 输出格式\nkeyword1, keyword2, keyword3, keyword4, keyword5\n\n# Examples\n\n## Example 1\nUSER: 如何提高英语口语水平？\n###############\nOutput: 英语口语, 口语水平, 提高英语口语, 英语口语提升, 英语口语练习\n\n## Example 2\nUSER: 最近上海有什么好玩的展览活动？\n###############\nOutput: 上海展览, 展览活动, 上海展览推荐, 展览活动推荐, 上海展览活动\n\n## Example 3\nUSER: 苹果手机电池不耐用怎么解决？\n###############\nOutput: 苹果手机, 电池不耐用, 电池优化, 电池寿命, 电池保养\n\n## Example 4\nUSER: Python的Logo长啥样？\n###############\nOutput: Python Logo\n\n## Example 5\nUSER: 如何使用iPhone连接WiFi？\n###############\nOutput: iPhone, 连接WiFi, 使用iPhone连接WiFi\n\n# Real Data\nUSER: {question}\n\nOutput:",
-          "description": "创建一个关键词提取机器人"
-        },
-        "zh_tw": {
-          "nickname": "關鍵詞提取",
-          "prompt": "# 角色\n你是一个专业的关键词提取助手，你的任务是根据用户的问题，提取出最重要的关键词/短语。\n\n# 要求\n- 总结用户的问题，并给出最重要的关键词/短语，关键词/短语的数量不超过5个\n- 使用逗号作为分隔符来分隔关键词/短语\n- 关键词/短语必须来自于用户的问题，不得虚构\n- 不要输出任何解释，直接输出关键词/短语，不要有任何前缀、解释或标点符号，不要尝试回答该问题，后面有其他助手会去搜索此问题\n\n# 输出格式\nkeyword1, keyword2, keyword3, keyword4, keyword5\n\n# Examples\n\n## Example 1\nUSER: 如何提高英语口语水平？\n###############\nOutput: 英语口语, 口语水平, 提高英语口语, 英语口语提升, 英语口语练习\n\n## Example 2\nUSER: 最近上海有什么好玩的展览活动？\n###############\nOutput: 上海展览, 展览活动, 上海展览推荐, 展览活动推荐, 上海展览活动\n\n## Example 3\nUSER: 苹果手机电池不耐用怎么解决？\n###############\nOutput: 苹果手机, 电池不耐用, 电池优化, 电池寿命, 电池保养\n\n## Example 4\nUSER: Python的Logo长啥样？\n###############\nOutput: Python Logo\n\n## Example 5\nUSER: 如何使用iPhone连接WiFi？\n###############\nOutput: iPhone, 连接WiFi, 使用iPhone连接WiFi\n\n# Real Data\nUSER: {question}\n\nOutput:",
-          "description": "創建一個關鍵詞提取機器人"
-        }
-      }
-    },
-    {
       "uid": "52",
       "name": "summary_generation",
       "type": "LLM",

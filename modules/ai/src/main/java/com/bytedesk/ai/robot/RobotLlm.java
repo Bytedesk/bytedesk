@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-19 15:21:59
+ * @LastEditTime: 2025-09-12 09:39:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -134,7 +134,7 @@ public class RobotLlm {
 
     // rewrite prompt
     @Builder.Default
-    @Column(name = "llm_rewrite_prompt")
+    @Column(name = "llm_rewrite_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String rewritePrompt = RobotConsts.ROBOT_LLM_DEFAULT_REWRITE_PROMPT;
 
     // search type
