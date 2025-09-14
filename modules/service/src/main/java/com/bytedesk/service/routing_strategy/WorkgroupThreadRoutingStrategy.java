@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 16:40:03
+ * @LastEditTime: 2025-09-13 22:51:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -102,37 +102,59 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * @return 消息协议对象
      */
     public MessageProtobuf createWorkgroupThread(VisitorRequest visitorRequest) {
+        long startTime = System.currentTimeMillis();
+        log.info("开始创建工作组线程 - visitorUid: {}, workgroupUid: {}, forceAgent: {}", 
+                visitorRequest.getUid(), visitorRequest.getSid(), visitorRequest.getForceAgent());
+        
         // 1. 验证和获取工作组信息
+        log.debug("步骤1: 开始获取工作组信息 - workgroupUid: {}", visitorRequest.getSid());
         WorkgroupEntity workgroup = getWorkgroupEntity(visitorRequest.getSid());
+        log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数: {}", 
+                workgroup.getUid(), workgroup.getConnectedAgentCount());
         
         // 2. 生成会话主题并检查现有会话
+        log.debug("步骤2: 开始处理线程创建或获取");
         String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroup.getUid(), visitorRequest.getUid());
+        log.debug("生成工作组线程主题: {}", topic);
         ThreadEntity thread = getOrCreateWorkgroupThread(visitorRequest, workgroup, topic);
+        log.info("步骤2完成: 线程处理完成 - threadUid: {}, 状态: {}, 是否新建: {}", 
+                thread.getUid(), thread.getStatus(), thread.isNew());
         
         // 3. 处理现有活跃会话
+        log.debug("步骤3: 检查是否为现有活跃会话");
         MessageProtobuf existingThreadResult = handleExistingWorkgroupThread(visitorRequest, thread, workgroup);
         if (existingThreadResult != null) {
+            log.info("检测到现有活跃会话，直接返回 - threadUid: {}, 总耗时: {}ms", 
+                    thread.getUid(), System.currentTimeMillis() - startTime);
             return existingThreadResult;
         }
         
         // 4. 新会话路由决策
-        return routeNewWorkgroupThread(visitorRequest, thread, workgroup);
+        log.debug("步骤4: 开始新会话路由决策");
+        MessageProtobuf result = routeNewWorkgroupThread(visitorRequest, thread, workgroup);
+        log.info("创建工作组线程完成 - threadUid: {}, 总耗时: {}ms", 
+                thread.getUid(), System.currentTimeMillis() - startTime);
+        return result;
     }
 
     /**
      * 获取工作组实体
      */
     private WorkgroupEntity getWorkgroupEntity(String workgroupUid) {
+        long startTime = System.currentTimeMillis();
+        log.debug("开始获取工作组实体 - workgroupUid: {}", workgroupUid);
+        
         validateUid(workgroupUid, "Workgroup");
         
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
         if (!workgroupOptional.isPresent()) {
-            log.error("Workgroup uid {} not found", workgroupUid);
+            log.error("工作组不存在 - workgroupUid: {}", workgroupUid);
             throw new IllegalArgumentException("Workgroup uid " + workgroupUid + " not found");
         }
         
         WorkgroupEntity workgroup = workgroupOptional.get();
-        log.info("已获取工作组最新数据，在线客服数量: {}", workgroup.getConnectedAgentCount());
+        log.info("工作组实体获取完成 - workgroupUid: {}, 在线客服数量: {}, 耗时: {}ms", 
+                workgroup.getUid(), workgroup.getConnectedAgentCount(), System.currentTimeMillis() - startTime);
         return workgroup;
     }
 
@@ -140,17 +162,26 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取或创建工作组会话
      */
     private ThreadEntity getOrCreateWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
+        long dbStartTime = System.currentTimeMillis();
+        log.debug("开始查询现有工作组线程 - topic: {}", topic);
+        
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        log.debug("工作组线程查询完成 - 耗时: {}ms", System.currentTimeMillis() - dbStartTime);
         
         if (threadOptional.isPresent()) {
             ThreadEntity existingThread = threadOptional.get();
-            log.debug("Found existing thread with status: {}", existingThread.getStatus());
+            log.info("发现现有工作组线程 - threadUid: {}, 状态: {}, 创建时间: {}", 
+                    existingThread.getUid(), existingThread.getStatus(), existingThread.getCreatedAt());
             return existingThread;
         }
 
         // 创建新会话
-        log.info("Creating new workgroup thread for topic: {}", topic);
-        return visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
+        log.debug("未找到现有工作组线程，开始创建新线程");
+        long createStartTime = System.currentTimeMillis();
+        ThreadEntity newThread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
+        log.info("新工作组线程创建完成 - threadUid: {}, 创建耗时: {}ms", 
+                newThread.getUid(), System.currentTimeMillis() - createStartTime);
+        return newThread;
     }
 
     /**
@@ -159,28 +190,34 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * @return 如果是现有活跃会话则返回相应消息，否则返回null继续新会话流程
      */
     private MessageProtobuf handleExistingWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+        log.debug("开始处理现有工作组会话 - threadUid: {}, 状态: {}", thread.getUid(), thread.getStatus());
+        
         if (thread.isNew()) {
-            log.debug("Thread is in new state, continue with routing");
+            log.debug("线程处于新建状态，继续路由流程");
             return null; // 继续新会话流程
         }
         
         if (thread.isRoboting()) {
+            log.info("发现现有机器人会话，进入机器人处理流程");
             return handleExistingRobotThread(visitorRequest, thread, workgroup);
         }
         
         if (thread.isChatting()) {
+            log.info("发现现有聊天会话，进入聊天处理流程");
             return handleExistingChatThread(visitorRequest, thread, workgroup);
         }
         
         if (thread.isQueuing()) {
-            log.info("Thread is queuing, return queuing message");
+            log.info("发现现有排队会话，返回排队消息");
             return getWorkgroupQueuingMessage(visitorRequest, thread);
         }
         
         if (thread.isOffline()) {
+            log.info("发现现有离线会话，进入离线处理流程");
             return handleExistingOfflineThread(visitorRequest, thread, workgroup);
         }
         
+        log.debug("线程状态不匹配任何已知处理流程，继续新会话流程 - 状态: {}", thread.getStatus());
         return null; // 其他状态继续新会话流程
     }
 
@@ -236,10 +273,19 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 路由新工作组会话
      */
     private MessageProtobuf routeNewWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+        log.debug("开始新工作组会话路由决策 - threadUid: {}, workgroupUid: {}", 
+                thread.getUid(), workgroup.getUid());
+        
         // 决定路由方向：机器人 or 人工
-        if (shouldRouteToRobot(visitorRequest, workgroup)) {
+        boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup);
+        log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态: {}", 
+                shouldUseRobot, visitorRequest.getForceAgent(), workgroup.isConnected());
+        
+        if (shouldUseRobot) {
+            log.info("路由到机器人处理");
             return routeToRobot(visitorRequest, thread, workgroup);
         } else {
+            log.info("路由到人工客服处理");
             return routeToAgent(visitorRequest, thread, workgroup);
         }
     }
@@ -248,25 +294,35 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 判断是否应该路由到机器人
      */
     private boolean shouldRouteToRobot(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
+        log.debug("开始机器人路由决策判断");
+        
         // 强制转人工
         if (visitorRequest.getForceAgent()) {
-            log.info("Force transfer to agent requested");
+            log.info("用户强制要求转人工，不使用机器人");
             return false;
         }
         
         // 检查机器人配置和服务时间
         boolean isOffline = !workgroup.isConnected();
         boolean isInServiceTime = workgroup.getMessageLeaveSettings().isInServiceTime();
+        
+        log.debug("路由决策参数 - 工作组离线状态: {}, 在服务时间内: {}", 
+                isOffline, isInServiceTime);
+        
         boolean transferToRobot = workgroup.getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime);
+        log.debug("机器人设置决策结果: {}", transferToRobot);
         
         if (transferToRobot) {
             RobotEntity robot = workgroup.getRobotSettings().getRobot();
             if (robot != null) {
-                log.info("Routing to robot - offline: {}, in service time: {}", isOffline, isInServiceTime);
+                log.info("满足机器人路由条件，将路由到机器人 - robotUid: {}, offline: {}, in service time: {}", 
+                        robot.getUid(), isOffline, isInServiceTime);
                 return true;
             } else {
-                log.warn("Robot routing configured but robot not found for workgroup: {}", workgroup.getUid());
+                log.warn("机器人路由条件满足但未找到机器人实体 - workgroupUid: {}", workgroup.getUid());
             }
+        } else {
+            log.debug("不满足机器人路由条件，将路由到人工客服");
         }
         
         return false;
@@ -291,36 +347,58 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 路由到人工客服
      */
     private MessageProtobuf routeToAgent(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+        log.debug("开始路由到人工客服 - threadUid: {}, workgroupUid: {}", 
+                thread.getUid(), workgroup.getUid());
+        
         // 检查是否在工作时间内
         boolean isInServiceTime = workgroup.getMessageLeaveSettings().isInServiceTime();
+        log.debug("服务时间检查 - 是否在服务时间内: {}", isInServiceTime);
+        
         if (!isInServiceTime) {
-            log.info("Not in service time, routing to offline message");
+            log.info("不在服务时间内，路由到离线留言");
             // 选择离线留言接待客服
             AgentEntity messageLeaveAgent = workgroup.getMessageLeaveAgent();
             if (messageLeaveAgent == null) {
-                log.error("离线留言接待客服不存在，请配置工作组留言接待客服");
+                log.error("离线留言接待客服不存在，请配置工作组留言接待客服 - workgroupUid: {}", 
+                        workgroup.getUid());
                 throw new IllegalStateException("Workgroup message leave agent not found");
             }
             
+            log.debug("使用离线留言接待客服 - agentUid: {}", messageLeaveAgent.getUid());
+            
             // 加入队列（用于统计和管理）
+            long enqueueStartTime = System.currentTimeMillis();
             UserProtobuf agent = messageLeaveAgent.toUserProtobuf();
             QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+            log.debug("离线留言队列加入完成 - 耗时: {}ms", System.currentTimeMillis() - enqueueStartTime);
             
             // 直接返回离线留言消息
             return getOfflineMessage(visitorRequest, thread, messageLeaveAgent, workgroup, queueMemberEntity);
         }
         
         // 选择客服
+        log.debug("在服务时间内，开始选择客服");
+        long selectStartTime = System.currentTimeMillis();
         AgentEntity agentEntity = selectAgent(workgroup, thread);
+        log.info("客服选择完成 - agentUid: {}, 选择耗时: {}ms", 
+                agentEntity.getUid(), System.currentTimeMillis() - selectStartTime);
         
         // 加入队列
+        log.debug("开始将线程加入工作组队列");
+        long enqueueStartTime = System.currentTimeMillis();
         UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+        log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", 
+                queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
         
         // 处理强制转人工
-        handleForceAgentTransfer(visitorRequest, thread, queueMemberEntity);
+        if (visitorRequest.getForceAgent()) {
+            log.debug("处理强制转人工标记");
+            handleForceAgentTransfer(visitorRequest, thread, queueMemberEntity);
+        }
         
         // 根据客服状态进行路由
+        log.debug("开始根据客服状态进行最终路由");
         return routeByAgentStatus(agentEntity, thread, queueMemberEntity, workgroup, visitorRequest);
     }
 

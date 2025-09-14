@@ -69,8 +69,14 @@ public class JmsArtemisConfig {
         factory.setErrorHandler(jmsErrorHandler);
 		// 禁用事务模式
 		factory.setSessionTransacted(false);
+		// 设置接收超时时间
+		factory.setReceiveTimeout(30000L);
+		// 设置恢复间隔
+		factory.setRecoveryInterval(3000L);
 		// 启用自动启动
 		factory.setAutoStartup(true);
+		// 设置每个任务处理的最大消息数
+		factory.setMaxMessagesPerTask(10);
 		return factory;
 	}
 
@@ -83,20 +89,22 @@ public class JmsArtemisConfig {
 		configurer.configure(factory, connectionFactory);
 		// You could still override some settings if necessary.
 		factory.setPubSubDomain(true);
-		// 设置并发数为1，确保单实例处理，避免同一消息被多个监听器重复处理
-		factory.setConcurrency("1");
+		// 设置并发数为1-3，允许适当的并发处理但避免过多实例
+		factory.setConcurrency("1-3");
 		// 设置确认模式为自动确认，避免阻塞
 		factory.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
 		// 设置错误处理器
         factory.setErrorHandler(jmsErrorHandler);
 		// 禁用事务模式
 		factory.setSessionTransacted(false);
-		// 设置接收超时时间为10秒
-		factory.setReceiveTimeout(10000L);
-		// 设置恢复间隔为5秒
-		factory.setRecoveryInterval(5000L);
+		// 设置接收超时时间为30秒，增加超时时间避免过早断开
+		factory.setReceiveTimeout(30000L);
+		// 设置恢复间隔为3秒，减少恢复间隔
+		factory.setRecoveryInterval(3000L);
 		// 启用自动启动
 		factory.setAutoStartup(true);
+		// 设置每个任务处理的最大消息数，避免长时间占用
+		factory.setMaxMessagesPerTask(10);
 		return factory;
 	}
 
@@ -119,27 +127,36 @@ public class JmsArtemisConfig {
         return new DynamicDestinationResolver() {
             @Override
             public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain) throws JMSException {
-                pubSubDomain = destinationName.startsWith(JmsArtemisConsts.TOPIC_PREFIX);
-                return super.resolveDestinationName(session, destinationName, pubSubDomain);
+                // 根据目标名称确定是否为 topic
+                boolean isTopicDestination = destinationName.startsWith(JmsArtemisConsts.TOPIC_PREFIX);
+                log.debug("Resolving destination: {}, pubSubDomain: {}, isTopic: {}", destinationName, pubSubDomain, isTopicDestination);
+                return super.resolveDestinationName(session, destinationName, isTopicDestination);
             }
         };
     }
 
 	@Bean
 	public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
-		// log.info("Creating JmsTemplate with custom configuration for mode: {}", artemisMode);
+		log.info("Creating JmsTemplate with custom configuration");
 		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
 		// 设置消息转换器
 		jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
 		// 设置目标解析器
 		jmsTemplate.setDestinationResolver(destinationResolver());
 		// 设置接收超时时间
-		jmsTemplate.setReceiveTimeout(10000L);
+		jmsTemplate.setReceiveTimeout(30000L);
+		// 设置发送超时时间
+		jmsTemplate.setTimeToLive(30000L);
 		// 禁用事务
 		jmsTemplate.setSessionTransacted(false);
 		// 设置确认模式
 		jmsTemplate.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
-		// 设置重试配置 - 通过连接工厂处理
+		// 设置消息优先级
+		jmsTemplate.setPriority(4);
+		// 设置传送模式为非持久化，提高性能
+		jmsTemplate.setDeliveryMode(jakarta.jms.DeliveryMode.NON_PERSISTENT);
+		// 启用显式 QoS 设置
+		jmsTemplate.setExplicitQosEnabled(true);
 		return jmsTemplate;
 	}
 }

@@ -265,12 +265,23 @@ public abstract class AbstractThreadRoutingStrategy {
      */
     protected <T> T executeWithExceptionHandling(String operation, String threadUid, 
             java.util.function.Supplier<T> action) {
+        long startTime = System.currentTimeMillis();
         try {
-            log.debug("Executing {} for thread {}", operation, threadUid);
+            log.info("开始执行策略操作: {} - threadUid: {}", operation, threadUid);
             T result = action.get();
-            log.debug("Successfully completed {} for thread {}", operation, threadUid);
+            long executionTime = System.currentTimeMillis() - startTime;
+            log.info("策略操作执行成功: {} - threadUid: {}, 耗时: {}ms", operation, threadUid, executionTime);
+            
+            // 如果执行时间超过5秒，记录警告
+            if (executionTime > 5000) {
+                log.warn("策略操作执行缓慢: {} - threadUid: {}, 耗时: {}ms", operation, threadUid, executionTime);
+            }
+            
             return result;
         } catch (Exception e) {
+            long executionTime = System.currentTimeMillis() - startTime;
+            log.error("策略操作执行失败: {} - threadUid: {}, 耗时: {}ms, 错误: {}", 
+                    operation, threadUid, executionTime, e.getMessage(), e);
             throw handleStrategyException(operation, e, threadUid);
         }
     }

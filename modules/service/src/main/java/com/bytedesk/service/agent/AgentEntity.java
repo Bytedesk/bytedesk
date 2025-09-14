@@ -170,6 +170,10 @@ public class AgentEntity extends BaseEntity {
         return this.getConnected() && this.isAvailable();
     }
 
+    public Boolean isConnected() {
+        return this.connected != null && this.connected;
+    }
+
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
             .uid(this.getUid())

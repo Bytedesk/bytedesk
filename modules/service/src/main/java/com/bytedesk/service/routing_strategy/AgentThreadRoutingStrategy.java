@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-15 15:58:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-24 16:35:24
+ * @LastEditTime: 2025-09-15 07:03:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.routing_strategy;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -81,48 +82,103 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 一对一人工客服，不支持机器人接待
      */
     public MessageProtobuf createAgentThread(VisitorRequest visitorRequest) {
+        long startTime = System.currentTimeMillis();
+        log.info("开始创建客服线程 - visitorUid: {}, agentUid: {}", 
+                visitorRequest.getUid(), visitorRequest.getSid());
+        
         // 1. 验证和获取客服信息
+        log.debug("步骤1: 开始获取客服信息 - agentUid: {}", visitorRequest.getSid());
         AgentEntity agentEntity = getAgentEntity(visitorRequest.getSid());
+        log.info("步骤1完成: 成功获取客服信息 - agentUid: {}, 最大接待数: {}, 连接状态: {}", 
+                agentEntity.getUid(), agentEntity.getMaxThreadCount(), agentEntity.isConnectedAndAvailable());
         
         // 2. 处理现有线程或创建新线程
+        log.debug("步骤2: 开始处理线程创建或获取");
         String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
+        log.debug("生成线程主题: {}", topic);
         ThreadEntity thread = getOrCreateThread(visitorRequest, agentEntity, topic);
+        log.info("步骤2完成: 线程处理完成 - threadUid: {}, 状态: {}, 是否新建: {}", 
+                thread.getUid(), thread.getStatus(), thread.isNew());
         
         // 3. 如果是已存在的线程，直接返回相应消息
         if (isExistingActiveThread(thread)) {
-            return handleExistingThread(thread, agentEntity);
+            log.info("检测到现有活跃线程，直接返回 - threadUid: {}, 状态: {}", 
+                    thread.getUid(), thread.getStatus());
+            MessageProtobuf result = handleExistingThread(thread, agentEntity);
+            log.info("创建客服线程完成(现有线程) - 总耗时: {}ms", System.currentTimeMillis() - startTime);
+            return result;
         }
         
         // 4. 新线程处理：加入队列并根据客服状态路由
-        return routeNewThread(thread, agentEntity, visitorRequest);
+        log.debug("步骤4: 开始新线程路由处理");
+        MessageProtobuf result = routeNewThread(thread, agentEntity, visitorRequest);
+        log.info("创建客服线程完成(新线程) - threadUid: {}, 总耗时: {}ms", 
+                thread.getUid(), System.currentTimeMillis() - startTime);
+        return result;
     }
 
     /**
      * 获取或创建线程
      */
     private ThreadEntity getOrCreateThread(VisitorRequest visitorRequest, AgentEntity agentEntity, String topic) {
-        Optional<ThreadEntity> existingThread = threadRestService.findFirstByTopic(topic);
+        long startTime = System.currentTimeMillis();
+        log.debug("开始获取或创建线程 - topic: {}, visitorUid: {}, agentUid: {}", 
+                topic, visitorRequest.getUid(), agentEntity.getUid());
         
-        if (existingThread.isPresent()) {
-            ThreadEntity thread = existingThread.get();
+        try {
+            // 查询现有线程
+            long dbStartTime = System.currentTimeMillis();
+            log.debug("开始查询现有线程 - topic: {}", topic);
             
-            // 处理不同状态的现有线程
-            if (thread.isNew() || thread.isChatting() || thread.isQueuing()) {
-                return thread;
-            } else if (thread.isOffline() && !agentEntity.isConnectedAndAvailable()) {
-                return thread;
+            Optional<ThreadEntity> existingThread = threadRestService.findFirstByTopic(topic);
+            log.debug("线程查询完成 - 耗时: {}ms", System.currentTimeMillis() - dbStartTime);
+            
+            if (existingThread.isPresent()) {
+                ThreadEntity thread = existingThread.get();
+                log.info("发现现有线程 - threadUid: {}, 状态: {}, 创建时间: {}, 查询耗时: {}ms", 
+                        thread.getUid(), thread.getStatus(), thread.getCreatedAt(), 
+                        System.currentTimeMillis() - dbStartTime);
+                
+                // 处理不同状态的现有线程
+                if (thread.isNew() || thread.isChatting() || thread.isQueuing()) {
+                    log.debug("现有线程状态可直接使用 - 状态: {}", thread.getStatus());
+                    return thread;
+                } else if (thread.isOffline() && !agentEntity.isConnectedAndAvailable()) {
+                    log.debug("客服离线且线程离线状态，继续使用现有线程");
+                    return thread;
+                }
+                log.debug("现有线程状态不符合条件，将创建新线程 - 当前状态: {}, 客服可用: {}", 
+                        thread.getStatus(), agentEntity.isConnectedAndAvailable());
+            } else {
+                log.debug("未找到现有线程，将创建新线程");
             }
+            
+            // 创建新线程
+            log.debug("开始创建新线程 - topic: {}", topic);
+            long createStartTime = System.currentTimeMillis();
+            ThreadEntity newThread = visitorThreadService.createAgentThread(visitorRequest, agentEntity, topic);
+            log.info("新线程创建完成 - threadUid: {}, 创建耗时: {}ms, 总耗时: {}ms", 
+                    newThread.getUid(), System.currentTimeMillis() - createStartTime, 
+                    System.currentTimeMillis() - startTime);
+            return newThread;
+            
+        } catch (Exception e) {
+            log.error("获取或创建线程失败 - topic: {}, visitorUid: {}, agentUid: {}, 错误: {}, 耗时: {}ms", 
+                    topic, visitorRequest.getUid(), agentEntity.getUid(), e.getMessage(), 
+                    System.currentTimeMillis() - startTime, e);
+            throw new RuntimeException("Failed to get or create thread", e);
         }
-        
-        // 创建新线程
-        return visitorThreadService.createAgentThread(visitorRequest, agentEntity, topic);
     }
 
     /**
      * 检查是否为已存在的活跃线程
      */
     private boolean isExistingActiveThread(ThreadEntity thread) {
-        return thread.isChatting() || thread.isQueuing();
+        log.debug("检查线程活跃状态 - threadUid: {}, 状态: {}", thread.getUid(), thread.getStatus());
+        boolean isActive = thread.isChatting() || thread.isQueuing();
+        log.debug("线程活跃状态检查结果 - threadUid: {}, 是否活跃: {}, 是否聊天中: {}, 是否排队中: {}", 
+                thread.getUid(), isActive, thread.isChatting(), thread.isQueuing());
+        return isActive;
     }
 
     /**
@@ -144,15 +200,26 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 路由新线程
      */
     private MessageProtobuf routeNewThread(ThreadEntity thread, AgentEntity agentEntity, VisitorRequest visitorRequest) {
+        log.debug("开始新线程路由 - threadUid: {}, agentUid: {}", thread.getUid(), agentEntity.getUid());
+        
         // 加入队列
+        long enqueueStartTime = System.currentTimeMillis();
+        log.debug("开始将线程加入队列");
         UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
-        log.info("Enqueued to queue {}", queueMemberEntity.getUid());
+        log.info("线程成功加入队列 - queueMemberUid: {}, 队列加入耗时: {}ms", 
+                queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
         
         // 根据客服状态路由
+        log.debug("开始根据客服状态进行路由 - 可用状态: {}", 
+                agentEntity.isAvailable());
+        
         if (agentEntity.isConnectedAndAvailable()) {
+            log.info("客服在线且可用，路由到在线客服处理");
             return routeOnlineAgent(thread, agentEntity, queueMemberEntity);
         } else {
+            log.info("客服不可用，路由到离线处理 -  可用状态: {}", 
+                    agentEntity.isAvailable());
             return handleOfflineAgent(thread, agentEntity, queueMemberEntity);
         }
     }
@@ -161,12 +228,31 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 路由在线客服
      */
     private MessageProtobuf routeOnlineAgent(ThreadEntity thread, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
+        long startTime = System.currentTimeMillis();
+        log.info("开始在线客服路由处理 - threadUid: {}, agentUid: {}, agentNickname: {}", 
+                thread.getUid(), agentEntity.getUid(), agentEntity.getNickname());
+        
         // 检查是否达到最大接待人数
-        if (queueMemberEntity.getAgentQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
-            return handleAvailableAgent(thread, agentEntity, queueMemberEntity);
+        int currentChattingCount = queueMemberEntity.getAgentQueue().getChattingCount();
+        int maxThreadCount = agentEntity.getMaxThreadCount();
+        
+        log.info("检查客服接待容量 - 当前接待: {}, 最大接待: {}, agentUid: {}, 队列ID: {}", 
+                currentChattingCount, maxThreadCount, agentEntity.getUid(), queueMemberEntity.getAgentQueue().getUid());
+        
+        MessageProtobuf result;
+        if (currentChattingCount < maxThreadCount) {
+            log.info("客服容量充足，直接分配给客服 - agentUid: {}, 剩余容量: {}", 
+                    agentEntity.getUid(), maxThreadCount - currentChattingCount);
+            result = handleAvailableAgent(thread, agentEntity, queueMemberEntity);
         } else {
-            return handleQueuedAgent(thread, agentEntity, queueMemberEntity);
+            log.info("客服已达最大接待数，线程进入排队 - agentUid: {}, 当前排队数: {}", 
+                    agentEntity.getUid(), queueMemberEntity.getAgentQueue().getQueuingCount());
+            result = handleQueuedAgent(thread, agentEntity, queueMemberEntity);
         }
+        
+        log.info("在线客服路由处理完成 - threadUid: {}, agentUid: {}, 处理耗时: {}ms", 
+                thread.getUid(), agentEntity.getUid(), System.currentTimeMillis() - startTime);
+        return result;
     }
 
     /**
@@ -174,29 +260,60 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      */
     private MessageProtobuf handleAvailableAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
-        validateThread(threadFromRequest, "handle available agent");
-        Assert.notNull(agent, "AgentEntity must not be null");
-        Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
+        long startTime = System.currentTimeMillis();
+        log.info("开始处理可用客服分配 - threadUid: {}, agentUid: {}, agentNickname: {}", 
+                threadFromRequest.getUid(), agent.getUid(), agent.getNickname());
         
-        // 获取并更新线程状态
-        ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        String welcomeContent = getAgentWelcomeMessage(agent);
-        thread.setChatting().setContent(welcomeContent);
-        
-        // 保存线程
-        ThreadEntity savedThread = saveThread(thread);
-        
-        // 更新队列成员状态
-        updateQueueMemberForAcceptance(queueMemberEntity);
-        
-        // 发布事件
-        publishThreadEvents(savedThread);
-        
-        // 发送欢迎消息
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
-        messageSendService.sendProtobufMessage(messageProtobuf);
-        
-        return messageProtobuf;
+        try {
+            validateThread(threadFromRequest, "handle available agent");
+            Assert.notNull(agent, "AgentEntity must not be null");
+            Assert.notNull(queueMemberEntity, "QueueMemberEntity must not be null");
+            
+            // 获取并更新线程状态
+            log.debug("获取最新线程状态并更新为聊天状态");
+            ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+            String welcomeContent = getAgentWelcomeMessage(agent);
+            thread.setChatting().setContent(welcomeContent);
+            log.debug("线程状态更新完成 - 状态: {}, 欢迎消息长度: {}", 
+                    thread.getStatus(), welcomeContent != null ? welcomeContent.length() : 0);
+            
+            // 保存线程
+            long saveStartTime = System.currentTimeMillis();
+            log.debug("开始保存线程状态");
+            ThreadEntity savedThread = saveThread(thread);
+            log.debug("线程保存完成 - 耗时: {}ms", System.currentTimeMillis() - saveStartTime);
+            
+            // 更新队列成员状态
+            log.debug("开始更新队列成员状态为已接受");
+            updateQueueMemberForAcceptance(queueMemberEntity);
+            log.debug("队列成员状态更新完成");
+            
+            // 发布事件
+            log.debug("开始发布线程事件");
+            publishThreadEvents(savedThread);
+            log.debug("线程事件发布完成");
+            
+            // 发送欢迎消息
+            log.debug("开始发送欢迎消息");
+            long msgStartTime = System.currentTimeMillis();
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
+            messageSendService.sendProtobufMessage(messageProtobuf);
+            log.info("可用客服处理完成 - threadUid: {}, agentUid: {}, 消息发送耗时: {}ms, 总处理耗时: {}ms", 
+                    savedThread.getUid(), agent.getUid(), System.currentTimeMillis() - msgStartTime, 
+                    System.currentTimeMillis() - startTime);
+            
+            return messageProtobuf;
+            
+        } catch (IllegalArgumentException e) {
+            log.error("可用客服处理失败，参数错误 - threadUid: {}, agentUid: {}, 错误: {}", 
+                    threadFromRequest.getUid(), agent.getUid(), e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("可用客服处理失败，系统异常 - threadUid: {}, agentUid: {}, 错误: {}, 耗时: {}ms", 
+                    threadFromRequest.getUid(), agent.getUid(), e.getMessage(), 
+                    System.currentTimeMillis() - startTime, e);
+            throw new RuntimeException("Failed to handle available agent", e);
+        }
     }
 
     /**
@@ -204,22 +321,38 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      */
     private MessageProtobuf handleQueuedAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
+        long startTime = System.currentTimeMillis();
+        log.info("开始处理客服排队情况 - threadUid: {}, agentUid: {}, agentNickname: {}", 
+                threadFromRequest.getUid(), agent.getUid(), agent.getNickname());
+        
         validateThread(threadFromRequest, "handle queued agent");
 
         // 获取并更新线程状态
+        log.debug("获取最新线程状态用于排队处理");
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+        
+        log.debug("生成排队消息内容");
         String queueContent = generateAgentQueueMessage(queueMemberEntity);
         thread.setQueuing().setContent(queueContent);
+        log.debug("线程状态设置为排队 - threadUid: {}, 排队消息长度: {}", 
+                thread.getUid(), queueContent != null ? queueContent.length() : 0);
         
         // 保存线程
+        log.debug("保存排队状态的线程");
         ThreadEntity savedThread = saveThread(thread);
+        log.debug("排队线程保存完成 - threadUid: {}", savedThread.getUid());
         
         // 发布事件
+        log.debug("发布排队线程相关事件");
         publishThreadEvents(savedThread);
         
         // 发送排队消息
+        log.debug("开始发送排队消息");
+        long msgStartTime = System.currentTimeMillis();
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        log.info("排队消息发送完成 - threadUid: {}, 消息发送耗时: {}ms, 总处理耗时: {}ms", 
+                savedThread.getUid(), System.currentTimeMillis() - msgStartTime, System.currentTimeMillis() - startTime);
         
         return messageProtobuf;
     }
@@ -229,31 +362,55 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      */
     private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent, 
             QueueMemberEntity queueMemberEntity) {
+        long startTime = System.currentTimeMillis();
+        log.info("开始处理离线客服情况 - threadUid: {}, agentUid: {}, agentNickname: {}, 在线状态: {}", 
+                threadFromRequest.getUid(), agent.getUid(), agent.getNickname(), agent.getConnected());
+        
         validateThread(threadFromRequest, "handle offline agent");
         
         // 获取并更新线程状态
+        log.debug("获取最新线程状态用于离线处理");
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+        
+        log.debug("生成离线消息内容");
         String offlineContent = getAgentOfflineMessage(agent);
         thread.setOffline().setContent(offlineContent);
+        log.debug("线程状态设置为离线 - threadUid: {}, 离线消息长度: {}", 
+                thread.getUid(), offlineContent != null ? offlineContent.length() : 0);
         
         // 保存线程
+        log.debug("保存离线状态的线程");
         ThreadEntity savedThread = saveThread(thread);
+        log.debug("离线线程保存完成 - threadUid: {}", savedThread.getUid());
         
         // 更新队列状态
+        log.debug("更新队列成员离线状态 - queueMemberUid: {}", queueMemberEntity.getUid());
         queueMemberEntity.setAgentOffline(true);
-        queueMemberRestService.save(queueMemberEntity);
+        QueueMemberEntity savedQueueMember = queueMemberRestService.save(queueMemberEntity);
+        log.debug("队列成员离线状态更新完成 - queueMemberUid: {}", savedQueueMember.getUid());
         
         // 创建离线消息
+        log.debug("创建离线消息实体");
+        long msgCreateStartTime = System.currentTimeMillis();
         MessageEntity message = ThreadMessageUtil.getAgentThreadOfflineMessage(offlineContent, savedThread);
-        messageRestService.save(message);
+        MessageEntity savedMessage = messageRestService.save(message);
+        log.debug("离线消息实体创建完成 - messageUid: {}, 创建耗时: {}ms", 
+                savedMessage.getUid(), System.currentTimeMillis() - msgCreateStartTime);
         
         // 发送离线消息
-        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
+        log.debug("开始发送离线消息");
+        long msgSendStartTime = System.currentTimeMillis();
+        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(savedMessage, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+        log.info("离线消息发送完成 - threadUid: {}, 发送耗时: {}ms", 
+                savedThread.getUid(), System.currentTimeMillis() - msgSendStartTime);
         
         // 发布事件
+        log.debug("发布离线线程相关事件");
         publishThreadEvents(savedThread);
         
+        log.info("离线客服处理完成 - threadUid: {}, agentUid: {}, 总处理耗时: {}ms", 
+                savedThread.getUid(), agent.getUid(), System.currentTimeMillis() - startTime);
         return messageProtobuf;
     }
 
@@ -263,61 +420,151 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 获取客服实体
      */
     private AgentEntity getAgentEntity(String agentUid) {
-        validateUid(agentUid, "Agent");
+        long startTime = System.currentTimeMillis();
+        log.debug("开始获取客服实体 - agentUid: {}", agentUid);
         
-        return agentRestService.findByUid(agentUid)
-                .orElseThrow(() -> {
-                    log.error("Agent uid {} not found", agentUid);
-                    return new IllegalArgumentException("Agent uid " + agentUid + " not found");
-                });
-    }
-
-    /**
+        try {
+            validateUid(agentUid, "Agent");
+            
+            log.debug("开始查询客服实体 - agentUid: {}", agentUid);
+            Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+            
+            if (!agentOptional.isPresent()) {
+                log.error("客服实体不存在 - agentUid: {}", agentUid);
+                throw new IllegalArgumentException("Agent uid " + agentUid + " not found");
+            }
+            
+            AgentEntity agent = agentOptional.get();
+            log.info("客服实体获取成功 - agentUid: {}, nickname: {}, 可用状态: {}, 最大接待数: {}, 查询耗时: {}ms", 
+                    agent.getUid(), agent.getNickname(), agent.isAvailable(), 
+                    agent.getMaxThreadCount(), System.currentTimeMillis() - startTime);
+            return agent;
+            
+        } catch (IllegalArgumentException e) {
+            log.error("客服实体获取失败，参数错误 - agentUid: {}, 错误: {}", agentUid, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("客服实体获取失败，系统异常 - agentUid: {}, 错误: {}, 耗时: {}ms", 
+                    agentUid, e.getMessage(), System.currentTimeMillis() - startTime, e);
+            throw new RuntimeException("Failed to get agent entity: " + agentUid, e);
+        }
+    }    /**
      * 获取客服欢迎消息
      */
     private String getAgentWelcomeMessage(AgentEntity agent) {
-        String customMessage = agent.getServiceSettings().getWelcomeTip();
-        return getValidWelcomeMessage(customMessage);
+        log.debug("获取客服欢迎消息 - agentUid: {}", agent.getUid());
+        
+        String customMessage = null;
+        try {
+            customMessage = agent.getServiceSettings().getWelcomeTip();
+            log.debug("客服自定义欢迎消息 - agentUid: {}, 消息长度: {}", 
+                    agent.getUid(), customMessage != null ? customMessage.length() : 0);
+        } catch (Exception e) {
+            log.warn("获取客服自定义欢迎消息失败 - agentUid: {}, 错误: {}", agent.getUid(), e.getMessage());
+        }
+        
+        String welcomeMessage = getValidWelcomeMessage(customMessage);
+        log.info("客服欢迎消息获取完成 - agentUid: {}, 最终消息长度: {}", 
+                agent.getUid(), welcomeMessage != null ? welcomeMessage.length() : 0);
+        return welcomeMessage;
     }
 
     /**
      * 获取客服离线消息
      */
     private String getAgentOfflineMessage(AgentEntity agent) {
-        String customMessage = agent.getMessageLeaveSettings().getMessageLeaveTip();
-        return getValidOfflineMessage(customMessage);
+        log.debug("获取客服离线消息 - agentUid: {}", agent.getUid());
+        
+        String customMessage = null;
+        try {
+            customMessage = agent.getMessageLeaveSettings().getMessageLeaveTip();
+            log.debug("客服自定义离线消息 - agentUid: {}, 消息长度: {}", 
+                    agent.getUid(), customMessage != null ? customMessage.length() : 0);
+        } catch (Exception e) {
+            log.warn("获取客服自定义离线消息失败 - agentUid: {}, 错误: {}", agent.getUid(), e.getMessage());
+        }
+        
+        String offlineMessage = getValidOfflineMessage(customMessage);
+        log.info("客服离线消息获取完成 - agentUid: {}, 最终消息长度: {}", 
+                agent.getUid(), offlineMessage != null ? offlineMessage.length() : 0);
+        return offlineMessage;
     }
 
     /**
      * 生成客服排队消息
      */
     private String generateAgentQueueMessage(QueueMemberEntity queueMemberEntity) {
+        log.debug("开始生成客服排队消息 - queueMemberUid: {}", queueMemberEntity.getUid());
+        
         int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
-        return generateQueueMessage(queuingCount);
+        log.debug("获取队列信息 - queueUid: {}, 当前排队数: {}", 
+                queueMemberEntity.getAgentQueue().getUid(), queuingCount);
+        
+        String queueMessage = generateQueueMessage(queuingCount);
+        log.info("客服排队消息生成完成 - queueMemberUid: {}, 排队数: {}, 消息长度: {}", 
+                queueMemberEntity.getUid(), queuingCount, queueMessage != null ? queueMessage.length() : 0);
+        return queueMessage;
     }
 
     /**
      * 更新队列成员接受状态
      */
     private void updateQueueMemberForAcceptance(QueueMemberEntity queueMemberEntity) {
-        queueMemberEntity.setAgentAcceptedAt(BdDateUtils.now());
+        long startTime = System.currentTimeMillis();
+        log.debug("开始更新队列成员接受状态 - queueMemberUid: {}, threadUid: {}", 
+                queueMemberEntity.getUid(), queueMemberEntity.getThread().getUid());
+        
+        ZonedDateTime acceptTime = BdDateUtils.now();
+        queueMemberEntity.setAgentAcceptedAt(acceptTime);
         queueMemberEntity.setAgentAcceptType(QueueMemberAcceptTypeEnum.AUTO.name());
-        queueMemberRestService.save(queueMemberEntity);
+        
+        log.debug("设置队列成员接受状态 - queueMemberUid: {}, 接受时间: {}, 接受类型: {}", 
+                queueMemberEntity.getUid(), acceptTime, QueueMemberAcceptTypeEnum.AUTO.name());
+        
+        QueueMemberEntity savedEntity = queueMemberRestService.save(queueMemberEntity);
+        log.info("队列成员接受状态更新完成 - queueMemberUid: {}, 更新耗时: {}ms", 
+                savedEntity.getUid(), System.currentTimeMillis() - startTime);
     }
 
     /**
      * 发布线程相关事件
      */
     private void publishThreadEvents(ThreadEntity savedThread) {
-        bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+        long startTime = System.currentTimeMillis();
+        log.debug("开始发布线程相关事件 - threadUid: {}, 状态: {}", savedThread.getUid(), savedThread.getStatus());
+        
+        try {
+            // 发布添加主题事件
+            log.debug("发布ThreadAddTopicEvent事件 - threadUid: {}, topic: {}", 
+                    savedThread.getUid(), savedThread.getTopic());
+            bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+            
+            // 发布线程处理创建事件
+            log.debug("发布ThreadProcessCreateEvent事件 - threadUid: {}", savedThread.getUid());
+            bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+            
+            log.info("线程相关事件发布完成 - threadUid: {}, 发布耗时: {}ms", 
+                    savedThread.getUid(), System.currentTimeMillis() - startTime);
+        } catch (Exception e) {
+            log.error("发布线程事件失败 - threadUid: {}, 错误信息: {}", savedThread.getUid(), e.getMessage(), e);
+            throw e;
+        }
     }
 
     /**
      * 获取客服继续对话消息
      */
     private MessageProtobuf getAgentContinueMessage(ThreadEntity thread) {
+        log.debug("生成客服继续对话消息 - threadUid: {}", thread.getUid());
+        
         UserProtobuf user = thread.getAgentProtobuf();
+        if (user == null) {
+            log.warn("线程中未找到客服信息 - threadUid: {}", thread.getUid());
+            throw new IllegalStateException("Thread agent protobuf is null");
+        }
+        
+        log.info("客服继续对话消息生成完成 - threadUid: {}, agentUid: {}, agentNickname: {}", 
+                thread.getUid(), user.getUid(), user.getNickname());
         return ThreadMessageUtil.getThreadContinueMessage(user, thread);
     }
 
@@ -325,7 +572,16 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 获取客服排队消息
      */
     private MessageProtobuf getAgentQueuingMessage(ThreadEntity thread) {
+        log.debug("生成客服排队消息 - threadUid: {}", thread.getUid());
+        
         UserProtobuf user = thread.getAgentProtobuf();
+        if (user == null) {
+            log.warn("线程中未找到客服信息 - threadUid: {}", thread.getUid());
+            throw new IllegalStateException("Thread agent protobuf is null");
+        }
+        
+        log.info("客服排队消息生成完成 - threadUid: {}, agentUid: {}, agentNickname: {}", 
+                thread.getUid(), user.getUid(), user.getNickname());
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
 }
