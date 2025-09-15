@@ -25,6 +25,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -43,6 +50,8 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final CategoryRestService categoryRestService;
 
     @Override
     protected Specification<FeedbackEntity> createSpecification(FeedbackRequest request) {
@@ -174,18 +183,45 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     }
     
     public void initFeedbacks(String orgUid) {
-        // log.info("initThreadFeedback");
-        // for (String feedback : FeedbackInitData.getAllFeedbacks()) {
-        //     FeedbackRequest feedbackRequest = FeedbackRequest.builder()
-        //             .uid(Utils.formatUid(orgUid, feedback))
-        //             // .name(feedback)
-        //             .type(FeedbackTypeEnum.THREAD.name())
-        //             .level(LevelEnum.ORGANIZATION.name())
-        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-        //             .orgUid(orgUid)
-        //             .build();
-        //     create(feedbackRequest);
-        // }
+        log.info("initFeedbackCategories");
+        
+        // 初始化反馈分类
+        String[] feedbackCategories = {
+            "错别字、拼写错误",
+            "链接跳转有问题", 
+            "文档和实操过程不一致",
+            "文档难以理解",
+            "建议或其他"
+        };
+        
+        String level = LevelEnum.ORGANIZATION.name();
+        
+        for (String categoryName : feedbackCategories) {
+            // 检查分类是否已存在
+            Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
+                    categoryName, CategoryTypeEnum.FEEDBACK.name(), orgUid, level, BytedeskConsts.PLATFORM_BYTEDESK);
+            
+            if (!categoryOptional.isPresent()) {
+                // 创建新的反馈分类
+                CategoryRequest categoryRequest = CategoryRequest.builder()
+                        .name(categoryName)
+                        .order(0)
+                        .level(level)
+                        .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                        .type(CategoryTypeEnum.FEEDBACK.name())
+                        .orgUid(orgUid)
+                        .build();
+                
+                CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
+                if (categoryResponse != null) {
+                    log.info("Created feedback category: {}", categoryName);
+                } else {
+                    log.error("Failed to create feedback category: {}", categoryName);
+                }
+            } else {
+                log.debug("Feedback category already exists: {}", categoryName);
+            }
+        }
     }
 
     
