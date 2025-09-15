@@ -26,5 +26,10 @@ public enum CategoryTypeEnum {
     TICKET,
     FAQ,
     WORKFLOW,
+    FEEDBACK,
+    KBASE_COMMENT,
+    VOC_COMMENT,
+    COMPLAINT,
+    OPINION,
     MCP_SERVER,
 }
