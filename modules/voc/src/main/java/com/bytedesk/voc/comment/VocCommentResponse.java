@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:04
+ * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 13:58:12
+ * @LastEditTime: 2025-09-15 13:59:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,11 +11,13 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.complaint;
+package com.bytedesk.voc.comment;
+
 
 import java.util.List;
 
-import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.base.BaseResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,15 +28,14 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComplaintRequest extends BaseRequest {
+public class VocCommentResponse extends BaseResponse {
 
     private String title;
 
-    // @Builder.Default
-    // private String type = ComplaintTypeEnum.CUSTOMER.name();
+    // private String type;
 
     // private String content;
 

@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.feedback;
+package com.bytedesk.voc.comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FeedbackSpecification extends BaseSpecification<FeedbackEntity, FeedbackRequest> {
+public class VocCommentSpecification extends BaseSpecification<VocCommentEntity, VocCommentRequest> {
     
-    public static Specification<FeedbackEntity> search(FeedbackRequest request, AuthService authService) {
+    public static Specification<VocCommentEntity> search(VocCommentRequest request, AuthService authService) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
         //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {

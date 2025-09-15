@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-05-11 18:26:04
+ * @Date: 2024-05-11 18:26:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 13:58:12
+ * @LastEditTime: 2025-07-03 13:35:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,35 +11,46 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.complaint;
+package com.bytedesk.kbase.comment;
 
-import java.util.List;
+import com.bytedesk.core.base.BaseResponse;
 
-import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
+@Builder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComplaintRequest extends BaseRequest {
+public class KbaseCommentResponse extends BaseResponse {
 
-    private String title;
+    private String content;
 
-    // @Builder.Default
-    // private String type = ComplaintTypeEnum.CUSTOMER.name();
+    private String type;
 
-    // private String content;
+    private String level;
 
-    private String imageUrl;
+    private String platform;
 
-    private List<String> categoryUids;
+    // replyTo comment uid
+    private String replyToUid;
+
+    // replyTo comment content
+    private String replyToContent;
+
+    // replyTo comment user
+    private String replyToUser;
+
+    // 评论文章
+    private String articleUid;
+
+    // 评论者
+    private String user;
 
 }

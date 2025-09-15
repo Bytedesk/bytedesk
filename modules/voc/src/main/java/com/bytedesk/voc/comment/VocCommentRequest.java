@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.complaint;
+package com.bytedesk.voc.comment;
 
 import java.util.List;
 
@@ -29,12 +29,12 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComplaintRequest extends BaseRequest {
+public class VocCommentRequest extends BaseRequest {
 
     private String title;
 
     // @Builder.Default
-    // private String type = ComplaintTypeEnum.CUSTOMER.name();
+    // private String type = VocCommentTypeEnum.CUSTOMER.name();
 
     // private String content;
 

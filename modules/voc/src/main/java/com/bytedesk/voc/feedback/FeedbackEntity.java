@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 13:52:39
+ * @LastEditTime: 2025-09-15 14:04:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,14 +13,13 @@
  */
 package com.bytedesk.voc.feedback;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.I18Consts;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -45,23 +44,18 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_voc_feedback")
 public class FeedbackEntity extends BaseEntity {
 
-    /**
-     * Name of the feedback
-     */
-    private String name;
+    private String title;
+    
+    // @Builder.Default
+    // @Column(name = "feedback_type")
+    // private String type = FeedbackTypeEnum.CUSTOMER.name();
 
-    /**
-     * Description of the feedback
-     */
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
+    // 
+    private String content;
 
-    /**
-     * Type of feedback (CUSTOMER, TICKET, ARTICLE, etc.)
-     */
-    @Builder.Default
-    @Column(name = "feedback_type")
-    private String type = FeedbackTypeEnum.CUSTOMER.name();
+    private String imageUrl;
+
+    private List<String> categoryUids;
 
  
 }

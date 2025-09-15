@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 14:09:24
+ * @LastEditTime: 2025-09-15 14:09:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.feedback;
+package com.bytedesk.voc.comment;
 
 import java.util.Optional;
 
@@ -38,9 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntity, FeedbackRequest, FeedbackResponse, FeedbackExcel> {
+public class VocCommentRestService extends BaseRestServiceWithExport<VocCommentEntity, VocCommentRequest, VocCommentResponse, VocCommentExcel> {
 
-    private final FeedbackRepository feedbackRepository;
+    private final VocCommentRepository commentRepository;
 
     private final ModelMapper modelMapper;
 
@@ -49,42 +49,42 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     private final AuthService authService;
 
     @Override
-    protected Specification<FeedbackEntity> createSpecification(FeedbackRequest request) {
-        return FeedbackSpecification.search(request, authService);
+    protected Specification<VocCommentEntity> createSpecification(VocCommentRequest request) {
+        return VocCommentSpecification.search(request, authService);
     }
 
     @Override
-    protected Page<FeedbackEntity> executePageQuery(Specification<FeedbackEntity> spec, Pageable pageable) {
-        return feedbackRepository.findAll(spec, pageable);
+    protected Page<VocCommentEntity> executePageQuery(Specification<VocCommentEntity> spec, Pageable pageable) {
+        return commentRepository.findAll(spec, pageable);
     }
 
-    @Cacheable(value = "feedback", key = "#uid", unless="#result==null")
+    @Cacheable(value = "comment", key = "#uid", unless="#result==null")
     @Override
-    public Optional<FeedbackEntity> findByUid(String uid) {
-        return feedbackRepository.findByUid(uid);
+    public Optional<VocCommentEntity> findByUid(String uid) {
+        return commentRepository.findByUid(uid);
     }
 
-    // @Cacheable(value = "feedback", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    // public Optional<FeedbackEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-    //     return feedbackRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+    // @Cacheable(value = "comment", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
+    // public Optional<VocCommentEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
+    //     return commentRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     // }
 
     public Boolean existsByUid(String uid) {
-        return feedbackRepository.existsByUid(uid);
+        return commentRepository.existsByUid(uid);
     }
 
     @Transactional
     @Override
-    public FeedbackResponse create(FeedbackRequest request) {
+    public VocCommentResponse create(VocCommentRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
         // if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-        //     Optional<FeedbackEntity> feedback = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-        //     if (feedback.isPresent()) {
-        //         return convertToResponse(feedback.get());
+        //     Optional<VocCommentEntity> comment = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+        //     if (comment.isPresent()) {
+        //         return convertToResponse(comment.get());
         //     }
         // }
         // 
@@ -93,53 +93,53 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
             request.setUserUid(user.getUid());
         }
         // 
-        FeedbackEntity entity = modelMapper.map(request, FeedbackEntity.class);
+        VocCommentEntity entity = modelMapper.map(request, VocCommentEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
         // 
-        FeedbackEntity savedEntity = save(entity);
+        VocCommentEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create feedback failed");
+            throw new RuntimeException("Create comment failed");
         }
         return convertToResponse(savedEntity);
     }
 
     @Transactional
     @Override
-    public FeedbackResponse update(FeedbackRequest request) {
-        Optional<FeedbackEntity> optional = feedbackRepository.findByUid(request.getUid());
+    public VocCommentResponse update(VocCommentRequest request) {
+        Optional<VocCommentEntity> optional = commentRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            FeedbackEntity entity = optional.get();
+            VocCommentEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            FeedbackEntity savedEntity = save(entity);
+            VocCommentEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update feedback failed");
+                throw new RuntimeException("Update comment failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Feedback not found");
+            throw new RuntimeException("VocComment not found");
         }
     }
 
     @Override
-    protected FeedbackEntity doSave(FeedbackEntity entity) {
-        return feedbackRepository.save(entity);
+    protected VocCommentEntity doSave(VocCommentEntity entity) {
+        return commentRepository.save(entity);
     }
 
     @Override
-    public FeedbackEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FeedbackEntity entity) {
+    public VocCommentEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, VocCommentEntity entity) {
         try {
-            Optional<FeedbackEntity> latest = feedbackRepository.findByUid(entity.getUid());
+            Optional<VocCommentEntity> latest = commentRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                FeedbackEntity latestEntity = latest.get();
+                VocCommentEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
-                return feedbackRepository.save(latestEntity);
+                return commentRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -151,44 +151,44 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<FeedbackEntity> optional = feedbackRepository.findByUid(uid);
+        Optional<VocCommentEntity> optional = commentRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // feedbackRepository.delete(optional.get());
+            // commentRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Feedback not found");
+            throw new RuntimeException("VocComment not found");
         }
     }
 
     @Override
-    public void delete(FeedbackRequest request) {
+    public void delete(VocCommentRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public FeedbackResponse convertToResponse(FeedbackEntity entity) {
-        return modelMapper.map(entity, FeedbackResponse.class);
+    public VocCommentResponse convertToResponse(VocCommentEntity entity) {
+        return modelMapper.map(entity, VocCommentResponse.class);
     }
 
     @Override
-    public FeedbackExcel convertToExcel(FeedbackEntity entity) {
-        return modelMapper.map(entity, FeedbackExcel.class);
+    public VocCommentExcel convertToExcel(VocCommentEntity entity) {
+        return modelMapper.map(entity, VocCommentExcel.class);
     }
     
-    public void initFeedbacks(String orgUid) {
-        // log.info("initThreadFeedback");
-        for (String feedback : FeedbackInitData.getAllFeedbacks()) {
-            FeedbackRequest feedbackRequest = FeedbackRequest.builder()
-                    .uid(Utils.formatUid(orgUid, feedback))
-                    // .name(feedback)
-                    .type(FeedbackTypeEnum.THREAD.name())
+    public void initVocComments(String orgUid) {
+        // log.info("initThreadVocComment");
+        for (String comment : VocCommentInitData.getAllVocComments()) {
+            VocCommentRequest commentRequest = VocCommentRequest.builder()
+                    .uid(Utils.formatUid(orgUid, comment))
+                    // .name(comment)
+                    .type(VocCommentTypeEnum.THREAD.name())
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            create(feedbackRequest);
+            create(commentRequest);
         }
     }
 

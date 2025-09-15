@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 14:09:24
+ * @LastEditTime: 2025-09-15 14:09:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.feedback;
+package com.bytedesk.voc.complaint;
 
 import java.util.Optional;
 
@@ -38,9 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntity, FeedbackRequest, FeedbackResponse, FeedbackExcel> {
+public class ComplaintRestService extends BaseRestServiceWithExport<ComplaintEntity, ComplaintRequest, ComplaintResponse, ComplaintExcel> {
 
-    private final FeedbackRepository feedbackRepository;
+    private final ComplaintRepository complaintRepository;
 
     private final ModelMapper modelMapper;
 
@@ -49,42 +49,42 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     private final AuthService authService;
 
     @Override
-    protected Specification<FeedbackEntity> createSpecification(FeedbackRequest request) {
-        return FeedbackSpecification.search(request, authService);
+    protected Specification<ComplaintEntity> createSpecification(ComplaintRequest request) {
+        return ComplaintSpecification.search(request, authService);
     }
 
     @Override
-    protected Page<FeedbackEntity> executePageQuery(Specification<FeedbackEntity> spec, Pageable pageable) {
-        return feedbackRepository.findAll(spec, pageable);
+    protected Page<ComplaintEntity> executePageQuery(Specification<ComplaintEntity> spec, Pageable pageable) {
+        return complaintRepository.findAll(spec, pageable);
     }
 
-    @Cacheable(value = "feedback", key = "#uid", unless="#result==null")
+    @Cacheable(value = "complaint", key = "#uid", unless="#result==null")
     @Override
-    public Optional<FeedbackEntity> findByUid(String uid) {
-        return feedbackRepository.findByUid(uid);
+    public Optional<ComplaintEntity> findByUid(String uid) {
+        return complaintRepository.findByUid(uid);
     }
 
-    // @Cacheable(value = "feedback", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    // public Optional<FeedbackEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-    //     return feedbackRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+    // @Cacheable(value = "complaint", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
+    // public Optional<ComplaintEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
+    //     return complaintRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     // }
 
     public Boolean existsByUid(String uid) {
-        return feedbackRepository.existsByUid(uid);
+        return complaintRepository.existsByUid(uid);
     }
 
     @Transactional
     @Override
-    public FeedbackResponse create(FeedbackRequest request) {
+    public ComplaintResponse create(ComplaintRequest request) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
         // if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-        //     Optional<FeedbackEntity> feedback = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-        //     if (feedback.isPresent()) {
-        //         return convertToResponse(feedback.get());
+        //     Optional<ComplaintEntity> complaint = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+        //     if (complaint.isPresent()) {
+        //         return convertToResponse(complaint.get());
         //     }
         // }
         // 
@@ -93,53 +93,53 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
             request.setUserUid(user.getUid());
         }
         // 
-        FeedbackEntity entity = modelMapper.map(request, FeedbackEntity.class);
+        ComplaintEntity entity = modelMapper.map(request, ComplaintEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
         // 
-        FeedbackEntity savedEntity = save(entity);
+        ComplaintEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create feedback failed");
+            throw new RuntimeException("Create complaint failed");
         }
         return convertToResponse(savedEntity);
     }
 
     @Transactional
     @Override
-    public FeedbackResponse update(FeedbackRequest request) {
-        Optional<FeedbackEntity> optional = feedbackRepository.findByUid(request.getUid());
+    public ComplaintResponse update(ComplaintRequest request) {
+        Optional<ComplaintEntity> optional = complaintRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            FeedbackEntity entity = optional.get();
+            ComplaintEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
-            FeedbackEntity savedEntity = save(entity);
+            ComplaintEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update feedback failed");
+                throw new RuntimeException("Update complaint failed");
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Feedback not found");
+            throw new RuntimeException("Complaint not found");
         }
     }
 
     @Override
-    protected FeedbackEntity doSave(FeedbackEntity entity) {
-        return feedbackRepository.save(entity);
+    protected ComplaintEntity doSave(ComplaintEntity entity) {
+        return complaintRepository.save(entity);
     }
 
     @Override
-    public FeedbackEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, FeedbackEntity entity) {
+    public ComplaintEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ComplaintEntity entity) {
         try {
-            Optional<FeedbackEntity> latest = feedbackRepository.findByUid(entity.getUid());
+            Optional<ComplaintEntity> latest = complaintRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                FeedbackEntity latestEntity = latest.get();
+                ComplaintEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 // latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
-                return feedbackRepository.save(latestEntity);
+                return complaintRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -151,44 +151,44 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<FeedbackEntity> optional = feedbackRepository.findByUid(uid);
+        Optional<ComplaintEntity> optional = complaintRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // feedbackRepository.delete(optional.get());
+            // complaintRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Feedback not found");
+            throw new RuntimeException("Complaint not found");
         }
     }
 
     @Override
-    public void delete(FeedbackRequest request) {
+    public void delete(ComplaintRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
-    public FeedbackResponse convertToResponse(FeedbackEntity entity) {
-        return modelMapper.map(entity, FeedbackResponse.class);
+    public ComplaintResponse convertToResponse(ComplaintEntity entity) {
+        return modelMapper.map(entity, ComplaintResponse.class);
     }
 
     @Override
-    public FeedbackExcel convertToExcel(FeedbackEntity entity) {
-        return modelMapper.map(entity, FeedbackExcel.class);
+    public ComplaintExcel convertToExcel(ComplaintEntity entity) {
+        return modelMapper.map(entity, ComplaintExcel.class);
     }
     
-    public void initFeedbacks(String orgUid) {
-        // log.info("initThreadFeedback");
-        for (String feedback : FeedbackInitData.getAllFeedbacks()) {
-            FeedbackRequest feedbackRequest = FeedbackRequest.builder()
-                    .uid(Utils.formatUid(orgUid, feedback))
-                    // .name(feedback)
-                    .type(FeedbackTypeEnum.THREAD.name())
+    public void initComplaints(String orgUid) {
+        // log.info("initThreadComplaint");
+        for (String complaint : ComplaintInitData.getAllComplaints()) {
+            ComplaintRequest complaintRequest = ComplaintRequest.builder()
+                    .uid(Utils.formatUid(orgUid, complaint))
+                    // .name(complaint)
+                    .type(ComplaintTypeEnum.THREAD.name())
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            create(feedbackRequest);
+            create(complaintRequest);
         }
     }
 

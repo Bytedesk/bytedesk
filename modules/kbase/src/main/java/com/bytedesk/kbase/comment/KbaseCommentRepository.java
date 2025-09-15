@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 14:09:07
+ * @LastEditTime: 2024-10-24 18:20:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,20 +11,16 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.complaint;
+package com.bytedesk.kbase.comment;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ComplaintRepository extends JpaRepository<ComplaintEntity, Long>, JpaSpecificationExecutor<ComplaintEntity> {
+public interface KbaseCommentRepository extends JpaRepository<KbaseCommentEntity, Long>, JpaSpecificationExecutor<KbaseCommentEntity> {
 
-    Optional<ComplaintEntity> findByUid(String uid);
-
-    Boolean existsByUid(String uid);
-
-    // Optional<ComplaintEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+    Optional<KbaseCommentEntity> findByUid(String uid);
 
     // Boolean existsByPlatform(String platform);
 }

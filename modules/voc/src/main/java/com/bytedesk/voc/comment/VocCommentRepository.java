@@ -11,20 +11,20 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.complaint;
+package com.bytedesk.voc.comment;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ComplaintRepository extends JpaRepository<ComplaintEntity, Long>, JpaSpecificationExecutor<ComplaintEntity> {
+public interface VocCommentRepository extends JpaRepository<VocCommentEntity, Long>, JpaSpecificationExecutor<VocCommentEntity> {
 
-    Optional<ComplaintEntity> findByUid(String uid);
+    Optional<VocCommentEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 
-    // Optional<ComplaintEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+    // Optional<VocCommentEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
     // Boolean existsByPlatform(String platform);
 }
