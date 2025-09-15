@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 14:01:10
+ * @LastEditTime: 2025-09-15 15:18:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,10 +38,6 @@ public class FeedbackSpecification extends BaseSpecification<FeedbackEntity, Fee
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
             }
-            // description
-            // if (StringUtils.hasText(request.getDescription())) {
-            //     predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
-            // }
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
