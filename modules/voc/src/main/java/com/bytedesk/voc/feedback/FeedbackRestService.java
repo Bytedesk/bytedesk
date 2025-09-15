@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-22 07:04:17
+ * @LastEditTime: 2025-09-15 13:55:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -183,7 +183,6 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
             FeedbackRequest feedbackRequest = FeedbackRequest.builder()
                     .uid(Utils.formatUid(orgUid, feedback))
                     .name(feedback)
-                    .order(0)
                     .type(FeedbackTypeEnum.THREAD.name())
                     .level(LevelEnum.ORGANIZATION.name())
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
