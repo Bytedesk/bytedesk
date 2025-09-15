@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 14:09:18
+ * @LastEditTime: 2025-09-15 15:13:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,13 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -179,17 +175,17 @@ public class VocCommentRestService extends BaseRestServiceWithExport<VocCommentE
     
     public void initVocComments(String orgUid) {
         // log.info("initThreadVocComment");
-        for (String comment : VocCommentInitData.getAllVocComments()) {
-            VocCommentRequest commentRequest = VocCommentRequest.builder()
-                    .uid(Utils.formatUid(orgUid, comment))
-                    // .name(comment)
-                    .type(VocCommentTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            create(commentRequest);
-        }
+        // for (String comment : VocCommentInitData.getAllVocComments()) {
+        //     VocCommentRequest commentRequest = VocCommentRequest.builder()
+        //             .uid(Utils.formatUid(orgUid, comment))
+        //             // .name(comment)
+        //             .type(VocCommentTypeEnum.THREAD.name())
+        //             .level(LevelEnum.ORGANIZATION.name())
+        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+        //             .orgUid(orgUid)
+        //             .build();
+        //     create(commentRequest);
+        // }
     }
 
     
