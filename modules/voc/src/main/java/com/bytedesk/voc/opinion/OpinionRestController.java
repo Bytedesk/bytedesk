@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 13:49:09
+ * @LastEditTime: 2025-09-15 15:03:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
 
     private final OpinionRestService opinionRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query opinion by org")
+    @ActionAnnotation(title = "opinion", action = "组织查询", description = "query opinion by org")
     @Operation(summary = "Query Opinions by Organization", description = "Retrieve opinions for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(OpinionRequest request) {
@@ -49,7 +49,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
         return ResponseEntity.ok(JsonResult.success(opinions));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query opinion by user")
+    @ActionAnnotation(title = "opinion", action = "用户查询", description = "query opinion by user")
     @Operation(summary = "Query Opinions by User", description = "Retrieve opinions for the current user")
     @Override
     public ResponseEntity<?> queryByUser(OpinionRequest request) {
@@ -59,7 +59,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
         return ResponseEntity.ok(JsonResult.success(opinions));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query opinion by uid")
+    @ActionAnnotation(title = "opinion", action = "查询详情", description = "query opinion by uid")
     @Operation(summary = "Query Opinion by UID", description = "Retrieve a specific opinion by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(OpinionRequest request) {
@@ -69,7 +69,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
         return ResponseEntity.ok(JsonResult.success(opinion));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create opinion")
+    @ActionAnnotation(title = "opinion", action = "新建", description = "create opinion")
     @Operation(summary = "Create Opinion", description = "Create a new opinion")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +80,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
         return ResponseEntity.ok(JsonResult.success(opinion));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update opinion")
+    @ActionAnnotation(title = "opinion", action = "更新", description = "update opinion")
     @Operation(summary = "Update Opinion", description = "Update an existing opinion")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +91,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
         return ResponseEntity.ok(JsonResult.success(opinion));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete opinion")
+    @ActionAnnotation(title = "opinion", action = "删除", description = "delete opinion")
     @Operation(summary = "Delete Opinion", description = "Delete a opinion")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +102,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export opinion")
+    @ActionAnnotation(title = "opinion", action = "导出", description = "export opinion")
     @Operation(summary = "Export Opinions", description = "Export opinions to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,7 +113,7 @@ public class OpinionRestController extends BaseRestController<OpinionRequest, Op
             response,
             opinionRestService,
             OpinionExcel.class,
-            "标签",
+            "opinion",
             "opinion"
         );
     }

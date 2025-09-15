@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 13:49:28
+ * @LastEditTime: 2025-09-15 15:03:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
 
     private final ComplaintRestService complaintRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query complaint by org")
+    @ActionAnnotation(title = "complaint", action = "组织查询", description = "query complaint by org")
     @Operation(summary = "Query Complaints by Organization", description = "Retrieve complaints for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(ComplaintRequest request) {
@@ -49,7 +49,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
         return ResponseEntity.ok(JsonResult.success(complaints));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query complaint by user")
+    @ActionAnnotation(title = "complaint", action = "用户查询", description = "query complaint by user")
     @Operation(summary = "Query Complaints by User", description = "Retrieve complaints for the current user")
     @Override
     public ResponseEntity<?> queryByUser(ComplaintRequest request) {
@@ -59,7 +59,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
         return ResponseEntity.ok(JsonResult.success(complaints));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query complaint by uid")
+    @ActionAnnotation(title = "complaint", action = "查询详情", description = "query complaint by uid")
     @Operation(summary = "Query Complaint by UID", description = "Retrieve a specific complaint by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(ComplaintRequest request) {
@@ -69,7 +69,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
         return ResponseEntity.ok(JsonResult.success(complaint));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create complaint")
+    @ActionAnnotation(title = "complaint", action = "新建", description = "create complaint")
     @Operation(summary = "Create Complaint", description = "Create a new complaint")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +80,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
         return ResponseEntity.ok(JsonResult.success(complaint));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update complaint")
+    @ActionAnnotation(title = "complaint", action = "更新", description = "update complaint")
     @Operation(summary = "Update Complaint", description = "Update an existing complaint")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +91,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
         return ResponseEntity.ok(JsonResult.success(complaint));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete complaint")
+    @ActionAnnotation(title = "complaint", action = "删除", description = "delete complaint")
     @Operation(summary = "Delete Complaint", description = "Delete a complaint")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +102,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export complaint")
+    @ActionAnnotation(title = "complaint", action = "导出", description = "export complaint")
     @Operation(summary = "Export Complaints", description = "Export complaints to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,7 +113,7 @@ public class ComplaintRestController extends BaseRestController<ComplaintRequest
             response,
             complaintRestService,
             ComplaintExcel.class,
-            "标签",
+            "complaint",
             "complaint"
         );
     }

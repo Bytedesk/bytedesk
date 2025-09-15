@@ -39,7 +39,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
 
     private final FeedbackRestService feedbackRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query feedback by org")
+    @ActionAnnotation(title = "feedback", action = "组织查询", description = "query feedback by org")
     @Operation(summary = "Query Feedbacks by Organization", description = "Retrieve feedbacks for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(FeedbackRequest request) {
@@ -49,7 +49,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
         return ResponseEntity.ok(JsonResult.success(feedbacks));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query feedback by user")
+    @ActionAnnotation(title = "feedback", action = "用户查询", description = "query feedback by user")
     @Operation(summary = "Query Feedbacks by User", description = "Retrieve feedbacks for the current user")
     @Override
     public ResponseEntity<?> queryByUser(FeedbackRequest request) {
@@ -59,7 +59,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
         return ResponseEntity.ok(JsonResult.success(feedbacks));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query feedback by uid")
+    @ActionAnnotation(title = "feedback", action = "查询详情", description = "query feedback by uid")
     @Operation(summary = "Query Feedback by UID", description = "Retrieve a specific feedback by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(FeedbackRequest request) {
@@ -69,7 +69,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
         return ResponseEntity.ok(JsonResult.success(feedback));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create feedback")
+    @ActionAnnotation(title = "feedback", action = "新建", description = "create feedback")
     @Operation(summary = "Create Feedback", description = "Create a new feedback")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +80,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
         return ResponseEntity.ok(JsonResult.success(feedback));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update feedback")
+    @ActionAnnotation(title = "feedback", action = "更新", description = "update feedback")
     @Operation(summary = "Update Feedback", description = "Update an existing feedback")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +91,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
         return ResponseEntity.ok(JsonResult.success(feedback));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete feedback")
+    @ActionAnnotation(title = "feedback", action = "删除", description = "delete feedback")
     @Operation(summary = "Delete Feedback", description = "Delete a feedback")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +102,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export feedback")
+    @ActionAnnotation(title = "feedback", action = "导出", description = "export feedback")
     @Operation(summary = "Export Feedbacks", description = "Export feedbacks to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,7 +113,7 @@ public class FeedbackRestController extends BaseRestController<FeedbackRequest, 
             response,
             feedbackRestService,
             FeedbackExcel.class,
-            "标签",
+            "feedback",
             "feedback"
         );
     }

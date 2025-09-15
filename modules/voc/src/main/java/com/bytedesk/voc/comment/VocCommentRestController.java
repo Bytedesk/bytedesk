@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 13:49:28
+ * @LastEditTime: 2025-09-15 15:03:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -39,7 +39,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
 
     private final VocCommentRestService commentRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query comment by org")
+    @ActionAnnotation(title = "comment", action = "组织查询", description = "query comment by org")
     @Operation(summary = "Query VocComments by Organization", description = "Retrieve comments for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(VocCommentRequest request) {
@@ -49,7 +49,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query comment by user")
+    @ActionAnnotation(title = "comment", action = "用户查询", description = "query comment by user")
     @Operation(summary = "Query VocComments by User", description = "Retrieve comments for the current user")
     @Override
     public ResponseEntity<?> queryByUser(VocCommentRequest request) {
@@ -59,7 +59,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query comment by uid")
+    @ActionAnnotation(title = "comment", action = "查询详情", description = "query comment by uid")
     @Operation(summary = "Query VocComment by UID", description = "Retrieve a specific comment by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(VocCommentRequest request) {
@@ -69,7 +69,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create comment")
+    @ActionAnnotation(title = "comment", action = "新建", description = "create comment")
     @Operation(summary = "Create VocComment", description = "Create a new comment")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +80,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update comment")
+    @ActionAnnotation(title = "comment", action = "更新", description = "update comment")
     @Operation(summary = "Update VocComment", description = "Update an existing comment")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +91,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete comment")
+    @ActionAnnotation(title = "comment", action = "删除", description = "delete comment")
     @Operation(summary = "Delete VocComment", description = "Delete a comment")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +102,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export comment")
+    @ActionAnnotation(title = "comment", action = "导出", description = "export comment")
     @Operation(summary = "Export VocComments", description = "Export comments to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,7 +113,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
             response,
             commentRestService,
             VocCommentExcel.class,
-            "标签",
+            "comment",
             "comment"
         );
     }
