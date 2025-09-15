@@ -13,33 +13,20 @@
  */
 package com.bytedesk.voc.feedback;
 
-/**
- * Feedback type enumeration
- * Defines different types of feedback sources and contexts
- */
 public enum FeedbackTypeEnum {
-    WORKGROUP("技能组反馈"),
-    AGENT("客服反馈"),
-    ROBOT("机器人反馈"),
-    SYSTEM("系统反馈"),
-    GENERAL("通用反馈"),
-    ;
+    WORKGROUP,      // Feedback from workgroup
+    AGENT,          // Feedback from agent
+    ROBOT,          // Feedback from robot interaction
+    SYSTEM,         // System generated feedback
+    GENERAL;        // General feedback
 
-    private final String description;
-
-    FeedbackTypeEnum(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public static FeedbackTypeEnum fromString(String type) {
-        try {
-            return FeedbackTypeEnum.valueOf(type.toUpperCase());
-        } catch (Exception e) {
-            return GENERAL;
+    // 根据字符串查找对应的枚举常量
+    public static FeedbackTypeEnum fromValue(String value) {
+        for (FeedbackTypeEnum type : FeedbackTypeEnum.values()) {
+            if (type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
         }
+        return GENERAL; // 默认返回通用类型
     }
 }

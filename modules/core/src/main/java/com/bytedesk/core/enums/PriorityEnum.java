@@ -13,48 +13,21 @@
  */
 package com.bytedesk.core.enums;
 
-/**
- * Priority enumeration for tasks, feedback, complaints, and other entities
- * Defines different priority levels from low to urgent
- */
 public enum PriorityEnum {
-    LOW("低优先级", 1),
-    MEDIUM("中等优先级", 2),
-    HIGH("高优先级", 3),
-    URGENT("紧急", 4),
-    CRITICAL("严重", 5);
+    LOW,
+    MEDIUM,
+    HIGH,
+    URGENT,
+    CRITICAL;
 
-    private final String description;
-    private final int level;
-
-    PriorityEnum(String description, int level) {
-        this.description = description;
-        this.level = level;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public int getLevel() {
-        return this.level;
-    }
-
-    public static PriorityEnum fromString(String priority) {
-        try {
-            return PriorityEnum.valueOf(priority.toUpperCase());
-        } catch (Exception e) {
-            return MEDIUM;
-        }
-    }
-
-    public static PriorityEnum fromLevel(int level) {
-        for (PriorityEnum priority : values()) {
-            if (priority.level == level) {
+    // 根据字符串查找对应的枚举常量
+    public static PriorityEnum fromValue(String value) {
+        for (PriorityEnum priority : PriorityEnum.values()) {
+            if (priority.name().equalsIgnoreCase(value)) {
                 return priority;
             }
         }
-        return MEDIUM;
+        return MEDIUM; // 默认返回中等优先级
     }
 
     public boolean isHighPriority() {

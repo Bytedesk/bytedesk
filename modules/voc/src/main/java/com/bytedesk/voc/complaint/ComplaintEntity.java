@@ -499,4 +499,75 @@ public class ComplaintEntity extends BaseEntity {
     public UserProtobuf getResolveUserProtobuf() {
         return JSON.parseObject(resolveUser, UserProtobuf.class);
     }
+
+    // Priority related methods
+    public Boolean isHighPriority() {
+        return getPriorityEnum().isHighPriority();
+    }
+
+    public Boolean isLowPriority() {
+        return getPriorityEnum().isLowPriority();
+    }
+
+    public Boolean isUrgent() {
+        return getPriorityEnum().isUrgent();
+    }
+
+    public PriorityEnum getPriorityEnum() {
+        return PriorityEnum.fromValue(priority);
+    }
+
+    public void setPriorityEnum(PriorityEnum priorityEnum) {
+        this.priority = priorityEnum.name();
+    }
+
+    // Utility methods for date formatting
+    public String getRepliedAtString() {
+        return BdDateUtils.formatDatetimeToString(repliedAt);
+    }
+
+    public String getReadAtString() {
+        return BdDateUtils.formatDatetimeToString(readAt);
+    }
+
+    public String getTransferredAtString() {
+        return BdDateUtils.formatDatetimeToString(transferredAt);
+    }
+
+    public String getClosedAtString() {
+        return BdDateUtils.formatDatetimeToString(closedAt);
+    }
+
+    public String getResolvedAtString() {
+        return BdDateUtils.formatDatetimeToString(resolvedAt);
+    }
+
+    // Business logic methods
+    public Boolean hasReply() {
+        return replyContent != null && !replyContent.trim().isEmpty();
+    }
+
+    public Boolean hasImages() {
+        return images != null && !images.isEmpty();
+    }
+
+    public Boolean hasAttachments() {
+        return attachments != null && !attachments.isEmpty();
+    }
+
+    public Boolean hasReplyImages() {
+        return replyImages != null && !replyImages.isEmpty();
+    }
+
+    public Boolean hasReplyAttachments() {
+        return replyAttachments != null && !replyAttachments.isEmpty();
+    }
+
+    public Boolean hasInvestigationNotes() {
+        return investigationNotes != null && !investigationNotes.trim().isEmpty();
+    }
+
+    public Boolean hasResolutionDescription() {
+        return resolutionDescription != null && !resolutionDescription.trim().isEmpty();
+    }
 }

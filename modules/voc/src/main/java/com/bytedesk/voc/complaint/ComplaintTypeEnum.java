@@ -13,37 +13,24 @@
  */
 package com.bytedesk.voc.complaint;
 
-/**
- * Complaint type enumeration
- * Defines different types of complaint sources and contexts
- */
 public enum ComplaintTypeEnum {
-    SERVICE("服务投诉"),
-    PRODUCT("产品投诉"),
-    AGENT("客服投诉"),
-    WORKGROUP("技能组投诉"),
-    SYSTEM("系统投诉"),
-    BILLING("账单投诉"),
-    TECHNICAL("技术投诉"),
-    PRIVACY("隐私投诉"),
-    GENERAL("通用投诉"),
-    ;
+    SERVICE,        // Service related complaint
+    PRODUCT,        // Product related complaint
+    AGENT,          // Agent related complaint
+    WORKGROUP,      // Workgroup related complaint
+    SYSTEM,         // System related complaint
+    BILLING,        // Billing related complaint
+    TECHNICAL,      // Technical support complaint
+    PRIVACY,        // Privacy related complaint
+    GENERAL;        // General complaint
 
-    private final String description;
-
-    ComplaintTypeEnum(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public static ComplaintTypeEnum fromString(String type) {
-        try {
-            return ComplaintTypeEnum.valueOf(type.toUpperCase());
-        } catch (Exception e) {
-            return GENERAL;
+    // 根据字符串查找对应的枚举常量
+    public static ComplaintTypeEnum fromValue(String value) {
+        for (ComplaintTypeEnum type : ComplaintTypeEnum.values()) {
+            if (type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
         }
+        return GENERAL; // 默认返回通用类型
     }
 }

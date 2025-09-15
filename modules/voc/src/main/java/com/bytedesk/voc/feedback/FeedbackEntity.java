@@ -488,7 +488,7 @@ public class FeedbackEntity extends BaseEntity {
     }
 
     public PriorityEnum getPriorityEnum() {
-        return PriorityEnum.fromString(priority);
+        return PriorityEnum.fromValue(priority);
     }
 
     public void setPriorityEnum(PriorityEnum priorityEnum) {
