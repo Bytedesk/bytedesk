@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-07-23 17:02:46
+ * @Date: 2025-09-15 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 15:49:09
+ * @LastEditTime: 2025-09-15 14:30:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,20 +14,28 @@
 package com.bytedesk.voc.feedback;
 
 /**
- * Feedback type enumeration
- * Defines different types of feedback sources and contexts
+ * Feedback processing status enumeration
+ * Defines the lifecycle states of feedback from submission to resolution
  */
-public enum FeedbackTypeEnum {
-    WORKGROUP("技能组反馈"),
-    AGENT("客服反馈"),
-    ROBOT("机器人反馈"),
-    SYSTEM("系统反馈"),
-    GENERAL("通用反馈"),
+public enum FeedbackStatusEnum {
+    PENDING("待处理"),
+    PROCESSING("处理中"),
+    READ("已读"),
+    REPLIED("已回复"),
+    TRANSFERRED("已转接"),
+    ESCALATED("已升级"),
+    CLOSED("已关闭"),
+    RESOLVED("已解决"),
+    REJECTED("已拒绝"),
+    SPAM("垃圾反馈"),
+    INVALID("无效反馈"),
+    CONFIRMED("已确认"), // 用户确认反馈有效
+    CANCELLED("已取消"), // 用户取消反馈
     ;
 
     private final String description;
 
-    FeedbackTypeEnum(String description) {
+    FeedbackStatusEnum(String description) {
         this.description = description;
     }
 
@@ -35,11 +43,11 @@ public enum FeedbackTypeEnum {
         return this.description;
     }
 
-    public static FeedbackTypeEnum fromString(String type) {
+    public static FeedbackStatusEnum fromString(String status) {
         try {
-            return FeedbackTypeEnum.valueOf(type.toUpperCase());
+            return FeedbackStatusEnum.valueOf(status.toUpperCase());
         } catch (Exception e) {
-            return GENERAL;
+            return PENDING;
         }
     }
 }
