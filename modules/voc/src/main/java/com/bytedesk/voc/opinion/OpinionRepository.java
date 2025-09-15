@@ -11,20 +11,20 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.feedback;
+package com.bytedesk.voc.opinion;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface FeedbackRepository extends JpaRepository<FeedbackEntity, Long>, JpaSpecificationExecutor<FeedbackEntity> {
+public interface OpinionRepository extends JpaRepository<OpinionEntity, Long>, JpaSpecificationExecutor<OpinionEntity> {
 
-    Optional<FeedbackEntity> findByUid(String uid);
+    Optional<OpinionEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 
-    Optional<FeedbackEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+    Optional<OpinionEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
     // Boolean existsByPlatform(String platform);
 }

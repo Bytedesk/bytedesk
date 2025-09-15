@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-15 13:52:39
+ * @LastEditTime: 2025-09-15 13:47:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.voc.feedback;
+package com.bytedesk.voc.comment;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -28,11 +28,11 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Feedback entity for content categorization and organization
- * Provides feedback functionality for various system entities
+ * Comment entity for content categorization and organization
+ * Provides comment functionality for various system entities
  * 
- * Database Table: bytedesk_core_feedback
- * Purpose: Stores feedback definitions, colors, and organization settings
+ * Database Table: bytedesk_core_comment
+ * Purpose: Stores comment definitions, colors, and organization settings
  */
 @Entity
 @Data
@@ -41,27 +41,39 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({FeedbackEntityListener.class})
-@Table(name = "bytedesk_voc_feedback")
-public class FeedbackEntity extends BaseEntity {
+// @EntityListeners({CommentEntityListener.class})
+@Table(name = "bytedesk_voc_comment")
+public class CommentEntity extends BaseEntity {
 
     /**
-     * Name of the feedback
+     * Name of the comment
      */
     private String name;
 
     /**
-     * Description of the feedback
+     * Description of the comment
      */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of feedback (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Type of comment (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "feedback_type")
-    private String type = FeedbackTypeEnum.CUSTOMER.name();
+    @Column(name = "comment_type")
+    private String type = CommentTypeEnum.CUSTOMER.name();
 
- 
+    /**
+     * Color theme for the comment display
+     */
+    @Builder.Default
+    @Column(name = "comment_color")
+    private String color = "red";
+
+    /**
+     * Display order of the comment
+     */
+    @Builder.Default
+    @Column(name = "comment_order")
+    private Integer order = 0;
 }
