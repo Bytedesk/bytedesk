@@ -22,6 +22,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.enums.PriorityEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.BdDateUtils;
 
@@ -85,7 +86,8 @@ public class FeedbackEntity extends BaseEntity {
      * Priority level of the feedback
      */
     @Builder.Default
-    private String priority = "MEDIUM";
+    @Column(name = "feedback_priority")
+    private String priority = PriorityEnum.MEDIUM.name();
 
     /**
      * Feedback rating/score (1-5 stars)
@@ -474,7 +476,23 @@ public class FeedbackEntity extends BaseEntity {
     }
 
     public Boolean isHighPriority() {
-        return "HIGH".equalsIgnoreCase(priority) || "URGENT".equalsIgnoreCase(priority);
+        return getPriorityEnum().isHighPriority();
+    }
+
+    public Boolean isLowPriority() {
+        return getPriorityEnum().isLowPriority();
+    }
+
+    public Boolean isUrgent() {
+        return getPriorityEnum().isUrgent();
+    }
+
+    public PriorityEnum getPriorityEnum() {
+        return PriorityEnum.fromString(priority);
+    }
+
+    public void setPriorityEnum(PriorityEnum priorityEnum) {
+        this.priority = priorityEnum.name();
     }
 
     public Boolean hasGoodRating() {

@@ -25,6 +25,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -43,6 +50,8 @@ public class ComplaintRestService extends BaseRestServiceWithExport<ComplaintEnt
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final CategoryRestService categoryRestService;
 
     @Override
     protected Specification<ComplaintEntity> createSpecification(ComplaintRequest request) {
@@ -174,18 +183,48 @@ public class ComplaintRestService extends BaseRestServiceWithExport<ComplaintEnt
     }
     
     public void initComplaints(String orgUid) {
-        // log.info("initThreadComplaint");
-        // for (String complaint : ComplaintInitData.getAllComplaints()) {
-        //     ComplaintRequest complaintRequest = ComplaintRequest.builder()
-        //             .uid(Utils.formatUid(orgUid, complaint))
-        //             // .name(complaint)
-        //             .type(ComplaintTypeEnum.THREAD.name())
-        //             .level(LevelEnum.ORGANIZATION.name())
-        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-        //             .orgUid(orgUid)
-        //             .build();
-        //     create(complaintRequest);
-        // }
+        log.info("initComplaintCategories");
+        
+        // 初始化投诉分类
+        String[] complaintCategories = {
+            "服务态度问题",
+            "服务质量问题", 
+            "产品质量问题",
+            "技术支持问题",
+            "账单问题",
+            "隐私问题",
+            "系统故障",
+            "其他投诉"
+        };
+        
+        String level = LevelEnum.ORGANIZATION.name();
+        
+        for (String categoryName : complaintCategories) {
+            // 检查分类是否已存在
+            Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
+                    categoryName, CategoryTypeEnum.COMPLAINT.name(), orgUid, level, BytedeskConsts.PLATFORM_BYTEDESK);
+            
+            if (!categoryOptional.isPresent()) {
+                // 创建新的投诉分类
+                CategoryRequest categoryRequest = CategoryRequest.builder()
+                        .name(categoryName)
+                        .order(0)
+                        .level(level)
+                        .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                        .type(CategoryTypeEnum.COMPLAINT.name())
+                        .orgUid(orgUid)
+                        .build();
+                
+                CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
+                if (categoryResponse != null) {
+                    log.info("Created complaint category: {}", categoryName);
+                } else {
+                    log.error("Failed to create complaint category: {}", categoryName);
+                }
+            } else {
+                log.debug("Complaint category already exists: {}", categoryName);
+            }
+        }
     }
 
     
