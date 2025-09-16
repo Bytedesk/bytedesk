@@ -156,7 +156,7 @@ public class RobotTestController {
                 return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
             }
             
-            String response = robotService.sessionTitleGeneration(content, orgUid);
+            String response = robotService.threadTitleGeneration(content, orgUid);
             return ResponseEntity.ok(JsonResult.success("session title generated", response));
         } catch (Exception e) {
             log.error("Error in sessionTitleGeneration test", e);

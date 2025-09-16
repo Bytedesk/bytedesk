@@ -1129,7 +1129,7 @@
     },
     {
       "uid": "53",
-      "name": "session_title_generation",
+      "name": "thread_title_generation",
       "type": "LLM",
       "category": "i18n.module.service",
       "i18n": {
@@ -1216,6 +1216,29 @@
           "nickname": "關係提取",
           "prompt": "## 任务\n从用户提供的实体数组中，提取实体之间存在的明确关系，形成结构化的关系网络。\n\n## 要求\n1. 关系提取必须基于提供的文本内容，不得臆测不存在的关系\n2. 结果必须以JSON数组格式输出，每个关系为数组中的一个对象\n3. 每个关系对象必须包含 source, target, description 和 strength 字段\n4. 不要输出任何解释或额外内容，只输出JSON数组\n5. 若没有找到任何关系，返回空数组 []\n\n## 关系提取规则\n- 只有在文本中明确体现的关系才应被提取\n- 源实体(source)和目标实体(target)必须是实体数组中已有的实体\n- 关系描述(description)应简明扼要地说明两个实体间的具体关系\n- 关系强度(strength)应根据以下标准确定：\n  * 10分：直接创造/从属关系（如作者与作品、发明者与发明、母公司与子公司）\n  * 9分：同一实体的不同表现形式（如别名、曾用名）\n  * 8分：紧密相关且互相影响的关系（如密切合作伙伴、家庭成员）\n  * 7分：明确但非直接的关系（如作品中的角色、组织中的成员）\n  * 6分：间接关联且有明确联系（如同事关系、相似产品）\n  * 5分：存在关联但较为松散（如同一领域的不同概念）\n\n## 提取步骤\n1. 仔细分析文本内容，确定哪些实体之间存在明确关系\n2. 只考虑文本中明确提及的关系，不要臆测\n3. 对每个找到的关系，确定：\n   - source: 关系的源实体标题（必须是实体列表中已有的实体）\n   - target: 关系的目标实体标题（必须是实体列表中已有的实体）\n   - description: 简明准确的关系描述（用中文表述）\n   - strength: 基于上述标准的关系强度（5-10之间的整数）\n4. 检查每个关系是否双向：\n   - 如果关系是双向的（如\"A是B的朋友\"意味着\"B也是A的朋友\"），考虑是否需要创建反向关系\n   - 如果关系是单向的（如\"A创作了B\"），则只保留单向关系\n5. 验证所有关系的一致性和合理性：\n   - 确保没有矛盾的关系（如A同时是B的父亲和兄弟）\n   - 确保关系描述与关系强度匹配\n6. 将所有有效关系组织为JSON数组\n\n## 实体数组：\n{entities}\n\n## 文本内容：\n{question}",
           "description": "創建一個關係提取機器人"
+        }
+      }
+    },
+    {
+      "uid": "57",
+      "name": "question_suggest",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Question Suggest",
+          "prompt": "You are a professional question suggestion assistant. Your task is to analyze the user's content and generate relevant, helpful questions that users might want to ask.\n\n## Core Requirements\n- Generate 3-5 practical and valuable questions based on the provided content\n- Questions should be specific, clear, and directly related to the content\n- Cover different aspects: basic concepts, practical applications, deeper understanding, comparisons, etc.\n- Use natural, conversational language\n- Ensure questions are actionable and answerable\n- Output only the question list in JSON array format, no explanations\n\n## Question Types to Consider\n1. **Clarification questions**: \"What does... mean?\", \"How is... defined?\"\n2. **How-to questions**: \"How to...\", \"What are the steps to...\"\n3. **Comparison questions**: \"What's the difference between... and...\"\n4. **Application questions**: \"When should I use...\", \"What are the benefits of...\"\n5. **Troubleshooting questions**: \"What if... doesn't work?\", \"How to solve... problem?\"\n6. **Best practice questions**: \"What are the best practices for...\"\n\n## Output Format\nReturn a JSON array of strings, each string being a suggested question:\n[\"Question 1\", \"Question 2\", \"Question 3\"]\n\n## Content to analyze:\n{question}",
+          "description": "Create a question suggestion bot that generates relevant questions based on content"
+        },
+        "zh_cn": {
+          "nickname": "问题建议",
+          "prompt": "你是一个专业的问题建议助手。你的任务是分析用户提供的内容，并生成相关的、有帮助的问题供用户参考。\n\n## 核心要求\n- 基于提供的内容生成3-5个实用且有价值的问题\n- 问题应该具体、清晰，与内容直接相关\n- 覆盖不同方面：基础概念、实际应用、深入理解、对比分析等\n- 使用自然、对话式的语言\n- 确保问题具有可操作性和可回答性\n- 仅输出问题列表的JSON数组格式，不要包含解释\n\n## 问题类型参考\n1. **澄清类问题**：\"什么是...？\"，\"...是如何定义的？\"\n2. **操作类问题**：\"如何...？\"，\"...的步骤是什么？\"\n3. **对比类问题**：\"...和...有什么区别？\"\n4. **应用类问题**：\"什么时候应该使用...？\"，\"...的好处是什么？\"\n5. **故障排除问题**：\"如果...不工作怎么办？\"，\"如何解决...问题？\"\n6. **最佳实践问题**：\"...的最佳实践是什么？\"\n\n## 输出格式\n返回一个字符串数组的JSON格式，每个字符串都是一个建议的问题：\n[\"问题1\", \"问题2\", \"问题3\"]\n\n## 需要分析的内容：\n{question}",
+          "description": "创建一个基于内容生成相关问题建议的机器人"
+        },
+        "zh_tw": {
+          "nickname": "問題建議",
+          "prompt": "你是一个专业的问题建议助手。你的任务是分析用户提供的内容，并生成相关的、有帮助的问题供用户参考。\n\n## 核心要求\n- 基于提供的内容生成3-5个实用且有价值的问题\n- 问题应该具体、清晰，与内容直接相关\n- 覆盖不同方面：基础概念、实际应用、深入理解、对比分析等\n- 使用自然、对话式的语言\n- 确保问题具有可操作性和可回答性\n- 仅输出问题列表的JSON数组格式，不要包含解释\n\n## 问题类型参考\n1. **澄清类问题**：\"什么是...？\"，\"...是如何定义的？\"\n2. **操作类问题**：\"如何...？\"，\"...的步骤是什么？\"\n3. **对比类问题**：\"...和...有什么区别？\"\n4. **应用类问题**：\"什么时候应该使用...？\"，\"...的好处是什么？\"\n5. **故障排除问题**：\"如果...不工作怎么办？\"，\"如何解决...问题？\"\n6. **最佳实践问题**：\"...的最佳实践是什么？\"\n\n## 输出格式\n返回一个字符串数组的JSON格式，每个字符串都是一个建议的问题：\n[\"問題1\", \"問題2\", \"問題3\"]\n\n## 需要分析的内容：\n{question}",
+          "description": "創建一個基於內容生成相關問題建議的機器人"
         }
       }
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:47:57
+ * @LastEditTime: 2025-09-16 15:23:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -160,8 +160,8 @@ public class RobotService extends AbstractRobotService {
     /**
      * 会话标题生成服务 - 纯文本处理，不需要知识库
      */
-    public String sessionTitleGeneration(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_SESSION_TITLE_GENERATION, orgUid, content, 
+    public String threadTitleGeneration(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_THREAD_TITLE_GENERATION, orgUid, content, 
                 I18Consts.I18N_LLM_CONFIG_TIP, false);
     }
 
@@ -186,6 +186,14 @@ public class RobotService extends AbstractRobotService {
      */
     public String relationshipExtraction(String content, String orgUid) {
         return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content, 
+                I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    /**
+     * 问题建议服务 - 纯文本处理，不需要知识库
+     */
+    public String questionSuggest(String content, String orgUid) {
+        return processSyncRequest(RobotConsts.ROBOT_NAME_QUESTION_SUGGEST, orgUid, content, 
                 I18Consts.I18N_LLM_CONFIG_TIP, false);
     }
 

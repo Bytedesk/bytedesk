@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-13 17:11:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 10:04:18
+ * @LastEditTime: 2025-09-16 15:23:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -90,10 +90,11 @@ public class RobotConsts {
   public static final String ROBOT_NAME_FALLBACK_RESPONSE = "fallback_response"; // 后备回复
   public static final String ROBOT_NAME_QUERY_REWRITE = "query_rewrite"; // 查询重写
   public static final String ROBOT_NAME_SUMMARY_GENERATION = "summary_generation"; // 摘要生成
-  public static final String ROBOT_NAME_SESSION_TITLE_GENERATION = "session_title_generation"; // 会话标题生成
+  public static final String ROBOT_NAME_THREAD_TITLE_GENERATION = "thread_title_generation"; // 会话标题生成
   public static final String ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY = "context_template_summary"; // 上下文模板摘要
   public static final String ROBOT_NAME_ENTITY_EXTRACTION = "entity_extraction"; // 实体提取
   public static final String ROBOT_NAME_RELATIONSHIP_EXTRACTION = "relationship_extraction"; // 关系提取
+  public static final String ROBOT_NAME_QUESTION_SUGGEST = "question_suggest"; // 问题建议
   
   // 默认客服问答提示词
   public static final String ROBOT_LLM_DEFAULT_PROMPT = """
