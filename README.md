@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 18:11:40
+ * @LastEditTime: 2025-09-16 08:52:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -113,6 +113,13 @@ AI powered Omnichannel customer service With Team Cooperation
 git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
 docker compose -p bytedesk -f docker-compose.yaml up -d
+```
+
+```bash
+# Please replace 127.0.0.1 with your server IP
+Access address: http://127.0.0.1:9003/
+Default account: admin@email.com
+Default password: admin
 ```
 
 - [Docker Deploy](https://www.weiyuai.cn/docs/docs/deploy/docker/)
