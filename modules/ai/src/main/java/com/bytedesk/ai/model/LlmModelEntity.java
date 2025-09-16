@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 16:31:09
+ * @LastEditTime: 2025-09-16 10:01:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,10 +76,10 @@ public class LlmModelEntity extends BaseEntity {
      */
     private String providerUid;
 
-    /**
-     * Name of the model provider
-     */
-    private String providerName;
+    // /**
+    //  * Name of the model provider
+    //  */
+    // private String providerName;
 
     @Builder.Default
     @Column(name = "is_enabled")

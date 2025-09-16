@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +72,7 @@ public class SpringAIMinimaxEmbeddingConfig {
     }
 
     @Bean("minimaxEmbeddingModel")
-    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmConsts.MINIMAX, matchIfMissing = false)
+    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmProviderConstants.MINIMAX, matchIfMissing = false)
     MiniMaxEmbeddingModel minimaxEmbeddingModel() {
         return new MiniMaxEmbeddingModel(minimaxEmbeddingApi(), MetadataMode.EMBED, minimaxEmbeddingOptions());
     }

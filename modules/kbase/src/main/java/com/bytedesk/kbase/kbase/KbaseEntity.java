@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-22 16:16:42
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 20:40:34
+ * @LastEditTime: 2025-09-16 10:50:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmDefaults;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.LanguageEnum;
@@ -220,14 +220,14 @@ public class KbaseEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "llm_embedding_provider")
-    private String embeddingProvider = LlmConsts.DEFAULT_EMBEDDING_PROVIDER;
+    private String embeddingProvider = LlmDefaults.DEFAULT_EMBEDDING_PROVIDER;
     
     /**
      * LLM embedding model for vector search functionality
      */
     @Builder.Default
     @Column(name = "llm_embedding_model")
-    private String embeddingModel = LlmConsts.DEFAULT_EMBEDDING_MODEL;
+    private String embeddingModel = LlmDefaults.DEFAULT_EMBEDDING_MODEL;
 
     /**
      * Whether to show chat functionality in the knowledge base

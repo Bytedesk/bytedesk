@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-31 10:53:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-18 14:42:46
+ * @LastEditTime: 2025-09-16 10:20:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -107,7 +107,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.DASHSCOPE)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.DASHSCOPE)
     public ChatModel primaryDashscopeChatModel() {
         log.info("Setting Dashscope chat model as Primary");
         if (dashscopeChatModel == null) {
@@ -129,7 +129,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.BAIDU)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.BAIDU)
     public ChatModel primaryBaiduChatModel() {
         log.info("Setting Baidu chat model as Primary");
         if (baiduChatModel == null) {
@@ -140,7 +140,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.TENCENT)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.TENCENT)
     public ChatModel primaryTencentChatModel() {
         log.info("Setting Tencent chat model as Primary");
         if (tencentChatModel == null) {
@@ -151,7 +151,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.VOLCENGINE)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.VOLCENGINE)
     public ChatModel primaryVolcengineChatModel() {
         log.info("Setting Volcengine chat model as Primary");
         if (volcengineChatModel == null) {
@@ -173,7 +173,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.OPENROUTER)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.OPENROUTER)
     public ChatModel primaryOpenrouterChatModel() {
         log.info("Setting OpenRouter chat model as Primary");
         if (openrouterChatModel == null) {
@@ -184,7 +184,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.SILICONFLOW)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.SILICONFLOW)
     public ChatModel primarySiliconflowChatModel() {
         log.info("Setting SiliconFlow chat model as Primary");
         if (siliconflowChatModel == null) {
@@ -195,7 +195,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.GITEE)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.GITEE)
     public ChatModel primaryGiteeChatModel() {
         log.info("Setting Gitee chat model as Primary");
         if (giteeChatModel == null) {

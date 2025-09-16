@@ -105,7 +105,7 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
 
         LlmModelRequest request = LlmModelRequest.builder()
                 .providerUid(providerUid)
-                .providerName(providerName)
+                // .providerName(providerName)
                 .name(modelJson.getName())
                 .nickname(modelJson.getNickname())
                 .description(modelJson.getDescription())

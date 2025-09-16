@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="250916-rename-name-to-provider_type" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ai_provider"/>
+                <columnExists tableName="bytedesk_ai_provider" columnName="name"/>
+                <not>
+                    <columnExists tableName="bytedesk_ai_provider" columnName="provider_type"/>
+                </not>
+            </and>
+        </preConditions>
+        <comment>Rename column name to provider_type in bytedesk_ai_provider table (only if name exists)</comment>
+        <renameColumn
+            tableName="bytedesk_ai_provider"
+            oldColumnName="name"
+            newColumnName="provider_type"
+            columnDataType="varchar(255)"/>
+        <rollback>
+            <renameColumn
+                tableName="bytedesk_ai_provider"
+                oldColumnName="provider_type"
+                newColumnName="name"
+                columnDataType="varchar(255)"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

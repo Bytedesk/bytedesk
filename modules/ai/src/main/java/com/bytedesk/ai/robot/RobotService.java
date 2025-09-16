@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 10:27:06
+ * @LastEditTime: 2025-09-16 10:47:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,7 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -259,7 +259,7 @@ public class RobotService extends AbstractRobotService {
      * AI提供商选择和处理的公共方法
      */
     private String getAIProviderName(RobotProtobuf robot) {
-        String provider = LlmConsts.ZHIPUAI;
+        String provider = LlmProviderConstants.ZHIPUAI;
         if (robot.getLlm() != null) {
             provider = robot.getLlm().getTextProvider().toLowerCase();
         }
@@ -279,10 +279,10 @@ public class RobotService extends AbstractRobotService {
             springAIServiceRegistry.getServiceByProviderName(provider)
                 .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
         } catch (IllegalArgumentException e) {
-            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmConsts.ZHIPUAI);
+            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmProviderConstants.ZHIPUAI);
             // 如果找不到指定的提供商，尝试使用默认的智谱AI
             try {
-                springAIServiceRegistry.getServiceByProviderName(LlmConsts.ZHIPUAI)
+                springAIServiceRegistry.getServiceByProviderName(LlmProviderConstants.ZHIPUAI)
                     .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
             } catch (Exception ex) {
                 log.error("使用默认AI服务提供商失败", ex);
@@ -304,10 +304,10 @@ public class RobotService extends AbstractRobotService {
             return springAIServiceRegistry.getServiceByProviderName(provider)
                 .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
         } catch (IllegalArgumentException e) {
-            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmConsts.ZHIPUAI);
+            log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmProviderConstants.ZHIPUAI);
             // 如果找不到指定的提供商，尝试使用默认的智谱AI
             try {
-                return springAIServiceRegistry.getServiceByProviderName(LlmConsts.ZHIPUAI)
+                return springAIServiceRegistry.getServiceByProviderName(LlmProviderConstants.ZHIPUAI)
                     .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
             } catch (Exception ex) {
                 log.error("使用默认AI服务提供商失败", ex);

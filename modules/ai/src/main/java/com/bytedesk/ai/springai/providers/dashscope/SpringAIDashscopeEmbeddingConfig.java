@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Primary;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +78,7 @@ public class SpringAIDashscopeEmbeddingConfig {
     }
 
     @Bean("dashscopeEmbeddingModel")
-    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmConsts.DASHSCOPE, matchIfMissing = false)
+    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmProviderConstants.DASHSCOPE, matchIfMissing = false)
     DashScopeEmbeddingModel dashscopeEmbeddingModel() {
         return new DashScopeEmbeddingModel(bytedeskDashscopeEmbeddingApi(), MetadataMode.EMBED, bytedeskDashscopeEmbeddingOptions());
     }

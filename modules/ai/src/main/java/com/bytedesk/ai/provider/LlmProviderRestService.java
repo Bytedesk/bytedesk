@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-10 13:17:24
+ * @LastEditTime: 2025-09-16 10:06:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -65,39 +65,39 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return llmProviderRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "provider", key = "#name", unless = "#result == null")
-    public Optional<LlmProviderEntity> findByNameAndOrgUid(String name, String orgUid) {
-        return llmProviderRepository.findByNameAndLevelAndOrgUidAndDeletedFalse(name, LevelEnum.ORGANIZATION.name(), orgUid);
+    @Cacheable(value = "provider", key = "#type", unless = "#result == null")
+    public Optional<LlmProviderEntity> findByTypeAndOrgUid(String type, String orgUid) {
+        return llmProviderRepository.findByTypeAndLevelAndOrgUidAndDeletedFalse(type, LevelEnum.ORGANIZATION.name(), orgUid);
     }
 
-    @Cacheable(value = "provider", key = "#name + '-' + #level", unless = "#result == null")
-    public List<LlmProviderEntity> findByName(String name, String level) {
-        return llmProviderRepository.findByNameAndLevelAndDeletedFalse(name, level);
+    @Cacheable(value = "provider", key = "#type + '-' + #level", unless = "#result == null")
+    public List<LlmProviderEntity> findByType(String type, String level) {
+        return llmProviderRepository.findByTypeAndLevelAndDeletedFalse(type, level);
     }
 
     public List<LlmProviderEntity> findByStatusAndLevel(String status, String level) {
         return llmProviderRepository.findByStatusAndLevelAndDeletedFalse(status, level);
     }
 
-    public Boolean existsByNameAndLevel(String name, String level) {
-        return llmProviderRepository.existsByNameAndLevelAndDeletedFalse(name, level);
+    public Boolean existsByTypeAndLevel(String type, String level) {
+        return llmProviderRepository.existsByTypeAndLevelAndDeletedFalse(type, level);
     }
 
-    public Boolean existsByNameAndLevelAndStatus(String name, String level, String status) {
-        return llmProviderRepository.existsByNameAndLevelAndStatusAndDeletedFalse(name, level, status);
+    public Boolean existsByTypeAndLevelAndStatus(String type, String level, String status) {
+        return llmProviderRepository.existsByTypeAndLevelAndStatusAndDeletedFalse(type, level, status);
     }
 
-    public Boolean existsByNameAndLevelAndOrgUid(String name, String level, String orgUid) {
-        return llmProviderRepository.existsByNameAndLevelAndOrgUidAndDeletedFalse(name, level, orgUid);
+    public Boolean existsByTypeAndLevelAndOrgUid(String type, String level, String orgUid) {
+        return llmProviderRepository.existsByTypeAndLevelAndOrgUidAndDeletedFalse(type, level, orgUid);
     }
 
     @Override
     public LlmProviderResponse create(LlmProviderRequest request) {
         // 
-        Optional<LlmProviderEntity> optional = llmProviderRepository.findByNameAndLevelAndOrgUidAndDeletedFalse(request.getName(), request.getLevel(), request.getOrgUid());
-        if (optional.isPresent()) {
-            return convertToResponse(optional.get());
-        }
+        // Optional<LlmProviderEntity> optional = llmProviderRepository.findByTypeAndLevelAndOrgUidAndDeletedFalse(request.getType(), request.getLevel(), request.getOrgUid());
+        // if (optional.isPresent()) {
+        //     return convertToResponse(optional.get());
+        // }
         // 
         LlmProviderEntity entity = modelMapper.map(request, LlmProviderEntity.class);
         entity.setUid(uidUtils.getUid());
@@ -109,11 +109,12 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return convertToResponse(savedProvider);
     }
 
-    public LlmProviderResponse createFromProviderJson(String providerName, ProviderJson providerJson, String level, String orgUid) {
+    public LlmProviderResponse createFromProviderJson(String providerType, ProviderJson providerJson, String level, String orgUid) {
 
         LlmProviderRequest request = LlmProviderRequest.builder()
-                .name(providerName)
+                // .name(providerType)
                 .nickname(providerJson.getNickname())
+                .type(providerType)
                 .logo(AvatarConsts.getLlmThreadDefaultAvatarBaseUrl() + providerJson.getLogo())
                 .baseUrl(providerJson.getBaseUrl())
                 .webUrl(providerJson.getWebUrl())
@@ -132,7 +133,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
             LlmProviderEntity entity = optional.get();
             modelMapper.map(request, entity);
             // 
-            // entity.setName(request.getName());
+            // entity.setType(request.getType());
             // entity.setNickname(request.getNickname());
             // entity.setDescription(request.getDescription());
             // entity.setLogo(request.getLogo());

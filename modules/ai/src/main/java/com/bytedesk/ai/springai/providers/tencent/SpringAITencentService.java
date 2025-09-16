@@ -33,8 +33,8 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
@@ -164,7 +164,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "hunyuan-pro";
-                    recordAiTokenUsage(robot, LlmConsts.TENCENT, modelType,
+                    recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });
@@ -220,7 +220,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                     && StringUtils.hasText(robot.getLlm().getTextModel()))
                             ? robot.getLlm().getTextModel()
                             : "hunyuan-pro";
-            recordAiTokenUsage(robot, LlmConsts.TENCENT, modelType,
+            recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -286,14 +286,14 @@ public class SpringAITencentService extends BaseSpringAIService {
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
-                            tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.TENCENT,
+                            tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.TENCENT,
                             (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                     : "hunyuan-pro");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "hunyuan-pro";
-                    recordAiTokenUsage(robot, LlmConsts.TENCENT, modelType,
+                    recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });

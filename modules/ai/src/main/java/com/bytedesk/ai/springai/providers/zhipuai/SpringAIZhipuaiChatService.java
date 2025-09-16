@@ -32,8 +32,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
@@ -149,7 +149,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo";
                     log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
-                    recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
+                    recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -241,7 +241,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                     ? robot.getLlm().getTextModel() : "glm-3-turbo";
             log.info("Zhipuai API sync recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), tokenUsage.getTotalTokens(), modelType);
-            recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
+            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -324,13 +324,13 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                     
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo";
                     log.info("Zhipuai API SSE recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
-                    recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
+                    recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }

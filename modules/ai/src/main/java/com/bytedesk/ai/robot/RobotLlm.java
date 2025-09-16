@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 09:39:11
+ * @LastEditTime: 2025-09-16 10:10:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,7 +14,7 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmDefaults;
 import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
@@ -23,11 +23,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 // https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html
 @Embeddable
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RobotLlm {
@@ -49,7 +50,7 @@ public class RobotLlm {
     // 文本对话模型提供商
     @Builder.Default
     @Column(name = "llm_text_provider")
-    private String textProvider = LlmConsts.DEFAULT_TEXT_PROVIDER;
+    private String textProvider = LlmDefaults.DEFAULT_TEXT_PROVIDER;
 
     @Column(name = "llm_text_provider_uid")
     private String textProviderUid;
@@ -57,7 +58,7 @@ public class RobotLlm {
     // text chat model name
     @Builder.Default
     @Column(name = "llm_text_model")
-    private String textModel = LlmConsts.DEFAULT_TEXT_MODEL; 
+    private String textModel = LlmDefaults.DEFAULT_TEXT_MODEL; 
 
     // 视觉模型
     // 启用vision
@@ -68,7 +69,7 @@ public class RobotLlm {
     // 视觉模型提供商
     @Builder.Default
     @Column(name = "llm_vision_provider")
-    private String visionProvider = LlmConsts.DEFAULT_VISION_PROVIDER;
+    private String visionProvider = LlmDefaults.DEFAULT_VISION_PROVIDER;
 
     @Column(name = "llm_vision_provider_uid")
     private String visionProviderUid;
@@ -76,7 +77,7 @@ public class RobotLlm {
     // 视觉模型名称
     @Builder.Default
     @Column(name = "llm_vision_model")
-    private String visionModel = LlmConsts.DEFAULT_VISION_MODEL;
+    private String visionModel = LlmDefaults.DEFAULT_VISION_MODEL;
 
     // 语音模型
     @Builder.Default
@@ -86,7 +87,7 @@ public class RobotLlm {
     // 语音模型提供商
     @Builder.Default
     @Column(name = "llm_audio_provider")
-    private String audioProvider = LlmConsts.DEFAULT_AUDIO_PROVIDER;
+    private String audioProvider = LlmDefaults.DEFAULT_AUDIO_PROVIDER;
 
     @Column(name = "llm_audio_provider_uid")
     private String audioProviderUid;
@@ -94,7 +95,7 @@ public class RobotLlm {
     // 语音模型名称
     @Builder.Default
     @Column(name = "llm_audio_model")
-    private String audioModel = LlmConsts.DEFAULT_AUDIO_MODEL;
+    private String audioModel = LlmDefaults.DEFAULT_AUDIO_MODEL;
 
     // 启用rerank
     @Builder.Default
@@ -104,7 +105,7 @@ public class RobotLlm {
     // rerank model provider
     @Builder.Default
     @Column(name = "llm_rerank_provider")
-    private String rerankProvider = LlmConsts.DEFAULT_RERANK_PROVIDER;
+    private String rerankProvider = LlmDefaults.DEFAULT_RERANK_PROVIDER;
 
     @Column(name = "llm_rerank_provider_uid")
     private String rerankProviderUid;
@@ -112,7 +113,7 @@ public class RobotLlm {
     // rerank model name
     @Builder.Default
     @Column(name = "llm_rerank_model")
-    private String rerankModel = LlmConsts.DEFAULT_RERANK_MODEL;
+    private String rerankModel = LlmDefaults.DEFAULT_RERANK_MODEL;
 
     // rewrite
     @Builder.Default
@@ -122,7 +123,7 @@ public class RobotLlm {
     // rewrite model provider
     @Builder.Default
     @Column(name = "llm_rewrite_provider")
-    private String rewriteProvider = LlmConsts.DEFAULT_REWRITE_PROVIDER;
+    private String rewriteProvider = LlmDefaults.DEFAULT_REWRITE_PROVIDER;
 
     @Column(name = "llm_rewrite_provider_uid")
     private String rewriteProviderUid;
@@ -130,7 +131,7 @@ public class RobotLlm {
     // rewrite model name
     @Builder.Default
     @Column(name = "llm_rewrite_model")
-    private String rewriteModel = LlmConsts.DEFAULT_REWRITE_MODEL;
+    private String rewriteModel = LlmDefaults.DEFAULT_REWRITE_MODEL;
 
     // rewrite prompt
     @Builder.Default

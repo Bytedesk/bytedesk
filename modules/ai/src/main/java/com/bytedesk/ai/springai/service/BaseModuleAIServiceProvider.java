@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-10 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-10 10:00:00
+ * @LastEditTime: 2025-09-16 10:46:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService
 import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
 import com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService;
 import com.bytedesk.ai.zhipuai.ZhipuaiService;
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -65,18 +65,18 @@ public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
 
     @PostConstruct
     public void registerServices() {
-        springAIDashscopeService.ifPresent(service -> registerService(LlmConsts.DASHSCOPE, service));
-        zhipuaiService.ifPresent(service -> registerService(LlmConsts.ZHIPUAI, service));
-        springAIDeepseekService.ifPresent(service -> registerService(LlmConsts.DEEPSEEK, service));
-        springAIMinimaxService.ifPresent(service -> registerService(LlmConsts.MINIMAX, service));
-        springAIBaiduService.ifPresent(service -> registerService(LlmConsts.BAIDU, service));
-        springAIOllamaService.ifPresent(service -> registerService(LlmConsts.OLLAMA, service));
-        springAISiliconFlowService.ifPresent(service -> registerService(LlmConsts.SILICONFLOW, service));
-        springAIGiteeService.ifPresent(service -> registerService(LlmConsts.GITEE, service));
-        springAITencentService.ifPresent(service -> registerService(LlmConsts.TENCENT, service));
-        springAIVolcengineService.ifPresent(service -> registerService(LlmConsts.VOLCENGINE, service));
+        springAIDashscopeService.ifPresent(service -> registerService(LlmProviderConstants.DASHSCOPE, service));
+        zhipuaiService.ifPresent(service -> registerService(LlmProviderConstants.ZHIPUAI, service));
+        springAIDeepseekService.ifPresent(service -> registerService(LlmProviderConstants.DEEPSEEK, service));
+        springAIMinimaxService.ifPresent(service -> registerService(LlmProviderConstants.MINIMAX, service));
+        springAIBaiduService.ifPresent(service -> registerService(LlmProviderConstants.BAIDU, service));
+        springAIOllamaService.ifPresent(service -> registerService(LlmProviderConstants.OLLAMA, service));
+        springAISiliconFlowService.ifPresent(service -> registerService(LlmProviderConstants.SILICONFLOW, service));
+        springAIGiteeService.ifPresent(service -> registerService(LlmProviderConstants.GITEE, service));
+        springAITencentService.ifPresent(service -> registerService(LlmProviderConstants.TENCENT, service));
+        springAIVolcengineService.ifPresent(service -> registerService(LlmProviderConstants.VOLCENGINE, service));
         
-        springAICustomService.ifPresent(service -> registerService(LlmConsts.CUSTOM, service));
+        springAICustomService.ifPresent(service -> registerService(LlmProviderConstants.CUSTOM, service));
         
         log.info("BaseModuleAIServiceProvider registered {} AI services", serviceRegistry.size());
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-11 10:14:41
+ * @LastEditTime: 2025-09-16 10:42:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,8 +13,12 @@
  */
 package com.bytedesk.core.constant;
 
-public class LlmConsts {
-    private LlmConsts() {}
+/**
+ * LLM 提供商常量字符串 - 专门用于注解等需要编译时常量的场景
+ * 这些常量与 LlmProviderType 枚举的值保持一致
+ */
+public class LlmProviderConstants {
+    private LlmProviderConstants() {}
     
     // 已上线
     public static final String OLLAMA = "ollama";
@@ -50,32 +54,4 @@ public class LlmConsts {
     public static final String N8N = "n8n";
     public static final String MAXKB = "maxkb";
     public static final String RAGFLOW = "ragflow";
-
-    // 默认 智谱AI
-    // 默认文字对话模型提供商
-    public static final String DEFAULT_TEXT_PROVIDER = ZHIPUAI;
-    // 默认文字对话模型
-    public static final String DEFAULT_TEXT_MODEL = "glm-4-flash";
-    // 默认Vision提供商
-    public static final String DEFAULT_VISION_PROVIDER = ZHIPUAI;
-    // 默认Vision模型
-    public static final String DEFAULT_VISION_MODEL = "llava:latest";
-    // 默认Speech提供商
-    public static final String DEFAULT_AUDIO_PROVIDER = ZHIPUAI;
-    // 默认Speech模型
-    public static final String DEFAULT_AUDIO_MODEL = "mxbai-tts:latest";
-    // 默认Embedding提供商
-    public static final String DEFAULT_EMBEDDING_PROVIDER = ZHIPUAI;
-    // 默认Embedding模型
-    public static final String DEFAULT_EMBEDDING_MODEL = "embedding-2";
-    // 默认Rerank提供商
-    public static final String DEFAULT_RERANK_PROVIDER = ZHIPUAI;
-    // 默认Rerank模型
-    public static final String DEFAULT_RERANK_MODEL = "linux6200/bge-reranker-v2-m3:latest";
-    // 默认rewrite提供商
-    public static final String DEFAULT_REWRITE_PROVIDER = ZHIPUAI;
-    // 默认rewrite模型
-    public static final String DEFAULT_REWRITE_MODEL = "glm-4-flash";
-    
-    
 }

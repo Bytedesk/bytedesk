@@ -29,8 +29,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
@@ -115,7 +115,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gitee-chat";
-                    recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
+                    recordAiTokenUsage(robot, LlmProviderConstants.GITEE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -165,7 +165,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
                     ? robot.getLlm().getTextModel() : "gitee-chat";
-            recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
+            recordAiTokenUsage(robot, LlmProviderConstants.GITEE, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -229,11 +229,11 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
                     log.info("Gitee API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.GITEE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gitee-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.GITEE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gitee-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gitee-chat";
-                    recordAiTokenUsage(robot, LlmConsts.GITEE, modelType, 
+                    recordAiTokenUsage(robot, LlmProviderConstants.GITEE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:10:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-25 15:37:10
+ * @LastEditTime: 2025-09-16 10:07:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -52,23 +52,23 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
     /**
      * 初始化 LLM 提供商和模型
      * 
-     * @see LlmProviderRestService#existsByNameAndLevel(String, String)
-     * @see LlmModelRestService#existsByNameAndProviderUid(String, String)
+     * @see LlmProviderRestService#existsByTypeAndLevel(String, String)
+     * @see LlmModelRestService#existsByTypeAndProviderUid(String, String)
      */
     public void init() {
         // init platform providers
         String level = LevelEnum.PLATFORM.name();
         Map<String, ProviderJson> providerJsonMap = llmProviderJsonService.loadProviders();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
-            String providerName = entry.getKey();
+            String providerType = entry.getKey();
             ProviderJson providerJson = entry.getValue();
-            // log.info("initialize provider {}", providerName);
-            if (!llmProviderRestService.existsByNameAndLevel(providerName, level)) {
+            // log.info("initialize provider {}", providerType);
+            if (!llmProviderRestService.existsByTypeAndLevel(providerType, level)) {
                 String orgUid = ""; // 平台版本暂时不支持组织
-                llmProviderRestService.createFromProviderJson(providerName, providerJson, level, orgUid);
+                llmProviderRestService.createFromProviderJson(providerType, providerJson, level, orgUid);
             } else {
                 // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
-                List<LlmProviderEntity> providerList = llmProviderRestService.findByName(providerName, level);
+                List<LlmProviderEntity> providerList = llmProviderRestService.findByType(providerType, level);
                 if (!providerList.isEmpty()) {
                     LlmProviderEntity providerEntity = providerList.get(0);
                     String status = providerJson.getStatus();
@@ -82,17 +82,17 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
         //
         Map<String, List<ModelJson>> modelJsonMap = llmModelJsonService.loadModels();
         for (Map.Entry<String, List<ModelJson>> entry : modelJsonMap.entrySet()) {
-            String providerName = entry.getKey();
-            List<LlmProviderEntity> providerList = llmProviderRestService.findByName(providerName, level);
+            String providerType = entry.getKey();
+            List<LlmProviderEntity> providerList = llmProviderRestService.findByType(providerType, level);
             if (!providerList.isEmpty()) {
                 LlmProviderEntity provider = providerList.get(0);
                 String providerUid = provider.getUid();
-                // log.warn("provider exists {} {} ", providerName, providerUid);
+                // log.warn("provider exists {} {} ", providerType, providerUid);
                 List<ModelJson> modelJsons = entry.getValue();
                 for (ModelJson modelJson : modelJsons) {
                     if (!llmModelRestService.existsByNameAndProviderUid(modelJson.getName(), providerUid)) {
                         String orgUid = ""; // 平台版本暂时不支持组织
-                        llmModelRestService.createFromModelJson(providerUid, providerName, modelJson, level, orgUid);
+                        llmModelRestService.createFromModelJson(providerUid, providerType, modelJson, level, orgUid);
                     }
                 }
             }
@@ -101,22 +101,22 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
         // 查询所有组织，复制平台级别的provider和model
         level = LevelEnum.ORGANIZATION.name();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
-            String providerName = entry.getKey();
+            String providerType = entry.getKey();
             ProviderJson providerJson = entry.getValue();
-            // log.info("initialize provider {}", providerName);
+            // log.info("initialize provider {}", providerType);
             String status = providerJson.getStatus();
             if (LlmProviderStatusEnum.PRODUCTION.name().equalsIgnoreCase(status)) {
-                if (!llmProviderRestService.existsByNameAndLevelAndStatus(providerName, level, status)) {
+                if (!llmProviderRestService.existsByTypeAndLevelAndStatus(providerType, level, status)) {
                     // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-                    // llmProviderRestService.createFromProviderJson(providerName, providerJson, level, orgUid);
+                    // llmProviderRestService.createFromProviderJson(providerType, providerJson, level, orgUid);
                     List<OrganizationEntity> organizationList = organizationRestService.findAll();
                     for (OrganizationEntity organizationEntity : organizationList) {
                         String orgUid = organizationEntity.getUid();
-                        llmProviderRestService.createFromProviderJson(providerName, providerJson, level, orgUid);
+                        llmProviderRestService.createFromProviderJson(providerType, providerJson, level, orgUid);
                     }
                 } else {
                     // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
-                    List<LlmProviderEntity> providerList = llmProviderRestService.findByName(providerName, level);
+                    List<LlmProviderEntity> providerList = llmProviderRestService.findByType(providerType, level);
                     if (!providerList.isEmpty()) {
                         LlmProviderEntity providerEntity = providerList.get(0);
                         providerEntity.setStatus(status);

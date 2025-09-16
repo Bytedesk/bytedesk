@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 09:44:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-16 15:37:49
+ * @LastEditTime: 2025-09-16 10:49:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,7 +16,8 @@ package com.bytedesk.core.utils;
 import org.springframework.core.env.Environment;
 
 import com.bytedesk.core.base.LlmProviderConfigDefault;
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmDefaults;
+import com.bytedesk.core.constant.LlmProviderConstants;
 
 import lombok.experimental.UtilityClass;
 
@@ -25,23 +26,23 @@ public class LlmConfigUtils {
 
     public LlmProviderConfigDefault getLlmProviderConfigDefault(Environment environment) {
         // Get the default chat provider and model
-        String defaultChatProvider = environment.getProperty("spring.ai.model.chat", LlmConsts.DEFAULT_TEXT_PROVIDER);
+        String defaultChatProvider = environment.getProperty("spring.ai.model.chat", LlmDefaults.DEFAULT_TEXT_PROVIDER);
         String defaultChatModel = getChatModel(environment, defaultChatProvider);
 
         // Get the default embedding provider and model
-        String defaultEmbeddingProvider = environment.getProperty("spring.ai.model.embedding", LlmConsts.DEFAULT_EMBEDDING_PROVIDER);
+        String defaultEmbeddingProvider = environment.getProperty("spring.ai.model.embedding", LlmDefaults.DEFAULT_EMBEDDING_PROVIDER);
         String defaultEmbeddingModel = getEmbeddingModel(environment, defaultEmbeddingProvider);
 
         // Get the default vision provider and model
-        String defaultVisionProvider = environment.getProperty("spring.ai.model.vision", LlmConsts.DEFAULT_VISION_PROVIDER);
+        String defaultVisionProvider = environment.getProperty("spring.ai.model.vision", LlmDefaults.DEFAULT_VISION_PROVIDER);
         String defaultVisionModel = getVisionModel(environment, defaultVisionProvider);
 
         // Get the default voice provider and model
-        String defaultVoiceProvider = environment.getProperty("spring.ai.model.audio", LlmConsts.DEFAULT_AUDIO_PROVIDER);
+        String defaultVoiceProvider = environment.getProperty("spring.ai.model.audio", LlmDefaults.DEFAULT_AUDIO_PROVIDER);
         String defaultVoiceModel = getVoiceModel(environment, defaultVoiceProvider);
 
         // Get the default rerank provider and model
-        String defaultRerankProvider = environment.getProperty("spring.ai.model.rerank", LlmConsts.DEFAULT_RERANK_PROVIDER);
+        String defaultRerankProvider = environment.getProperty("spring.ai.model.rerank", LlmDefaults.DEFAULT_RERANK_PROVIDER);
         String defaultRerankModel = getRerankModel(environment, defaultRerankProvider);
 
         return LlmProviderConfigDefault.builder()
@@ -60,84 +61,84 @@ public class LlmConfigUtils {
 
     private String getChatModel(Environment environment, String provider) {
         switch (provider) {
-            case LlmConsts.ZHIPUAI:
+            case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.chat.options.model", "glm-4-flash");
-            case LlmConsts.OLLAMA:
+            case LlmProviderConstants.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.chat.options.model", "qwen3:0.6b");
-            case LlmConsts.DEEPSEEK:
+            case LlmProviderConstants.DEEPSEEK:
                 return environment.getProperty("spring.ai.deepseek.chat.options.model", "deepseek-chat");
-            case LlmConsts.DASHSCOPE:
+            case LlmProviderConstants.DASHSCOPE:
                 return environment.getProperty("spring.ai.dashscope.chat.options.model", "deepseek-r1");
-            case LlmConsts.SILICONFLOW:
+            case LlmProviderConstants.SILICONFLOW:
                 return environment.getProperty("spring.ai.siliconflow.chat.options.model", "Qwen/QwQ-32B");
-            case LlmConsts.GITEE:
+            case LlmProviderConstants.GITEE:
                 return environment.getProperty("spring.ai.gitee.chat.options.model", "Qwen/QwQ-32B");
-            case LlmConsts.TENCENT:
+            case LlmProviderConstants.TENCENT:
                 return environment.getProperty("spring.ai.tencent.chat.options.model", "hunyuan-t1-latest");
-            case LlmConsts.BAIDU:
+            case LlmProviderConstants.BAIDU:
                 return environment.getProperty("spring.ai.baidu.chat.options.model", "ernie-x1-32k-preview");
-            case LlmConsts.VOLCENGINE:
+            case LlmProviderConstants.VOLCENGINE:
                 return environment.getProperty("spring.ai.volcengine.chat.options.model", "doubao-1-5-pro-32k-250115");
-            case LlmConsts.OPENAI:
+            case LlmProviderConstants.OPENAI:
                 return environment.getProperty("spring.ai.openai.chat.options.model", "gpt-4o");
-            case LlmConsts.OPENROUTER:
+            case LlmProviderConstants.OPENROUTER:
                 return environment.getProperty("spring.ai.openrouter.chat.options.model", "");
-            case LlmConsts.MOONSHOT:
+            case LlmProviderConstants.MOONSHOT:
                 return environment.getProperty("spring.ai.moonshot.chat.options.model", "moonshot-v1-8k");
-            case LlmConsts.MINIMAX:
+            case LlmProviderConstants.MINIMAX:
                 return environment.getProperty("spring.ai.minimax.chat.options.model", "minimax-v1");
             default:
-                return LlmConsts.DEFAULT_TEXT_MODEL;
+                return LlmDefaults.DEFAULT_TEXT_MODEL;
         }
     }
 
     private String getEmbeddingModel(Environment environment, String provider) {
         switch (provider) {
-            case LlmConsts.ZHIPUAI:
+            case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.embedding.options.model", "embedding-2");
-            case LlmConsts.OLLAMA:
+            case LlmProviderConstants.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.embedding.options.model", "bge-m3:latest");
-            case LlmConsts.DASHSCOPE:
+            case LlmProviderConstants.DASHSCOPE:
                 return environment.getProperty("spring.ai.dashscope.embedding.options.model", "text-embedding-v1");
             default:
-                return LlmConsts.DEFAULT_EMBEDDING_MODEL;
+                return LlmDefaults.DEFAULT_EMBEDDING_MODEL;
         }
     }
 
     private String getVisionModel(Environment environment, String provider) {
         switch (provider) {
-            case LlmConsts.ZHIPUAI:
+            case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.vision.options.model", "llava:latest");
-            case LlmConsts.OLLAMA:
+            case LlmProviderConstants.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.vision.options.model", "llava:latest");
-            case LlmConsts.OPENAI:
+            case LlmProviderConstants.OPENAI:
                 return environment.getProperty("spring.ai.openai.vision.options.model", "gpt-4o");
             default:
-                return LlmConsts.DEFAULT_VISION_MODEL;
+                return LlmDefaults.DEFAULT_VISION_MODEL;
         }
     }
 
     private String getVoiceModel(Environment environment, String provider) {
         switch (provider) {
-            case LlmConsts.ZHIPUAI:
+            case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.voice.options.model", "mxbai-tts:latest");
-            case LlmConsts.OLLAMA:
+            case LlmProviderConstants.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.voice.options.model", "mxbai-tts:latest");
-            case LlmConsts.OPENAI:
+            case LlmProviderConstants.OPENAI:
                 return environment.getProperty("spring.ai.openai.audio.voice.options.model", "tts-1");
             default:
-                return LlmConsts.DEFAULT_AUDIO_MODEL;
+                return LlmDefaults.DEFAULT_AUDIO_MODEL;
         }
     }
 
     private String getRerankModel(Environment environment, String provider) {
         switch (provider) {
-            case LlmConsts.ZHIPUAI:
+            case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.rerank.options.model", "linux6200/bge-reranker-v2-m3:latest");
-            case LlmConsts.OLLAMA:
+            case LlmProviderConstants.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.embedding.options.model.rerank", "linux6200/bge-reranker-v2-m3:latest");
             default:
-                return LlmConsts.DEFAULT_RERANK_MODEL;
+                return LlmDefaults.DEFAULT_RERANK_MODEL;
         }
     }
 } 

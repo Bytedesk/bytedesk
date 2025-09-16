@@ -7,5 +7,6 @@
 
     <include file="db/changelog/migration/250821_rename_kb_type_to_kbase_type.xml" />
     <include file="db/changelog/migration/250910_rename_api_url_to_base_url.xml" />
+    <include file="db/changelog/migration/250916_rename_name_to_provider_type.xml" />
 
 </databaseChangeLog>

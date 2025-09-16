@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 16:35:19
+ * @LastEditTime: 2025-09-16 10:46:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,11 @@ package com.bytedesk.ai.zhipuai;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,8 +33,8 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.zhipu.oapi.ClientV4;
@@ -93,7 +98,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         }
 
         try {
-            log.info("Creating dynamic Zhipuai client with provider: {} ({})", provider.getName(), provider.getUid());
+            log.info("Creating dynamic Zhipuai client with provider: {} ({})", provider.getType(), provider.getUid());
             
             return new ClientV4.Builder(apiKey)
                     .enableTokenCache()
@@ -142,15 +147,15 @@ public class ZhipuaiService extends BaseSpringAIService {
         
         // 将Spring AI的Message转换为智谱AI的ChatMessage
         if (prompt != null && prompt.getInstructions() != null) {
-            for (org.springframework.ai.chat.messages.Message message : prompt.getInstructions()) {
+            for (Message message : prompt.getInstructions()) {
                 String role;
                 String content = message.getText();
                 
-                if (message instanceof org.springframework.ai.chat.messages.SystemMessage) {
+                if (message instanceof SystemMessage) {
                     role = ChatMessageRole.SYSTEM.value();
-                } else if (message instanceof org.springframework.ai.chat.messages.UserMessage) {
+                } else if (message instanceof UserMessage) {
                     role = ChatMessageRole.USER.value();
-                } else if (message instanceof org.springframework.ai.chat.messages.AssistantMessage) {
+                } else if (message instanceof AssistantMessage) {
                     role = ChatMessageRole.ASSISTANT.value();
                 } else {
                     // 对于其他类型的消息，默认作为系统消息处理
@@ -297,7 +302,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                             String modelType = llm.getTextModel();
                             log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
                                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType, responseTime);
-                            recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
+                            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                         })
                         .doOnError(error -> {
@@ -373,7 +378,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             String modelType = llm.getTextModel();
             log.info("Zhipuai API sync recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), tokenUsage.getTotalTokens(), modelType, responseTime);
-            recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
+            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -499,7 +504,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 }
                                 
                                 sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.ZHIPUAI, modelType);
+                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.ZHIPUAI, modelType);
                             } catch (Exception e) {
                                 log.error("Zhipuai API SSE error completing stream: ", e);
                             }
@@ -525,7 +530,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             log.info("Zhipuai API SSE recording token usage - prompt: {}, completion: {}, total: {}, model: {}, responseTime: {}ms", 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType, responseTime);
-            recordAiTokenUsage(robot, LlmConsts.ZHIPUAI, modelType, 
+            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
     }

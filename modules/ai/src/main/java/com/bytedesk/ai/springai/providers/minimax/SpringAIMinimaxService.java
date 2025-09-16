@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 14:14:53
+ * @LastEditTime: 2025-09-16 10:47:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,8 +34,8 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
@@ -98,7 +98,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
         }
         
         try {
-            log.info("Creating dynamic Minimax chat model with provider: {} ({})", provider.getName(), provider.getUid());
+            log.info("Creating dynamic Minimax chat model with provider: {} ({})", provider.getType(), provider.getUid());
             // 尝试使用 MiniMaxApi 构造函数而不是 builder
             MiniMaxApi miniMaxApi = new MiniMaxApi(provider.getBaseUrl(), provider.getApiKey());
             
@@ -169,7 +169,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "minimax-chat";
-                    recordAiTokenUsage(robot, LlmConsts.MINIMAX, modelType, 
+                    recordAiTokenUsage(robot, LlmProviderConstants.MINIMAX, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -221,7 +221,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
                     ? robot.getLlm().getTextModel() : "minimax-chat";
-            recordAiTokenUsage(robot, LlmConsts.MINIMAX, modelType, 
+            recordAiTokenUsage(robot, LlmProviderConstants.MINIMAX, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -286,11 +286,11 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                     log.info("Minimax API SSE complete");
                     // 发送流结束消息，包含token使用情况
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmConsts.MINIMAX, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "minimax-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.MINIMAX, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "minimax-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "minimax-chat";
-                    recordAiTokenUsage(robot, LlmConsts.MINIMAX, modelType, 
+                    recordAiTokenUsage(robot, LlmProviderConstants.MINIMAX, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }

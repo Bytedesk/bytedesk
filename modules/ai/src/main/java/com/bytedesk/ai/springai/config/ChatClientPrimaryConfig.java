@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -107,7 +107,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.DASHSCOPE)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.DASHSCOPE)
     public ChatClient primaryDashscopeChatClient() {
         log.info("Setting Dashscope chat client as Primary");
         if (dashscopeChatClient == null) {
@@ -129,7 +129,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.BAIDU)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.BAIDU)
     public ChatClient primaryBaiduChatClient() {
         log.info("Setting Baidu chat client as Primary");
         if (baiduChatClient == null) {
@@ -140,7 +140,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.TENCENT)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.TENCENT)
     public ChatClient primaryTencentChatClient() {
         log.info("Setting Tencent chat client as Primary");
         if (tencentChatClient == null) {
@@ -151,7 +151,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.VOLCENGINE)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.VOLCENGINE)
     public ChatClient primaryVolcengineChatClient() {
         log.info("Setting Volcengine chat client as Primary");
         if (volcengineChatClient == null) {
@@ -173,7 +173,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.OPENROUTER)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.OPENROUTER)
     public ChatClient primaryOpenrouterChatClient() {
         log.info("Setting OpenRouter chat client as Primary");
         if (openrouterChatClient == null) {
@@ -184,7 +184,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.SILICONFLOW)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.SILICONFLOW)
     public ChatClient primarySiliconflowChatClient() {
         log.info("Setting SiliconFlow chat client as Primary");
         if (siliconflowChatClient == null) {
@@ -195,7 +195,7 @@ public class ChatClientPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmConsts.GITEE)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.GITEE)
     public ChatClient primaryGiteeChatClient() {
         log.info("Setting Gitee chat client as Primary");
         if (giteeChatClient == null) {

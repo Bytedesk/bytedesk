@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:35
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-19 14:58:11
+ * @LastEditTime: 2025-09-16 10:03:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,15 +23,15 @@ public interface LlmProviderRepository extends JpaRepository<LlmProviderEntity, 
     
     Optional<LlmProviderEntity> findByUid(String uid);
 
-    List<LlmProviderEntity> findByNameAndLevelAndDeletedFalse(String name, String level);
+    List<LlmProviderEntity> findByTypeAndLevelAndDeletedFalse(String type, String level);
 
-    Optional<LlmProviderEntity> findByNameAndLevelAndOrgUidAndDeletedFalse(String name, String level, String orgUid);
+    Optional<LlmProviderEntity> findByTypeAndLevelAndOrgUidAndDeletedFalse(String type, String level, String orgUid);
     
-    Boolean existsByNameAndLevelAndDeletedFalse(String name, String level);
+    Boolean existsByTypeAndLevelAndDeletedFalse(String type, String level);
 
-    Boolean existsByNameAndLevelAndStatusAndDeletedFalse(String name, String level, String status);
+    Boolean existsByTypeAndLevelAndStatusAndDeletedFalse(String type, String level, String status);
 
-    Boolean existsByNameAndLevelAndOrgUidAndDeletedFalse(String name, String level, String orgUid);
+    Boolean existsByTypeAndLevelAndOrgUidAndDeletedFalse(String type, String level, String orgUid);
 
     List<LlmProviderEntity> findByStatusAndLevelAndDeletedFalse(String status, String level);
 }

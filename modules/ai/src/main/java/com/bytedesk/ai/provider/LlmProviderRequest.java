@@ -32,7 +32,7 @@ public class LlmProviderRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
     
-    private String name;
+    // private String name;
 
     private String nickname;
 
@@ -42,7 +42,7 @@ public class LlmProviderRequest extends BaseRequest {
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
 
-    // private String type;
+    private String type;
 
     //
     private String baseUrl;

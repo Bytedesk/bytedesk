@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-08-21 15:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 15:05:42
+ * @LastEditTime: 2025-09-16 10:45:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -34,8 +34,8 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
-import com.bytedesk.core.constant.LlmConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 
@@ -127,7 +127,7 @@ public class SpringAICustomService extends BaseSpringAIService {
             // 创建选项
             OpenAiChatOptions options = createDynamicOptions(llm);
             if (options == null) {
-                log.warn("Failed to create dynamic options for provider {}, using default chat model", provider.getName());
+                log.warn("Failed to create dynamic options for provider {}, using default chat model", provider.getType());
                 return defaultChatModel;
             }
 
@@ -146,7 +146,7 @@ public class SpringAICustomService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, String fullPromptContent) {
         // 从robot中获取llm配置和提供商信息
         RobotLlm llm = robot.getLlm();
-        String providerName = getProviderName(llm);
+        String providerName = getProviderType(llm);
         log.info("{} API websocket fullPromptContent: {}", providerName, fullPromptContent);
         
         if (llm == null) {
@@ -238,7 +238,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         
         // 从robot中获取llm配置和提供商信息
         RobotLlm llm = robot.getLlm();
-        String providerName = getProviderName(llm);
+        String providerName = getProviderType(llm);
         log.info("{} API sync fullPromptContent: {}", providerName, fullPromptContent);
 
         if (llm == null) {
@@ -294,7 +294,7 @@ public class SpringAICustomService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
         // 从robot中获取llm配置和提供商信息
         RobotLlm llm = robot.getLlm();
-        String providerName = getProviderName(llm);
+        String providerName = getProviderType(llm);
         log.info("{} API SSE fullPromptContent: {}", providerName, fullPromptContent);
 
         if (llm == null) {
@@ -452,14 +452,14 @@ public class SpringAICustomService extends BaseSpringAIService {
     /**
      * 根据LLM配置获取提供商名称（用于日志）
      */
-    private String getProviderName(RobotLlm llm) {
+    private String getProviderType(RobotLlm llm) {
         if (llm == null) {
             return "Unknown";
         }
         
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isPresent()) {
-            return llmProviderOptional.get().getName();
+            return llmProviderOptional.get().getType();
         }
         
         return "Unknown Provider";
@@ -470,63 +470,63 @@ public class SpringAICustomService extends BaseSpringAIService {
      */
     private String getProviderConstant(RobotLlm llm) {
         if (llm == null) {
-            return LlmConsts.CUSTOM;
+            return LlmProviderConstants.CUSTOM;
         }
         
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isPresent()) {
-            String providerName = llmProviderOptional.get().getName();
-            if (StringUtils.hasText(providerName)) {
+            String providerType = llmProviderOptional.get().getType();
+            if (StringUtils.hasText(providerType)) {
                 // 将提供商名称转换为对应的常量
-                return mapProviderNameToConstant(providerName.toLowerCase());
+                return mapProviderNameToConstant(providerType.toLowerCase());
             }
         }
         
-        return LlmConsts.CUSTOM;
+        return LlmProviderConstants.CUSTOM;
     }
 
     /**
      * 将提供商名称映射到对应的常量
      */
-    private String mapProviderNameToConstant(String providerName) {
-        if (providerName == null) {
-            return LlmConsts.CUSTOM;
+    private String mapProviderNameToConstant(String providerType) {
+        if (providerType == null) {
+            return LlmProviderConstants.CUSTOM;
         }
         
         // 移除空格并转为小写
-        providerName = providerName.replaceAll("\\s+", "").toLowerCase();
+        providerType = providerType.replaceAll("\\s+", "").toLowerCase();
         
         // 根据名称匹配对应的常量
-        if (providerName.contains("deepseek")) {
-            return LlmConsts.DEEPSEEK;
-        } else if (providerName.contains("openai")) {
-            return LlmConsts.OPENAI;
-        } else if (providerName.contains("gitee")) {
-            return LlmConsts.GITEE;
-        } else if (providerName.contains("tencent") || providerName.contains("hunyuan")) {
-            return LlmConsts.TENCENT;
-        } else if (providerName.contains("baidu") || providerName.contains("qianfan")) {
-            return LlmConsts.BAIDU;
-        } else if (providerName.contains("volcengine") || providerName.contains("doubao")) {
-            return LlmConsts.VOLCENGINE;
-        } else if (providerName.contains("siliconflow") || providerName.contains("silicon")) {
-            return LlmConsts.SILICONFLOW;
-        } else if (providerName.contains("openrouter")) {
-            return LlmConsts.OPENROUTER;
-        } else if (providerName.contains("groq")) {
-            return LlmConsts.GROQ;
-        } else if (providerName.contains("anthropic") || providerName.contains("claude")) {
-            return LlmConsts.ANTHROPIC;
-        } else if (providerName.contains("moonshot") || providerName.contains("kimi")) {
-            return LlmConsts.MOONSHOT;
-        } else if (providerName.contains("stepfun")) {
-            return LlmConsts.STEPFUN;
-        } else if (providerName.contains("yi") || providerName.contains("01.ai")) {
-            return LlmConsts.YI;
-        } else if (providerName.contains("baichuan")) {
-            return LlmConsts.BAICHUAN;
+        if (providerType.contains("deepseek")) {
+            return LlmProviderConstants.DEEPSEEK;
+        } else if (providerType.contains("openai")) {
+            return LlmProviderConstants.OPENAI;
+        } else if (providerType.contains("gitee")) {
+            return LlmProviderConstants.GITEE;
+        } else if (providerType.contains("tencent") || providerType.contains("hunyuan")) {
+            return LlmProviderConstants.TENCENT;
+        } else if (providerType.contains("baidu") || providerType.contains("qianfan")) {
+            return LlmProviderConstants.BAIDU;
+        } else if (providerType.contains("volcengine") || providerType.contains("doubao")) {
+            return LlmProviderConstants.VOLCENGINE;
+        } else if (providerType.contains("siliconflow") || providerType.contains("silicon")) {
+            return LlmProviderConstants.SILICONFLOW;
+        } else if (providerType.contains("openrouter")) {
+            return LlmProviderConstants.OPENROUTER;
+        } else if (providerType.contains("groq")) {
+            return LlmProviderConstants.GROQ;
+        } else if (providerType.contains("anthropic") || providerType.contains("claude")) {
+            return LlmProviderConstants.ANTHROPIC;
+        } else if (providerType.contains("moonshot") || providerType.contains("kimi")) {
+            return LlmProviderConstants.MOONSHOT;
+        } else if (providerType.contains("stepfun")) {
+            return LlmProviderConstants.STEPFUN;
+        } else if (providerType.contains("yi") || providerType.contains("01.ai")) {
+            return LlmProviderConstants.YI;
+        } else if (providerType.contains("baichuan")) {
+            return LlmProviderConstants.BAICHUAN;
         } else {
-            return LlmConsts.CUSTOM;
+            return LlmProviderConstants.CUSTOM;
         }
     }
 }

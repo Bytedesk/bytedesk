@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-27 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 08:49:05
+ * @LastEditTime: 2025-09-16 10:50:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.env.MockEnvironment;
 
 import com.bytedesk.core.base.LlmProviderConfigDefault;
-import com.bytedesk.core.constant.LlmConsts;
+import com.bytedesk.core.constant.LlmDefaults;
 
 class LlmConfigUtilsTest {
 
@@ -91,16 +91,16 @@ class LlmConfigUtilsTest {
 
         // Then
         assertNotNull(config);
-        assertEquals(LlmConsts.DEFAULT_TEXT_PROVIDER, config.getDefaultChatProvider());
-        assertEquals(LlmConsts.DEFAULT_TEXT_MODEL, config.getDefaultChatModel());
-        assertEquals(LlmConsts.DEFAULT_EMBEDDING_PROVIDER, config.getDefaultEmbeddingProvider());
-        assertEquals(LlmConsts.DEFAULT_EMBEDDING_MODEL, config.getDefaultEmbeddingModel());
-        assertEquals(LlmConsts.DEFAULT_VISION_PROVIDER, config.getDefaultVisionProvider());
-        assertEquals(LlmConsts.DEFAULT_VISION_MODEL, config.getDefaultVisionModel());
-        assertEquals(LlmConsts.DEFAULT_AUDIO_PROVIDER, config.getDefaultVoiceProvider());
-        assertEquals(LlmConsts.DEFAULT_AUDIO_MODEL, config.getDefaultVoiceModel());
-        assertEquals(LlmConsts.DEFAULT_RERANK_PROVIDER, config.getDefaultRerankProvider());
-        assertEquals(LlmConsts.DEFAULT_RERANK_MODEL, config.getDefaultRerankModel());
+        assertEquals(LlmDefaults.DEFAULT_TEXT_PROVIDER, config.getDefaultChatProvider());
+        assertEquals(LlmDefaults.DEFAULT_TEXT_MODEL, config.getDefaultChatModel());
+        assertEquals(LlmDefaults.DEFAULT_EMBEDDING_PROVIDER, config.getDefaultEmbeddingProvider());
+        assertEquals(LlmDefaults.DEFAULT_EMBEDDING_MODEL, config.getDefaultEmbeddingModel());
+        assertEquals(LlmDefaults.DEFAULT_VISION_PROVIDER, config.getDefaultVisionProvider());
+        assertEquals(LlmDefaults.DEFAULT_VISION_MODEL, config.getDefaultVisionModel());
+        assertEquals(LlmDefaults.DEFAULT_AUDIO_PROVIDER, config.getDefaultVoiceProvider());
+        assertEquals(LlmDefaults.DEFAULT_AUDIO_MODEL, config.getDefaultVoiceModel());
+        assertEquals(LlmDefaults.DEFAULT_RERANK_PROVIDER, config.getDefaultRerankProvider());
+        assertEquals(LlmDefaults.DEFAULT_RERANK_MODEL, config.getDefaultRerankModel());
     }
 
     @Test

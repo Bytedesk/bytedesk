@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-10 13:13:27
+ * @LastEditTime: 2025-09-16 10:42:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,6 +15,7 @@ package com.bytedesk.ai.provider;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.LlmProviderConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +42,7 @@ public class LlmProviderEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    // private String name;
 
     private String nickname;
 
@@ -52,8 +53,9 @@ public class LlmProviderEntity extends BaseEntity {
     private String description = BytedeskConsts.EMPTY_STRING;
 
     // 使用type代替name
-    // @Column(name = "provider_type")
-    // private String type;
+    @Builder.Default
+    @Column(name = "provider_type")
+    private String type = LlmProviderConstants.ZHIPUAI;
 
     // 原先apiUrl 现在baseUrl
     private String baseUrl;
