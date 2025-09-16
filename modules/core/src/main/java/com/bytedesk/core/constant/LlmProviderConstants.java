@@ -54,4 +54,6 @@ public class LlmProviderConstants {
     public static final String N8N = "n8n";
     public static final String MAXKB = "maxkb";
     public static final String RAGFLOW = "ragflow";
+    public static final String FASTGPT = "fastgpt";
+    public static final String WEKNORA = "weknora";
 }
