@@ -65,9 +65,9 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
         return llmModelRepository.findByProviderUid(providerUid);
     }
 
-    public List<LlmModelEntity> findByProviderNameAndOrgUid(String providerName, String orgUid) {
-        return llmModelRepository.findByProviderNameAndOrgUidAndDeletedFalse(providerName, orgUid);
-    }
+    // public List<LlmModelEntity> findByProviderNameAndOrgUid(String providerName, String orgUid) {
+    //     return llmModelRepository.findByProviderNameAndOrgUidAndDeletedFalse(providerName, orgUid);
+    // }
 
     public Boolean existsByNameAndProviderUid(String name, String providerUid) {
         return llmModelRepository.existsByNameAndProviderUid(name, providerUid);

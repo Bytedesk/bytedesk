@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:04:20
+ * @LastEditTime: 2025-09-16 10:59:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,8 +30,6 @@ public class LlmProviderResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
     
-    // private String name;
-
     private String nickname;
 
     // https://cdn.weiyuai.cn/assets/images/llm/model/baichuan.png
