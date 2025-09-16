@@ -1,3 +1,5 @@
+import { FeedbackConfig as FeedbackConfig_2 } from '../types';
+
 declare interface Animation_2 {
     enabled?: boolean;
     duration?: number;
@@ -43,6 +45,7 @@ export declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
+    feedbackConfig?: FeedbackConfig;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;
     animation?: Animation_2;
@@ -71,6 +74,14 @@ declare class BytedeskWeb {
     private initVisitorPromise;
     private getUnreadMessageCountPromise;
     private clearUnreadMessagesPromise;
+    private feedbackTooltip;
+    private feedbackDialog;
+    private selectedText;
+    private selectionDebounceTimer;
+    private isTooltipVisible;
+    private lastSelectionText;
+    private lastMouseEvent;
+    private lastSelectionRect;
     constructor(config: BytedeskConfig);
     private setupApiUrl;
     private getDefaultConfig;
@@ -114,6 +125,126 @@ declare class BytedeskWeb {
     private showContextMenu;
     private hideContextMenu;
     private togglePlacement;
+    /**
+     * 初始化文档反馈功能
+     */
+    private initFeedbackFeature;
+    /**
+     * 设置文本选择监听器
+     */
+    private setupTextSelectionListener;
+    /**
+     * 带防抖的文本选择处理
+     */
+    private handleTextSelectionWithDebounce;
+    /**
+     * 处理文本选择
+     */
+    private handleTextSelection;
+    /**
+     * 创建反馈提示框
+     */
+    private createFeedbackTooltip;
+    /**
+     * 显示反馈提示框
+     */
+    private showFeedbackTooltip;
+    /**
+     * 隐藏反馈提示框
+     */
+    private hideFeedbackTooltip;
+    /**
+     * 创建反馈对话框
+     */
+    private createFeedbackDialog;
+    /**
+     * 显示反馈对话框
+     */
+    private showFeedbackDialog;
+    /**
+     * 隐藏反馈对话框
+     */
+    private hideFeedbackDialog;
+    /**
+     * 生成页面截图并上传到服务器
+     * @returns 返回上传后的截图URL，如果失败则返回null
+     */
+    private generateAndUploadScreenshot;
+    /**
+     * 生成截图预览（不上传到服务器）
+     */
+    private generateScreenshotPreview;
+    /**
+     * 计算选中文本附近的截图区域
+     */
+    private calculateScreenshotArea;
+    /**
+     * 动态加载 html2canvas
+     */
+    private loadHtml2Canvas;
+    /**
+     * 从CDN加载html2canvas
+     */
+    private loadHtml2CanvasFromCDN;
+    /**
+     * 提交反馈
+     */
+    private submitFeedback;
+    /**
+     * 提交反馈到服务器
+     */
+    private submitFeedbackToServer;
+    /**
+     * 显示反馈成功消息
+     */
+    private showFeedbackSuccess;
+    /**
+     * 公共方法：显示反馈对话框
+     */
+    showDocumentFeedback(selectedText?: string): void;
+    /**
+     * 公共方法：重新初始化反馈功能
+     */
+    reinitFeedbackFeature(): void;
+    /**
+     * 公共方法：强制初始化反馈功能（用于调试）
+     */
+    forceInitFeedbackFeature(): {
+        success: boolean;
+        methods: {
+            showDocumentFeedback: boolean;
+            testTextSelection: boolean;
+        };
+        elements: {
+            tooltip: boolean;
+            dialog: boolean;
+            tooltipDOM: boolean;
+            dialogDOM: boolean;
+        };
+    };
+    /**
+     * 公共方法：测试文本选择功能
+     */
+    testTextSelection(text?: string): void;
+    /**
+     * 公共方法：获取调试信息
+     */
+    getDebugInfo(): {
+        config: BytedeskConfig;
+        feedbackConfig: FeedbackConfig_2 | undefined;
+        feedbackTooltip: boolean;
+        feedbackDialog: boolean;
+        selectedText: string;
+        methods: {
+            showDocumentFeedback: "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
+            testTextSelection: "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
+            forceInitFeedbackFeature: "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
+        };
+    };
+    /**
+     * 公共方法：销毁反馈功能
+     */
+    private destroyFeedbackFeature;
 }
 export default BytedeskWeb;
 
@@ -133,6 +264,38 @@ declare interface ChatConfig {
     orderInfo?: string;
     vipLevel?: string;
     [key: string]: string | number | undefined;
+}
+
+export declare interface FeedbackConfig {
+    enabled?: boolean;
+    trigger?: 'selection' | 'button' | 'both';
+    showOnSelection?: boolean;
+    selectionText?: string;
+    buttonText?: string;
+    dialogTitle?: string;
+    placeholder?: string;
+    submitText?: string;
+    cancelText?: string;
+    successMessage?: string;
+    categoryNames?: string[];
+    requiredTypes?: boolean;
+    typesSectionTitle?: string;
+    typesDescription?: string;
+    submitScreenshot?: boolean;
+    onSubmit?: (feedback: FeedbackData) => void;
+    onCancel?: () => void;
+}
+
+export declare interface FeedbackData {
+    selectedText: string;
+    images?: string[];
+    content: string;
+    categoryNames?: string;
+    url: string;
+    title: string;
+    userAgent: string;
+    visitorUid?: string;
+    orgUid?: string;
 }
 
 declare interface InviteConfig {

@@ -43,6 +43,7 @@ declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
+    feedbackConfig?: FeedbackConfig;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;
     animation?: Animation_2;
@@ -78,6 +79,38 @@ declare interface ChatConfig {
     orderInfo?: string;
     vipLevel?: string;
     [key: string]: string | number | undefined;
+}
+
+declare interface FeedbackConfig {
+    enabled?: boolean;
+    trigger?: 'selection' | 'button' | 'both';
+    showOnSelection?: boolean;
+    selectionText?: string;
+    buttonText?: string;
+    dialogTitle?: string;
+    placeholder?: string;
+    submitText?: string;
+    cancelText?: string;
+    successMessage?: string;
+    categoryNames?: string[];
+    requiredTypes?: boolean;
+    typesSectionTitle?: string;
+    typesDescription?: string;
+    submitScreenshot?: boolean;
+    onSubmit?: (feedback: FeedbackData) => void;
+    onCancel?: () => void;
+}
+
+declare interface FeedbackData {
+    selectedText: string;
+    images?: string[];
+    content: string;
+    categoryNames?: string;
+    url: string;
+    title: string;
+    userAgent: string;
+    visitorUid?: string;
+    orgUid?: string;
 }
 
 declare interface InviteConfig {
