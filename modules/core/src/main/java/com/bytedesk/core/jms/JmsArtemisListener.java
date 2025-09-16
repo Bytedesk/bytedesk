@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:57:05
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-18 08:50:24
+ * @LastEditTime: 2025-09-16 08:59:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -139,7 +139,7 @@ public class JmsArtemisListener {
 				return;
 			}
 			
-			log.debug("JmsArtemisListener receiveTopicMessage string {}", json);
+			// log.debug("JmsArtemisListener receiveTopicMessage string {}", json);
 			BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
 			bytedeskEventPublisher.publishMessageJsonEvent(json);
 		} catch (Exception e) {
