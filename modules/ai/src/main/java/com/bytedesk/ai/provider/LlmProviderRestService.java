@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:49:26
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:06:16
+ * @LastEditTime: 2025-09-16 11:13:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -93,11 +93,6 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     @Override
     public LlmProviderResponse create(LlmProviderRequest request) {
-        // 
-        // Optional<LlmProviderEntity> optional = llmProviderRepository.findByTypeAndLevelAndOrgUidAndDeletedFalse(request.getType(), request.getLevel(), request.getOrgUid());
-        // if (optional.isPresent()) {
-        //     return convertToResponse(optional.get());
-        // }
         // 
         LlmProviderEntity entity = modelMapper.map(request, LlmProviderEntity.class);
         entity.setUid(uidUtils.getUid());

@@ -36,7 +36,7 @@
     },
     "gitee": {
         "nickname": "Gitee魔力方舟",
-        "logo": "gitee.svg",
+        "logo": "gitee.png",
         "baseUrl": "https://ai.gitee.com",
         "webUrl": "https://ai.gitee.com/",
         "status": "PRODUCTION"
@@ -127,7 +127,7 @@
     },
     "moonshot": {
         "nickname": "Kimi",
-        "logo": "moonshot.jpg",
+        "logo": "moonshot.png",
         "baseUrl": "https://api.moonshot.cn",
         "webUrl": "https://moonshot.ai/",
         "status": "DEVELOPMENT"
@@ -162,7 +162,7 @@
     },
     "anthropic": {
         "nickname": "Anthropic",
-        "logo": "anthropic.jpeg",
+        "logo": "anthropic.png",
         "baseUrl": "https://api.anthropic.com/",
         "webUrl": "https://anthropic.com/",
         "status": "DEVELOPMENT"
@@ -176,7 +176,7 @@
     },
     "aihubmix": {
         "nickname": "AIHubMix",
-        "logo": "aihubmix.jpg",
+        "logo": "aihubmix.png",
         "baseUrl": "https://aihubmix.com",
         "webUrl": "https://aihubmix.com/",
         "status": "DEVELOPMENT"
