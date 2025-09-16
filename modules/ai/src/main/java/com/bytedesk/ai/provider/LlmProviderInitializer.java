@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 17:10:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:07:13
+ * @LastEditTime: 2025-09-16 13:02:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,9 +51,6 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
     }
     /**
      * 初始化 LLM 提供商和模型
-     * 
-     * @see LlmProviderRestService#existsByTypeAndLevel(String, String)
-     * @see LlmModelRestService#existsByTypeAndProviderUid(String, String)
      */
     public void init() {
         // init platform providers
@@ -106,6 +103,7 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
             // log.info("initialize provider {}", providerType);
             String status = providerJson.getStatus();
             if (LlmProviderStatusEnum.PRODUCTION.name().equalsIgnoreCase(status)) {
+                // 
                 if (!llmProviderRestService.existsByTypeAndLevelAndStatus(providerType, level, status)) {
                     // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
                     // llmProviderRestService.createFromProviderJson(providerType, providerJson, level, orgUid);

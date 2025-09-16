@@ -86,7 +86,7 @@
     "dify": {
         "nickname": "Dify",
         "logo": "dify.png",
-        "baseUrl": "https://api.dify.ai",
+        "baseUrl": "https://api.dify.ai/v1",
         "webUrl": "https://www.dify.ai/",
         "status": "PRODUCTION"
     },
