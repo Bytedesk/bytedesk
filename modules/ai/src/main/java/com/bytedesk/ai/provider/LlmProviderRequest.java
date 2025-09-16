@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:50:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:59:30
+ * @LastEditTime: 2025-09-16 15:58:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -46,6 +46,10 @@ public class LlmProviderRequest extends BaseRequest {
     private String baseUrl;
     private String apiKey;
     private String webUrl;
+
+    // 关联的Coze Bot
+    private String cozeBotId;
+    
     // 
     private String status;
 
