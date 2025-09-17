@@ -440,11 +440,11 @@ services:
       SPRING_AI_VOLCENGINE_CHAT_ENABLED: "false"
       SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL: doubao-1-5-pro-32k-250115
       SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE: 0.7
+
       # vector store
-      SPRING_AI_VECTORSTORE_REDIS_INITIALIZE_SCHEMA: "true"
-      # SPRING_AI_VECTORSTORE_REDIS_URI: redis://:qfRxz3tVT8Nh@redis-bytedesk:6379
-      SPRING_AI_VECTORSTORE_REDIS_INDEX_NAME: bytedesk_vs_index
-      # SPRING_AI_VECTORSTORE_REDIS_PREFIX: bytedesk_vs_prefix:
+      SPRING_AI_VECTORSTORE_TYPE: elasticsearch
+      # SPRING_AI_VECTORSTORE_TYPE: none  
+
       # elasticsearch
       # 浏览器可视化插件管理 es-client: https://gitee.com/q2316367743/es-client
       # 配置参数 https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html#elasticsearchvector-properties
