@@ -79,6 +79,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     private final CategoryRestService categoryRestService;
 
+    private final LlmProviderRestService llmProviderRestService;
+
     @Override
     protected Specification<RobotEntity> createSpecification(RobotRequest request) {
         return RobotSpecification.search(request, authService);
@@ -88,8 +90,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     protected Page<RobotEntity> executePageQuery(Specification<RobotEntity> spec, Pageable pageable) {
         return robotRepository.findAll(spec, pageable);
     }
-
-    private final LlmProviderRestService llmProviderRestService;
 
     @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
     @Override
