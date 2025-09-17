@@ -1,0 +1,70 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-09-17 15:15:00
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-09-17 15:15:00
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.ai.segment;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 分词响应DTO
+ * @author jackning
+ */
+@Data
+@Accessors(chain = true)
+public class SegmentResponse {
+    
+    /**
+     * 原始文本
+     */
+    private String originalText;
+    
+    /**
+     * 分词类型
+     */
+    private String type;
+    
+    /**
+     * 分词结果（词语列表，type=word时使用）
+     */
+    private List<String> words;
+    
+    /**
+     * 分词详细结果（type=detail时使用）
+     */
+    private List<SegmentWordDetail> details;
+    
+    /**
+     * 词频统计结果（type=count时使用）
+     */
+    private Map<String, Integer> wordCount;
+    
+    /**
+     * 总词数
+     */
+    private Integer totalWords;
+    
+    /**
+     * 唯一词数
+     */
+    private Integer uniqueWords;
+    
+    /**
+     * 处理时间（毫秒）
+     */
+    private Long processingTimeMs;
+    
+}

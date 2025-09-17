@@ -120,17 +120,7 @@
 			<artifactId>protobuf-java-format</artifactId>
 			<version>1.4</version>
 		</dependency>
-
-		<!-- 分词、词频分析  -->
-		<!-- https://mvnrepository.com/artifact/org.ansj/ansj_seg -->
-		<!-- https://github.com/NLPchina/ansj_seg -->
-		<!-- https://mvnrepository.com/artifact/org.nlpcn/nlp-lang -->
-		<!-- <dependency>
-			<groupId>org.ansj</groupId>
-			<artifactId>ansj_seg</artifactId>
-			<version>5.1.6</version>
-		</dependency> -->
-
+		
 		<!-- 汉字转拼音 -->
         <!-- https://github.com/houbb/pinyin -->
         <!-- https://mvnrepository.com/artifact/com.github.houbb/pinyin -->
@@ -139,15 +129,6 @@
             <artifactId>pinyin</artifactId>
             <version>0.4.0</version>
         </dependency>
-
-		<!-- 中文分词 -->
-		<!-- https://github.com/houbb/segment -->
-		<!-- https://mvnrepository.com/artifact/com.github.houbb/segment -->
-		<dependency>
-			<groupId>com.github.houbb</groupId>
-			<artifactId>segment</artifactId>
-			<version>0.3.1</version>
-		</dependency>
 
 		<!-- 敏感词过滤 -->
 		<!-- https://github.com/houbb/sensitive-word -->

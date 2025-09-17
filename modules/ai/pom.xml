@@ -249,6 +249,24 @@
 			<artifactId>zipkin-reporter-brave</artifactId>
 		</dependency>
 
+		<!-- 分词、词频分析  -->
+		<!-- https://mvnrepository.com/artifact/org.ansj/ansj_seg -->
+		<!-- https://github.com/NLPchina/ansj_seg -->
+		<!-- <dependency>
+			<groupId>org.ansj</groupId>
+			<artifactId>ansj_seg</artifactId>
+			<version>5.1.6</version>
+		</dependency> -->
+
+		<!-- 中文分词 -->
+		<!-- https://github.com/houbb/segment -->
+		<!-- https://mvnrepository.com/artifact/com.github.houbb/segment -->
+		<dependency>
+			<groupId>com.github.houbb</groupId>
+			<artifactId>segment</artifactId>
+			<version>0.3.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
