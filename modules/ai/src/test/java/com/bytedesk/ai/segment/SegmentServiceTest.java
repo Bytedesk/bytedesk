@@ -18,6 +18,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.bytedesk.ai.segment.SegmentRequest;
+import com.bytedesk.ai.segment.SegmentResponse;
+import com.bytedesk.ai.segment.SegmentService;
+import com.bytedesk.ai.segment.SegmentWordDetail;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

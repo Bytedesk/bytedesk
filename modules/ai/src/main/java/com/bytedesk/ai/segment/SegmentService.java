@@ -53,8 +53,8 @@ public class SegmentService {
         try {
             return SegmentHelper.segment(text, SegmentResultHandlers.word());
         } catch (Exception e) {
-            log.error("分词失败: {}", e.getMessage(), e);
-            return new ArrayList<>();
+            log.error("基础分词失败: text={}, error={}", text, e.getMessage(), e);
+            throw new SegmentException("分词失败: " + e.getMessage(), e);
         }
     }
     
@@ -79,8 +79,8 @@ public class SegmentService {
                     ))
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            log.error("详细分词失败: {}", e.getMessage(), e);
-            return new ArrayList<>();
+            log.error("详细分词失败: text={}, error={}", text, e.getMessage(), e);
+            throw new SegmentException("详细分词失败: " + e.getMessage(), e);
         }
     }
     
@@ -98,8 +98,8 @@ public class SegmentService {
         try {
             return SegmentHelper.wordCount(text);
         } catch (Exception e) {
-            log.error("词频统计失败: {}", e.getMessage(), e);
-            return Map.of();
+            log.error("词频统计失败: text={}, error={}", text, e.getMessage(), e);
+            throw new SegmentException("词频统计失败: " + e.getMessage(), e);
         }
     }
     
