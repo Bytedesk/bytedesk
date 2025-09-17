@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-17 09:15:52
+ * @LastEditTime: 2025-09-17 09:37:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,12 @@ public enum FormTypeEnum {
     FLOW,
     
     // ========== 客户服务表单 ==========
+
+    /**
+     * 询前问卷表单 - 用于客户咨询前的信息收集
+     */
+    PRE_SALES_QUESTIONNAIRE,
+
     /**
      * 客户留言表单 - 客户留言和咨询
      */
