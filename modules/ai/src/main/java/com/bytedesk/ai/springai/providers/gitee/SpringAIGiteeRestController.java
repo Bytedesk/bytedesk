@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/test/api/v1/gitee")
+@RequestMapping("/gitee/api/v1")
 @RequiredArgsConstructor
 public class SpringAIGiteeRestController {
 
@@ -38,7 +38,7 @@ public class SpringAIGiteeRestController {
 
     /**
      * 获取结构化模型列表
-     * GET http://127.0.0.1:9003/test/api/v1/gitee/models
+     * GET http://127.0.0.1:9003/gitee/api/v1/models
      * 注意：此接口可以匿名访问，无需 API Key，返回强类型的 GiteeModel 对象
      */
     @GetMapping("/models")

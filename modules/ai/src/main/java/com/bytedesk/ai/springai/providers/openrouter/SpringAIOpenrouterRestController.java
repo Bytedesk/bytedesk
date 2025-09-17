@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-02 22:17:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 22:57:41
+ * @LastEditTime: 2025-09-17 16:40:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/test/api/v1/openrouter")
+@RequestMapping("/openrouter/api/v1")
 @RequiredArgsConstructor
 public class SpringAIOpenrouterRestController {
 
@@ -38,7 +38,7 @@ public class SpringAIOpenrouterRestController {
 
     /**
      * 获取结构化模型列表
-     * GET http://127.0.0.1:9003/test/api/v1/openrouter/models
+     * GET http://127.0.0.1:9003/openrouter/api/v1/models
      * 注意：此接口可以匿名访问，无需 API Key，返回强类型的 OpenrouterModel 对象
      */
     @GetMapping("/models")
