@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[9522],{6833:function(n,i,e){e.r(i);var u=e(31549);i.default=function(){return(0,u.jsx)("div",{children:(0,u.jsx)("h1",{children:"Opinion"})})}}}]);
