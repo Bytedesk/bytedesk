@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:50:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 15:58:30
+ * @LastEditTime: 2025-09-17 13:46:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -45,6 +45,10 @@ public class LlmProviderResponse extends BaseResponse {
     
     // 关联的Coze Bot
     private String cozeBotId;
+
+    // 关联的Ragflow Chat
+    private String ragflowType; // chat or agent
+    private String ragflowId; // chatId or agentId
     
     //
     private String status;

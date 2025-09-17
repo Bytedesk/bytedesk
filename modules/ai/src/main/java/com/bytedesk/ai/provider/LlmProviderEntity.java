@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 13:44:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 11:43:46
+ * @LastEditTime: 2025-09-17 13:54:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -64,6 +64,10 @@ public class LlmProviderEntity extends BaseEntity {
 
     // 关联的Coze Bot
     private String cozeBotId;
+
+    // 关联的Ragflow Chat
+    private String ragflowType; // chat or agent
+    private String ragflowId; // chatId or agentId
 
     @Builder.Default
     private String status = LlmProviderStatusEnum.DEVELOPMENT.name();
