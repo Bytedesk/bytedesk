@@ -58,6 +58,7 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean allowRegister;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
+        private Boolean forceVisitorAuth; // 是否强制访客认证，默认false
     }
 
     @Getter

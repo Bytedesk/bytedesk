@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.bytedesk</groupId>
-        <artifactId>im</artifactId>
-        <version>${revision}</version>
-    </parent>
+	<parent>
+		<groupId>com.bytedesk</groupId>
+		<artifactId>demos</artifactId>
+		<version>${revision}</version>
+	</parent>
 
-    <artifactId>demos</artifactId>
-    <packaging>pom</packaging>
-    <version>${revision}</version>
+	<artifactId>bytedesk-demos</artifactId>
+	<version>${revision}</version>
 
-    <modules>
-        <module>booking</module>
-    </modules>
+	<name>bytedesk-demos</name>
+	<description>https://ai.bytedesk.com</description>
 
-    <dependencies>
+	<properties>
+
+	</properties>
+
+	<dependencies>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -34,12 +36,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!--webflux-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -61,18 +57,18 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <scope>provided</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+            <scope>provided</scope>
+        </dependency> -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -107,14 +103,32 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring Boot Mail Starter -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-        <!-- ///////////////////////////////////////////////////////////////////////////// -->
+        <!-- querydsl crud增强-->
+        <!-- http://querydsl.com/ -->
+        <!-- https://github.com/querydsl/querydsl/tree/master/querydsl-jpa -->
+        <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-jpa -->
+        <!-- <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <classifier>jakarta</classifier>
+            <version>${querydsl.version}</version>
+        </dependency> -->
+
+
+        <!-- //////////////////////////////////微语模块/////////////////////////////////////////// -->
+
+        <dependency>
+            <groupId>com.bytedesk</groupId>
+            <artifactId>bytedesk-module-ai</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.bytedesk</groupId>
@@ -126,13 +140,6 @@
         <dependency>
             <groupId>com.bytedesk</groupId>
             <artifactId>bytedesk-module-kbase</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedesk</groupId>
-            <artifactId>bytedesk-module-ai</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
@@ -151,34 +158,16 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- <dependency>
-            <groupId>com.bytedesk</groupId>
-            <artifactId>bytedesk-module-social</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency> -->
-
-        <!-- saas -->
         <dependency>
             <groupId>com.bytedesk</groupId>
-            <artifactId>bytedesk-enterprise-core</artifactId>
+            <artifactId>bytedesk-module-ticket</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- ///////////////////////////////////////////////////////////////////////////// -->
+        <!-- //////////////////////////////////第三方模块/////////////////////////////////////////// -->
 
-        <!-- querydsl crud增强-->
-        <!-- http://querydsl.com/ -->
-        <!-- https://github.com/querydsl/querydsl/tree/master/querydsl-jpa -->
-        <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-jpa -->
-        <!-- <dependency>
-            <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-jpa</artifactId>
-            <classifier>jakarta</classifier>
-            <version>${querydsl.version}</version>
-        </dependency> -->
-
+        <!--  -->
         <!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
         <!-- https://alibaba.github.io/fastjson2/ -->
         <!-- https://github.com/alibaba/fastjson2/blob/main/docs/spring_support_cn.md -->
@@ -197,6 +186,7 @@
             <version>4.0.3</version>
             <scope>provided</scope>
         </dependency>
+
 
         <!-- 跟Spring ai中swagger集成冲突，去掉 -->
         <!-- http://127.0.0.1:9003/swagger-ui/index.html -->
@@ -249,11 +239,33 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <!--阿里云短信平台-->
+        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <!-- <version>4.6.4</version> -->
+            <version>4.5.13</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 邮件 -->
+        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-dm -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-dm</artifactId>
+            <!-- <version>3.3.2</version> -->
+            <version>3.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- apijson auto generate crud api -->
+        <!-- http://apijson.cn/doc/zh/ -->
+        <!-- https://jitpack.io/#Tencent/APIJSON/7.0.0 -->
         <!-- <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.14.0</version>
+            <groupId>com.github.Tencent</groupId>
+            <artifactId>APIJSON</artifactId>
+            <version>7.0.0</version>
             <scope>provided</scope>
         </dependency> -->
 
@@ -265,22 +277,13 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://github.com/redis/jedis?tab=readme-ov-file -->
-        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--  -->
-        <dependency>
+        <!-- 暂停自动hot reload -->
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -289,8 +292,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-test -->
         <dependency>
@@ -303,8 +304,8 @@
 
     <build>
         <plugins>
-
         </plugins>
     </build>
+
 
 </project>

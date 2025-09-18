@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-18 16:30:17
+ * @LastEditTime: 2025-09-18 16:43:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import org.flowable.engine.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,10 +23,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,12 +50,9 @@ import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
-import com.bytedesk.ticket.comment.TicketCommentRequest;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
-import com.bytedesk.ticket.comment.TicketCommentEntity;
-import com.bytedesk.ticket.comment.TicketCommentRepository;
 import com.bytedesk.core.topic.TopicUtils;
 
 import lombok.AllArgsConstructor;
@@ -71,11 +64,9 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketRestService
         extends BaseRestServiceWithExport<TicketEntity, TicketRequest, TicketResponse, TicketExcel> {
 
-    private final TaskService taskService;
+    // private final TaskService taskService;
 
     private final TicketRepository ticketRepository;
-
-    private final TicketCommentRepository commentRepository;
 
     private final TicketAttachmentRepository attachmentRepository;
 
@@ -122,6 +113,64 @@ public class TicketRestService
         // 默认是工作组工单，暂不启用一对一
         ticket.setType(TicketTypeEnum.DEPARTMENT.name());
         ticket.setOwner(owner); // 创建人
+        //
+        ticket.setAssignee(request.getAssigneeJson());
+        ticket.setReporter(request.getReporterJson());
+        //
+        if (StringUtils.hasText(request.getAssigneeJson())
+                && StringUtils.hasText(request.getAssignee().getUid())) {
+            ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+        } else {
+            ticket.setStatus(TicketStatusEnum.NEW.name());
+        }
+        //
+        ticket.setReporter(request.getReporterJson());
+        // 先保存工单
+        TicketEntity savedTicket = save(ticket);
+        // 保存附件
+        Set<TicketAttachmentEntity> attachments = new HashSet<>();
+        if (request.getUploadUids() != null) {
+            for (String uploadUid : request.getUploadUids()) {
+                Optional<UploadEntity> uploadOptional = uploadRestService.findByUid(uploadUid);
+                if (uploadOptional.isPresent()) {
+                    TicketAttachmentEntity attachment = new TicketAttachmentEntity();
+                    attachment.setUid(uidUtils.getUid());
+                    attachment.setOrgUid(savedTicket.getOrgUid());
+                    attachment.setTicket(savedTicket);
+                    attachment.setUpload(uploadOptional.get());
+                    attachmentRepository.save(attachment);
+                    //
+                    attachments.add(attachment);
+                }
+            }
+        }
+        savedTicket.setAttachments(attachments);
+
+        // 未绑定客服会话的情况下，创建工单客服会话
+        if (!StringUtils.hasText(ticket.getThreadUid())) {
+            // 如果创建工单的时候没有绑定会话，则创建会话
+            ThreadEntity thread = createTicketThread(ticket);
+            if (thread != null) {
+                ticket.setTopic(thread.getTopic());
+                ticket.setThreadUid(thread.getUid());
+            }
+        }
+
+        // 保存工单
+        savedTicket = save(savedTicket);
+        if (savedTicket == null) {
+            throw new RuntimeException("create ticket failed");
+        }
+
+        return convertToResponse(savedTicket);
+    }
+
+    @Transactional
+    public TicketResponse createByVisitor(TicketRequest request) {
+        // 创建工单...
+        TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
+        ticket.setUid(uidUtils.getUid());
+        ticket.setType(TicketTypeEnum.VISITOR.name());
         //
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());
@@ -298,60 +347,49 @@ public class TicketRestService
         return threadRestService.save(thread);
     }
 
-    @Transactional
-    public void verifyTicket(Long ticketId, boolean approved) {
-        taskService.complete(getTaskIdByTicketId(ticketId),
-                Map.of("approved", approved));
-    }
+    // @Transactional
+    // public void verifyTicket(Long ticketId, boolean approved) {
+    //     taskService.complete(getTaskIdByTicketId(ticketId),
+    //             Map.of("approved", approved));
+    // }
 
-    @Transactional
-    public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentRequest) {
-        TicketEntity ticket = findTicketById(ticketId);
+    // @Transactional
+    // public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentRequest) {
+    //     TicketEntity ticket = findTicketById(ticketId);
 
-        TicketCommentEntity comment = new TicketCommentEntity();
-        comment.setTicket(ticket);
-        comment.setContent(commentRequest.getContent());
-        // comment.setAuthor(commentDTO.getAuthor());
+    //     TicketCommentEntity comment = new TicketCommentEntity();
+    //     comment.setTicket(ticket);
+    //     comment.setContent(commentRequest.getContent());
+    //     // comment.setAuthor(commentDTO.getAuthor());
 
-        return commentRepository.save(comment);
-    }
+    //     return commentRepository.save(comment);
+    // }
 
-    @Transactional
-    public TicketAttachmentEntity uploadAttachment(Long ticketId, MultipartFile file) {
-        TicketEntity ticket = findTicketById(ticketId);
+    // @Transactional
+    // public TicketAttachmentEntity uploadAttachment(Long ticketId, MultipartFile file) {
+    //     TicketEntity ticket = findTicketById(ticketId);
 
-        TicketAttachmentEntity attachment = new TicketAttachmentEntity();
-        attachment.setTicket(ticket);
-        // attachment.setFileName(file.getOriginalFilename());
-        // attachment.setFileType(file.getContentType());
-        // attachment.setFileSize(file.getSize());
-        // attachment.setFilePath("/uploads/" + file.getOriginalFilename());
+    //     TicketAttachmentEntity attachment = new TicketAttachmentEntity();
+    //     attachment.setTicket(ticket);
+    //     // attachment.setFileName(file.getOriginalFilename());
+    //     // attachment.setFileType(file.getContentType());
+    //     // attachment.setFileSize(file.getSize());
+    //     // attachment.setFilePath("/uploads/" + file.getOriginalFilename());
 
-        return attachmentRepository.save(attachment);
-    }
+    //     return attachmentRepository.save(attachment);
+    // }
 
-    private String getTaskIdByTicketId(Long ticketId) {
-        return taskService.createTaskQuery()
-                .processInstanceBusinessKey(ticketId.toString())
-                .singleResult()
-                .getId();
-    }
+    // private String getTaskIdByTicketId(Long ticketId) {
+    //     return taskService.createTaskQuery()
+    //             .processInstanceBusinessKey(ticketId.toString())
+    //             .singleResult()
+    //             .getId();
+    // }
 
-    private TicketEntity findTicketById(Long ticketId) {
-        return ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException("Ticket not found: " + ticketId));
-    }
-
-    @Override
-    public TicketEntity save(TicketEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        } catch (Exception e) {
-            throw new RuntimeException("save ticket exception: " + e.getMessage());
-        }
-    }
+    // private TicketEntity findTicketById(Long ticketId) {
+    //     return ticketRepository.findById(ticketId)
+    //             .orElseThrow(() -> new RuntimeException("Ticket not found: " + ticketId));
+    // }
 
     @Override
     protected TicketEntity doSave(TicketEntity entity) {

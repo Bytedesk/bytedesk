@@ -1,8 +1,8 @@
-<!--
+/*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-09-04 07:32:44
+ * @Date: 2025-09-04 07:22:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-04 07:32:49
+ * @LastEditTime: 2025-09-18 17:26:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -10,14 +10,17 @@
  *  contact: 270580156@qq.com 
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
--->
-# 订票演示
+ */
+package com.bytedesk.demos;
 
-## 适用场景
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-- 机票预定、退票、改签
-- 酒店预定、退房、续住
-- 汽车预定、还车
-- 旅游线路预定、取消
-- 电影票预定、退票
-- 餐厅订座、取消
+@SpringBootApplication
+public class DemosApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemosApplication.class, args);
+	}
+
+}

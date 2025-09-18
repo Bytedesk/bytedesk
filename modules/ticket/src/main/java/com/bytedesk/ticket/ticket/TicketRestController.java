@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 17:11:36
+ * @LastEditTime: 2025-09-18 16:38:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,23 +18,18 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
-import com.bytedesk.ticket.comment.TicketCommentRequest;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.bytedesk.ticket.comment.TicketCommentEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @Slf4j
@@ -66,6 +61,15 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     // @PreAuthorize("hasAuthority('TICKET_READ')")
+    @Override
+    public ResponseEntity<?> queryByUid(TicketRequest request) {
+        
+        TicketResponse response = ticketRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    // @PreAuthorize("hasAuthority('TICKET_READ')")
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(TicketRequest request) {
 
@@ -81,13 +85,6 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         Page<TicketResponse> page = ticketRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
-    }
-
-    // @PreAuthorize("hasAuthority('TICKET_READ')")
-    @Override
-    public ResponseEntity<?> queryByUid(TicketRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @PreAuthorize("hasAuthority('TICKET_CREATE')")
@@ -120,15 +117,15 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success());
     }
     
-    @PostMapping("/{id}/comments")
-    public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
-        return ticketRestService.addComment(id, comment);
-    }
+    // @PostMapping("/{id}/comments")
+    // public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
+    //     return ticketRestService.addComment(id, comment);
+    // }
     
-    @PostMapping("/{id}/attachments")
-    public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
-        return ticketRestService.uploadAttachment(id, file);
-    }
+    // @PostMapping("/{id}/attachments")
+    // public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
+    //     return ticketRestService.uploadAttachment(id, file);
+    // }
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
