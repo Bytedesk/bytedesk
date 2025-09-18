@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-14 10:45:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-13 12:44:05
+ * @LastEditTime: 2025-09-18 14:38:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -70,6 +70,9 @@ public class ServiceSettingsRequest  implements Serializable {
 
     @Builder.Default
     private Boolean showPreForm = false;
+
+    @Builder.Default
+    private Boolean preFormRequired = false;
 
     @Builder.Default
     private String preForm = BytedeskConsts.EMPTY_JSON_STRING;
