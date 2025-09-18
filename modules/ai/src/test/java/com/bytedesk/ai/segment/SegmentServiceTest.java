@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-17 15:25:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-17 15:25:00
+ * @LastEditTime: 2025-09-18 14:25:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,11 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.bytedesk.ai.segment.SegmentRequest;
-import com.bytedesk.ai.segment.SegmentResponse;
-import com.bytedesk.ai.segment.SegmentService;
-import com.bytedesk.ai.segment.SegmentWordDetail;
 
 import java.util.Arrays;
 import java.util.List;

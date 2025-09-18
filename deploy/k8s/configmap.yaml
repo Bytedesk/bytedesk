@@ -10,7 +10,7 @@ data:
   
   # 微语配置
   BYTEDESK_DEBUG: "false"
-  BYTEDESK_VERSION: "0.9.6"
+  BYTEDESK_VERSION: "0.9.7"
   BYTEDESK_LICENSE_KEY: ""
   
   # 自定义配置
