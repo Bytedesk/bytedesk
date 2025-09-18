@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-06 10:44:36
+ * @LastEditTime: 2025-09-18 13:33:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -71,6 +71,8 @@ public class TicketRequest extends BaseRequest {
     private Integer rating;
     // 客户验证
     private Boolean verified;
+    // 自定义表单 json schema
+    private String schema;
 
     public String getAssigneeJson() {
         if (assignee == null) {
