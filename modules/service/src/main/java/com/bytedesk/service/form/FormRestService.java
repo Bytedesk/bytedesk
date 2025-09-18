@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-18 10:26:46
+ * @LastEditTime: 2025-09-18 16:05:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -54,6 +54,10 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     @Override
     public Optional<FormEntity> findByUid(String uid) {
         return formRepository.findByUid(uid);
+    }
+
+    public Page<FormResponse> queryAvailableForms(FormRequest request) {
+        return queryByOrg(request);
     }
 
     @Override

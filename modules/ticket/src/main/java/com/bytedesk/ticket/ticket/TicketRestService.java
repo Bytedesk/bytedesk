@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-06 09:55:42
+ * @LastEditTime: 2025-09-18 16:30:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -91,12 +91,20 @@ public class TicketRestService
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
 
     @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
     public Optional<TicketEntity> findByUid(String uid) {
         return ticketRepository.findByUid(uid);
+    }
+
+    // query by visitor uid
+    public Page<TicketResponse> queryByVisitorUid(TicketRequest request) {
+       Pageable pageable = request.getPageable();
+        Specification<TicketEntity> spec = createSpecification(request);
+        Page<TicketEntity> page = executePageQuery(spec, pageable);
+        return page.map(this::convertToResponse);
     }
 
     @Transactional
@@ -406,7 +414,7 @@ public class TicketRestService
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            categoryService.create(categoryRequest);
+            categoryRestService.create(categoryRequest);
         }
     }
 
