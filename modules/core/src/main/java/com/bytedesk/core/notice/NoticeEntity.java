@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-01 09:27:49
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-10 10:25:02
+ * @LastEditTime: 2025-09-18 17:49:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,6 +32,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
+ * 用于发布：用户登录通知、会话转接、会话邀请通知，待重构到 MessageEntity
+ * 
  * System notice entity for announcements and notifications
  * Different from message type notices - used for system-wide announcements
  * 
