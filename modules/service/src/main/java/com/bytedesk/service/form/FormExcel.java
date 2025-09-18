@@ -34,9 +34,5 @@ public class FormExcel {
     @ColumnWidth(20)
     private String type;
 
-    @ExcelProperty(index = 2, value = "Color")
-    @ColumnWidth(20)
-    private String color;
-
     
 }

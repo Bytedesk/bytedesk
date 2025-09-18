@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-02 14:13:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 14:14:18
+ * @LastEditTime: 2025-09-18 10:15:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -30,12 +30,7 @@ public enum FormStatusEnum {
      * 已发布状态
      */
     PUBLISHED,
-    
-    /**
-     * 已归档状态
-     */
-    ARCHIVED,
-    
+
     /**
      * 已禁用状态
      */
