@@ -37,5 +37,7 @@ public class FormRequest extends BaseRequest {
 
     // private String type;
 
+    private String status;
+
     private String schema;
 }
