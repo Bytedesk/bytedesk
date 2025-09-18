@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-06 21:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 13:28:11
+ * @LastEditTime: 2025-09-18 11:35:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,18 +22,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ServiceSettingsInitializer implements SmartInitializingSingleton {
 
-    // private final AuthorityRestService authorityService;
-
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
     }
 
     private void initPermissions() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = ServiceSettingsPermissions.ARTICLE_PREFIX + permission.name();
-        //     authorityService.createForPlatform(permissionValue);
-        // }
     }
 
 }
