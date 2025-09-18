@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 11:45:31
+ * @LastEditTime: 2025-09-18 11:07:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -54,36 +52,6 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
     @Override
     protected Page<FormResultEntity> executePageQuery(Specification<FormResultEntity> spec, Pageable pageable) {
         return tagRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<FormResultEntity> queryByOrgEntity(FormResultRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<FormResultEntity> spec = FormResultSpecification.search(request, authService);
-        return tagRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public Page<FormResultResponse> queryByOrg(FormResultRequest request) {
-        Page<FormResultEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<FormResultResponse> queryByUser(FormResultRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
-    }
-
-    @Override
-    public FormResultResponse queryByUid(FormResultRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")

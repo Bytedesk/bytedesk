@@ -37,6 +37,34 @@ public class FormResultResponse extends BaseResponse {
 
     private String type;
 
+    private String formUid;
+
+    private String submitterUid;
+
+    private String submitterName;
+
+    private String submitterEmail;
+
+    private String submitterMobile;
+
+    private String submitterIp;
+
+    private String formData;
+
+    private String relatedUid;
+
+    private String relatedType;
+
+    private String status;
+
+    private String processResult;
+
+    private String processorUid;
+
+    private Integer formVersion;
+
+    private String attachments;
+
     private String color;
 
     private Integer order;

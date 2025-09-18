@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 14:55:23
+ * @LastEditTime: 2025-09-18 10:26:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,6 +23,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -36,6 +38,8 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final AuthService authService;
 
     @Override
     protected Specification<FormEntity> createSpecification(FormRequest request) {
@@ -56,7 +60,12 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
     public FormResponse create(FormRequest request) {
         FormEntity entity = modelMapper.map(request, FormEntity.class);
         entity.setUid(uidUtils.getUid());
-
+        // 
+        UserEntity user = authService.getCurrentUser();
+        if (user != null) {
+            entity.setUserUid(user.getUid());
+        }
+        // 
         FormEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create form failed");
