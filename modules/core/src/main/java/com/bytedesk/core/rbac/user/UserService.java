@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-03 18:10:09
+ * @LastEditTime: 2025-09-18 09:25:50
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -166,7 +166,6 @@ public class UserService {
         user = save(user);
         // 新注册用户添加role_user
         addRoleUser(user);
-
         //
         return ConvertUtils.convertToUserResponse(user);
     }

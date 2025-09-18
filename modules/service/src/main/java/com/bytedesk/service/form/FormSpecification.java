@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 14:04:53
+ * @LastEditTime: 2025-09-18 09:16:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -32,6 +33,11 @@ public class FormSpecification extends BaseSpecification<FormEntity, FormRequest
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // 
+            // type
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

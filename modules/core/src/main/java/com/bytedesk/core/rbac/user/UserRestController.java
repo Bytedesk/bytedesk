@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-24 13:00:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-08 14:40:00
+ * @LastEditTime: 2025-09-18 09:06:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,6 +73,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @ActionAnnotation(title = "user", action = "新建", description = "create user info")
     @Override
     public ResponseEntity<?> create(UserRequest request) {
@@ -116,12 +117,10 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
+
         UserResponse userResponse = userRestService.getProfile();
-        if (userResponse != null) {
-            return ResponseEntity.ok(JsonResult.success(userResponse));
-        } else {
-            return ResponseEntity.ok().body(JsonResult.error("login first", -1, false));
-        }
+        
+        return ResponseEntity.ok(JsonResult.success(userResponse));
     }
     
     // 用户自己修改密码

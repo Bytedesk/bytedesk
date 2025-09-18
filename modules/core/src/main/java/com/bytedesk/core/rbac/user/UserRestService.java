@@ -52,13 +52,13 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     public UserResponse getProfile() {
         UserEntity user = authService.getUser(); // 返回的是缓存，导致修改后的数据无法获取
         if (user == null) {
-            return null;
+            throw new RuntimeException("User not found");
         }
         Optional<UserEntity> userOptional = findByUid(user.getUid());
         if (userOptional.isPresent()) {
             return convertToResponse(userOptional.get());
         } else {
-            return null;
+            throw new RuntimeException("User not found");
         }
     }
 
