@@ -49,7 +49,7 @@ public class KbaseRequest extends BaseRequest {
 
     private String type;
 
-    private String subType;
+    // private String subType;
 
     // headline标头
     @Builder.Default

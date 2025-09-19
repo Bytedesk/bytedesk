@@ -39,7 +39,7 @@ public class KbaseResponse extends BaseResponse {
 
     private String type;
 
-    private String subType;
+    // private String subType;
 
     // headline标头
     private String headline;
