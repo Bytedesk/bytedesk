@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-11 12:06:58
+ * @LastEditTime: 2025-09-19 10:28:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,7 +17,7 @@
 
 ```bash
 .
-├── docker-compose-middleware.yaml # 仅启动mysql,redis,elasticsearch依赖，不启动微语
+├── docker-compose-noai.yaml # 不使用ai，无机器人问答
 ├── docker-compose-ollama.yaml # 启动微语，同时启动mysql,redis,ollama,elasticsearch依赖和微语，内含ollama，默认使用ollama对话
 ├── docker-compose.yaml # 启动微语，同时启动mysql,redis,elasticsearch依赖和微语，不内含ollama，默认使用zhipuai
 ```
@@ -37,8 +37,8 @@ cp .env.example .env
 docker compose -p bytedesk -f docker-compose.yaml up -d
 # start mysql, redis, ollama, elasticsearch dependencies and weiyu, with ollama
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
-# start middleware container, including rabbitmq and redis，without weiyu
-docker compose -p bytedesk -f docker-compose-middleware.yaml up -d
+# start without ai
+docker compose -p bytedesk -f docker-compose-noai.yaml up -d
 # chat model
 docker exec ollama-bytedesk ollama pull qwen3:0.6b
 # embedding model

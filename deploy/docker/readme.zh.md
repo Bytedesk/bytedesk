@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-12 10:21:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-04 22:05:32
+ * @LastEditTime: 2025-09-19 10:27:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,9 +17,9 @@
 
 ```bash
 .
-├── docker-compose-middleware.yaml # 仅启动mysql,redis,elasticsearch依赖，不启动微语
-├── docker-compose-ollama.yaml # 启动微语，同时启动mysql,redis,ollama,elasticsearch依赖和微语，内含ollama，默认使用ollama对话
-├── docker-compose.yaml # 启动微语，同时启动mysql,redis,elasticsearch依赖和微语，不内含ollama，默认使用zhipuai
+├── docker-compose-noai.yaml # 不使用ai，无机器人问答
+├── docker-compose-ollama.yaml # 启动微语，内含ollama，默认使用ollama对话
+├── docker-compose.yaml # 启动微语，不内含ollama，默认使用zhipuai
 ```
 
 ## 微语启动步骤
@@ -37,8 +37,8 @@ cp .env.example .env
 docker compose -p bytedesk -f docker-compose.yaml up -d
 # 同时启动mysql,redis,ollama,elasticsearch依赖和微语，内含ollama
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
-# 仅启动mysql、redis、elasticsearch依赖，不启动微语
-docker compose -p bytedesk -f docker-compose-middleware.yaml up -d
+# 启动不使用ai，无机器人问答
+docker compose -p bytedesk -f docker-compose-noai.yaml up -d
 # 拉取ollama模型
 # 对话模型
 docker exec ollama-bytedesk ollama pull qwen3:0.6b

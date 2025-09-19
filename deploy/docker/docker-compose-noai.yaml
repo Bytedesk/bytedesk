@@ -1,0 +1,519 @@
+services:
+  bytedesk-mysql:
+    image: mysql:latest
+    container_name: mysql-bytedesk
+    environment:
+      MYSQL_DATABASE: bytedesk
+      MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
+      TZ: Asia/Shanghai  # 添加这一行
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  bytedesk-redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis-bytedesk
+    ports:
+      - "16379:6379"
+    environment:
+      - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
+    volumes:
+      - redis_data:/data
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD", "redis-cli", "-a", "qfRxz3tVT8Nh", "ping"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+      
+  # ActiveMQ Artemis 消息队列
+  # http://localhost:18161/console，使用 admin/admin 作为登录凭据
+  bytedesk-artemis:
+    image: apache/activemq-artemis:latest
+    container_name: artemis-bytedesk
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+      - ANONYMOUS_LOGIN=false
+      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia
+    ports:
+      - "16161:61616"   # JMS
+      - "16162:61617"   # AMQP
+      - "18161:8161"     # Web Console
+      - "15672:5672"     # AMQP
+      - "16163:61613"   # STOMP
+      - "11883:1883"     # MQTT
+    volumes:
+      - artemis_data:/var/lib/artemis/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "-u", "admin:admin", "http://localhost:8161/console/jolokia/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ElasticSearch 向量数据库
+  bytedesk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    container_name: elasticsearch-bytedesk
+    environment:
+      - node.name=bytedesk-es01
+      - cluster.name=bytedesk-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=bytedesk123
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+
+  # Zipkin 分布式追踪系统- Spring Ai Observability
+  bytedesk-zipkin:
+    image: 'openzipkin/zipkin:latest'
+    container_name: zipkin-bytedesk
+    ports:
+      - '19411:9411'
+    volumes:
+      - zipkin_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO Console
+  # http://localhost:19001 - MinIO API
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  bytedesk:
+    # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
+    # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest # aliyun enterprise
+    # mage: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest # aliyun community
+    container_name: bytedesk
+    depends_on:
+      - bytedesk-mysql
+      - bytedesk-redis
+      - bytedesk-elasticsearch
+      - bytedesk-artemis
+      - bytedesk-zipkin
+      - bytedesk-minio
+      # bytedesk-mysql:
+      #   condition: service_healthy
+      # bytedesk-redis:
+      #   condition: service_healthy
+      # bytedesk-elasticsearch:
+      #   condition: service_healthy
+      # bytedesk-artemis:
+      #   condition: service_healthy
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: 9003
+      # bytedesk config
+      BYTEDESK_DEBUG: "false"
+      BYTEDESK_VERSION: 0.9.7
+      # 申请licenseKey
+      # https://www.weiyuai.cn/docs/zh-CN/docs/faq#%E9%97%AE%E9%A2%9813%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E8%AF%95%E7%94%A8%E7%89%88license
+      BYTEDESK_LICENSE_KEY: 
+      # enable custom config: name, logo, description
+      BYTEDESK_CUSTOM_ENABLED: "false"
+      BYTEDESK_CUSTOM_NAME: 
+      BYTEDESK_CUSTOM_LOGO: 
+      BYTEDESK_CUSTOM_DESCRIPTION: 
+      BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: "false"
+      BYTEDESK_CUSTOM_SHOW_DEMO: "false"
+      BYTEDESK_CUSTOM_PRIVACY_POLICY_URL: https://www.weiyuai.cn/privacy.html
+      BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL: https://www.weiyuai.cn/terms.html
+      BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: "true"
+      BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE: "true"
+      BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE: "true"
+      BYTEDESK_CUSTOM_DOC_URL_SHOW: "true"
+      BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
+      BYTEDESK_CUSTOM_LANG: zh-CN
+      BYTEDESK_CUSTOM_ALLOW_REGISTER: "true"
+      BYTEDESK_CUSTOM_FORCE_VALIDATE_MOBILE: "true"
+      BYTEDESK_CUSTOM_FORCE_VALIDATE_EMAIL: "true"
+      # Admin config
+      BYTEDESK_ADMIN_EMAIL: admin@email.com
+      BYTEDESK_ADMIN_PASSWORD: admin
+      BYTEDESK_ADMIN_NICKNAME: SuperAdmin
+      BYTEDESK_ADMIN_MOBILE: 13345678000
+      BYTEDESK_ADMIN_MOBILE_WHITELIST: 18888888000,18888888001,18888888002,18888888003,18888888004,18888888005
+      BYTEDESK_ADMIN_EMAIL_WHITELIST: 100@email.com,101@email.com,102@email.com,103@email.com,104@email.com,105@email.com
+      BYTEDESK_ADMIN_VALIDATE_CODE: 123456
+      
+      # Member config
+      BYTEDESK_MEMBER_PASSWORD: 123456
+      # Performance Testing config
+      BYTEDESK_TESTING_ENABLED: "false"
+      # BYTEDESK_TESTING_ACCOUNT_COUNT: 300
+      # BYTEDESK_TESTING_ACCOUNT_USERNAME: test
+      # BYTEDESK_TESTING_ACCOUNT_PASSWORD: password
+      BYTEDESK_TESTING_DISABLE_CAPTCHA: "false"
+      BYTEDESK_TESTING_DISABLE_IP_FILTER: "false"
+      # whitelist ip for performance testing
+      BYTEDESK_TESTING_IP_WHITELIST: 127.0.0.1,127.0.0.2
+      # Organization config
+      BYTEDESK_ORGANIZATION_NAME: MyCompany
+      BYTEDESK_ORGANIZATION_CODE: bytedesk
+      # Features config
+      BYTEDESK_FEATURES_JAVA_AI: "true"
+      BYTEDESK_FEATURES_EMAIL_TYPE: javamail
+      # 头像的访问地址，请修改为服务器实际的地址
+      BYTEDESK_FEATURES_AVATAR_BASE_URL: http://127.0.0.1:9003
+      # CORS config
+      # BYTEDESK_CORS_ALLOWED_ORIGINS: *
+      # JWT config
+      BYTEDESK_JWT_SECRET_KEY: 1dfaf8d004207b628a9a6b859c429f49a9a7ead9fd8161c1e60847aeef06dbd2
+      BYTEDESK_JWT_EXPIRATION: 2592000000
+      BYTEDESK_JWT_REFRESH_TOKEN_EXPIRATION: 5184000000
+       # db config
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-bytedesk:3306/bytedesk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: r8FqfdbWUaN3
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # redis config
+      SPRING_DATA_REDIS_DATABASE: 0
+      SPRING_DATA_REDIS_HOST: redis-bytedesk
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: qfRxz3tVT8Nh
+      SPRING_DATA_REDIS_TIMEOUT: 10000
+      SPRING_DATA_REDIS_REPOSITORIES_ENABLED: "false"
+      # Cache config
+      BYTEDESK_CACHE_LEVEL: 0
+      BYTEDESK_CACHE_PREFIX: bytedeskim
+      BYTEDESK_CACHE_REDIS_STREAM_KEY: bytedeskim:stream
+      # Upload config
+      BYTEDESK_UPLOAD_TYPE: local
+      BYTEDESK_UPLOAD_DIR: /app/uploads
+      # 上传文件的访问地址，请修改为服务器实际的地址
+      BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
+      # MinIO配置（当使用MinIO时）
+      BYTEDESK_MINIO_ENABLED: "false"
+      BYTEDESK_MINIO_ENDPOINT: http://bytedesk-minio:9000  # Docker内部通信使用服务名
+      BYTEDESK_MINIO_ACCESS_KEY: minioadmin
+      BYTEDESK_MINIO_SECRET_KEY: minioadmin123
+      BYTEDESK_MINIO_BUCKET_NAME: bytedesk
+      BYTEDESK_MINIO_REGION: us-east-1
+      BYTEDESK_MINIO_SECURE: false
+      # Knowledge base config
+      BYTEDESK_KBASE_THEME: default
+      BYTEDESK_KBASE_HTML_PATH: helpcenter
+      # 知识库的访问地址，请修改为服务器实际的地址
+      BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
+      # Socket config
+      BYTEDESK_SOCKET_HOST: 0.0.0.0
+      BYTEDESK_SOCKET_WEBSOCKET_PORT: 9885
+      BYTEDESK_SOCKET_LEAK_DETECTOR_LEVEL: SIMPLE
+      BYTEDESK_SOCKET_PARENT_EVENT_LOOP_GROUP_THREAD_COUNT: 1
+      BYTEDESK_SOCKET_CHILD_EVENT_LOOP_GROUP_THREAD_COUNT: 8
+      BYTEDESK_SOCKET_MAX_PAYLOAD_SIZE: 10240
+      # Call FreeSwitch config
+      BYTEDESK_CALL_FREESWITCH_ENABLED: "false"
+      BYTEDESK_CALL_FREESWITCH_SERVER: 127.0.0.1
+      BYTEDESK_CALL_FREESWITCH_ESL_PORT: 8021
+      BYTEDESK_CALL_FREESWITCH_ESL_PASSWORD: password
+      BYTEDESK_CALL_FREESWITCH_SIP_PORT: 5060
+      BYTEDESK_CALL_FREESWITCH_WEBRTC_PORT: 7443
+      BYTEDESK_CALL_FREESWITCH_WS_PORT: 5066
+      BYTEDESK_CALL_FREESWITCH_CALL_TIMEOUT: 120
+      # Cluster config
+      BYTEDESK_CLUSTER_ENABLED: "false"
+      # Push config
+      # BYTEDESK_PUSH_APNS_BUNDLE_ID: com.kefux.im
+      # BYTEDESK_PUSH_APNS_P12_URL: 123.p12
+      # BYTEDESK_PUSH_APNS_P12_PASSWORD: 123456
+      # druid
+      SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_USERNAME: admin@email.com
+      SPRING_DATASOURCE_DRUID_STAT_VIEW_SERVLET_LOGIN_PASSWORD: admin
+      # Actuator security configuration
+      MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT: "false"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ''
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_EXCLUDE: '*'
+      MANAGEMENT_ENDPOINT_HEALTH_ENABLED: "false"
+      MANAGEMENT_ENDPOINT_INFO_ENABLED: "false"
+      MANAGEMENT_SERVER_PORT: -1
+      MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
+      SPRING_SECURITY_BASIC_ENABLED: "true"
+      # Zipkin Tracing Configuration
+      MANAGEMENT_TRACING_ENABLED: "false"
+      MANAGEMENT_ZIPKIN_TRACING_ENABLED: "false"
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:19411/api/v2/spans
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
+      # ai config
+      # 默认对话配置
+      # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_text
+      SPRING_AI_MODEL_CHAT: none
+      # 默认向量模型
+      # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_embedding
+      SPRING_AI_MODEL_EMBEDDING: none
+      # 默认视觉模型
+      # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_vision
+      SPRING_AI_MODEL_VISION: none
+      SPRING_AI_MODEL_IMAGE: none
+      SPRING_AI_MODEL_MODERATION: none
+      # 默认语音模型
+      SPRING_AI_MODEL_AUDIO: none
+      SPRING_AI_MODEL_AUDIO_SPEECH: none
+      SPRING_AI_MODEL_AUDIO_TRANSCRIPTION: none
+      # 默认重排序模型
+      SPRING_AI_MODEL_RERANK: none
+      # 多模态模型
+      SPRING_AI_MODEL_MULTIMODAL: none
+      # ollama
+      SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
+      SPRING_AI_OLLAMA_CHAT_ENABLED: "false"
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen3:0.6b
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: "false"
+      # 如果主要处理中文内容，推荐使用BGE模型，在中文语义理解上表现更好
+      # https://huggingface.co/BAAI/bge-m3: Dimension: 1024, Sequence Length: 8192          
+      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: bge-m3:latest
+      # https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html#auto-pulling-models
+      # always/when_missing/never
+      SPRING_AI_OLLAMA_INIT_PULL_MODEL_STRATEGY: when_missing
+      # https://huggingface.co/BAAI/bge-reranker-v2-m3
+      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL_RERANK: bge-reranker-v2-m3:latest
+      # zhipuai
+      # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
+      # SPRING_AI_ZHIPUAI_BASE_URL: https://open.bigmodel.cn/api/paas
+      SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: "false"
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4-flash
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TOP_P: 0.9
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MAX_TOKENS: 4096
+      SPRING_AI_ZHIPUAI_CONNECTION_TIMEOUT: 30
+      SPRING_AI_ZHIPUAI_READ_TIMEOUT: 10
+      SPRING_AI_ZHIPUAI_WRITE_TIMEOUT: 10
+      SPRING_AI_ZHIPUAI_PING_INTERVAL: 10
+      SPRING_AI_ZHIPUAI_MAX_IDLE_CONNECTIONS: 8
+      SPRING_AI_ZHIPUAI_KEEP_ALIVE_DURATION: 1
+      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "false"
+      # SPRING_AI_ZHIPUAI_EMBEDDING_BASE_URL: https://api.bigmodel.cn
+      # SPRING_AI_ZHIPUAI_EMBEDDING_API_KEY: 'sk-xxx'
+      SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-2
+      # deepseek
+      # 申请key https://api-docs.deepseek.com/zh-cn/
+      # SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com
+      # SPRING_AI_DEEPSEEK_API_KEY: 'sk-xxx'
+      # SPRING_AI_DEEPSEEK_CHAT_ENABLED: "false"
+      # # deepseek-reasoner or deepseek-chat
+      # SPRING_AI_DEEPSEEK_CHAT_OPTIONS_MODEL: deepseek-chat
+      # SPRING_AI_DEEPSEEK_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED: "false"
+      # openai
+      # https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html
+      # SPRING_AI_OPENAI_BASE_URL: https://api.openai.com
+      # SPRING_AI_OPENAI_API_KEY: 'sk-xxx'
+      # SPRING_AI_OPENAI_CHAT_ENABLED: "false"
+      # SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gpt-4o
+      # # SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gpt-4o-mini
+      # SPRING_AI_OPENAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # SPRING_AI_OPENAI_EMBEDDING_ENABLED: "false"
+      # alibaba
+      # 阿里云百炼大模型获取api key：
+      # https://bailian.console.aliyun.com/?apiKey=1#/api-key
+      # 阿里云百炼大模型模型列表：
+      # https://bailian.console.aliyun.com/?spm=a2c4g.11186623.0.0.11c67980m5X2VR#/model-market
+      SPRING_AI_DASHSCOPE_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_BASE_URL: https://dashscope.aliyuncs.com
+      SPRING_AI_DASHSCOPE_API_KEY: 'sk-xxx'
+      SPRING_AI_DASHSCOPE_CHAT_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_MODEL: qwen-max
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TOP_P: 3
+      SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_IMAGE_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_EMBEDDING_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_EMBEDDING_OPTIONS_MODEL: text-embedding-v1
+      SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_ENABLED: "false"
+      # siliconflow
+      # https://siliconflow.com/
+      # https://docs.spring.io/spring-ai/reference/api/chat/siliconflow-chat.html
+      # SPRING_AI_SILICONFLOW_BASE_URL: https://api.siliconflow.cn
+      # SPRING_AI_SILICONFLOW_API_KEY: 'sk-xxx'
+      # SPRING_AI_SILICONFLOW_CHAT_ENABLED: "false"
+      # SPRING_AI_SILICONFLOW_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
+      # SPRING_AI_SILICONFLOW_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # gitee
+      # https://ai.gitee.com/
+      # https://ai.gitee.com/docs/best-practice/integration
+      # SPRING_AI_GITEE_BASE_URL: https://ai.gitee.com
+      # SPRING_AI_GITEE_API_KEY: 'sk-xxx'
+      # SPRING_AI_GITEE_CHAT_ENABLED: "false"
+      # SPRING_AI_GITEE_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
+      # SPRING_AI_GITEE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
+      # tencent
+      # https://console.cloud.tencent.com/hunyuan/start#
+      # https://cloud.tencent.com/document/product/1729/111007
+      # SPRING_AI_TENCENT_BASE_URL: https://api.hunyuan.cloud.tencent.com
+      # SPRING_AI_TENCENT_API_KEY: 'sk-xxx'
+      # SPRING_AI_TENCENT_CHAT_ENABLED: "false"
+      # SPRING_AI_TENCENT_CHAT_OPTIONS_MODEL: hunyuan-t1-latest
+      # SPRING_AI_TENCENT_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
+      # baidu
+      # https://console.bce.baidu.com/iam/#/iam/apikey/list
+      # https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Fm2vrveyu
+      # SPRING_AI_BAIDU_BASE_URL: https://qianfan.baidubce.com/v2
+      # # model builder（可用）
+      # SPRING_AI_BAIDU_API_KEY: 'bce-v3/xxx'
+      # SPRING_AI_BAIDU_CHAT_ENABLED: "false"
+      # SPRING_AI_BAIDU_CHAT_OPTIONS_MODEL: ernie-x1-32k-preview
+      # SPRING_AI_BAIDU_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
+      # volcengine 火山引擎
+      # api key: https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey?apikey=%7B%7D
+      # https://www.volcengine.com/docs/82379/1330626
+      # SPRING_AI_VOLCENGINE_BASE_URL: https://ark.cn-beijing.volces.com/api/v3
+      # SPRING_AI_VOLCENGINE_API_KEY: 'sk-xxx'
+      # SPRING_AI_VOLCENGINE_CHAT_ENABLED: "false"
+      # SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL: doubao-1-5-pro-32k-250115
+      # SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      
+      # vector store
+      # SPRING_AI_VECTORSTORE_TYPE: elasticsearch
+      SPRING_AI_VECTORSTORE_TYPE: none  
+      
+      # elasticsearch
+      # 浏览器可视化插件管理 es-client: https://gitee.com/q2316367743/es-client
+      # 配置参数 https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html#elasticsearchvector-properties
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch-bytedesk:9200
+      SPRING_ELASTICSEARCH_USERNAME: elastic
+      SPRING_ELASTICSEARCH_PASSWORD: bytedesk123
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_ENABLED: "false"
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INITIALIZE_SCHEMA: "true"
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INDEX_NAME: bytedesk_vs_index
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_DIMENSIONS: 1024
+      # cosine/l2_norm/dot_product
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_SIMILARITY: cosine
+      
+      # mcp
+      SPRING_AI_MCP_CLIENT_ENABLED: "false"
+      SPRING_AI_MCP_SERVER_ENABLED: "false"
+      SPRING_AI_MCP_SERVER_STDIO: "false"
+      SPRING_AI_MCP_SERVER_TYPE: SYNC
+      # weaviate
+      SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: "false"
+      # SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: "true"
+      # logging config
+      LOGGING_LEVEL_COM_BYTEDESK_AI: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_CORE: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_KBASE: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_SERVICE: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_SOCIAL: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_WECHAT: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_SHOP: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_TEAM: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_TICKET: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_STARTER: DEBUG
+      # wechat config
+      WECHAT_PAY_ENABLED: "false"
+      WECHAT_PAY_CERTPATH: ''
+      # 阿里云短信服务的签名，可以在控制台找到，如是中文，请转为Unicode
+      ALIYUN_SMS_SIGNNAME: ''
+      #阿里云短信服务的模板Code，可以在控制台找到
+      ALIYUN_SMS_TEMPLATECODE: ''
+      # Artemis JMS 配置
+      SPRING_ARTEMIS_MODE: native
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis-bytedesk:61616
+      SPRING_ARTEMIS_USER: admin
+      SPRING_ARTEMIS_PASSWORD: admin
+      SPRING_ARTEMIS_EMBEDDED_QUEUES: DLQ
+      SPRING_JMS_LISTENER_CONCURRENCY: 3
+      SPRING_JMS_LISTENER_MAX_CONCURRENCY: 20
+      SPRING_JMS_LISTENER_ACKNOWLEDGE_MODE: client
+      SPRING_JMS_LISTENER_AUTO_STARTUP: "true"
+      SPRING_JMS_LISTENER_MAX_ATTEMPTS: 5
+      SPRING_JMS_LISTENER_INITIAL_INTERVAL: 1000
+      SPRING_JMS_LISTENER_MAX_INTERVAL: 10000
+      SPRING_JMS_LISTENER_MULTIPLIER: 2.0
+      SPRING_JMS_LISTENER_RECEIVE_TIMEOUT: 1000
+      SPRING_JMS_LISTENER_MISSING_QUEUES_FATAL: "false"
+      # springdoc
+      SPRINGDOC_SHOW_ACTUATOR: "false"
+      # swagger-ui
+      # http://服务器ip:9003/swagger-ui/index.html
+      SPRINGDOC_SWAGGER_UI_ENABLED: "false"
+      SPRINGDOC_SWAGGER_UI_PATH: /index.html
+      # api-docs
+      SPRINGDOC_API_DOCS_ENABLED: "false"
+      SPRINGDOC_API_DOCS_PATH: /v3/api-docs
+      # 百度翻译 https://fanyi-api.baidu.com/doc/21
+      BYTEDESK_TRANSLATE_BAIDU_APPID: placeholder
+      BYTEDESK_TRANSLATE_BAIDU_KEY: placeholder
+    ports:
+      - 9003:9003
+      - 9885:9885
+    volumes:
+      - upload_data:/app/uploads
+    networks:
+      - bytedesk-network
+
+volumes:
+  mysql_data:
+    name: bytedesk_mysql_data
+  redis_data:
+    name: bytedesk_redis_data
+  elasticsearch_data:
+    name: bytedesk_elasticsearch_data
+  upload_data:
+    name: bytedesk_upload_data
+  artemis_data:
+    name: bytedesk_artemis_data
+  zipkin_data:
+    name: bytedesk_zipkin_data
+  minio_data:
+    name: bytedesk_minio_data
+
+networks:
+  bytedesk-network:
+    driver: bridge
