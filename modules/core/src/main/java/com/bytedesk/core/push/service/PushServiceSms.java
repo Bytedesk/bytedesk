@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 16:39:27
+ * @LastEditTime: 2025-09-19 09:38:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,11 +11,10 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.push.sms;
+package com.bytedesk.core.push.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.aliyuncs.CommonRequest;
@@ -27,11 +26,11 @@ import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
-import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 @Slf4j
 @Service
@@ -81,36 +80,44 @@ public class PushServiceSms {
     @Autowired
     private BytedeskProperties bytedeskProperties;
 
-    @Async
-    public void notify(MessageEntity e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'notify'");
-    }
-
-    @Async
-    public void send(String mobile, String country, String content, HttpServletRequest request) {
+    public boolean send(String mobile, String country, String content, HttpServletRequest request) {
+        Assert.hasText(mobile, "手机号不能为空");
+        Assert.hasText(content, "短信内容不能为空");
+        
         log.info("send sms to {}, country: {}, content: {}", mobile, country, content);
 
         // 测试手机号不发送验证码
         if (Utils.isTestMobile(mobile)) {
-            return;
+            return true; // 测试手机号认为发送成功
         }
 
         // 白名单手机号使用固定验证码，无需真正发送验证码
         if (bytedeskProperties.isInWhitelist(mobile)) {
-            return;
+            return true; // 白名单手机号认为发送成功
         }
 
         // 测试环境不发送验证码
         // if (bytedeskProperties.getDebug()) {
-        //     return;
+        //     return true; // 测试环境认为发送成功
         // }
 
-        sendValidateCode(mobile, country, content);
+        try {
+            return sendValidateCode(mobile, country, content);
+        } catch (Exception e) {
+            log.error("发送短信失败", e);
+            return false;
+        }
     }
 
-    public void sendValidateCode(String mobile, String country, String code) {
+    public boolean sendValidateCode(String mobile, String country, String code) {
+        Assert.hasText(mobile, "手机号不能为空");
+        Assert.hasText(code, "验证码不能为空");
+        
         log.info("sendValidateCode sms to {}, country: {}, code: {}", mobile, country, code);
+
+        // 处理国家代码：只保留数字，中国86可以不添加前缀
+        String phoneNumber = formatPhoneNumber(mobile, country);
+        log.debug("格式化后的手机号: {}", phoneNumber);
 
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
         IAcsClient client = new DefaultAcsClient(profile);
@@ -121,7 +128,7 @@ public class PushServiceSms {
         request.setSysVersion("2017-05-25");
         request.setSysAction("SendSms");
         request.putQueryParameter("RegionId", regionId);
-        request.putQueryParameter("PhoneNumbers", mobile);
+        request.putQueryParameter("PhoneNumbers", phoneNumber);
         // 已在init方法中处理了编码问题，此处直接使用
         log.debug("配置文件签名：{}", signName);
         request.putQueryParameter("SignName", signName);
@@ -130,11 +137,41 @@ public class PushServiceSms {
         try {
             CommonResponse response = client.getCommonResponse(request);
             log.info("sendValidateCode sms response: {}", response.getData());
+            return true; // 发送成功
         } catch (ServerException e) {
-            e.printStackTrace();
+            log.error("阿里云短信发送失败 - ServerException", e);
+            return false;
         } catch (ClientException e) {
-            e.printStackTrace();
+            log.error("阿里云短信发送失败 - ClientException", e);
+            return false;
         }
+    }
+    
+    /**
+     * 格式化手机号码，处理国家代码
+     * @param mobile 手机号
+     * @param country 国家代码
+     * @return 格式化后的手机号
+     */
+    private String formatPhoneNumber(String mobile, String country) {
+        // 处理国家代码：只保留数字
+        String cleanCountry = "";
+        if (country != null && !country.isEmpty()) {
+            cleanCountry = country.replaceAll("[^0-9]", "");
+        }
+        
+        // 中国86区号可以不添加前缀
+        if ("86".equals(cleanCountry)) {
+            return mobile;
+        }
+        
+        // 其他国家需要添加国家代码前缀
+        if (!cleanCountry.isEmpty()) {
+            return cleanCountry + mobile;
+        }
+        
+        // 如果没有国家代码，默认返回手机号（中国手机号）
+        return mobile;
     }
     
     

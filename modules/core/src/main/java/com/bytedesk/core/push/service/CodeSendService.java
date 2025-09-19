@@ -21,8 +21,6 @@ import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.push.PushRequest;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
-import com.bytedesk.core.push.email.PushServiceEmail;
-import com.bytedesk.core.push.sms.PushServiceSms;
 import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.push.strategy.AuthValidationStrategyFactory;
 import com.bytedesk.core.rbac.auth.AuthRequest;
@@ -110,11 +108,9 @@ public class CodeSendService {
     private boolean sendCodeByType(AuthRequest authRequest, String receiver, String country, 
                                   String code, HttpServletRequest request) {
         if (authRequest.isEmail()) {
-            pushServiceEmail.send(receiver, code, request);
-            return true;
+            return pushServiceEmail.send(receiver, code, request);
         } else if (authRequest.isMobile()) {
-            pushServiceSms.send(receiver, country, code, request);
-            return true;
+            return pushServiceSms.send(receiver, country, code, request);
         }
         return false;
     }

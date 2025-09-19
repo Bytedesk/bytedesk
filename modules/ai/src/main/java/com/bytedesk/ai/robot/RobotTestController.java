@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-12 16:20:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 11:50:53
+ * @LastEditTime: 2025-09-19 09:07:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -13,11 +13,8 @@
  */
 package com.bytedesk.ai.robot;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,21 +57,11 @@ public class RobotTestController {
     // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "备用回复", description = "fallback response test")
     @PostMapping("/fallback-response")
-    public ResponseEntity<?> testFallbackResponse(@RequestBody Map<String, String> request) {
-        try {
-            String content = request.get("content");
-            String orgUid = request.get("orgUid");
-            
-            if (!StringUtils.hasText(content) || !StringUtils.hasText(orgUid)) {
-                return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
-            }
-            
-            String response = robotService.fallbackResponse(content, orgUid);
-            return ResponseEntity.ok(JsonResult.success("fallback response generated", response));
-        } catch (Exception e) {
-            log.error("Error in fallbackResponse test", e);
-            return ResponseEntity.internalServerError().body(JsonResult.error("Service error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> testFallbackResponse(@RequestBody RobotRequest request) {
+        
+        String response = robotService.fallbackResponse(request.getContent(), request.getOrgUid());
+        
+        return ResponseEntity.ok(JsonResult.success("fallback response generated", response));
     }
 
     /**
@@ -89,21 +76,11 @@ public class RobotTestController {
     // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "查询重写", description = "query rewrite test")
     @PostMapping("/query-rewrite")
-    public ResponseEntity<?> testQueryRewrite(@RequestBody Map<String, String> request) {
-        try {
-            String content = request.get("content");
-            String orgUid = request.get("orgUid");
-            
-            if (!StringUtils.hasText(content) || !StringUtils.hasText(orgUid)) {
-                return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
-            }
-            
-            String response = robotService.queryRewrite(content, orgUid);
-            return ResponseEntity.ok(JsonResult.success("query rewritten", response));
-        } catch (Exception e) {
-            log.error("Error in queryRewrite test", e);
-            return ResponseEntity.internalServerError().body(JsonResult.error("Service error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> testQueryRewrite(@RequestBody RobotRequest request) {
+
+        String response = robotService.queryRewrite(request.getContent(), request.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success("query rewritten", response));
     }
 
     /**
@@ -118,21 +95,11 @@ public class RobotTestController {
     // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "摘要生成", description = "summary generation test")
     @PostMapping("/summary-generation")
-    public ResponseEntity<?> testSummaryGeneration(@RequestBody Map<String, String> request) {
-        try {
-            String content = request.get("content");
-            String orgUid = request.get("orgUid");
-            
-            if (!StringUtils.hasText(content) || !StringUtils.hasText(orgUid)) {
-                return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
-            }
-            
-            String response = robotService.summaryGeneration(content, orgUid);
-            return ResponseEntity.ok(JsonResult.success("summary generated", response));
-        } catch (Exception e) {
-            log.error("Error in summaryGeneration test", e);
-            return ResponseEntity.internalServerError().body(JsonResult.error("Service error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> testSummaryGeneration(@RequestBody RobotRequest request) {
+
+        String response = robotService.summaryGeneration(request.getContent(), request.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success("summary generated", response));
     }
 
     /**
@@ -147,21 +114,11 @@ public class RobotTestController {
     // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "会话标题生成", description = "session title generation test")
     @PostMapping("/session-title-generation")
-    public ResponseEntity<?> testSessionTitleGeneration(@RequestBody Map<String, String> request) {
-        try {
-            String content = request.get("content");
-            String orgUid = request.get("orgUid");
-            
-            if (!StringUtils.hasText(content) || !StringUtils.hasText(orgUid)) {
-                return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
-            }
-            
-            String response = robotService.threadTitleGeneration(content, orgUid);
-            return ResponseEntity.ok(JsonResult.success("session title generated", response));
-        } catch (Exception e) {
-            log.error("Error in sessionTitleGeneration test", e);
-            return ResponseEntity.internalServerError().body(JsonResult.error("Service error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> testSessionTitleGeneration(@RequestBody RobotRequest request) {
+
+        String response = robotService.threadTitleGeneration(request.getContent(), request.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success("session title generated", response));
     }
 
     /**
@@ -176,21 +133,11 @@ public class RobotTestController {
     // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "上下文模板摘要", description = "context template summary test")
     @PostMapping("/context-template-summary")
-    public ResponseEntity<?> testContextTemplateSummary(@RequestBody Map<String, String> request) {
-        try {
-            String content = request.get("content");
-            String orgUid = request.get("orgUid");
-            
-            if (!StringUtils.hasText(content) || !StringUtils.hasText(orgUid)) {
-                return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
-            }
-            
-            String response = robotService.contextTemplateSummary(content, orgUid);
-            return ResponseEntity.ok(JsonResult.success("context template summary generated", response));
-        } catch (Exception e) {
-            log.error("Error in contextTemplateSummary test", e);
-            return ResponseEntity.internalServerError().body(JsonResult.error("Service error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> testContextTemplateSummary(@RequestBody RobotRequest request) {
+
+        String response = robotService.contextTemplateSummary(request.getContent(), request.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success("context template summary generated", response));
     }
 
     /**
@@ -205,21 +152,11 @@ public class RobotTestController {
     // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "实体提取", description = "entity extraction test")
     @PostMapping("/entity-extraction")
-    public ResponseEntity<?> testEntityExtraction(@RequestBody Map<String, String> request) {
-        try {
-            String content = request.get("content");
-            String orgUid = request.get("orgUid");
-            
-            if (!StringUtils.hasText(content) || !StringUtils.hasText(orgUid)) {
-                return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
-            }
-            
-            String response = robotService.entityExtraction(content, orgUid);
-            return ResponseEntity.ok(JsonResult.success("entities extracted", response));
-        } catch (Exception e) {
-            log.error("Error in entityExtraction test", e);
-            return ResponseEntity.internalServerError().body(JsonResult.error("Service error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> testEntityExtraction(@RequestBody RobotRequest request) {
+
+        String response = robotService.entityExtraction(request.getContent(), request.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success("entities extracted", response));
     }
 
     /**
@@ -234,20 +171,11 @@ public class RobotTestController {
     // @PreAuthorize("hasAuthority('ROBOT_TEST')")
     @ActionAnnotation(title = "机器人测试", action = "关系提取", description = "relationship extraction test")
     @PostMapping("/relationship-extraction")
-    public ResponseEntity<?> testRelationshipExtraction(@RequestBody Map<String, String> request) {
-        try {
-            String content = request.get("content");
-            String orgUid = request.get("orgUid");
-            
-            if (!StringUtils.hasText(content) || !StringUtils.hasText(orgUid)) {
-                return ResponseEntity.badRequest().body(JsonResult.error("content and orgUid are required"));
-            }
-            
-            String response = robotService.relationshipExtraction(content, orgUid);
-            return ResponseEntity.ok(JsonResult.success("relationships extracted", response));
-        } catch (Exception e) {
-            log.error("Error in relationshipExtraction test", e);
-            return ResponseEntity.internalServerError().body(JsonResult.error("Service error: " + e.getMessage()));
-        }
+    public ResponseEntity<?> testRelationshipExtraction(@RequestBody RobotRequest request) {
+
+        String response = robotService.relationshipExtraction(request.getContent(), request.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success("relationships extracted", response));
     }
+    
 }

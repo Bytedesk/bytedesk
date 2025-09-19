@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.push.web;
+package com.bytedesk.core.push.service;
 
 // push to chrome/firefox/safari/opera/edge
 public class PushWebService {

@@ -273,8 +273,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--aliyun
-        sms-->
+        <!--aliyun sms-->
         <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-core -->
         <dependency>
             <groupId>com.aliyun</groupId>
@@ -328,17 +327,6 @@
             <scope>provided</scope>
         </dependency> -->
 
-        
-        <!-- apijson auto generate crud api -->
-        <!-- http://apijson.cn/doc/zh/ -->
-        <!-- https://jitpack.io/#Tencent/APIJSON/7.0.0 -->
-        <!-- <dependency>
-            <groupId>com.github.Tencent</groupId>
-            <artifactId>APIJSON</artifactId>
-            <version>7.0.0</version>
-            <scope>provided</scope>
-        </dependency> -->
-
         <!-- 验证码 -->
         <!-- https://mvnrepository.com/artifact/pro.fessional/kaptcha -->
         <dependency>
@@ -373,25 +361,6 @@
             <version>2.15.1</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- redis search https://github.com/redis/lettucemod -->
-        <!-- https://mvnrepository.com/artifact/com.redis/lettucemod-spring -->
-        <!-- <dependency>
-            <groupId>com.redis</groupId>
-            <artifactId>lettucemod-spring</artifactId>
-            <version>4.1.0</version>
-            <scope>provided</scope>
-        </dependency> -->
-
-        <!-- https://redis.io/docs/latest/integrate/redisom-for-java/ -->
-        <!-- https://github.com/redis/redis-om-spring?tab=readme-ov-file -->
-        <!-- https://mvnrepository.com/artifact/com.redis.om/redis-om-spring -->
-        <!-- <dependency>
-            <groupId>com.redis.om</groupId>
-            <artifactId>redis-om-spring</artifactId>
-            <version>0.9.7</version>
-            <scope>provided</scope>
-        </dependency> -->
 
         <!-- jedis pool config -->
         <dependency>
@@ -428,6 +397,24 @@
             <version>2.245</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- TODO: Rate Limiter -->
+		<!-- https://bucket4j.com/8.14.0/toc.html -->
+		<!-- https://github.com/bucket4j/bucket4j -->
+		<!-- https://mvnrepository.com/artifact/com.bucket4j/bucket4j_jdk17-core -->
+		<!-- <dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j_jdk17-core</artifactId>
+			<version>8.14.0</version>
+		</dependency> -->
+
+		<!-- TODO: DDos Protection -->
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+		<!-- <dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.5.0-M3</version>
+		</dependency> -->
 
         <!--  -->
         <dependency>

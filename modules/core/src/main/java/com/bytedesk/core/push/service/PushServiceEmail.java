@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-26 16:37:35
+ * @LastEditTime: 2025-09-19 09:34:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,15 +11,13 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.push.email;
+package com.bytedesk.core.push.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
@@ -29,12 +27,12 @@ import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
-import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 /**
  * https://springdoc.cn/spring-boot-email/
@@ -62,36 +60,36 @@ public class PushServiceEmail {
     @Value("${spring.mail.username:}")
     private String from;
 
-
-    @Async
-    public void notify(MessageEntity e) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'notify'");
-    }
-
-    @Async
-    public void send(String email, String content, HttpServletRequest request) {
+    public boolean send(String email, String content, HttpServletRequest request) {
+        Assert.hasText(email, "邮箱地址不能为空");
+        Assert.hasText(content, "邮件内容不能为空");
+        
         // log.info("send email to {}, content {}", email, content);
 
         // 测试邮箱不发送邮件
         if (Utils.isTestEmail(email)) {
-            return;
+            return true; // 测试邮箱认为发送成功
         }
 
         // 白名单邮箱使用固定验证码，无需真正发送验证码
         if (bytedeskProperties.isInWhitelist(email)) {
-            return;
+            return true; // 白名单邮箱认为发送成功
         }
 
         // 调试模式不发送邮件
-        if (bytedeskProperties.getDebug()) {
-            return;
-        }
+        // if (bytedeskProperties.getDebug()) {
+        //     return true; // 调试模式认为发送成功
+        // }
 
-        if (bytedeskProperties.getEmailType().equals("aliyun")) {
-            sendAliyunValidateCode(email, content);
-        } else {
-            sendJavaMailValidateCode(email, content);
+        try {
+            if (bytedeskProperties.getEmailType().equals("aliyun")) {
+                return sendAliyunValidateCode(email, content);
+            } else {
+                return sendJavaMailValidateCode(email, content);
+            }
+        } catch (Exception e) {
+            log.error("发送邮件失败", e);
+            return false;
         }
     }
 
@@ -100,12 +98,12 @@ public class PushServiceEmail {
      *
      * @param email Email
      * @param code  验证码
+     * @return 发送是否成功
      */
-    public void sendAliyunValidateCode(String email, String code) {
+    public boolean sendAliyunValidateCode(String email, String code) {
+        Assert.hasText(email, "邮箱地址不能为空");
+        Assert.hasText(code, "验证码不能为空");
         
-        if (!StringUtils.hasText(email)) {
-            return;
-        }
         log.info("sendValidateCode email={} ,code={}", email, code);
 
         // TODO: 检测同一个ip是否短时间内有发送过验证码，如果短时间内发送过，则不发送
@@ -139,26 +137,27 @@ public class PushServiceEmail {
             // 如果调用成功，正常返回httpResponse；如果调用失败则抛出异常，需要在异常中捕获错误异常码；错误异常码请参考对应的API文档;
             // SingleSendMailResponse httpResponse =
             client.getAcsResponse(request);
+            return true; // 发送成功
         } catch (ServerException e) {
             // 捕获错误异常码
-            log.info("ErrCode : {}", e.getErrCode());
-            e.printStackTrace();
+            log.error("阿里云邮件发送失败 - ServerException, ErrCode: {}", e.getErrCode(), e);
+            return false;
         } catch (ClientException e) {
             // 捕获错误异常码
-            // log.info("ErrCode : {}", e.getErrCode());
-            e.printStackTrace();
+            log.error("阿里云邮件发送失败 - ClientException, ErrCode: {}", e.getErrCode(), e);
+            return false;
         }
     }
 
 
-    public void sendJavaMailValidateCode(String email, String code) {
-        if (!StringUtils.hasText(email)) {
-            return;
-        }
+    public boolean sendJavaMailValidateCode(String email, String code) {
+        Assert.hasText(email, "邮箱地址不能为空");
+        Assert.hasText(code, "验证码不能为空");
+        
         log.info("sendJavaMailValidateCode email={} ,code={}", email, code);
         // 
         String content = "您的验证码是" + code + ", 15分钟内有效。开源在线客服&企业IM系统, https://www.weiyuai.cn";
-        sendJavaMail(email, "微语验证码", content);
+        return sendJavaMail(email, "微语验证码", content);
     }
 
     /**
@@ -167,8 +166,13 @@ public class PushServiceEmail {
      * 
      * @param email
      * @param content
+     * @return 发送是否成功
      */
-    public void sendJavaMail(String email, String subject, String content) {
+    public boolean sendJavaMail(String email, String subject, String content) {
+        Assert.hasText(email, "邮箱地址不能为空");
+        Assert.hasText(subject, "邮件主题不能为空");
+        Assert.hasText(content, "邮件内容不能为空");
+        
          // 创建一个邮件消息
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
@@ -185,9 +189,10 @@ public class PushServiceEmail {
             
             // 发送
             javaMailSender.send(message);
+            return true; // 发送成功
         } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
+            log.error("JavaMail发送邮件失败", e);
+            return false;
         }
     }
 

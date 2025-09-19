@@ -39,8 +39,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		
-
 		<!-- spring statemachine - 迁移到 cola statemachine -->
 		<!-- https://github.com/spring-projects/spring-statemachine -->
 		<!--
@@ -147,27 +145,7 @@
 			<version>3.2.0</version>
 		</dependency>
 
-		<!-- TODO: Rate Limiter -->
-		<!-- https://bucket4j.com/8.14.0/toc.html -->
-		<!-- https://github.com/bucket4j/bucket4j -->
-		<!-- https://mvnrepository.com/artifact/com.bucket4j/bucket4j_jdk17-core -->
-		<!-- <dependency>
-			<groupId>com.bucket4j</groupId>
-			<artifactId>bucket4j_jdk17-core</artifactId>
-			<version>8.14.0</version>
-		</dependency> -->
-
-		<!-- TODO: DDos Protection -->
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
-		<!-- <dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-			<version>4.5.0-M3</version>
-		</dependency> -->
-
-
 		<!-- ////////////////////// 推送 /////////////////////////////////// -->
-
 
 		<!-- apple push -->
 		<!-- https://github.com/jchambers/pushy -->

@@ -1,4 +1,4 @@
-package com.bytedesk.core.push.ios;
+package com.bytedesk.core.push.service;
 
 import com.eatthepath.pushy.apns.ApnsClient;
 import com.eatthepath.pushy.apns.PushNotificationResponse;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 // Annotation-specified bean name 'pushApnsService' for bean class 
 // [com.bytedesk.core.push.ios.PushApnsService] conflicts with existing, non-compatible bean definition of same name
-public class ApnsPushService {
+public class PushApnsService {
 
     // private static final Semaphore semaphore = new Semaphore(10000);
 
