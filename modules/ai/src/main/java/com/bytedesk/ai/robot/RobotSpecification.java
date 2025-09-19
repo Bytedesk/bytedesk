@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 09:07:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 15:24:03
+ * @LastEditTime: 2025-09-19 14:42:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,6 +76,16 @@ public class RobotSpecification extends BaseSpecification<RobotEntity, RobotRequ
             // 方便前端搜索
             if (StringUtils.hasText(request.getPrompt())) {
                 predicates.add(criteriaBuilder.like(root.get("llm").get("prompt"), "%" + request.getPrompt() + "%"));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+                
+                orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             // 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

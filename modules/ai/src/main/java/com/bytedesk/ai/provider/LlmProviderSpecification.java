@@ -48,9 +48,10 @@ public class LlmProviderSpecification extends BaseSpecification<LlmProviderEntit
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
                 String searchText = request.getSearchText();
-
-                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                
                 orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("type"), "%" + searchText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 09:48:53
+ * @LastEditTime: 2025-09-19 14:58:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -136,6 +136,8 @@ public class PushServiceSms {
         request.putQueryParameter("TemplateParam", "{\"code\":\"" + code + "\"}");
         try {
             CommonResponse response = client.getCommonResponse(request);
+            // 发送失败提示：{"Message":"手机号码格式错误","RequestId":"42DC3C7D-DABE-5E13-AB10-873060508C47","Code":"isv.MOBILE_NUMBER_ILLEGAL"}
+            // 发送成功提示：{"Message":"OK","RequestId":"1EA51590-4DBF-51EC-9FEC-812E7193C74D","Code":"OK","BizId":"458315458265098373^0"}
             log.info("sendValidateCode sms response: {}", response.getData());
             return true; // 发送成功
         } catch (ServerException e) {

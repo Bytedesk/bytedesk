@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-07 11:45:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 15:45:54
+ * @LastEditTime: 2025-09-19 14:42:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -35,11 +36,16 @@ public class WorkgroupSpecification extends BaseSpecification<WorkgroupEntity, W
             // 使用基类方法处理超级管理员权限和组织过滤
             addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             //
-            // status == null, 报错
-            // if (StringUtils.hasText(request.getStatus().name())) {
-            // predicates.add(criteriaBuilder.like(root.get("status"), "%" +
-            // request.getStatus().name() + "%"));
-            // }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+                
+                orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
