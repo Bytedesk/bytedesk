@@ -121,13 +121,16 @@ public class CodeSendService {
         PushRequest pushRequest = new PushRequest();
         // 复制必要的字段
         pushRequest.setType(authRequest.getType());
+        pushRequest.setCountry(authRequest.getCountry());
         pushRequest.setReceiver(authRequest.getReceiver());
         pushRequest.setPlatform(authRequest.getPlatform());
         pushRequest.setSender(TypeConsts.TYPE_SYSTEM);
         pushRequest.setContent(code);
         pushRequest.setIp(ip);
         pushRequest.setIpLocation(ipLocation);
-        
+        pushRequest.setChannel(authRequest.getChannel());
+        pushRequest.setDeviceUid(authRequest.getDeviceUid());
+        // 
         pushRestService.create(pushRequest);
     }
 }

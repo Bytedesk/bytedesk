@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-08 14:39:27
+ * @LastEditTime: 2025-09-19 09:58:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -22,10 +22,12 @@ import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.utils.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Push业务服务 - 处理业务逻辑
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PushService {
@@ -73,11 +75,11 @@ public class PushService {
      * 验证验证码
      */
     public Boolean validateCode(String receiver, String code, HttpServletRequest request) {
-        
         // 参数非空校验
         Assert.hasText(receiver, "Receiver cannot be null or empty");
         Assert.hasText(code, "Code cannot be null or empty");
         Assert.notNull(request, "HttpServletRequest cannot be null");
+        log.info("validate code for receiver: {}, code: {}", receiver, code);
         
         Optional<PushEntity> pushOptional = findByStatusAndReceiverAndContent(PushStatusEnum.PENDING, receiver, code);
         if (pushOptional.isPresent()) {

@@ -45,7 +45,9 @@ public class PushEntity extends BaseEntity {
 
     private String content;
 
-    private String receiver;
+    // 
+    private String country;
+    private String receiver; // email or mobile
 
     @Column(name = "push_type")
     private String type;
