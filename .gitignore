@@ -72,6 +72,7 @@ modules/local/target/*
 effective-pom.xml
 cicd/
 deploy/server/bytedesk-starter-0.4.4.jar
+.env
 .env.dev
 .env.prod
 statistic/
