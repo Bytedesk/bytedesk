@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 15:08:07
+ * @LastEditTime: 2025-09-19 15:22:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -144,7 +144,7 @@ public class AuthController {
         // send mobile code
         PushSendResult result = pushService.sendCode(authRequest, request);
         if (!result.isSuccess()) {
-            String errorMessage = getErrorMessage(result.getErrorType());
+            String errorMessage = result.getErrorMessage(); //Utils.getErrorMessage(result.getErrorType());
             return ResponseEntity.ok().body(JsonResult.error(errorMessage, -2, false));
         }
 
@@ -212,7 +212,7 @@ public class AuthController {
         // send email code
         PushSendResult result = pushService.sendCode(authRequest, request);
         if (!result.isSuccess()) {
-            String errorMessage = getErrorMessage(result.getErrorType());
+            String errorMessage = result.getErrorMessage(); //Utils.getErrorMessage(result.getErrorType());
             return ResponseEntity.ok().body(JsonResult.error(errorMessage, -2, false));
         }
 
@@ -285,24 +285,6 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-    /**
-     * 根据错误类型获取对应的错误消息
-     */
-    private String getErrorMessage(PushSendResult.SendCodeErrorType errorType) {
-        if (errorType == null) {
-            return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
-        }
-        
-        switch (errorType) {
-            case TOO_FREQUENT:
-                return I18Consts.I18N_AUTH_CAPTCHA_SEND_TOO_FREQUENT;
-            case ALREADY_SENT:
-                return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
-            case SEND_FAILED:
-                return "验证码发送失败，请稍后重试";
-            default:
-                return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
-        }
-    }
+    
 
 }

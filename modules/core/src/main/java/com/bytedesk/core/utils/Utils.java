@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-01 10:22:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 09:26:23
+ * @LastEditTime: 2025-09-19 15:23:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -19,6 +19,9 @@ import java.util.Random;
 import java.util.UUID;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.push.service.PushSendResult;
 
 import lombok.experimental.UtilityClass;
 
@@ -150,6 +153,26 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    /**
+     * 根据错误类型获取对应的错误消息
+     */
+    public String getErrorMessage(PushSendResult.SendCodeErrorType errorType) {
+        if (errorType == null) {
+            return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
+        }
+        
+        switch (errorType) {
+            case TOO_FREQUENT:
+                return I18Consts.I18N_AUTH_CAPTCHA_SEND_TOO_FREQUENT;
+            case ALREADY_SENT:
+                return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
+            case SEND_FAILED:
+                return "验证码发送失败，请稍后重试";
+            default:
+                return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
+        }
     }
 
 
