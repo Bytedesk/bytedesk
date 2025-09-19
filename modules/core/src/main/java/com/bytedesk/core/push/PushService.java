@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 09:58:07
+ * @LastEditTime: 2025-09-19 10:03:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -81,7 +81,7 @@ public class PushService {
         Assert.notNull(request, "HttpServletRequest cannot be null");
         log.info("validate code for receiver: {}, code: {}", receiver, code);
         
-        Optional<PushEntity> pushOptional = findByStatusAndReceiverAndContent(PushStatusEnum.PENDING, receiver, code);
+        Optional<PushEntity> pushOptional = findByStatusAndReceiverAndContent(PushStatusEnum.PENDING.name(), receiver, code);
         if (pushOptional.isPresent()) {
             PushEntity push = pushOptional.get();
             push.setStatus(PushStatusEnum.CONFIRMED.name());
@@ -92,6 +92,8 @@ public class PushService {
             pushFilterService.removeIpLastSentTime(ip);
             
             return true;
+        } else {
+            log.info("No matching push record found for receiver: {}, code: {}", receiver, code);
         }
         return false;
     }
@@ -105,7 +107,7 @@ public class PushService {
 
     // =============== 内部辅助方法 ===============
 
-    private Optional<PushEntity> findByStatusAndReceiverAndContent(PushStatusEnum status, String receiver, String content) {
-        return pushRepository.findByStatusAndReceiverAndContent(status.name(), receiver, content);
+    private Optional<PushEntity> findByStatusAndReceiverAndContent(String status, String receiver, String content) {
+        return pushRepository.findByStatusAndReceiverAndContent(status, receiver, content);
     }
 }

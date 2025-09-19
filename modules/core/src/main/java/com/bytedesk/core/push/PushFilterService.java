@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-05 11:03:50
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-05 11:08:12
+ * @LastEditTime: 2025-09-19 10:06:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,14 +32,12 @@ public class PushFilterService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-
     // 检查是否可以发送验证码
     public Boolean canSendCode(String ip) {
         String key = RedisConsts.PUSH_CODE_IP_PREFIX + ip;
         Boolean exists = stringRedisTemplate.hasKey(key);
         return exists == null || !exists;
     }
-
 
     // 更新IP最后发送验证码的时间
     public void updateIpLastSentTime(String ip) {
