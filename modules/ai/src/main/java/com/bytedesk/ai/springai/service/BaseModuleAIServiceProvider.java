@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-10 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:46:17
+ * @LastEditTime: 2025-09-19 08:43:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -84,7 +84,7 @@ public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
     private void registerService(String providerName, SpringAIService service) {
         if (service != null) {
             serviceRegistry.put(providerName, service);
-            log.debug("已注册基础模块AI服务提供商: {}", providerName);
+            // log.debug("已注册基础模块AI服务提供商: {}", providerName);
         }
     }
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-19 13:05:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-10 11:34:57
+ * @LastEditTime: 2025-09-19 08:43:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -54,8 +54,8 @@ public class SpringAIServiceRegistry {
                 SpringAIService service = provider.getService(providerName);
                 if (service != null) {
                     serviceRegistry.put(providerName, service);
-                    log.info("已注册AI服务提供商: {} (来源: {}, 优先级: {})", 
-                            providerName, provider.getClass().getSimpleName(), provider.getPriority());
+                    // log.info("已注册AI服务提供商: {} (来源: {}, 优先级: {})", 
+                    //         providerName, provider.getClass().getSimpleName(), provider.getPriority());
                 }
             }
         }

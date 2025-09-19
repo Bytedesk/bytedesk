@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-10-15 14:54:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 13:13:31
+ * @LastEditTime: 2025-09-19 08:41:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -129,7 +129,7 @@ public class JmsArtemisConfig {
             public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain) throws JMSException {
                 // 根据目标名称确定是否为 topic
                 boolean isTopicDestination = destinationName.startsWith(JmsArtemisConsts.TOPIC_PREFIX);
-                log.debug("Resolving destination: {}, pubSubDomain: {}, isTopic: {}", destinationName, pubSubDomain, isTopicDestination);
+                // log.debug("Resolving destination: {}, pubSubDomain: {}, isTopic: {}", destinationName, pubSubDomain, isTopicDestination);
                 return super.resolveDestinationName(session, destinationName, isTopicDestination);
             }
         };
