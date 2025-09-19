@@ -16,9 +16,10 @@ package com.bytedesk.core.push;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import com.bytedesk.core.push.service.CodeSendService;
-import com.bytedesk.core.push.service.ScanLoginService;
+import com.bytedesk.core.push.service.PushSendService;
+import com.bytedesk.core.push.service.PushSendResult;
 import com.bytedesk.core.rbac.auth.AuthRequest;
+import com.bytedesk.core.rbac.auth.AuthScanService;
 import com.bytedesk.core.utils.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,15 +37,15 @@ public class PushService {
     private final PushFilterService pushFilterService;
     
     // 业务服务组件
-    private final CodeSendService codeSendService;
-    private final ScanLoginService scanLoginService;
+    private final PushSendService codeSendService;
+    private final AuthScanService scanLoginService;
 
     // =============== REST接口方法 ===============
 
     /**
      * 发送验证码
      */
-    public Boolean sendCode(AuthRequest authRequest, HttpServletRequest request) {
+    public PushSendResult sendCode(AuthRequest authRequest, HttpServletRequest request) {
         return codeSendService.sendCode(authRequest, request);
     }
 

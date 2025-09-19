@@ -193,6 +193,7 @@ public class I18Consts {
     public static final String I18N_AUTH_CAPTCHA_ERROR = "验证码错误"; // 验证码错误
     public static final String I18N_AUTH_CAPTCHA_EXPIRED = "验证码已过期"; // 验证码已过期
     public static final String I18N_AUTH_CAPTCHA_ALREADY_SEND = "验证码已发送"; // 验证码已发送
+    public static final String I18N_AUTH_CAPTCHA_SEND_TOO_FREQUENT = "验证码发送过于频繁"; // 验证码发送过于频繁
     public static final String I18N_AUTH_CAPTCHA_VALIDATE_FAILED = "验证码验证失败"; // 验证码验证失败
     // 助手相关
     public static final String I18N_FILE_ASSISTANT_NAME = "文件助手"; // 文件助手

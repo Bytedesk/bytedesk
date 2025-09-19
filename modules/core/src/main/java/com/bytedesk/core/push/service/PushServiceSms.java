@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 14:58:40
+ * @LastEditTime: 2025-09-19 15:15:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,8 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.Utils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -79,8 +81,23 @@ public class PushServiceSms {
 
     @Autowired
     private BytedeskProperties bytedeskProperties;
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public boolean sendSms(String mobile, String country, String content, HttpServletRequest request) {
+        PushSendResult result = sendSmsWithResult(mobile, country, content, request);
+        return result.isSuccess();
+    }
+    
+    /**
+     * 发送短信并返回详细结果
+     * @param mobile 手机号
+     * @param country 国家代码
+     * @param content 短信内容
+     * @param request HTTP请求
+     * @return SendCodeResult 发送结果
+     */
+    public PushSendResult sendSmsWithResult(String mobile, String country, String content, HttpServletRequest request) {
         Assert.hasText(mobile, "手机号不能为空");
         Assert.hasText(content, "短信内容不能为空");
         
@@ -88,28 +105,28 @@ public class PushServiceSms {
 
         // 测试手机号不发送验证码
         if (Utils.isTestMobile(mobile)) {
-            return true; // 测试手机号认为发送成功
+            return PushSendResult.success(); // 测试手机号认为发送成功
         }
 
         // 白名单手机号使用固定验证码，无需真正发送验证码
         if (bytedeskProperties.isInWhitelist(mobile)) {
-            return true; // 白名单手机号认为发送成功
+            return PushSendResult.success(); // 白名单手机号认为发送成功
         }
 
         // 测试环境不发送验证码
         // if (bytedeskProperties.getDebug()) {
-        //     return true; // 测试环境认为发送成功
+        //     return SendCodeResult.success(); // 测试环境认为发送成功
         // }
 
         try {
             return sendValidateCode(mobile, country, content);
         } catch (Exception e) {
             log.error("发送短信失败", e);
-            return false;
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "发送短信异常: " + e.getMessage());
         }
     }
 
-    public boolean sendValidateCode(String mobile, String country, String code) {
+    public PushSendResult sendValidateCode(String mobile, String country, String code) {
         Assert.hasText(mobile, "手机号不能为空");
         Assert.hasText(code, "验证码不能为空");
         
@@ -139,13 +156,15 @@ public class PushServiceSms {
             // 发送失败提示：{"Message":"手机号码格式错误","RequestId":"42DC3C7D-DABE-5E13-AB10-873060508C47","Code":"isv.MOBILE_NUMBER_ILLEGAL"}
             // 发送成功提示：{"Message":"OK","RequestId":"1EA51590-4DBF-51EC-9FEC-812E7193C74D","Code":"OK","BizId":"458315458265098373^0"}
             log.info("sendValidateCode sms response: {}", response.getData());
-            return true; // 发送成功
+            
+            // 解析响应结果
+            return parseAliyunSmsResponse(response.getData());
         } catch (ServerException e) {
             log.error("阿里云短信发送失败 - ServerException", e);
-            return false;
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "阿里云服务器错误: " + e.getErrMsg());
         } catch (ClientException e) {
             log.error("阿里云短信发送失败 - ClientException", e);
-            return false;
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "阿里云客户端错误: " + e.getErrMsg());
         }
     }
     
@@ -176,5 +195,70 @@ public class PushServiceSms {
         return mobile;
     }
     
+    /**
+     * 解析阿里云短信服务响应
+     * @param responseData 响应JSON数据
+     * @return SendCodeResult
+     */
+    private PushSendResult parseAliyunSmsResponse(String responseData) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(responseData);
+            String code = jsonNode.get("Code").asText();
+            String message = jsonNode.get("Message").asText();
+            
+            // 判断是否发送成功
+            if ("OK".equalsIgnoreCase(code)) {
+                return PushSendResult.success();
+            } else {
+                // 根据错误代码返回中文错误信息
+                String errorMessage = getChineseErrorMessage(code, message);
+                return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, errorMessage);
+            }
+        } catch (Exception e) {
+            log.error("解析阿里云短信响应失败", e);
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "解析短信服务响应失败");
+        }
+    }    /**
+     * 根据阿里云错误代码返回中文错误信息
+     * @param code 错误代码
+     * @param originalMessage 原始错误信息
+     * @return 中文错误信息
+     */
+    private String getChineseErrorMessage(String code, String originalMessage) {
+        switch (code) {
+            case "isv.MOBILE_NUMBER_ILLEGAL":
+                return "手机号码格式错误";
+            case "isv.MOBILE_COUNT_OVER_LIMIT":
+                return "手机号码数量超过限制";
+            case "isv.TEMPLATE_MISSING_PARAMETERS":
+                return "短信模板参数缺失";
+            case "isv.BUSINESS_LIMIT_CONTROL":
+                return "业务限流";
+            case "isv.INVALID_PARAMETERS":
+                return "参数错误";
+            case "isv.SYSTEM_ERROR":
+                return "系统错误";
+            case "isv.OUT_OF_SERVICE":
+                return "服务不可用";
+            case "SignatureNonce.Duplicate":
+                return "重复请求";
+            case "InvalidTimeStamp.Expired":
+                return "时间戳过期";
+            case "SignatureDoesNotMatch":
+                return "签名验证失败";
+            case "InvalidAccessKeyId.NotFound":
+                return "AccessKey不存在";
+            case "Forbidden.RAM":
+                return "RAM权限不足";
+            case "isv.DAY_LIMIT_CONTROL":
+                return "日发送量超限";
+            case "isv.SMS_CONTENT_ILLEGAL":
+                return "短信内容包含违禁词";
+            case "isv.SMS_SIGN_ILLEGAL":
+                return "短信签名不合规";
+            default:
+                return "短信发送失败: " + originalMessage;
+        }
+    }
     
 }

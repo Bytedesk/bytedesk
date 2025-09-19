@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-08 14:40:12
+ * @LastEditTime: 2025-09-19 15:16:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CodeSendService {
+public class PushSendService {
     
     private final AuthValidationStrategyFactory strategyFactory;
     private final PushServiceEmail pushServiceEmail;
@@ -48,7 +48,7 @@ public class CodeSendService {
     private final PushFilterService pushFilterService;
     private final PushRestService pushRestService;
 
-    public Boolean sendCode(AuthRequest authRequest, HttpServletRequest request) {
+    public PushSendResult sendCode(AuthRequest authRequest, HttpServletRequest request) {
         
         // 参数非空校验
         Assert.notNull(authRequest, "AuthRequest cannot be null");
@@ -66,7 +66,7 @@ public class CodeSendService {
         // 验证IP频率限制
         if (!pushFilterService.canSendCode(ip)) {
             log.info("验证码发送过于频繁，IP: {}", ip);
-            return false;
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.TOO_FREQUENT, "验证码发送过于频繁");
         }
         
         // 使用策略模式处理不同类型的验证逻辑
@@ -77,16 +77,16 @@ public class CodeSendService {
         
         // 检查是否已发送验证码
         if (pushRestService.existsByStatusAndTypeAndReceiver(PushStatusEnum.PENDING, type, receiver)) {
-            return false;
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.ALREADY_SENT, "验证码已发送");
         }
 
         // 生成验证码
         String code = generateCode(receiver);
         
         // 发送验证码
-        boolean sendSuccess = sendCodeByType(authRequest, receiver, country, code, request);
-        if (!sendSuccess) {
-            return false;
+        PushSendResult sendResult = sendCodeByType(authRequest, receiver, country, code, request);
+        if (!sendResult.isSuccess()) {
+            return sendResult;
         }
 
         // 保存验证码记录
@@ -95,7 +95,7 @@ public class CodeSendService {
         // 更新IP最后发送验证码的时间
         pushFilterService.updateIpLastSentTime(ip);
 
-        return true;
+        return PushSendResult.success();
     }
 
     private String generateCode(String receiver) {
@@ -105,14 +105,14 @@ public class CodeSendService {
         return Utils.getRandomCode();
     }
 
-    private boolean sendCodeByType(AuthRequest authRequest, String receiver, String country, 
+    private PushSendResult sendCodeByType(AuthRequest authRequest, String receiver, String country, 
                                   String code, HttpServletRequest request) {
         if (authRequest.isEmail()) {
-            return pushServiceEmail.sendEmail(receiver, code, request);
+            return pushServiceEmail.sendEmailWithResult(receiver, code, request);
         } else if (authRequest.isMobile()) {
-            return pushServiceSms.sendSms(receiver, country, code, request);
+            return pushServiceSms.sendSmsWithResult(receiver, country, code, request);
         }
-        return false;
+        return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "不支持的发送类型");
     }
 
     private void saveCodeRecord(AuthRequest authRequest, String code, String ip, HttpServletRequest request) {

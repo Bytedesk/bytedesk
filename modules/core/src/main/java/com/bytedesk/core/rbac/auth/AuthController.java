@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 10:00:07
+ * @LastEditTime: 2025-09-19 15:08:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -25,6 +25,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
 import com.bytedesk.core.push.PushService;
+import com.bytedesk.core.push.service.PushSendResult;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
@@ -141,9 +142,10 @@ public class AuthController {
         }
 
         // send mobile code
-        Boolean result = pushService.sendCode(authRequest, request);
-        if (!result) {
-            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
+        PushSendResult result = pushService.sendCode(authRequest, request);
+        if (!result.isSuccess()) {
+            String errorMessage = getErrorMessage(result.getErrorType());
+            return ResponseEntity.ok().body(JsonResult.error(errorMessage, -2, false));
         }
 
         return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
@@ -208,9 +210,10 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
         // send email code
-        Boolean result = pushService.sendCode(authRequest, request);
-        if (!result) {
-            return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND, -1, false));
+        PushSendResult result = pushService.sendCode(authRequest, request);
+        if (!result.isSuccess()) {
+            String errorMessage = getErrorMessage(result.getErrorType());
+            return ResponseEntity.ok().body(JsonResult.error(errorMessage, -2, false));
         }
 
         return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
@@ -280,6 +283,26 @@ public class AuthController {
         AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
         
         return ResponseEntity.ok(JsonResult.success(authResponse));
+    }
+
+    /**
+     * 根据错误类型获取对应的错误消息
+     */
+    private String getErrorMessage(PushSendResult.SendCodeErrorType errorType) {
+        if (errorType == null) {
+            return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
+        }
+        
+        switch (errorType) {
+            case TOO_FREQUENT:
+                return I18Consts.I18N_AUTH_CAPTCHA_SEND_TOO_FREQUENT;
+            case ALREADY_SENT:
+                return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
+            case SEND_FAILED:
+                return "验证码发送失败，请稍后重试";
+            default:
+                return I18Consts.I18N_AUTH_CAPTCHA_ALREADY_SEND;
+        }
     }
 
 }

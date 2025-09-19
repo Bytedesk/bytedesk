@@ -61,6 +61,18 @@ public class PushServiceEmail {
     private String from;
 
     public boolean sendEmail(String email, String content, HttpServletRequest request) {
+        // 为了保持向后兼容，调用新的方法并返回结果
+        return sendEmailWithResult(email, content, request).isSuccess();
+    }
+    
+    /**
+     * 发送邮件并返回详细结果
+     * @param email 邮箱地址
+     * @param content 邮件内容
+     * @param request HTTP请求
+     * @return SendCodeResult 发送结果
+     */
+    public PushSendResult sendEmailWithResult(String email, String content, HttpServletRequest request) {
         Assert.hasText(email, "邮箱地址不能为空");
         Assert.hasText(content, "邮件内容不能为空");
         
@@ -68,28 +80,35 @@ public class PushServiceEmail {
 
         // 测试邮箱不发送邮件
         if (Utils.isTestEmail(email)) {
-            return true; // 测试邮箱认为发送成功
+            return PushSendResult.success(); // 测试邮箱认为发送成功
         }
 
         // 白名单邮箱使用固定验证码，无需真正发送验证码
         if (bytedeskProperties.isInWhitelist(email)) {
-            return true; // 白名单邮箱认为发送成功
+            return PushSendResult.success(); // 白名单邮箱认为发送成功
         }
 
         // 调试模式不发送邮件
         // if (bytedeskProperties.getDebug()) {
-        //     return true; // 调试模式认为发送成功
+        //     return SendCodeResult.success(); // 调试模式认为发送成功
         // }
 
         try {
+            boolean success;
             if (bytedeskProperties.getEmailType().equals("aliyun")) {
-                return sendAliyunValidateCode(email, content);
+                success = sendAliyunValidateCode(email, content);
             } else {
-                return sendJavaMailValidateCode(email, content);
+                success = sendJavaMailValidateCode(email, content);
+            }
+            
+            if (success) {
+                return PushSendResult.success();
+            } else {
+                return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "邮件发送失败");
             }
         } catch (Exception e) {
             log.error("发送邮件失败", e);
-            return false;
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "邮件发送异常: " + e.getMessage());
         }
     }
 

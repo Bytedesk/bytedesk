@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-08 10:00:00
+ * @LastEditTime: 2025-09-19 15:17:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.push.service;
+package com.bytedesk.core.rbac.auth;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,6 @@ import com.bytedesk.core.push.PushRequest;
 import com.bytedesk.core.push.PushResponse;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
-import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.Utils;
@@ -37,7 +36,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-public class ScanLoginService {
+public class AuthScanService {
     
     private final PushRestService pushRestService;
     private final ModelMapper modelMapper;
