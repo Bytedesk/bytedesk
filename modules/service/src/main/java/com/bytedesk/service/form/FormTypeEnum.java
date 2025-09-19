@@ -24,6 +24,10 @@ public enum FormTypeEnum {
      * 工单表单 - 用于创建和处理客户服务工单
      */
     TICKET,
+    /**
+     * 访客工单表单 - 用于访客提交的工单
+     */
+    TICKET_VISITOR,
     
     /**
      * 会话表单 - 用于客服会话中的信息收集
