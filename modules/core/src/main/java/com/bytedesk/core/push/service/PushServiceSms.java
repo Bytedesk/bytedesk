@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:29:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 09:38:20
+ * @LastEditTime: 2025-09-19 09:48:53
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -80,7 +80,7 @@ public class PushServiceSms {
     @Autowired
     private BytedeskProperties bytedeskProperties;
 
-    public boolean send(String mobile, String country, String content, HttpServletRequest request) {
+    public boolean sendSms(String mobile, String country, String content, HttpServletRequest request) {
         Assert.hasText(mobile, "手机号不能为空");
         Assert.hasText(content, "短信内容不能为空");
         

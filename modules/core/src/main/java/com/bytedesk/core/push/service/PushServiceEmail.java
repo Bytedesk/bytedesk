@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-31 15:30:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 09:34:39
+ * @LastEditTime: 2025-09-19 09:49:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -60,7 +60,7 @@ public class PushServiceEmail {
     @Value("${spring.mail.username:}")
     private String from;
 
-    public boolean send(String email, String content, HttpServletRequest request) {
+    public boolean sendEmail(String email, String content, HttpServletRequest request) {
         Assert.hasText(email, "邮箱地址不能为空");
         Assert.hasText(content, "邮件内容不能为空");
         

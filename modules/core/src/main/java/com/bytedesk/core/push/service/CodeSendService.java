@@ -108,9 +108,9 @@ public class CodeSendService {
     private boolean sendCodeByType(AuthRequest authRequest, String receiver, String country, 
                                   String code, HttpServletRequest request) {
         if (authRequest.isEmail()) {
-            return pushServiceEmail.send(receiver, code, request);
+            return pushServiceEmail.sendEmail(receiver, code, request);
         } else if (authRequest.isMobile()) {
-            return pushServiceSms.send(receiver, country, code, request);
+            return pushServiceSms.sendSms(receiver, country, code, request);
         }
         return false;
     }
