@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-03 08:55:36
+ * @Date: 2025-09-19 17:01:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 16:45:20
+ * @LastEditTime: 2025-09-19 17:02:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,13 +11,9 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket;
+package com.bytedesk.service.visitor;
 
-public enum TicketTypeEnum {
-    AGENT, // agent 一对一处理的工单
-    DEPARTMENT, // department 部门工单
-    WORKGROUP, // workgroup 工作组工单
-    MEMBER, // member 组织成员工单
-    USER, // user 提交的工单
-    VISITOR // visitor 提交的工单
+public enum VisitorTypeEnum {
+    ANONYMOUS, // anonymous visitor
+    REGISTERED // registered visitor, need to login
 }

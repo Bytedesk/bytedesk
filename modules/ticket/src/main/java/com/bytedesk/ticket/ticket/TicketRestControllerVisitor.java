@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-18 16:18:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-18 16:34:30
+ * @LastEditTime: 2025-09-19 16:53:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,6 +16,8 @@ package com.bytedesk.ticket.ticket;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,8 +44,8 @@ public class TicketRestControllerVisitor {
     }
 
     // create ticket by visitor
-    @GetMapping("/create")
-    public ResponseEntity<?> createByVisitor(TicketRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> createByVisitor(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketRestService.createByVisitor(request);
 

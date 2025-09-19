@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-04 17:05:48
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-07 16:42:48
+ * @LastEditTime: 2025-09-19 17:03:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,9 +27,13 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
+
 
 @Data
-@Builder
+@SuperBuilder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
@@ -50,6 +54,9 @@ public class VisitorRequest extends BaseRequest {
 
 	@Builder.Default
 	private String lang = LanguageEnum.ZH_CN.name();
+
+	@Builder.Default
+	private String type = VisitorTypeEnum.ANONYMOUS.name();
 	
 	// device info
 	private String browser;

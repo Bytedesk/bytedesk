@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 12:13:01
+ * @LastEditTime: 2025-09-19 16:55:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -343,50 +343,6 @@ public class TicketRestService
         return threadRestService.save(thread);
     }
 
-    // @Transactional
-    // public void verifyTicket(Long ticketId, boolean approved) {
-    //     taskService.complete(getTaskIdByTicketId(ticketId),
-    //             Map.of("approved", approved));
-    // }
-
-    // @Transactional
-    // public TicketCommentEntity addComment(Long ticketId, TicketCommentRequest commentRequest) {
-    //     TicketEntity ticket = findTicketById(ticketId);
-
-    //     TicketCommentEntity comment = new TicketCommentEntity();
-    //     comment.setTicket(ticket);
-    //     comment.setContent(commentRequest.getContent());
-    //     // comment.setAuthor(commentDTO.getAuthor());
-
-    //     return commentRepository.save(comment);
-    // }
-
-    // @Transactional
-    // public TicketAttachmentEntity uploadAttachment(Long ticketId, MultipartFile file) {
-    //     TicketEntity ticket = findTicketById(ticketId);
-
-    //     TicketAttachmentEntity attachment = new TicketAttachmentEntity();
-    //     attachment.setTicket(ticket);
-    //     // attachment.setFileName(file.getOriginalFilename());
-    //     // attachment.setFileType(file.getContentType());
-    //     // attachment.setFileSize(file.getSize());
-    //     // attachment.setFilePath("/uploads/" + file.getOriginalFilename());
-
-    //     return attachmentRepository.save(attachment);
-    // }
-
-    // private String getTaskIdByTicketId(Long ticketId) {
-    //     return taskService.createTaskQuery()
-    //             .processInstanceBusinessKey(ticketId.toString())
-    //             .singleResult()
-    //             .getId();
-    // }
-
-    // private TicketEntity findTicketById(Long ticketId) {
-    //     return ticketRepository.findById(ticketId)
-    //             .orElseThrow(() -> new RuntimeException("Ticket not found: " + ticketId));
-    // }
-
     @Override
     protected TicketEntity doSave(TicketEntity entity) {
         return ticketRepository.save(entity);
@@ -456,7 +412,6 @@ public class TicketRestService
     public TicketExcel convertToExcel(TicketEntity entity) {
         return modelMapper.map(entity, TicketExcel.class);
     }
-
 
     @Override
     protected Specification<TicketEntity> createSpecification(TicketRequest request) {

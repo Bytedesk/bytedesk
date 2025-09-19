@@ -65,6 +65,10 @@ public class VisitorEntity extends BaseEntity {
 	@Builder.Default
 	private String lang = LanguageEnum.ZH_CN.name();
 
+	@Builder.Default
+	@Column(name = "visitor_type")
+	private String type = VisitorTypeEnum.ANONYMOUS.name();
+
 	@Embedded
 	private VisitorDevice deviceInfo;
 
