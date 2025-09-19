@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 08:52:45
+ * @LastEditTime: 2025-09-19 15:37:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -178,5 +178,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 ## Terms of Use
 
+- **Allowed Uses**: Can be used for commercial purposes, but prohibited from resale without prior permission
 - **Prohibited Uses**: Strictly prohibited for use in illegal and non-compliant businesses including trojans, viruses, pornography, gambling, fraud, and other illegal activities
 - **Disclaimer**: This software does not guarantee any form of legal liability. Users are responsible for their own usage risks
