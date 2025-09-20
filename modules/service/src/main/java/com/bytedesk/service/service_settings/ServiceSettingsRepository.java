@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:32:09
+ * @LastEditTime: 2025-06-20 12:52:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.settings_service;
+package com.bytedesk.service.service_settings;
 
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ public interface ServiceSettingsRepository extends JpaRepository<ServiceSettings
 
     Boolean existsByUid(String uid);
 
-    // Boolean existsByPlatform(String platform);
+    Optional<ServiceSettingsEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
-    
+    // Boolean existsByPlatform(String platform);
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-02 08:24:04
+ * @LastEditTime: 2025-06-20 14:24:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,21 +11,17 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.settings_service;
+package com.bytedesk.service.service_settings;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.I18Consts;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
@@ -35,16 +31,12 @@ public class ServiceSettingsRequest extends BaseRequest {
 
     private String name;
 
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
+    private String description;
 
     // @Builder.Default
     // private String type = ServiceSettingsTypeEnum.CUSTOMER.name();
 
-    @Builder.Default
-    private String color = "red";
+    private String color;
 
-    @Builder.Default
-    private Integer order = 0;
-
+    private Integer order;
 }

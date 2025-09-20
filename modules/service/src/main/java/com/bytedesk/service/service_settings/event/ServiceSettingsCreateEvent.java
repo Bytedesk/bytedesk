@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:24:57
+ * @LastEditTime: 2025-09-20 10:29:01
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,28 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.settings_service.event;
+package com.bytedesk.service.service_settings.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
+import com.bytedesk.service.service_settings.ServiceSettingsEntity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Getter
-@Setter
+@Data
 @EqualsAndHashCode(callSuper = false)
-public class ServiceSettingsUpdateEvent extends ApplicationEvent {
+public class ServiceSettingsCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private ServiceSettingsEntity serviceSetting;
+    private ServiceSettingsEntity serviceSettings;
 
-    public ServiceSettingsUpdateEvent(ServiceSettingsEntity serviceSetting) {
-        super(serviceSetting);
-        this.serviceSetting = serviceSetting;
+    public ServiceSettingsCreateEvent(ServiceSettingsEntity serviceSettings) {
+        super(serviceSettings);
+        this.serviceSettings = serviceSettings;
     }
 
 }

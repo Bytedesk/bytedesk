@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-25 09:52:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-29 15:24:29
+ * @LastEditTime: 2025-09-19 17:49:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,15 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.settings_service;
+package com.bytedesk.service.service_settings;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.kbase.settings_service.event.ServiceSettingsCreateEvent;
-import com.bytedesk.kbase.settings_service.event.ServiceSettingsUpdateEvent;
+import com.bytedesk.service.service_settings.event.ServiceSettingsCreateEvent;
+import com.bytedesk.service.service_settings.event.ServiceSettingsUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -31,18 +31,18 @@ import lombok.extern.slf4j.Slf4j;
 public class ServiceSettingsEntityListener {
 
     @PostPersist
-    public void onPostPersist(ServiceSettingsEntity serviceSetting) {
-        log.info("onPostPersist: {}", serviceSetting);
-        ServiceSettingsEntity cloneServiceSettings = SerializationUtils.clone(serviceSetting);
+    public void onPostPersist(ServiceSettingsEntity serviceSettings) {
+        log.info("onPostPersist: {}", serviceSettings);
+        ServiceSettingsEntity cloneServiceSettings = SerializationUtils.clone(serviceSettings);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishEvent(new ServiceSettingsCreateEvent(cloneServiceSettings));
     }
 
     @PostUpdate
-    public void onPostUpdate(ServiceSettingsEntity serviceSetting) {
-        log.info("onPostUpdate: {}", serviceSetting);
-        ServiceSettingsEntity cloneServiceSettings = SerializationUtils.clone(serviceSetting);
+    public void onPostUpdate(ServiceSettingsEntity serviceSettings) {
+        log.info("onPostUpdate: {}", serviceSettings);
+        ServiceSettingsEntity cloneServiceSettings = SerializationUtils.clone(serviceSettings);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishEvent(new ServiceSettingsUpdateEvent(cloneServiceSettings));

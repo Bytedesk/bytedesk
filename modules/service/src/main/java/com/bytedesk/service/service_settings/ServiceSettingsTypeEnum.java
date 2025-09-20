@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-11-06 21:43:58
+ * @Date: 2024-07-23 17:02:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-18 11:35:44
+ * @LastEditTime: 2025-03-11 08:57:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,23 +11,10 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.kbase.settings_service;
+package com.bytedesk.service.service_settings;
 
-import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.stereotype.Component;
-
-import lombok.AllArgsConstructor;
-
-@Component
-@AllArgsConstructor
-public class ServiceSettingsInitializer implements SmartInitializingSingleton {
-
-    @Override
-    public void afterSingletonsInstantiated() {
-        initPermissions();
-    }
-
-    private void initPermissions() {
-    }
-
+public enum ServiceSettingsTypeEnum {
+    THREAD,
+    CUSTOMER,
+    TICKET
 }
