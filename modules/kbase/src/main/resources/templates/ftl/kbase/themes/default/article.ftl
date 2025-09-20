@@ -126,7 +126,8 @@
                                 <div class="uk-card-header uk-padding-remove">
                                     <div class="uk-grid-small uk-flex-middle  uk-position-relative" uk-grid>
                                         <div class="uk-width-auto">
-                                            <img id="supportArticleUserAvatar" class="uk-border-circle" width="40" height="40" src="${article.user.avatar}">
+                                            <img id="supportArticleUserAvatar" class="uk-border-circle" width="40" height="40"
+                                                 src="${(article.user.avatar)!((kbase.logoUrl)!('/favicon.ico'))}">
                                         </div>
                                         <div class="uk-width-expand">
                                             <#--  <h5 id="supportArticleUserNickname" class="uk-card-title">${article.user.nickname!''}</h5>  -->

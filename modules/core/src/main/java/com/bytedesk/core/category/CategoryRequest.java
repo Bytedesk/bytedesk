@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-18 10:57:38
+ * @LastEditTime: 2025-09-20 15:24:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -43,7 +43,7 @@ public class CategoryRequest extends BaseRequest {
     private String parentUid;
 
     @Builder.Default
-    private List<String> children = new ArrayList<>();
+    private List<String> childrenUids = new ArrayList<>();
 
     // knowledge base uid
     private String kbUid;
