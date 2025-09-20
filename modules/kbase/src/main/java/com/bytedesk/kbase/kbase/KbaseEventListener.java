@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-08-27 13:53:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-09 10:12:38
+ * @LastEditTime: 2025-09-20 15:02:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,15 +28,18 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.event.CategoryCreateEvent;
 import com.bytedesk.core.category.event.CategoryUpdateEvent;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.kbase.article.ArticleEntity;
+import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.event.ArticleCreateEvent;
 import com.bytedesk.kbase.article.event.ArticleUpdateEvent;
 import com.bytedesk.kbase.kbase.event.KbaseCreateEvent;
 import com.bytedesk.kbase.kbase.event.KbaseUpdateEvent;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
+import com.bytedesk.core.utils.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,11 +52,13 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class KbaseEventListener {
 
-        private final KbaseRestService kbaseService;
+        private final KbaseRestService kbaseRestService;
 
         private final KbaseStaticService kbaseStaticService;
 
         private final QuickReplyRestService quickReplyRestService;
+
+        private final ArticleRestService articleRestService;
 
         @EventListener
         public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -61,11 +66,20 @@ public class KbaseEventListener {
                 String orgUid = organization.getUid();
                 log.info("kbase - organization created {}", orgUid);
                 // 初始化知识库
-                kbaseService.initKbase(orgUid);
+                kbaseRestService.initKbase(orgUid);
                 // 初始化快捷回复分类
                 quickReplyRestService.initQuickReplyCategory(orgUid);
                 // 初始化快捷回复
                 quickReplyRestService.initQuickReply(orgUid);
+
+                // 在知识库初始化后，为该组织的帮助中心创建默认文章（若无则创建）
+                String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
+                var articles = articleRestService.findByKbUid(kbUid);
+                boolean exists = articles.stream().anyMatch(a -> "如何使用帮助文档".equals(a.getTitle()));
+                if (!exists) {
+                        articleRestService.initDefaultArticleForOrg(orgUid);
+                        log.info("KbaseEventListener: created default guide article for org {}", orgUid);
+                }
         }
 
         @EventListener
@@ -109,7 +123,7 @@ public class KbaseEventListener {
                         return;
                 }
                 //
-                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(kbUid);
+                Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(kbUid);
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
@@ -137,7 +151,7 @@ public class KbaseEventListener {
                         return;
                 }
                 //
-                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(category.getKbUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(category.getKbUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
@@ -165,7 +179,7 @@ public class KbaseEventListener {
                         return;
                 }
                 //
-                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbase().getUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(article.getKbase().getUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;
@@ -191,7 +205,7 @@ public class KbaseEventListener {
                         return;
                 }
                 //
-                Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(article.getKbase().getUid());
+                Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(article.getKbase().getUid());
                 if (kbaseOptional.isPresent()) {
                         if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 return;

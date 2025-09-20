@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
+import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedInitializer;
 import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordInitializer;
 import com.bytedesk.kbase.llm_file.FileInitializer;
@@ -29,6 +30,7 @@ import com.bytedesk.kbase.quick_reply.QuickReplyInitializer;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.utils.Utils;
 
 @Slf4j
 @Component
@@ -38,6 +40,8 @@ public class KbaseInitializer implements SmartInitializingSingleton {
     private final KbaseRestService kbaseRestService;
 
     private final AuthorityRestService authorityRestService;
+
+    private final ArticleRestService articleRestService;
 
     private final FaqInitializer faqInitializer;
 
@@ -83,6 +87,15 @@ public class KbaseInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // 初始化知识库
         kbaseRestService.initKbase(orgUid);
+
+        // 在知识库创建完成后，去重并初始化默认帮助文档文章
+        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
+        var articles = articleRestService.findByKbUid(kbUid);
+        boolean exists = articles.stream().anyMatch(a -> "如何使用帮助文档".equals(a.getTitle()));
+        if (!exists) {
+            articleRestService.initDefaultArticleForOrg(orgUid);
+            log.info("KbaseInitializer: created default guide article for org {}", orgUid);
+        }
     }
 
     private void initPermissions() {

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 22:59:18
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 13:31:09
+ * @LastEditTime: 2025-09-20 14:46:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,19 +28,23 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRepository;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity, ArticleRequest, ArticleResponse, ArticleExcel> {
 
     private final ArticleRepository articleRepository;
@@ -48,14 +52,55 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
-
-    // 循环依赖
-    // private final KbaseRestService kbaseRestService;
+    
     private final KbaseRepository kbaseRepository;
 
     @Override
     protected Specification<ArticleEntity> createSpecification(ArticleRequest request) {
         return ArticleSpecification.search(request, authService);
+    }
+
+    /**
+     * 为指定组织初始化一篇默认的“如何使用帮助文档”文章
+     * 去重逻辑在调用方（ArticleInitializer）中处理，这里仅负责创建
+     */
+    public void initDefaultArticleForOrg(String orgUid) {
+        try {
+            // 使用与 initKbase 一致的固定UID，确保绑定到该组织的HELPCENTER知识库
+            String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_HELPCENTER_UID);
+            Optional<KbaseEntity> kbOpt = kbaseRepository.findByUid(kbUid);
+            if (kbOpt.isEmpty()) {
+                log.warn("initDefaultArticleForOrg: HELPCENTER Kbase not found by uid={} for orgUid={}", kbUid, orgUid);
+                return;
+            }
+            KbaseEntity kb = kbOpt.get();
+
+            // 构造默认文章内容
+            String title = "如何使用帮助文档";
+            String summary = "在管理后台 -> 知识库 -> 帮助文档 中添加和管理文章";
+            String md = "# 如何使用帮助文档\n\n" +
+                        "您可以在【管理后台】 -> 【知识库】 -> 【帮助文档】中：\n\n" +
+                        "- 新建、编辑、发布文章\n" +
+                        "- 支持 Markdown 与富文本\n" +
+                        "- 配置是否公开访问与置顶展示\n\n" +
+                        "建议：为常见问题创建分类与标签，便于搜索与维护。";
+
+            ArticleEntity entity = ArticleEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(orgUid)
+                .title(title)
+                .summary(summary)
+                .contentMarkdown(md)
+                .markdown(true)
+                .published(true)
+                .kbase(kb)
+                .build();
+
+            save(entity);
+            log.info("Initialized default guide article for orgUid={} in kbase uid={}", orgUid, kb.getUid());
+        } catch (Exception e) {
+            log.error("initDefaultArticleForOrg failed for orgUid={}: {}", orgUid, e.getMessage(), e);
+        }
     }
 
     @Override
@@ -179,8 +224,6 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
     public ArticleResponse convertToResponse(ArticleEntity entity) {
         return KbaseConvertUtils.convertToArticleResponse(entity);
     }
-
-    
 
     @Override
     public ArticleExcel convertToExcel(ArticleEntity article) {

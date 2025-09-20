@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-06 21:43:58
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-20 11:43:11
+ * @LastEditTime: 2025-09-20 14:45:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,33 +16,11 @@ package com.bytedesk.kbase.article;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
-
 @Component
-@AllArgsConstructor
 public class ArticleInitializer implements SmartInitializingSingleton {
-
-    // private final AuthorityRestService authorityService;
 
     @Override
     public void afterSingletonsInstantiated() {
-        init();
+        // 文章初始化逻辑已迁移至 KbaseInitializer 和 KbaseEventListener，避免与 Kbase 创建时序冲突与重复创建。
     }
-
-    private void init() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = ArticlePermissions.ARTICLE_PREFIX + permission.name();
-        //     if (authorityService.existsByValue(permissionValue)) {
-        //         continue;
-        //     }
-        //     AuthorityRequest authRequest = AuthorityRequest.builder()
-        //             .name(I18Consts.I18N_PREFIX + permissionValue)
-        //             .value(permissionValue)
-        //             .description("Permission for " + permissionValue)
-        //             .build();
-        //     authRequest.setUid(permissionValue.toLowerCase());
-        //     authorityService.create(authRequest);
-        // }
-    }
-
 }

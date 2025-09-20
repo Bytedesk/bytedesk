@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-31 16:33:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-31 09:49:02
+ * @LastEditTime: 2025-09-20 14:57:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,8 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ArticleEventListener {
 
-    // private final ArticleElasticService articleElasticService;
     private final ArticleMessageService articleMessageService;
+    // private final ArticleElasticService articleElasticService;
+
+    // 组织创建的文章初始化逻辑已迁移到 KbaseEventListener，以确保先创建对应Kbase
 
     // Article仅用于全文搜索，通过消息队列异步处理
     @EventListener
