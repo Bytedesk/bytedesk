@@ -344,24 +344,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     @Override
     protected Page<CategoryEntity> executePageQuery(Specification<CategoryEntity> spec, Pageable pageable) {
-        Specification<CategoryEntity> distinctSpec = (root, query, cb) -> {
-            query.distinct(true);
-            return spec == null ? null : spec.toPredicate(root, query, cb);
-        };
-        Page<CategoryEntity> page = categoryRepository.findAll(distinctSpec, pageable);
-        // 按 uid 去重，避免同一实体重复出现在分页内容中
-        List<CategoryEntity> uniqueEntities = page.getContent().stream()
-                .filter(Objects::nonNull)
-                .filter(e -> StringUtils.hasText(e.getUid()))
-                .collect(Collectors.toMap(
-                        CategoryEntity::getUid,
-                        e -> e,
-                        (a, b) -> a,
-                        java.util.LinkedHashMap::new))
-                .values()
-                .stream()
-                .collect(Collectors.toList());
-        return new PageImpl<>(uniqueEntities, pageable, page.getTotalElements());
+        return categoryRepository.findAll(spec, pageable);
     }
 
     public void initCategories(String orgUid) {
