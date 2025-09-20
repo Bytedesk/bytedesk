@@ -1,51 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="800" height="430" xmlns="http://www.w3.org/2000/svg">
+<svg width="900" height="500" xmlns="http://www.w3.org/2000/svg">
   <!-- 背景 -->
-  <rect width="800" height="430" fill="#f8f9fa" rx="10" ry="10"/>
+  <rect width="900" height="500" fill="#f8f9fa" rx="10" ry="10"/>
   
   <!-- 标题 -->
-  <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" font-weight="bold">微语系统集群架构图</text>
+  <text x="450" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" font-weight="bold">微语系统集群架构图</text>
   
   <!-- 负载均衡层 -->
-  <rect x="250" y="80" width="300" height="60" rx="5" ry="5" fill="#90caf9" stroke="#1976d2" stroke-width="2"/>
-  <text x="400" y="115" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">负载均衡层 (Nginx/云服务商LB)</text>
+  <rect x="300" y="80" width="300" height="60" rx="5" ry="5" fill="#90caf9" stroke="#1976d2" stroke-width="2"/>
+  <text x="450" y="115" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">负载均衡层 (Nginx/云服务商LB)</text>
 
   <!-- 应用服务层 -->
   <rect x="100" y="170" width="180" height="60" rx="5" ry="5" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
   <text x="190" y="205" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">微语服务实例 1</text>
   
-  <rect x="310" y="170" width="180" height="60" rx="5" ry="5" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
-  <text x="400" y="205" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">微语服务实例 2</text>
+  <rect x="360" y="170" width="180" height="60" rx="5" ry="5" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
+  <text x="450" y="205" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">微语服务实例 2</text>
   
-  <rect x="520" y="170" width="180" height="60" rx="5" ry="5" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
-  <text x="610" y="205" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">微语服务实例 3</text>
+  <rect x="620" y="170" width="180" height="60" rx="5" ry="5" fill="#a5d6a7" stroke="#388e3c" stroke-width="2"/>
+  <text x="710" y="205" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">微语服务实例 3</text>
   
   <!-- 连接线 - 负载均衡到服务 -->
-  <line x1="400" y1="140" x2="190" y2="170" stroke="#666666" stroke-width="2"/>
-  <line x1="400" y1="140" x2="400" y2="170" stroke="#666666" stroke-width="2"/>
-  <line x1="400" y1="140" x2="610" y2="170" stroke="#666666" stroke-width="2"/>
+  <line x1="450" y1="140" x2="190" y2="170" stroke="#666666" stroke-width="2"/>
+  <line x1="450" y1="140" x2="450" y2="170" stroke="#666666" stroke-width="2"/>
+  <line x1="450" y1="140" x2="710" y2="170" stroke="#666666" stroke-width="2"/>
   
   <!-- 消息中间件 -->
-  <rect x="250" y="260" width="300" height="60" rx="5" ry="5" fill="#ffcc80" stroke="#ef6c00" stroke-width="2"/>
-  <text x="400" y="295" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">消息中间件 (Apache ActiveMQ Artemis)</text>
+  <rect x="300" y="280" width="300" height="60" rx="5" ry="5" fill="#ffcc80" stroke="#ef6c00" stroke-width="2"/>
+  <text x="450" y="315" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">消息中间件 (Apache ActiveMQ Artemis)</text>
   
-  <!-- 连接线 - 服务到消息中间件 -->
-  <line x1="190" y1="230" x2="400" y2="260" stroke="#666666" stroke-width="2"/>
-  <line x1="400" y1="230" x2="400" y2="260" stroke="#666666" stroke-width="2"/>
-  <line x1="610" y1="230" x2="400" y2="260" stroke="#666666" stroke-width="2"/>
+  <!-- 连接线 - 服务到消息中间件 (实时消息、状态同步) -->
+  <line x1="190" y1="230" x2="450" y2="280" stroke="#ff6b35" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="450" y1="230" x2="450" y2="280" stroke="#ff6b35" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="710" y1="230" x2="450" y2="280" stroke="#ff6b35" stroke-width="2" stroke-dasharray="5,5"/>
   
   <!-- 数据存储层 -->
-  <rect x="100" y="350" width="180" height="60" rx="5" ry="5" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
-  <text x="190" y="385" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">MySQL 数据库</text>
+  <rect x="100" y="380" width="180" height="60" rx="5" ry="5" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="190" y="415" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">MySQL 数据库</text>
   
-  <rect x="310" y="350" width="180" height="60" rx="5" ry="5" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
-  <text x="400" y="385" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">ElasticSearch</text>
+  <rect x="360" y="380" width="180" height="60" rx="5" ry="5" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="450" y="415" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">ElasticSearch</text>
   
-  <rect x="520" y="350" width="180" height="60" rx="5" ry="5" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
-  <text x="610" y="385" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">Redis 集群</text>
+  <rect x="620" y="380" width="180" height="60" rx="5" ry="5" fill="#ce93d8" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="710" y="415" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="bold">Redis 集群</text>
   
-  <!-- 连接线 - 消息中间件到数据存储 -->
-  <line x1="400" y1="320" x2="190" y2="350" stroke="#666666" stroke-width="2"/>
-  <line x1="400" y1="320" x2="400" y2="350" stroke="#666666" stroke-width="2"/>
-  <line x1="400" y1="320" x2="610" y2="350" stroke="#666666" stroke-width="2"/>
+  <!-- 连接线 - 消息中间件到数据存储 (异步处理) -->
+  <line x1="450" y1="340" x2="190" y2="380" stroke="#666666" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="450" y1="340" x2="450" y2="380" stroke="#666666" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="450" y1="340" x2="710" y2="380" stroke="#666666" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 连接线 - 服务直接到数据存储 (同步操作) -->
+  <line x1="190" y1="230" x2="190" y2="380" stroke="#1976d2" stroke-width="2"/>
+  <line x1="450" y1="230" x2="450" y2="380" stroke="#1976d2" stroke-width="2"/>
+  <line x1="710" y1="230" x2="710" y2="380" stroke="#1976d2" stroke-width="2"/>
+  
+  <!-- 图例 -->
+  <rect x="50" y="460" width="800" height="30" fill="white" stroke="#ccc" stroke-width="1" rx="3" ry="3"/>
+  <line x1="70" y1="475" x2="120" y2="475" stroke="#1976d2" stroke-width="2"/>
+  <text x="130" y="480" font-family="Arial, sans-serif" font-size="12" fill="#333">直接连接 (同步操作)</text>
+  
+  <line x1="250" y1="475" x2="300" y2="475" stroke="#ff6b35" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="310" y="480" font-family="Arial, sans-serif" font-size="12" fill="#333">消息中间件 (实时消息)</text>
+  
+  <line x1="450" y1="475" x2="500" y2="475" stroke="#666666" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="510" y="480" font-family="Arial, sans-serif" font-size="12" fill="#333">异步处理</text>
 </svg>

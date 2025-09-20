@@ -1,0 +1,22 @@
+{
+  "name": "Bytedesk微语文档中心",
+  "short_name": "Bytedesk文档",
+  "theme_color": "#3578e5",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/docs/",
+  "start_url": "/docs/",
+  "description": "微语智能客服系统官方文档",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
