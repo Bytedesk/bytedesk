@@ -53,4 +53,44 @@ public class CategorySpecification extends BaseSpecification<CategoryEntity, Cat
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    /**
+     * 专门用于查询根分类的 Specification（parent 为 null 的分类）
+     * 
+     * @param request 查询请求参数
+     * @param authService 认证服务
+     * @return 根分类查询规范
+     */
+    public static Specification<CategoryEntity> searchRootOnly(CategoryRequest request, AuthService authService) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            
+            // 基础条件：只查找根分类
+            predicates.add(criteriaBuilder.isNull(root.get("parent")));
+            
+            // 添加基础查询条件（deleted = false, orgUid 等）
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            
+            // 添加其他搜索条件
+            if (StringUtils.hasText(request.getName())) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            }
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.like(root.get("type"), "%" + request.getType() + "%"));
+            }
+            if (StringUtils.hasText(request.getKbUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+            }
+            if (StringUtils.hasText(request.getUserUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
+            }
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
+            }
+            
+            // 确保查询结果唯一
+            query.distinct(true);
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }

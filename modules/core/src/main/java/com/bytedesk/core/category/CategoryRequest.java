@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:21:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-20 15:24:14
+ * @LastEditTime: 2025-09-20 16:10:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,9 +12,6 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.core.category;
-
-import java.util.List;
-import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
@@ -42,8 +39,8 @@ public class CategoryRequest extends BaseRequest {
     // 父类uid
     private String parentUid;
 
-    @Builder.Default
-    private List<String> childrenUids = new ArrayList<>();
+    // @Builder.Default
+    // private List<String> childrenUids = new ArrayList<>();
 
     // knowledge base uid
     private String kbUid;
