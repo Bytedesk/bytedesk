@@ -8,6 +8,8 @@
  */
 package com.bytedesk.core.utils;
 
+import com.bytedesk.core.ip.IpUtils;
+
 public class CidrDemo {
     
     public static void main(String[] args) {

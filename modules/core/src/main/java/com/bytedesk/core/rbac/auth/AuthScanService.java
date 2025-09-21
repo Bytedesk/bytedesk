@@ -18,13 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.push.PushEntity;
 import com.bytedesk.core.push.PushRequest;
 import com.bytedesk.core.push.PushResponse;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.Utils;
 import org.modelmapper.ModelMapper;
 

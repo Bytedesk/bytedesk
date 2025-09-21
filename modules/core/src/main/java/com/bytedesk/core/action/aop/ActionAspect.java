@@ -28,7 +28,7 @@ import com.bytedesk.core.action.ActionRequest;
 import com.bytedesk.core.action.ActionRestService;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.ip.IpService;
-import com.bytedesk.core.utils.IpUtils;
+import com.bytedesk.core.ip.IpUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;

@@ -35,6 +35,7 @@ import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRequest;
@@ -45,7 +46,6 @@ import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.message_unread.MessageUnreadRestService;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -9,6 +9,9 @@
 package com.bytedesk.core.utils;
 
 import org.junit.jupiter.api.Test;
+
+import com.bytedesk.core.ip.IpUtils;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class IpUtilsCidrTest {

@@ -17,10 +17,11 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import com.bytedesk.core.push.service.PushSendService;
+import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.push.service.PushSendResult;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthScanService;
-import com.bytedesk.core.utils.IpUtils;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

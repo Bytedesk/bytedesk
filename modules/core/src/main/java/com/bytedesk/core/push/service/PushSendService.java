@@ -18,13 +18,13 @@ import org.springframework.util.Assert;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.ip.IpService;
+import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.push.PushRequest;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.push.strategy.AuthValidationStrategyFactory;
 import com.bytedesk.core.rbac.auth.AuthRequest;
-import com.bytedesk.core.utils.IpUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.push.PushFilterService;
 

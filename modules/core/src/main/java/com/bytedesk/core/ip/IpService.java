@@ -17,7 +17,6 @@ import org.lionsoul.ip2region.xdb.Searcher;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.IpUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
