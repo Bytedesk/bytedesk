@@ -32,10 +32,7 @@ public class TicketFlowService {
     private final TaskService taskService;
     private final RepositoryService repositoryService;
     private final HistoryService historyService;
-    // private final TicketService assignmentService;
     private final TicketCommentService commentService;
-    // private final AgentRestService agentService;
-    // private final WorkgroupRestService workgroupService;
 
     /**
      * 启动工单流程
