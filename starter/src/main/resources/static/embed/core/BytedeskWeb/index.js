@@ -1312,6 +1312,12 @@ class K {
           font-family: inherit;
         ">${((r = this.config.feedbackConfig) == null ? void 0 : r.submitText) || "提交反馈"}</button>
       </div>
+
+      <div style="margin-top: 12px; text-align: center; font-size: 12px; color: #999;">
+        <a href="https://www.weiyuai.cn/" target="_blank" rel="noopener noreferrer" style="color: #aaaaaa; text-decoration: none;">
+           微语技术支持
+        </a>
+      </div>
     `, e.addEventListener("click", (a) => {
       var h, b;
       switch (a.target.getAttribute("data-action")) {

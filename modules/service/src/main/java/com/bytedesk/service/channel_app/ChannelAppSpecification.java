@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 14:25:07
+ * @LastEditTime: 2025-09-22 11:04:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -36,6 +36,16 @@ public class ChannelAppSpecification extends BaseSpecification<ChannelAppEntity,
             // 
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+                
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
