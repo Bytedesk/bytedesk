@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-21 13:06:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 10:30:48
+ * @LastEditTime: 2025-09-22 17:51:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,14 +11,13 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ticket.ticket.sla;
+package com.bytedesk.ticket.ticket;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ticket.service.TicketNotificationService;
-import com.bytedesk.ticket.ticket.TicketEntity;
 
 import org.flowable.dmn.api.DmnDecisionService;
 import com.bytedesk.core.utils.BdDateUtils;
