@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-12 10:16:44
+ * @LastEditTime: 2025-09-22 16:07:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,7 +37,7 @@ public class TicketProcessRequest extends BaseRequest {
 
     // private String type;
 
-    // private String content;
+    private String schema;
 
     // 是否已部署流程
     private Boolean deployed;

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-15 15:10:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 16:43:48
+ * @LastEditTime: 2025-09-22 16:08:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,7 +83,7 @@ public class TicketProcessService {
             throw new RuntimeException("流程定义不存在" + request.getUid());
         }
         String orgUid = ticketProcess.get().getOrgUid();
-        String bpmnXml = ticketProcess.get().getContent();
+        String bpmnXml = ticketProcess.get().getSchema();
 
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()

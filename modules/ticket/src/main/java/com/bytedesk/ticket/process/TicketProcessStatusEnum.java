@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-15 15:44:10
+ * @Date: 2025-04-02 14:13:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-15 15:44:13
+ * @LastEditTime: 2025-09-22 15:55:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,26 +13,22 @@
  */
 package com.bytedesk.ticket.process;
 
-import java.io.Serializable;
+/**
+ * 工单流程状态枚举
+ */
+public enum TicketProcessStatusEnum {
+    /**
+     * 草稿状态
+     */
+    DRAFT,
+    
+    /**
+     * 已发布状态
+     */
+    PUBLISHED,
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ProcessDefinitionResponse implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private String id;
-    private String key;
-    private String name;
-    private String description;
-    private Integer version;
-    private String deploymentId;
-    private String tenantId;
+    /**
+     * 已禁用状态
+     */
+    DISABLED
 }

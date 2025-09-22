@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="250922-rename-content-to-process_schema" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ticket_process"/>
+                <columnExists tableName="bytedesk_ticket_process" columnName="content"/>
+                <not>
+                    <columnExists tableName="bytedesk_ticket_process" columnName="process_schema"/>
+                </not>
+            </and>
+        </preConditions>
+        <comment>Rename column content to process_schema in bytedesk_ticket_process table (only if content exists)</comment>
+        <renameColumn
+            tableName="bytedesk_ticket_process"
+            oldColumnName="content"
+            newColumnName="process_schema"
+            columnDataType="text"/>
+        <rollback>
+            <renameColumn
+                tableName="bytedesk_ticket_process"
+                oldColumnName="process_schema"
+                newColumnName="content"
+                columnDataType="text"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

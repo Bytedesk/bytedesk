@@ -133,7 +133,7 @@ public class TicketProcessRestService
             TicketProcessEntity entity = optional.get();
             entity.setKey(request.getKey());
             entity.setName(request.getName());
-            entity.setContent(request.getContent());
+            entity.setSchema(request.getSchema());
             entity.setDescription(request.getDescription());
             //
             TicketProcessEntity savedEntity = save(entity);

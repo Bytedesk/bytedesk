@@ -84,8 +84,8 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     public ResponseEntity<?> queryProcesses(TicketProcessRequest request) {
         List<ProcessDefinition> definitions = processService.query(request);
         
-        List<ProcessDefinitionResponse> dtos = definitions.stream()
-            .map(def -> ProcessDefinitionResponse.builder()
+        List<TicketProcessDefinitionResponse> dtos = definitions.stream()
+            .map(def -> TicketProcessDefinitionResponse.builder()
                 .id(def.getId())
                 .key(def.getKey())
                 .name(def.getName())
@@ -105,7 +105,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
         ProcessDefinition definition = processService.deploy(request);
         
         // 转换为 DTO 返回
-        ProcessDefinitionResponse dto = ProcessDefinitionResponse.builder()
+        TicketProcessDefinitionResponse dto = TicketProcessDefinitionResponse.builder()
             .id(definition.getId())
             .key(definition.getKey())
             .name(definition.getName())
@@ -124,8 +124,8 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
         List<ProcessDefinition> definitions = processService.undeploy(request);
         
         // 转换为 DTO 列表返回
-        List<ProcessDefinitionResponse> dtos = definitions.stream()
-            .map(def -> ProcessDefinitionResponse.builder()
+        List<TicketProcessDefinitionResponse> dtos = definitions.stream()
+            .map(def -> TicketProcessDefinitionResponse.builder()
                 .id(def.getId())
                 .key(def.getKey())
                 .name(def.getName())
