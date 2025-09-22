@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 17:11:26
+ * @LastEditTime: 2025-09-22 16:38:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,7 +84,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     public ResponseEntity<?> queryProcesses(TicketProcessRequest request) {
         List<ProcessDefinition> definitions = processService.query(request);
         
-        List<TicketProcessDefinitionResponse> dtos = definitions.stream()
+        List<TicketProcessDefinitionResponse> ticketProcessResponses = definitions.stream()
             .map(def -> TicketProcessDefinitionResponse.builder()
                 .id(def.getId())
                 .key(def.getKey())
@@ -96,7 +96,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
                 .build())
             .collect(Collectors.toList());
 
-        return ResponseEntity.ok(JsonResult.success(dtos));
+        return ResponseEntity.ok(JsonResult.success(ticketProcessResponses));
     }
 
     // 部署流程
@@ -124,7 +124,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
         List<ProcessDefinition> definitions = processService.undeploy(request);
         
         // 转换为 DTO 列表返回
-        List<TicketProcessDefinitionResponse> dtos = definitions.stream()
+        List<TicketProcessDefinitionResponse> ticketProcessResponses = definitions.stream()
             .map(def -> TicketProcessDefinitionResponse.builder()
                 .id(def.getId())
                 .key(def.getKey())
@@ -136,7 +136,7 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
                 .build())
             .collect(Collectors.toList());
 
-        return ResponseEntity.ok(JsonResult.success(dtos));
+        return ResponseEntity.ok(JsonResult.success(ticketProcessResponses));
     }
 
     @Override

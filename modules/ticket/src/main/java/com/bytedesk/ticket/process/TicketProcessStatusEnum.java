@@ -23,9 +23,9 @@ public enum TicketProcessStatusEnum {
     DRAFT,
     
     /**
-     * 已发布状态
+     * 已部署状态
      */
-    PUBLISHED,
+    DEPLOYED,
 
     /**
      * 已禁用状态
