@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-20 17:15:17
+ * @LastEditTime: 2025-09-22 13:28:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -62,7 +62,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         Pageable pageable = request.getPageable();
         
         // 使用专门的根分类查询 Specification
-        Specification<CategoryEntity> rootOnlySpec = CategorySpecification.searchRootOnly(request, authService);
+        Specification<CategoryEntity> rootOnlySpec = CategorySpecification.search(request, authService);
 
         // 第一步：获取所有符合条件的根节点实体
         List<CategoryEntity> allRootEntities = categoryRepository.findAll(rootOnlySpec);
