@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-11 18:13:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-01 23:34:18
+ * @LastEditTime: 2025-09-22 13:15:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -49,6 +49,16 @@ public class RoleSpecification extends BaseSpecification<RoleEntity, RoleRequest
                 if (StringUtils.hasText(request.getOrgUid())) {
                     predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
                 }
+            }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+                
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
