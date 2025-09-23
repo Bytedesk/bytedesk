@@ -15,11 +15,7 @@ package com.bytedesk.ai.zhipuai;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Base64;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import com.bytedesk.ai.utils.AIFileUtils;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -54,7 +50,6 @@ import ai.z.openapi.service.model.MessageContent;
 import ai.z.openapi.service.model.VideoUrl;
 
 import lombok.extern.slf4j.Slf4j;
-import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.core.message.content.ImageContent;
 import com.bytedesk.core.message.content.VideoContent;
 import com.bytedesk.core.message.content.FileContent;
@@ -166,9 +161,9 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                 String url = ic != null ? ic.getUrl() : null;
                 if (url != null && !url.isEmpty()) {
                     String toSend = url;
-                    if (isLocalLoopbackHttpUrl(url)) {
+                    if (AIFileUtils.isLocalLoopbackHttpUrl(url)) {
                         try {
-                            String b64 = fetchHttpAsBase64(url, 8 * 1024 * 1024);
+                            String b64 = AIFileUtils.fetchHttpAsBase64(url, 8 * 1024 * 1024);
                             if (b64 != null && !b64.isEmpty()) {
                                 toSend = b64;
                                 log.debug("Converted local image url to base64 (MessageProtobuf) for zai image_url: {} -> (base64)", url);
@@ -179,6 +174,10 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                     }
                     contents.add(MessageContent.builder().type(ZAI_IMAGE_URL)
                             .imageUrl(ImageUrl.builder().url(toSend).build()).build());
+                    // 若有图片说明（label），追加一条文本消息
+                    if (ic != null && ic.getLabel() != null && !ic.getLabel().isEmpty()) {
+                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(ic.getLabel()).build());
+                    }
                 }
             } else if (type == MessageTypeEnum.VIDEO) {
                 VideoContent vc = VideoContent.fromJson(raw);
@@ -186,20 +185,33 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                 if (url != null && !url.isEmpty()) {
                     contents.add(MessageContent.builder().type(ZAI_VIDEO_URL)
                             .videoUrl(VideoUrl.builder().url(url).build()).build());
+                    // 若有视频说明（label），追加一条文本消息
+                    if (vc != null && vc.getLabel() != null && !vc.getLabel().isEmpty()) {
+                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(vc.getLabel()).build());
+                    }
                 }
             } else if (type == MessageTypeEnum.FILE || type == MessageTypeEnum.AUDIO) {
                 // AUDIO 暂按 file_url 处理
                 String url = null;
+                FileContent fc = null;
+                AudioContent ac = null;
                 if (type == MessageTypeEnum.FILE) {
-                    FileContent fc = FileContent.fromJson(raw);
+                    fc = FileContent.fromJson(raw);
                     url = fc != null ? fc.getUrl() : null;
                 } else {
-                    AudioContent ac = AudioContent.fromJson(raw);
+                    ac = AudioContent.fromJson(raw);
                     url = ac != null ? ac.getUrl() : null;
                 }
                 if (url != null && !url.isEmpty()) {
                     contents.add(MessageContent.builder().type(ZAI_FILE_URL)
                             .fileUrl(FileUrl.builder().url(url).build()).build());
+                    // 若有文件/音频说明（label），追加一条文本消息
+                    if (fc != null && fc.getLabel() != null && !fc.getLabel().isEmpty()) {
+                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(fc.getLabel()).build());
+                    }
+                    if (ac != null && ac.getLabel() != null && !ac.getLabel().isEmpty()) {
+                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(ac.getLabel()).build());
+                    }
                 }
             } else {
                 // 其他类型按文本
@@ -212,7 +224,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
         return contents;
     }
 
-    // 从传入文本中识别 BaseSpringAIService 注入的媒体标记并构建 zai 多模态内容；否则退化为纯文本。
+    // 直接根据文本尝试解析媒体 JSON（ImageContent/VideoContent/FileContent/AudioContent），否则退化为纯文本。
     private List<MessageContent> buildUserContents(String text) {
         List<MessageContent> contents = new ArrayList<>();
         if (text == null) {
@@ -220,123 +232,78 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
             return contents;
         }
         String trimmed = text.trim();
-        if (trimmed.startsWith(RobotConsts.BD_MEDIA_PREFIX)) {
-            // 形如 __BD_MEDIA__:{"type":"IMAGE","url":"https://..."}
-            String json = trimmed.substring(RobotConsts.BD_MEDIA_PREFIX.length());
-            try {
-                // 简单解析避免引入依赖
-                String type = extractJsonField(json, RobotConsts.BD_MEDIA_FIELD_TYPE);
-                String url = extractJsonField(json, RobotConsts.BD_MEDIA_FIELD_URL);
-                if (url != null && !url.isEmpty()) {
-                    MessageTypeEnum mt = null;
+        // 尝试逐类解析标准 JSON
+        try {
+            ImageContent ic = ImageContent.fromJson(trimmed);
+            if (ic != null && ic.getUrl() != null && !ic.getUrl().isEmpty()) {
+                String url = ic.getUrl();
+                String toSend = url;
+                if (AIFileUtils.isLocalLoopbackHttpUrl(url)) {
                     try {
-                        mt = MessageTypeEnum.valueOf(type);
-                    } catch (Exception ignore) {
-                    }
-                    if (mt == MessageTypeEnum.IMAGE) {
-                        // 若为本地回环地址（127.* 或 localhost），尝试抓取并转 Base64 以适配 SDK 要求
-                        String toSend = url;
-                        if (isLocalLoopbackHttpUrl(url)) {
-                            try {
-                                String b64 = fetchHttpAsBase64(url, 8 * 1024 * 1024); // 上限 8MB
-                                if (b64 != null && !b64.isEmpty()) {
-                                    toSend = b64;
-                                    log.debug("Converted local image url to base64 for zai image_url: {} -> (base64)", url);
-                                } else {
-                                    log.warn("Failed to convert local image to base64, fallback to original url: {}", url);
-                                }
-                            } catch (Exception ce) {
-                                log.warn("Convert local image to base64 error, fallback to original url: {} - {}", url,
-                                        ce.getMessage());
-                            }
+                        String b64 = AIFileUtils.fetchHttpAsBase64(url, 8 * 1024 * 1024);
+                        if (b64 != null && !b64.isEmpty()) {
+                            toSend = b64;
+                            log.debug("Converted local image url to base64 for zai image_url: {} -> (base64)", url);
                         }
-                        contents.add(MessageContent.builder().type(ZAI_IMAGE_URL)
-                                .imageUrl(ImageUrl.builder().url(toSend).build()).build());
-                    } else if (mt == MessageTypeEnum.VIDEO) {
-                        contents.add(MessageContent.builder().type(ZAI_VIDEO_URL)
-                                .videoUrl(VideoUrl.builder().url(url).build()).build());
-                    } else if (mt == MessageTypeEnum.FILE || mt == MessageTypeEnum.AUDIO) {
-                        // AUDIO 暂按 file_url 处理
-                        contents.add(MessageContent.builder().type(ZAI_FILE_URL)
-                                .fileUrl(FileUrl.builder().url(url).build()).build());
-                    } else {
-                        // 未知类型按文本
-                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
+                    } catch (Exception ce) {
+                        log.warn("Convert local image to base64 error, fallback to original url: {} - {}", url, ce.getMessage());
                     }
                 }
-            } catch (Exception e) {
-                log.debug("parse BD_MEDIA payload failed, fallback to text: {}", e.getMessage());
-                contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
+                contents.add(MessageContent.builder().type(ZAI_IMAGE_URL)
+                        .imageUrl(ImageUrl.builder().url(toSend).build()).build());
+                // 若有图片说明（label），追加一条文本消息
+                if (ic.getLabel() != null && !ic.getLabel().isEmpty()) {
+                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(ic.getLabel()).build());
+                }
+                return contents;
             }
-        } else {
-            // 无标记，按纯文本
-            contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
-        }
+        } catch (Exception ignore) {}
+
+        try {
+            VideoContent vc = VideoContent.fromJson(trimmed);
+            if (vc != null && vc.getUrl() != null && !vc.getUrl().isEmpty()) {
+                contents.add(MessageContent.builder().type(ZAI_VIDEO_URL)
+                        .videoUrl(VideoUrl.builder().url(vc.getUrl()).build()).build());
+                // 若有视频说明（label），追加一条文本消息
+                if (vc.getLabel() != null && !vc.getLabel().isEmpty()) {
+                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(vc.getLabel()).build());
+                }
+                return contents;
+            }
+        } catch (Exception ignore) {}
+
+        try {
+            FileContent fc = FileContent.fromJson(trimmed);
+            if (fc != null && fc.getUrl() != null && !fc.getUrl().isEmpty()) {
+                contents.add(MessageContent.builder().type(ZAI_FILE_URL)
+                        .fileUrl(FileUrl.builder().url(fc.getUrl()).build()).build());
+                // 若有文件说明（label），追加一条文本消息
+                if (fc.getLabel() != null && !fc.getLabel().isEmpty()) {
+                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(fc.getLabel()).build());
+                }
+                return contents;
+            }
+        } catch (Exception ignore) {}
+
+        try {
+            AudioContent ac = AudioContent.fromJson(trimmed);
+            if (ac != null && ac.getUrl() != null && !ac.getUrl().isEmpty()) {
+                contents.add(MessageContent.builder().type(ZAI_FILE_URL)
+                        .fileUrl(FileUrl.builder().url(ac.getUrl()).build()).build());
+                // 若有音频说明（label），追加一条文本消息
+                if (ac.getLabel() != null && !ac.getLabel().isEmpty()) {
+                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(ac.getLabel()).build());
+                }
+                return contents;
+            }
+        } catch (Exception ignore) {}
+
+        // 以上均无法解析为媒体 JSON，则按纯文本
+        contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
         return contents;
     }
 
-    // 判断是否为本地回环 HTTP(S) 地址（127.* 或 localhost）
-    private boolean isLocalLoopbackHttpUrl(String url) {
-        try {
-            URL u = new URL(url);
-            String host = u.getHost();
-            String protocol = u.getProtocol();
-            if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
-                return false;
-            }
-            if (host == null)
-                return false;
-            String h = host.trim().toLowerCase();
-            return h.equals("localhost") || h.startsWith("127.");
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // 读取 HTTP(S) 资源并转为 Base64，带大小上限
-    private String fetchHttpAsBase64(String url, int maxBytes) {
-        HttpURLConnection conn = null;
-        try {
-            URL u = new URL(url);
-            conn = (HttpURLConnection) u.openConnection();
-            conn.setConnectTimeout(3000);
-            conn.setReadTimeout(5000);
-            conn.setInstanceFollowRedirects(true);
-            conn.setRequestMethod("GET");
-            int code = conn.getResponseCode();
-            if (code != HttpURLConnection.HTTP_OK) {
-                log.warn("fetchHttpAsBase64 non-200: {} for url {}", code, url);
-                return null;
-            }
-            try (InputStream in = conn.getInputStream(); ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-                byte[] buf = new byte[8192];
-                int total = 0;
-                int n;
-                while ((n = in.read(buf)) > 0) {
-                    bos.write(buf, 0, n);
-                    total += n;
-                    if (total > maxBytes) {
-                        log.warn("fetchHttpAsBase64 exceeded maxBytes ({}), url {}", maxBytes, url);
-                        return null;
-                    }
-                }
-                byte[] bytes = bos.toByteArray();
-                if (bytes.length == 0)
-                    return null;
-                return Base64.getEncoder().encodeToString(bytes);
-            }
-        } catch (Exception e) {
-            log.warn("fetchHttpAsBase64 error: {} for url {}", e.getMessage(), url);
-            return null;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.disconnect();
-                } catch (Exception ignore) {
-                }
-            }
-        }
-    }
+    // 工具函数迁移至 AIFileUtils
 
     // zai-sdk 消息内容类型常量
     private static final String ZAI_TEXT = "text";
@@ -344,22 +311,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
     private static final String ZAI_VIDEO_URL = "video_url";
     private static final String ZAI_FILE_URL = "file_url";
 
-    // 提取极简 JSON 字段值，只支持一层字符串字段。
-    private String extractJsonField(String json, String field) {
-        if (json == null)
-            return null;
-        String key = "\"" + field + "\":";
-        int i = json.indexOf(key);
-        if (i < 0)
-            return null;
-        int start = json.indexOf('"', i + key.length());
-        if (start < 0)
-            return null;
-        int end = json.indexOf('"', start + 1);
-        if (end < 0)
-            return null;
-        return json.substring(start + 1, end);
-    }
+    // 保留：如需自定义解析辅助，可在此处添加
 
     private String extractFinalTextFromResponse(ChatCompletionResponse response) {
         try {
@@ -631,6 +583,19 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                                 if (data.getChoices() != null && !data.getChoices().isEmpty()) {
                                     Delta delta = data.getChoices().get(0).getDelta();
                                     String piece = extractDeltaText(delta);
+                                    // 提取模型推理内容（reasoningContent）
+                                    String reasoning = null;
+                                    try {
+                                        java.lang.reflect.Method getReasoning = delta.getClass()
+                                                .getMethod("getReasoningContent");
+                                        Object rv = getReasoning.invoke(delta);
+                                        if (rv instanceof String rs && !rs.isEmpty()) {
+                                            reasoning = rs;
+                                        }
+                                    } catch (NoSuchMethodException ignore) {
+                                        // 某些SDK版本没有该字段
+                                    } catch (Exception ignore) {
+                                    }
                                     if (piece != null) {
                                         String pieceTrim = piece.trim();
                                         if (pieceTrim.equalsIgnoreCase("null")) {
@@ -639,7 +604,8 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                                         }
                                         if (!pieceTrim.isEmpty()) {
                                             finalAnswer.append(pieceTrim);
-                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, pieceTrim);
+                                            // 将推理内容附带在 RobotStreamContent.reasonContent 字段
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, pieceTrim, reasoning);
                                         } else {
                                             log.debug("SSE piece is empty after trim, delta={}", delta);
                                         }

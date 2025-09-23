@@ -35,10 +35,6 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotStreamContent;
-import com.bytedesk.core.message.content.ImageContent;
-import com.bytedesk.core.message.content.VideoContent;
-import com.bytedesk.core.message.content.FileContent;
-import com.bytedesk.core.message.content.AudioContent;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElastic;
@@ -68,7 +64,6 @@ import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorSearchResult;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 
 import lombok.extern.slf4j.Slf4j;
-import com.bytedesk.ai.robot.RobotConsts;
 
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
@@ -1357,27 +1352,15 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
         String type = messageEntity.getType();
         try {
-            String url = null;
             if (MessageTypeEnum.IMAGE.name().equals(type)) {
-                ImageContent ic = ImageContent.fromJson(content);
-                if (ic != null)
-                    url = ic.getUrl();
-                return buildBdMediaPayload(MessageTypeEnum.IMAGE, url);
+                // 直接返回标准 JSON（ImageContent），由下游 fromJson 解析
+                return content;
             } else if (MessageTypeEnum.VIDEO.name().equals(type)) {
-                VideoContent vc = VideoContent.fromJson(content);
-                if (vc != null)
-                    url = vc.getUrl();
-                return buildBdMediaPayload(MessageTypeEnum.VIDEO, url);
+                return content;
             } else if (MessageTypeEnum.FILE.name().equals(type)) {
-                FileContent fc = FileContent.fromJson(content);
-                if (fc != null)
-                    url = fc.getUrl();
-                return buildBdMediaPayload(MessageTypeEnum.FILE, url);
+                return content;
             } else if (MessageTypeEnum.AUDIO.name().equals(type)) {
-                AudioContent ac = AudioContent.fromJson(content);
-                if (ac != null)
-                    url = ac.getUrl();
-                return buildBdMediaPayload(MessageTypeEnum.AUDIO, url);
+                return content;
             }
         } catch (Exception e) {
             log.debug("toBdMediaMarkerIfMedia parse failed, fallback to text: {}", e.getMessage());
@@ -1385,15 +1368,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         return content;
     }
 
-    private String buildBdMediaPayload(MessageTypeEnum type, String url) {
-        if (type == null || !StringUtils.hasText(url)) {
-            return ""; // 空 URL 则返回空字符串，避免污染 Prompt
-        }
-        // 简单拼接 JSON，避免额外依赖；ZhipuMultiModelService 会解析
-        return RobotConsts.BD_MEDIA_PREFIX
-            + "{\"" + RobotConsts.BD_MEDIA_FIELD_TYPE + "\":\"" + type.name() + "\"," 
-            + "\"" + RobotConsts.BD_MEDIA_FIELD_URL + "\":\"" + url + "\"}";
-    }
+    // 不再构造自定义 BD_MEDIA 前缀；媒体消息直接使用标准 JSON（BaseContent.toJson）在下游解析
 
     private void processDirectResponse(String query, List<FaqProtobuf> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
@@ -1529,13 +1504,24 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter, String content) {
+        sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, content, null);
+    }
+
+    /**
+     * 发送流式片段（可携带推理内容）
+     */
+    protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            SseEmitter emitter, String content, String reasonContent) {
         log.info("BaseSpringAIService sendStreamMessage content {}", content);
         try {
             if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
                 // 使用 RobotStreamContent 包装流式片段，类型改为 ROBOT_STREAM
-                RobotStreamContent robotStream = RobotStreamContent.builder()
-                        .answer(content)
-                        .build();
+                RobotStreamContent.RobotStreamContentBuilder<?, ?> builder = RobotStreamContent.builder()
+                        .answer(content);
+                if (StringUtils.hasLength(reasonContent)) {
+                    builder.reasonContent(reasonContent);
+                }
+                RobotStreamContent robotStream = builder.build();
                 messageProtobufReply.setContent(robotStream.toJson());
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
                 // 保存消息到数据库

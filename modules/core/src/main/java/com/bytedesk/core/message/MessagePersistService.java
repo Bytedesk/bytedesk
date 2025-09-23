@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.message.content.RobotStreamContent;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -56,7 +57,57 @@ public class MessagePersistService {
                 Optional<MessageEntity> messageOpt = messageRestService.findByUid(uid);
                 if (messageOpt.isPresent()) {
                     MessageEntity message = messageOpt.get();
-                    message.setContent(message.getContent() + messageProtobuf.getContent());
+                    try {
+                        // 解析已存与本次分片为 RobotStreamContent，按字段拼接
+                        String existingJson = message.getContent();
+                        String incomingJson = messageProtobuf.getContent();
+
+                        RobotStreamContent existing = null;
+                        RobotStreamContent incoming = null;
+                        try {
+                            if (existingJson != null && !existingJson.isEmpty()) {
+                                existing = RobotStreamContent.fromJson(existingJson, RobotStreamContent.class);
+                            }
+                        } catch (Exception ignore) {
+                            // 旧数据或非JSON，忽略
+                        }
+                        try {
+                            if (incomingJson != null && !incomingJson.isEmpty()) {
+                                incoming = RobotStreamContent.fromJson(incomingJson, RobotStreamContent.class);
+                            }
+                        } catch (Exception ignore) {
+                        }
+
+                        if (existing == null || incoming == null) {
+                            // 兜底：任一无法解析时，仍旧进行字符串拼接以不丢数据
+                            message.setContent((existingJson == null ? "" : existingJson)
+                                    + (incomingJson == null ? "" : incomingJson));
+                        } else {
+                            String mergedAnswer = concatSafe(existing.getAnswer(), incoming.getAnswer());
+                            String mergedReason = concatSafe(existing.getReasonContent(), incoming.getReasonContent());
+
+                            // 沿用已有的其它字段（question、sources、kbUid、robotUid、regenerationContext）
+                            RobotStreamContent merged = RobotStreamContent.builder()
+                                    .question(existing.getQuestion() != null ? existing.getQuestion()
+                                            : incoming.getQuestion())
+                                    .answer(mergedAnswer)
+                                    .reasonContent(mergedReason)
+                                    .sources(existing.getSources() != null ? existing.getSources()
+                                            : incoming.getSources())
+                                    .regenerationContext(existing.getRegenerationContext() != null
+                                            ? existing.getRegenerationContext()
+                                            : incoming.getRegenerationContext())
+                                    .kbUid(existing.getKbUid() != null ? existing.getKbUid() : incoming.getKbUid())
+                                    .robotUid(existing.getRobotUid() != null ? existing.getRobotUid()
+                                            : incoming.getRobotUid())
+                                    .build();
+                            message.setContent(merged.toJson());
+                        }
+                    } catch (Exception ex) {
+                        log.warn("Failed to merge ROBOT_STREAM content using JSON, fallback to raw append: {}",
+                                ex.getMessage());
+                        message.setContent(message.getContent() + messageProtobuf.getContent());
+                    }
                     messageRestService.save(message);
                 }
                 return;
@@ -92,6 +143,12 @@ public class MessagePersistService {
             message.setOrgUid(orgUid);
         }
         messageRestService.save(message);
+    }
+
+    private String concatSafe(String a, String b) {
+        if (a == null || a.isEmpty()) return b == null ? "" : b;
+        if (b == null || b.isEmpty()) return a;
+        return a + b;
     }
 
     // 处理消息通知，已处理的消息返回true，未处理的消息返回false

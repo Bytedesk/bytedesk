@@ -28,6 +28,9 @@ public class RobotStreamContent extends BaseContent {
     
     private String answer;
     
+    // 推理内容（例如部分模型返回的 reasoningContent）
+    private String reasonContent;
+    
     // 答案来源信息列表
     private List<SourceReference> sources;
     
