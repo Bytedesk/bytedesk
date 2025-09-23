@@ -33,7 +33,7 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.LlmProviderConstants;
+import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import lombok.extern.slf4j.Slf4j;

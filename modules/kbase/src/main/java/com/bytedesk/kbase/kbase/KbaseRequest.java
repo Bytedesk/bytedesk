@@ -19,12 +19,12 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.LlmDefaults;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.llm.LlmDefaults;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

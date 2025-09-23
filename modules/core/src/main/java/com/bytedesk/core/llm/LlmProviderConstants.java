@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.constant;
+package com.bytedesk.core.llm;
 
 /**
  * LLM 提供商常量字符串 - 专门用于注解等需要编译时常量的场景

@@ -22,8 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.provider.event.LlmProviderCreateEvent;
-import com.bytedesk.core.constant.LlmProviderConstants;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

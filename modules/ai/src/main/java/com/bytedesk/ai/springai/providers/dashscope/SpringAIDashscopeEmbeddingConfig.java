@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Primary;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
-import com.bytedesk.core.constant.LlmProviderConstants;
+import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

@@ -15,7 +15,7 @@ package com.bytedesk.ai.provider;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.LlmProviderConstants;
+import com.bytedesk.core.llm.LlmProviderConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

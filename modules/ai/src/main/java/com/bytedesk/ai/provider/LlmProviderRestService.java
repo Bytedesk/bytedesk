@@ -30,8 +30,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.base.LlmProviderConfigDefault;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.llm.LlmConfigUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.LlmConfigUtils;
 
 import lombok.AllArgsConstructor;
 import org.springframework.core.env.Environment;

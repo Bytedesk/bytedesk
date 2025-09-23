@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.bytedesk.core.constant.LlmProviderConstants;
+import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.extern.slf4j.Slf4j;
 

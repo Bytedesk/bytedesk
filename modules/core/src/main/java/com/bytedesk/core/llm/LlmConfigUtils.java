@@ -11,13 +11,11 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.utils;
+package com.bytedesk.core.llm;
 
 import org.springframework.core.env.Environment;
 
 import com.bytedesk.core.base.LlmProviderConfigDefault;
-import com.bytedesk.core.constant.LlmDefaults;
-import com.bytedesk.core.constant.LlmProviderConstants;
 
 import lombok.experimental.UtilityClass;
 

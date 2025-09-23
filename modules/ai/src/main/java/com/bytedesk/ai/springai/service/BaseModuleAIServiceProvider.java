@@ -31,7 +31,7 @@ import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService
 import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
 import com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService;
 import com.bytedesk.ai.zhipuai.ZhipuaiService;
-import com.bytedesk.core.constant.LlmProviderConstants;
+import com.bytedesk.core.llm.LlmProviderConstants;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

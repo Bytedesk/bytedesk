@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 11:40:58
+ * @LastEditTime: 2025-09-23 11:55:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.constant;
+package com.bytedesk.core.llm;
 
 /**
  * LLM 默认配置常量
@@ -27,10 +27,10 @@ public class LlmDefaults {
     // 默认文字对话模型
     public static final String DEFAULT_TEXT_MODEL = "glm-4-flash";
     
-    // 默认Vision提供商
+    // 默认视觉对话模型提供商
     public static final String DEFAULT_VISION_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认Vision模型
-    public static final String DEFAULT_VISION_MODEL = "llava:latest";
+    // 默认视觉对话模型
+    public static final String DEFAULT_VISION_MODEL = "glm-4.1v-thinking-flash";
     
     // 默认文本转语音提供商
     public static final String DEFAULT_AUDIO_PROVIDER = LlmProviderConstants.ZHIPUAI;

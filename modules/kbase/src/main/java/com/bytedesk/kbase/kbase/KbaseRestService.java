@@ -36,6 +36,7 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.llm.LlmConfigUtils;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -44,7 +45,6 @@ import com.bytedesk.kbase.article.ArticleRequest;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
-import com.bytedesk.core.utils.LlmConfigUtils;
 
 import lombok.AllArgsConstructor;
 import org.springframework.core.env.Environment;

@@ -19,7 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.env.MockEnvironment;
 
 import com.bytedesk.core.base.LlmProviderConfigDefault;
-import com.bytedesk.core.constant.LlmDefaults;
+import com.bytedesk.core.llm.LlmConfigUtils;
+import com.bytedesk.core.llm.LlmDefaults;
 
 class LlmConfigUtilsTest {
 

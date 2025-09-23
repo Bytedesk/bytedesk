@@ -14,8 +14,8 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.constant.LlmDefaults;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.llm.LlmDefaults;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
