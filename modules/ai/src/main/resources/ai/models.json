@@ -159,7 +159,6 @@
             "description": "GLM-Z1 FlashX 增强版，速度与质量进一步提升",
             "type": "TEXT"
         },
-        
         {
             "name": "glm-4.5v",
             "nickname": "GLM-4.5V",

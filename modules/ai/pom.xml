@@ -264,6 +264,14 @@
 			<version>0.3.1</version>
 		</dependency>
 
+		<!-- OCR 图像文字识别 -->
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.tess4j/tess4j -->
+		<!-- <dependency>
+			<groupId>net.sourceforge.tess4j</groupId>
+			<artifactId>tess4j</artifactId>
+			<version>5.16.0</version>
+		</dependency> -->
+
 	</dependencies>
 
 	<!-- https://docs.spring.io/spring-ai/reference/getting-started.html -->
