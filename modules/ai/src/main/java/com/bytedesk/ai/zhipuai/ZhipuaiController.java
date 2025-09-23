@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 10:13:34
+ * @LastEditTime: 2025-09-23 10:23:02
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -1033,6 +1033,8 @@ public class ZhipuaiController {
         }
     }
 
+    
+    
     /**
      * 在 Bean 销毁时关闭线程池
      */
