@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-17 07:44:11
+ * @LastEditTime: 2025-09-23 15:02:11
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -152,10 +152,10 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             }
             
             // Set default vision provider and model if not provided
-            if (!StringUtils.hasText(llm.getVisionProvider()) || !StringUtils.hasText(llm.getVisionModel())) {
-                llm.setVisionProvider(llm.getVisionProvider() != null ? llm.getVisionProvider() : modelConfig.getDefaultVisionProvider());
-                llm.setVisionModel(llm.getVisionModel() != null ? llm.getVisionModel() : modelConfig.getDefaultVisionModel());
-            }
+            // if (!StringUtils.hasText(llm.getVisionProvider()) || !StringUtils.hasText(llm.getVisionModel())) {
+            //     llm.setVisionProvider(llm.getVisionProvider() != null ? llm.getVisionProvider() : modelConfig.getDefaultVisionProvider());
+            //     llm.setVisionModel(llm.getVisionModel() != null ? llm.getVisionModel() : modelConfig.getDefaultVisionModel());
+            // }
             
             // Set default voice provider and model if not provided
             if (!StringUtils.hasText(llm.getAudioProvider()) || !StringUtils.hasText(llm.getAudioModel())) {

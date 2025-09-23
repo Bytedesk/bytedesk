@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 10:23:02
+ * @LastEditTime: 2025-09-23 15:03:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -903,9 +903,9 @@ public class ZhipuaiController {
 
     /**
      * 传入Base64图片，图片理解
-     * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/base64-image
+     * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/base64
      */
-    @GetMapping("/test/glm4.5v/base64-image")
+    @GetMapping("/test/glm4.5v/base64")
     public ResponseEntity<JsonResult<?>> testZhipuaiBase64Image() throws IOException {
 
         String file = ClassLoader.getSystemResource("your/path/xxx.png").getFile();

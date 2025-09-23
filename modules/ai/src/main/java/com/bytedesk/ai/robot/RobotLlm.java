@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:10:41
+ * @LastEditTime: 2025-09-23 15:01:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -40,7 +40,12 @@ public class RobotLlm {
 
     @Builder.Default
     @Column(name = "is_thinking_enabled")
-    private Boolean enableThinking = false;
+    private Boolean enableThinking = true;
+
+    // enable streaming
+    @Builder.Default
+    @Column(name = "is_streaming_enabled")
+    private Boolean enableStreaming = false;
 
     // 启用搜索
     @Builder.Default
@@ -62,22 +67,22 @@ public class RobotLlm {
 
     // 视觉模型
     // 启用vision
-    @Builder.Default
-    @Column(name = "is_vision_enabled")
-    private Boolean visionEnabled = false;
+    // @Builder.Default
+    // @Column(name = "is_vision_enabled")
+    // private Boolean visionEnabled = false;
 
-    // 视觉模型提供商
-    @Builder.Default
-    @Column(name = "llm_vision_provider")
-    private String visionProvider = LlmDefaults.DEFAULT_VISION_PROVIDER;
+    // // 视觉模型提供商
+    // @Builder.Default
+    // @Column(name = "llm_vision_provider")
+    // private String visionProvider = LlmDefaults.DEFAULT_VISION_PROVIDER;
 
-    @Column(name = "llm_vision_provider_uid")
-    private String visionProviderUid;
+    // @Column(name = "llm_vision_provider_uid")
+    // private String visionProviderUid;
 
-    // 视觉模型名称
-    @Builder.Default
-    @Column(name = "llm_vision_model")
-    private String visionModel = LlmDefaults.DEFAULT_VISION_MODEL;
+    // // 视觉模型名称
+    // @Builder.Default
+    // @Column(name = "llm_vision_model")
+    // private String visionModel = LlmDefaults.DEFAULT_VISION_MODEL;
 
     // 语音模型
     @Builder.Default
