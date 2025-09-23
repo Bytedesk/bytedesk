@@ -36,6 +36,10 @@ public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, Llm
             // if (StringUtils.hasText(request.getOrgUid())) {
             //     predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             // }
+            // type
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
             // enabled
             if (request.getEnabled() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("enabled"), request.getEnabled()));
@@ -48,10 +52,6 @@ public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, Llm
             if (StringUtils.hasText(request.getProviderUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("providerUid"), request.getProviderUid()));
             }
-            // providerName
-            // if (StringUtils.hasText(request.getProviderName())) {
-            //     predicates.add(criteriaBuilder.equal(root.get("providerName"), request.getProviderName()));
-            // }
             // searchText
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
@@ -60,7 +60,7 @@ public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, Llm
                 orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
-                // orPredicates.add(criteriaBuilder.like(root.get("providerName"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("type"), "%" + searchText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
