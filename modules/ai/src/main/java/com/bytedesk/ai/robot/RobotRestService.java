@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-22 16:44:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 15:21:46
+ * @LastEditTime: 2025-09-23 15:27:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -182,100 +182,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     }
 
     @Transactional
-    public ThreadResponse createLlmThread(ThreadRequest request) {
-        UserEntity owner = authService.getUser();
-        if (owner == null) {
-            throw new NotLoginException("login required");
-        }
-        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getRobot()); 
-        if (robotProtobuf == null) {
-            throw new RuntimeException("robot is required");
-        }
-        // 因为robotProtobuf中没有name字段，所以前端通过uid传递name
-        String robotName = robotProtobuf.getUid();
-        if (!StringUtils.hasText(robotName)) {
-            throw new RuntimeException("robotUid is required");
-        }
-        Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(robotName, owner.getOrgUid());
-        if (!robotOptional.isPresent()) {
-            throw new RuntimeException("robot " + robotName + " not found");
-        }
-        String robotUid = robotOptional.get().getUid();
-        // 
-        String topic = null;
-        if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
-            // org/robot/robotUid/userUid
-            topic = TopicUtils.formatOrgRobotThreadTopic(robotUid, owner.getUid());
-        } else {
-            // org/robot/robotUid/userUid/randomUid
-            topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
-        }
-        // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
-        if (!request.getForceNew()) {
-            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicAndOwner(topic, owner);
-            if (threadOptional.isPresent()) {
-                return threadRestService.convertToResponse(threadOptional.get());
-            }
-        }
-        //
-        RobotEntity robotEntity = robotOptional.get();
-        robotEntity.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
-        String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
-        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
-        // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
-        ThreadEntity thread = ThreadEntity.builder()
-                .uid(uidUtils.getUid())
-                .topic(topic)
-                .type(ThreadTypeEnum.LLM.name())
-                // .unreadCount(0)
-                .hide(request.getHide())
-                .user(user)
-                .agent(robot)
-                .robot(robot)
-                .userUid(owner.getUid())
-                .owner(owner)
-                .orgUid(owner.getOrgUid())
-                .build();
-        //
-        ThreadEntity savedThread = threadRestService.save(thread);
-        if (savedThread == null) {
-            throw new RuntimeException("thread save failed");
-        }
-        return threadRestService.convertToResponse(savedThread);
-    }
-
-    @Transactional
-    public ThreadResponse updateLlmThread(ThreadRequest request) {
-        //
-        String topic = request.getTopic();
-        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getAgent());
-        // 
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-        if (!threadOptional.isPresent()) {
-            throw new RuntimeException("thread not found");
-        }
-        ThreadEntity thread = threadOptional.get();
-        // 
-        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(robotProtobuf.getLlm().getTextProviderUid());
-        if (!llmProviderOptional.isPresent()) {
-            throw new RuntimeException("llm provider not found");
-        }
-        robotProtobuf.setAvatar(llmProviderOptional.get().getLogo());
-        robotProtobuf.setNickname(llmProviderOptional.get().getNickname());
-        thread.setAgent(robotProtobuf.toJson());
-        thread.setRobot(robotProtobuf.toJson());
-        thread.setUser(robotProtobuf.toJson());
-        log.info("update thread robot: {}", robotProtobuf.toJson());
-        //
-        ThreadEntity savedThread = threadRestService.save(thread);
-        if (savedThread == null) {
-            throw new RuntimeException("thread save failed");
-        }
-        //
-        return ConvertUtils.convertToThreadResponse(savedThread);
-    }
-    
-    @Transactional
     @Override
     public RobotResponse update(RobotRequest request) {
 
@@ -427,6 +333,100 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         } else {
             robot.setLlm(request.getLlm());
         }
+    }
+
+    @Transactional
+    public ThreadResponse createLlmThread(ThreadRequest request) {
+        UserEntity owner = authService.getUser();
+        if (owner == null) {
+            throw new NotLoginException("login required");
+        }
+        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getRobot()); 
+        if (robotProtobuf == null) {
+            throw new RuntimeException("robot is required");
+        }
+        // 因为robotProtobuf中没有name字段，所以前端通过uid传递name
+        String robotName = robotProtobuf.getUid();
+        if (!StringUtils.hasText(robotName)) {
+            throw new RuntimeException("robotUid is required");
+        }
+        Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(robotName, owner.getOrgUid());
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot " + robotName + " not found");
+        }
+        String robotUid = robotOptional.get().getUid();
+        // 
+        String topic = null;
+        if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
+            // org/robot/robotUid/userUid
+            topic = TopicUtils.formatOrgRobotThreadTopic(robotUid, owner.getUid());
+        } else {
+            // org/robot/robotUid/userUid/randomUid
+            topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
+        }
+        // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
+        if (!request.getForceNew()) {
+            Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicAndOwner(topic, owner);
+            if (threadOptional.isPresent()) {
+                return threadRestService.convertToResponse(threadOptional.get());
+            }
+        }
+        //
+        RobotEntity robotEntity = robotOptional.get();
+        robotEntity.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
+        String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
+        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
+        ThreadEntity thread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
+                .topic(topic)
+                .type(ThreadTypeEnum.LLM.name())
+                // .unreadCount(0)
+                .hide(request.getHide())
+                .user(user)
+                .agent(robot)
+                .robot(robot)
+                .userUid(owner.getUid())
+                .owner(owner)
+                .orgUid(owner.getOrgUid())
+                .build();
+        //
+        ThreadEntity savedThread = threadRestService.save(thread);
+        if (savedThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        return threadRestService.convertToResponse(savedThread);
+    }
+
+    @Transactional
+    public ThreadResponse updateLlmThread(ThreadRequest request) {
+        //
+        String topic = request.getTopic();
+        RobotProtobuf robotProtobuf = RobotProtobuf.fromJson(request.getAgent());
+        // 
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("thread not found");
+        }
+        ThreadEntity thread = threadOptional.get();
+        // 
+        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(robotProtobuf.getLlm().getTextProviderUid());
+        if (!llmProviderOptional.isPresent()) {
+            throw new RuntimeException("llm provider not found");
+        }
+        robotProtobuf.setAvatar(llmProviderOptional.get().getLogo());
+        robotProtobuf.setNickname(llmProviderOptional.get().getNickname());
+        thread.setAgent(robotProtobuf.toJson());
+        thread.setRobot(robotProtobuf.toJson());
+        thread.setUser(robotProtobuf.toJson());
+        log.info("update thread robot: {}", robotProtobuf.toJson());
+        //
+        ThreadEntity savedThread = threadRestService.save(thread);
+        if (savedThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        //
+        return ConvertUtils.convertToThreadResponse(savedThread);
     }
 
     // update avatar
