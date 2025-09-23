@@ -1067,9 +1067,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                             MessageTypeEnum.FILE.name().equals(messageEntity.getType()) ||
                             MessageTypeEnum.VIDEO.name().equals(messageEntity.getType()) ||
                             MessageTypeEnum.AUDIO.name().equals(messageEntity.getType())) {
-                        // 用户消息：如为多媒体类型，转换为带类型标记的简化内容（仅传 URL）
-                        String payload = toBdMediaMarkerIfMedia(messageEntity, content);
-                        messages.add(new UserMessage(payload));
+                        // 用户消息：文本或多媒体均直接传递标准 JSON/文本内容，由下游解析
+                        messages.add(new UserMessage(content));
                     } else if (MessageTypeEnum.TEXT.name().equals(messageEntity.getType()) ||
                             // MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType()) ||
                             MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
@@ -1241,9 +1240,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     if (messageEntity.isFromVisitor()
                             || messageEntity.isFromUser()
                             || messageEntity.isFromMember()) {
-                        // 若为多媒体类型，仅传 URL 并带类型标记
-                        String payload = toBdMediaMarkerIfMedia(messageEntity, content);
-                        messages.add(new UserMessage(payload));
+                        // 直接传递内容（文本或标准多媒体 JSON）
+                        messages.add(new UserMessage(content));
                     } else {
                         // 机器人、客服、系统等其他消息统一使用SystemMessage
                         messages.add(new SystemMessage(content));
@@ -1307,8 +1305,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     if (messageEntity.isFromVisitor()
                             || messageEntity.isFromUser()
                             || messageEntity.isFromMember()) {
-                        String payload = toBdMediaMarkerIfMedia(messageEntity, content);
-                        messages.add(new UserMessage(payload));
+                        messages.add(new UserMessage(content));
                     } else {
                         // 机器人、客服、系统等其他消息统一使用SystemMessage
                         messages.add(new SystemMessage(content));
@@ -1337,35 +1334,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         String response = processPromptSync(aiPrompt.toString(), robot, fullPromptContent);
         return new PromptResult(response, fullPromptContent);
-    }
-
-    // ===== 自定义：为多媒体用户消息构造类型标记，传递到具体 AI Service 做多模态转换 =====
-
-    /**
-     * 若消息为 IMAGE/VIDEO/FILE/AUDIO 类型，则解析 JSON 提取 url 并包装为带前缀的 JSON 字符串，
-     * 形如："__BD_MEDIA__:{\"type\":\"IMAGE\",\"url\":\"https://...\"}"
-     * 否则返回原始文本内容。
-     */
-    private String toBdMediaMarkerIfMedia(MessageEntity messageEntity, String content) {
-        if (messageEntity == null || content == null) {
-            return content;
-        }
-        String type = messageEntity.getType();
-        try {
-            if (MessageTypeEnum.IMAGE.name().equals(type)) {
-                // 直接返回标准 JSON（ImageContent），由下游 fromJson 解析
-                return content;
-            } else if (MessageTypeEnum.VIDEO.name().equals(type)) {
-                return content;
-            } else if (MessageTypeEnum.FILE.name().equals(type)) {
-                return content;
-            } else if (MessageTypeEnum.AUDIO.name().equals(type)) {
-                return content;
-            }
-        } catch (Exception e) {
-            log.debug("toBdMediaMarkerIfMedia parse failed, fallback to text: {}", e.getMessage());
-        }
-        return content;
     }
 
     // 不再构造自定义 BD_MEDIA 前缀；媒体消息直接使用标准 JSON（BaseContent.toJson）在下游解析
