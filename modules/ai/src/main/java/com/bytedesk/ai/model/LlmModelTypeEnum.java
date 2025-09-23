@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-17 14:44:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-11 15:23:07
+ * @LastEditTime: 2025-09-23 11:38:30
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,7 +22,7 @@ public enum LlmModelTypeEnum {
     CODE("code"),  // 代码模型
     REASONING("reasoning"), // 推理模型
     FUNCTION("function"), // 函数调用模型
-    TEXT2IMAGE("text2image"), // 文本生成图像模型
+    TEXT2IMAGE("text2image"), // 文本生成图像模型/图像生成模型
     IMAGE2TEXT("image2text"), // 图像转文本模型
     AUDIO2TEXT("audio2text"), // 语音转文本模型
     TEXT2AUDIO("text2audio"), // 文本转语音模型

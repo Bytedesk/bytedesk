@@ -92,6 +92,123 @@
             "nickname": "Embedding-3",
             "description": "文本嵌入模型，将文本转换为向量表示，适用于检索和语义搜索",
             "type": "EMBEDDING"
+        },
+        {
+            "name": "glm-4.5",
+            "nickname": "GLM-4.5",
+            "description": "GLM-4.5 旗舰文本模型，支持复杂推理与超长上下文，适合智能体应用",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-4.5-air",
+            "nickname": "GLM-4.5-Air",
+            "description": "GLM-4.5-Air 轻量高效版本，响应更快，适合低延迟场景",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-4.5-x",
+            "nickname": "GLM-4.5-X",
+            "description": "GLM-4.5-X 版本，面向更复杂的推理与工具使用场景",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-4.5-airx",
+            "nickname": "GLM-4.5-AirX",
+            "description": "GLM-4.5-AirX 扩展版，在轻量与能力之间取得更好平衡",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-4.5-flash",
+            "nickname": "GLM-4.5-Flash",
+            "description": "GLM-4.5 快速版，聚焦极致响应速度",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-4-air-250414",
+            "nickname": "GLM-4-Air-250414",
+            "description": "GLM-4-Air 2025-04-14 版本，性能与稳定性优化",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-4-flashx-250414",
+            "nickname": "GLM-4-FlashX-250414",
+            "description": "GLM-4-FlashX 2025-04-14 版本，进一步优化速度与质量",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-z1-air",
+            "nickname": "GLM-Z1-Air",
+            "description": "GLM-Z1 Air 版本，面向更快更轻的通用对话体验",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-z1-airx",
+            "nickname": "GLM-Z1-AirX",
+            "description": "GLM-Z1 AirX 扩展版，兼顾能力与延迟",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-z1-flash",
+            "nickname": "GLM-Z1-Flash",
+            "description": "GLM-Z1 快速版，优化短对话与快速交互",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-z1-flashx",
+            "nickname": "GLM-Z1-FlashX",
+            "description": "GLM-Z1 FlashX 增强版，速度与质量进一步提升",
+            "type": "TEXT"
+        },
+        
+        {
+            "name": "glm-4.5v",
+            "nickname": "GLM-4.5V",
+            "description": "GLM-4.5V 视觉多模态模型，具备卓越的视觉理解能力",
+            "type": "VISION"
+        },
+        {
+            "name": "glm-4v-plus-0111",
+            "nickname": "GLM-4V-Plus-0111",
+            "description": "GLM-4V-Plus 0111 版本，图像理解与细节描述更佳",
+            "type": "VISION"
+        },
+        {
+            "name": "glm-4.1v-thinking-flashx",
+            "nickname": "GLM-4.1V-Thinking-FlashX",
+            "description": "GLM-4.1V Thinking FlashX，强调视觉推理思考能力",
+            "type": "VISION"
+        },
+        {
+            "name": "glm-4.1v-thinking-flash",
+            "nickname": "GLM-4.1V-Thinking-Flash（免费）",
+            "description": "GLM-4.1V Thinking Flash 版本，兼顾速度与视觉推理",
+            "type": "VISION"
+        },
+
+        {
+            "name": "glm-4-voice",
+            "nickname": "GLM-4-Voice (TTS)",
+            "description": "GLM-4-Voice 文本转语音（TTS），支持高质量语音合成",
+            "type": "TEXT2AUDIO"
+        },
+        {
+            "name": "glm-4-voice",
+            "nickname": "GLM-4-Voice (ASR)",
+            "description": "GLM-4-Voice 语音转文本（ASR），支持语音理解与识别",
+            "type": "AUDIO2TEXT"
+        },
+
+        {
+            "name": "charglm-4",
+            "nickname": "CharGLM-4",
+            "description": "角色扮演专用模型，支持丰富的角色与设定",
+            "type": "TEXT"
+        },
+        {
+            "name": "emohaa",
+            "nickname": "Emohaa",
+            "description": "专业心理咨询模型，擅长情感支持与心理疏导",
+            "type": "TEXT"
         }
     ],
     "dashscope": [
