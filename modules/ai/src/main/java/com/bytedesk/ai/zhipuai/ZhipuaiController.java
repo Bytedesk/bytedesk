@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 10:07:44
+ * @LastEditTime: 2025-09-23 10:13:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -857,7 +857,7 @@ public class ZhipuaiController {
      * https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java-2
      * 图片理解，多张图片
      * 不支持同时理解文件、视频和图像。
-     * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/multi-image
+     * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/image
      */
     @GetMapping("/test/glm4.5v/image")
     public ResponseEntity<JsonResult<?>> testZhipuaiMultiModelImage() {
@@ -894,10 +894,11 @@ public class ZhipuaiController {
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
             System.out.println(reply);
+            return ResponseEntity.ok(JsonResult.success(reply));
         } else {
-            log.error("Error in testZhipuaiMultiImage: {}", response.getMsg());
+            log.error("Error in testZhipuaiMultiModelImage: {}", response.getMsg());
+            return ResponseEntity.ok(JsonResult.error(response.getMsg()));
         }
-        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**
@@ -937,10 +938,11 @@ public class ZhipuaiController {
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
             System.out.println(reply);
+            return ResponseEntity.ok(JsonResult.success(reply));
         } else {
             log.error("Error in testZhipuaiBase64Image: {}", response.getMsg());
+            return ResponseEntity.ok(JsonResult.error(response.getMsg()));
         }
-        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**
@@ -977,10 +979,11 @@ public class ZhipuaiController {
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
             System.out.println(reply);
+            return ResponseEntity.ok(JsonResult.success(reply));
         } else {
             log.error("Error in testZhipuaiMultiModelVideo: {}", response.getMsg());
+            return ResponseEntity.ok(JsonResult.error(response.getMsg()));
         }
-        return ResponseEntity.ok(JsonResult.success());
     }
 
     /**
