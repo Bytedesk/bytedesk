@@ -76,10 +76,10 @@ public class LlmModelEntity extends BaseEntity {
      */
     private String providerUid;
 
-    // /**
-    //  * Name of the model provider
-    //  */
-    // private String providerName;
+    /**
+     * Type of the model provider
+     */
+    private String providerType;
 
     @Builder.Default
     @Column(name = "is_enabled")

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:08:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 11:48:42
+ * @LastEditTime: 2025-09-23 12:31:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -37,8 +37,8 @@ public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, Llm
             //     predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             // }
             // type
-            if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            if (StringUtils.hasText(request.getProviderType())) {
+                predicates.add(criteriaBuilder.equal(root.get("providerType"), request.getProviderType()));
             }
             // enabled
             if (request.getEnabled() != null) {
@@ -60,7 +60,7 @@ public class LlmModelSpecification extends BaseSpecification<LlmModelEntity, Llm
                 orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
-                orPredicates.add(criteriaBuilder.like(root.get("type"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("providerType"), "%" + searchText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }

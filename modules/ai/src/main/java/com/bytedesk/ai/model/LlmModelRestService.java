@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:19:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 14:41:21
+ * @LastEditTime: 2025-09-23 12:40:28
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -101,11 +101,11 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
         return convertToResponse(savedModel);
     }
 
-    public LlmModelResponse createFromModelJson(String providerUid, String providerName, ModelJson modelJson, String level, String orgUid) {
+    public LlmModelResponse createFromModelJson(String providerUid, String providerType,  ModelJson modelJson, String level, String orgUid) {
 
         LlmModelRequest request = LlmModelRequest.builder()
                 .providerUid(providerUid)
-                // .providerName(providerName)
+                .providerType(providerType)
                 .name(modelJson.getName())
                 .nickname(modelJson.getNickname())
                 .description(modelJson.getDescription())
