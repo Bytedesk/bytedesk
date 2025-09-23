@@ -320,11 +320,12 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                         messageProtobufReply);
                 return;
             }
-            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-                    .model(model)
-                    .messages(zaiMessages)
-                    .thinking(ChatThinking.builder().type(ZAI_THINKING_ENABLED).build())
-                    .build();
+        boolean enableThinking = robot != null && robot.getLlm() != null && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+        ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+            .model(model)
+            .messages(zaiMessages)
+            .thinking(enableThinking ? ChatThinking.builder().type(ZAI_THINKING_ENABLED).build() : null)
+            .build();
             long start = System.currentTimeMillis();
             ChatCompletionResponse resp = client.chat().createChatCompletion(req);
             boolean success = resp != null && resp.isSuccess();
@@ -360,11 +361,12 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                 log.error("No available ZhipuAiClient for sync");
                 return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
-            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-                    .model(model)
-                    .messages(msgs)
-                    .thinking(ChatThinking.builder().type(ZAI_THINKING_ENABLED).build())
-                    .build();
+        boolean enableThinking = robot != null && robot.getLlm() != null && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+        ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+            .model(model)
+            .messages(msgs)
+            .thinking(enableThinking ? ChatThinking.builder().type(ZAI_THINKING_ENABLED).build() : null)
+            .build();
             long start = System.currentTimeMillis();
             ChatCompletionResponse resp = client.chat().createChatCompletion(req);
             boolean success = resp != null && resp.isSuccess();
@@ -406,12 +408,13 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                         messageProtobufReply, emitter);
                 return;
             }
-            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-                    .model(model)
-                    .messages(zaiMessages)
-                    .stream(true)
-                    .thinking(ChatThinking.builder().type(ZAI_THINKING_ENABLED).build())
-                    .build();
+        boolean enableThinking = robot != null && robot.getLlm() != null && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+        ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                .model(model)
+                .messages(zaiMessages)
+                .stream(true)
+            .thinking(enableThinking ? ChatThinking.builder().type(ZAI_THINKING_ENABLED).build() : null)
+                .build();
             ChatCompletionResponse response = client.chat().createChatCompletion(req);
             if (response != null && response.isSuccess() && response.getFlowable() != null) {
                 response.getFlowable().subscribe(
