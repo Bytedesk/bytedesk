@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-04-14 14:30:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-30 12:36:02
+ * @LastEditTime: 2025-09-23 16:28:26
  * @Description: 消息类型转换工具类
  */
 package com.bytedesk.core.utils;
@@ -48,8 +48,8 @@ public class MessageTypeConverter {
         typeToChineseMap.put(MessageTypeEnum.TICKET_SUBMIT.name(), "工单提交");
         typeToChineseMap.put(MessageTypeEnum.TYPING.name(), "正在输入");
         typeToChineseMap.put(MessageTypeEnum.PROCESSING.name(), "处理中");
-        typeToChineseMap.put(MessageTypeEnum.STREAM.name(), "流式消息");
-        typeToChineseMap.put(MessageTypeEnum.STREAM_END.name(), "流式结束");
+        typeToChineseMap.put(MessageTypeEnum.ROBOT_STREAM.name(), "流式消息");
+        typeToChineseMap.put(MessageTypeEnum.ROBOT_STREAM_END.name(), "流式结束");
         typeToChineseMap.put(MessageTypeEnum.PREVIEW.name(), "消息预览");
         typeToChineseMap.put(MessageTypeEnum.RECALL.name(), "消息撤回");
         typeToChineseMap.put(MessageTypeEnum.DELIVERED.name(), "已送达");

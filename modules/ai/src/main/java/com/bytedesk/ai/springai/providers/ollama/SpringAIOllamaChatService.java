@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:59:14
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:31:36
+ * @LastEditTime: 2025-09-23 16:29:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -137,7 +137,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("Ollama API Websocket response text: {}", textContent);
 
-                                sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                                sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = extractTokenUsage(response);

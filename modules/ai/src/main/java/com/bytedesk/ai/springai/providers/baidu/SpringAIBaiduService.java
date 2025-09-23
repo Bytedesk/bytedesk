@@ -163,7 +163,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                                 fullResponseText[0].append(textContent);
                             }
                             
-                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况 - 使用百度专用的提取方法
                         tokenUsage[0] = extractBaiduTokenUsage(response);

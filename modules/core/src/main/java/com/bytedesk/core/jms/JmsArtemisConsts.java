@@ -39,6 +39,10 @@ public class JmsArtemisConsts {
     public static final String QUEUE_CHUNK_INDEX = QUEUE_PREFIX + "chunk.index";
     // Chunk处理完成队列
     public static final String QUEUE_CHUNK_COMPLETE = QUEUE_PREFIX + "chunk.complete";
+    // Image索引队列
+    public static final String QUEUE_IMAGE_INDEX = QUEUE_PREFIX + "image.index";
+    // Image处理完成队列
+    public static final String QUEUE_IMAGE_COMPLETE = QUEUE_PREFIX + "image.complete";
     // Article索引队列
     public static final String QUEUE_ARTICLE_INDEX = QUEUE_PREFIX + "article.index";
     // Webpage索引队列

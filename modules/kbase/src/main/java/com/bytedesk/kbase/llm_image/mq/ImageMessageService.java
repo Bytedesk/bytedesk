@@ -85,8 +85,8 @@ public class ImageMessageService {
                 return jmsMessage;
             };
             
-            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_CHUNK_INDEX, message, postProcessor);
-            log.debug("消息已发送到队列: {}", JmsArtemisConsts.QUEUE_CHUNK_INDEX);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_IMAGE_INDEX, message, postProcessor);
+            log.debug("消息已发送到队列: {}", JmsArtemisConsts.QUEUE_IMAGE_INDEX);
         } catch (Exception e) {
             log.error("发送Image索引消息失败: {}", e.getMessage(), e);
         }
@@ -142,8 +142,8 @@ public class ImageMessageService {
                 return jmsMessage;
             };
             
-            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_CHUNK_INDEX, message, postProcessor);
-            log.debug("删除消息已发送到队列: {}", JmsArtemisConsts.QUEUE_CHUNK_INDEX);
+            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_IMAGE_INDEX, message, postProcessor);
+            log.debug("删除消息已发送到队列: {}", JmsArtemisConsts.QUEUE_IMAGE_INDEX);
         } catch (Exception e) {
             log.error("发送Image删除消息失败: {}", e.getMessage(), e);
         }
@@ -255,7 +255,7 @@ public class ImageMessageService {
                 };
                 
                 // 发送消息
-                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_CHUNK_INDEX, message, postProcessor);
+                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_IMAGE_INDEX, message, postProcessor);
                 
             } catch (Exception e) {
                 log.error("发送Image索引消息失败: {}, 错误: {}", imageUid, e.getMessage(), e);
@@ -308,7 +308,7 @@ public class ImageMessageService {
                     return jmsMessage;
                 };
                 
-                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_CHUNK_INDEX, message, postProcessor);
+                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_IMAGE_INDEX, message, postProcessor);
             }
             
             log.info("批量删除消息发送完成，共{}条消息，批次ID: {}", imageUids.size(), batchId);
@@ -335,7 +335,7 @@ public class ImageMessageService {
                     .processType(processType)
                     .build();
             
-            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_CHUNK_COMPLETE, message);
+        jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_IMAGE_COMPLETE, message);
             log.debug("已发送image完成通知: image={}, file={}, status={}, type={}", 
                     imageUid, fileUid, status, processType);
         } catch (Exception e) {

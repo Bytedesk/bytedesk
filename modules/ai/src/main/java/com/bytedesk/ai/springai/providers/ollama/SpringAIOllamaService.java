@@ -147,7 +147,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("Ollama API Websocket response text: {}", textContent);
 
-                                sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                                sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = extractTokenUsage(response);

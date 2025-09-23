@@ -45,7 +45,7 @@ public class ImageCompleteListener {
      * 监听image处理完成的消息
      * 当文件的所有image都处理完成时，更新文件状态
      */
-    @JmsListener(destination = JmsArtemisConsts.QUEUE_CHUNK_COMPLETE, containerFactory = "jmsArtemisQueueFactory")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_IMAGE_COMPLETE, containerFactory = "jmsArtemisQueueFactory")
     public void onImageProcessComplete(ImageCompleteMessage message) {
         try {
             log.debug("接收到image处理完成通知: 文件={}, image={}", message.getFileUid(), message.getImageUid());

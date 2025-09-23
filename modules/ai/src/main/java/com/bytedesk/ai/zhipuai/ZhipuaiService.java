@@ -255,7 +255,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                                     if (content != null) {
                                         String contentStr = content.toString();
                                         if (!contentStr.isEmpty() && !contentStr.equals("null")) {
-                                            sendMessageWebsocket(MessageTypeEnum.STREAM, contentStr, messageProtobufReply);
+                                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, contentStr, messageProtobufReply);
                                         }
                                     }
                                 } else {
@@ -270,10 +270,10 @@ public class ZhipuaiService extends BaseSpringAIService {
                                         String extractedContent = extractContentFromDeltaString(deltaStr);
                                         if (extractedContent != null && !extractedContent.isEmpty()) {
                                             log.info("Zhipuai API websocket extracted content: {}", extractedContent);
-                                            sendMessageWebsocket(MessageTypeEnum.STREAM, extractedContent, messageProtobufReply);
+                                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, extractedContent, messageProtobufReply);
                                         } else if (!deltaStr.isEmpty() && !deltaStr.equals("null") && !isEmptyAssistantMessage(deltaStr)) {
                                             // 如果无法提取content，且不是空的助手消息，则发送原始delta字符串
-                                            sendMessageWebsocket(MessageTypeEnum.STREAM, deltaStr, messageProtobufReply);
+                                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, deltaStr, messageProtobufReply);
                                         }
                                     }
                                 }

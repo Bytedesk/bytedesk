@@ -85,12 +85,14 @@ public enum MessageTypeEnum {
     ROBOT_QUESTION, // 机器人问题
     ROBOT_ANSWER, // 机器人答案
     ROBOT_STREAM, // 机器人流式响应（包含源引用）
+    ROBOT_STREAM_START, // 机器人流式响应开始
+    ROBOT_STREAM_END, // 机器人流式响应结束
     ROBOT_UP, // 点赞
     ROBOT_DOWN, // 点踩
     // 
-    STREAM, // 流式消息TEXT，大模型回复
-    STREAM_START, // 流式消息开始
-    STREAM_END, // 流式消息结束
+    // STREAM, // 流式消息TEXT，大模型回复，改为 ROBOT_STREAM
+    // STREAM_START, // 流式消息开始
+    // STREAM_END, // 流式消息结束
     // 
     ARTICLE, // 文章
     // 

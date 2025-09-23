@@ -1076,7 +1076,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         String payload = toBdMediaMarkerIfMedia(messageEntity, content);
                         messages.add(new UserMessage(payload));
                     } else if (MessageTypeEnum.TEXT.name().equals(messageEntity.getType()) ||
-                            MessageTypeEnum.STREAM.name().equals(messageEntity.getType()) ||
+                            // MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType()) ||
                             MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
                         // 对于机器人回复，提取实际的回答文本
                         if (MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
@@ -1512,7 +1512,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             String initialContent) {
         try {
             if (!isEmitterCompleted(emitter)) {
-                messageProtobufReply.setType(MessageTypeEnum.STREAM_START);
+                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_START);
                 messageProtobufReply.setContent(initialContent);
                 String startJson = messageProtobufReply.toJson();
                 emitter.send(SseEmitter.event()
@@ -1532,8 +1532,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         log.info("BaseSpringAIService sendStreamMessage content {}", content);
         try {
             if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
-                messageProtobufReply.setContent(content);
-                messageProtobufReply.setType(MessageTypeEnum.STREAM);
+                // 使用 RobotStreamContent 包装流式片段，类型改为 ROBOT_STREAM
+                RobotStreamContent robotStream = RobotStreamContent.builder()
+                        .answer(content)
+                        .build();
+                messageProtobufReply.setContent(robotStream.toJson());
+                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, false);
                 String messageJson = messageProtobufReply.toJson();
@@ -1573,7 +1577,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         try {
             if (!isEmitterCompleted(emitter)) {
                 // 发送流结束标记
-                messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_END);
                 messageProtobufReply.setContent("");
                 // 保存消息到数据库，包含token使用情况、prompt内容和AI模型信息
                 persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens,
@@ -1690,7 +1694,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         .name("message"));
 
                 // 发送结束标记
-                messageProtobufReply.setType(MessageTypeEnum.STREAM_END);
+                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_END);
                 messageProtobufReply.setContent("");
 
                 emitter.send(SseEmitter.event()

@@ -69,8 +69,8 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     /**
      * 检查是否存在指定状态、类型和接收者的记录
      */
-    public Boolean existsByStatusAndTypeAndReceiver(PushStatusEnum status, String type, String receiver) {
-        return pushRepository.existsByStatusAndTypeAndReceiver(status.name(), type, receiver);
+    public Boolean existsByStatusAndTypeAndReceiver(String status, String type, String receiver) {
+        return pushRepository.existsByStatusAndTypeAndReceiver(status, type, receiver);
     }
 
     /**

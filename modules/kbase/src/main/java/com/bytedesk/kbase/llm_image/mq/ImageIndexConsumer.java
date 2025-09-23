@@ -66,7 +66,7 @@ public class ImageIndexConsumer {
      * @param jmsMessage JMS原始消息
      * @param message Image索引消息
      */
-    @JmsListener(destination = JmsArtemisConsts.QUEUE_CHUNK_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "2-5")
+    @JmsListener(destination = JmsArtemisConsts.QUEUE_IMAGE_INDEX, containerFactory = "jmsArtemisQueueFactory", concurrency = "2-5")
     public void processIndexMessage(jakarta.jms.Message jmsMessage, ImageIndexMessage message) {
         boolean success = false;
         int maxRetryAttempts = 3;
@@ -407,7 +407,7 @@ public class ImageIndexConsumer {
                         .processType(processType)
                         .build();
                 
-                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_CHUNK_COMPLETE, message);
+                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_IMAGE_COMPLETE, message);
                 log.debug("已发送image处理完成通知: {}, 状态: {}", image.getUid(), status);
             }
         } catch (Exception e) {

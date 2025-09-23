@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 15:22:56
+ * @LastEditTime: 2025-09-23 17:08:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -133,7 +133,7 @@ public class AuthController {
 
     @PostMapping("/send/mobile")
     public ResponseEntity<?> sendMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
-        log.debug("send mobile code {}, client {}, type {}", authRequest.toString(), authRequest.getChannel(),
+        log.debug("send mobile code {}, channel {}, type {}", authRequest.toString(), authRequest.getChannel(),
                 authRequest.getType());
 
         if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-23 13:34:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 14:55:36
+ * @LastEditTime: 2025-09-23 15:41:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,11 @@ package com.bytedesk.ai.zhipuai;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Base64;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -50,6 +55,10 @@ import ai.z.openapi.service.model.VideoUrl;
 
 import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.ai.robot.RobotConsts;
+import com.bytedesk.core.message.content.ImageContent;
+import com.bytedesk.core.message.content.VideoContent;
+import com.bytedesk.core.message.content.FileContent;
+import com.bytedesk.core.message.content.AudioContent;
 
 @Slf4j
 @Service
@@ -66,6 +75,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
     // zai-sdk 角色/思维模式常量
     private static final String ZAI_ROLE_SYSTEM = "system";
     private static final String ZAI_THINKING_ENABLED = "enabled";
+    private static final String ZAI_THINKING_DISABLED = "disabled";
 
     private String getModel(RobotProtobuf robot) {
         try {
@@ -142,6 +152,66 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
         return messages;
     }
 
+    // 直接根据原始 MessageProtobuf（而不是通过 BD_MEDIA 标记）构建用户多模态内容
+    private List<MessageContent> buildUserContentsFromMessage(MessageProtobuf messageProtobufQuery) {
+        List<MessageContent> contents = new ArrayList<>();
+        if (messageProtobufQuery == null) {
+            return contents;
+        }
+        MessageTypeEnum type = messageProtobufQuery.getType();
+        String raw = messageProtobufQuery.getContent();
+        try {
+            if (type == MessageTypeEnum.IMAGE) {
+                ImageContent ic = ImageContent.fromJson(raw);
+                String url = ic != null ? ic.getUrl() : null;
+                if (url != null && !url.isEmpty()) {
+                    String toSend = url;
+                    if (isLocalLoopbackHttpUrl(url)) {
+                        try {
+                            String b64 = fetchHttpAsBase64(url, 8 * 1024 * 1024);
+                            if (b64 != null && !b64.isEmpty()) {
+                                toSend = b64;
+                                log.debug("Converted local image url to base64 (MessageProtobuf) for zai image_url: {} -> (base64)", url);
+                            }
+                        } catch (Exception ce) {
+                            log.warn("Convert local image to base64 error (MessageProtobuf), fallback to url: {} - {}", url, ce.getMessage());
+                        }
+                    }
+                    contents.add(MessageContent.builder().type(ZAI_IMAGE_URL)
+                            .imageUrl(ImageUrl.builder().url(toSend).build()).build());
+                }
+            } else if (type == MessageTypeEnum.VIDEO) {
+                VideoContent vc = VideoContent.fromJson(raw);
+                String url = vc != null ? vc.getUrl() : null;
+                if (url != null && !url.isEmpty()) {
+                    contents.add(MessageContent.builder().type(ZAI_VIDEO_URL)
+                            .videoUrl(VideoUrl.builder().url(url).build()).build());
+                }
+            } else if (type == MessageTypeEnum.FILE || type == MessageTypeEnum.AUDIO) {
+                // AUDIO 暂按 file_url 处理
+                String url = null;
+                if (type == MessageTypeEnum.FILE) {
+                    FileContent fc = FileContent.fromJson(raw);
+                    url = fc != null ? fc.getUrl() : null;
+                } else {
+                    AudioContent ac = AudioContent.fromJson(raw);
+                    url = ac != null ? ac.getUrl() : null;
+                }
+                if (url != null && !url.isEmpty()) {
+                    contents.add(MessageContent.builder().type(ZAI_FILE_URL)
+                            .fileUrl(FileUrl.builder().url(url).build()).build());
+                }
+            } else {
+                // 其他类型按文本
+                contents.add(MessageContent.builder().type(ZAI_TEXT).text(raw != null ? raw : "").build());
+            }
+        } catch (Exception e) {
+            log.warn("buildUserContentsFromMessage parse failed, fallback to text: {}", e.getMessage());
+            contents.add(MessageContent.builder().type(ZAI_TEXT).text(raw != null ? raw : "").build());
+        }
+        return contents;
+    }
+
     // 从传入文本中识别 BaseSpringAIService 注入的媒体标记并构建 zai 多模态内容；否则退化为纯文本。
     private List<MessageContent> buildUserContents(String text) {
         List<MessageContent> contents = new ArrayList<>();
@@ -164,8 +234,24 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                     } catch (Exception ignore) {
                     }
                     if (mt == MessageTypeEnum.IMAGE) {
+                        // 若为本地回环地址（127.* 或 localhost），尝试抓取并转 Base64 以适配 SDK 要求
+                        String toSend = url;
+                        if (isLocalLoopbackHttpUrl(url)) {
+                            try {
+                                String b64 = fetchHttpAsBase64(url, 8 * 1024 * 1024); // 上限 8MB
+                                if (b64 != null && !b64.isEmpty()) {
+                                    toSend = b64;
+                                    log.debug("Converted local image url to base64 for zai image_url: {} -> (base64)", url);
+                                } else {
+                                    log.warn("Failed to convert local image to base64, fallback to original url: {}", url);
+                                }
+                            } catch (Exception ce) {
+                                log.warn("Convert local image to base64 error, fallback to original url: {} - {}", url,
+                                        ce.getMessage());
+                            }
+                        }
                         contents.add(MessageContent.builder().type(ZAI_IMAGE_URL)
-                                .imageUrl(ImageUrl.builder().url(url).build()).build());
+                                .imageUrl(ImageUrl.builder().url(toSend).build()).build());
                     } else if (mt == MessageTypeEnum.VIDEO) {
                         contents.add(MessageContent.builder().type(ZAI_VIDEO_URL)
                                 .videoUrl(VideoUrl.builder().url(url).build()).build());
@@ -187,6 +273,69 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
             contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
         }
         return contents;
+    }
+
+    // 判断是否为本地回环 HTTP(S) 地址（127.* 或 localhost）
+    private boolean isLocalLoopbackHttpUrl(String url) {
+        try {
+            URL u = new URL(url);
+            String host = u.getHost();
+            String protocol = u.getProtocol();
+            if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
+                return false;
+            }
+            if (host == null)
+                return false;
+            String h = host.trim().toLowerCase();
+            return h.equals("localhost") || h.startsWith("127.");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // 读取 HTTP(S) 资源并转为 Base64，带大小上限
+    private String fetchHttpAsBase64(String url, int maxBytes) {
+        HttpURLConnection conn = null;
+        try {
+            URL u = new URL(url);
+            conn = (HttpURLConnection) u.openConnection();
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(5000);
+            conn.setInstanceFollowRedirects(true);
+            conn.setRequestMethod("GET");
+            int code = conn.getResponseCode();
+            if (code != HttpURLConnection.HTTP_OK) {
+                log.warn("fetchHttpAsBase64 non-200: {} for url {}", code, url);
+                return null;
+            }
+            try (InputStream in = conn.getInputStream(); ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                byte[] buf = new byte[8192];
+                int total = 0;
+                int n;
+                while ((n = in.read(buf)) > 0) {
+                    bos.write(buf, 0, n);
+                    total += n;
+                    if (total > maxBytes) {
+                        log.warn("fetchHttpAsBase64 exceeded maxBytes ({}), url {}", maxBytes, url);
+                        return null;
+                    }
+                }
+                byte[] bytes = bos.toByteArray();
+                if (bytes.length == 0)
+                    return null;
+                return Base64.getEncoder().encodeToString(bytes);
+            }
+        } catch (Exception e) {
+            log.warn("fetchHttpAsBase64 error: {} for url {}", e.getMessage(), url);
+            return null;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.disconnect();
+                } catch (Exception ignore) {
+                }
+            }
+        }
     }
 
     // zai-sdk 消息内容类型常量
@@ -258,7 +407,12 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                 java.lang.reflect.Method m = delta.getClass().getMethod("getContent");
                 Object v = m.invoke(delta);
                 if (v instanceof String s && !s.isEmpty()) {
-                    return s;
+                    String trimmed = s.trim();
+                    if ("null".equalsIgnoreCase(trimmed)) {
+                        log.debug("extractDeltaText: ignoring literal 'null' from getContent(), delta={}", delta);
+                        return null;
+                    }
+                    return trimmed;
                 }
             } catch (NoSuchMethodException ignore) {
             }
@@ -275,9 +429,18 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                 if ((sub.startsWith("\"") && sub.endsWith("\"")) || (sub.startsWith("'") && sub.endsWith("'"))) {
                     sub = sub.substring(1, sub.length() - 1);
                 }
+                if ("null".equalsIgnoreCase(sub)) {
+                    log.debug("extractDeltaText: ignoring literal 'null' from toString() content field, delta={}", delta);
+                    return null;
+                }
                 return sub;
             }
-            return s;
+            String sTrim = s == null ? null : s.trim();
+            if ("null".equalsIgnoreCase(sTrim)) {
+                log.debug("extractDeltaText: ignoring literal 'null' from toString() fallback, delta={}", delta);
+                return null;
+            }
+            return sTrim;
         } catch (Exception e) {
             return delta.toString();
         }
@@ -313,6 +476,25 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
         try {
             String model = getModel(robot);
             List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
+            // 覆盖最新的用户消息为基于 MessageProtobuf 直接解析的多模态内容，避免 BD_MEDIA 标记往返
+            try {
+                List<MessageContent> directUserContents = buildUserContentsFromMessage(messageProtobufQuery);
+                if (directUserContents != null && !directUserContents.isEmpty()) {
+                    for (int i = zaiMessages.size() - 1; i >= 0; i--) {
+                        ChatMessage m = zaiMessages.get(i);
+                        if (ChatMessageRole.USER.value().equals(m.getRole())) {
+                            ChatMessage replaced = ChatMessage.builder()
+                                    .role(m.getRole())
+                                    .content(directUserContents)
+                                    .build();
+                            zaiMessages.set(i, replaced);
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception ig) {
+                log.debug("websocket override user content failed: {}", ig.getMessage());
+            }
             ZhipuAiClient client = createDynamicClient(robot != null ? robot.getLlm() : null);
             if (client == null) {
                 log.error("No available ZhipuAiClient");
@@ -320,12 +502,14 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                         messageProtobufReply);
                 return;
             }
-        boolean enableThinking = robot != null && robot.getLlm() != null && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
-        ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-            .model(model)
-            .messages(zaiMessages)
-            .thinking(enableThinking ? ChatThinking.builder().type(ZAI_THINKING_ENABLED).build() : null)
-            .build();
+            boolean enableThinking = robot != null && robot.getLlm() != null
+                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                    .model(model)
+                    .messages(zaiMessages)
+                    .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
+                            .build())
+                    .build();
             long start = System.currentTimeMillis();
             ChatCompletionResponse resp = client.chat().createChatCompletion(req);
             boolean success = resp != null && resp.isSuccess();
@@ -361,12 +545,14 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                 log.error("No available ZhipuAiClient for sync");
                 return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
-        boolean enableThinking = robot != null && robot.getLlm() != null && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
-        ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-            .model(model)
-            .messages(msgs)
-            .thinking(enableThinking ? ChatThinking.builder().type(ZAI_THINKING_ENABLED).build() : null)
-            .build();
+            boolean enableThinking = robot != null && robot.getLlm() != null
+                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                    .model(model)
+                    .messages(msgs)
+                    .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
+                            .build())
+                    .build();
             long start = System.currentTimeMillis();
             ChatCompletionResponse resp = client.chat().createChatCompletion(req);
             boolean success = resp != null && resp.isSuccess();
@@ -402,19 +588,41 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
         final StringBuilder finalAnswer = new StringBuilder();
         try {
             List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
+            // 覆盖最新的用户消息为基于 MessageProtobuf 直接解析的多模态内容，避免 BD_MEDIA 标记往返
+            try {
+                List<MessageContent> directUserContents = buildUserContentsFromMessage(messageProtobufQuery);
+                if (directUserContents != null && !directUserContents.isEmpty()) {
+                    for (int i = zaiMessages.size() - 1; i >= 0; i--) {
+                        ChatMessage m = zaiMessages.get(i);
+                        if (ChatMessageRole.USER.value().equals(m.getRole())) {
+                            ChatMessage replaced = ChatMessage.builder()
+                                    .role(m.getRole())
+                                    .content(directUserContents)
+                                    .build();
+                            zaiMessages.set(i, replaced);
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception ig) {
+                log.debug("sse override user content failed: {}", ig.getMessage());
+            }
             ZhipuAiClient client = createDynamicClient(robot.getLlm());
             if (client == null) {
                 handleSseError(new IllegalStateException("No available ZhipuAiClient"), messageProtobufQuery,
                         messageProtobufReply, emitter);
                 return;
             }
-        boolean enableThinking = robot != null && robot.getLlm() != null && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
-        ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-                .model(model)
-                .messages(zaiMessages)
-                .stream(true)
-            .thinking(enableThinking ? ChatThinking.builder().type(ZAI_THINKING_ENABLED).build() : null)
-                .build();
+            boolean enableThinking = robot != null && robot.getLlm() != null
+                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                    .model(model)
+                    .messages(zaiMessages)
+                    .stream(true)
+                    .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
+                            .build())
+                    .build();
+            log.info("zai stream request: model={}, enableThinking={}, messages={} ", model, enableThinking, zaiMessages.size());
             ChatCompletionResponse response = client.chat().createChatCompletion(req);
             if (response != null && response.isSuccess() && response.getFlowable() != null) {
                 response.getFlowable().subscribe(
@@ -423,9 +631,20 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                                 if (data.getChoices() != null && !data.getChoices().isEmpty()) {
                                     Delta delta = data.getChoices().get(0).getDelta();
                                     String piece = extractDeltaText(delta);
-                                    if (piece != null && !piece.isEmpty()) {
-                                        finalAnswer.append(piece);
-                                        sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, piece);
+                                    if (piece != null) {
+                                        String pieceTrim = piece.trim();
+                                        if (pieceTrim.equalsIgnoreCase("null")) {
+                                            log.warn("SSE piece is literal 'null', delta={}, data={}", delta, data);
+                                            return;
+                                        }
+                                        if (!pieceTrim.isEmpty()) {
+                                            finalAnswer.append(pieceTrim);
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, pieceTrim);
+                                        } else {
+                                            log.debug("SSE piece is empty after trim, delta={}", delta);
+                                        }
+                                    } else {
+                                        log.debug("SSE piece is null, delta={}", delta);
                                     }
                                 }
                             } catch (Exception ex) {

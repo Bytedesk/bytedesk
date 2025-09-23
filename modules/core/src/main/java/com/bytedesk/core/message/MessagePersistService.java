@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-16 18:04:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-14 22:56:48
+ * @LastEditTime: 2025-09-23 16:28:10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -51,7 +51,7 @@ public class MessagePersistService {
         String uid = messageProtobuf.getUid();
         if (messageRestService.existsByUid(uid)) {
             // 流式消息单独处理下
-            if (MessageTypeEnum.STREAM.equals(type)) {
+            if (MessageTypeEnum.ROBOT_STREAM.equals(type)) {
                 // 更新消息内容
                 Optional<MessageEntity> messageOpt = messageRestService.findByUid(uid);
                 if (messageOpt.isPresent()) {

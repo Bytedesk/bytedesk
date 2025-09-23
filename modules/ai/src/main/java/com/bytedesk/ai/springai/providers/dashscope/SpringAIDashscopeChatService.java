@@ -104,7 +104,7 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
                             // 累积完整响应文本
                             fullResponseText[0].append(textContent);
 
-                            sendMessageWebsocket(MessageTypeEnum.STREAM, textContent, messageProtobufReply);
+                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
                         tokenUsage[0] = extractTokenUsage(response);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 15:16:09
+ * @LastEditTime: 2025-09-23 17:11:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -76,8 +76,8 @@ public class PushSendService {
         }
         
         // 检查是否已发送验证码
-        if (pushRestService.existsByStatusAndTypeAndReceiver(PushStatusEnum.PENDING, type, receiver)) {
-            return PushSendResult.failure(PushSendResult.SendCodeErrorType.ALREADY_SENT, "验证码已发送");
+        if (pushRestService.existsByStatusAndTypeAndReceiver(PushStatusEnum.PENDING.name(), type, receiver)) {
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.ALREADY_SENT, "验证码已经发送，请勿重复发送");
         }
 
         // 生成验证码
