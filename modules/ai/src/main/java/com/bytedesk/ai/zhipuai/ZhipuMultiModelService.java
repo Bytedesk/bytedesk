@@ -1,0 +1,430 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-09-23 13:34:37
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-09-23 14:29:09
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.ai.zhipuai;
+
+import java.util.ArrayList;
+import java.util.List;
+ 
+
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.bytedesk.ai.provider.LlmProviderEntity;
+import com.bytedesk.ai.provider.LlmProviderRestService;
+import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.core.llm.LlmProviderConstants;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageTypeEnum;
+
+import ai.z.openapi.ZhipuAiClient;
+import ai.z.openapi.service.model.ChatCompletionCreateParams;
+import ai.z.openapi.service.model.ChatCompletionResponse;
+import ai.z.openapi.service.model.ChatMessage;
+import ai.z.openapi.service.model.ChatMessageRole;
+import ai.z.openapi.service.model.ChatThinking;
+import ai.z.openapi.service.model.Delta;
+import ai.z.openapi.service.model.FileUrl;
+import ai.z.openapi.service.model.ImageUrl;
+import ai.z.openapi.service.model.MessageContent;
+import ai.z.openapi.service.model.VideoUrl;
+
+import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.ai.robot.RobotConsts;
+
+@Slf4j
+@Service
+public class ZhipuMultiModelService extends BaseSpringAIService {
+    
+    @Autowired
+    private LlmProviderRestService llmProviderRestService;
+    
+    @Autowired(required = false)
+    @Qualifier("zhipuAiClient")
+    private ZhipuAiClient defaultClient;
+    
+    private static final String DEFAULT_MULTI_MODEL = "glm-4.1v-thinking-flash";
+    
+    // 简单的 URL 正则，用于从文本中提取多模态资源
+    // 过去用于正则识别 URL 的常量已移除；现在依赖上游注入的 BD_MEDIA 标记。
+    
+    private String getModel(RobotProtobuf robot) {
+        try {
+            if (robot != null && robot.getLlm() != null && robot.getLlm().getTextModel() != null && !robot.getLlm().getTextModel().isEmpty()) {
+                return robot.getLlm().getTextModel();
+            }
+        } catch (Exception ignore) {}
+        return DEFAULT_MULTI_MODEL;
+    }
+    
+    /**
+     * 根据机器人配置动态创建 ZhipuAiClient，优先使用 provider apiKey，失败则回退默认 Bean。
+     */
+    private ZhipuAiClient createDynamicClient(RobotLlm llm) {
+        try {
+            if (llm == null || llm.getTextProviderUid() == null) {
+                log.warn("RobotLlm or textProviderUid is null, using default ZhipuAiClient");
+                return defaultClient;
+            }
+            var opt = llmProviderRestService.findByUid(llm.getTextProviderUid());
+            if (opt.isEmpty()) {
+                log.warn("LlmProvider with uid {} not found, using default ZhipuAiClient", llm.getTextProviderUid());
+                return defaultClient;
+            }
+            LlmProviderEntity provider = opt.get();
+            String apiKey = provider.getApiKey();
+            if (apiKey == null || apiKey.trim().isEmpty()) {
+                log.warn("API key is not configured for provider {}, using default ZhipuAiClient", provider.getUid());
+                return defaultClient;
+            }
+            log.info("Creating dynamic ZhipuAiClient with provider: {} ({})", provider.getType(), provider.getUid());
+            return ZhipuAiClient.builder().apiKey(apiKey).build();
+        } catch (Exception e) {
+            log.error("Failed to create dynamic ZhipuAiClient, using default", e);
+            return defaultClient;
+        }
+    }
+    
+    private List<ChatMessage> buildZaiMessagesFromPrompt(Prompt prompt) {
+        List<ChatMessage> messages = new ArrayList<>();
+        if (prompt == null || prompt.getInstructions() == null) {
+            return messages;
+        }
+        for (Message m : prompt.getInstructions()) {
+            if (m instanceof SystemMessage) {
+                messages.add(ChatMessage.builder()
+                        .role("system")
+                        .content(List.of(
+                                MessageContent.builder().type("text").text(m.getText()).build()
+                        ))
+                        .build());
+            } else if (m instanceof UserMessage) {
+                messages.add(ChatMessage.builder()
+                        .role(ChatMessageRole.USER.value())
+                        .content(buildUserContents(m.getText()))
+                        .build());
+            } else if (m instanceof AssistantMessage) {
+                // 将历史助手消息也带上，利于多轮
+                messages.add(ChatMessage.builder()
+                        .role(ChatMessageRole.ASSISTANT.value())
+                        .content(List.of(
+                                MessageContent.builder().type("text").text(m.getText()).build()
+                        ))
+                        .build());
+            } else {
+                // 兜底按系统文本处理
+                messages.add(ChatMessage.builder()
+                        .role("system")
+                        .content(List.of(
+                                MessageContent.builder().type("text").text(m.getText()).build()
+                        ))
+                        .build());
+            }
+        }
+        return messages;
+    }
+    
+    // 从传入文本中识别 BaseSpringAIService 注入的媒体标记并构建 zai 多模态内容；否则退化为纯文本。
+    private List<MessageContent> buildUserContents(String text) {
+        List<MessageContent> contents = new ArrayList<>();
+        if (text == null) {
+            contents.add(MessageContent.builder().type("text").text("").build());
+            return contents;
+        }
+        String trimmed = text.trim();
+        if (trimmed.startsWith(RobotConsts.BD_MEDIA_PREFIX)) {
+            // 形如 __BD_MEDIA__:{"type":"IMAGE","url":"https://..."}
+            String json = trimmed.substring(RobotConsts.BD_MEDIA_PREFIX.length());
+            try {
+                // 简单解析避免引入依赖
+                String type = extractJsonField(json, RobotConsts.BD_MEDIA_FIELD_TYPE);
+                String url = extractJsonField(json, RobotConsts.BD_MEDIA_FIELD_URL);
+                if (url != null && !url.isEmpty()) {
+                    MessageTypeEnum mt = null;
+                    try { mt = MessageTypeEnum.valueOf(type); } catch (Exception ignore) {}
+                    if (mt == MessageTypeEnum.IMAGE) {
+                        contents.add(MessageContent.builder().type(ZAI_IMAGE_URL).imageUrl(ImageUrl.builder().url(url).build()).build());
+                    } else if (mt == MessageTypeEnum.VIDEO) {
+                        contents.add(MessageContent.builder().type(ZAI_VIDEO_URL).videoUrl(VideoUrl.builder().url(url).build()).build());
+                    } else if (mt == MessageTypeEnum.FILE || mt == MessageTypeEnum.AUDIO) {
+                        // AUDIO 暂按 file_url 处理
+                        contents.add(MessageContent.builder().type(ZAI_FILE_URL).fileUrl(FileUrl.builder().url(url).build()).build());
+                    } else {
+                        // 未知类型按文本
+                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("parse BD_MEDIA payload failed, fallback to text: {}", e.getMessage());
+                contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
+            }
+        } else {
+            // 无标记，按纯文本
+            contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
+        }
+        return contents;
+    }
+
+    // zai-sdk 消息内容类型常量
+    private static final String ZAI_TEXT = "text";
+    private static final String ZAI_IMAGE_URL = "image_url";
+    private static final String ZAI_VIDEO_URL = "video_url";
+    private static final String ZAI_FILE_URL = "file_url";
+
+    // 提取极简 JSON 字段值，只支持一层字符串字段。
+    private String extractJsonField(String json, String field) {
+        if (json == null) return null;
+        String key = "\"" + field + "\":";
+        int i = json.indexOf(key);
+        if (i < 0) return null;
+        int start = json.indexOf('"', i + key.length());
+        if (start < 0) return null;
+        int end = json.indexOf('"', start + 1);
+        if (end < 0) return null;
+        return json.substring(start + 1, end);
+    }
+    
+    private String extractFinalTextFromResponse(ChatCompletionResponse response) {
+        try {
+            if (response == null || response.getData() == null || response.getData().getChoices() == null || response.getData().getChoices().isEmpty()) {
+                return null;
+            }
+            Object msgObj = response.getData().getChoices().get(0).getMessage();
+            if (msgObj instanceof ChatMessage cm) {
+                Object contentObj = cm.getContent();
+                if (contentObj instanceof List<?>) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Object o : (List<?>) contentObj) {
+                        if (o instanceof MessageContent mc) {
+                            if ("text".equalsIgnoreCase(mc.getType()) && mc.getText() != null) {
+                                sb.append(mc.getText());
+                            }
+                        } else if (o != null) {
+                            sb.append(o.toString());
+                        }
+                    }
+                    String text = sb.toString();
+                    if (text.contains("<think>")) {
+                        text = text.replaceAll("(?s)<think>.*?</think>", "");
+                    }
+                    return text;
+                } else if (contentObj instanceof String s) {
+                    String text = s;
+                    if (text.contains("<think>")) {
+                        text = text.replaceAll("(?s)<think>.*?</think>", "");
+                    }
+                    return text;
+                }
+                // 兜底
+                return cm.toString();
+            }
+            return String.valueOf(msgObj);
+        } catch (Exception e) {
+            log.warn("extractFinalTextFromResponse failed: {}", e.getMessage());
+            return null;
+        }
+    }
+    
+    private String extractDeltaText(Delta delta) {
+        if (delta == null) return null;
+        try {
+            // 优先尝试 content 字段
+            // 部分 SDK 提供 getContent()，否则回退 toString() 简单提取
+            try {
+                java.lang.reflect.Method m = delta.getClass().getMethod("getContent");
+                Object v = m.invoke(delta);
+                if (v instanceof String s && !s.isEmpty()) {
+                    return s;
+                }
+            } catch (NoSuchMethodException ignore) {}
+            String s = delta.toString();
+            // 尝试从形如 "content=..." 里粗略抽取
+            int idx = s.indexOf("content=");
+            if (idx >= 0) {
+                int start = idx + 8;
+                int end = s.indexOf(',', start);
+                if (end < 0) end = s.length();
+                String sub = s.substring(start, end).trim();
+                // 去掉可能的引号
+                if ((sub.startsWith("\"") && sub.endsWith("\"")) || (sub.startsWith("'") && sub.endsWith("'"))) {
+                    sub = sub.substring(1, sub.length() - 1);
+                }
+                return sub;
+            }
+            return s;
+        } catch (Exception e) {
+            return delta.toString();
+        }
+    }
+    
+    private long estimateTokens(String text) {
+        if (text == null || text.isEmpty()) return 1;
+        int zh = 0, en = 0;
+        for (char c : text.toCharArray()) {
+            if (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN) zh++; else en++;
+        }
+        long est = (long) (zh / 1.5 + en / 4.0);
+        return Math.max(1, est);
+    }
+        
+    @Override
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+        try {
+            String model = getModel(robot);
+            List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
+            ZhipuAiClient client = createDynamicClient(robot != null ? robot.getLlm() : null);
+            if (client == null) {
+                log.error("No available ZhipuAiClient");
+                sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂不可用", messageProtobufReply);
+                return;
+            }
+            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                    .model(model)
+                    .messages(zaiMessages)
+                    .thinking(ChatThinking.builder().type("enabled").build())
+                    .build();
+            long start = System.currentTimeMillis();
+            ChatCompletionResponse resp = client.chat().createChatCompletion(req);
+            boolean success = resp != null && resp.isSuccess();
+            String text = success ? extractFinalTextFromResponse(resp) : "";
+            if (text == null) text = "";
+            // 发送 websocket 文本
+            sendMessageWebsocket(MessageTypeEnum.TEXT, text, messageProtobufReply);
+            // 记录用量事件（粗略估算）
+            long promptTokens = estimateTokens(fullPromptContent);
+            long completionTokens = estimateTokens(text);
+            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens, completionTokens, success, System.currentTimeMillis() - start);
+        } catch (Exception e) {
+            log.error("processPromptWebsocket failed", e);
+            sendMessageWebsocket(MessageTypeEnum.ERROR, "服务暂不可用", messageProtobufReply);
+        }
+    }
+
+    @Override
+    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+        try {
+            String model = getModel(robot);
+            // 将文本包装为 Prompt -> zai 消息
+            List<ChatMessage> msgs = new ArrayList<>();
+            msgs.add(ChatMessage.builder()
+                    .role(ChatMessageRole.USER.value())
+                    .content(buildUserContents(message))
+                    .build());
+            ZhipuAiClient client = createDynamicClient(robot != null ? robot.getLlm() : null);
+            if (client == null) {
+                log.error("No available ZhipuAiClient for sync");
+                return "服务暂不可用";
+            }
+            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                    .model(model)
+                    .messages(msgs)
+                    .thinking(ChatThinking.builder().type("enabled").build())
+                    .build();
+            long start = System.currentTimeMillis();
+            ChatCompletionResponse resp = client.chat().createChatCompletion(req);
+            boolean success = resp != null && resp.isSuccess();
+            String text = success ? extractFinalTextFromResponse(resp) : null;
+            if (text == null) text = "";
+            if (text.contains("<think>")) {
+                text = text.replaceAll("(?s)<think>.*?</think>", "");
+            }
+            // 记录用量事件（粗略估算）
+            long promptTokens = estimateTokens(fullPromptContent != null && !fullPromptContent.isEmpty() ? fullPromptContent : message);
+            long completionTokens = estimateTokens(text);
+            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens, completionTokens, success, System.currentTimeMillis() - start);
+            return text;
+        } catch (Exception e) {
+            log.error("processPromptSync failed", e);
+            return "服务暂不可用";
+        }
+    }
+
+    @Override
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+        if (robot == null || robot.getLlm() == null) {
+            handleSseError(new IllegalArgumentException("robot or llm is null"), messageProtobufQuery, messageProtobufReply, emitter);
+            return;
+        }
+        String model = getModel(robot);
+        // 起始提示
+        sendStreamStartMessage(messageProtobufReply, emitter, "正在思考…");
+        long start = System.currentTimeMillis();
+        final StringBuilder finalAnswer = new StringBuilder();
+        try {
+            List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
+            ZhipuAiClient client = createDynamicClient(robot.getLlm());
+            if (client == null) {
+                handleSseError(new IllegalStateException("No available ZhipuAiClient"), messageProtobufQuery, messageProtobufReply, emitter);
+                return;
+            }
+            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                    .model(model)
+                    .messages(zaiMessages)
+                    .stream(true)
+                    .thinking(ChatThinking.builder().type("enabled").build())
+                    .build();
+            ChatCompletionResponse response = client.chat().createChatCompletion(req);
+            if (response != null && response.isSuccess() && response.getFlowable() != null) {
+                response.getFlowable().subscribe(
+                        data -> {
+                            try {
+                                if (data.getChoices() != null && !data.getChoices().isEmpty()) {
+                                    Delta delta = data.getChoices().get(0).getDelta();
+                                    String piece = extractDeltaText(delta);
+                                    if (piece != null && !piece.isEmpty()) {
+                                        finalAnswer.append(piece);
+                                        sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, piece);
+                                    }
+                                }
+                            } catch (Exception ex) {
+                                log.error("SSE send piece error", ex);
+                            }
+                        },
+                        err -> {
+                            log.error("zai stream error", err);
+                            handleSseError(err, messageProtobufQuery, messageProtobufReply, emitter);
+                        },
+                        () -> {
+                            String answer = finalAnswer.toString();
+                            if (answer.contains("<think>")) {
+                                answer = answer.replaceAll("(?s)<think>.*?</think>", "");
+                            }
+                            long promptTokens = estimateTokens(fullPromptContent);
+                            long completionTokens = estimateTokens(answer);
+                            // 结束并持久化
+                            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, promptTokens, completionTokens, promptTokens + completionTokens, fullPromptContent, LlmProviderConstants.ZHIPUAI, model);
+                            // 发布用量事件
+                            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens, completionTokens, true, System.currentTimeMillis() - start);
+                        }
+                );
+            } else {
+                handleSseError(new RuntimeException(response != null ? response.getMsg() : "null response"), messageProtobufQuery, messageProtobufReply, emitter);
+            }
+        } catch (Exception e) {
+            log.error("processPromptSse failed", e);
+            handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+        }
+    }
+    
+}

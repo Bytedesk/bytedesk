@@ -30,7 +30,7 @@ import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
 import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
 import com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService;
-import com.bytedesk.ai.zhipuai.ZhipuaiService;
+import com.bytedesk.ai.zhipuai.ZhipuMultiModelService;
 import com.bytedesk.core.llm.LlmProviderConstants;
 
 import jakarta.annotation.PostConstruct;
@@ -48,7 +48,8 @@ import lombok.extern.slf4j.Slf4j;
 public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
 
     private final Optional<SpringAIDeepseekService> springAIDeepseekService;
-    private final Optional<ZhipuaiService> zhipuaiService;
+    // private final Optional<ZhipuaiService> zhipuaiService;
+    private final Optional<ZhipuMultiModelService> zhipuaiService;
     private final Optional<SpringAIDashscopeService> springAIDashscopeService;
     private final Optional<SpringAIOllamaService> springAIOllamaService;
     private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;

@@ -50,7 +50,7 @@ public class RobotLlm {
     // 文本对话模型提供商
     @Builder.Default
     @Column(name = "llm_text_provider")
-    private String textProvider = LlmDefaults.DEFAULT_TEXT_PROVIDER;
+    private String textProvider = LlmDefaults.DEFAULT_CHAT_PROVIDER;
 
     @Column(name = "llm_text_provider_uid")
     private String textProviderUid;
@@ -58,7 +58,7 @@ public class RobotLlm {
     // text chat model name
     @Builder.Default
     @Column(name = "llm_text_model")
-    private String textModel = LlmDefaults.DEFAULT_TEXT_MODEL; 
+    private String textModel = LlmDefaults.DEFAULT_CHAT_MODEL; 
 
     // 视觉模型
     // 启用vision

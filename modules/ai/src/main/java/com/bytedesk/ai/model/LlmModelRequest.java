@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 12:20:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 12:30:40
+ * @LastEditTime: 2025-09-23 13:47:12
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.model;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -44,6 +47,11 @@ public class LlmModelRequest extends BaseRequest {
     private String providerUid;
 
     private String providerType;
+
+    @Builder.Default
+    private List<String> tagList = new ArrayList<>();
+
+    private Boolean free;
 
     private Boolean enabled;
 

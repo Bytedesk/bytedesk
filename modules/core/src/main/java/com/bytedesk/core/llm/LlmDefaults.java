@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 11:55:19
+ * @LastEditTime: 2025-09-23 13:18:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,6 +21,11 @@ public class LlmDefaults {
     private LlmDefaults() {}
     
     // 默认 智谱AI
+
+    // 默认对话模型提供商
+    public static final String DEFAULT_CHAT_PROVIDER = LlmProviderConstants.ZHIPUAI;
+    // 默认对话模型: glm-4.1v-thinking-flash 支持多模态，且免费
+    public static final String DEFAULT_CHAT_MODEL = "glm-4.1v-thinking-flash";
     
     // 默认文字对话模型提供商
     public static final String DEFAULT_TEXT_PROVIDER = LlmProviderConstants.ZHIPUAI;
