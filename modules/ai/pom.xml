@@ -110,6 +110,13 @@
 			<artifactId>oapi-java-sdk</artifactId>
 			<version>${zhipuai.oapi-java-sdk.version}</version>
 		</dependency>
+		<!-- https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java -->
+		<!-- https://mvnrepository.com/artifact/ai.z.openapi/zai-sdk -->
+		<dependency>
+			<groupId>ai.z.openapi</groupId>
+			<artifactId>zai-sdk</artifactId>
+			<version>0.0.5.1</version>
+		</dependency>
 
 		<!-- vector store -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->

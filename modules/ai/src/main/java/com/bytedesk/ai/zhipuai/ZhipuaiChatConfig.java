@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.zhipu.oapi.ClientV4;
 
+import ai.z.openapi.ZhipuAiClient;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
@@ -98,6 +99,21 @@ public class ZhipuaiChatConfig {
                     keepAliveDuration, 
                     TimeUnit.SECONDS
                 ))
+                .build();
+    }
+
+
+    @Bean("zhipuAiClient")
+    public ZhipuAiClient zhipuAiClient() {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            log.warn("Zhipuai API key is not configured");
+            return null;
+        }
+
+        log.info("Initializing ZhipuAiClient with model: {}", model);
+        
+        return ZhipuAiClient.builder()
+                .apiKey(apiKey)
                 .build();
     }
 } 
