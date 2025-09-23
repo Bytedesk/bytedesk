@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 09:50:45
+ * @LastEditTime: 2025-09-23 10:07:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,8 +32,10 @@ import ai.z.openapi.service.model.ChatMessage;
 import ai.z.openapi.service.model.ChatMessageRole;
 import ai.z.openapi.service.model.ChatThinking;
 import ai.z.openapi.service.model.Delta;
+import ai.z.openapi.service.model.FileUrl;
 import ai.z.openapi.service.model.ImageUrl;
 import ai.z.openapi.service.model.MessageContent;
+import ai.z.openapi.service.model.VideoUrl;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
@@ -819,8 +821,7 @@ public class ZhipuaiController {
                                 emitter.completeWithError(error);
                             },
                             // Process streaming response completion event
-                            () -> emitter.complete()
-                    );
+                            () -> emitter.complete());
                 } else {
                     emitter.send(SseEmitter.event().data("Error: " + response.getMsg()));
                     emitter.complete();
@@ -829,7 +830,8 @@ public class ZhipuaiController {
                 log.error("Error in testZhipuaiAsync SSE", e);
                 try {
                     emitter.send(SseEmitter.event().data("Error: " + e.getMessage()));
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 emitter.completeWithError(e);
             }
         });
@@ -857,37 +859,35 @@ public class ZhipuaiController {
      * 不支持同时理解文件、视频和图像。
      * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/multi-image
      */
-    @GetMapping("/test/glm4.5v/multi-image")
-    public ResponseEntity<JsonResult<?>> testZhipuaiMultiImage() {
+    @GetMapping("/test/glm4.5v/image")
+    public ResponseEntity<JsonResult<?>> testZhipuaiMultiModelImage() {
         ChatCompletionCreateParams request = ChatCompletionCreateParams.builder()
-            .model("glm-4.5v")
-            .messages(Arrays.asList(
-                ChatMessage.builder()
-                    .role(ChatMessageRole.USER.value())
-                    .content(Arrays.asList(
-                        MessageContent.builder()
-                            .type("image_url")
-                            .imageUrl(ImageUrl.builder()
-                                .url("https://cdn.bigmodel.cn/static/logo/register.png")
-                                .build())
-                            .build(),
-                        MessageContent.builder()
-                            .type("image_url")
-                            .imageUrl(ImageUrl.builder()
-                                .url("https://cdn.bigmodel.cn/static/logo/api-key.png")
-                                .build())
-                            .build(),
-                        MessageContent.builder()
-                            .type("text")
-                            .text("What are the pics talk about?")
-                            .build()
-                    ))
-                    .build()
-            ))
-            .thinking(ChatThinking.builder()
-                .type("enabled")
-                .build())
-            .build();
+                .model("glm-4.5v")
+                .messages(Arrays.asList(
+                        ChatMessage.builder()
+                                .role(ChatMessageRole.USER.value())
+                                .content(Arrays.asList(
+                                        MessageContent.builder()
+                                                .type("image_url")
+                                                .imageUrl(ImageUrl.builder()
+                                                        .url("https://cdn.bigmodel.cn/static/logo/register.png")
+                                                        .build())
+                                                .build(),
+                                        MessageContent.builder()
+                                                .type("image_url")
+                                                .imageUrl(ImageUrl.builder()
+                                                        .url("https://cdn.bigmodel.cn/static/logo/api-key.png")
+                                                        .build())
+                                                .build(),
+                                        MessageContent.builder()
+                                                .type("text")
+                                                .text("What are the pics talk about?")
+                                                .build()))
+                                .build()))
+                .thinking(ChatThinking.builder()
+                        .type("enabled")
+                        .build())
+                .build();
 
         ChatCompletionResponse response = zhipuAiClient.chat().createChatCompletion(request);
 
@@ -902,34 +902,35 @@ public class ZhipuaiController {
 
     /**
      * 传入Base64图片，图片理解
+     * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/base64-image
      */
     @GetMapping("/test/glm4.5v/base64-image")
     public ResponseEntity<JsonResult<?>> testZhipuaiBase64Image() throws IOException {
-        
+
         String file = ClassLoader.getSystemResource("your/path/xxx.png").getFile();
         byte[] bytes = Files.readAllBytes(new File(file).toPath());
         Base64.Encoder encoder = Base64.getEncoder();
         String base64 = encoder.encodeToString(bytes);
 
         ChatCompletionCreateParams request = ChatCompletionCreateParams.builder()
-            .model("glm-4.5v")
-            .messages(Arrays.asList(
-                ChatMessage.builder()
-                    .role(ChatMessageRole.USER.value())
-                    .content(Arrays.asList(
-                        MessageContent.builder()
-                            .type("image_url")
-                            .imageUrl(ImageUrl.builder()
-                                .url(base64)
-                                .build())
-                            .build(),
-                        MessageContent.builder()
-                            .type("text")
-                            .text("What are the pics talk about?")
-                            .build()))
-                    .build()))
-            .thinking(ChatThinking.builder().type("enabled").build())
-            .build();
+                .model("glm-4.5v")
+                .messages(Arrays.asList(
+                        ChatMessage.builder()
+                                .role(ChatMessageRole.USER.value())
+                                .content(Arrays.asList(
+                                        MessageContent.builder()
+                                                .type("image_url")
+                                                .imageUrl(ImageUrl.builder()
+                                                        .url(base64)
+                                                        .build())
+                                                .build(),
+                                        MessageContent.builder()
+                                                .type("text")
+                                                .text("What are the pics talk about?")
+                                                .build()))
+                                .build()))
+                .thinking(ChatThinking.builder().type("enabled").build())
+                .build();
 
         ChatCompletionResponse response = zhipuAiClient.chat().createChatCompletion(request);
 
@@ -941,7 +942,93 @@ public class ZhipuaiController {
         }
         return ResponseEntity.ok(JsonResult.success());
     }
-    
+
+    /**
+     * 视频理解
+     * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/video
+     */
+    @GetMapping("/test/glm4.5v/video")
+    public ResponseEntity<JsonResult<?>> testZhipuaiMultiModelVideo() {
+
+        ChatCompletionCreateParams request = ChatCompletionCreateParams.builder()
+                .model("glm-4.5v")
+                .messages(Arrays.asList(
+                        ChatMessage.builder()
+                                .role(ChatMessageRole.USER.value())
+                                .content(Arrays.asList(
+                                        MessageContent.builder()
+                                                .type("video_url")
+                                                .videoUrl(VideoUrl.builder()
+                                                        .url("https://cdn.bigmodel.cn/agent-demos/lark/113123.mov")
+                                                        .build())
+                                                .build(),
+                                        MessageContent.builder()
+                                                .type("text")
+                                                .text("What are the video show about?")
+                                                .build()))
+                                .build()))
+                .thinking(ChatThinking.builder()
+                        .type("enabled")
+                        .build())
+                .build();
+
+        ChatCompletionResponse response = zhipuAiClient.chat().createChatCompletion(request);
+
+        if (response.isSuccess()) {
+            Object reply = response.getData().getChoices().get(0).getMessage();
+            System.out.println(reply);
+        } else {
+            log.error("Error in testZhipuaiMultiModelVideo: {}", response.getMsg());
+        }
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    /**
+     * 文本理解
+     * Get http://127.0.0.1:9003/zhipuai/test/glm4.5v/file
+     */
+    @GetMapping("/test/glm4.5v/file")
+    public ResponseEntity<JsonResult<?>> testZhipuaiMultiModelFile() {
+
+        ChatCompletionCreateParams request = ChatCompletionCreateParams.builder()
+                .model("glm-4.5v")
+                .messages(Arrays.asList(
+                        ChatMessage.builder()
+                                .role(ChatMessageRole.USER.value())
+                                .content(Arrays.asList(
+                                        MessageContent.builder()
+                                                .type("file_url")
+                                                .fileUrl(FileUrl.builder()
+                                                        .url("https://cdn.bigmodel.cn/static/demo/demo2.txt")
+                                                        .build())
+                                                .build(),
+                                        MessageContent.builder()
+                                                .type("file_url")
+                                                .fileUrl(FileUrl.builder()
+                                                        .url("https://cdn.bigmodel.cn/static/demo/demo1.pdf")
+                                                        .build())
+                                                .build(),
+                                        MessageContent.builder()
+                                                .type("text")
+                                                .text("What are the files show about?")
+                                                .build()))
+                                .build()))
+                .thinking(ChatThinking.builder()
+                        .type("enabled")
+                        .build())
+                .build();
+
+        ChatCompletionResponse response = zhipuAiClient.chat().createChatCompletion(request);
+
+        if (response.isSuccess()) {
+            Object reply = response.getData().getChoices().get(0).getMessage();
+            System.out.println(reply);
+            return ResponseEntity.ok(JsonResult.success(reply));
+        } else {
+            log.error("Error in testZhipuaiMultiModelFile: {}", response.getMsg());
+            return ResponseEntity.ok(JsonResult.error(response.getMsg()));
+        }
+    }
 
     /**
      * 在 Bean 销毁时关闭线程池
