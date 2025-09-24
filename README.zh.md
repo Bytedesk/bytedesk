@@ -119,6 +119,25 @@ http://127.0.0.1:9003/
 默认密码: admin
 ```
 
+## 项目目录结构
+
+该仓库为基于 Maven 的多模块单体仓库（根目录 `pom.xml`）。以下为主要目录与用途说明：
+
+```text
+bytedesk/
+├─ channels/           # 渠道接入（抖音/店铺/社交/微信 等）
+├─ demos/              # 示例工程与演示代码
+├─ deploy/             # 部署相关（docker、k8s、server 配置）
+├─ enterprise/         # 企业版能力（ai、call、core、kbase、service、ticket）
+├─ images/             # 文档与界面预览图片
+├─ jmeter/             # 性能测试脚本与说明
+├─ logs/               # 运行日志（本地/开发环境）
+├─ modules/            # 核心业务模块（IM、客服、知识库、工单、AI 等）
+├─ plugins/            # 可选插件（freeswitch、webrtc、开放平台等）
+├─ projects/           # 自定义项目或扩展
+├─ starter/            # 启动器/模板
+```
+
 ## 架构图
 
 - [架构图](https://www.weiyuai.cn/architecture.html)

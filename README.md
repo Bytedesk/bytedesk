@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 15:37:18
+ * @LastEditTime: 2025-09-24 09:47:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -125,6 +125,25 @@ Default password: admin
 - [Docker Deploy](https://www.weiyuai.cn/docs/docs/deploy/docker/)
 - [Baota Deploy](https://www.weiyuai.cn/docs/docs/deploy/baota)
 - [Source Code](https://www.weiyuai.cn/docs/docs/deploy/source)
+
+## Project Structure
+
+Monorepo powered by Maven (root `pom.xml`) with multiple modules and deploy assets.
+
+```text
+bytedesk/
+├─ channels/           # Channel integrations (douyin, shop, social, wechat)
+├─ demos/              # Example projects and sample code
+├─ deploy/             # Deployment assets: docker, k8s, server configs
+├─ enterprise/         # Enterprise features (ai, call, core, kbase, service, ticket)
+├─ images/             # Images used in docs and UI previews
+├─ jmeter/             # Performance tests and scripts
+├─ logs/               # Runtime logs (local/dev)
+├─ modules/            # Core product modules (TeamIM, Service, KBase, Ticket, AI, ...)
+├─ plugins/            # Optional plugins (freeswitch, webrtc, open platform)
+├─ projects/           # Custom projects or extensions
+├─ starter/            # Starters/boilerplates
+```
 
 ## architecture
 
