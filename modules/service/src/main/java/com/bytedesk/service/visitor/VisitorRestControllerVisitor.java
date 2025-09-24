@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.RobotPipelineService;
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.annotation.BlackIpFilter;
@@ -78,6 +79,9 @@ public class VisitorRestControllerVisitor {
     private final RobotService robotService;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    // Pipeline 编排服务
+    private final RobotPipelineService pipelineService;
 
     @ApiRateLimiter(value = 1, timeout = 1)
     @PostMapping("/init")
@@ -320,6 +324,73 @@ public class VisitorRestControllerVisitor {
         });
 
         return emitter;
+    }
+
+    // ========== Pipeline 编排：SSE 流式 ==========
+    @BlackIpFilter(title = "black", action = "sendSsePipelineMessage")
+    @BlackUserFilter(title = "black", action = "sendSsePipelineMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendSsePipelineMessage")
+    @VisitorAnnotation(title = "visitor", action = "sendSsePipelineMessage", description = "pipeline stream chat")
+    @GetMapping(value = "/pipeline/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter sendSsePipelineMessage(@RequestParam(value = "message") String message) {
+
+        // SSE 采用较长超时时间
+        SseEmitter emitter = new SseEmitter(600_000L);
+
+        executorService.execute(() -> {
+            try {
+                pipelineService.streamChat(message, emitter);
+            } catch (Exception e) {
+                log.error("sendSsePipelineMessage Error processing SSE request", e);
+                try {
+                    emitter.completeWithError(e);
+                } catch (Exception completeException) {
+                    log.debug("SSE emitter completion failed, connection may already be closed: {}",
+                            completeException.getMessage());
+                }
+            }
+        });
+
+        emitter.onTimeout(() -> {
+            log.warn("sendSsePipelineMessage SSE connection timed out");
+            try {
+                emitter.complete();
+            } catch (Exception e) {
+                log.debug("SSE emitter timeout completion failed: {}", e.getMessage());
+            }
+        });
+
+        emitter.onCompletion(() -> {
+            log.info("sendSsePipelineMessage SSE connection completed");
+        });
+
+        emitter.onError((e) -> {
+            log.warn("sendSsePipelineMessage SSE connection error: {}", e.getMessage());
+            try {
+                emitter.complete();
+            } catch (Exception completeException) {
+                log.debug("SSE emitter error completion failed: {}", completeException.getMessage());
+            }
+        });
+
+        return emitter;
+    }
+
+    // ========== Pipeline 编排：同步 ==========
+    @BlackIpFilter(title = "black", action = "pipelineSync")
+    @BlackUserFilter(title = "black", action = "pipelineSync")
+    @TabooJsonFilter(title = "敏感词", action = "pipelineSync")
+    @ApiRateLimiter(value = 10.0, timeout = 1)
+    @VisitorAnnotation(title = "visitor", action = "pipelineSync", description = "pipeline sync visitor message")
+    @PostMapping(value = "/pipeline/message/sync")
+    public ResponseEntity<?> sendSyncPipelineMessage(@RequestParam(value = "message") String message) {
+        try {
+            MessageProtobuf response = pipelineService.syncChat(message);
+            return ResponseEntity.ok(JsonResult.success("pipeline sync success", response));
+        } catch (Exception e) {
+            log.error("Error processing pipeline sync message", e);
+            return ResponseEntity.ok(JsonResult.error("处理消息失败：" + e.getMessage()));
+        }
     }
 
     // message/sync

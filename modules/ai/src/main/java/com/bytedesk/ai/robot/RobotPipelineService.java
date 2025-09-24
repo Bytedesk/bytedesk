@@ -1,4 +1,4 @@
-package com.bytedesk.ai.pipeline;
+package com.bytedesk.ai.robot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,16 +11,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.robot.RobotRestService;
-import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.SpringAIService;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.StreamContent;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadProtobuf;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,41 +27,41 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PipelineService {
+public class RobotPipelineService {
 
-    private final RobotService robotService;
-    private final RobotRestService robotRestService;
     private final SpringAIServiceRegistry springAIServiceRegistry;
     private final ThreadRestService threadRestService;
+    private final MessageService messageService;
 
     // ====== 对外编排入口 ======
-    public void streamChat(PipelineChatRequest req, SseEmitter emitter) {
+    public void streamChat(String messageJson, SseEmitter emitter) {
         Assert.notNull(emitter, "emitter is null");
-        validateRequest(req);
+        // 解析并校验消息
+        Parsed parsed = parseAndValidate(messageJson);
 
         // 1) 构造查询和机器人
-        RobotProtobuf robot = loadRobot(req);
-        MessageProtobuf msgQ = req.toMessageQuery();
-        MessageProtobuf msgR = req.toRobotReply(msgQ, robot);
+        RobotProtobuf robot = loadRobotByThreadTopic(parsed.threadTopic);
+        MessageProtobuf msgQ = parsed.message;
+        MessageProtobuf msgR = RobotProtobufAware.createRobotReply(msgQ, robot);
 
-        // 2) 重写查询
-        String query = StringUtils.hasText(req.getQuery()) ? req.getQuery() : "";
-        String rewritten = rewriteQueryIfEnabled(query, req, robot.getOrgUid());
+        // 2) 查询（默认不启用重写）
+        String query = StringUtils.hasText(parsed.query) ? parsed.query : "";
+        String rewritten = query;
 
         // 3) 预处理/分段（占位）
         // 预处理/分段（占位）
-        preprocessAndSegment(rewritten, req);
+        preprocessAndSegment(rewritten, null);
 
         // 4) chunk search（复用 BaseSpringAIService 能力，通过具体 Provider 的 Base 实现）
         BaseSpringAIService.SearchResultWithSources sr = chunkSearchWithSources(rewritten, robot);
 
         // 5) rerank（占位：按 score 排序）
-        List<StreamContent.SourceReference> reranked = chunkRerank(sr.getSourceReferences(), req);
+        List<StreamContent.SourceReference> reranked = chunkRerank(sr.getSourceReferences(), null);
 
         // 6) merge（占位：按来源聚合不变更内容）
-        List<StreamContent.SourceReference> merged = chunkMerge(reranked, req);
+        List<StreamContent.SourceReference> merged = chunkMerge(reranked, null);
         // 7) filter topK（占位结果暂不直接传递给 provider，后续可用于 prompt 拼装）
-        filterTopK(merged, req.getTopK());
+        filterTopK(merged, null);
 
         // 9) 流式聊天（带来源）
         SpringAIService provider = getProvider(robot);
@@ -75,27 +74,26 @@ public class PipelineService {
         }
     }
 
-    public MessageProtobuf syncChat(PipelineChatRequest req) {
-        validateRequest(req);
+    public MessageProtobuf syncChat(String messageJson) {
+        Parsed parsed = parseAndValidate(messageJson);
 
-        RobotProtobuf robot = loadRobot(req);
-        MessageProtobuf msgQ = req.toMessageQuery();
-        MessageProtobuf msgR = req.toRobotReply(msgQ, robot);
+        RobotProtobuf robot = loadRobotByThreadTopic(parsed.threadTopic);
+        MessageProtobuf msgQ = parsed.message;
+        MessageProtobuf msgR = RobotProtobufAware.createRobotReply(msgQ, robot);
 
-        String query = StringUtils.hasText(req.getQuery()) ? req.getQuery() : "";
-        String rewritten = rewriteQueryIfEnabled(query, req, robot.getOrgUid());
+        String query = StringUtils.hasText(parsed.query) ? parsed.query : "";
+        String rewritten = query;
 
         // 预处理/分段（占位）
-        // 预处理/分段（占位）
-        preprocessAndSegment(rewritten, req);
+        preprocessAndSegment(rewritten, null);
 
         // 搜索
         BaseSpringAIService.SearchResultWithSources sr = chunkSearchWithSources(rewritten, robot);
 
         // rerank/merge/topK
-        List<StreamContent.SourceReference> reranked = chunkRerank(sr.getSourceReferences(), req);
-        List<StreamContent.SourceReference> merged = chunkMerge(reranked, req);
-        filterTopK(merged, req.getTopK());
+        List<StreamContent.SourceReference> reranked = chunkRerank(sr.getSourceReferences(), null);
+        List<StreamContent.SourceReference> merged = chunkMerge(reranked, null);
+        filterTopK(merged, null);
 
         // 同步聊天
         SpringAIService provider = getProvider(robot);
@@ -107,19 +105,12 @@ public class PipelineService {
 
     // ====== 步骤实现（尽量复用，缺失先占位） ======
 
-    private String rewriteQueryIfEnabled(String query, PipelineChatRequest req, String orgUid) {
-        if (Boolean.TRUE.equals(req.getEnableRewrite())) {
-            try {
-                return robotService.queryRewrite(query, orgUid);
-            } catch (Exception e) {
-                log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
-                return query;
-            }
-        }
-        return query;
-    }
+    // 保留占位：如需启用重写，可在消息中增加标志或从 robot 配置读取
+    // private String rewriteQueryIfEnabled(String query, String orgUid) {
+    // return query;
+    // }
 
-    private List<String> preprocessAndSegment(String content, PipelineChatRequest req) {
+    private List<String> preprocessAndSegment(String content, Object unused) {
         // 占位：简单按标点/换行切分
         if (!StringUtils.hasText(content))
             return List.of();
@@ -152,7 +143,7 @@ public class PipelineService {
     }
 
     private List<StreamContent.SourceReference> chunkRerank(List<StreamContent.SourceReference> refs,
-            PipelineChatRequest req) {
+            Object unused) {
         if (refs == null)
             return List.of();
         // 占位：按 score 降序
@@ -163,7 +154,7 @@ public class PipelineService {
     }
 
     private List<StreamContent.SourceReference> chunkMerge(List<StreamContent.SourceReference> refs,
-            PipelineChatRequest req) {
+            Object unused) {
         // 占位：不合并，后续可按 fileUid/sourceType 做聚合
         return refs == null ? List.of() : refs;
     }
@@ -185,36 +176,54 @@ public class PipelineService {
         return springAIServiceRegistry.getServiceByProviderName(provider);
     }
 
-    private RobotProtobuf loadRobot(PipelineChatRequest req) {
-        // 允许通过 orgUid + robotName 查找，或直接携带 robotUid
-        if (StringUtils.hasText(req.getRobotJson())) {
-            return RobotProtobuf.fromJson(req.getRobotJson());
-        }
-        Assert.hasText(req.getThreadTopic(), "threadTopic is required");
-        // 复用 RobotService 的线程查询逻辑：间接通过线程获取机器人
-        // 这里走简化路径：让 MessageProtobuf 的 threadTopic 由 provider内部使用
-        // 如需严格按主题取机器人，可引入 ThreadRestService；这里用 RobotRestService 兜底
-        if (StringUtils.hasText(req.getRobotUid())) {
-            return robotRestService.findByUid(req.getRobotUid())
-                    .map(RobotProtobuf::convertFromRobotEntity)
-                    .orElseThrow(() -> new IllegalArgumentException("robot not found: " + req.getRobotUid()));
-        }
-        // 优先从会话topic解析机器人
+    private RobotProtobuf loadRobotByThreadTopic(String threadTopic) {
+        Assert.hasText(threadTopic, "threadTopic is required");
         Optional<com.bytedesk.core.thread.ThreadEntity> threadOptional = threadRestService
-                .findFirstByTopic(req.getThreadTopic());
+                .findFirstByTopic(threadTopic);
         if (threadOptional.isPresent() && StringUtils.hasText(threadOptional.get().getRobot())) {
             RobotProtobuf robot = RobotProtobuf.fromJson(threadOptional.get().getRobot());
             if (robot != null) {
                 return robot;
             }
         }
-        throw new IllegalArgumentException(
-                "robot resolving failed; provide robotJson/robotUid or ensure thread has robot");
+        throw new IllegalArgumentException("robot resolving failed by threadTopic: " + threadTopic);
     }
 
-    private void validateRequest(PipelineChatRequest req) {
-        Assert.notNull(req, "request is null");
-        Assert.hasText(req.getQuery(), "query is required");
-        Assert.hasText(req.getThreadTopic(), "threadTopic is required");
+    private Parsed parseAndValidate(String messageJson) {
+        Assert.notNull(messageJson, "message json is null");
+        String processed = messageService.processMessageJson(messageJson);
+        MessageProtobuf mp = MessageProtobuf.fromJson(processed);
+        Assert.notNull(mp, "message parse failed");
+        ThreadProtobuf thread = mp.getThread();
+        Assert.notNull(thread, "thread is null");
+        String topic = thread.getTopic();
+        Assert.hasText(topic, "threadTopic is required");
+        MessageTypeEnum type = mp.getType();
+        if (type != null && !MessageTypeEnum.TEXT.equals(type) && !MessageTypeEnum.ROBOT_QUESTION.equals(type)) {
+            throw new IllegalArgumentException("unsupported message type: " + type);
+        }
+        String query = mp.getContent();
+        Assert.hasText(query, "query is required");
+        return new Parsed(mp, query, topic);
+    }
+
+    private static class Parsed {
+        final MessageProtobuf message;
+        final String query;
+        final String threadTopic;
+
+        Parsed(MessageProtobuf message, String query, String threadTopic) {
+            this.message = message;
+            this.query = query;
+            this.threadTopic = threadTopic;
+        }
+    }
+
+    private static class RobotProtobufAware {
+        static MessageProtobuf createRobotReply(MessageProtobuf queryMsg, RobotProtobuf robot) {
+            // 复用工具类，避免直接依赖 PipelineChatRequest
+            return com.bytedesk.ai.robot_message.RobotMessageUtils.createRobotMessage(
+                    queryMsg.getThread(), robot, queryMsg);
+        }
     }
 }
