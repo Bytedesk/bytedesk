@@ -185,7 +185,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         for (StreamContent.SourceReference src : raw.getSourceReferences()) {
-            if (src == null || !StringUtils.hasText(src.getSourceUid())) continue;
+            if (src == null || !StringUtils.hasText(src.getSourceUid()))
+                continue;
             Agg a = aggMap.computeIfAbsent(src.getSourceUid(), k -> {
                 Agg x = new Agg();
                 x.faq = faqByUid.get(k); // 可能为null，但一般会在上面初始化
@@ -218,12 +219,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         // 输出结果（仅保留有faq对象的项；来源为空时仍返回faq，score视为0）
         List<FaqProtobuf> outFaqs = new ArrayList<>();
-        List<StreamContent.SourceReference> outSrcs = new ArrayList<>();
+        List<StreamContent.SourceReference> outSources = new ArrayList<>();
         for (Agg a : list) {
             if (a.faq != null) {
                 outFaqs.add(a.faq);
                 if (a.bestSrc != null) {
-                    outSrcs.add(a.bestSrc);
+                    outSources.add(a.bestSrc);
                 } else {
                     // 构造一个占位来源，便于前端保持结构一致（可选）
                     StreamContent.SourceReference placeholder = StreamContent.SourceReference.builder()
@@ -234,15 +235,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
                             .score(0.0)
                             .highlighted(false)
                             .build();
-                    outSrcs.add(placeholder);
+                    outSources.add(placeholder);
                 }
             }
         }
-
-        return new SearchResultWithSources(outFaqs, outSrcs);
+        return new SearchResultWithSources(outFaqs, outSources);
     }
-
-    // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
 
     // 保留一个无参构造函数，或者只接收特定的必需依赖
     protected BaseSpringAIService() {
@@ -482,42 +480,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered) {
         // 调用重载方法，传入默认的token使用情况（0）和空prompt
-        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, 0, 0, 0, "");
-    }
-
-    /**
-     * 持久化消息，包含token使用情况
-     * 
-     * @param messageProtobufQuery 查询消息
-     * @param messageProtobufReply 回复消息
-     * @param isUnanswered         是否未回答
-     * @param promptTokens         prompt token数量
-     * @param completionTokens     completion token数量
-     * @param totalTokens          总token数量
-     */
-    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens) {
-        // 调用重载方法，传入空prompt
-        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, promptTokens, completionTokens,
-                totalTokens, "");
-    }
-
-    /**
-     * 持久化消息，包含token使用情况和prompt内容
-     * 
-     * @param messageProtobufQuery 查询消息
-     * @param messageProtobufReply 回复消息
-     * @param isUnanswered         是否未回答
-     * @param promptTokens         prompt token数量
-     * @param completionTokens     completion token数量
-     * @param totalTokens          总token数量
-     * @param prompt               传入到大模型的完整prompt内容
-     */
-    public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            Boolean isUnanswered, long promptTokens, long completionTokens, long totalTokens, String prompt) {
-        // 调用重载方法，传入空的AI提供商和模型信息
-        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, promptTokens, completionTokens,
-                totalTokens, prompt, "", "");
+        persistMessage(messageProtobufQuery, messageProtobufReply, isUnanswered, 0, 0,
+                0, "", "", "");
     }
 
     /**
@@ -937,8 +901,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             SseEmitter emitter) {
         log.info("BaseSpringAIService processLlmResponseWithSources");
 
-    // 搜索知识库并获取源引用（聚合/重排/TopK后）
-    SearchResultWithSources searchResult = rerankMergeTopK(searchKnowledgeBaseWithSources(query, robot), robot);
+        // 搜索知识库并获取源引用（聚合/重排/TopK后）
+        SearchResultWithSources searchResult = rerankMergeTopK(searchKnowledgeBaseWithSources(query, robot), robot);
         List<FaqProtobuf> searchResultList = searchResult.getSearchResults();
         List<StreamContent.SourceReference> sourceReferences = searchResult.getSourceReferences();
 
@@ -1010,7 +974,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         // 用户消息：文本或多媒体均直接传递标准 JSON/文本内容，由下游解析
                         messages.add(new UserMessage(content));
                     } else if (MessageTypeEnum.TEXT.name().equals(messageEntity.getType()) ||
-                            // MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType()) ||
+                    // MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType()) ||
                             MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
                         // 对于机器人回复，提取实际的回答文本
                         if (MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
@@ -1078,8 +1042,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
         }
     }
-
-    
 
     protected void processLlmResponseWebsocket(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
