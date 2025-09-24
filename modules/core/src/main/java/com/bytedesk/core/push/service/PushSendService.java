@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 17:11:48
+ * @LastEditTime: 2025-09-24 11:02:47
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -16,6 +16,7 @@ package com.bytedesk.core.push.service;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
@@ -65,8 +66,8 @@ public class PushSendService {
         
         // 验证IP频率限制
         if (!pushFilterService.canSendCode(ip)) {
-            log.info("验证码发送过于频繁，IP: {}", ip);
-            return PushSendResult.failure(PushSendResult.SendCodeErrorType.TOO_FREQUENT, "验证码发送过于频繁");
+            // log.info("验证码发送过于频繁，IP: {}", ip);
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.TOO_FREQUENT, I18Consts.I18N_CAPTCHA_SEND_TOO_FREQUENT);
         }
         
         // 使用策略模式处理不同类型的验证逻辑
@@ -77,7 +78,7 @@ public class PushSendService {
         
         // 检查是否已发送验证码
         if (pushRestService.existsByStatusAndTypeAndReceiver(PushStatusEnum.PENDING.name(), type, receiver)) {
-            return PushSendResult.failure(PushSendResult.SendCodeErrorType.ALREADY_SENT, "验证码已经发送，请勿重复发送");
+            return PushSendResult.failure(PushSendResult.SendCodeErrorType.ALREADY_SENT, I18Consts.I18N_CAPTCHA_ALREADY_SENT);
         }
 
         // 生成验证码
@@ -112,7 +113,7 @@ public class PushSendService {
         } else if (authRequest.isMobile()) {
             return pushServiceSms.sendSmsWithResult(receiver, country, code, request);
         }
-        return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "不支持的发送类型");
+        return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, I18Consts.I18N_CAPTCHA_UNSUPPORTED_TYPE);
     }
 
     private void saveCodeRecord(AuthRequest authRequest, String code, String ip, HttpServletRequest request) {

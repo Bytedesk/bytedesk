@@ -329,7 +329,7 @@ public class VisitorRestControllerVisitor {
     @ApiRateLimiter(value = 10.0, timeout = 1)
     @VisitorAnnotation(title = "visitor", action = "sync", description = "sync visitor message")
     @PostMapping("/message/sync")
-    public ResponseEntity<?> sync(@RequestBody Map<String, String> map) {
+    public ResponseEntity<?> sendSyncVisitorMessage(@RequestBody Map<String, String> map) {
         //
         String json = (String) map.get("json");
         log.debug("sync json {}", json);

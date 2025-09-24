@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 11:29:36
+ * @LastEditTime: 2025-09-24 11:02:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -373,5 +373,12 @@ public class I18Consts {
     /** 排队等待消息模板 */
     public static final String I18N_QUEUE_WAITING_MESSAGE_TEMPLATE = "当前排队人数：%d 大约等待时间：%d 分钟";
 
-    // 
+    // "验证码发送过于频繁"
+    public static final String I18N_CAPTCHA_SEND_TOO_FREQUENT = "验证码发送过于频繁，请稍后再试"; // 验证码发送过于频繁，请稍后再试
+
+    // "验证码已经发送，请勿重复发送"
+    public static final String I18N_CAPTCHA_ALREADY_SENT = "验证码已经发送，请勿重复发送"; // 验证码已经发送，请勿重复发送
+
+    // "不支持的发送类型"
+    public static final String I18N_CAPTCHA_UNSUPPORTED_TYPE = "不支持的发送类型"; // 不支持的发送类型
 }
