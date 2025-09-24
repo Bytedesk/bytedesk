@@ -640,7 +640,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // 2. 知识库搜索相关方法
     protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
         // 统一走“带来源”的检索，再做聚合/TopK，返回Faq列表
-        SearchResultWithSources aggregated = searchKnowledgeBaseWithSourcesAggregated(query, robot);
+        SearchResultWithSources raw = searchKnowledgeBaseWithSources(query, robot);
+        SearchResultWithSources aggregated = rerankMergeTopK(raw, robot);
         return aggregated.getSearchResults();
     }
 
@@ -687,14 +688,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         return new SearchResultWithSources(searchResultList, sourceReferences);
-    }
-
-    /**
-     * 原始WithSources检索 + 统一聚合重排TopK 的入口
-     */
-    protected SearchResultWithSources searchKnowledgeBaseWithSourcesAggregated(String query, RobotProtobuf robot) {
-        SearchResultWithSources raw = searchKnowledgeBaseWithSources(query, robot);
-        return rerankMergeTopK(raw, robot);
     }
 
     /**
@@ -944,8 +937,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             SseEmitter emitter) {
         log.info("BaseSpringAIService processLlmResponseWithSources");
 
-        // 搜索知识库并获取源引用（聚合/重排/TopK后）
-        SearchResultWithSources searchResult = searchKnowledgeBaseWithSourcesAggregated(query, robot);
+    // 搜索知识库并获取源引用（聚合/重排/TopK后）
+    SearchResultWithSources searchResult = rerankMergeTopK(searchKnowledgeBaseWithSources(query, robot), robot);
         List<FaqProtobuf> searchResultList = searchResult.getSearchResults();
         List<StreamContent.SourceReference> sourceReferences = searchResult.getSourceReferences();
 
@@ -1055,32 +1048,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         String fullPromptContent = extractFullPromptContent(messages);
         log.info("BaseSpringAIService createAndProcessPromptWithSources fullPromptContent: {}", fullPromptContent);
 
-        processPromptSseWithSources(aiPrompt, sourceReferences, robot, messageProtobufQuery, messageProtobufReply,
-                emitter, fullPromptContent);
-    }
-
-    /**
-     * 处理SSE流式响应，包含源引用信息
-     * 
-     * 这个方法提供了一个默认实现，处理带有源引用的流式响应
-     * 子类可以重写此方法以提供特定AI服务的优化实现
-     */
-    protected void processPromptSseWithSources(Prompt prompt, List<StreamContent.SourceReference> sourceReferences,
-            RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
-
+        // 直接调用抽象的流式处理方法；在此处统一做错误兜底，避免额外的 WithSources 封装
         try {
-            // 调用原始的processPromptSse来获取AI响应
-            // 子类应该重写这个方法来实际处理流式响应和源引用
-            log.info("processPromptSseWithSources: 调用抽象的processPromptSse方法");
-
-            // 由于这是抽象方法，我们需要在具体的子类中实现
-            // 这里提供一个基础的实现框架，但实际的AI流处理需要在子类中完成
-            processPromptSse(prompt, robot, messageProtobufQuery, messageProtobufReply, emitter, fullPromptContent);
-
+            processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter, fullPromptContent);
         } catch (Exception e) {
-            log.error("processPromptSseWithSources处理失败", e);
-            // 出错时发送错误消息
+            log.error("createAndProcessPromptWithSources 调用 processPromptSse 失败", e);
+            // 出错时发送包含来源的错误消息，保持客户端结构稳定
             String errorMessage = "处理请求时发生错误，请稍后重试";
             String robotStreamContent = createRobotStreamContentAnswer(
                     messageProtobufQuery.getContent(),
@@ -1105,6 +1078,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
         }
     }
+
+    
 
     protected void processLlmResponseWebsocket(String query, List<FaqProtobuf> searchResultList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
@@ -1498,119 +1473,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    /**
-     * 发送带有源引用的流式开始消息
-     */
-    protected void sendStreamStartMessageWithSources(MessageProtobuf messageProtobufReply, SseEmitter emitter,
-            String fullPromptContent, List<StreamContent.SourceReference> sourceReferences, RobotProtobuf robot) {
-
-        // 创建带有源引用的开始消息
-        String robotStreamContent = createRobotStreamContentAnswer(
-                fullPromptContent,
-                "", // 开始时还没有答案
-                sourceReferences,
-                robot);
-
-        messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
-        messageProtobufReply.setContent(robotStreamContent);
-        messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
-        log.info("BaseSpringAIService sendStreamStartMessageWithSources messageProtobufReply {}", messageProtobufReply);
-
-        try {
-            if (!isEmitterCompleted(emitter)) {
-                emitter.send(SseEmitter.event()
-                        .data(messageProtobufReply.toJson())
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-            } else {
-                log.debug("SSE emitter already completed, skipping stream start message with sources");
-            }
-        } catch (Exception e) {
-            log.error("sendStreamStartMessageWithSources failed", e);
-        }
-    }
-
-    /**
-     * 发送带有源引用的流式消息
-     */
-    protected void sendStreamMessageWithSources(MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, String content, List<StreamContent.SourceReference> sourceReferences,
-            RobotProtobuf robot, String query) {
-
-        log.info("BaseSpringAIService sendStreamMessageWithSources content {}", content);
-        try {
-            if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
-                // 创建带有源引用的流式消息
-                String robotStreamContent = createRobotStreamContentAnswer(query, content, sourceReferences, robot);
-
-                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
-                messageProtobufReply.setContent(robotStreamContent);
-                messageProtobufReply.setChannel(ChannelEnum.SYSTEM);
-
-                // 保存消息到数据库
-                persistMessage(messageProtobufQuery, messageProtobufReply, false);
-
-                // 发送SSE事件
-                emitter.send(SseEmitter.event()
-                        .data(messageProtobufReply.toJson())
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-            } else {
-                log.debug("SSE emitter already completed or empty content, skipping stream message with sources");
-            }
-        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
-            log.debug("SSE connection no longer usable during stream message with sources: {}", e.getMessage());
-        } catch (Exception e) {
-            log.error("sendStreamMessageWithSources failed", e);
-        }
-    }
-
-    /**
-     * 发送带有源引用的流式结束消息
-     */
-    protected void sendStreamEndMessageWithSources(MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, List<StreamContent.SourceReference> sourceReferences, RobotProtobuf robot,
-            String query, String finalAnswer, long promptTokens, long completionTokens, long totalTokens,
-            String prompt, String aiProvider, String aiModel) {
-
-        log.info("BaseSpringAIService sendStreamEndMessageWithSources final answer: {}", finalAnswer);
-        try {
-            if (!isEmitterCompleted(emitter)) {
-                // 创建最终的带有源引用的消息
-                String robotStreamContent = createRobotStreamContentAnswer(query, finalAnswer, sourceReferences, robot);
-
-                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
-                messageProtobufReply.setContent(robotStreamContent);
-
-                // 保存消息到数据库，包含token使用情况、prompt内容和AI模型信息
-                persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens, completionTokens,
-                        totalTokens, prompt, aiProvider, aiModel);
-
-                // 发送最终消息
-                emitter.send(SseEmitter.event()
-                        .data(messageProtobufReply.toJson())
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-
-                // 发送结束标记
-                messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_END);
-                messageProtobufReply.setContent("");
-
-                emitter.send(SseEmitter.event()
-                        .data(messageProtobufReply.toJson())
-                        .id(messageProtobufReply.getUid())
-                        .name("message"));
-
-                emitter.complete();
-            }
-        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
-            log.debug("SSE connection no longer usable during stream end with sources: {}", e.getMessage());
-        } catch (Exception e) {
-            log.error("Error sending stream end message with sources", e);
-        }
-    }
+    // 删除 WithSources 流式发送的重复辅助方法，统一由各 provider 在 processPromptSse 内部按需发送
 
     // 5. 工具和辅助方法
     protected String extractTextFromResponse(Object response) {
