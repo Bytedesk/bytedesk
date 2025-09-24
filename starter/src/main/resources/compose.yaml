@@ -2,6 +2,7 @@ services:
   bytedesk-mysql:
     image: mysql:latest
     container_name: mysql-bytedesk
+    restart: always
     environment:
       MYSQL_DATABASE: bytedesk
       MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
@@ -21,6 +22,7 @@ services:
   bytedesk-redis:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
+    restart: always
     ports:
       - "16379:6379"
     environment:
@@ -39,6 +41,7 @@ services:
   bytedesk-ollama:
     image: ollama/ollama:latest
     container_name: ollama-bytedesk
+    restart: always
     ports:
       - "21434:11434"
     volumes:
@@ -58,6 +61,7 @@ services:
   bytedesk-artemis:
     image: apache/activemq-artemis:latest
     container_name: artemis-bytedesk
+    restart: always
     environment:
       - ARTEMIS_USER=admin
       - ARTEMIS_PASSWORD=admin
@@ -84,6 +88,7 @@ services:
   bytedesk-elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
     container_name: elasticsearch-bytedesk
+    restart: always
     environment:
       - node.name=bytedesk-es01
       - cluster.name=bytedesk-es-cluster
@@ -113,6 +118,7 @@ services:
   bytedesk-zipkin:
     image: 'openzipkin/zipkin:latest'
     container_name: zipkin-bytedesk
+    restart: always
     ports:
       - '19411:9411'
     volumes:
@@ -272,6 +278,7 @@ services:
   bytedesk-minio:
     image: minio/minio:latest
     container_name: minio-bytedesk
+    restart: always
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin123
