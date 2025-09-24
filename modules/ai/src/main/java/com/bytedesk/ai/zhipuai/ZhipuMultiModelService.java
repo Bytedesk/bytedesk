@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-23 13:34:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-24 16:05:14
+ * @LastEditTime: 2025-09-25 07:53:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,6 +51,7 @@ import ai.z.openapi.service.model.VideoUrl;
 
 import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.message.content.ImageContent;
+import com.bytedesk.core.message.content.StreamContent;
 import com.bytedesk.core.message.content.VideoContent;
 import com.bytedesk.core.message.content.FileContent;
 import com.bytedesk.core.message.content.AudioContent;
@@ -526,7 +527,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
         if (robot == null || robot.getLlm() == null) {
             handleSseError(new IllegalArgumentException("robot or llm is null"), messageProtobufQuery,
                     messageProtobufReply, emitter);
@@ -604,7 +605,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                                         if (!pieceTrim.isEmpty()) {
                                             finalAnswer.append(pieceTrim);
                                             // 将推理内容附带在 RobotStreamContent.reasonContent 字段
-                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, pieceTrim, reasoning);
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, pieceTrim, reasoning, sourceReferences);
                                         } else {
                                             log.debug("SSE piece is empty after trim, delta={}", delta);
                                         }

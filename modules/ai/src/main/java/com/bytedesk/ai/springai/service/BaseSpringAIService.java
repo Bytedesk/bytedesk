@@ -148,6 +148,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     /**
+     * TODO: 使用rerank模型
      * 聚合/去重/重排/TopK：对原始检索结果进行统一处理。
      * 规则：
      * - 以 sourceUid 为主键进行去重（同一内容来自全文与向量两路时合并，取最高score）。
@@ -900,9 +901,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
         log.info("BaseSpringAIService processLlmResponseWithSources");
 
         // 搜索知识库并获取源引用（聚合/重排/TopK后）
-        SearchResultWithSources searchResult = rerankMergeTopK(searchKnowledgeBaseWithSources(query, robot), robot);
-        List<FaqProtobuf> searchResultList = searchResult.getSearchResults();
-        List<StreamContent.SourceReference> sourceReferences = searchResult.getSourceReferences();
+        SearchResultWithSources searchResult = searchKnowledgeBaseWithSources(query, robot);
+        SearchResultWithSources aggregatedResult = rerankMergeTopK(searchResult, robot);
+        // 
+        List<FaqProtobuf> searchResultList = aggregatedResult.getSearchResults();
+        List<StreamContent.SourceReference> sourceReferences = aggregatedResult.getSourceReferences();
         log.info("BaseSpringAIService processLlmResponseWithSources searchResultList {}, sourceReferences {}",
                 searchResultList.size(), sourceReferences.size());
 
@@ -999,7 +1002,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         // 直接调用抽象的流式处理方法；在此处统一做错误兜底，避免额外的 WithSources 封装
         try {
-            processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
+            processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, sourceReferences, emitter);
         } catch (Exception e) {
             log.error("createAndProcessPromptWithSources 调用 processPromptSse 失败", e);
             // 出错时发送包含来源的错误消息，保持客户端结构稳定
@@ -1110,7 +1113,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
 
-        processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, emitter);
+        processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, null, emitter);
     }
 
     private PromptResult createAndProcessPromptSyncWithPrompt(String query, String context, RobotProtobuf robot,
@@ -1310,14 +1313,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter, String content) {
-        sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, content, null);
+        sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, content, null, null);
     }
 
     /**
      * 发送流式片段（可携带推理内容）
      */
     protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, String content, String reasonContent) {
+            SseEmitter emitter, String content, String reasonContent, List<StreamContent.SourceReference> sourceReferences) {
         log.info("BaseSpringAIService sendStreamMessage content {}", content);
         try {
             if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
@@ -1328,8 +1331,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     builder.reasonContent(reasonContent);
                 }
                 StreamContent streamContent = builder.build();
+                if (sourceReferences != null) {
+                    streamContent.setSources(sourceReferences);
+                }
                 messageProtobufReply.setContent(streamContent.toJson());
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
+                    
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, false);
                 String messageJson = messageProtobufReply.toJson();
@@ -1868,5 +1875,5 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected abstract String processPromptSync(String message, RobotProtobuf robot);
 
     protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter);
+            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter);
 }

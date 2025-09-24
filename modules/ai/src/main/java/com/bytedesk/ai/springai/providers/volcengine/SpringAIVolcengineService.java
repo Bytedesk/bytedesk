@@ -36,6 +36,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.StreamContent;
+
 import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
@@ -218,7 +220,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
         log.info("SpringAIVolcengineService processPromptSse with full prompt content");
         // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         // 从robot中获取llm配置
