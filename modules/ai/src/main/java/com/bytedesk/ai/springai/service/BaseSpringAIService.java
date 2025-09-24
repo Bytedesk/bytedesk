@@ -34,7 +34,7 @@ import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.RobotStreamContent;
+import com.bytedesk.core.message.content.StreamContent;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElastic;
@@ -127,10 +127,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     public static class SearchResultWithSources {
         private final List<FaqProtobuf> searchResults;
-        private final List<RobotStreamContent.SourceReference> sourceReferences;
+        private final List<StreamContent.SourceReference> sourceReferences;
 
         public SearchResultWithSources(List<FaqProtobuf> searchResults,
-                List<RobotStreamContent.SourceReference> sourceReferences) {
+                List<StreamContent.SourceReference> sourceReferences) {
             this.searchResults = searchResults;
             this.sourceReferences = sourceReferences;
         }
@@ -139,7 +139,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return searchResults;
         }
 
-        public List<RobotStreamContent.SourceReference> getSourceReferences() {
+        public List<StreamContent.SourceReference> getSourceReferences() {
             return sourceReferences;
         }
     }
@@ -596,7 +596,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         // 创建搜索结果列表和源引用列表
         List<FaqProtobuf> searchResultList = new ArrayList<>();
-        List<RobotStreamContent.SourceReference> sourceReferences = new ArrayList<>();
+        List<StreamContent.SourceReference> sourceReferences = new ArrayList<>();
 
         // 根据搜索类型执行相应的搜索
         String searchType = robot.getLlm().getSearchType();
@@ -754,7 +754,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * 执行全文搜索并收集源引用信息
      */
     private void executeFulltextSearchWithSources(String query, String kbUid, List<FaqProtobuf> searchResultList,
-            List<RobotStreamContent.SourceReference> sourceReferences) {
+            List<StreamContent.SourceReference> sourceReferences) {
         List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
         for (FaqElasticSearchResult withScore : searchResults) {
             FaqElastic faq = withScore.getFaqElastic();
@@ -762,8 +762,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchResultList.add(faqProtobuf);
 
             // 创建FAQ源引用
-            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType(RobotStreamContent.SourceTypeEnum.FAQ)
+            StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                    .sourceType(StreamContent.SourceTypeEnum.FAQ)
                     .sourceUid(faq.getUid())
                     .sourceName(faq.getQuestion())
                     .contentSummary(getContentSummary(faq.getAnswer(), 200))
@@ -780,8 +780,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchResultList.add(faqProtobuf);
 
             // 创建文本源引用
-            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType(RobotStreamContent.SourceTypeEnum.TEXT)
+            StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                    .sourceType(StreamContent.SourceTypeEnum.TEXT)
                     .sourceUid(text.getUid())
                     .sourceName(text.getTitle())
                     .contentSummary(getContentSummary(text.getContent(), 200))
@@ -798,8 +798,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchResultList.add(faqProtobuf);
 
             // 创建Chunk源引用，包含文件信息
-            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType(RobotStreamContent.SourceTypeEnum.CHUNK)
+            StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                    .sourceType(StreamContent.SourceTypeEnum.CHUNK)
                     .sourceUid(chunk.getUid())
                     .sourceName(chunk.getName())
                     .fileName(chunk.getFileName())
@@ -819,8 +819,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             searchResultList.add(faqProtobuf);
 
             // 创建网页源引用
-            RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                    .sourceType(RobotStreamContent.SourceTypeEnum.WEBPAGE)
+            StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                    .sourceType(StreamContent.SourceTypeEnum.WEBPAGE)
                     .sourceUid(webpage.getUid())
                     .sourceName(webpage.getTitle())
                     .contentSummary(getContentSummary(webpage.getContent(), 200))
@@ -835,7 +835,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * 执行向量搜索并收集源引用信息
      */
     private void executeVectorSearchWithSources(String query, String kbUid, List<FaqProtobuf> searchResultList,
-            List<RobotStreamContent.SourceReference> sourceReferences) {
+            List<StreamContent.SourceReference> sourceReferences) {
         // 检查 FaqVectorService 是否可用
         if (faqVectorService != null) {
             try {
@@ -847,8 +847,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     searchResultList.add(faqProtobuf);
 
                     // 创建FAQ向量源引用
-                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType(RobotStreamContent.SourceTypeEnum.FAQ)
+                    StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                            .sourceType(StreamContent.SourceTypeEnum.FAQ)
                             .sourceUid(faqVector.getUid())
                             .sourceName(faqVector.getQuestion())
                             .contentSummary(getContentSummary(faqVector.getAnswer(), 200))
@@ -873,8 +873,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     searchResultList.add(faqProtobuf);
 
                     // 创建文本向量源引用
-                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType(RobotStreamContent.SourceTypeEnum.TEXT)
+                    StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                            .sourceType(StreamContent.SourceTypeEnum.TEXT)
                             .sourceUid(textVector.getUid())
                             .sourceName(textVector.getTitle())
                             .contentSummary(getContentSummary(textVector.getContent(), 200))
@@ -899,8 +899,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     searchResultList.add(faqProtobuf);
 
                     // 创建Chunk向量源引用，包含文件信息
-                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType(RobotStreamContent.SourceTypeEnum.CHUNK)
+                    StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                            .sourceType(StreamContent.SourceTypeEnum.CHUNK)
                             .sourceUid(chunkVector.getUid())
                             .sourceName(chunkVector.getName())
                             .fileName(chunkVector.getFileName())
@@ -928,8 +928,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     searchResultList.add(faqProtobuf);
 
                     // 创建网页向量源引用
-                    RobotStreamContent.SourceReference sourceRef = RobotStreamContent.SourceReference.builder()
-                            .sourceType(RobotStreamContent.SourceTypeEnum.WEBPAGE)
+                    StreamContent.SourceReference sourceRef = StreamContent.SourceReference.builder()
+                            .sourceType(StreamContent.SourceTypeEnum.WEBPAGE)
                             .sourceUid(webpageVector.getUid())
                             .sourceName(webpageVector.getTitle())
                             .contentSummary(getContentSummary(webpageVector.getContent(), 200))
@@ -968,15 +968,15 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * @return RobotStreamContent JSON字符串
      */
     protected String createRobotStreamContentAnswer(String question, String answer,
-            List<RobotStreamContent.SourceReference> sourceReferences, RobotProtobuf robot) {
+            List<StreamContent.SourceReference> sourceReferences, RobotProtobuf robot) {
         // 构建上下文信息用于重新生成答案
         StringBuilder contextBuilder = new StringBuilder();
-        for (RobotStreamContent.SourceReference source : sourceReferences) {
+        for (StreamContent.SourceReference source : sourceReferences) {
             contextBuilder.append("Source: ").append(source.getSourceName()).append("\n");
             contextBuilder.append("Content: ").append(source.getContentSummary()).append("\n\n");
         }
 
-        RobotStreamContent streamContent = RobotStreamContent.builder()
+        StreamContent streamContent = StreamContent.builder()
                 .question(question)
                 .answer(answer)
                 .sources(sourceReferences)
@@ -1000,7 +1000,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 搜索知识库并获取源引用
         SearchResultWithSources searchResult = searchKnowledgeBaseWithSources(query, robot);
         List<FaqProtobuf> searchResultList = searchResult.getSearchResults();
-        List<RobotStreamContent.SourceReference> sourceReferences = searchResult.getSourceReferences();
+        List<StreamContent.SourceReference> sourceReferences = searchResult.getSourceReferences();
 
         if (searchResultList.isEmpty()) {
             // 未找到相关内容，使用默认回复
@@ -1029,7 +1029,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * 创建并处理包含源引用的提示词
      */
     private void createAndProcessPromptWithSources(String query, String context,
-            List<RobotStreamContent.SourceReference> sourceReferences,
+            List<StreamContent.SourceReference> sourceReferences,
             RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
@@ -1075,8 +1075,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         // 对于机器人回复，提取实际的回答文本
                         if (MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
                             try {
-                                RobotStreamContent robotContent = RobotStreamContent.fromJson(content,
-                                        RobotStreamContent.class);
+                                StreamContent robotContent = StreamContent.fromJson(content,
+                                        StreamContent.class);
                                 if (robotContent != null && robotContent.getAnswer() != null) {
                                     content = robotContent.getAnswer();
                                 }
@@ -1118,7 +1118,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * 这个方法提供了一个默认实现，处理带有源引用的流式响应
      * 子类可以重写此方法以提供特定AI服务的优化实现
      */
-    protected void processPromptSseWithSources(Prompt prompt, List<RobotStreamContent.SourceReference> sourceReferences,
+    protected void processPromptSseWithSources(Prompt prompt, List<StreamContent.SourceReference> sourceReferences,
             RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
 
@@ -1484,13 +1484,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
         try {
             if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
                 // 使用 RobotStreamContent 包装流式片段，类型改为 ROBOT_STREAM
-                RobotStreamContent.RobotStreamContentBuilder<?, ?> builder = RobotStreamContent.builder()
+                StreamContent.StreamContentBuilder<?, ?> builder = StreamContent.builder()
                         .answer(content);
                 if (StringUtils.hasLength(reasonContent)) {
                     builder.reasonContent(reasonContent);
                 }
-                RobotStreamContent robotStream = builder.build();
-                messageProtobufReply.setContent(robotStream.toJson());
+                StreamContent streamContent = builder.build();
+                messageProtobufReply.setContent(streamContent.toJson());
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM);
                 // 保存消息到数据库
                 persistMessage(messageProtobufQuery, messageProtobufReply, false);
@@ -1555,7 +1555,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      * 发送带有源引用的流式开始消息
      */
     protected void sendStreamStartMessageWithSources(MessageProtobuf messageProtobufReply, SseEmitter emitter,
-            String fullPromptContent, List<RobotStreamContent.SourceReference> sourceReferences, RobotProtobuf robot) {
+            String fullPromptContent, List<StreamContent.SourceReference> sourceReferences, RobotProtobuf robot) {
 
         // 创建带有源引用的开始消息
         String robotStreamContent = createRobotStreamContentAnswer(
@@ -1588,7 +1588,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     protected void sendStreamMessageWithSources(MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, String content, List<RobotStreamContent.SourceReference> sourceReferences,
+            SseEmitter emitter, String content, List<StreamContent.SourceReference> sourceReferences,
             RobotProtobuf robot, String query) {
 
         log.info("BaseSpringAIService sendStreamMessageWithSources content {}", content);
@@ -1624,7 +1624,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
      */
     protected void sendStreamEndMessageWithSources(MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, List<RobotStreamContent.SourceReference> sourceReferences, RobotProtobuf robot,
+            SseEmitter emitter, List<StreamContent.SourceReference> sourceReferences, RobotProtobuf robot,
             String query, String finalAnswer, long promptTokens, long completionTokens, long totalTokens,
             String prompt, String aiProvider, String aiModel) {
 

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.message.content.RobotStreamContent;
+import com.bytedesk.core.message.content.StreamContent;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -62,18 +62,18 @@ public class MessagePersistService {
                         String existingJson = message.getContent();
                         String incomingJson = messageProtobuf.getContent();
 
-                        RobotStreamContent existing = null;
-                        RobotStreamContent incoming = null;
+                        StreamContent existing = null;
+                        StreamContent incoming = null;
                         try {
                             if (existingJson != null && !existingJson.isEmpty()) {
-                                existing = RobotStreamContent.fromJson(existingJson, RobotStreamContent.class);
+                                existing = StreamContent.fromJson(existingJson, StreamContent.class);
                             }
                         } catch (Exception ignore) {
                             // 旧数据或非JSON，忽略
                         }
                         try {
                             if (incomingJson != null && !incomingJson.isEmpty()) {
-                                incoming = RobotStreamContent.fromJson(incomingJson, RobotStreamContent.class);
+                                incoming = StreamContent.fromJson(incomingJson, StreamContent.class);
                             }
                         } catch (Exception ignore) {
                         }
@@ -87,7 +87,7 @@ public class MessagePersistService {
                             String mergedReason = concatSafe(existing.getReasonContent(), incoming.getReasonContent());
 
                             // 沿用已有的其它字段（question、sources、kbUid、robotUid、regenerationContext）
-                            RobotStreamContent merged = RobotStreamContent.builder()
+                            StreamContent merged = StreamContent.builder()
                                     .question(existing.getQuestion() != null ? existing.getQuestion()
                                             : incoming.getQuestion())
                                     .answer(mergedAnswer)

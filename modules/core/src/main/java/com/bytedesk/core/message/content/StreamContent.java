@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RobotStreamContent extends BaseContent {
+public class StreamContent extends BaseContent {
 
     private String question;
     

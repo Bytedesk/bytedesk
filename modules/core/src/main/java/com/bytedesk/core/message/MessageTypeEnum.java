@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 21:50:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 12:28:28
+ * @LastEditTime: 2025-09-24 08:55:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -84,15 +84,12 @@ public enum MessageTypeEnum {
     ROBOT, // 机器人消息
     ROBOT_QUESTION, // 机器人问题
     ROBOT_ANSWER, // 机器人答案
-    ROBOT_STREAM, // 机器人流式响应（包含源引用）
-    ROBOT_STREAM_START, // 机器人流式响应开始
-    ROBOT_STREAM_END, // 机器人流式响应结束
     ROBOT_UP, // 点赞
     ROBOT_DOWN, // 点踩
     // 
-    // STREAM, // 流式消息TEXT，大模型回复，改为 ROBOT_STREAM
-    // STREAM_START, // 流式消息开始
-    // STREAM_END, // 流式消息结束
+    ROBOT_STREAM, // 机器人流式响应（包含源引用）
+    ROBOT_STREAM_START, // 机器人流式响应开始
+    ROBOT_STREAM_END, // 机器人流式响应结束
     // 
     ARTICLE, // 文章
     // 
