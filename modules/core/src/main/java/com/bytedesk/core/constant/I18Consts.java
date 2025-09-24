@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-26 22:25:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-24 11:02:22
+ * @LastEditTime: 2025-09-24 15:10:17
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -381,4 +381,8 @@ public class I18Consts {
 
     // "不支持的发送类型"
     public static final String I18N_CAPTCHA_UNSUPPORTED_TYPE = "不支持的发送类型"; // 不支持的发送类型
+
+    // "处理请求时发生错误，请稍后重试"
+    public static final String I18N_ROBOT_PROCESSING_ERROR = "处理请求时发生错误，请稍后重试"; // 处理请求时发生错误，请稍后重试
+
 }

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-21 13:37:15
+ * @LastEditTime: 2025-09-24 16:02:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -72,10 +72,10 @@ public class SpringAICustomChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Custom API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("Custom API websocket ");
         
         if (customChatModel == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -120,8 +120,8 @@ public class SpringAICustomChatService extends BaseSpringAIService {
 
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
-        log.info("Custom API sync fullPromptContent: {}", fullPromptContent);
+    protected String processPromptSync(String message, RobotProtobuf robot) {
+        log.info("Custom API sync ");
         
         try {
             if (customChatModel == null) {
@@ -154,10 +154,10 @@ public class SpringAICustomChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Custom API SSE fullPromptContent: {}", fullPromptContent);
+        log.info("Custom API SSE ");
 
         if (customChatModel == null) {
             handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
@@ -200,7 +200,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                 () -> {
                     log.info("Custom API SSE complete");
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            0, 0, 0, "", "custom", (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "custom-chat");
+                            0, 0, 0, prompt, "custom", (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "custom-chat");
                 });
     }
 
@@ -214,7 +214,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null, "");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Custom service is not available");
         } catch (Exception e) {
             log.error("Error checking Custom service health", e);

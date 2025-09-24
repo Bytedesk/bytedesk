@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-08-21 15:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:45:31
+ * @LastEditTime: 2025-09-24 16:02:36
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -143,11 +143,11 @@ public class SpringAICustomService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置和提供商信息
         RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
-        log.info("{} API websocket fullPromptContent: {}", providerName, fullPromptContent);
+        log.info("{} API websocket", providerName);
         
         if (llm == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -231,7 +231,7 @@ public class SpringAICustomService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
@@ -239,7 +239,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         // 从robot中获取llm配置和提供商信息
         RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
-        log.info("{} API sync fullPromptContent: {}", providerName, fullPromptContent);
+        log.info("{} API sync: {}", providerName);
 
         if (llm == null) {
             return providerName + " service is not available";
@@ -291,11 +291,11 @@ public class SpringAICustomService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置和提供商信息
         RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
-        log.info("{} API SSE fullPromptContent: {}", providerName, fullPromptContent);
+        log.info("{} API SSE: {}", providerName);
 
         if (llm == null) {
             handleSseError(new RuntimeException(providerName + " service not available"), messageProtobufQuery,
@@ -374,7 +374,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
-                            tokenUsage[0].getTotalTokens(), fullPromptContent, getProviderConstant(llm),
+                            tokenUsage[0].getTotalTokens(), prompt, getProviderConstant(llm),
                             (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                     : "default-model");
                     // 记录token使用情况

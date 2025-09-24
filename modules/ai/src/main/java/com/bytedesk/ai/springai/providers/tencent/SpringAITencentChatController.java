@@ -58,7 +58,7 @@ public class SpringAITencentChatController {
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        String response = springAITencentService.processPromptSync(message, null, "");
+        String response = springAITencentService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

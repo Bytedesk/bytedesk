@@ -108,10 +108,9 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
      */
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Zhipuai API websocket fullPromptContent: {}", fullPromptContent);
 
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
@@ -158,13 +157,11 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
      * 方式2：同步调用（带prompt参数）
      */
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
-        
-        log.info("Zhipuai API sync fullPromptContent: {}", fullPromptContent);
-        
+                
         try {
             if (bytedeskZhipuaiChatModel == null) {
                 return "Zhipuai service is not available";
@@ -251,11 +248,9 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
      */
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Zhipuai API SSE fullPromptContent: {}", fullPromptContent);
-
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
         
@@ -324,7 +319,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                     
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo";
@@ -668,7 +663,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
     public Boolean isServiceHealthy() {
         try {
             // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test", null, "");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用");
         } catch (Exception e) {
             log.error("Error checking Zhipuai service health", e);

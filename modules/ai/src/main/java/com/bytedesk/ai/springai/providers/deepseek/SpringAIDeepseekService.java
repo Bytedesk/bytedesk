@@ -124,10 +124,10 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Deepseek API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("Deepseek API websocket ");
         if (llm == null) {
             log.info("Deepseek API not available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, "Deepseek service is not available", messageProtobufReply);
@@ -190,16 +190,16 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
-        log.info("Deepseek API sync fullPromptContent: {}", fullPromptContent);
+        log.info("Deepseek API sync ");
         
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Deepseek API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("Deepseek API websocket ");
 
         if (llm == null) {
             log.info("Deepseek API not available");
@@ -251,14 +251,14 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Deepseek API SSE fullPromptContent: {}", fullPromptContent);
+        log.info("Deepseek API SSE ");
 
         if (llm == null) {
             log.info("Deepseek API not available");
-            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.DEEPSEEK,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "deepseek-chat");
             return;
@@ -270,7 +270,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         if (chatModel == null) {
             log.error("Failed to create Deepseek chat model and no default chat model available");
             // 使用sendStreamEndMessage方法替代重复的代码
-            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.DEEPSEEK,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "deepseek-chat");
             return;
@@ -316,7 +316,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                         // 发送流结束消息，包含token使用情况和prompt内容
                         sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
-                                tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.DEEPSEEK,
+                                tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.DEEPSEEK,
                                 (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                         : "deepseek-chat");
                         // 记录token使用情况

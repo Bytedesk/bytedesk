@@ -57,7 +57,7 @@ public class SpringAIOpenaiChatController {
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        String response = springAIOpenaiService.processPromptSync(message, null, "");
+        String response = springAIOpenaiService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

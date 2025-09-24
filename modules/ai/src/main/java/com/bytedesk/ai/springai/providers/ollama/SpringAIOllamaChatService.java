@@ -104,10 +104,10 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
     }
 
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Ollama API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("Ollama API websocket ");
         if (llm == null) {
             log.info("Ollama API not available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, "Ollama service is not available", messageProtobufReply);
@@ -171,16 +171,16 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
         }
     }
 
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
 
-        log.info("Ollama API sync fullPromptContent: {}", fullPromptContent);
+        log.info("Ollama API sync ");
 
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Ollama API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("Ollama API websocket ");
 
         if (llm == null) {
             log.info("Ollama API not available");
@@ -233,15 +233,15 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
     }
 
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         Assert.notNull(emitter, "SseEmitter must not be null");
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Ollama API SSE fullPromptContent: {}", fullPromptContent);
+        log.info("Ollama API SSE ");
 
         if (llm == null) {
             log.info("Ollama API not available");
-            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.OLLAMA,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
             return;
@@ -253,7 +253,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
         if (chatModel == null) {
             log.info("Ollama API not available");
             // 使用sendStreamEndMessage方法替代重复的代码
-            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.OLLAMA,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
             return;
@@ -299,7 +299,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
                         // 发送流结束消息，包含token使用情况和prompt内容
                         sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
-                                tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.OLLAMA,
+                                tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.OLLAMA,
                                 (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                         : "llama2");
                         // 记录token使用情况

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 15:28:39
+ * @LastEditTime: 2025-09-24 16:03:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -81,7 +81,7 @@ public class ZhipuaiController {
         }
 
         try {
-            String result = zhipuaiService.processPromptSync(message, null, "");
+            String result = zhipuaiService.processPromptSync(message, null);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in chat sync", e);
@@ -120,7 +120,7 @@ public class ZhipuaiController {
                 // 创建简单的消息对象用于测试
                 // 这里需要创建MessageProtobuf对象，但为了简化，我们直接调用服务
                 // 在实际使用中，应该通过SpringAIServiceRegistry调用
-                String result = zhipuaiService.processPromptSync(message, null, "");
+                String result = zhipuaiService.processPromptSync(message, null);
                 emitter.send("data: " + result + "\n\n");
                 emitter.complete();
             } catch (Exception e) {

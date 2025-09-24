@@ -113,10 +113,10 @@ public class SpringAITencentService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Tencent API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("Tencent API websocket ");
 
         // 创建动态chatModel
         OpenAiChatModel chatModel = createTencentChatModel(llm);
@@ -171,12 +171,12 @@ public class SpringAITencentService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
 
-        log.info("Tencent API sync fullPromptContent: {}", fullPromptContent);
+        log.info("Tencent API sync ");
 
         try {
             // 创建动态chatModel
@@ -227,10 +227,10 @@ public class SpringAITencentService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Tencent API SSE fullPromptContent: {}", fullPromptContent);
+        log.info("Tencent API SSE ");
 
         // 创建动态chatModel
         OpenAiChatModel chatModel = createTencentChatModel(llm);
@@ -286,7 +286,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
-                            tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.TENCENT,
+                            tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.TENCENT,
                             (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                     : "hunyuan-pro");
                     // 记录token使用情况

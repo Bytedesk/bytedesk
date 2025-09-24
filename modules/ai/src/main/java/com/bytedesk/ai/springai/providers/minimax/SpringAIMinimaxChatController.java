@@ -60,7 +60,7 @@ public class SpringAIMinimaxChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIMinimaxService.processPromptSync(message, null, "");
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIMinimaxService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

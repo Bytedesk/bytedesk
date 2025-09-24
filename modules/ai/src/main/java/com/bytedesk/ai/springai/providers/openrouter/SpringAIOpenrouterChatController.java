@@ -54,7 +54,7 @@ public class SpringAIOpenrouterChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIOpenrouterService.processPromptSync(message, null, "");
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIOpenrouterService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

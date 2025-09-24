@@ -67,8 +67,8 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
-        log.info("SpringAIGiteeService processPromptWebsocket with full prompt content: {}", fullPromptContent);
+            MessageProtobuf messageProtobufReply) {
+        log.info("SpringAIGiteeService processPromptWebsocket with full prompt content");
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
@@ -121,8 +121,8 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
-        log.info("SpringAIGiteeService processPromptSync with full prompt content: {}", fullPromptContent);
+    protected String processPromptSync(String message, RobotProtobuf robot) {
+        log.info("SpringAIGiteeService processPromptSync with full prompt content");
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
@@ -172,8 +172,8 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
-        log.info("SpringAIGiteeService processPromptSse with full prompt content: {}", fullPromptContent);
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        log.info("SpringAIGiteeService processPromptSse with full prompt content");
         // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         RobotLlm llm = robot.getLlm();
 
@@ -229,7 +229,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
                     log.info("Gitee API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.GITEE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gitee-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.GITEE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gitee-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gitee-chat";
@@ -250,7 +250,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null, "");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Gitee service is not available");
         } catch (Exception e) {
             log.error("Error checking Gitee service health", e);

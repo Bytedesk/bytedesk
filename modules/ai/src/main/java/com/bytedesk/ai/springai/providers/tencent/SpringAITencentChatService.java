@@ -66,10 +66,10 @@ public class SpringAITencentChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Tencent API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("Tencent API websocket ");
         
         if (tencentChatModel == null) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -122,12 +122,12 @@ public class SpringAITencentChatService extends BaseSpringAIService {
 
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
-        log.info("Tencent API sync fullPromptContent: {}", fullPromptContent);
+        log.info("Tencent API sync ");
         
         try {
             if (tencentChatModel == null) {
@@ -173,10 +173,10 @@ public class SpringAITencentChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Tencent API SSE fullPromptContent: {}", fullPromptContent);
+        log.info("Tencent API SSE ");
 
         if (tencentChatModel == null) {
             handleSseError(new RuntimeException("Tencent service not available"), messageProtobufQuery, messageProtobufReply, emitter);
@@ -228,7 +228,7 @@ public class SpringAITencentChatService extends BaseSpringAIService {
                     log.info("Tencent API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.TENCENT, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "hunyuan-pro");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.TENCENT, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "hunyuan-pro");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "hunyuan-pro";
@@ -247,7 +247,7 @@ public class SpringAITencentChatService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null, "");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Tencent service is not available");
         } catch (Exception e) {
             log.error("Error checking Tencent service health", e);

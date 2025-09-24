@@ -68,10 +68,10 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, String fullPromptContent) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("SiliconFlow API websocket fullPromptContent: {}", fullPromptContent);
+        log.info("SiliconFlow API websocket ");
         
         if (!siliconFlowChatModel.isPresent()) {
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -125,12 +125,12 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
     // }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
-        log.info("SiliconFlow API sync fullPromptContent: {}", fullPromptContent);
+        log.info("SiliconFlow API sync ");
         
         try {
             if (!siliconFlowChatModel.isPresent()) {
@@ -177,10 +177,10 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("SiliconFlow API SSE fullPromptContent: {}", fullPromptContent);
+        log.info("SiliconFlow API SSE ");
 
         if (!siliconFlowChatModel.isPresent()) {
             handleSseError(new RuntimeException("SiliconFlow service not available"), messageProtobufQuery,
@@ -234,7 +234,7 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
                     // 发送流结束消息，包含token使用情况和prompt内容
                     // String promptText = extractTextFromPrompt(prompt);
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "siliconflow-chat");
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "siliconflow-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmProviderConstants.SILICONFLOW;
@@ -252,7 +252,7 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
 
         try {
             // 发送一个简单的测试请求来检测服务是否响应
-            String response = processPromptSync("test", null, "");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("siliconFlow service is not available");
         } catch (Exception e) {
             log.error("Error checking SiliconFlow service health", e);

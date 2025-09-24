@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-26 16:58:56
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 14:58:23
+ * @LastEditTime: 2025-09-24 15:58:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -99,10 +99,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Zhipuai API websocket fullPromptContent: {}", fullPromptContent);
         if (llm == null) {
             log.info("Zhipuai API not available");
             sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -165,16 +164,14 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
-        log.info("Zhipuai API sync fullPromptContent: {}", fullPromptContent);
         
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Zhipuai API websocket fullPromptContent: {}", fullPromptContent);
 
         if (llm == null) {
             log.info("Zhipuai API not available");
@@ -226,14 +223,13 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Zhipuai API SSE fullPromptContent: {}", fullPromptContent);
 
         if (llm == null) {
             log.info("Zhipuai API not available");
-            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.ZHIPUAI,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-4");
             return;
@@ -245,7 +241,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         if (chatModel == null) {
             log.info("Zhipuai API not available");
             // 使用sendStreamEndMessage方法替代重复的代码
-            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, fullPromptContent,
+            sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.ZHIPUAI,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-4");
             return;
@@ -291,7 +287,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                         // 发送流结束消息，包含token使用情况和prompt内容
                         sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
-                                tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.ZHIPUAI,
+                                tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.ZHIPUAI,
                                 (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                         : "glm-4");
                         // 记录token使用情况

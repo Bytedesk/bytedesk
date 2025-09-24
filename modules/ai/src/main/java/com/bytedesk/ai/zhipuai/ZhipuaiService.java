@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:46:36
+ * @LastEditTime: 2025-09-24 15:28:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -190,12 +190,10 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 方式1：异步流式调用 - 实现BaseSpringAIService的抽象方法（带prompt参数）
      */
     @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API websocket prompt: {}", prompt);
-        log.info("Zhipuai API websocket fullPromptContent: {}", fullPromptContent);
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
@@ -328,16 +326,14 @@ public class ZhipuaiService extends BaseSpringAIService {
      * 方式2：同步调用 - 实现BaseSpringAIService的抽象方法（带prompt参数）
      */
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         if (robot == null || robot.getLlm() == null || robot.getLlm().getTextModel() == null) {
             log.error("Robot or RobotLlm is null, cannot process prompt sync");
             return "Error: Robot or RobotLlm is not configured";
         }
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        // 添加请求日志
-        log.info("Zhipuai API sync fullPromptContent: {}", fullPromptContent);
-
+        // 
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
@@ -388,17 +384,15 @@ public class ZhipuaiService extends BaseSpringAIService {
      */
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         if (robot == null || robot.getLlm() == null || robot.getLlm().getTextModel() == null) {
             log.error("Robot or RobotLlm is null, cannot process prompt SSE");
             sendSseMessage(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, robot, messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
-        // if (robot)
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API SSE prompt: {}", prompt);
-        log.info("Zhipuai API SSE fullPromptContent: {}", fullPromptContent);
 
         // 发送起始消息
         sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
@@ -504,7 +498,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 }
                                 
                                 sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.ZHIPUAI, modelType);
+                                        tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.ZHIPUAI, modelType);
                             } catch (Exception e) {
                                 log.error("Zhipuai API SSE error completing stream: ", e);
                             }

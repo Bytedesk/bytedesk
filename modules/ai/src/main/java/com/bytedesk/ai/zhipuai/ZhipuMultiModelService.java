@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-23 13:34:37
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 15:41:51
+ * @LastEditTime: 2025-09-24 16:05:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -424,7 +424,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply) {
         try {
             String model = getModel(robot);
             List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
@@ -471,7 +471,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
             // 发送 websocket 文本
             sendMessageWebsocket(MessageTypeEnum.TEXT, text, messageProtobufReply);
             // 记录用量事件（粗略估算）
-            long promptTokens = estimateTokens(fullPromptContent);
+            long promptTokens = estimateTokens(prompt.getContents());
             long completionTokens = estimateTokens(text);
             recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens, completionTokens, success,
                     System.currentTimeMillis() - start);
@@ -483,7 +483,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
+    protected String processPromptSync(String message, RobotProtobuf robot) {
         try {
             String model = getModel(robot);
             // 将文本包装为 Prompt -> zai 消息
@@ -513,8 +513,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                 text = "";
             text = stripThinkTags(text);
             // 记录用量事件（粗略估算）
-            long promptTokens = estimateTokens(
-                    fullPromptContent != null && !fullPromptContent.isEmpty() ? fullPromptContent : message);
+            long promptTokens = estimateTokens(message);
             long completionTokens = estimateTokens(text);
             recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens, completionTokens, success,
                     System.currentTimeMillis() - start);
@@ -527,7 +526,7 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         if (robot == null || robot.getLlm() == null) {
             handleSseError(new IllegalArgumentException("robot or llm is null"), messageProtobufQuery,
                     messageProtobufReply, emitter);
@@ -623,11 +622,11 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
                         },
                         () -> {
                             String answer = stripThinkTags(finalAnswer.toString());
-                            long promptTokens = estimateTokens(fullPromptContent);
+                            long promptTokens = estimateTokens(prompt.getContents());
                             long completionTokens = estimateTokens(answer);
                             // 结束并持久化
                             sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, promptTokens,
-                                    completionTokens, promptTokens + completionTokens, fullPromptContent,
+                                    completionTokens, promptTokens + completionTokens, prompt,
                                     LlmProviderConstants.ZHIPUAI, model);
                             // 发布用量事件
                             recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens,

@@ -70,8 +70,8 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
 
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, String fullPromptContent) {
-        log.info("SpringAIMinimaxService processPromptWebsocket with full prompt content: {}", fullPromptContent);
+            MessageProtobuf messageProtobufReply) {
+        log.info("SpringAIMinimaxService processPromptWebsocket with full prompt content");
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         
@@ -124,8 +124,8 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected String processPromptSync(String message, RobotProtobuf robot, String fullPromptContent) {
-        log.info("SpringAIMinimaxService processPromptSync with full prompt content: {}", fullPromptContent);
+    protected String processPromptSync(String message, RobotProtobuf robot) {
+        log.info("SpringAIMinimaxService processPromptSync with full prompt content");
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
@@ -175,8 +175,8 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, SseEmitter emitter, String fullPromptContent) {
-        log.info("SpringAIMinimaxService processPromptSse with full prompt content: {}", fullPromptContent);
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        log.info("SpringAIMinimaxService processPromptSse with full prompt content");
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
@@ -231,7 +231,7 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
                     log.info("Minimax API SSE complete");
                     // 发送流结束消息，包含token使用情况
                     sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), fullPromptContent, LlmProviderConstants.DEEPSEEK, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmProviderConstants.DEEPSEEK);
+                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.DEEPSEEK, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmProviderConstants.DEEPSEEK);
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmProviderConstants.DEEPSEEK;
@@ -295,7 +295,7 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
         }
 
         try {
-            String response = processPromptSync("test", null, "");
+            String response = processPromptSync("test", null);
             return !response.contains("不可用") && !response.equals("Minimax service is not available");
         } catch (Exception e) {
             log.error("Error checking Minimax service health", e);

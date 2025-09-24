@@ -72,7 +72,7 @@ public class SpringAIZhipuaiChatController {
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
-        String response = springAIZhipuaiService.processPromptSync(message, null, "");
+        String response = springAIZhipuaiService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
