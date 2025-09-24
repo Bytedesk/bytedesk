@@ -135,7 +135,7 @@ bytedesk/
 ├─ modules/            # 核心业务模块（IM、客服、知识库、工单、AI 等）
 ├─ plugins/            # 可选插件（freeswitch、webrtc、开放平台等）
 ├─ projects/           # 自定义项目或扩展
-├─ starter/            # 启动器/模板
+├─ starter/            # 启动器/项目入口
 ```
 
 ## 架构图

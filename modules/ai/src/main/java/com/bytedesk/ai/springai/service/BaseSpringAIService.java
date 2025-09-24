@@ -2,7 +2,10 @@ package com.bytedesk.ai.springai.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -142,6 +145,101 @@ public abstract class BaseSpringAIService implements SpringAIService {
         public List<StreamContent.SourceReference> getSourceReferences() {
             return sourceReferences;
         }
+    }
+
+    /**
+     * 聚合/去重/重排/TopK：对原始检索结果进行统一处理。
+     * 规则：
+     * - 以 sourceUid 为主键进行去重（同一内容来自全文与向量两路时合并，取最高score）。
+     * - 按分数从高到低排序。
+     * - 应用 RobotLlm.topK 截断（默认3）。
+     * 返回与入参相同结构：FaqProtobuf 列表与一一对应的 SourceReference（取该内容的最佳来源）。
+     */
+    protected SearchResultWithSources rerankMergeTopK(SearchResultWithSources raw, RobotProtobuf robot) {
+        if (raw == null) {
+            return new SearchResultWithSources(new ArrayList<>(), new ArrayList<>());
+        }
+
+        // 构建 uid -> Faq 映射（先收集到位）
+        Map<String, FaqProtobuf> faqByUid = new LinkedHashMap<>();
+        for (FaqProtobuf faq : raw.getSearchResults()) {
+            if (faq != null && StringUtils.hasText(faq.getUid())) {
+                faqByUid.putIfAbsent(faq.getUid(), faq);
+            }
+        }
+
+        // 聚合来源分数：同一 uid 取最高分的来源
+        class Agg {
+            FaqProtobuf faq;
+            StreamContent.SourceReference bestSrc;
+            double bestScore;
+        }
+
+        Map<String, Agg> aggMap = new LinkedHashMap<>();
+        // 先初始化Agg，保证即便没有source也能保留faq
+        for (Map.Entry<String, FaqProtobuf> e : faqByUid.entrySet()) {
+            Agg a = new Agg();
+            a.faq = e.getValue();
+            a.bestScore = 0.0;
+            aggMap.put(e.getKey(), a);
+        }
+
+        for (StreamContent.SourceReference src : raw.getSourceReferences()) {
+            if (src == null || !StringUtils.hasText(src.getSourceUid())) continue;
+            Agg a = aggMap.computeIfAbsent(src.getSourceUid(), k -> {
+                Agg x = new Agg();
+                x.faq = faqByUid.get(k); // 可能为null，但一般会在上面初始化
+                x.bestScore = 0.0;
+                return x;
+            });
+            double sc = src.getScore() != null ? src.getScore() : 0.0;
+            if (a.bestSrc == null || sc > a.bestScore) {
+                a.bestSrc = src;
+                a.bestScore = sc;
+            }
+        }
+
+        // 转为列表，按分数排序
+        List<Agg> list = new ArrayList<>(aggMap.values());
+        list.sort(Comparator.comparingDouble((Agg a) -> a.bestScore).reversed());
+
+        // 取TopK
+        int topK = 3;
+        try {
+            if (robot != null && robot.getLlm() != null && robot.getLlm().getTopK() != null
+                    && robot.getLlm().getTopK() > 0) {
+                topK = robot.getLlm().getTopK();
+            }
+        } catch (Exception ignored) {
+        }
+        if (list.size() > topK) {
+            list = list.subList(0, topK);
+        }
+
+        // 输出结果（仅保留有faq对象的项；来源为空时仍返回faq，score视为0）
+        List<FaqProtobuf> outFaqs = new ArrayList<>();
+        List<StreamContent.SourceReference> outSrcs = new ArrayList<>();
+        for (Agg a : list) {
+            if (a.faq != null) {
+                outFaqs.add(a.faq);
+                if (a.bestSrc != null) {
+                    outSrcs.add(a.bestSrc);
+                } else {
+                    // 构造一个占位来源，便于前端保持结构一致（可选）
+                    StreamContent.SourceReference placeholder = StreamContent.SourceReference.builder()
+                            .sourceType(StreamContent.SourceTypeEnum.FAQ)
+                            .sourceUid(a.faq.getUid())
+                            .sourceName(a.faq.getQuestion())
+                            .contentSummary(getContentSummary(a.faq.getAnswer(), 200))
+                            .score(0.0)
+                            .highlighted(false)
+                            .build();
+                    outSrcs.add(placeholder);
+                }
+            }
+        }
+
+        return new SearchResultWithSources(outFaqs, outSrcs);
     }
 
     // 可以添加更多自动注入的依赖，而不需要修改子类构造函数
@@ -544,40 +642,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     // 2. 知识库搜索相关方法
     protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
-        // 如果知识库未启用，直接返回空列表
-        if (!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) {
-            log.info("知识库未启用或未指定知识库UID");
-            return new ArrayList<>();
-        }
-
-        // 创建搜索结果列表
-        List<FaqProtobuf> searchResultList = new ArrayList<>();
-
-        // 根据搜索类型执行相应的搜索
-        String searchType = robot.getLlm().getSearchType();
-        if (searchType == null) {
-            searchType = RobotSearchTypeEnum.FULLTEXT.name(); // 默认使用全文搜索
-        }
-
-        // 执行搜索
-        switch (RobotSearchTypeEnum.valueOf(searchType)) {
-            case VECTOR:
-                log.info("使用向量搜索");
-                executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                break;
-            case MIXED:
-                log.info("使用混合搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                executeVectorSearch(query, robot.getKbUid(), searchResultList);
-                break;
-            case FULLTEXT:
-            default:
-                log.info("使用全文搜索");
-                executeFulltextSearch(query, robot.getKbUid(), searchResultList);
-                break;
-        }
-
-        return searchResultList;
+        // 统一走“带来源”的检索，再做聚合/TopK，返回Faq列表
+        SearchResultWithSources aggregated = searchKnowledgeBaseWithSourcesAggregated(query, robot);
+        return aggregated.getSearchResults();
     }
 
     /**
@@ -625,6 +692,15 @@ public abstract class BaseSpringAIService implements SpringAIService {
         return new SearchResultWithSources(searchResultList, sourceReferences);
     }
 
+    /**
+     * 原始WithSources检索 + 统一聚合重排TopK 的入口
+     */
+    protected SearchResultWithSources searchKnowledgeBaseWithSourcesAggregated(String query, RobotProtobuf robot) {
+        SearchResultWithSources raw = searchKnowledgeBaseWithSources(query, robot);
+        return rerankMergeTopK(raw, robot);
+    }
+
+    @SuppressWarnings("unused")
     private void executeFulltextSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
         List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
         for (FaqElasticSearchResult withScore : searchResults) {
@@ -668,6 +744,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // }
     }
 
+    @SuppressWarnings("unused")
     private void executeVectorSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
         // 检查 FaqVectorService 是否可用
         if (faqVectorService != null) {
@@ -997,8 +1074,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             SseEmitter emitter) {
         log.info("BaseSpringAIService processLlmResponseWithSources");
 
-        // 搜索知识库并获取源引用
-        SearchResultWithSources searchResult = searchKnowledgeBaseWithSources(query, robot);
+        // 搜索知识库并获取源引用（聚合/重排/TopK后）
+        SearchResultWithSources searchResult = searchKnowledgeBaseWithSourcesAggregated(query, robot);
         List<FaqProtobuf> searchResultList = searchResult.getSearchResults();
         List<StreamContent.SourceReference> sourceReferences = searchResult.getSourceReferences();
 

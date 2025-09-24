@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 09:43:27
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-24 09:47:05
+ * @LastEditTime: 2025-09-24 11:42:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -142,7 +142,7 @@ bytedesk/
 ├─ modules/            # Core product modules (TeamIM, Service, KBase, Ticket, AI, ...)
 ├─ plugins/            # Optional plugins (freeswitch, webrtc, open platform)
 ├─ projects/           # Custom projects or extensions
-├─ starter/            # Starters/boilerplates
+├─ starter/            # Starters/entry points
 ```
 
 ## architecture

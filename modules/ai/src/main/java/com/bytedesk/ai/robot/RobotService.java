@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 15:23:20
+ * @LastEditTime: 2025-09-24 12:56:58
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,12 +13,17 @@
  */
 package com.bytedesk.ai.robot;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+import com.bytedesk.ai.springai.service.SpringAIService;
+import com.bytedesk.ai.segment.SegmentService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -42,6 +47,8 @@ public class RobotService extends AbstractRobotService {
     private final ThreadRestService threadRestService;
     private final MessageService messageService;
     private final RobotRestService robotRestService;
+    private final SegmentService segmentService;
+    // Removed misplaced import statements
 
     @Override
     protected RobotRestService getRobotRestService() {
@@ -57,24 +64,24 @@ public class RobotService extends AbstractRobotService {
     public void processSseMemberMessage(String messageJson, SseEmitter emitter) {
         log.info("processSseMemberMessage: messageJson: {}", messageJson);
         Assert.notNull(emitter, "emitter is null");
-        
+
         // 使用公共方法验证和解析消息
         MessageValidationResult validationResult = validateAndParseMessage(messageJson);
         String query = validationResult.getQuery();
         log.info("robot processSseMessage {}", query);
-        
+
         // 使用公共方法获取机器人
         RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
         log.info("processSseMemberMessage thread reply");
-        
+
         // 创建机器人回复消息
         MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(
-                validationResult.getThreadProtobuf(), 
+                validationResult.getThreadProtobuf(),
                 robot,
                 validationResult.getMessageProtobuf());
-        
+
         // 处理LLM消息
-        processAIWithFallback(query, robot, validationResult.getMessageProtobuf(), 
+        processAIWithFallback(query, robot, validationResult.getMessageProtobuf(),
                 messageProtobufReply, emitter);
     }
 
@@ -82,69 +89,167 @@ public class RobotService extends AbstractRobotService {
     public void processSseVisitorMessage(String messageJson, SseEmitter emitter) {
         log.info("processSseVisitorMessage: messageJson: {}", messageJson);
         Assert.notNull(emitter, "emitter is null");
-        
+
         // 使用公共方法验证和解析消息
         MessageValidationResult validationResult = validateAndParseMessage(messageJson);
         String query = validationResult.getQuery();
         log.info("processSseVisitorMessage robot processSseMessage {}", query);
-        
+
         // 使用公共方法获取机器人
         RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
         log.info("processSseVisitorMessage thread reply");
-        
+
         // 机器人回复访客消息
         MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(
-                validationResult.getThreadProtobuf(), 
+                validationResult.getThreadProtobuf(),
                 robot,
                 validationResult.getMessageProtobuf());
-        
+
         // 处理LLM消息
-        processAIWithFallback(query, robot, validationResult.getMessageProtobuf(), 
+        processAIWithFallback(query, robot, validationResult.getMessageProtobuf(),
                 messageProtobufReply, emitter);
     }
 
     // 处理访客端同步请求消息，机器人设置为stream=false的情况，用于微信公众号等平台
     public MessageProtobuf processSyncVisitorMessage(String messageJson) {
         log.info("processSyncVisitorMessage: messageJson: {}", messageJson);
-        
+
         // 使用公共方法验证和解析消息
         MessageValidationResult validationResult = validateAndParseMessage(messageJson);
         String query = validationResult.getQuery();
         log.info("processSyncVisitorMessage robot processSyncMessage {}", query);
-        
+
         // 使用公共方法获取机器人
         RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
         log.info("processSyncVisitorMessage thread reply");
-        
+
         // 机器人回复访客消息
         MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(
-                validationResult.getThreadProtobuf(), 
+                validationResult.getThreadProtobuf(),
                 robot,
                 validationResult.getMessageProtobuf());
-        
+
         // 使用公共方法处理AI消息
-        String aiResponse = processSyncAIWithFallback(query, robot, 
+        String aiResponse = processSyncAIWithFallback(query, robot,
                 validationResult.getMessageProtobuf(), messageProtobufReply);
-        
+
         // 设置AI回复内容
         messageProtobufReply.setContent(aiResponse);
         return messageProtobufReply;
     }
 
-    // ==================== 新增的 7 个服务方法 ====================
+    // ==================== Pipeline 风格接口（整合至 RobotService） ====================
 
     /**
-     * 备用回复服务 - 可能需要查询知识库作为备用答案
+     * 访客端/通用：SSE 流式，带可选查询重写与来源处理
      */
-    public String fallbackResponse(String content, String orgUid) {
+    public void processSsePipelineMessage(String messageJson, SseEmitter emitter) {
+        log.info("processSsePipelineMessage: messageJson: {}", messageJson);
+        Assert.notNull(emitter, "emitter is null");
+
+        // 1) 复用通用消息解析
+        MessageValidationResult vr = validateAndParseMessage(messageJson);
+        String query = vr.getQuery();
+
+        // 2) 线程与机器人
+        RobotProtobuf robot = getRobotByThreadTopic(vr.getThreadTopic());
+
+        // 3) 可选：查询重写（失败回退原文）
+        String rewritten = query;
         try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content, 
-                    I18Consts.I18N_LLM_CONFIG_TIP, true);
+            if (robot != null && robot.getOrgUid() != null) {
+                rewritten = queryRewrite(query, robot.getOrgUid());
+            }
         } catch (Exception e) {
-            log.error("Error in fallbackResponse", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
+            log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
         }
+
+        // 4) 预处理/分词
+        List<String> tokens = preprocessAndSegment(rewritten);
+        String finalQuery = buildExpandedQuery(rewritten, tokens);
+
+        // 8) 组装机器人回复并流式输出（统一走带fallback的处理）
+        MessageProtobuf reply = RobotMessageUtils.createRobotMessage(vr.getThreadProtobuf(), robot,
+                vr.getMessageProtobuf());
+        processAIWithFallback(finalQuery, robot, vr.getMessageProtobuf(), reply, emitter);
+    }
+
+    /**
+     * 访客端/通用：同步模式，带可选查询重写与来源处理
+     */
+    public MessageProtobuf processSyncPipelineMessage(String messageJson) {
+        log.info("processSyncPipelineMessage: messageJson: {}", messageJson);
+
+        // 1) 解析
+        MessageValidationResult vr = validateAndParseMessage(messageJson);
+        String query = vr.getQuery();
+
+        // 2) 线程与机器人
+        RobotProtobuf robot = getRobotByThreadTopic(vr.getThreadTopic());
+
+        // 3) 可选：查询重写
+        String rewritten = query;
+        try {
+            if (robot != null && robot.getOrgUid() != null) {
+                rewritten = queryRewrite(query, robot.getOrgUid());
+            }
+        } catch (Exception e) {
+            log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
+        }
+
+        // 4) 预处理/分词
+        List<String> tokens = preprocessAndSegment(rewritten);
+        String finalQuery = buildExpandedQuery(rewritten, tokens);
+
+        // 检索与来源处理交由 BaseSpringAIService 在具体 provider 内部完成
+
+        // 8) 同步回答
+        MessageProtobuf reply = RobotMessageUtils.createRobotMessage(vr.getThreadProtobuf(), robot,
+                vr.getMessageProtobuf());
+        SpringAIService provider = getProvider(robot);
+        String answer = provider.sendSyncMessage(finalQuery, robot, vr.getMessageProtobuf(), reply);
+        reply.setContent(answer);
+        reply.setType(MessageTypeEnum.TEXT);
+        return reply;
+    }
+
+    // ==================== Pipeline 私有辅助 ====================
+
+    private SpringAIService getProvider(RobotProtobuf robot) {
+        String provider = (robot != null && robot.getLlm() != null && robot.getLlm().getTextProvider() != null)
+                ? robot.getLlm().getTextProvider().toLowerCase()
+                : LlmProviderConstants.ZHIPUAI;
+        return springAIServiceRegistry.getServiceByProviderName(provider);
+    }
+
+    private List<String> preprocessAndSegment(String content) {
+        if (content == null || content.isBlank()) {
+            return List.of();
+        }
+        // 使用 SegmentService 进行分词，并过滤标点符号，最小长度 1
+        List<String> words = segmentService.segmentWords(content);
+        return segmentService.filterWords(words, true, 1);
+    }
+
+    // 检索与来源处理：统一交由 BaseSpringAIService 具体实现负责（避免重复和反射调用）
+
+    /**
+     * 基于分词结果构建扩展查询，提升召回。
+     * - 去重
+     * - 限制最大拼接词数，避免过长
+     */
+    private String buildExpandedQuery(String base, List<String> tokens) {
+        if (tokens == null || tokens.isEmpty()) {
+            return base;
+        }
+        // 去重并限制最多 8 个词
+        List<String> uniq = tokens.stream().distinct().limit(8).collect(Collectors.toList());
+        String extra = String.join(" ", uniq);
+        if (extra.isBlank()) {
+            return base;
+        }
+        // 简单拼接，保留原文，提高召回（必要时可改为加权语法由底层模型/检索解析）
+        return base + " " + extra;
     }
 
     /**
@@ -153,7 +258,7 @@ public class RobotService extends AbstractRobotService {
     public String queryRewrite(String content, String orgUid) {
         try {
             validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content, 
+            return processSyncRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content,
                     I18Consts.I18N_LLM_CONFIG_TIP, false);
         } catch (Exception e) {
             log.error("Error in queryRewrite", e);
@@ -167,7 +272,7 @@ public class RobotService extends AbstractRobotService {
     public String summaryGeneration(String content, String orgUid) {
         try {
             validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content, 
+            return processSyncRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content,
                     I18Consts.I18N_LLM_CONFIG_TIP, false);
         } catch (Exception e) {
             log.error("Error in summaryGeneration", e);
@@ -181,7 +286,7 @@ public class RobotService extends AbstractRobotService {
     public String threadTitleGeneration(String content, String orgUid) {
         try {
             validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_THREAD_TITLE_GENERATION, orgUid, content, 
+            return processSyncRequest(RobotConsts.ROBOT_NAME_THREAD_TITLE_GENERATION, orgUid, content,
                     I18Consts.I18N_LLM_CONFIG_TIP, false);
         } catch (Exception e) {
             log.error("Error in threadTitleGeneration", e);
@@ -195,7 +300,7 @@ public class RobotService extends AbstractRobotService {
     public String contextTemplateSummary(String content, String orgUid) {
         try {
             validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content, 
+            return processSyncRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content,
                     I18Consts.I18N_LLM_CONFIG_TIP, false);
         } catch (Exception e) {
             log.error("Error in contextTemplateSummary", e);
@@ -209,7 +314,7 @@ public class RobotService extends AbstractRobotService {
     public String entityExtraction(String content, String orgUid) {
         try {
             validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content, 
+            return processSyncRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content,
                     I18Consts.I18N_LLM_CONFIG_TIP, false);
         } catch (Exception e) {
             log.error("Error in entityExtraction", e);
@@ -223,7 +328,7 @@ public class RobotService extends AbstractRobotService {
     public String relationshipExtraction(String content, String orgUid) {
         try {
             validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content, 
+            return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content,
                     I18Consts.I18N_LLM_CONFIG_TIP, false);
         } catch (Exception e) {
             log.error("Error in relationshipExtraction", e);
@@ -235,8 +340,22 @@ public class RobotService extends AbstractRobotService {
      * 问题建议服务 - 纯文本处理，不需要知识库
      */
     public String questionSuggest(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_QUESTION_SUGGEST, orgUid, content, 
+        return processSyncRequest(RobotConsts.ROBOT_NAME_QUESTION_SUGGEST, orgUid, content,
                 I18Consts.I18N_LLM_CONFIG_TIP, false);
+    }
+
+    /**
+     * 备用回复服务 - 可能需要查询知识库作为备用答案
+     */
+    public String fallbackResponse(String content, String orgUid) {
+        try {
+            validateParameters(content, orgUid);
+            return processSyncRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content,
+                    I18Consts.I18N_LLM_CONFIG_TIP, true);
+        } catch (Exception e) {
+            log.error("Error in fallbackResponse", e);
+            throw new RuntimeException("Service error: " + e.getMessage());
+        }
     }
 
     // ==================== 私有辅助方法 ====================
@@ -262,7 +381,7 @@ public class RobotService extends AbstractRobotService {
         private final ThreadProtobuf threadProtobuf;
         private final String threadTopic;
 
-        public MessageValidationResult(MessageProtobuf messageProtobuf, String query, 
+        public MessageValidationResult(MessageProtobuf messageProtobuf, String query,
                 ThreadProtobuf threadProtobuf, String threadTopic) {
             this.messageProtobuf = messageProtobuf;
             this.query = query;
@@ -270,10 +389,21 @@ public class RobotService extends AbstractRobotService {
             this.threadTopic = threadTopic;
         }
 
-        public MessageProtobuf getMessageProtobuf() { return messageProtobuf; }
-        public String getQuery() { return query; }
-        public ThreadProtobuf getThreadProtobuf() { return threadProtobuf; }
-        public String getThreadTopic() { return threadTopic; }
+        public MessageProtobuf getMessageProtobuf() {
+            return messageProtobuf;
+        }
+
+        public String getQuery() {
+            return query;
+        }
+
+        public ThreadProtobuf getThreadProtobuf() {
+            return threadProtobuf;
+        }
+
+        public String getThreadTopic() {
+            return threadTopic;
+        }
     }
 
     /**
@@ -281,22 +411,22 @@ public class RobotService extends AbstractRobotService {
      */
     private MessageValidationResult validateAndParseMessage(String messageJson) {
         Assert.notNull(messageJson, "messageJson is null");
-        
+
         // 处理消息JSON
         String processedJson = messageService.processMessageJson(messageJson);
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(processedJson);
         MessageTypeEnum messageType = messageProtobuf.getType();
         String query = messageProtobuf.getContent();
-        
+
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         Assert.notNull(threadProtobuf, "thread is null");
-        
+
         // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
         if (!messageType.equals(MessageTypeEnum.TEXT) &&
                 !messageType.equals(MessageTypeEnum.ROBOT_QUESTION)) {
             throw new RuntimeException("暂不支持此消息类型");
         }
-        
+
         String threadTopic = threadProtobuf.getTopic();
         return new MessageValidationResult(messageProtobuf, query, threadProtobuf, threadTopic);
     }
@@ -308,12 +438,12 @@ public class RobotService extends AbstractRobotService {
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic + " not found"));
         Assert.notNull(thread.getRobot(), "thread robot is null, threadTopic:" + threadTopic);
-        
+
         RobotProtobuf robot = RobotProtobuf.fromJson(thread.getRobot());
         if (robot == null) {
             throw new RuntimeException("robot is null, threadTopic:" + threadTopic);
         }
-        
+
         return robot;
     }
 
@@ -333,19 +463,19 @@ public class RobotService extends AbstractRobotService {
      */
     private void processAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
-        
+
         String provider = getAIProviderName(robot);
-        
+
         try {
             // 使用SpringAIServiceRegistry获取对应的服务
             springAIServiceRegistry.getServiceByProviderName(provider)
-                .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+                    .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
         } catch (IllegalArgumentException e) {
             log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmProviderConstants.ZHIPUAI);
             // 如果找不到指定的提供商，尝试使用默认的智谱AI
             try {
                 springAIServiceRegistry.getServiceByProviderName(LlmProviderConstants.ZHIPUAI)
-                    .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
+                        .sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, emitter);
             } catch (Exception ex) {
                 log.error("使用默认AI服务提供商失败", ex);
                 throw new RuntimeException("无法处理AI消息，所有提供商服务均不可用");
@@ -358,19 +488,19 @@ public class RobotService extends AbstractRobotService {
      */
     private String processSyncAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
-        
+
         String provider = getAIProviderName(robot);
-        
+
         try {
             // 使用SpringAIServiceRegistry获取对应的服务进行同步处理
             return springAIServiceRegistry.getServiceByProviderName(provider)
-                .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
+                    .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
         } catch (IllegalArgumentException e) {
             log.warn("未找到AI服务提供商: {}, 使用默认提供商: {}", provider, LlmProviderConstants.ZHIPUAI);
             // 如果找不到指定的提供商，尝试使用默认的智谱AI
             try {
                 return springAIServiceRegistry.getServiceByProviderName(LlmProviderConstants.ZHIPUAI)
-                    .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
+                        .sendSyncMessage(query, robot, messageProtobufQuery, messageProtobufReply);
             } catch (Exception ex) {
                 log.error("使用默认AI服务提供商失败", ex);
                 throw new RuntimeException("无法处理AI消息，所有提供商服务均不可用");
