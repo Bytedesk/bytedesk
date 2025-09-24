@@ -562,15 +562,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 .robot(messageProtobufReply.getUser().toJson())
                 .isUnAnswered(isUnanswered)
                 .orgUid(extraObject.getOrgUid())
-                //
                 // 添加token使用情况
                 .promptTokens((int) promptTokens)
                 .completionTokens((int) completionTokens)
                 .totalTokens((int) totalTokens)
-                //
                 // 添加完整prompt内容
                 .prompt(prompt)
-                //
                 // 添加AI模型信息
                 .aiProvider(aiProvider)
                 .aiModel(aiModel)
@@ -698,133 +695,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected SearchResultWithSources searchKnowledgeBaseWithSourcesAggregated(String query, RobotProtobuf robot) {
         SearchResultWithSources raw = searchKnowledgeBaseWithSources(query, robot);
         return rerankMergeTopK(raw, robot);
-    }
-
-    @SuppressWarnings("unused")
-    private void executeFulltextSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
-        List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
-        for (FaqElasticSearchResult withScore : searchResults) {
-            FaqElastic faq = withScore.getFaqElastic();
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
-            //
-            searchResultList.add(faqProtobuf);
-        }
-        //
-        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null);
-        for (TextElasticSearchResult withScore : textResults) {
-            TextElastic text = withScore.getTextElastic();
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
-            //
-            searchResultList.add(faqProtobuf);
-        }
-        //
-        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
-        for (ChunkElasticSearchResult withScore : chunkResults) {
-            ChunkElastic chunk = withScore.getChunkElastic();
-            //
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
-            searchResultList.add(faqProtobuf);
-        }
-
-        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null);
-        for (WebpageElasticSearchResult withScore : webpageResults) {
-            WebpageElastic webpage = withScore.getWebpageElastic();
-            //
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
-            searchResultList.add(faqProtobuf);
-        }
-        //
-        // List<ArticleElasticSearchResult> articleResults =
-        // articleElasticService.searchArticle(query, kbUid, null, null);
-        // for (ArticleElasticSearchResult withScore : articleResults) {
-        // ArticleElastic article = withScore.getArticleElastic();
-        // //
-        // FaqProtobuf faqProtobuf = FaqProtobuf.fromArticle(article);
-        // searchResultList.add(faqProtobuf);
-        // }
-    }
-
-    @SuppressWarnings("unused")
-    private void executeVectorSearch(String query, String kbUid, List<FaqProtobuf> searchResultList) {
-        // 检查 FaqVectorService 是否可用
-        if (faqVectorService != null) {
-            try {
-                List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null,
-                        5);
-                for (FaqVectorSearchResult withScore : searchResults) {
-                    FaqVector faqVector = withScore.getFaqVector();
-                    //
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
-                    searchResultList.add(faqProtobuf);
-                }
-            } catch (Exception e) {
-                log.warn("FaqVectorService search failed: {}", e.getMessage());
-            }
-        }
-        //
-        // 检查 TextVectorService 是否可用
-        if (textVectorService != null) {
-            try {
-                List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null,
-                        5);
-                for (TextVectorSearchResult withScore : textResults) {
-                    TextVector textVector = withScore.getTextVector();
-                    //
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
-                    searchResultList.add(faqProtobuf);
-                }
-            } catch (Exception e) {
-                log.warn("TextVectorService search failed: {}", e.getMessage());
-            }
-        }
-        //
-        // 检查 ChunkVectorService 是否可用
-        if (chunkVectorService != null) {
-            try {
-                List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null,
-                        null, 5);
-                for (ChunkVectorSearchResult withScore : chunkResults) {
-                    ChunkVector chunkVector = withScore.getChunkVector();
-                    //
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
-                    searchResultList.add(faqProtobuf);
-                }
-            } catch (Exception e) {
-                log.warn("ChunkVectorService search failed: {}", e.getMessage());
-            }
-        }
-        //
-        // 检查 WebpageVectorService 是否可用
-        if (webpageVectorService != null) {
-            try {
-                List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid,
-                        null, null, 5);
-                for (WebpageVectorSearchResult withScore : webpageResults) {
-                    WebpageVector webpageVector = withScore.getWebpageVector();
-                    //
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);
-                    searchResultList.add(faqProtobuf);
-                }
-            } catch (Exception e) {
-                log.warn("WebpageVectorService search failed: {}", e.getMessage());
-            }
-        }
-        //
-        // 检查 ArticleVectorService 是否可用
-        // if (articleVectorService != null) {
-        // try {
-        // List<ArticleVectorSearchResult> articleResults =
-        // articleVectorService.searchArticleVector(query, kbUid, null, null, 5);
-        // for (ArticleVectorSearchResult withScore : articleResults) {
-        // ArticleVector articleVector = withScore.getArticleVector();
-        // //
-        // FaqProtobuf faqProtobuf = FaqProtobuf.fromArticleVector(articleVector);
-        // searchResultList.add(faqProtobuf);
-        // }
-        // } catch (Exception e) {
-        // log.warn("ArticleVectorService search failed: {}", e.getMessage());
-        // }
-        // }
     }
 
     /**
