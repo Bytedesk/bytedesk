@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
-import com.bytedesk.ai.springai.service.SpringAIService;
+// import com.bytedesk.ai.springai.service.SpringAIService;
 import com.bytedesk.ai.segment.SegmentService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
@@ -105,8 +105,20 @@ public class RobotService extends AbstractRobotService {
                 robot,
                 validationResult.getMessageProtobuf());
 
-        // 处理LLM消息
-        processAIWithFallback(query, robot, validationResult.getMessageProtobuf(),
+        // 查询重写 + 分词扩展查询（原 Pipeline 逻辑合并至访客接口）
+        String rewritten = query;
+        try {
+            if (robot != null && robot.getOrgUid() != null) {
+                rewritten = queryRewrite(query, robot.getOrgUid());
+            }
+        } catch (Exception e) {
+            log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
+        }
+        List<String> tokens = preprocessAndSegment(rewritten);
+        String finalQuery = buildExpandedQuery(rewritten, tokens);
+
+        // 处理LLM消息（统一走fallback逻辑）
+        processAIWithFallback(finalQuery, robot, validationResult.getMessageProtobuf(),
                 messageProtobufReply, emitter);
     }
 
@@ -129,8 +141,20 @@ public class RobotService extends AbstractRobotService {
                 robot,
                 validationResult.getMessageProtobuf());
 
-        // 使用公共方法处理AI消息
-        String aiResponse = processSyncAIWithFallback(query, robot,
+        // 查询重写 + 分词扩展查询（原 Pipeline 逻辑合并至访客接口）
+        String rewritten = query;
+        try {
+            if (robot != null && robot.getOrgUid() != null) {
+                rewritten = queryRewrite(query, robot.getOrgUid());
+            }
+        } catch (Exception e) {
+            log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
+        }
+        List<String> tokens = preprocessAndSegment(rewritten);
+        String finalQuery = buildExpandedQuery(rewritten, tokens);
+
+        // 使用公共方法处理AI消息（统一走fallback逻辑）
+        String aiResponse = processSyncAIWithFallback(finalQuery, robot,
                 validationResult.getMessageProtobuf(), messageProtobufReply);
 
         // 设置AI回复内容
@@ -138,89 +162,7 @@ public class RobotService extends AbstractRobotService {
         return messageProtobufReply;
     }
 
-    // ==================== Pipeline 风格接口（整合至 RobotService） ====================
-
-    /**
-     * 访客端/通用：SSE 流式，带可选查询重写与来源处理
-     */
-    public void processSsePipelineMessage(String messageJson, SseEmitter emitter) {
-        log.info("processSsePipelineMessage: messageJson: {}", messageJson);
-        Assert.notNull(emitter, "emitter is null");
-
-        // 1) 复用通用消息解析
-        MessageValidationResult vr = validateAndParseMessage(messageJson);
-        String query = vr.getQuery();
-
-        // 2) 线程与机器人
-        RobotProtobuf robot = getRobotByThreadTopic(vr.getThreadTopic());
-
-        // 3) 可选：查询重写（失败回退原文）
-        String rewritten = query;
-        try {
-            if (robot != null && robot.getOrgUid() != null) {
-                rewritten = queryRewrite(query, robot.getOrgUid());
-            }
-        } catch (Exception e) {
-            log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
-        }
-
-        // 4) 预处理/分词
-        List<String> tokens = preprocessAndSegment(rewritten);
-        String finalQuery = buildExpandedQuery(rewritten, tokens);
-
-        // 8) 组装机器人回复并流式输出（统一走带fallback的处理）
-        MessageProtobuf reply = RobotMessageUtils.createRobotMessage(vr.getThreadProtobuf(), robot,
-                vr.getMessageProtobuf());
-        processAIWithFallback(finalQuery, robot, vr.getMessageProtobuf(), reply, emitter);
-    }
-
-    /**
-     * 访客端/通用：同步模式，带可选查询重写与来源处理
-     */
-    public MessageProtobuf processSyncPipelineMessage(String messageJson) {
-        log.info("processSyncPipelineMessage: messageJson: {}", messageJson);
-
-        // 1) 解析
-        MessageValidationResult vr = validateAndParseMessage(messageJson);
-        String query = vr.getQuery();
-
-        // 2) 线程与机器人
-        RobotProtobuf robot = getRobotByThreadTopic(vr.getThreadTopic());
-
-        // 3) 可选：查询重写
-        String rewritten = query;
-        try {
-            if (robot != null && robot.getOrgUid() != null) {
-                rewritten = queryRewrite(query, robot.getOrgUid());
-            }
-        } catch (Exception e) {
-            log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
-        }
-
-        // 4) 预处理/分词
-        List<String> tokens = preprocessAndSegment(rewritten);
-        String finalQuery = buildExpandedQuery(rewritten, tokens);
-
-        // 检索与来源处理交由 BaseSpringAIService 在具体 provider 内部完成
-
-        // 8) 同步回答
-        MessageProtobuf reply = RobotMessageUtils.createRobotMessage(vr.getThreadProtobuf(), robot,
-                vr.getMessageProtobuf());
-        SpringAIService provider = getProvider(robot);
-        String answer = provider.sendSyncMessage(finalQuery, robot, vr.getMessageProtobuf(), reply);
-        reply.setContent(answer);
-        reply.setType(MessageTypeEnum.TEXT);
-        return reply;
-    }
-
-    // ==================== Pipeline 私有辅助 ====================
-
-    private SpringAIService getProvider(RobotProtobuf robot) {
-        String provider = (robot != null && robot.getLlm() != null && robot.getLlm().getTextProvider() != null)
-                ? robot.getLlm().getTextProvider().toLowerCase()
-                : LlmProviderConstants.ZHIPUAI;
-        return springAIServiceRegistry.getServiceByProviderName(provider);
-    }
+    // ==================== Pipeline 风格接口已移除：逻辑已并入访客接口 ====================
 
     private List<String> preprocessAndSegment(String content) {
         if (content == null || content.isBlank()) {
