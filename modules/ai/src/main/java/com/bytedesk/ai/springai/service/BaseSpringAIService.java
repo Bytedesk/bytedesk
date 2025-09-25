@@ -1048,8 +1048,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 创建并处理提示
         Prompt aiPrompt = new Prompt(messages);
 
-        // 提取完整的prompt内容用于存储
-        // String fullPromptContent = extractFullPromptContent(messages);
         processPromptWebsocket(aiPrompt, robot, messageProtobufQuery, messageProtobufReply);
     }
 
