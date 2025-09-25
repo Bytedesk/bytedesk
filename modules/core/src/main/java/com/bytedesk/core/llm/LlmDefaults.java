@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-11-11 16:35:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 13:18:36
+ * @LastEditTime: 2025-09-25 13:21:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -30,7 +30,7 @@ public class LlmDefaults {
     // 默认文字对话模型提供商
     public static final String DEFAULT_TEXT_PROVIDER = LlmProviderConstants.ZHIPUAI;
     // 默认文字对话模型
-    public static final String DEFAULT_TEXT_MODEL = "glm-4-flash";
+    public static final String DEFAULT_TEXT_MODEL = "glm-4.5-flash";
     
     // 默认视觉对话模型提供商
     public static final String DEFAULT_VISION_PROVIDER = LlmProviderConstants.ZHIPUAI;
@@ -55,5 +55,5 @@ public class LlmDefaults {
     // 默认rewrite提供商
     public static final String DEFAULT_REWRITE_PROVIDER = LlmProviderConstants.ZHIPUAI;
     // 默认rewrite模型
-    public static final String DEFAULT_REWRITE_MODEL = "glm-4-flash";
+    public static final String DEFAULT_REWRITE_MODEL = "glm-4.5-flash";
 }

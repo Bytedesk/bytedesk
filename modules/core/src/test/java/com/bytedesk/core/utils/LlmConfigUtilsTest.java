@@ -33,7 +33,7 @@ class LlmConfigUtilsTest {
         environment.setProperty("spring.ai.model.vision", "zhipuai");
         environment.setProperty("spring.ai.model.audio", "zhipuai");
         environment.setProperty("spring.ai.model.rerank", "zhipuai");
-        environment.setProperty("spring.ai.zhipuai.chat.options.model", "glm-4-flash");
+        environment.setProperty("spring.ai.zhipuai.chat.options.model", "glm-4.5-flash");
         environment.setProperty("spring.ai.zhipuai.embedding.options.model", "embedding-2");
 
         // When
@@ -42,7 +42,7 @@ class LlmConfigUtilsTest {
         // Then
         assertNotNull(config);
         assertEquals("zhipuai", config.getDefaultChatProvider());
-        assertEquals("glm-4-flash", config.getDefaultChatModel());
+        assertEquals("glm-4.5-flash", config.getDefaultChatModel());
         assertEquals("zhipuai", config.getDefaultEmbeddingProvider());
         assertEquals("embedding-2", config.getDefaultEmbeddingModel());
         assertEquals("zhipuai", config.getDefaultVisionProvider());

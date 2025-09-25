@@ -60,7 +60,7 @@ public class LlmConfigUtils {
     private String getChatModel(Environment environment, String provider) {
         switch (provider) {
             case LlmProviderConstants.ZHIPUAI:
-                return environment.getProperty("spring.ai.zhipuai.chat.options.model", "glm-4-flash");
+                return environment.getProperty("spring.ai.zhipuai.chat.options.model", "glm-4.5-flash");
             case LlmProviderConstants.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.chat.options.model", "qwen3:0.6b");
             case LlmProviderConstants.DEEPSEEK:

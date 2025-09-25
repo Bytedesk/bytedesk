@@ -42,7 +42,7 @@ public class ZhipuaiChatConfig {
     @Value("${spring.ai.zhipuai.api-key:}")
     private String apiKey;
 
-    @Value("${spring.ai.zhipuai.chat.options.model:glm-4-flash}")
+    @Value("${spring.ai.zhipuai.chat.options.model:glm-4.5-flash}")
     private String model;
 
     @Value("${spring.ai.zhipuai.chat.options.temperature:0.7}")

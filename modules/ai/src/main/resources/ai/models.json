@@ -52,13 +52,13 @@
             "type": "TEXT"
         },
         {
-            "name": "glm-4-flash",
+            "name": "glm-4.5-flash",
             "nickname": "GLM-4-Flash(免费)",
             "description": "免费使用的快速响应GLM-4变体",
             "type": "TEXT"
         },
         {
-            "name": "glm-4-flashx",
+            "name": "glm-4.5-flashx",
             "nickname": "GLM-4-FlashX",
             "description": "GLM-4-Flash的增强版本，保持快速响应的同时提供更好的输出质量",
             "type": "TEXT"
@@ -130,7 +130,7 @@
             "type": "TEXT"
         },
         {
-            "name": "glm-4-flashx-250414",
+            "name": "glm-4.5-flashx-250414",
             "nickname": "GLM-4-FlashX-250414",
             "description": "GLM-4-FlashX 2025-04-14 版本，进一步优化速度与质量",
             "type": "TEXT"

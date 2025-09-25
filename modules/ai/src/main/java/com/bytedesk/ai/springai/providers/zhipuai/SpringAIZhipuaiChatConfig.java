@@ -45,7 +45,7 @@ public class SpringAIZhipuaiChatConfig {
     @Value("${spring.ai.zhipuai.base-url:https://open.bigmodel.cn/api/paas}")
     String zhipuaiBaseUrl;
 
-    @Value("${spring.ai.zhipuai.chat.options.model:glm-4-flash}")
+    @Value("${spring.ai.zhipuai.chat.options.model:glm-4.5-flash}")
     String zhipuaiApiModel;
 
     @Value("${spring.ai.zhipuai.chat.options.temperature:0.7}")
