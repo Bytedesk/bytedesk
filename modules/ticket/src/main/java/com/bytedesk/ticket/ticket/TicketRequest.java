@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-18 13:33:44
+ * @LastEditTime: 2025-09-25 16:03:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,11 +50,13 @@ public class TicketRequest extends BaseRequest {
     private String departmentUid;
     // 
     private Boolean assignmentAll;
-    private String assigneeUid; // 方便get查询
 
+    // 工单处理人
+    private String assigneeUid; // 方便get查询
     // private String assignee; // 原始json字符串
     private UserProtobuf assignee; // 方便post存储
 
+    // 工单提出者
     private String reporterUid; // 方便get查询
     // private String reporter;  // 原始 JSON 字符串
     private UserProtobuf reporter; // 方便post存储
@@ -63,7 +65,7 @@ public class TicketRequest extends BaseRequest {
     private String createdAtStart;
     private String createdAtEnd;
     private Set<String> uploadUids;
-    
+
     // 流程实例ID
     private String processInstanceId;
     // 流程定义实体UID

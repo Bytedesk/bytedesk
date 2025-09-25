@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:22:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-22 13:28:41
+ * @LastEditTime: 2025-09-25 16:07:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -56,8 +56,8 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     private final AuthService authService;
 
     public Page<CategoryResponse> queryByOrg(CategoryRequest request) {
-        log.info("queryByOrg started - pageNumber: {}, pageSize: {}", 
-                request.getPageable().getPageNumber(), request.getPageable().getPageSize());
+        // log.info("queryByOrg started - pageNumber: {}, pageSize: {}", 
+        //         request.getPageable().getPageNumber(), request.getPageable().getPageSize());
         
         Pageable pageable = request.getPageable();
         
@@ -66,21 +66,21 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
         // 第一步：获取所有符合条件的根节点实体
         List<CategoryEntity> allRootEntities = categoryRepository.findAll(rootOnlySpec);
-        log.info("Step 1: Found {} entities from database", allRootEntities.size());
+        // log.info("Step 1: Found {} entities from database", allRootEntities.size());
         
         // 打印所有原始实体的详细信息
-        for (CategoryEntity entity : allRootEntities) {
-            String parentInfo = entity.getParent() != null ? 
-                    "parent: " + entity.getParent().getUid() : "parent: null";
-            log.info("Step 1: Entity uid: {}, name: {}, {}", 
-                    entity.getUid(), entity.getName(), parentInfo);
-        }
+        // for (CategoryEntity entity : allRootEntities) {
+        //     String parentInfo = entity.getParent() != null ? 
+        //             "parent: " + entity.getParent().getUid() : "parent: null";
+        //     log.info("Step 1: Entity uid: {}, name: {}, {}", 
+        //             entity.getUid(), entity.getName(), parentInfo);
+        // }
         
-        List<String> allUids = allRootEntities.stream()
-                .filter(Objects::nonNull)
-                .map(CategoryEntity::getUid)
-                .collect(Collectors.toList());
-        log.info("Step 1: All UIDs from database: {}", allUids);
+        // List<String> allUids = allRootEntities.stream()
+        //         .filter(Objects::nonNull)
+        //         .map(CategoryEntity::getUid)
+        //         .collect(Collectors.toList());
+        // log.info("Step 1: All UIDs from database: {}", allUids);
         
         // 第二步：手动去重并分页
         List<String> uniqueUids = allRootEntities.stream()
@@ -89,23 +89,23 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                 .map(CategoryEntity::getUid)
                 .distinct()
                 .collect(Collectors.toList());
-        log.debug("Step 2: Unique UIDs after deduplication: {}", uniqueUids);
+        // log.debug("Step 2: Unique UIDs after deduplication: {}", uniqueUids);
         
         // 第三步：手动分页处理
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
         int startIndex = pageNumber * pageSize;
         int endIndex = Math.min((pageNumber + 1) * pageSize, uniqueUids.size());
-        log.debug("Step 3: Pagination - startIndex: {}, endIndex: {}, total: {}", 
-                startIndex, endIndex, uniqueUids.size());
+        // log.debug("Step 3: Pagination - startIndex: {}, endIndex: {}, total: {}", 
+        //         startIndex, endIndex, uniqueUids.size());
         
         List<CategoryResponse> content;
         if (startIndex >= uniqueUids.size()) {
             content = List.of();
-            log.debug("Step 3: No content - startIndex >= uniqueUids.size()");
+            // log.debug("Step 3: No content - startIndex >= uniqueUids.size()");
         } else {
             List<String> pagedUids = uniqueUids.subList(startIndex, endIndex);
-            log.debug("Step 3: Paged UIDs: {}", pagedUids);
+            // log.debug("Step 3: Paged UIDs: {}", pagedUids);
             
             List<CategoryEntity> entities = pagedUids.stream()
                     .map(this::findByUid)
@@ -113,21 +113,21 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                     .map(Optional::get)
                     .filter(entity -> entity.getParent() == null) // 再次确保只处理根分类
                     .collect(Collectors.toList());
-            log.debug("Step 3: Found {} root entities after filtering", entities.size());
+            // log.debug("Step 3: Found {} root entities after filtering", entities.size());
             
             content = entities.stream()
                     .map(this::convertToResponse)
                     .collect(Collectors.toList());
-            log.debug("Step 3: Converted to {} responses", content.size());
+            // log.debug("Step 3: Converted to {} responses", content.size());
             
             // 打印最终响应的 uid 列表
-            List<String> responseUids = content.stream()
-                    .map(CategoryResponse::getUid)
-                    .collect(Collectors.toList());
-            log.debug("Step 3: Final response UIDs: {}", responseUids);
+            // List<String> responseUids = content.stream()
+            //         .map(CategoryResponse::getUid)
+            //         .collect(Collectors.toList());
+            // log.debug("Step 3: Final response UIDs: {}", responseUids);
         }
 
-        log.debug("queryByOrg completed - returning {} items", content.size());
+        // log.debug("queryByOrg completed - returning {} items", content.size());
         return new PageImpl<>(content, pageable, uniqueUids.size());
     }
 
@@ -301,14 +301,14 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
             log.debug("convertToResponse: entity is null");
             return null;
         }
-        log.debug("convertToResponse: Processing entity with uid: {}, name: {}", 
-                entity.getUid(), entity.getName());
+        // log.debug("convertToResponse: Processing entity with uid: {}, name: {}", 
+        //         entity.getUid(), entity.getName());
         
         // 直接转换当前实体，不再强制返回根节点
         // 这样可以避免子分类导致重复返回父分类的问题
         CategoryResponse response = convertToResponseRecursive(entity, new HashSet<>());
-        log.debug("convertToResponse: Returning response with uid: {}, name: {}", 
-                response.getUid(), response.getName());
+        // log.debug("convertToResponse: Returning response with uid: {}, name: {}", 
+        //         response.getUid(), response.getName());
         return response;
     }
 

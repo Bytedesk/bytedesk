@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:58:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-18 13:34:19
+ * @LastEditTime: 2025-09-25 16:02:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -51,15 +51,17 @@ public class TicketResponse extends BaseResponse {
     private String categoryUid;
 
     // 使用UserProtobuf json格式化
-    private UserProtobuf user;
+    // private UserProtobuf user;
 
     private String workgroupUid;
     
     private String departmentUid;
     // 
+    // 工单处理人
     // 使用UserProtobuf json格式化
     private UserProtobuf assignee;
     // 
+    // 工单提出者
     // 使用UserProtobuf json格式化
     private UserProtobuf reporter;
     // 
