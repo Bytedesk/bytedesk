@@ -36,7 +36,7 @@ public class CategorySpecification extends BaseSpecification<CategoryEntity, Cat
             // 基础条件：只查找根分类
             predicates.add(criteriaBuilder.isNull(root.get("parent")));
             
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             //
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

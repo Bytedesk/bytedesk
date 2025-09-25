@@ -32,7 +32,7 @@ public class ChannelAppSpecification extends BaseSpecification<ChannelAppEntity,
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             // 
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));

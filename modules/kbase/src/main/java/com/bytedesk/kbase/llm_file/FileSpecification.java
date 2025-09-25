@@ -32,7 +32,7 @@ public class FileSpecification extends BaseSpecification<FileEntity, FileRequest
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
 
             // fileName
             if (StringUtils.hasText(request.getFileName())) {

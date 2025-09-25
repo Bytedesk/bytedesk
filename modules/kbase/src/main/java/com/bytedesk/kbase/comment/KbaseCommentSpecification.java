@@ -31,7 +31,7 @@ public class KbaseCommentSpecification extends BaseSpecification<KbaseCommentEnt
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

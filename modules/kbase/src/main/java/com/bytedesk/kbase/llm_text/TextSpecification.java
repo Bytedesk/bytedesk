@@ -32,7 +32,7 @@ public class TextSpecification extends BaseSpecification<TextEntity, TextRequest
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             // name
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));

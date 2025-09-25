@@ -29,7 +29,7 @@ public class VisitorTokenSpecification extends BaseSpecification<VisitorTokenEnt
     public static Specification<VisitorTokenEntity> search(VisitorTokenRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

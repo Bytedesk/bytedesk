@@ -32,7 +32,7 @@ public class WebsiteSpecification extends BaseSpecification<WebsiteEntity, Websi
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
 
             // categoryUid
             if (StringUtils.hasText(request.getCategoryUid())) {
