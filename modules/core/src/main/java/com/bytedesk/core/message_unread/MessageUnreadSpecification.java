@@ -32,7 +32,7 @@ public class MessageUnreadSpecification extends BaseSpecification<MessageUnreadE
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // 使用基础过滤条件，包括 deleted = false
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
 
             // 拉取访客未读消息，使用系统自动生成uid
             // uid 是系统自动生成访客uid

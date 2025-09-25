@@ -33,7 +33,7 @@ public class McpServerSpecification extends BaseSpecification<McpServerEntity, M
         //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             
             // name
             if (StringUtils.hasText(request.getName())) {

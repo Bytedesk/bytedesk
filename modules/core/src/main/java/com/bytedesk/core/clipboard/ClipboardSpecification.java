@@ -29,7 +29,7 @@ public class ClipboardSpecification extends BaseSpecification<ClipboardEntity, C
     public static Specification<ClipboardEntity> search(ClipboardRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));

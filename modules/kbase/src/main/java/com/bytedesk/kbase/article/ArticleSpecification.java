@@ -31,7 +31,7 @@ public class ArticleSpecification extends BaseSpecification<ArticleEntity, Artic
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));

@@ -33,7 +33,7 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
     public static Specification<MessageEntity> search(MessageRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             
             // 获取thread关联，用于访问thread的属性
             Join<Object, Object> threadJoin = root.join("thread", JoinType.LEFT);

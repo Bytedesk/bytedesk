@@ -32,7 +32,7 @@ public class FavoriteSpecification extends BaseSpecification<FavoriteEntity, Fav
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid())); // 暂时，不需要组织，仅适用于个人
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request)); // 暂时，不需要组织，仅适用于个人
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             // 
             // userUid

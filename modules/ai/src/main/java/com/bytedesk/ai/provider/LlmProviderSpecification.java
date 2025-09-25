@@ -32,7 +32,7 @@ public class LlmProviderSpecification extends BaseSpecification<LlmProviderEntit
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             // enabled
             if (request.getEnabled() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("enabled"), request.getEnabled()));

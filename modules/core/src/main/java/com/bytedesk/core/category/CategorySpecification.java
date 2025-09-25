@@ -73,7 +73,7 @@ public class CategorySpecification extends BaseSpecification<CategoryEntity, Cat
     //         predicates.add(criteriaBuilder.isNull(root.get("parent")));
             
     //         // 添加基础查询条件（deleted = false, orgUid 等）
-    //         predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+    //         predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             
     //         // 添加其他搜索条件
     //         if (StringUtils.hasText(request.getName())) {
