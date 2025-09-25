@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-22 16:52:54
+ * @LastEditTime: 2025-09-25 15:36:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -110,7 +110,7 @@ public class TicketRestService
         ticket.setUserUid(userUid); // 创建人
         // 默认是工作组工单，暂不启用一对一
         ticket.setType(TicketTypeEnum.DEPARTMENT.name());
-        ticket.setOwner(owner); // 创建人
+        // ticket.setOwner(owner); // 创建人
         //
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());

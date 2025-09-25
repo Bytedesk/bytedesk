@@ -193,8 +193,14 @@ public class TicketEntity extends BaseEntity {
     /**
      * User who created the ticket
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UserEntity owner;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // private UserEntity owner;
+    /**
+     * 在工单创建时，存储创建者用户信息
+     */
+    @Builder.Default
+    @Column(name = "ticket_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 获取工单的处理人
     public UserProtobuf getAssignee() {

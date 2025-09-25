@@ -40,21 +40,17 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
             }
-
             // topic
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
-
             // threadUid
             if (StringUtils.hasText(request.getThreadUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("threadUid"), request.getThreadUid()));
             }
-            
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
-
             // 时间范围过滤 - 使用BdDateUtils进行时间解析和转换
             if (StringUtils.hasText(request.getCreatedAtStart())) {
                 try {
@@ -66,7 +62,6 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                     log.warn("Invalid createdAtStart format: {}", request.getCreatedAtStart());
                 }
             }
-
             if (StringUtils.hasText(request.getCreatedAtEnd())) {
                 try {
                     java.time.ZonedDateTime endDateTime = BdDateUtils.parseEndDate(request.getCreatedAtEnd());
