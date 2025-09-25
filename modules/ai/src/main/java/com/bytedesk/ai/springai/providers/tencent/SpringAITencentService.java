@@ -265,7 +265,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                                 log.info("Tencent API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
+                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = extractTokenUsage(response);

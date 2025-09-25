@@ -290,7 +290,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     String textContent = assistantMessage.getText();
                                     log.info("Ollama API SSE response text: {}", textContent);
 
-                                    sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
+                                    sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                                 }
                                 // 提取token使用情况
                                 tokenUsage[0] = extractTokenUsage(response);

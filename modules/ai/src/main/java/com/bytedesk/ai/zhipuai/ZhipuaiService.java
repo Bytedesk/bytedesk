@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-19 09:39:15
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-25 07:48:14
+ * @LastEditTime: 2025-09-25 09:30:27
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -455,7 +455,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                                     if (content != null) {
                                         String contentStr = content.toString();
                                         if (!contentStr.isEmpty() && !contentStr.equals("null")) {
-                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, contentStr);
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, contentStr, null, sourceReferences);
                                         }
                                     }
                                 } else {
@@ -470,10 +470,10 @@ public class ZhipuaiService extends BaseSpringAIService {
                                         String extractedContent = extractContentFromDeltaString(deltaStr);
                                         if (extractedContent != null && !extractedContent.isEmpty()) {
                                             log.info("Zhipuai API SSE extracted content: {}", extractedContent);
-                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, extractedContent);
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, extractedContent, null, sourceReferences);
                                         } else if (!deltaStr.isEmpty() && !deltaStr.equals("null") && !isEmptyAssistantMessage(deltaStr)) {
                                             // 如果无法提取content，且不是空的助手消息，则发送原始delta字符串
-                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, deltaStr);
+                                            sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, deltaStr, null, sourceReferences);
                                         }
                                     }
                                 }

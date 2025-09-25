@@ -266,7 +266,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
                                     String textContent = assistantMessage.getText();
                                     log.info("Zhipuai API SSE response text: {}", textContent);
 
-                                    sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
+                                    sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                                 }
                                 // 提取token使用情况
                                 tokenUsage[0] = extractTokenUsage(response);

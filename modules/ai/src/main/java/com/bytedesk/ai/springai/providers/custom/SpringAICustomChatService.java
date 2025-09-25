@@ -187,7 +187,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                                 log.info("Custom API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent);
+                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                         }
                     } catch (Exception e) {

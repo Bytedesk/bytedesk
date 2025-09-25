@@ -1311,11 +1311,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
     }
 
-    protected void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, String content) {
-        sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, content, null, null);
-    }
-
     /**
      * 发送流式片段（可携带推理内容）
      */
