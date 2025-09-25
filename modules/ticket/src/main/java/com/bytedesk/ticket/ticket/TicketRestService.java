@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-25 16:26:59
+ * @LastEditTime: 2025-09-25 16:53:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -88,9 +88,9 @@ public class TicketRestService
         return ticketRepository.findByUid(uid);
     }
 
-    // query by visitor uid
-    public Page<TicketResponse> queryByVisitorUid(TicketRequest request) {
-       Pageable pageable = request.getPageable();
+    // query by user
+    public Page<TicketResponse> queryByUser(TicketRequest request) {
+        Pageable pageable = request.getPageable();
         Specification<TicketEntity> spec = createSpecification(request);
         Page<TicketEntity> page = executePageQuery(spec, pageable);
         return page.map(this::convertToResponse);

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-18 16:18:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-22 16:52:46
+ * @LastEditTime: 2025-09-25 16:53:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,7 +38,7 @@ public class TicketRestControllerVisitor {
     @GetMapping("/query")
     public ResponseEntity<?> queryByVisitorUid(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketRestService.queryByVisitorUid(request);
+        Page<TicketResponse> page = ticketRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
