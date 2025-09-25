@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.base.LlmProviderConfigDefault;
+import com.bytedesk.core.llm.LlmProviderConfigDefault;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.llm.LlmConfigUtils;

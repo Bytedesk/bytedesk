@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-09-25 17:03:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-17 14:20:28
+ * @LastEditTime: 2025-09-25 20:45:44
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.base.LlmProviderConfigDefault;
+import com.bytedesk.core.llm.LlmProviderConfigDefault;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;

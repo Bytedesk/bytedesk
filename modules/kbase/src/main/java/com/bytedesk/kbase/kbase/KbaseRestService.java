@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.base.LlmProviderConfigDefault;
+import com.bytedesk.core.llm.LlmProviderConfigDefault;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
