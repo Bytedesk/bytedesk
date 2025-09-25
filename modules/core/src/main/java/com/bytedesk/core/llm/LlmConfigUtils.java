@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-30 09:44:01
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-16 10:49:02
+ * @LastEditTime: 2025-09-25 20:38:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,8 +14,6 @@
 package com.bytedesk.core.llm;
 
 import org.springframework.core.env.Environment;
-
-import com.bytedesk.core.base.LlmProviderConfigDefault;
 
 import lombok.experimental.UtilityClass;
 

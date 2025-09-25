@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.base;
+package com.bytedesk.core.llm;
 
 import lombok.Builder;
 import lombok.Data;
