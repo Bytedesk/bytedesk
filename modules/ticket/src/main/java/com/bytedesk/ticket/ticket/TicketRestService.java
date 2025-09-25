@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 18:50:22
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-25 15:36:55
+ * @LastEditTime: 2025-09-25 16:26:59
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -99,75 +99,18 @@ public class TicketRestService
     @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
-        UserEntity owner = authService.getUser();
-        if (owner == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        String userUid = owner.getUid();
+        // UserEntity owner = authService.getUser();
+        // if (owner == null) {
+        //     throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        // }
+        // String userUid = owner.getUid();
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
-        ticket.setUserUid(userUid); // 创建人
+        // ticket.setUserUid(userUid); // 创建人
         // 默认是工作组工单，暂不启用一对一
-        ticket.setType(TicketTypeEnum.DEPARTMENT.name());
+        // ticket.setType(TicketTypeEnum.DEPARTMENT.name());
         // ticket.setOwner(owner); // 创建人
-        //
-        ticket.setAssignee(request.getAssigneeJson());
-        ticket.setReporter(request.getReporterJson());
-        //
-        if (StringUtils.hasText(request.getAssigneeJson())
-                && StringUtils.hasText(request.getAssignee().getUid())) {
-            ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
-        } else {
-            ticket.setStatus(TicketStatusEnum.NEW.name());
-        }
-        ticket.setReporter(request.getReporterJson());
-        // 先保存工单
-        TicketEntity savedTicket = save(ticket);
-        // 保存附件
-        Set<TicketAttachmentEntity> attachments = new HashSet<>();
-        if (request.getUploadUids() != null) {
-            for (String uploadUid : request.getUploadUids()) {
-                Optional<UploadEntity> uploadOptional = uploadRestService.findByUid(uploadUid);
-                if (uploadOptional.isPresent()) {
-                    TicketAttachmentEntity attachment = new TicketAttachmentEntity();
-                    attachment.setUid(uidUtils.getUid());
-                    attachment.setOrgUid(savedTicket.getOrgUid());
-                    attachment.setTicket(savedTicket);
-                    attachment.setUpload(uploadOptional.get());
-                    attachmentRepository.save(attachment);
-                    //
-                    attachments.add(attachment);
-                }
-            }
-        }
-        savedTicket.setAttachments(attachments);
-
-        // 未绑定客服会话的情况下，创建工单客服会话
-        if (!StringUtils.hasText(ticket.getThreadUid())) {
-            // 如果创建工单的时候没有绑定会话，则创建会话
-            ThreadEntity thread = createTicketThread(ticket);
-            if (thread != null) {
-                ticket.setTopic(thread.getTopic());
-                ticket.setThreadUid(thread.getUid());
-            }
-        }
-
-        // 保存工单
-        savedTicket = save(savedTicket);
-        if (savedTicket == null) {
-            throw new RuntimeException("create ticket failed");
-        }
-
-        return convertToResponse(savedTicket);
-    }
-
-    @Transactional
-    public TicketResponse createByVisitor(TicketRequest request) {
-        // 创建工单...
-        TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
-        ticket.setUid(uidUtils.getUid());
-        ticket.setType(TicketTypeEnum.VISITOR.name());
         //
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());

@@ -47,7 +47,7 @@ public class TicketRestControllerVisitor {
     @PostMapping("/create")
     public ResponseEntity<?> createByVisitor(@RequestBody TicketRequest request) {
 
-        TicketResponse response = ticketRestService.createByVisitor(request);
+        TicketResponse response = ticketRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
