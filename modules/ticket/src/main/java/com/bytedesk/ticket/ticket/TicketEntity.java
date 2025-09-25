@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-16 14:56:11
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-25 15:23:24
+ * @LastEditTime: 2025-09-25 16:00:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.comment.TicketCommentEntity;
@@ -31,12 +30,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.AllArgsConstructor;
 
 /**
@@ -47,7 +46,7 @@ import lombok.AllArgsConstructor;
  * Purpose: Stores support tickets, their status, assignments, and resolution history
  */
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true, exclude = { "attachments" })
 @EntityListeners({TicketEntityListener.class})
 @Entity(name = "bytedesk_ticket")
@@ -112,6 +111,7 @@ public class TicketEntity extends BaseEntity {
 
     /**
      * Ticket assignee information stored as JSON string
+     * 工单处理人
      */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
@@ -119,6 +119,7 @@ public class TicketEntity extends BaseEntity {
     
     /**
      * Ticket reporter information stored as JSON string
+     * 工单提出者
      */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
@@ -191,17 +192,11 @@ public class TicketEntity extends BaseEntity {
     private String schema;
 
     /**
-     * User who created the ticket
+     * 当前工单处理人 使用 assignee 字段代替
      */
     // @ManyToOne(fetch = FetchType.LAZY)
     // private UserEntity owner;
-    /**
-     * 在工单创建时，存储创建者用户信息
-     */
-    @Builder.Default
-    @Column(name = "ticket_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String user = BytedeskConsts.EMPTY_JSON_STRING;
-
+    
     // 获取工单的处理人
     public UserProtobuf getAssignee() {
         return JSON.parseObject(assignee, UserProtobuf.class);
