@@ -31,8 +31,12 @@ public class MemberSpecification extends BaseSpecification<MemberEntity, MemberR
     public static Specification<MemberEntity> search(MemberRequest request, AuthService authService) {
         log.info("member search request: {}, {}, {}", request, request.getOrgUid(), request.getSearchText());
         return (root, query, criteriaBuilder) -> {
+            // 校验：非超级管理员必须传 orgUid
+            if (!Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
+                throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
+            }
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             
             // 查询member.user.username
             if (StringUtils.hasText(request.getUsername())) {

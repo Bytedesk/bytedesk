@@ -31,7 +31,7 @@ public class TabooMessageSpecification extends BaseSpecification<TabooMessageEnt
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request.getOrgUid()));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
             //
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));

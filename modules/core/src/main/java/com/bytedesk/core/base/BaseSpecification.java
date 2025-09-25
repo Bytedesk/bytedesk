@@ -64,11 +64,15 @@ public abstract class BaseSpecification<T, TRequest> {
      * @param orgUid 组织ID
      * @return 基础查询条件列表
      */
-    protected static List<Predicate> getBasicPredicates(Root<?> root, CriteriaBuilder criteriaBuilder, String orgUid) {
+    protected static List<Predicate> getBasicPredicates(Root<?> root, CriteriaBuilder criteriaBuilder, BaseRequest request) {
+        // 非超级管理员必须提供 orgUid
+        if (!Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
+            throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
+        }
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-        if (StringUtils.hasText(orgUid)) {
-            predicates.add(criteriaBuilder.equal(root.get("orgUid"), orgUid));
+        if (StringUtils.hasText(request.getOrgUid())) {
+            predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
         }
         return predicates;
     }
