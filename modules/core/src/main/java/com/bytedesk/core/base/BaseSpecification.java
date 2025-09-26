@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-26 16:10:32
+ * @LastEditTime: 2025-09-26 16:42:38
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -91,14 +91,4 @@ public abstract class BaseSpecification<T, TRequest> {
         }
     }
 
-    /**
-     * 根据超级管理员权限和orgUid添加组织过滤条件
-     * 
-     * @param root 查询根对象
-     * @param criteriaBuilder 条件构建器
-     * @param predicates 条件列表
-     * @param request 请求对象
-     * @param authService 认证服务
-     */
-    // addOrgFilterIfNotSuperUser 已合并进 getBasicPredicates，如需组织过滤请直接调用 getBasicPredicates
 }
