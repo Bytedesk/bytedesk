@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-26 16:28:53
+ * @LastEditTime: 2025-09-26 16:51:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -38,12 +38,11 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder,request.getOrgUid()));
             // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // 使用基类方法处理超级管理员权限和组织过滤
             // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
-            
+
             // 仅当mergeByTopic为true时才应用topic合并逻辑
             if (Boolean.TRUE.equals(request.getMergeByTopic())) {
                 // 创建子查询获取每个topic的最新记录的updatedAt时间
@@ -132,7 +131,6 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
-            
             // 主题列表查询 - 支持批量查询指定的主题
             if (request.getTopicList() != null && !request.getTopicList().isEmpty()) {
                 List<Predicate> topicPredicates = new ArrayList<>();
@@ -147,15 +145,12 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                     predicates.add(criteriaBuilder.or(topicPredicates.toArray(new Predicate[0])));
                 }
             }
-            
             // 状态查询
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
-            
             // 创建一个包含inviteUids、monitorUids和ownerUid的OR条件组
             List<Predicate> filterPredicates = new ArrayList<>();
-
             // 通过 private List<String> inviteUids 查询 private List<String> invites
             if (request.getInviteUids() != null && !request.getInviteUids().isEmpty()) {
                 List<Predicate> invitePredicates = new ArrayList<>();
