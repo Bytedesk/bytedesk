@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 10:02:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 15:01:59
+ * @LastEditTime: 2025-09-26 09:45:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -12,6 +12,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ai.robot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -156,6 +159,16 @@ public class RobotLlm {
     @Column(name = "llm_score_threshold")
     private Double scoreThreshold = 0.5;
 
+    // do_sample
+    @Builder.Default
+    @Column(name = "llm_do_sample")
+    private Boolean doSample = true;
+
+    // 最大token数
+    @Builder.Default
+    @Column(name = "llm_max_tokens")
+    private Integer maxTokens = 1024;
+
     // 温度越低，回答结果越固定，随机性越低
     @Builder.Default
     @Column(name = "llm_temperature")
@@ -164,6 +177,40 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "llm_top_p")
     private Double topP = 0.7;  // 从float改为Double
+
+    // tools list
+    @Builder.Default
+    @Column(name = "llm_tools")
+    private List<String> tools = new ArrayList<>();
+
+    // tool_choice
+    @Builder.Default
+    @Column(name = "llm_tool_choice")
+    private String toolChoice = "auto";
+
+    // stop 停止词
+    @Builder.Default
+    @Column(name = "llm_stops")
+    private List<String> stops = new ArrayList<>();
+
+    /**
+     * response_format object 指定模型的响应输出格式，默认为text，仅文本模型支持此字段。
+     * 支持两种格式：{ "type": "text" } 表示普通文本输出模式，
+     * 模型返回自然语言文本；{ "type": "json_object" } 表示JSON输出模式，
+     * 模型会返回有效的JSON格式数据，适用于结构化数据提取、API响应生成等场景。
+     * 使用JSON模式时，建议在提示词中明确说明需要JSON格式输出。
+     */
+    @Builder.Default
+    @Column(name = "llm_response_format")
+    private String responseFormat = "text";
+
+    // request_id 字符串类型，用于唯一标识一次请求，模型会返回相同的request_id。
+    @Column(name = "llm_request_id")
+    private String requestId;
+
+    // user_id string类型，用于标识请求的用户，模型会返回相同的user_id。
+    @Column(name = "llm_user_id")
+    private String userId;
 
     @Builder.Default
     @Column(name = "llm_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
