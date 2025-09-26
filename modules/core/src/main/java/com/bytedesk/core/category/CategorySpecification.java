@@ -36,7 +36,7 @@ public class CategorySpecification extends BaseSpecification<CategoryEntity, Cat
             // 基础条件：只查找根分类
             predicates.add(criteriaBuilder.isNull(root.get("parent")));
             
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             //
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
@@ -73,7 +73,7 @@ public class CategorySpecification extends BaseSpecification<CategoryEntity, Cat
     //         predicates.add(criteriaBuilder.isNull(root.get("parent")));
             
     //         // 添加基础查询条件（deleted = false, orgUid 等）
-    //         predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+    //         predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             
     //         // 添加其他搜索条件
     //         if (StringUtils.hasText(request.getName())) {

@@ -33,7 +33,7 @@ public class RobotMessageSpecification extends BaseSpecification<RobotMessageEnt
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // user.nickname
             if (StringUtils.hasText(request.getUserNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUserNickname() + "%"));

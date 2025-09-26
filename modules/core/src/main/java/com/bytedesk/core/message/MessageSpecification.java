@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:53:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-12 15:44:32
+ * @LastEditTime: 2025-09-26 16:28:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -33,7 +33,7 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
     public static Specification<MessageEntity> search(MessageRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             
             // 获取thread关联，用于访问thread的属性
             Join<Object, Object> threadJoin = root.join("thread", JoinType.LEFT);
@@ -77,9 +77,10 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
                     predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.NOTIFICATION_RATE_SUBMITTED.name()));
                 }
             }
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // 使用基类方法处理超级管理员权限和组织过滤
-            addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
+            // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             //
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));

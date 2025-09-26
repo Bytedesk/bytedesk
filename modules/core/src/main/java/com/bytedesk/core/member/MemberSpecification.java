@@ -36,7 +36,7 @@ public class MemberSpecification extends BaseSpecification<MemberEntity, MemberR
                 throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
             }
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             
             // 查询member.user.username
             if (StringUtils.hasText(request.getUsername())) {

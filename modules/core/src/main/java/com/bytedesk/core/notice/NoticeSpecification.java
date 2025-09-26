@@ -29,7 +29,7 @@ public class NoticeSpecification extends BaseSpecification<NoticeEntity, NoticeR
     public static Specification<NoticeEntity> search(NoticeRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             //
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));

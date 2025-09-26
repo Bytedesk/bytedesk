@@ -33,7 +33,7 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // nickname
             if (StringUtils.hasText(request.getNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));

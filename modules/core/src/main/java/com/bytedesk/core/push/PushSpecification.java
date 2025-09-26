@@ -29,7 +29,7 @@ public class PushSpecification extends BaseSpecification<PushEntity, PushRequest
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

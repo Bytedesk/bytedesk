@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-12 09:07:53
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 14:42:02
+ * @LastEditTime: 2025-09-26 16:18:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -32,14 +32,10 @@ public class RobotSpecification extends BaseSpecification<RobotEntity, RobotRequ
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // 使用基类方法处理超级管理员权限和组织过滤
-            addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
-            // 查询level == 'PLATFORM' 或者 orgUid == request.getOrgUid()
-            // predicates.add(criteriaBuilder.or(
-            //     criteriaBuilder.equal(root.get("level"), LevelEnum.PLATFORM.name()),
-            //     criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid())
-            // ));
+            // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

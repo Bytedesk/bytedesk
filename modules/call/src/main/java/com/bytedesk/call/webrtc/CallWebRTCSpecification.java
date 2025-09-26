@@ -32,7 +32,7 @@ public class CallWebRTCSpecification extends BaseSpecification<CallWebRTCEntity,
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

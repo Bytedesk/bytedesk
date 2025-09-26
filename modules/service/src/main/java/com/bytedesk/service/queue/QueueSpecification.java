@@ -35,9 +35,10 @@ public class QueueSpecification extends BaseSpecification<QueueEntity, QueueRequ
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // 使用基类方法处理超级管理员权限和组织过滤
-            addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
+            // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             
             // 根据nickname查询
             if (StringUtils.hasText(request.getNickname())) {

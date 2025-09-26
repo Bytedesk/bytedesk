@@ -34,7 +34,7 @@ public class QueueMemberSpecification extends BaseSpecification<QueueMemberEntit
         // log.info("QueueMemberSpecification search: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
 
             // queueNickname - 搜索所有三种队列类型，不考虑线程类型
             if (StringUtils.hasText(request.getQueueNickname())) {

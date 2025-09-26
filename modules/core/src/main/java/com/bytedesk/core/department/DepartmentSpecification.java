@@ -34,7 +34,7 @@ public class DepartmentSpecification extends BaseSpecification<DepartmentEntity,
                 throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
             }
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // parent == null
             predicates.add(criteriaBuilder.isNull(root.get("parent")));
             // 过滤掉children中deleted==true的数据

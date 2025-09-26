@@ -33,7 +33,7 @@ public class VocCommentSpecification extends BaseSpecification<VocCommentEntity,
         //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // name
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));

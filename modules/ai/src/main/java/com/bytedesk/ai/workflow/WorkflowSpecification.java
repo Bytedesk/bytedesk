@@ -32,7 +32,7 @@ public class WorkflowSpecification extends BaseSpecification<WorkflowEntity, Wor
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // 
             // type
             if (StringUtils.hasText(request.getType())) {

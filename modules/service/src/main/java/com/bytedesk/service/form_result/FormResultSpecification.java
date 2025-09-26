@@ -33,7 +33,7 @@ public class FormResultSpecification extends BaseSpecification<FormResultEntity,
             request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-20 20:41:19
+ * @LastEditTime: 2025-09-26 16:10:32
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -41,17 +41,6 @@ public abstract class BaseSpecification<T, TRequest> {
      * @param authService 认证服务
      * @return Specification对象
      */
-    // public static <T, TRequest extends BaseRequest> Specification<T> search(TRequest request) {
-    //     throw new UnsupportedOperationException("Method search needs to be implemented in child class");
-    // }
-
-    /**
-     * 通用的搜索方法，需要子类实现具体的查询逻辑
-     * 
-     * @param request 请求对象
-     * @param authService 认证服务
-     * @return Specification对象
-     */
     public static <T, TRequest extends BaseRequest> Specification<T> search(TRequest request, AuthService authService) {
         throw new UnsupportedOperationException("Method search needs to be implemented in child class");
     }
@@ -64,14 +53,17 @@ public abstract class BaseSpecification<T, TRequest> {
      * @param orgUid 组织ID
      * @return 基础查询条件列表
      */
-    protected static List<Predicate> getBasicPredicates(Root<?> root, CriteriaBuilder criteriaBuilder, BaseRequest request) {
+    protected static List<Predicate> getBasicPredicates(Root<?> root, CriteriaBuilder criteriaBuilder, BaseRequest request, AuthService authService) {
+        // 验证超级管理员权限（如有必要会修改 request.superUser）
+        validateSuperUserPermission(request, authService);
         // 非超级管理员必须提供 orgUid
         if (!Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
             throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
         }
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-        if (StringUtils.hasText(request.getOrgUid())) {
+        // 只有非超级管理员且有 orgUid 时才加 orgUid 条件
+        if (!Boolean.TRUE.equals(request.getSuperUser()) && StringUtils.hasText(request.getOrgUid())) {
             predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
         }
         return predicates;
@@ -108,14 +100,5 @@ public abstract class BaseSpecification<T, TRequest> {
      * @param request 请求对象
      * @param authService 认证服务
      */
-    protected static void addOrgFilterIfNotSuperUser(Root<?> root, CriteriaBuilder criteriaBuilder, 
-                                                   List<Predicate> predicates, BaseRequest request, AuthService authService) {
-        // 先验证超级管理员权限
-        validateSuperUserPermission(request, authService);
-        
-        // 如果不是超级管理员且有orgUid，则添加组织过滤条件
-        if (!Boolean.TRUE.equals(request.getSuperUser()) && StringUtils.hasText(request.getOrgUid())) {
-            predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-        }
-    }
+    // addOrgFilterIfNotSuperUser 已合并进 getBasicPredicates，如需组织过滤请直接调用 getBasicPredicates
 }
