@@ -29,6 +29,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+/**
+ * https://spring.io/blog/2025/09/16/spring-ai-mcp-intro-blog
+ * McpServer Management Controller - Content mcpServer management and categorization APIs
+*/
 @RestController
 @RequestMapping("/api/v1/mcp/server")
 @AllArgsConstructor
