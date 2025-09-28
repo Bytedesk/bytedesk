@@ -68,6 +68,7 @@ public class FileEventListener {
                     .uploadUid(upload.getUid())
                     .fileName(upload.getFileName())
                     .fileUrl(upload.getFileUrl())
+                    .fileType(upload.getFileType())
                     .content(content)
                     .categoryUid(upload.getCategoryUid())
                     .kbUid(upload.getKbUid())

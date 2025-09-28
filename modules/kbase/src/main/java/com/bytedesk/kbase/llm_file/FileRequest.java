@@ -41,6 +41,8 @@ public class FileRequest extends BaseRequest {
 
     private String fileUrl;
 
+    private String fileType;
+
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
     

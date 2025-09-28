@@ -41,6 +41,8 @@ public class FileResponse extends BaseResponse {
 
     private String fileUrl;
 
+    private String fileType;
+
     private String elasticStatus;
 
     private String vectorStatus;

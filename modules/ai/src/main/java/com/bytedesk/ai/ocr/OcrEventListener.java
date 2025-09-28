@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-09-28 15:33:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-28 15:33:32
+ * @LastEditTime: 2025-09-28 15:39:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OcrEventListener {
 
     /**
-     * 监听上传创建事件，过滤图片，处理OCR识别
+     * 监听上传创建事件，判断是否图片类型，进行OCR识别
      * 
      * @param event 上传创建事件
      */
@@ -41,6 +41,6 @@ public class OcrEventListener {
             log.info("OcrEventListener LLM_FILE: {} - OCR开始", upload.getFileName());
         }
     }
-    
+
     
 }
