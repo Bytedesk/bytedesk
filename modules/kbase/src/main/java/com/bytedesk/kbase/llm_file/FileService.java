@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 09:08:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-28 16:27:13
+ * @LastEditTime: 2025-09-28 16:51:26
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,10 +13,13 @@
  */
 package com.bytedesk.kbase.llm_file;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.ai.document.Document;
@@ -33,6 +36,12 @@ import org.springframework.ai.reader.tika.TikaDocumentReader;
 // import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.ocr.TesseractOCRConfig;
+import org.apache.tika.parser.pdf.PDFParserConfig;
+import org.apache.tika.sax.BodyContentHandler;
 
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
@@ -42,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 解析文件内容
- * https://tika.apache.org/2.9.0/formats.html
+ * https://tika.apache.org/3.2.1/formats.html
  */
 @Slf4j
 @Service
@@ -74,6 +83,7 @@ public class FileService {
 		String ext = getFileExtension(actualFileName);
 		try {
 			if (ext.endsWith(".pdf")) {
+				// 先用 PDF 文本解析，若为空将自动回退 OCR
 				documents = readPdfPage(resource);
 			} else if (ext.endsWith(".json")) {
 				documents = readJson(resource);
@@ -84,6 +94,9 @@ public class FileService {
 			} else if (ext.endsWith(".html") || ext.endsWith(".htm") || ext.endsWith(".xhtml")) {
 				// HTML 使用 Jsoup 解析，自动过滤脚本/样式
 				documents = readHtml(resource);
+			} else if (isImageExt(ext)) {
+				// 图片优先走 OCR
+				documents = readByTikaWithOcr(resource, getOcrLanguage());
 			} else if (isTikaPreferred(ext)) {
 				documents = readByTika(resource);
 			} else {
@@ -93,11 +106,21 @@ public class FileService {
 
 			if (documents == null || documents.isEmpty() || allBlank(documents)) {
 				log.warn("Primary reader produced empty content, fallback to Tika. fileName={}", actualFileName);
-				documents = readByTika(resource);
+				// 对 PDF 和图片优先尝试 OCR
+				if (ext.endsWith(".pdf") || isImageExt(ext)) {
+					documents = readByTikaWithOcr(resource, getOcrLanguage());
+				} else {
+					documents = readByTika(resource);
+				}
 			}
 		} catch (Exception ex) {
 			log.warn("Primary reader failed, fallback to Tika. fileName={}, error={}", actualFileName, ex.getMessage());
-			documents = readByTika(resource);
+			// 异常时对 PDF/图片优先尝试 OCR
+			if (ext.endsWith(".pdf") || isImageExt(ext)) {
+				documents = readByTikaWithOcr(resource, getOcrLanguage());
+			} else {
+				documents = readByTika(resource);
+			}
 		}
 		
 		// 清理文档内容，移除可能导致问题的特殊字符
@@ -175,7 +198,6 @@ public class FileService {
 
 		TextReader textReader = new TextReader(resource);
 		// textReader.getCustomMetadata().put("filename", fileName);
-
 		return textReader.read();
 	}
 
@@ -194,6 +216,48 @@ public class FileService {
 
 		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
 		return tikaDocumentReader.read();
+	}
+
+	/**
+	 * 使用 Apache Tika + Tesseract 进行 OCR 解析，适用扫描 PDF 或图片。
+	 * 依赖系统已安装 tesseract 可执行程序与对应语言数据，默认使用 chi_sim+eng。
+	 */
+	public List<Document> readByTikaWithOcr(Resource resource, String ocrLanguage) {
+		List<Document> docs = new ArrayList<>();
+		try (InputStream is = resource.getInputStream()) {
+			AutoDetectParser parser = new AutoDetectParser();
+			ParseContext context = new ParseContext();
+
+			// 配置 Tesseract OCR
+			TesseractOCRConfig tessConfig = new TesseractOCRConfig();
+			if (ocrLanguage != null && !ocrLanguage.isBlank()) {
+				tessConfig.setLanguage(ocrLanguage);
+			}
+			log.info("Tika OCR enabled, language={}", (ocrLanguage == null || ocrLanguage.isBlank()) ? "default" : ocrLanguage);
+			context.set(TesseractOCRConfig.class, tessConfig);
+
+			// 针对 PDF：开启 OCR 与内嵌图像提取
+			PDFParserConfig pdfConfig = new PDFParserConfig();
+			pdfConfig.setExtractInlineImages(true);
+			pdfConfig.setOcrStrategy(PDFParserConfig.OCR_STRATEGY.OCR_AND_TEXT_EXTRACTION);
+			context.set(PDFParserConfig.class, pdfConfig);
+
+			BodyContentHandler handler = new BodyContentHandler(-1);
+			Metadata metadata = new Metadata();
+			parser.parse(is, handler, metadata, context);
+
+			String content = handler.toString();
+			Map<String, Object> meta = new HashMap<>();
+			for (String name : metadata.names()) {
+				meta.put(name, metadata.get(name));
+			}
+			docs.add(new Document(content, meta));
+		} catch (Exception e) {
+			log.warn("Tika OCR parse failed: {}", e.getMessage());
+			// 失败时回退普通 Tika 解析
+			return readByTika(resource);
+		}
+		return docs;
 	}
 
 	/**
@@ -288,6 +352,37 @@ public class FileService {
 		return true;
 	}
 
+	private boolean isImageExt(String ext) {
+		if (ext == null) return false;
+		switch (ext) {
+			case ".png":
+			case ".jpg":
+			case ".jpeg":
+			case ".bmp":
+			case ".gif":
+			case ".tif":
+			case ".tiff":
+			case ".webp":
+			case ".heic":
+			case ".heif":
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * 返回 OCR 使用的 Tesseract 语言设置，默认中英混合。
+	 * 可后续改为读取配置或环境变量。
+	 */
+	private String getOcrLanguage() {
+		String fromEnv = System.getenv("OCR_LANGUAGE");
+		if (fromEnv != null && !fromEnv.isBlank()) {
+			return fromEnv.trim();
+		}
+		return "chi_sim+eng";
+	}
+
 	/**
 	 * 根据扩展名判定是否优先交由 Tika 解析。
 	 * 覆盖范围参考 Tika 2.9.0 支持清单（示例集合，非穷举）。
@@ -311,6 +406,7 @@ public class FileService {
 		tikaExts.add(".zip"); tikaExts.add(".jar"); tikaExts.add(".war"); tikaExts.add(".ear");
 		tikaExts.add(".7z"); tikaExts.add(".rar"); tikaExts.add(".tar");
 		tikaExts.add(".gz"); tikaExts.add(".bz2"); tikaExts.add(".xz");
+		tikaExts.add(".z"); tikaExts.add(".lzma"); tikaExts.add(".lz4"); tikaExts.add(".snappy"); tikaExts.add(".br");
 		// 邮件与消息
 		tikaExts.add(".mbox"); tikaExts.add(".eml"); tikaExts.add(".msg"); tikaExts.add(".pst"); tikaExts.add(".tnef"); tikaExts.add(".winmail");
 		// 文本类
@@ -319,12 +415,15 @@ public class FileService {
 		tikaExts.add(".mp3"); tikaExts.add(".mp4"); tikaExts.add(".mov"); tikaExts.add(".m4v");
 		tikaExts.add(".ogg"); tikaExts.add(".opus"); tikaExts.add(".flac"); tikaExts.add(".wav"); tikaExts.add(".aiff");
 		tikaExts.add(".jpg"); tikaExts.add(".jpeg"); tikaExts.add(".png"); tikaExts.add(".gif"); tikaExts.add(".bmp");
-		tikaExts.add(".tif"); tikaExts.add(".tiff"); tikaExts.add(".webp"); tikaExts.add(".psd"); tikaExts.add(".heic"); tikaExts.add(".heif"); tikaExts.add(".icns"); tikaExts.add(".jxl");
+		tikaExts.add(".tif"); tikaExts.add(".tiff"); tikaExts.add(".webp"); tikaExts.add(".psd"); tikaExts.add(".heic"); tikaExts.add(".heif"); tikaExts.add(".icns"); tikaExts.add(".jxl"); tikaExts.add(".bpg");
 		// 其他
-		tikaExts.add(".chm"); tikaExts.add(".wmf"); tikaExts.add(".emf");
+		tikaExts.add(".chm"); tikaExts.add(".wmf"); tikaExts.add(".emf"); tikaExts.add(".dgn"); tikaExts.add(".dwg");
 		tikaExts.add(".dbf"); tikaExts.add(".mdb"); tikaExts.add(".accdb"); tikaExts.add(".sqlite");
 		tikaExts.add(".java"); tikaExts.add(".class"); tikaExts.add(".jar");
-		tikaExts.add(".xps");
+		tikaExts.add(".xps"); tikaExts.add(".xlf"); tikaExts.add(".xliff"); tikaExts.add(".xlz");
+		tikaExts.add(".wacz"); tikaExts.add(".warc");
+		// Executables – include common Unix/Darwin Mach-O indicators by extension, though Tika focuses on magic detection
+		tikaExts.add(".dylib"); tikaExts.add(".bundle"); tikaExts.add(".kext");
 
 		return tikaExts.contains(ext);
 	}

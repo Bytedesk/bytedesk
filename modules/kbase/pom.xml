@@ -56,11 +56,13 @@
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
-		<!-- https://tika.apache.org/2.9.0/formats.html -->
+		<!-- https://tika.apache.org/3.2.1/formats.html -->
 		<!-- read other file types, such as doc, docx, xls, xlsx, ppt, pptx, epub, odt, rtf, txt,
 		pdf, html, htm, xml, etc. -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
+		<!-- https://mvnrepository.com/artifact/org.apache.tika/tika-core -->
+		<!-- https://mvnrepository.com/artifact/org.apache.tika/tika-parsers-standard-package -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-tika-document-reader</artifactId>
