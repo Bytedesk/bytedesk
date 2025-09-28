@@ -105,6 +105,20 @@ public class UserService {
         UserEntity user = modelMapper.map(request, UserEntity.class);
         user.setUid(uidUtils.getUid());
         user.setPlatform(request.getPlatform());
+        // 设置注册来源：优先取请求值，否则根据提供的信息进行推断
+        String rs = request.getRegisterSource();
+        if (!StringUtils.hasText(rs)) {
+            if (StringUtils.hasText(request.getEmail())) {
+                rs = UserEntity.RegisterSource.EMAIL.name();
+            } else if (StringUtils.hasText(request.getMobile())) {
+                rs = UserEntity.RegisterSource.MOBILE.name();
+            } else if (StringUtils.hasText(request.getUsername())) {
+                rs = UserEntity.RegisterSource.USERNAME.name();
+            } else {
+                rs = UserEntity.RegisterSource.UNKNOWN.name();
+            }
+        }
+        user.setRegisterSource(rs);
         //
         if (StringUtils.hasText(request.getNickname())) {
             user.setNickname(request.getNickname());

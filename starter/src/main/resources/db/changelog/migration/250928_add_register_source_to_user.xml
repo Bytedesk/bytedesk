@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="250928-add-register-source-to-user" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_core_user" columnName="register_source"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_core_user">
+            <column name="register_source" type="varchar(32)" defaultValue="UNKNOWN">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Backfill existing rows to UNKNOWN where null -->
+        <update tableName="bytedesk_core_user">
+            <column name="register_source" value="UNKNOWN"/>
+            <where>register_source IS NULL</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

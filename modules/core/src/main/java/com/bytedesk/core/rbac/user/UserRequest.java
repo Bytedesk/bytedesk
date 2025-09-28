@@ -78,6 +78,10 @@ public class UserRequest extends BaseRequest {
 	@NotBlank(message = "platform required")
 	@Builder.Default
 	private String platform = PlatformEnum.BYTEDESK.name();
+
+	// 注册来源（例如：USERNAME、EMAIL、MOBILE、GITHUB、WECHAT、GOOGLE、DINGTALK、FEISHU、FACEBOOK、DOUYIN、LDAP、OIDC、OPENID、CAS、ADMIN、IMPORT、UNKNOWN）
+	@Builder.Default
+	private String registerSource = "UNKNOWN";
 	
 	// 注册验证码
 	private String captchaUid;

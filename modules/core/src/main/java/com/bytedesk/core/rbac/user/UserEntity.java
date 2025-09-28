@@ -384,6 +384,7 @@ public class UserEntity extends BaseEntityNoOrg {
 		LDAP,
 		OIDC,
 		OPENID,
+		CAS,
 		ADMIN,
 		IMPORT,
 		UNKNOWN

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:24
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-23 17:08:21
+ * @LastEditTime: 2025-09-28 14:14:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -26,6 +26,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.push.service.PushSendResult;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
@@ -71,6 +72,17 @@ public class AuthController {
         // validate sms code
         if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
+        }
+
+        // 显式设置注册来源，避免遗漏
+        if (!StringUtils.hasText(userRequest.getRegisterSource())) {
+            if (StringUtils.hasText(userRequest.getMobile())) {
+                userRequest.setRegisterSource("MOBILE");
+            } else if (StringUtils.hasText(userRequest.getEmail())) {
+                userRequest.setRegisterSource("EMAIL");
+            } else if (StringUtils.hasText(userRequest.getUsername())) {
+                userRequest.setRegisterSource("USERNAME");
+            }
         }
 
         UserResponse userResponse = userService.register(userRequest);
@@ -177,6 +189,8 @@ public class AuthController {
             userRequest.setEmailVerified(false);
             // 默认注册时，仅验证手机号，无需验证邮箱
             userRequest.setMobileVerified(true);
+            // 注册来源：手机号验证码登录自动注册
+            userRequest.setRegisterSource(UserEntity.RegisterSource.MOBILE.name());
             userService.register(userRequest);
         } else {
             // 如果用户已存在，检查并更新手机验证状态
@@ -239,6 +253,8 @@ public class AuthController {
             userRequest.setPlatform(authRequest.getPlatform());
             userRequest.setEmailVerified(true);
             userRequest.setMobileVerified(false);
+            // 注册来源：邮箱验证码登录自动注册
+            userRequest.setRegisterSource(UserEntity.RegisterSource.EMAIL.name());
             userService.register(userRequest);
         } else {
             // 如果用户已存在，检查并更新邮箱验证状态
