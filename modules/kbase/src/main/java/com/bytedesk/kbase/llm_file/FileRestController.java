@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-05 11:00:08
+ * @LastEditTime: 2025-09-28 14:39:19
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -151,38 +151,6 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         FileResponse file = fileRestService.rechunkFile(request.getUid());
         
         return ResponseEntity.ok(JsonResult.success(file));
-    }
-
-    @Operation(summary = "更新文件索引", description = "更新文件的Elasticsearch索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
-    @PostMapping("/updateIndex")
-    public ResponseEntity<?> updateIndex(@RequestBody FileRequest request) {
-        // chunkRestService.updateIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
-    }
-
-    @Operation(summary = "更新文件向量索引", description = "更新文件的向量索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
-    @PostMapping("/updateVectorIndex")
-    public ResponseEntity<?> updateVectorIndex(@RequestBody FileRequest request) {
-        // chunkRestService.updateVectorIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
-    }
-
-    @Operation(summary = "更新所有文件索引", description = "更新所有文件的Elasticsearch索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
-    @PostMapping("/updateAllIndex")
-    public ResponseEntity<?> updateAllIndex(@RequestBody FileRequest request) {
-        // chunkRestService.updateAllIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
-    }
-
-    @Operation(summary = "更新所有文件向量索引", description = "更新所有文件的向量索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
-    @PostMapping("/updateAllVectorIndex")
-    public ResponseEntity<?> updateAllVectorIndex(@RequestBody FileRequest request) {
-        // chunkRestService.updateAllVectorIndex(request);
-        return ResponseEntity.ok(JsonResult.success());
     }
     
 }
