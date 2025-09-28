@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar"><h1>Bytedesk API Docs</h1><div class="tab-section"><h2>Guides</h2><div class="group"><h3>Getting started</h3><ul><li><a href="index.html">index</a></li><li><a href="quickstart.html">quickstart</a></li><li><a href="development.html">development</a></li></ul></div><div class="group"><h3>Customization</h3><ul><li><a href="essentials/settings.html">settings</a></li><li><a href="essentials/navigation.html">navigation</a></li></ul></div><div class="group"><h3>Writing content</h3><ul><li><a href="essentials/markdown.html">markdown</a></li><li><a href="essentials/code.html">code</a></li><li><a href="essentials/images.html">images</a></li><li><a href="essentials/reusable-snippets.html">reusable-snippets</a></li></ul></div><div class="group"><h3>AI tools</h3><ul><li><a href="ai-tools/cursor.html">cursor</a></li><li><a href="ai-tools/claude-code.html">claude-code</a></li><li><a href="ai-tools/windsurf.html">windsurf</a></li></ul></div></div><div class="tab-section"><h2>API reference</h2><div class="group"><h3>API documentation</h3><ul><li><a href="api-reference/introduction.html">introduction</a></li></ul></div><div class="group"><h3>Endpoint examples</h3><ul><li><a href="api-reference/endpoint/get.html">get</a></li><li><a href="api-reference/endpoint/create.html">create</a></li><li><a href="api-reference/endpoint/delete.html">delete</a></li><li><a href="api-reference/endpoint/webhook.html">webhook</a></li></ul></div></div></nav>
+        <main class="content">
+            
+<p><Info></p>
+<p>  <strong>Prerequisites</strong>:</p>
+<p>  - Node.js version 19 or higher</p>
+<p>  - A docs repository with a <code>docs.json</code> file</p>
+</Info></p><p>Follow these steps to install and run Mintlify on your operating system.</p><p><Steps>
+<Step title="Install the Mintlify CLI"></p><p><code>`</code>bash
+<p>npm i -g mint</p>
+<p><code>`</code></p>
+</Step></p><p><Step title="Preview locally"></p><p>Navigate to your docs directory where your <code>docs.json</code> file is located, and run the following command:</p><p><code>`</code>bash
+<p>mint dev</p>
+<code>`</code></p><p>A local preview of your documentation will be available at <code>http://localhost:3000</code>.</p><p></Step>
+</Steps></p><p><h2>Custom ports</h2></p><p>By default, Mintlify uses port 3000. You can customize the port Mintlify runs on by using the <code>--port</code> flag. For example, to run Mintlify on port 3333, use this command:</p><p><code>`</code>bash
+<p>mint dev --port 3333</p>
+<code>`</code></p><p>If you attempt to run Mintlify on a port that's already in use, it will use the next available port:</p><p><code>`</code>md
+<p>Port 3000 is already in use. Trying 3001 instead.</p>
+<code>`</code></p><p><h2>Mintlify versions</h2></p><p>Please note that each CLI release is associated with a specific version of Mintlify. If your local preview does not align with the production version, please update the CLI:</p><p><code>`</code>bash
+<p>npm mint update</p>
+<code>`</code></p><p><h2>Validating links</h2></p><p>The CLI can assist with validating links in your documentation. To identify any broken links, use the following command:</p><p><code>`</code>bash
+<p>mint broken-links</p>
+<code>`</code></p><p><h2>Deployment</h2></p><p>If the deployment is successful, you should see the following:</p><p><Frame>
+<p>  <img src="/images/checks-passed.png" alt="Screenshot of a deployment confirmation message that says All checks have passed." style={{ borderRadius: '0.5rem' }} /></p>
+</Frame></p><p><h2>Code formatting</h2></p><p>We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.</p><p><h2>Troubleshooting</h2></p><p><AccordionGroup>
+  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'></p><p>    This may be due to an outdated version of node. Try the following:
+<p>    1. Remove the currently-installed version of the CLI: <code>npm remove -g mint</code></p>
+<p>    2. Upgrade to Node v19 or higher.</p>
+<p>    3. Reinstall the CLI: <code>npm i -g mint</code></p>
+  </Accordion></p><p>  <Accordion title="Issue: Encountering an unknown error">
+<p>  </p>
+<p>    Solution: Go to the root of your device and delete the <code>~/.mintlify</code> folder. Then run <code>mint dev</code> again.</p>
+<p>  </Accordion></p>
+</AccordionGroup></p><p>Curious about what changed in the latest CLI version? Check out the [CLI changelog](https://www.npmjs.com/package/mintlify?activeTab=versions).
+
+        </main>
+    </div>
+</body>
+</html>

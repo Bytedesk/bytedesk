@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windsurf setup</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" href="../favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar"><h1>Bytedesk API Docs</h1><div class="tab-section"><h2>Guides</h2><div class="group"><h3>Getting started</h3><ul><li><a href="../index.html">index</a></li><li><a href="../quickstart.html">quickstart</a></li><li><a href="../development.html">development</a></li></ul></div><div class="group"><h3>Customization</h3><ul><li><a href="../essentials/settings.html">settings</a></li><li><a href="../essentials/navigation.html">navigation</a></li></ul></div><div class="group"><h3>Writing content</h3><ul><li><a href="../essentials/markdown.html">markdown</a></li><li><a href="../essentials/code.html">code</a></li><li><a href="../essentials/images.html">images</a></li><li><a href="../essentials/reusable-snippets.html">reusable-snippets</a></li></ul></div><div class="group"><h3>AI tools</h3><ul><li><a href="../ai-tools/cursor.html">cursor</a></li><li><a href="../ai-tools/claude-code.html">claude-code</a></li><li><a href="../ai-tools/windsurf.html">windsurf</a></li></ul></div></div><div class="tab-section"><h2>API reference</h2><div class="group"><h3>API documentation</h3><ul><li><a href="../api-reference/introduction.html">introduction</a></li></ul></div><div class="group"><h3>Endpoint examples</h3><ul><li><a href="../api-reference/endpoint/get.html">get</a></li><li><a href="../api-reference/endpoint/create.html">create</a></li><li><a href="../api-reference/endpoint/delete.html">delete</a></li><li><a href="../api-reference/endpoint/webhook.html">webhook</a></li></ul></div></div></nav>
+        <main class="content">
+            
+Configure Windsurf's Cascade AI assistant to help you write and maintain documentation. This guide shows how to set up Windsurf specifically for your Mintlify documentation workflow.</p><p><h2>Prerequisites</h2></p><p>- Windsurf editor installed
+- Access to your documentation repository</p><p><h2>Workspace rules</h2></p><p>Create workspace rules that provide Windsurf with context about your documentation project and standards.</p><p>Create <code>.windsurf/rules.md</code> in your project root:</p><p><code>`</code>`markdown
+<h1>Mintlify technical writing rule</h1></p><p><h2>Project context</h2></p><p>- This is a documentation project on the Mintlify platform
+<p>- We use MDX files with YAML frontmatter  </p>
+<p>- Navigation is configured in <code>docs.json</code></p>
+- We follow technical writing best practices</p><p><h2>Writing standards</h2></p><p>- Use second person ("you") for instructions
+<p>- Write in active voice and present tense</p>
+<p>- Start procedures with prerequisites</p>
+<p>- Include expected outcomes for major steps</p>
+<p>- Use descriptive, keyword-rich headings</p>
+- Keep sentences concise but informative</p><p><h2>Required page structure</h2></p><p>Every page must start with frontmatter:</p><p><code>`</code>yaml
+<p>---</p>
+<p>title: "Clear, specific title"</p>
+<p>description: "Concise description for SEO and navigation"</p>
+<p>---</p>
+<code>`</code></p><p><h2>Mintlify components</h2></p><p><h3>Callouts</h3></p><p>- <code><Note></code> for helpful supplementary information
+<p>- <code><Warning></code> for important cautions and breaking changes</p>
+<p>- <code><Tip></code> for best practices and expert advice  </p>
+<p>- <code><Info></code> for neutral contextual information</p>
+- <code><Check></code> for success confirmations</p><p><h3>Code examples</h3></p><p>- When appropriate, include complete, runnable examples
+<p>- Use <code><CodeGroup></code> for multiple language examples</p>
+<p>- Specify language tags on all code blocks</p>
+<p>- Include realistic data, not placeholders</p>
+- Use <code><RequestExample></code> and <code><ResponseExample></code> for API docs</p><p><h3>Procedures</h3></p><p>- Use <code><Steps></code> component for sequential instructions
+<p>- Include verification steps with <code><Check></code> components when relevant</p>
+- Break complex procedures into smaller steps</p><p><h3>Content organization</h3></p><p>- Use <code><Tabs></code> for platform-specific content
+<p>- Use <code><Accordion></code> for progressive disclosure</p>
+<p>- Use <code><Card></code> and <code><CardGroup></code> for highlighting content</p>
+- Wrap images in <code><Frame></code> components with descriptive alt text</p><p><h2>API documentation requirements</h2></p><p>- Document all parameters with <code><ParamField></code> 
+<p>- Show response structure with <code><ResponseField></code></p>
+<p>- Include both success and error examples</p>
+<p>- Use <code><Expandable></code> for nested object properties</p>
+- Always include authentication examples</p><p><h2>Quality standards</h2></p><p>- Test all code examples before publishing
+<p>- Use relative paths for internal links</p>
+<p>- Include alt text for all images</p>
+<p>- Ensure proper heading hierarchy (start with h2)</p>
+<p>- Check existing patterns for consistency</p>
+<p><code>`</code>`</p>
+
+        </main>
+    </div>
+</body>
+</html>

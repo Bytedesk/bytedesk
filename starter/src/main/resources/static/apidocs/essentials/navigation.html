@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" href="../favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar"><h1>Bytedesk API Docs</h1><div class="tab-section"><h2>Guides</h2><div class="group"><h3>Getting started</h3><ul><li><a href="../index.html">index</a></li><li><a href="../quickstart.html">quickstart</a></li><li><a href="../development.html">development</a></li></ul></div><div class="group"><h3>Customization</h3><ul><li><a href="../essentials/settings.html">settings</a></li><li><a href="../essentials/navigation.html">navigation</a></li></ul></div><div class="group"><h3>Writing content</h3><ul><li><a href="../essentials/markdown.html">markdown</a></li><li><a href="../essentials/code.html">code</a></li><li><a href="../essentials/images.html">images</a></li><li><a href="../essentials/reusable-snippets.html">reusable-snippets</a></li></ul></div><div class="group"><h3>AI tools</h3><ul><li><a href="../ai-tools/cursor.html">cursor</a></li><li><a href="../ai-tools/claude-code.html">claude-code</a></li><li><a href="../ai-tools/windsurf.html">windsurf</a></li></ul></div></div><div class="tab-section"><h2>API reference</h2><div class="group"><h3>API documentation</h3><ul><li><a href="../api-reference/introduction.html">introduction</a></li></ul></div><div class="group"><h3>Endpoint examples</h3><ul><li><a href="../api-reference/endpoint/get.html">get</a></li><li><a href="../api-reference/endpoint/create.html">create</a></li><li><a href="../api-reference/endpoint/delete.html">delete</a></li><li><a href="../api-reference/endpoint/webhook.html">webhook</a></li></ul></div></div></nav>
+        <main class="content">
+            
+The navigation menu is the list of links on every website.</p><p>You will likely update <code>docs.json</code> every time you add a new page. Pages do not show up automatically.</p><p><h2>Navigation syntax</h2></p><p>Our navigation syntax is recursive which means you can make nested navigation groups. You don't need to include <code>.mdx</code> in page names.</p><p><CodeGroup></p><p><code>`</code>json Regular Navigation
+<p>"navigation": {</p>
+<p>  "tabs": [</p>
+<p>    {</p>
+<p>      "tab": "Docs",</p>
+<p>      "groups": [</p>
+<p>        {</p>
+<p>          "group": "Getting Started",</p>
+<p>          "pages": ["quickstart"]</p>
+<p>        }</p>
+<p>      ]</p>
+<p>    }</p>
+<p>  ]</p>
+<p>}</p>
+<code>`</code></p><p><code>`</code>json Nested Navigation
+<p>"navigation": {</p>
+<p>  "tabs": [</p>
+<p>    {</p>
+<p>      "tab": "Docs",</p>
+<p>      "groups": [</p>
+<p>        {</p>
+<p>          "group": "Getting Started",</p>
+<p>          "pages": [</p>
+<p>            "quickstart",</p>
+<p>            {</p>
+<p>              "group": "Nested Reference Pages",</p>
+<p>              "pages": ["nested-reference-page"]</p>
+<p>            }</p>
+<p>          ]</p>
+<p>        }</p>
+<p>      ]</p>
+<p>    }</p>
+<p>  ]</p>
+<p>}</p>
+<code>`</code></p><p></CodeGroup></p><p><h2>Folders</h2></p><p>Simply put your MDX files in folders and update the paths in <code>docs.json</code>.</p><p>For example, to have a page at <code>https://yoursite.com/your-folder/your-page</code> you would make a folder called <code>your-folder</code> containing an MDX file called <code>your-page.mdx</code>.</p><p><Warning></p><p>You cannot use <code>api</code> for the name of a folder unless you nest it inside another folder. Mintlify uses Next.js which reserves the top-level <code>api</code> folder for internal server calls. A folder name such as <code>api-reference</code> would be accepted.</p><p></Warning></p><p><code>`</code>json Navigation With Folder
+<p>"navigation": {</p>
+<p>  "tabs": [</p>
+<p>    {</p>
+<p>      "tab": "Docs",</p>
+<p>      "groups": [</p>
+<p>        {</p>
+<p>          "group": "Group Name",</p>
+<p>          "pages": ["your-folder/your-page"]</p>
+<p>        }</p>
+<p>      ]</p>
+<p>    }</p>
+<p>  ]</p>
+<p>}</p>
+<code>`</code></p><p><h2>Hidden pages</h2></p><p>MDX files not included in <code>docs.json</code> will not show up in the sidebar but are accessible through the search bar and by linking directly to them.
+
+        </main>
+    </div>
+</body>
+</html>

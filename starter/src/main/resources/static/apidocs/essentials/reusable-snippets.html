@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reusable snippets</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" href="../favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar"><h1>Bytedesk API Docs</h1><div class="tab-section"><h2>Guides</h2><div class="group"><h3>Getting started</h3><ul><li><a href="../index.html">index</a></li><li><a href="../quickstart.html">quickstart</a></li><li><a href="../development.html">development</a></li></ul></div><div class="group"><h3>Customization</h3><ul><li><a href="../essentials/settings.html">settings</a></li><li><a href="../essentials/navigation.html">navigation</a></li></ul></div><div class="group"><h3>Writing content</h3><ul><li><a href="../essentials/markdown.html">markdown</a></li><li><a href="../essentials/code.html">code</a></li><li><a href="../essentials/images.html">images</a></li><li><a href="../essentials/reusable-snippets.html">reusable-snippets</a></li></ul></div><div class="group"><h3>AI tools</h3><ul><li><a href="../ai-tools/cursor.html">cursor</a></li><li><a href="../ai-tools/claude-code.html">claude-code</a></li><li><a href="../ai-tools/windsurf.html">windsurf</a></li></ul></div></div><div class="tab-section"><h2>API reference</h2><div class="group"><h3>API documentation</h3><ul><li><a href="../api-reference/introduction.html">introduction</a></li></ul></div><div class="group"><h3>Endpoint examples</h3><ul><li><a href="../api-reference/endpoint/get.html">get</a></li><li><a href="../api-reference/endpoint/create.html">create</a></li><li><a href="../api-reference/endpoint/delete.html">delete</a></li><li><a href="../api-reference/endpoint/webhook.html">webhook</a></li></ul></div></div></nav>
+        <main class="content">
+            
+import SnippetIntro from '/snippets/snippet-intro.mdx';</p><p><SnippetIntro /></p><p><h2>Creating a custom snippet</h2></p><p><strong>Pre-condition</strong>: You must create your snippet file in the <code>snippets</code> directory.</p><p><Note>
+<p>  Any page in the <code>snippets</code> directory will be treated as a snippet and will not</p>
+<p>  be rendered into a standalone page. If you want to create a standalone page</p>
+<p>  from the snippet, import the snippet into another file and call it as a</p>
+<p>  component.</p>
+</Note></p><p><h3>Default export</h3></p><p>1. Add content to your snippet file that you want to re-use across multiple
+<p>   locations. Optionally, you can add variables that can be filled in via props</p>
+   when you import the snippet.</p><p><code>`</code>mdx snippets/my-snippet.mdx
+<p>Hello world! This is my content I want to reuse across pages. My keyword of the</p>
+<p>day is {word}.</p>
+<code>`</code></p><p><Warning>
+<p>  The content that you want to reuse must be inside the <code>snippets</code> directory in</p>
+<p>  order for the import to work.</p>
+</Warning></p><p>2. Import the snippet into your destination file.</p><p><code>`</code>mdx destination-file.mdx
+<p>---</p>
+<p>title: My title</p>
+<p>description: My Description</p>
+---</p><p>import MySnippet from '/snippets/path/to/my-snippet.mdx';</p><p><h2>Header</h2></p><p>Lorem impsum dolor sit amet.</p><p><MySnippet word="bananas" />
+<code>`</code></p><p><h3>Reusable variables</h3></p><p>1. Export a variable from your snippet file:</p><p><code>`</code>mdx snippets/path/to/custom-variables.mdx
+export const myName = 'my name';</p><p>export const myObject = { fruit: 'strawberries' };
+<code>`</code></p><p>2. Import the snippet from your destination file and use the variable:</p><p><code>`</code>mdx destination-file.mdx
+<p>---</p>
+<p>title: My title</p>
+<p>description: My Description</p>
+---</p><p>import { myName, myObject } from '/snippets/path/to/custom-variables.mdx';</p><p>Hello, my name is {myName} and I like {myObject.fruit}.
+<code>`</code></p><p><h3>Reusable components</h3></p><p>1. Inside your snippet file, create a component that takes in props by exporting
+   your component in the form of an arrow function.</p><p><code>`</code>mdx snippets/custom-component.mdx
+<p>export const MyComponent = ({ title }) => (</p>
+<p>  <div></p>
+<p>    <h1>{title}</h1></p>
+    <p>... snippet content ...</p>
+<p>  </div></p>
+<p>);</p>
+<code>`</code></p><p><Warning>
+<p>  MDX does not compile inside the body of an arrow function. Stick to HTML</p>
+<p>  syntax when you can or use a default export if you need to use MDX.</p>
+</Warning></p><p>2. Import the snippet into your destination file and pass in the props</p><p><code>`</code>mdx destination-file.mdx
+<p>---</p>
+<p>title: My title</p>
+<p>description: My Description</p>
+---</p><p>import { MyComponent } from '/snippets/custom-component.mdx';</p><p>Lorem ipsum dolor sit amet.</p><p><MyComponent title={'Custom title'} />
+<p><code>`</code></p>
+
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quickstart</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.svg">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar"><h1>Bytedesk API Docs</h1><div class="tab-section"><h2>Guides</h2><div class="group"><h3>Getting started</h3><ul><li><a href="index.html">index</a></li><li><a href="quickstart.html">quickstart</a></li><li><a href="development.html">development</a></li></ul></div><div class="group"><h3>Customization</h3><ul><li><a href="essentials/settings.html">settings</a></li><li><a href="essentials/navigation.html">navigation</a></li></ul></div><div class="group"><h3>Writing content</h3><ul><li><a href="essentials/markdown.html">markdown</a></li><li><a href="essentials/code.html">code</a></li><li><a href="essentials/images.html">images</a></li><li><a href="essentials/reusable-snippets.html">reusable-snippets</a></li></ul></div><div class="group"><h3>AI tools</h3><ul><li><a href="ai-tools/cursor.html">cursor</a></li><li><a href="ai-tools/claude-code.html">claude-code</a></li><li><a href="ai-tools/windsurf.html">windsurf</a></li></ul></div></div><div class="tab-section"><h2>API reference</h2><div class="group"><h3>API documentation</h3><ul><li><a href="api-reference/introduction.html">introduction</a></li></ul></div><div class="group"><h3>Endpoint examples</h3><ul><li><a href="api-reference/endpoint/get.html">get</a></li><li><a href="api-reference/endpoint/create.html">create</a></li><li><a href="api-reference/endpoint/delete.html">delete</a></li><li><a href="api-reference/endpoint/webhook.html">webhook</a></li></ul></div></div></nav>
+        <main class="content">
+            
+<h2>Get started in three steps</h2></p><p>Get your documentation site running locally and make your first customization.</p><p><h3>Step 1: Set up your local environment</h3></p><p><AccordionGroup>
+<p>  <Accordion icon="copy" title="Clone your docs locally"></p>
+<p>    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).</p>
+<p>    </p>
+<p>    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.</p>
+<p>  </Accordion></p>
+<p>  <Accordion icon="rectangle-terminal" title="Start the preview server"></p>
+<p>    1. Install the Mintlify CLI: <code>npm i -g mint</code></p>
+<p>    2. Navigate to your docs directory and run: <code>mint dev</code></p>
+<p>    3. Open <code>http://localhost:3000</code> to see your docs live!</p>
+<p>    </p>
+<p>    <Tip>Your preview updates automatically as you edit files.</Tip></p>
+<p>  </Accordion></p>
+</AccordionGroup></p><p><h3>Step 2: Deploy your changes</h3></p><p><AccordionGroup>
+<p>  <Accordion icon="github" title="Install our GitHub app"></p>
+<p>    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).</p>
+<p>    </p>
+<p>    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.</p>
+<p></Accordion></p>
+<p><Accordion icon="palette" title="Update your site name and colors"></p>
+    For a first change, let's update the name and colors of your docs site.</p><p>    1. Open <code>docs.json</code> in your editor.
+<p>    2. Change the <code>"name"</code> field to your project name.</p>
+<p>    3. Update the <code>"colors"</code> to match your brand.</p>
+    4. Save and see your changes instantly at <code>http://localhost:3000</code>.</p><p>    <Tip>Try changing the primary color to see an immediate difference!</Tip>
+<p>  </Accordion></p>
+</AccordionGroup></p><p><h3>Step 3: Go live</h3></p><p><Accordion icon="rocket" title="Publish your docs">
+<p>  1. Commit and push your changes.</p>
+<p>  2. Your docs will update and be live in moments!</p>
+</Accordion></p><p><h2>Next steps</h2></p><p>Now that you have your docs running, explore these key features:</p><p><CardGroup cols={2}></p><p><Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
+<p>  Learn MDX syntax and start writing your documentation.</p>
+</Card></p><p><Card title="Customize style" icon="palette" href="/essentials/settings">
+<p>  Make your docs match your brand perfectly.</p>
+</Card></p><p><Card title="Add code examples" icon="square-code" href="/essentials/code">
+<p>  Include syntax-highlighted code blocks.</p>
+</Card></p><p><Card title="API documentation" icon="code" href="/api-reference/introduction">
+<p>  Auto-generate API docs from OpenAPI specs.</p>
+</Card></p><p></CardGroup></p><p><Note>
+<p>  <strong>Need help?</strong> See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).</p>
+<p></Note></p>
+
+        </main>
+    </div>
+</body>
+</html>
