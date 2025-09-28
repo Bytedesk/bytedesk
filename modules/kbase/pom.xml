@@ -21,6 +21,16 @@
 	<dependencies>
 
 		<!-- reader -->
+		 <!-- read html -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-jsoup-document-reader -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-jsoup-document-reader</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- read pdf -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-pdf-document-reader -->
 		<dependency>
@@ -35,6 +45,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<!-- read markdown -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
 		<dependency>
@@ -44,6 +56,8 @@
 		</dependency>
 		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
 		<!-- https://tika.apache.org/2.9.0/formats.html -->
+
+		<!-- read other file types, such as doc, docx, xls, xlsx, ppt, pptx, epub, odt, rtf, txt, pdf, html, htm, xml, etc. -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
 		<dependency>
@@ -126,7 +140,7 @@
 		</dependency> -->
 
 		<!-- //////////////////////////////////////////////////////////////// -->
-		
+
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-core</artifactId>

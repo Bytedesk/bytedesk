@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 09:08:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-05 11:10:53
+ * @LastEditTime: 2025-09-28 16:04:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,6 +36,10 @@ import com.bytedesk.core.upload.UploadRestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 解析文件内容
+ * https://tika.apache.org/2.9.0/formats.html
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -115,21 +119,6 @@ public class FileService {
 						.build());
 
 		return pdfReader.read();
-		// 读取所有文档
-		// List<Document> documents = pdfReader.read();
-		// // 提取文本内容
-		// StringBuilder contentBuilder = new StringBuilder();
-		// for (Document doc : documents) {
-		// 	contentBuilder.append(doc.getText()).append("\n");
-		// }
-		// // 保存文本内容到file
-		// // upload.setContent(contentBuilder.toString());
-        // return contentBuilder.toString();
-
-		// 继续原有的分割和存储逻辑
-		// var tokenTextSplitter = new TokenTextSplitter();
-		// List<Document> docList = tokenTextSplitter.split(documents);
-		// storeDocuments(docList, file);
 	}
 
 	public List<Document> readJson(Resource resource) {
@@ -141,20 +130,6 @@ public class FileService {
 		JsonReader jsonReader = new JsonReader(resource, "description");
 
 		return jsonReader.read();
-		// 读取所有文档
-		// List<Document> documents = jsonReader.read();
-		// // 提取文本内容
-		// StringBuilder contentBuilder = new StringBuilder();
-		// for (Document doc : documents) {
-		// 	contentBuilder.append(doc.getText()).append("\n");
-		// }
-		// // 保存文本内容到file
-		// // upload.setContent(contentBuilder.toString());
-        // return contentBuilder.toString();
-
-		// var tokenTextSplitter = new TokenTextSplitter();
-		// List<Document> docList = tokenTextSplitter.split(documents);
-		// storeDocuments(docList, file);
 	}
 
 	// 使用spring ai markdown reader
@@ -168,19 +143,6 @@ public class FileService {
 				MarkdownDocumentReaderConfig.builder().build());
 
 		return markdownReader.read();
-		// List<Document> documents = markdownReader.read();
-		// // 提取文本内容
-		// StringBuilder contentBuilder = new StringBuilder();
-		// for (Document doc : documents) {
-		// 	contentBuilder.append(doc.getText()).append("\n");
-		// }
-		// // 保存文本内容到file
-		// // upload.setContent(contentBuilder.toString());
-        // return contentBuilder.toString();
-
-		// var tokenTextSplitter = new TokenTextSplitter();
-		// List<Document> docList = tokenTextSplitter.split(documents);
-		// storeDocuments(docList, file);
 	}
 
 	public List<Document> readTxt(Resource resource) {
@@ -188,25 +150,10 @@ public class FileService {
 		// Assert.hasText(fileName, "File name must not be empty");
 		// Assert.isTrue(fileName.endsWith(".txt"), String.format("File must end with .txt, got %s", fileName));
 
-		// Resource resource = uploadRestService.loadAsResource(fileName);
 		TextReader textReader = new TextReader(resource);
 		// textReader.getCustomMetadata().put("filename", fileName);
 
 		return textReader.read();
-		// 读取所有文档
-		// List<Document> documents = textReader.read();
-		// // 提取文本内容
-		// StringBuilder contentBuilder = new StringBuilder();
-		// for (Document doc : documents) {
-		// 	contentBuilder.append(doc.getText()).append("\n");
-		// }
-		// // 保存文本内容到file
-		// // upload.setContent(contentBuilder.toString());
-        // return contentBuilder.toString();
-
-		// var tokenTextSplitter = new TokenTextSplitter();
-		// List<Document> docList = tokenTextSplitter.split(documents);
-		// storeDocuments(docList, file);
 	}
 
 	// https://tika.apache.org/2.9.0/formats.html
@@ -216,24 +163,9 @@ public class FileService {
 		// Assert.hasText(fileName, "File name must not be empty");
 		// Assert.notNull(file, "FileEntity must not be null");
 
-		// Resource resource = uploadRestService.loadAsResource(fileName);
 		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
 
 		return tikaDocumentReader.read();
-		// 读取所有文档
-		// List<Document> documents = tikaDocumentReader.read();
-		// // 提取文本内容
-		// StringBuilder contentBuilder = new StringBuilder();
-		// for (Document doc : documents) {
-		// 	contentBuilder.append(doc.getText()).append("\n");
-		// }
-		// // 保存文本内容到file
-		// // upload.setContent(contentBuilder.toString());
-        // return contentBuilder.toString();
-
-		// var tokenTextSplitter = new TokenTextSplitter();
-		// List<Document> docList = tokenTextSplitter.split(documents);
-		// storeDocuments(docList, file);
 	}
 
 	/**
