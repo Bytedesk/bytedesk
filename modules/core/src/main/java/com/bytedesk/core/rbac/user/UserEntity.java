@@ -123,6 +123,15 @@ public class UserEntity extends BaseEntityNoOrg {
 	private String sex = Sex.UNKNOWN.name();
 
 	/**
+	 * Registration source of the user
+	 * Examples: USERNAME, EMAIL, MOBILE, GITHUB, WECHAT, GOOGLE, DINGTALK, FEISHU,
+	 * FACEBOOK, DOUYIN, LDAP, OIDC, OPENID, ADMIN, IMPORT, UNKNOWN
+	 */
+	@Builder.Default
+	@Column(name = "register_source", length = 32)
+	private String registerSource = RegisterSource.UNKNOWN.name();
+
+	/**
 	 * Whether the user account is enabled
 	 */
 	@Builder.Default
@@ -358,6 +367,26 @@ public class UserEntity extends BaseEntityNoOrg {
 		MALE,
 		FEMALE,
 		UNKNOWN // unknown
+	}
+
+	// 注册来源枚举，便于统一使用
+	public enum RegisterSource {
+		USERNAME,
+		EMAIL,
+		MOBILE,
+		GITHUB,
+		WECHAT,
+		GOOGLE,
+		DINGTALK,
+		FEISHU,
+		FACEBOOK,
+		DOUYIN,
+		LDAP,
+		OIDC,
+		OPENID,
+		ADMIN,
+		IMPORT,
+		UNKNOWN
 	}
 
 	public UserProtobuf toProtobuf() {
