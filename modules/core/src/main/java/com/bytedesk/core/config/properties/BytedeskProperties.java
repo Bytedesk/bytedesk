@@ -223,6 +223,11 @@ public class BytedeskProperties {
         private Boolean loginMobileEnable = true;
         // private Boolean loginEmailEnable = false;
         private Boolean loginScanEnable = false;
+        // enable wechat login
+        private Boolean loginWechatEnable = false;
+        private Boolean loginGithubEnable = false;
+        private Boolean loginFacebookEnable = false;
+        private Boolean loginGoogleEnable = false;
         private Boolean docUrlShow = true;
         private String docUrl;
         // default lang: en-US, zh-CN, zh-TW

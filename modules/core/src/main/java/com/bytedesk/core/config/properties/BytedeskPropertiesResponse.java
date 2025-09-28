@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-07 20:45:09
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-12 16:41:59
+ * @LastEditTime: 2025-09-28 09:08:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -50,6 +50,10 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean loginMobileEnable = true;
         // private Boolean loginEmailEnable = false;
         private Boolean loginScanEnable = false;
+        private Boolean loginWechatEnable = false;
+        private Boolean loginGithubEnable = false;
+        private Boolean loginFacebookEnable = false;
+        private Boolean loginGoogleEnable = false;
         private Boolean docUrlShow = true;
         private String docUrl;
         // default lang: en-US, zh-CN, zh-TW
