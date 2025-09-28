@@ -21,7 +21,7 @@
 	<dependencies>
 
 		<!-- reader -->
-		 <!-- read html -->
+		<!-- read html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-jsoup-document-reader -->
 		<dependency>
@@ -54,10 +54,11 @@
 			<artifactId>spring-ai-markdown-document-reader</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+
 		<!-- https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html -->
 		<!-- https://tika.apache.org/2.9.0/formats.html -->
-
-		<!-- read other file types, such as doc, docx, xls, xlsx, ppt, pptx, epub, odt, rtf, txt, pdf, html, htm, xml, etc. -->
+		<!-- read other file types, such as doc, docx, xls, xlsx, ppt, pptx, epub, odt, rtf, txt,
+		pdf, html, htm, xml, etc. -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
 		<dependency>
@@ -76,69 +77,6 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html -->
-		<!-- https://redis.io/docs/latest/develop/interact/search-and-query/ -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-redis -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-vector-store-redis</artifactId>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/chroma.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-chroma-store-spring-boot-starter -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-chroma-store-spring-boot-starter</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/weaviate.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-weaviate-store-spring-boot-starter</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/milvus.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-milvus-store-spring-boot-starter</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/oracle.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-oracle-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/pinecone.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-pinecone-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/qdrant.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-qdrant-store-spring-boot-starter</artifactId>
-		</dependency> -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/typesense.html -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-typesense-spring-boot-starter</artifactId>
-		</dependency> -->
-
 		<!-- //////////////////////////////////////////////////////////////// -->
 
 		<dependency>
@@ -156,7 +94,6 @@
 		</dependency>
 
 		<!-- //////////////////////////////////////////////////////////////// -->
-
 
 	</dependencies>
 

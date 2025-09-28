@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-14 09:08:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-28 16:04:49
+ * @LastEditTime: 2025-09-28 16:27:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,12 +14,16 @@
 package com.bytedesk.kbase.llm_file;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.TextReader;
+import org.springframework.ai.reader.jsoup.JsoupDocumentReader;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
@@ -64,16 +68,35 @@ public class FileService {
 		} else {
 			actualFileName = upload.getFileName();
 		}
-		log.info("Using fileName for type detection: {}", actualFileName);		List<Document> documents;
-		if (actualFileName.toLowerCase().endsWith(".pdf")) {
-			documents = readPdfPage(resource);
-		} else if (actualFileName.toLowerCase().endsWith(".json")) {
-			documents = readJson(resource);
-		} else if (actualFileName.toLowerCase().endsWith(".txt")) {
-			documents = readTxt(resource);
-		} else if (actualFileName.toLowerCase().endsWith(".md")) {
-			documents = readMarkdown(resource);
-		} else {
+		log.info("Using fileName for type detection: {}", actualFileName);
+
+		List<Document> documents;
+		String ext = getFileExtension(actualFileName);
+		try {
+			if (ext.endsWith(".pdf")) {
+				documents = readPdfPage(resource);
+			} else if (ext.endsWith(".json")) {
+				documents = readJson(resource);
+			} else if (ext.endsWith(".txt")) {
+				documents = readTxt(resource);
+			} else if (ext.endsWith(".md")) {
+				documents = readMarkdown(resource);
+			} else if (ext.endsWith(".html") || ext.endsWith(".htm") || ext.endsWith(".xhtml")) {
+				// HTML 使用 Jsoup 解析，自动过滤脚本/样式
+				documents = readHtml(resource);
+			} else if (isTikaPreferred(ext)) {
+				documents = readByTika(resource);
+			} else {
+				// 兜底
+				documents = readByTika(resource);
+			}
+
+			if (documents == null || documents.isEmpty() || allBlank(documents)) {
+				log.warn("Primary reader produced empty content, fallback to Tika. fileName={}", actualFileName);
+				documents = readByTika(resource);
+			}
+		} catch (Exception ex) {
+			log.warn("Primary reader failed, fallback to Tika. fileName={}, error={}", actualFileName, ex.getMessage());
 			documents = readByTika(resource);
 		}
 		
@@ -156,6 +179,12 @@ public class FileService {
 		return textReader.read();
 	}
 
+	// 新增：HTML 专用解析（过滤脚本/样式，保留正文结构）
+	public List<Document> readHtml(Resource resource) {
+		JsoupDocumentReader htmlReader = new JsoupDocumentReader(resource);
+		return htmlReader.read();
+	}
+
 	// https://tika.apache.org/2.9.0/formats.html
 	// PDF, DOC/DOCX, PPT/PPTX, and HTML
 	public List<Document> readByTika(Resource resource) {
@@ -164,7 +193,6 @@ public class FileService {
 		// Assert.notNull(file, "FileEntity must not be null");
 
 		TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(resource);
-
 		return tikaDocumentReader.read();
 	}
 
@@ -237,6 +265,68 @@ public class FileService {
 			// 移除一些可能导致token编码问题的特殊字符
 			.replaceAll("[\\uE000-\\uF8FF]", "") // 私用区字符
 			.trim();
+	}
+
+	// ---------------------------------------------------------
+	// 辅助方法
+	// ---------------------------------------------------------
+
+	private String getFileExtension(String fileName) {
+		if (fileName == null) return "";
+		String lower = fileName.toLowerCase(Locale.ROOT);
+		int idx = lower.lastIndexOf('.');
+		if (idx < 0) return "";
+		return lower.substring(idx);
+	}
+
+	private boolean allBlank(List<Document> docs) {
+		for (Document d : docs) {
+			if (d != null && d.getText() != null && !d.getText().trim().isEmpty()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * 根据扩展名判定是否优先交由 Tika 解析。
+	 * 覆盖范围参考 Tika 2.9.0 支持清单（示例集合，非穷举）。
+	 */
+	private boolean isTikaPreferred(String ext) {
+		if (ext == null || ext.isEmpty()) return true;
+		Set<String> tikaExts = new HashSet<>();
+		// Office OOXML / OLE2
+		tikaExts.add(".doc"); tikaExts.add(".docx");
+		tikaExts.add(".xls"); tikaExts.add(".xlsx");
+		tikaExts.add(".ppt"); tikaExts.add(".pptx");
+		tikaExts.add(".vsd"); tikaExts.add(".vsdx");
+		tikaExts.add(".mpp");
+		// OpenDocument / iWorks / RTF / EPUB / PDF（PDF 单独已处理）
+		tikaExts.add(".odt"); tikaExts.add(".ods"); tikaExts.add(".odp");
+		tikaExts.add(".pages"); tikaExts.add(".numbers"); tikaExts.add(".key");
+		tikaExts.add(".rtf"); tikaExts.add(".epub");
+		// XML / SVG（HTML 已由 Jsoup 处理）
+		tikaExts.add(".xml"); tikaExts.add(".svg");
+		// 压缩与打包
+		tikaExts.add(".zip"); tikaExts.add(".jar"); tikaExts.add(".war"); tikaExts.add(".ear");
+		tikaExts.add(".7z"); tikaExts.add(".rar"); tikaExts.add(".tar");
+		tikaExts.add(".gz"); tikaExts.add(".bz2"); tikaExts.add(".xz");
+		// 邮件与消息
+		tikaExts.add(".mbox"); tikaExts.add(".eml"); tikaExts.add(".msg"); tikaExts.add(".pst"); tikaExts.add(".tnef"); tikaExts.add(".winmail");
+		// 文本类
+		tikaExts.add(".csv"); tikaExts.add(".tsv");
+		// 多媒体（可抽取元数据/有限文本）
+		tikaExts.add(".mp3"); tikaExts.add(".mp4"); tikaExts.add(".mov"); tikaExts.add(".m4v");
+		tikaExts.add(".ogg"); tikaExts.add(".opus"); tikaExts.add(".flac"); tikaExts.add(".wav"); tikaExts.add(".aiff");
+		tikaExts.add(".jpg"); tikaExts.add(".jpeg"); tikaExts.add(".png"); tikaExts.add(".gif"); tikaExts.add(".bmp");
+		tikaExts.add(".tif"); tikaExts.add(".tiff"); tikaExts.add(".webp"); tikaExts.add(".psd"); tikaExts.add(".heic"); tikaExts.add(".heif"); tikaExts.add(".icns"); tikaExts.add(".jxl");
+		// 其他
+		tikaExts.add(".chm"); tikaExts.add(".wmf"); tikaExts.add(".emf");
+		tikaExts.add(".dbf"); tikaExts.add(".mdb"); tikaExts.add(".accdb"); tikaExts.add(".sqlite");
+		tikaExts.add(".java"); tikaExts.add(".class"); tikaExts.add(".jar");
+		tikaExts.add(".xps");
+
+		return tikaExts.contains(ext);
 	}
 
     
