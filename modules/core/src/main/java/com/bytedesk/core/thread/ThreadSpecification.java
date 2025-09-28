@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-26 16:51:52
+ * @LastEditTime: 2025-09-26 16:57:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -122,7 +122,6 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             } else if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
-
             // 其他条件
             if (StringUtils.hasText(request.getUid())) {
                 predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
