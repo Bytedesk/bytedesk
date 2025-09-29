@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-29 11:39:33
+ * @LastEditTime: 2025-09-29 17:13:41
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,7 +29,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -388,17 +387,18 @@ public class RobotService extends AbstractRobotService {
         // 处理消息JSON
         String processedJson = messageService.processMessageJson(messageJson);
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(processedJson);
-        MessageTypeEnum messageType = messageProtobuf.getType();
+        // MessageTypeEnum messageType = messageProtobuf.getType();
         String query = messageProtobuf.getContent();
 
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         Assert.notNull(threadProtobuf, "thread is null");
 
+        // 已经上线多模态能力，暂时不限制消息类型
         // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
-        if (!messageType.equals(MessageTypeEnum.TEXT) &&
-                !messageType.equals(MessageTypeEnum.ROBOT_QUESTION)) {
-            throw new RuntimeException("暂不支持此消息类型");
-        }
+        // if (!messageType.equals(MessageTypeEnum.TEXT) &&
+        //         !messageType.equals(MessageTypeEnum.ROBOT_QUESTION)) {
+        //     throw new RuntimeException("暂不支持此消息类型");
+        // }
 
         String threadTopic = threadProtobuf.getTopic();
         return new MessageValidationResult(messageProtobuf, query, threadProtobuf, threadTopic);
