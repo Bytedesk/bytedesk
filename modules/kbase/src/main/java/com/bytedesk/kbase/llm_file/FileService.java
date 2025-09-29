@@ -95,8 +95,10 @@ public class FileService {
 				// HTML 使用 Jsoup 解析，自动过滤脚本/样式
 				documents = readHtml(resource);
 			} else if (isImageExt(ext)) {
-				// 图片优先走 OCR
-				documents = readByTikaWithOcr(resource, getOcrLanguage());
+				// 图片文件不在 FileService 中处理，已在 FileEventListener 中过滤
+				// 此处作为兜底机制，返回空文档列表
+				log.debug("图片文件跳过 FileService 处理（兜底机制）: {}", actualFileName);
+				documents = new ArrayList<>();
 			} else if (isTikaPreferred(ext)) {
 				documents = readByTika(resource);
 			} else {
@@ -106,18 +108,26 @@ public class FileService {
 
 			if (documents == null || documents.isEmpty() || allBlank(documents)) {
 				log.warn("Primary reader produced empty content, fallback to Tika. fileName={}", actualFileName);
-				// 对 PDF 和图片优先尝试 OCR
-				if (ext.endsWith(".pdf") || isImageExt(ext)) {
+				// 对 PDF 优先尝试 OCR，图片文件跳过
+				if (ext.endsWith(".pdf")) {
 					documents = readByTikaWithOcr(resource, getOcrLanguage());
+				} else if (isImageExt(ext)) {
+					// 图片文件不进行 fallback OCR 处理
+					log.debug("图片文件跳过 fallback OCR 处理（兜底机制）: {}", actualFileName);
+					documents = new ArrayList<>();
 				} else {
 					documents = readByTika(resource);
 				}
 			}
 		} catch (Exception ex) {
 			log.warn("Primary reader failed, fallback to Tika. fileName={}, error={}", actualFileName, ex.getMessage());
-			// 异常时对 PDF/图片优先尝试 OCR
-			if (ext.endsWith(".pdf") || isImageExt(ext)) {
+			// 异常时对 PDF 优先尝试 OCR，图片文件跳过
+			if (ext.endsWith(".pdf")) {
 				documents = readByTikaWithOcr(resource, getOcrLanguage());
+			} else if (isImageExt(ext)) {
+				// 图片文件异常时也不进行 OCR 处理
+				log.debug("图片文件异常时跳过 OCR 处理（兜底机制）: {}", actualFileName);
+				documents = new ArrayList<>();
 			} else {
 				documents = readByTika(resource);
 			}

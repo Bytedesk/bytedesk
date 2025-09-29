@@ -25,6 +25,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
+import com.bytedesk.core.utils.BdUploadUtils;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkTypeEnum;
@@ -52,6 +53,12 @@ public class FileEventListener {
         UploadEntity upload = event.getUpload();
         // 专门存储大模型上传文件记录
         if (UploadTypeEnum.LLM_FILE.name().equalsIgnoreCase(upload.getType())) {
+            // 检查是否为图片文件，如果是图片则跳过，交由OcrEventListener异步处理
+            if (BdUploadUtils.isImageFile(upload.getFileName(), upload.getFileType())) {
+                log.info("跳过图片文件处理，交由OcrEventListener处理: {} ({})", upload.getFileName(), upload.getFileType());
+                return;
+            }
+            
             log.info("UploadEventListener LLM_FILE: {} - 开始使用MQ处理", upload.getFileName());
             
             try {
