@@ -1319,7 +1319,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
             if (StringUtils.hasLength(content) && !isEmitterCompleted(emitter)) {
                 // 使用 RobotStreamContent 包装流式片段，类型改为 ROBOT_STREAM
                 StreamContent.StreamContentBuilder<?, ?> builder = StreamContent.builder()
-                        .answer(content);
+                        .answer(content)
+                        // 将用户提问同步写入，便于前端进行问答配对
+                        .question(messageProtobufQuery != null ? messageProtobufQuery.getContent() : null)
+                        .questionUid(messageProtobufQuery != null ? messageProtobufQuery.getUid() : null);
                 if (StringUtils.hasLength(reasonContent)) {
                     builder.reasonContent(reasonContent);
                 }

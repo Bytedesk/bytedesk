@@ -205,7 +205,8 @@ public class MessageUnreadRestService
     }
 
     public long getUnreadCount(MessageUnreadRequest request) {
-        if (!StringUtils.hasText(request.getUid())) {
+        if (!StringUtils.hasText(request.getUid()) 
+            || !StringUtils.hasText(request.getOrgUid())) {
             return 0;
         }
         // 

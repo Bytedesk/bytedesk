@@ -26,6 +26,9 @@ public class StreamContent extends BaseContent {
 
     private String question;
     
+    // 用户提问消息的唯一标识，用于前端进行问题与答案的配对
+    private String questionUid;
+    
     private String answer;
     
     // 推理内容（例如部分模型返回的 reasoningContent）
