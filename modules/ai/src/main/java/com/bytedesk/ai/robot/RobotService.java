@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-03-11 17:29:51
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-24 14:42:15
+ * @LastEditTime: 2025-09-29 11:39:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
@@ -253,6 +254,30 @@ public class RobotService extends AbstractRobotService {
         } catch (Exception e) {
             log.error("Error in contextTemplateSummary", e);
             throw new RuntimeException("Service error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * OCR文字提取服务 - 图片文字识别，不需要知识库
+     */
+    public String ocrExtraction(String imageUrl, String orgUid) {
+        try {
+            if (!StringUtils.hasText(imageUrl)) {
+                throw new IllegalArgumentException("Image URL cannot be null or empty");
+            }
+            if (!StringUtils.hasText(orgUid)) {
+                throw new IllegalArgumentException("Organization UID cannot be null or empty");
+            }
+            
+            // 创建包含图片的消息内容
+            String content = "请提取图片中的文字内容"; // 基本提示词，实际提示词在robots.json中定义
+            
+            // 使用多模态处理，传入图片URL
+            return processMultiModalSyncRequest(RobotConsts.ROBOT_NAME_OCR_EXTRACTION, orgUid, content, imageUrl,
+                    I18Consts.I18N_LLM_CONFIG_TIP, false);
+        } catch (Exception e) {
+            log.error("Error in ocrExtraction for imageUrl: {}", imageUrl, e);
+            throw new RuntimeException("OCR extraction service error: " + e.getMessage());
         }
     }
 

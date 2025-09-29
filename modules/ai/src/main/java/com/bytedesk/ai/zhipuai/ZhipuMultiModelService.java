@@ -525,6 +525,73 @@ public class ZhipuMultiModelService extends BaseSpringAIService {
         }
     }
 
+    /**
+     * 多模态同步请求处理，支持图片等媒体类型
+     */
+    public String processMultiModalSyncRequest(MessageProtobuf messageProtobuf, RobotProtobuf robot, boolean searchKnowledgeBase) {
+        try {
+            String model = getModel(robot);
+            
+            // 构建多模态内容
+            List<MessageContent> userContents = buildUserContentsFromMessage(messageProtobuf);
+            if (userContents.isEmpty()) {
+                // 如果没有有效的多模态内容，回退到纯文本处理
+                return processPromptSync(messageProtobuf.getContent(), robot);
+            }
+            
+            // 构建消息列表
+            List<ChatMessage> msgs = new ArrayList<>();
+            
+            // 如果需要搜索知识库，添加系统消息（这里暂时跳过，因为OCR通常不需要知识库）
+            if (searchKnowledgeBase && robot != null) {
+                // 可以在这里添加知识库相关的系统提示
+            }
+            
+            // 添加用户消息
+            msgs.add(ChatMessage.builder()
+                    .role(ChatMessageRole.USER.value())
+                    .content(userContents)
+                    .build());
+            
+            // 获取客户端
+            ZhipuAiClient client = createDynamicClient(robot != null ? robot.getLlm() : null);
+            if (client == null) {
+                log.error("No available ZhipuAiClient for multi-modal sync");
+                return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+            }
+            
+            // 启用思维模式（如果配置了）
+            boolean enableThinking = robot != null && robot.getLlm() != null
+                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+            
+            // 构建请求
+            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+                    .model(model)
+                    .messages(msgs)
+                    .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
+                            .build())
+                    .build();
+                    
+            long start = System.currentTimeMillis();
+            ChatCompletionResponse resp = client.chat().createChatCompletion(req);
+            boolean success = resp != null && resp.isSuccess();
+            String text = success ? extractFinalTextFromResponse(resp) : null;
+            if (text == null) text = "";
+            text = stripThinkTags(text);
+            
+            // 记录用量事件（粗略估算）
+            long promptTokens = estimateTokens("multi-modal-input");
+            long completionTokens = estimateTokens(text);
+            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens, completionTokens, success,
+                    System.currentTimeMillis() - start);
+            
+            return text;
+        } catch (Exception e) {
+            log.error("processMultiModalSyncRequest failed", e);
+            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+        }
+    }
+
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {

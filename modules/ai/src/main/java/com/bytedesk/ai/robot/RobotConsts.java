@@ -95,6 +95,7 @@ public class RobotConsts {
     public static final String ROBOT_NAME_ENTITY_EXTRACTION = "entity_extraction"; // 实体提取
     public static final String ROBOT_NAME_RELATIONSHIP_EXTRACTION = "relationship_extraction"; // 关系提取
     public static final String ROBOT_NAME_QUESTION_SUGGEST = "question_suggest"; // 问题建议
+    public static final String ROBOT_NAME_OCR_EXTRACTION = "ocr_extraction"; // OCR文字提取
 
     // 默认客服问答提示词
     public static final String ROBOT_LLM_DEFAULT_PROMPT = """

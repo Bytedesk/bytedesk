@@ -15,9 +15,11 @@ package com.bytedesk.ai.robot;
 
 import java.util.Optional;
 
-import com.bytedesk.ai.springai.service.SpringAIService;
+import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class AbstractRobotService {
-
+    
     /**
      * 获取RobotRestService实例，由子类实现
      */
@@ -58,16 +60,16 @@ public abstract class AbstractRobotService {
      * 通用的直接调用 LLM 方法，支持自定义错误消息和控制是否查询知识库
      */
     protected String processSyncRequest(String robotName, String orgUid, String query, String errorMessage, boolean searchKnowledgeBase) {
+        log.info("processSyncRequest robotName: {}, orgUid: {}, query: {}, searchKnowledgeBase: {}", 
+                robotName, orgUid, query, searchKnowledgeBase);
+
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
         if (robotOptional.isPresent()) {
-            RobotLlm llm = robotOptional.get().getLlm();
-            String provider = llm.getTextProvider();
+            String provider = robotOptional.get().getLlm().getTextProvider();
+            log.info("processSyncRequest provider: {}", provider);
 
             try {
-                // Get the appropriate service from registry
-                SpringAIService service = getSpringAIServiceRegistry().getServiceByProviderName(provider);
-
-                // 使用新添加的接口方法直接调用大模型并获取结果
+                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
                 RobotProtobuf robot = RobotProtobuf.convertFromRobotEntity(robotOptional.get());
                 //
                 return service.processSyncRequest(query, robot, searchKnowledgeBase);
@@ -78,5 +80,69 @@ public abstract class AbstractRobotService {
             }
         }
         return "Robot not found";
+    }
+
+    /**
+     * 通用的多模态直接调用 LLM 方法，支持图片URL输入
+     */
+    protected String processMultiModalSyncRequest(String robotName, String orgUid, String textQuery, String imageUrl, String errorMessage, boolean searchKnowledgeBase) {
+        log.info("processMultiModalSyncRequest robotName: {}, orgUid: {}, textQuery: {}, imageUrl: {}, searchKnowledgeBase: {}", 
+                robotName, orgUid, textQuery, imageUrl, searchKnowledgeBase);
+
+        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
+        if (robotOptional.isPresent()) {
+            String provider = robotOptional.get().getLlm().getTextProvider();
+            log.info("processMultiModalSyncRequest provider: {}", provider);
+
+            try {
+                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
+                RobotProtobuf robot = RobotProtobuf.convertFromRobotEntity(robotOptional.get());
+                
+                // 如果服务支持多模态处理（如ZhipuMultiModelService），使用多模态方法
+                if (service instanceof com.bytedesk.ai.zhipuai.ZhipuMultiModelService) {
+                    com.bytedesk.ai.zhipuai.ZhipuMultiModelService multiModelService = 
+                        (com.bytedesk.ai.zhipuai.ZhipuMultiModelService) service;
+                    
+                    // 创建包含图片的MessageProtobuf
+                    MessageProtobuf imageMessage = createImageMessage(imageUrl, textQuery);
+                    return multiModelService.processMultiModalSyncRequest(imageMessage, robot, searchKnowledgeBase);
+                } else {
+                    // 回退到文本处理，附加图片URL信息
+                    String combinedQuery = textQuery + " (图片链接: " + imageUrl + ")";
+                    return service.processSyncRequest(combinedQuery, robot, searchKnowledgeBase);
+                }
+
+            } catch (IllegalArgumentException e) {
+                log.warn("Provider {} not found for multi-modal request", provider);
+                throw new RuntimeException(errorMessage);
+            }
+        }
+        return "Robot not found";
+    }
+
+    /**
+     * 创建包含图片信息的MessageProtobuf
+     */
+    private MessageProtobuf createImageMessage(String imageUrl, String textQuery) {
+        try {
+            // 创建ImageContent
+            com.bytedesk.core.message.content.ImageContent imageContent = 
+                com.bytedesk.core.message.content.ImageContent.builder()
+                    .url(imageUrl)
+                    .label(textQuery)
+                    .build();
+            
+            return MessageProtobuf.builder()
+                    .type(MessageTypeEnum.IMAGE)
+                    .content(imageContent.toJson())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error creating image message", e);
+            // 回退创建文本消息
+            return MessageProtobuf.builder()
+                    .type(MessageTypeEnum.TEXT)
+                    .content(textQuery)
+                    .build();
+        }
     }
 }
