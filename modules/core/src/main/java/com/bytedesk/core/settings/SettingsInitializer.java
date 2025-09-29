@@ -31,7 +31,7 @@ public class SettingsInitializer implements SmartInitializingSingleton {
         initPermissions();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        settingsRestService.initSettingss(orgUid);
+        settingsRestService.initSettings(orgUid);
     }
 
     private void initPermissions() {

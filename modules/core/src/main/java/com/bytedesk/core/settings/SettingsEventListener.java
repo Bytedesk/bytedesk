@@ -36,7 +36,7 @@ public class SettingsEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("thread - organization created: {}", organization.getName());
-        settingsRestService.initSettingss(orgUid);
+        settingsRestService.initSettings(orgUid);
     }
 
  
