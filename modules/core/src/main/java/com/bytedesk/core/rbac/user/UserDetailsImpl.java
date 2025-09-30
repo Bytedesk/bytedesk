@@ -34,6 +34,8 @@ import com.bytedesk.core.utils.ConvertUtils;
 @Data
 public class UserDetailsImpl implements UserDetails {
 
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private String uid;
     private String username;
