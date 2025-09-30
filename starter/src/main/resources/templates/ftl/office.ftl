@@ -63,7 +63,7 @@ Hero Section START -->
 
 <!-- =======================
 Core Features START -->
-<section id="features" class="bg-light py-5">
+<section id="features" class="bg-body-tertiary py-5">
 	<div class="container">
 		<!-- Title -->
 		<div class="row mb-5">
@@ -77,7 +77,7 @@ Core Features START -->
 
 			<!-- AI对话编辑 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-primary bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-comments text-primary fa-2x"></i>
 					</div>
@@ -88,7 +88,7 @@ Core Features START -->
 
 			<!-- 多格式支持 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-success bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-file-alt text-success fa-2x"></i>
 					</div>
@@ -99,7 +99,7 @@ Core Features START -->
 
 			<!-- 语音转文字 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-microphone text-warning fa-2x"></i>
 					</div>
@@ -110,7 +110,7 @@ Core Features START -->
 
 			<!-- 智能文字校对 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-info bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-spell-check text-info fa-2x"></i>
 					</div>
@@ -121,7 +121,7 @@ Core Features START -->
 
 			<!-- 内容扩展 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-purple bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-expand-arrows-alt fa-2x" style="color: #6f42c1;"></i>
 					</div>
@@ -143,9 +143,9 @@ Core Features START -->
 
 			<!-- 格式化输出 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-dark bg-opacity-10 rounded-circle mx-auto mb-3">
-						<i class="fas fa-align-left text-dark fa-2x"></i>
+						<i class="fas fa-align-left text-body fa-2x"></i>
 					</div>
 					<h5 class="mb-3">智能格式化</h5>
 					<p class="mb-0">自动调整段落结构、标题层级、列表格式，生成美观专业的文档布局</p>
@@ -154,7 +154,7 @@ Core Features START -->
 
 			<!-- 逐段编辑 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-danger bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-edit text-danger fa-2x"></i>
 					</div>
@@ -232,14 +232,14 @@ Use Cases START -->
 
 <!-- =======================
 Demo Section START -->
-<section id="demo" class="bg-light py-5">
+<section id="demo" class="bg-body-tertiary py-5">
 	<div class="container">
 		<div class="row g-4 align-items-center">
 			<div class="col-lg-6">
 				<h2 class="fw-bold mb-4">AI对话编辑演示</h2>
 				<p class="mb-4">看看我们的AI是如何通过简单的对话来帮助您编辑文档的：</p>
 				
-				<div class="bg-white rounded-3 p-4 mb-4 shadow-sm">
+				<div class="bg-body rounded-3 p-4 mb-4 shadow-sm">
 					<div class="d-flex align-items-start mb-3">
 						<div class="bg-primary rounded-circle p-2 me-3">
 							<i class="fas fa-user text-white"></i>
@@ -367,7 +367,7 @@ Benefits START -->
 
 <!-- =======================
 Pricing START -->
-<section class="bg-light py-5">
+<section class="bg-body-tertiary py-5">
 	<div class="container">
 		<div class="row mb-5">
 			<div class="col-lg-8 mx-auto text-center">
@@ -379,7 +379,7 @@ Pricing START -->
 		<div class="row g-4">
 			<!-- 免费版 -->
 			<div class="col-lg-4">
-				<div class="bg-white rounded-3 p-4 h-100 shadow-sm text-center">
+				<div class="bg-body rounded-3 p-4 h-100 shadow-sm text-center">
 					<h4 class="mb-3">免费版</h4>
 					<div class="display-6 fw-bold text-primary mb-3">¥0</div>
 					<p class="text-muted mb-4">适合个人用户体验</p>
@@ -396,7 +396,7 @@ Pricing START -->
 
 			<!-- 专业版 -->
 			<div class="col-lg-4">
-				<div class="bg-white rounded-3 p-4 h-100 shadow border-primary position-relative">
+				<div class="bg-body rounded-3 p-4 h-100 shadow border-primary position-relative">
 					<div class="position-absolute top-0 start-50 translate-middle">
 						<span class="badge bg-primary">推荐</span>
 					</div>
@@ -419,7 +419,7 @@ Pricing START -->
 
 			<!-- 企业版 -->
 			<div class="col-lg-4">
-				<div class="bg-white rounded-3 p-4 h-100 shadow-sm text-center">
+				<div class="bg-body rounded-3 p-4 h-100 shadow-sm text-center">
 					<h4 class="mb-3">企业版</h4>
 					<div class="display-6 fw-bold text-primary mb-3">定制</div>
 					<p class="text-muted mb-4">适合大型企业和机构</p>

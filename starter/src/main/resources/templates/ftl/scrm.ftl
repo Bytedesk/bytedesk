@@ -63,7 +63,7 @@ Hero Section START -->
 
 <!-- =======================
 Core Features START -->
-<section id="features" class="bg-light py-5">
+<section id="features" class="bg-body-tertiary py-5">
 	<div class="container">
 		<!-- Title -->
 		<div class="row mb-5">
@@ -77,7 +77,7 @@ Core Features START -->
 
 			<!-- AI客户画像 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-primary bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-user-circle text-primary fa-2x"></i>
 					</div>
@@ -88,7 +88,7 @@ Core Features START -->
 
 			<!-- 多渠道数据整合 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-success bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-project-diagram text-success fa-2x"></i>
 					</div>
@@ -99,7 +99,7 @@ Core Features START -->
 
 			<!-- 销售漏斗管理 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-funnel-dollar text-warning fa-2x"></i>
 					</div>
@@ -110,7 +110,7 @@ Core Features START -->
 
 			<!-- 智能营销自动化 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-info bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-robot text-info fa-2x"></i>
 					</div>
@@ -121,7 +121,7 @@ Core Features START -->
 
 			<!-- 客户生命周期管理 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-purple bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-sync-alt fa-2x" style="color: #6f42c1;"></i>
 					</div>
@@ -132,7 +132,7 @@ Core Features START -->
 
 			<!-- 数据分析报表 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-secondary bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-chart-bar text-secondary fa-2x"></i>
 					</div>
@@ -145,7 +145,7 @@ Core Features START -->
 			<div class="col-sm-6 col-lg-4">
 				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-dark bg-opacity-10 rounded-circle mx-auto mb-3">
-						<i class="fas fa-history text-dark fa-2x"></i>
+						<i class="fas fa-history text-body fa-2x"></i>
 					</div>
 					<h5 class="mb-3">客户服务记录</h5>
 					<p class="mb-0">完整记录客户服务历史，支持通话录音、聊天记录、邮件往来等全记录</p>
@@ -232,14 +232,14 @@ Use Cases START -->
 
 <!-- =======================
 Demo Section START -->
-<section id="demo" class="bg-light py-5">
+<section id="demo" class="bg-body-tertiary py-5">
 	<div class="container">
 		<div class="row g-4 align-items-center">
 			<div class="col-lg-6">
 				<h2 class="fw-bold mb-4">AI客户分析演示</h2>
 				<p class="mb-4">看看我们的AI是如何智能分析客户数据，提供精准的客户洞察：</p>
 				
-				<div class="bg-white rounded-3 p-4 mb-4 shadow-sm">
+				<div class="bg-body rounded-3 p-4 mb-4 shadow-sm">
 					<div class="d-flex align-items-start mb-3">
 						<div class="bg-primary rounded-circle p-2 me-3">
 							<i class="fas fa-user text-white"></i>
@@ -367,7 +367,7 @@ Benefits START -->
 
 <!-- =======================
 Pricing START -->
-<section class="bg-light py-5">
+<section class="bg-body-tertiary py-5">
 	<div class="container">
 		<div class="row mb-5">
 			<div class="col-lg-8 mx-auto text-center">
@@ -379,7 +379,7 @@ Pricing START -->
 		<div class="row g-4">
 			<!-- 基础版 -->
 			<div class="col-lg-4">
-				<div class="bg-white rounded-3 p-4 h-100 shadow-sm text-center">
+				<div class="bg-body rounded-3 p-4 h-100 shadow-sm text-center">
 					<h4 class="mb-3">基础版</h4>
 					<div class="display-6 fw-bold text-primary mb-3">¥199<small class="fs-6 text-muted">/月</small></div>
 					<p class="text-muted mb-4">适合10人以下小团队</p>
@@ -397,7 +397,7 @@ Pricing START -->
 
 			<!-- 专业版 -->
 			<div class="col-lg-4">
-				<div class="bg-white rounded-3 p-4 h-100 shadow border-primary position-relative">
+				<div class="bg-body rounded-3 p-4 h-100 shadow border-primary position-relative">
 					<div class="position-absolute top-0 start-50 translate-middle">
 						<span class="badge bg-primary">推荐</span>
 					</div>
@@ -420,7 +420,7 @@ Pricing START -->
 
 			<!-- 企业版 -->
 			<div class="col-lg-4">
-				<div class="bg-white rounded-3 p-4 h-100 shadow-sm text-center">
+				<div class="bg-body rounded-3 p-4 h-100 shadow-sm text-center">
 					<h4 class="mb-3">企业版</h4>
 					<div class="display-6 fw-bold text-primary mb-3">定制</div>
 					<p class="text-muted mb-4">适合大型企业和集团</p>

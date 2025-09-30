@@ -30,7 +30,7 @@
 		if(el != 'undefined' && el != null) {
 			const showActiveTheme = theme => {
 			const activeThemeIcon = document.querySelector('.theme-icon-active use')
-			const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+			const btnToActive = document.querySelector('[data-bs-theme-value="' + theme + '"]')
 			const svgOfActiveBtn = btnToActive.querySelector('.theme-icon use').getAttribute('href')
 
 			document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
