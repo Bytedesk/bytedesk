@@ -36,6 +36,7 @@ import lombok.experimental.Accessors;
 public class AutoReplySettingsResponse implements Serializable {
 
     // 自动回复开关
+    private static final long serialVersionUID = 1L;
     @Builder.Default
     private Boolean autoReplyEnabled = false;
 

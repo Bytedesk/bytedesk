@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FaqResponseVisitor implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     protected String uid;
 
     private String orgUid;

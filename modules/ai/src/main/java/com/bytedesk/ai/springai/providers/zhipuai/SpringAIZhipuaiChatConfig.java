@@ -54,7 +54,9 @@ public class SpringAIZhipuaiChatConfig {
     @Bean("bytedeskZhipuaiApi")
     ZhiPuAiApi bytedeskZhipuaiApi() {
         // return new ZhiPuAiApi(zhipuaiBaseUrl, zhipuaiApiKey);
-        return new ZhiPuAiApi(zhipuaiApiKey);
+        return ZhiPuAiApi.builder()
+                .apiKey(zhipuaiApiKey)
+                .build();
     }
 
     @Bean("bytedeskZhipuaiChatOptions")

@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 public class LlmProviderConfigDefault implements Serializable {
     
     // Chat 配置
+    private static final long serialVersionUID = 1L;
     private String defaultChatProvider;
     private String defaultChatModel;
     

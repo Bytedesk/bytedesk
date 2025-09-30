@@ -17,7 +17,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -50,8 +50,8 @@ public class SpringAIOllamaChatConfig {
     }
 
     @Bean("bytedeskOllamaChatOptions")
-    OllamaOptions bytedeskOllamaChatOptions() {
-        return OllamaOptions.builder()
+    OllamaChatOptions bytedeskOllamaChatOptions() {
+        return OllamaChatOptions.builder()
                 .model(ollamaChatOptionsModel)
                 // 使用keepAlive而不是timeout来设置超时
                 // .keepAlive("30s") // 使用30秒的超时设置

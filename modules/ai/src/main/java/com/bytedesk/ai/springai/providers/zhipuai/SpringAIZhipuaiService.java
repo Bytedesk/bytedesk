@@ -72,7 +72,9 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     }
 
     public ZhiPuAiApi createZhipuaiApi(String apiKey) {
-        return new ZhiPuAiApi(apiKey);
+        return ZhiPuAiApi.builder()
+                .apiKey(apiKey)
+                .build();
     }
 
     /**

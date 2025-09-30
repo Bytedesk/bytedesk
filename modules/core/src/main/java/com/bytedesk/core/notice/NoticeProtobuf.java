@@ -43,6 +43,7 @@ public class NoticeProtobuf implements Serializable {
     }
 
     public String toJson() {
+    private static final long serialVersionUID = 1L;
         return JSON.toJSONString(this);
     }
 }

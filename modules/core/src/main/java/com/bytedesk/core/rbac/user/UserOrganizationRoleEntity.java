@@ -68,7 +68,9 @@ public class UserOrganizationRoleEntity implements Serializable  {
         joinColumns = @JoinColumn(name = "user_org_role_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"authorities"})
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({
+    private static final long serialVersionUID = 1L;
+"authorities"})
     private Set<RoleEntity> roles = new HashSet<>();
     
     // 用户角色有效期

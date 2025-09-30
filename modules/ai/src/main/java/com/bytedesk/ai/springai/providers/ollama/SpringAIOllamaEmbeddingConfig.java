@@ -17,7 +17,7 @@ import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.model.SpringAIModels;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -53,8 +53,8 @@ public class SpringAIOllamaEmbeddingConfig {
     }
 
     @Bean("bytedeskOllamaEmbeddingOptions")
-    OllamaOptions bytedeskOllamaEmbeddingOptions() {
-        return OllamaOptions.builder()
+    OllamaEmbeddingOptions bytedeskOllamaEmbeddingOptions() {
+        return OllamaEmbeddingOptions.builder()
                 .model(ollamaEmbeddingOptionsModel)
                 .build();
     }

@@ -60,6 +60,7 @@ public class QuartzJob extends QuartzJobBean implements Serializable {
     }
 
     public void test2() {
+    private static final long serialVersionUID = 1L;
         log.info("quartz job test2 is running");
     }
     

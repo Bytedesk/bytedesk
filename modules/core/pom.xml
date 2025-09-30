@@ -17,7 +17,8 @@
 
 	<properties>
 		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>
-		<protobuf.version>3.25.5</protobuf.version>
+		<protobuf.version>4.28.2</protobuf.version>
+		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<os-maven-plugin.version>1.7.1</os-maven-plugin.version>
 	</properties>
 
@@ -300,16 +301,14 @@
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
-				<version>0.6.1</version>
+				<version>${protobuf-maven-plugin.version}</version>
 				<configuration>
 					<protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
-					<!-- <protocExecutable>protoc</protocExecutable> -->
 					<protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
 					<outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>
 					<clearOutputDirectory>false</clearOutputDirectory>
 				</configuration>
 				<executions>
-					<!-- 生成java类 -->
 					<execution>
 						<goals>
 							<goal>compile</goal>
@@ -330,8 +329,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<!--<source>target/generated-sources/protobuf/java</source>-->
-								<source>src/main/java</source>
+								<source>target/generated-sources/protobuf/java</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -348,6 +346,27 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<!-- Maven 编译器插件 - 配置警告抑制 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<source>17</source>
+					<target>17</target>
+					<compilerArgs>
+						<!-- 抑制 protobuf 生成代码的警告 -->
+						<arg>-Xlint:-serial</arg>
+						<arg>-Xlint:-rawtypes</arg>
+						<arg>-Xlint:-unchecked</arg>
+						<!-- 为生成的代码目录添加警告抑制 -->
+						<arg>-Xmaxwarns</arg>
+						<arg>10000</arg>
+					</compilerArgs>
+					<!-- 为 protobuf 生成的代码配置特殊处理 -->
+					<generatedSourcesDirectory>target/generated-sources/protobuf/java</generatedSourcesDirectory>
+				</configuration>
 			</plugin>
 
 		</plugins>

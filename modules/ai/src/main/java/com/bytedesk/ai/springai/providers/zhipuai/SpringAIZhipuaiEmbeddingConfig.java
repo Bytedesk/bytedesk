@@ -53,9 +53,13 @@ public class SpringAIZhipuaiEmbeddingConfig {
     @Bean("bytedeskZhipuaiEmbeddingApi")
     ZhiPuAiApi bytedeskZhipuaiEmbeddingApi() {
         if (zhipuaiEmbeddingApiKey != null && !zhipuaiEmbeddingApiKey.isEmpty()) {
-            return new ZhiPuAiApi(zhipuaiEmbeddingApiKey);
+            return ZhiPuAiApi.builder()
+                    .apiKey(zhipuaiEmbeddingApiKey)
+                    .build();
         } else {
-            return new ZhiPuAiApi(zhipuaiApiKey);
+            return ZhiPuAiApi.builder()
+                    .apiKey(zhipuaiApiKey)
+                    .build();
         }
     }
 

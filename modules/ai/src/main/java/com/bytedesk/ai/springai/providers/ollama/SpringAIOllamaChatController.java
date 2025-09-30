@@ -22,7 +22,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +59,7 @@ public class SpringAIOllamaChatController {
     public ResponseEntity<JsonResult<?>> chatSync(OllamaRequest request) {
         // 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
-        OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
+        OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
         OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
@@ -81,7 +81,7 @@ public class SpringAIOllamaChatController {
         Prompt prompt = new Prompt(new UserMessage(request.getMessage()));
         // 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
-        OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
+        OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
         OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model != null) {
             return model.stream(prompt);
@@ -129,7 +129,7 @@ public class SpringAIOllamaChatController {
     public ResponseEntity<JsonResult<?>> chatCustom(OllamaRequest request) {
 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
-        OllamaOptions options = OllamaOptions.builder().model(request.getModel()).build();
+        OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
         OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));

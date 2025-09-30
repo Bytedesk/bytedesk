@@ -19,7 +19,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
-import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -60,13 +60,13 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
     }
 
     /**
-     * 根据机器人配置创建动态的OllamaOptions
+     * 根据机器人配置创建动态的OllamaChatOptions
      * 
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OllamaOptions createOllamaOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> OllamaOptions.builder()
+    private OllamaChatOptions createOllamaChatOptions(RobotLlm llm) {
+        return super.createDynamicOptions(llm, robotLlm -> OllamaChatOptions.builder()
                 .model(robotLlm.getTextModel())
                 .temperature(robotLlm.getTemperature())
                 .topP(robotLlm.getTopP())
@@ -198,7 +198,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
                 // 如果有robot参数，尝试创建自定义选项
                 if (robot != null && robot.getLlm() != null) {
                     // 创建自定义选项
-                    OllamaOptions customOptions = createOllamaOptions(robot.getLlm());
+                    OllamaChatOptions customOptions = createOllamaChatOptions(robot.getLlm());
                     if (customOptions != null) {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
