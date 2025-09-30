@@ -183,17 +183,25 @@ bytedesk/
 <!-- - [Email](mailto:270580156@qq.com) -->
 <!-- - [微信](./images/wechat.png) -->
 - 扫码加微信，入群，备注：微语
-- <img src="./images/wechat.png" width="100">
+
+![微信二维码](./images/wechat.png)
 <!-- - 微语技术支持群：
-- <img src="./images/wechat_group.jpg" width="100"> -->
+![微信群二维码](./images/wechat_group.jpg) -->
 - 服务号
-- <img src="./images/wechat_mp.jpg" width="100">
+
+![微信服务号二维码](./images/wechat_mp.jpg)
+
 - 订阅号
-- <img src="./images/wechatai_mp.jpg" width="100">
+
+![微信订阅号二维码](./images/wechatai_mp.jpg)
+
 - 软著
-- <img src="./images/copyright.png" width="100">
+
+![软件著作权证书](./images/copyright.png)
+
 - 商标
-- <img src="./images/trademark.jpg" width="100">
+
+![商标证书](./images/trademark.jpg)
 
 ## License
 

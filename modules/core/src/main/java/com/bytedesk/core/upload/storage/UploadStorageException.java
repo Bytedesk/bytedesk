@@ -15,6 +15,8 @@ package com.bytedesk.core.upload.storage;
 
 public class UploadStorageException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	public UploadStorageException(String message) {
 		super(message);
 	}
