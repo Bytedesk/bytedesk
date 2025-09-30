@@ -143,7 +143,7 @@ Core Features START -->
 
 			<!-- 客户服务记录 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-dark bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-history text-body fa-2x"></i>
 					</div>
@@ -154,7 +154,7 @@ Core Features START -->
 
 			<!-- 智能客户分群 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-danger bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-layer-group text-danger fa-2x"></i>
 					</div>
@@ -165,7 +165,7 @@ Core Features START -->
 
 			<!-- 任务提醒系统 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-success bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-bell text-success fa-2x"></i>
 					</div>
@@ -381,7 +381,7 @@ Pricing START -->
 			<div class="col-lg-4">
 				<div class="bg-body rounded-3 p-4 h-100 shadow-sm text-center">
 					<h4 class="mb-3">基础版</h4>
-					<div class="display-6 fw-bold text-primary mb-3">¥199<small class="fs-6 text-muted">/月</small></div>
+					<div class="display-6 fw-bold text-primary mb-3">价格面议</div>
 					<p class="text-muted mb-4">适合10人以下小团队</p>
 					<ul class="list-unstyled mb-4">
 						<li class="mb-2"><i class="fas fa-check text-success me-2"></i>1000个客户档案</li>
@@ -403,7 +403,7 @@ Pricing START -->
 					</div>
 					<div class="text-center">
 						<h4 class="mb-3">专业版</h4>
-						<div class="display-6 fw-bold text-primary mb-3">¥599<small class="fs-6 text-muted">/月</small></div>
+						<div class="display-6 fw-bold text-primary mb-3">价格面议</div>
 						<p class="text-muted mb-4">适合50人以下中型团队</p>
 						<ul class="list-unstyled mb-4">
 							<li class="mb-2"><i class="fas fa-check text-success me-2"></i>10000个客户档案</li>

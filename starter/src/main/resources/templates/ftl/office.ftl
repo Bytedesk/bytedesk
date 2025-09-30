@@ -114,8 +114,8 @@ Core Features START -->
 					<div class="icon-xl bg-info bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-spell-check text-info fa-2x"></i>
 					</div>
-					<h5 class="mb-3">智能文字校对</h5>
-					<p class="mb-0">AI驱动的语法检查、拼写纠错、标点修正，确保文档内容准确无误，提升专业度</p>
+					<h5 class="mb-3">智能文档校对</h5>
+					<p class="mb-0">专业校对引擎驱动，自动纠正错字和语法错误，智能标点修正与风格统一，全面提升文档专业度</p>
 				</div>
 			</div>
 
@@ -132,7 +132,7 @@ Core Features START -->
 
 			<!-- 文字改写 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-secondary bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-pen-fancy text-secondary fa-2x"></i>
 					</div>
@@ -165,7 +165,7 @@ Core Features START -->
 
 			<!-- 样式定制 -->
 			<div class="col-sm-6 col-lg-4">
-				<div class="bg-white rounded-3 text-center p-4 h-100 shadow-sm">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
 					<div class="icon-xl bg-success bg-opacity-10 rounded-circle mx-auto mb-3">
 						<i class="fas fa-palette text-success fa-2x"></i>
 					</div>
@@ -177,6 +177,57 @@ Core Features START -->
 		</div>
 	</div>
 </section>
+
+<!-- =======================
+AI 文生文场景 START -->
+<section class="py-5">
+	<div class="container">
+		<!-- Title -->
+		<div class="row mb-5">
+			<div class="col-lg-8 mx-auto text-center">
+				<h2 class="fw-bold">AI文生文场景</h2>
+				<p class="mb-0">围绕实际办公写作高频需求，提供从采集到成文的全流程智能能力</p>
+			</div>
+		</div>
+
+		<div class="row g-4">
+			<!-- 会议纪要自动生成 -->
+			<div class="col-sm-6 col-lg-4">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
+					<div class="icon-xl bg-primary bg-opacity-10 rounded-circle mx-auto mb-3">
+						<i class="fas fa-clipboard-list text-primary fa-2x"></i>
+					</div>
+					<h5 class="mb-3">会议纪要自动生成</h5>
+					<p class="mb-0">语音识别+AI处理，自动提炼要点、分条罗列结论与待办，生成规范会议纪要</p>
+				</div>
+			</div>
+
+			<!-- 公文格式套用 -->
+			<div class="col-sm-6 col-lg-4">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
+					<div class="icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
+						<i class="fas fa-file-signature text-warning fa-2x"></i>
+					</div>
+					<h5 class="mb-3">公文格式套用</h5>
+					<p class="mb-0">一键套用红头文件与公文模板，智能校验版式与要素，确保规范与合规</p>
+				</div>
+			</div>
+
+			<!-- 智能写稿助手 -->
+			<div class="col-sm-6 col-lg-4">
+				<div class="bg-body rounded-3 text-center p-4 h-100 shadow-sm">
+					<div class="icon-xl bg-success bg-opacity-10 rounded-circle mx-auto mb-3">
+						<i class="fas fa-feather-alt text-success fa-2x"></i>
+					</div>
+					<h5 class="mb-3">智能写稿助手</h5>
+					<p class="mb-0">基于企业知识库与行业资料，自动生成初稿并给出优化建议，显著提升成文质量与效率</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+AI 文生文场景 END -->
 
 <!-- =======================
 Use Cases START -->
@@ -381,7 +432,7 @@ Pricing START -->
 			<div class="col-lg-4">
 				<div class="bg-body rounded-3 p-4 h-100 shadow-sm text-center">
 					<h4 class="mb-3">免费版</h4>
-					<div class="display-6 fw-bold text-primary mb-3">¥0</div>
+					<div class="display-6 fw-bold text-primary mb-3">免费试用</div>
 					<p class="text-muted mb-4">适合个人用户体验</p>
 					<ul class="list-unstyled mb-4">
 						<li class="mb-2"><i class="fas fa-check text-success me-2"></i>基础AI编辑功能</li>
@@ -402,7 +453,7 @@ Pricing START -->
 					</div>
 					<div class="text-center">
 						<h4 class="mb-3">专业版</h4>
-						<div class="display-6 fw-bold text-primary mb-3">¥99<small class="fs-6 text-muted">/月</small></div>
+						<div class="display-6 fw-bold text-primary mb-3">价格面议</div>
 						<p class="text-muted mb-4">适合专业用户和小团队</p>
 						<ul class="list-unstyled mb-4">
 							<li class="mb-2"><i class="fas fa-check text-success me-2"></i>全部AI编辑功能</li>
