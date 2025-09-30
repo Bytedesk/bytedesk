@@ -23,6 +23,7 @@
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
 		<zhipuai.oapi-java-sdk.version>release-V4-2.4.3</zhipuai.oapi-java-sdk.version>
+		<mcp.version>0.13.1</mcp.version>
 	</properties>
 
 	<dependencies>
@@ -34,7 +35,7 @@
 			<artifactId>spring-ai-autoconfigure-retry</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-retry -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -168,6 +169,26 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
+		<!-- https://modelcontextprotocol.io/sdk/java/mcp-overview -->
+		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp -->
+		<dependency>
+			<groupId>io.modelcontextprotocol.sdk</groupId>
+			<artifactId>mcp</artifactId>
+			<version>${mcp.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp-spring-webflux -->
+		<dependency>
+			<groupId>io.modelcontextprotocol.sdk</groupId>
+			<artifactId>mcp-spring-webflux</artifactId>
+			<version>${mcp.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp-spring-webmvc -->
+		<!-- <dependency>
+			<groupId>io.modelcontextprotocol.sdk</groupId>
+			<artifactId>mcp-spring-webmvc</artifactId>
+			<version>${mcp.version}</version>
+		</dependency> -->
+
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<dependency>
@@ -297,6 +318,13 @@
 				<groupId>com.alibaba.cloud.ai</groupId>
 				<artifactId>spring-ai-alibaba-bom</artifactId>
 				<version>${spring-ai-alibaba.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.modelcontextprotocol.sdk</groupId>
+				<artifactId>mcp-bom</artifactId>
+				<version>${mcp.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
