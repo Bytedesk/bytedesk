@@ -63,6 +63,8 @@ import java.time.ZonedDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntityNoOrg implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     // @Value("${bytedesk.timezone}")
     // private static final String timezone = "GMT+8";
 

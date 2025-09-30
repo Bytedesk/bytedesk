@@ -48,6 +48,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "bytedesk_core_user_org_role")
 public class UserOrganizationRoleEntity implements Serializable  {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -68,9 +70,7 @@ public class UserOrganizationRoleEntity implements Serializable  {
         joinColumns = @JoinColumn(name = "user_org_role_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({
-    private static final long serialVersionUID = 1L;
-"authorities"})
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"authorities"})
     private Set<RoleEntity> roles = new HashSet<>();
     
     // 用户角色有效期

@@ -31,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @DisallowConcurrentExecution
 public class QuartzJob extends QuartzJobBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -60,7 +62,6 @@ public class QuartzJob extends QuartzJobBean implements Serializable {
     }
 
     public void test2() {
-    private static final long serialVersionUID = 1L;
         log.info("quartz job test2 is running");
     }
     

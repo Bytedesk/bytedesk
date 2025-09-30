@@ -34,6 +34,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public abstract class BaseResponseNoOrg implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     protected String uid;
 
     protected String userUid;
