@@ -17,6 +17,8 @@ import org.springframework.security.core.AuthenticationException;
 
 public class MobileNotFoundException extends AuthenticationException {
 
+    private static final long serialVersionUID = 1L;
+
     public MobileNotFoundException(String msg) {
         super(msg);
     }

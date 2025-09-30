@@ -21,6 +21,8 @@ import org.springframework.security.core.GrantedAuthority;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 
 public class AuthToken implements Authentication {
+    
+    private static final long serialVersionUID = 1L;
     //
     private Boolean isAuthenticated;
     //
