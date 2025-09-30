@@ -168,6 +168,17 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="assets/images/element/profit.svg" alt="客户管理Scrm图标">
+					</div>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/scrm.html" class="stretched_link" target="_blank">客户管理Scrm</a></h5>
+					<span class="mb-0">AI智能客户画像，客户生命周期管理，营销自动化，销售漏斗分析，多渠道客户数据统一管理</span>
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/engineering.svg" alt="开放平台图标">
 					</div>
 					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="stretched_link" target="_blank">开放平台</a></h5>

@@ -107,12 +107,15 @@
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank">视频客服</a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="text-reset d-inline-block mb-1" target="_blank">开放平台</a>
+						<a href="https://www.weiyuai.cn/scrm.html" class="text-reset d-inline-block mb-1">客户管理Scrm</a>
 					</div>
 
 					<#--  第四行  -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/office.html" class="text-reset d-inline-block mb-1" target="_blank">AI文档</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="text-reset d-inline-block mb-1" target="_blank">开放平台</a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="https://www.weiyuai.cn/office.html" class="text-reset d-inline-block mb-1">AI文档</a>
 					</div>
 				</div>
 			</div>

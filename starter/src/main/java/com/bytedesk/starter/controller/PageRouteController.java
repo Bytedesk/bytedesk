@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:17:36
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-09 14:05:58
+ * @LastEditTime: 2025-09-30 08:56:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -256,7 +256,7 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/privacy
 	 * http://127.0.0.1:9003/terms
 	 */
-	@GetMapping({ "/{page:download|contact|about|privacy|terms|office}", "/{page:download|contact|about|privacy|terms|office}.html" })
+	@GetMapping({ "/{page:download|contact|about|privacy|terms|office|scrm}", "/{page:download|contact|about|privacy|terms|office|scrm}.html" })
 	public String handlePageRoutes(@PathVariable String page, Model model) {
 		if (!showDemo) {
 			// 添加自定义配置到模型

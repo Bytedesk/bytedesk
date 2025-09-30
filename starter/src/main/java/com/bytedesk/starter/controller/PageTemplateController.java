@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-03-13 12:09:02
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-29 12:08:49
+ * @LastEditTime: 2025-09-30 08:56:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -53,6 +53,7 @@ public class PageTemplateController {
         pageTemplateService.toHtml("contact");
         pageTemplateService.toHtml("privacy");
         pageTemplateService.toHtml("terms");
+        pageTemplateService.toHtml("scrm");
 
         return JsonResult.success("generate html success", 200, true);
     }
