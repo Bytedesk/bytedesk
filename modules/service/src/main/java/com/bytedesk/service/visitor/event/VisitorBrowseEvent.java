@@ -21,6 +21,8 @@ import lombok.Getter;
 
 @Getter
 public class VisitorBrowseEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     private final VisitorRequest visitorRequest;
 

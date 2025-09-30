@@ -28,6 +28,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)    
 public class QueueMemberExcel extends BaseExcel {
+    
+    private static final long serialVersionUID = 1L;
 
     // 按照前端代码中的列顺序排列
     @ExcelProperty(value = "访客昵称")

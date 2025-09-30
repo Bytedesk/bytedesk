@@ -16,6 +16,8 @@ package com.bytedesk.core.rbac.auth.event;
 import org.springframework.context.ApplicationEvent;
 
 public class AuthSuccessEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     public AuthSuccessEvent(Object source) {
         super(source);

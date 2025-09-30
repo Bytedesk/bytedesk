@@ -23,6 +23,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StreamContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
 
     private String question;
     

@@ -35,7 +35,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserService;
-import com.bytedesk.core.socket.mqtt.MqttConnectionService;
+import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;

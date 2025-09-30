@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class StompConnectedEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     private String clientId;
 

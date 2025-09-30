@@ -29,6 +29,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class BlackExcel  extends BaseExcel {
+    
+    private static final long serialVersionUID = 1L;
 
     // @ExcelProperty(value = "黑名单用户ID")
     // @ColumnWidth(20)

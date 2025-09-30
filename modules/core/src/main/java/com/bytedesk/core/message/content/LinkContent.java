@@ -31,6 +31,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class LinkContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
     private String url;           // 链接URL
     private String title;         // 链接标题
     private String description;   // 链接描述

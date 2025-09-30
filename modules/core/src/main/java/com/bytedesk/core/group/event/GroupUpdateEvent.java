@@ -23,6 +23,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class GroupUpdateEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     private GroupEntity group;
 

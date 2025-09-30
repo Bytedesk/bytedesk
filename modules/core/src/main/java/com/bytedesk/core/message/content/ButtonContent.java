@@ -93,6 +93,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ButtonContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
     /**
      * 按钮类型
      * 必填字段

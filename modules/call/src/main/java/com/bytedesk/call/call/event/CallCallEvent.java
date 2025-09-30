@@ -9,6 +9,8 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public abstract class CallCallEvent extends ApplicationEvent {
     
+    private static final long serialVersionUID = 1L;
+    
     private final String uuid;
     private final CallEventType eventType;
     

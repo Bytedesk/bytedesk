@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LocationContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
     private String latitude;      // 纬度
     private String longitude;     // 经度
     private String address;       // 地址

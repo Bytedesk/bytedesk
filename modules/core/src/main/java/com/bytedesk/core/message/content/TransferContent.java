@@ -31,6 +31,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class TransferContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
     private String content;
     
     private String status;

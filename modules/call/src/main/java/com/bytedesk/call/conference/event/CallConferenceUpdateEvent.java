@@ -22,6 +22,8 @@ import lombok.Getter;
 @Getter
 public class CallConferenceUpdateEvent extends ApplicationEvent {
     
+    private static final long serialVersionUID = 1L;
+    
     private final CallConferenceEntity conference;
     
     public CallConferenceUpdateEvent(CallConferenceEntity conference) {

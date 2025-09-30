@@ -27,6 +27,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MusicContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
     private String url;
     private String title;
     private String artist;

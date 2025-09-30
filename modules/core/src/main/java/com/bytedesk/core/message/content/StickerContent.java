@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StickerContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
 
     private String url;           // 贴纸URL
     private String label;         // 贴纸标签/说明

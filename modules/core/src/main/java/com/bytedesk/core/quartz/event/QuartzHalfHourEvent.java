@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class QuartzHalfHourEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     public QuartzHalfHourEvent(Object source) {
         super(source);

@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
     private String url;           // 文件URL
     private String name;          // 文件名称
     private String size;          // 文件大小 (字节)

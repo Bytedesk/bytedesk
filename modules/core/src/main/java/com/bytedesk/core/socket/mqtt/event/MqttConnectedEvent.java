@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class MqttConnectedEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     private String clientId;
 

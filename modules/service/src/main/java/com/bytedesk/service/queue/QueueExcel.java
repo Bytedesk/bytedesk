@@ -27,6 +27,8 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class QueueExcel extends BaseExcel {
+    
+    private static final long serialVersionUID = 1L;
 
     @ExcelProperty(value = "监控名称")
     @ColumnWidth(20)

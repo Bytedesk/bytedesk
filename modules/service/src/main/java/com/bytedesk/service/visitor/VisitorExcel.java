@@ -31,6 +31,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class VisitorExcel extends BaseExcel {
     
+    private static final long serialVersionUID = 1L;
+    
     @ExcelProperty(value = "昵称")
     @ColumnWidth(25)
     private String nickname;

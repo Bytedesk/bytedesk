@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class QuartzOneMinEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     public QuartzOneMinEvent(Object source) {
         super(source);

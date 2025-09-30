@@ -31,4 +31,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class InviteContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
 }

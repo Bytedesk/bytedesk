@@ -31,6 +31,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class AudioContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
     private String url;           // 音频URL
     private String duration;      // 音频时长 (秒)
     private String format;        // 音频格式 (兼容性字段)

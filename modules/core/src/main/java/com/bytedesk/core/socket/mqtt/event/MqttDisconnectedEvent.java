@@ -22,6 +22,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class MqttDisconnectedEvent extends ApplicationEvent {
     
+    private static final long serialVersionUID = 1L;
+    
     private String clientId;
 
     public MqttDisconnectedEvent(Object source, String clientId) {

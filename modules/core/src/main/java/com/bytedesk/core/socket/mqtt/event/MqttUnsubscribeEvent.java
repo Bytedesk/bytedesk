@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.socket.mqtt;
+package com.bytedesk.core.socket.mqtt.event;
 
 import org.springframework.context.ApplicationEvent;
 
@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class MqttUnsubscribeEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
     
     private String topic;
     private String clientId;

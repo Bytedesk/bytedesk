@@ -35,6 +35,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QuotationContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
     // 发送消息内容
     private String content;
 

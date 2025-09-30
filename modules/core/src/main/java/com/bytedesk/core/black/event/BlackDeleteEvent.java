@@ -23,6 +23,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class BlackDeleteEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     private final BlackEntity blackEntity;
 

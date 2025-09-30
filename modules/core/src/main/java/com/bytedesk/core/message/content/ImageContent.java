@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImageContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
 
     private String url;           // 图片URL
     private String width;         // 图片宽度

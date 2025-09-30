@@ -22,6 +22,8 @@ import lombok.Getter;
 @Getter
 public class CallGatewayCreateEvent extends ApplicationEvent {
     
+    private static final long serialVersionUID = 1L;
+    
     private final CallGatewayEntity gateway;
     
     public CallGatewayCreateEvent(CallGatewayEntity gateway) {

@@ -23,6 +23,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ThreadProcessCreateEvent extends ApplicationEvent {
+    
+    private static final long serialVersionUID = 1L;
 
     private ThreadEntity thread;
 

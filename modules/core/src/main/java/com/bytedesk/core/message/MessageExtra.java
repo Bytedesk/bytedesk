@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 public class MessageExtra extends BaseExtra {
+    
+    private static final long serialVersionUID = 1L;
 
     // 是否内部消息
     // 例如：企业内部员工之间的消息，true: 内部消息，false: 外部消息

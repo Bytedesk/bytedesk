@@ -28,6 +28,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class ArticleContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
     private String title;
 
     private String url;

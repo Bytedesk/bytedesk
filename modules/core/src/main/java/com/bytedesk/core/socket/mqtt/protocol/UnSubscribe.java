@@ -17,7 +17,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
-import com.bytedesk.core.socket.mqtt.MqttService;
+import com.bytedesk.core.socket.mqtt.service.MqttService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

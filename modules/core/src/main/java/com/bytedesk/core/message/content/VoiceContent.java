@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VoiceContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
     private String url;       // 语音文件URL
     private String duration;  // 语音时长（秒）
     private String format;    // 文件格式（如ogg, mp3）

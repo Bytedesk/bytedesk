@@ -22,6 +22,8 @@ import lombok.Getter;
 @Getter
 public class CallCdrCreateEvent extends ApplicationEvent {
     
+    private static final long serialVersionUID = 1L;
+    
     private final CallCdrEntity cdr;
     
     public CallCdrCreateEvent(CallCdrEntity cdr) {

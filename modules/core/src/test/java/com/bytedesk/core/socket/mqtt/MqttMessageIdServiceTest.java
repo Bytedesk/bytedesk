@@ -15,6 +15,9 @@ package com.bytedesk.core.socket.mqtt;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.bytedesk.core.socket.mqtt.service.MqttMessageIdService;
+
 import org.junit.jupiter.api.RepeatedTest;
 
 import java.util.concurrent.CountDownLatch;

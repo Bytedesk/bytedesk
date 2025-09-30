@@ -32,6 +32,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageLeaveExcel extends BaseExcel {
+    
+    private static final long serialVersionUID = 1L;
 
     @ExcelProperty(value = "联系方式")
     @ColumnWidth(15)

@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VideoContent extends BaseContent {
+    
+    private static final long serialVersionUID = 1L;
     private String url;           // 视频URL
     private String coverUrl;      // 视频封面URL
     private String duration;      // 视频时长 (秒)

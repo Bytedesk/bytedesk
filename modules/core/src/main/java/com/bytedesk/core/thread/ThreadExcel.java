@@ -28,6 +28,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ThreadExcel extends BaseExcel {
+    
+    private static final long serialVersionUID = 1L;
 
     @ExcelProperty(value = "昵称")
     @ColumnWidth(25)

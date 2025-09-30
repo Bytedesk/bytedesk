@@ -36,6 +36,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class EmailContent extends BaseContent {
     
+    private static final long serialVersionUID = 1L;
+    
     /**
      * 邮件主题
      */

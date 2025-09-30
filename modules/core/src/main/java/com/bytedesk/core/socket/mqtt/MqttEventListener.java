@@ -19,6 +19,9 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttSubscribeEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttUnsubscribeEvent;
+import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRestService;
 
