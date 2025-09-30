@@ -288,6 +288,36 @@
 	</dependencies>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- Only for Eclipse/VS Code m2e: ignore protobuf plugin executions inside the IDE to avoid Problems view errors. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.xolstice.maven.plugins</groupId>
+										<artifactId>protobuf-maven-plugin</artifactId>
+										<versionRange>[0.0.0,)</versionRange>
+										<goals>
+											<goal>compile</goal>
+											<goal>test-compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore/>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<extensions>
 			<!-- 用于动态检测操作系统类型 -->
 			<extension>
