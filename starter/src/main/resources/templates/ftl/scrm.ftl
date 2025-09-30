@@ -20,7 +20,7 @@
 
 <!-- =======================
 Hero Section START -->
-<section class="position-relative pb-0 pb-sm-5">
+<section class="position-relative pb-0 pb-sm-5 bg-body-tertiary">
 	<div class="container">
 		<!-- Title -->
 		<div class="row mb-5">
@@ -180,7 +180,7 @@ Core Features START -->
 
 <!-- =======================
 Use Cases START -->
-<section class="py-5">
+<section class="py-5 bg-body-tertiary">
 	<div class="container">
 		<div class="row mb-5">
 			<div class="col-lg-8 mx-auto text-center">
@@ -280,7 +280,7 @@ Demo Section START -->
 
 <!-- =======================
 Benefits START -->
-<section class="py-5">
+<section class="py-5 bg-body-tertiary">
 	<div class="container">
 		<div class="row mb-5">
 			<div class="col-lg-8 mx-auto text-center">
@@ -440,7 +440,7 @@ Pricing START -->
 
 <!-- =======================
 CTA Section START -->
-<section class="overflow-hidden py-5">
+<section class="overflow-hidden py-5 bg-body-tertiary">
 	<div class="container">
 		<div class="row g-4 align-items-center">
 			<div class="col-md-7 position-relative">
