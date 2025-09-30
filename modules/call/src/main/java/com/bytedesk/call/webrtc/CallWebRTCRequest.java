@@ -31,6 +31,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class CallWebRTCRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

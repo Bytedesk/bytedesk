@@ -51,6 +51,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_kbase_llm_text")
 public class TextEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String title;
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

@@ -41,6 +41,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({CallGatewayEntityListener.class})
 @Table(name = "bytedesk_call_gateway")
 public class CallGatewayEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 网关名称

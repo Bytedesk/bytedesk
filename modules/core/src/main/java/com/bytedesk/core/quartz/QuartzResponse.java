@@ -27,6 +27,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuartzResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
     
     /** 任务名称 */
     private String jobName;

@@ -32,6 +32,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowVariableResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 工作流UID

@@ -46,6 +46,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({NotificationEntityListener.class})
 @Table(name = "bytedesk_core_notification")
 public class NotificationEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the notification

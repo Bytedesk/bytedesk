@@ -44,6 +44,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({KbaseInviteEntityListener.class})
 @Table(name = "bytedesk_kbase_invite")
 public class KbaseInviteEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the invitation

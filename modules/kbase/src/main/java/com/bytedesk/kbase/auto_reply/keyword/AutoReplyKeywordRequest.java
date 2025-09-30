@@ -33,6 +33,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AutoReplyKeywordRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
     
     // 可以存储多个关键词："关键词1|关键词2|关键词3"
     @Builder.Default

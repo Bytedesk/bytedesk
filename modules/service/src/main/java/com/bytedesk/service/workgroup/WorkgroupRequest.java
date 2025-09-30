@@ -41,6 +41,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkgroupRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     @NotBlank
     private String nickname;

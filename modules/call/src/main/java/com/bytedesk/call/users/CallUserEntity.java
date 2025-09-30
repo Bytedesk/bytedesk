@@ -44,6 +44,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({CallUserEntityListener.class})
 @Table(name = "bytedesk_call_user")
 public class CallUserEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 用户名（SIP用户名）

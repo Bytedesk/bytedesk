@@ -44,6 +44,8 @@ import java.util.List;
 // @EntityListeners({CallWebRTCEntityListener.class})
 @Table(name = "bytedesk_call_webrtc")
 public class CallWebRTCEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 客服名称

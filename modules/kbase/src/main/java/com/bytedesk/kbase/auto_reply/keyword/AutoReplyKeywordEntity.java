@@ -48,6 +48,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({AutoReplyKeywordEntityListener.class})
 @Table(name = "bytedesk_kbase_auto_reply_keyword")
 public class AutoReplyKeywordEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     // 可以存储多个关键词："关键词1|关键词2|关键词3"
     // 或者存储正则表达式："^.*(关键词1|关键词2|关键词3).*$"

@@ -27,6 +27,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClipboardResponse extends BaseResponse {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String content;
 
     private MessageTypeEnum type;

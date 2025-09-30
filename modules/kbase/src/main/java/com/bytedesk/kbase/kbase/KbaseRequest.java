@@ -43,6 +43,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class KbaseRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     private String description;

@@ -38,6 +38,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_kanban_project_invite")
 public class ProjectInviteEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

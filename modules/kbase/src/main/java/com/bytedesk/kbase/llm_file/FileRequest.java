@@ -37,6 +37,9 @@ import com.bytedesk.core.utils.BdDateUtils;
 @NoArgsConstructor
 public class FileRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String fileName;
 
     private String fileUrl;

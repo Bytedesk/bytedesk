@@ -32,6 +32,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LlmModelRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     // 模型名称，用于调用
     private String name;

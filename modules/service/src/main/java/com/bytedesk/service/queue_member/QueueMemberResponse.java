@@ -38,6 +38,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueueMemberResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     // 作为工作组队列成员关系
     private QueueResponse queue;

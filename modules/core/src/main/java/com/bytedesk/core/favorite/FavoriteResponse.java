@@ -31,6 +31,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FavoriteResponse extends BaseResponseNoOrg {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 收藏名称/标题

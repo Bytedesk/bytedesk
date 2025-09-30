@@ -38,6 +38,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_plugin_kanban_report")
 public class ReportEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

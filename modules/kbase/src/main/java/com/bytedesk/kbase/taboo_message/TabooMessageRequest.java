@@ -36,6 +36,8 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TabooMessageRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
     
     // private String content;
 

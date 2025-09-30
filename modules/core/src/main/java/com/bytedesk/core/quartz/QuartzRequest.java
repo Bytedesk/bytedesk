@@ -28,6 +28,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuartzRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
     
     /** 任务名称 */
     @NotBlank(message = "jobName is required")

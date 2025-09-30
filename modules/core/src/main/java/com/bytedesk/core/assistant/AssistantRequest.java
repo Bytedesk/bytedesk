@@ -31,6 +31,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class AssistantRequest extends BaseRequestNoOrg {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String topic;
     
     private String nickname;

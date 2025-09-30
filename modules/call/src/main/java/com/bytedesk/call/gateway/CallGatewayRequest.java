@@ -31,6 +31,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CallGatewayRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 网关名称

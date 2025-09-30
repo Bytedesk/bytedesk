@@ -62,6 +62,8 @@ import com.alibaba.fastjson2.JSON;
     @Index(name = "idx_workflow_node_status", columnList = "node_status")
 })
 public class WorkflowNodeEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 节点名称

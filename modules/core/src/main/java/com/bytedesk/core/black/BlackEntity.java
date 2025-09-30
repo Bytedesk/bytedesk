@@ -45,6 +45,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({BlackEntityListener.class})
 @Table(name = "bytedesk_core_black")
 public class BlackEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     // 黑名单类型
     @Builder.Default

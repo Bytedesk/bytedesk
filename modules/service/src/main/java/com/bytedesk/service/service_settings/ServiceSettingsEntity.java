@@ -44,6 +44,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({ServiceSettingsEntityListener.class})
 @Table(name = "bytedesk_service_settings")
 public class ServiceSettingsEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the serviceSettings

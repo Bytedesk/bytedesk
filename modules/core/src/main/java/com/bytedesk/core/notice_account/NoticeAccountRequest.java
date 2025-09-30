@@ -30,6 +30,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class NoticeAccountRequest extends BaseRequestNoOrg {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String topic;
     
     // private String type;

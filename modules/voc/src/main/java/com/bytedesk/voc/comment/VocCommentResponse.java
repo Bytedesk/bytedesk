@@ -33,6 +33,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class VocCommentResponse extends BaseResponse {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String title;
 
     // private String type;

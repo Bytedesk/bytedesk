@@ -56,6 +56,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({ComplaintEntityListener.class})
 @Table(name = "bytedesk_voc_complaint")
 public class ComplaintEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Complaint title/subject

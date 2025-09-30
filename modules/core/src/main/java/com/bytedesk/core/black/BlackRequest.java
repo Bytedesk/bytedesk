@@ -31,6 +31,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlackRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     // 黑名单类型
     @Builder.Default

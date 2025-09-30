@@ -46,6 +46,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({McpServerEntityListener.class})
 @Table(name = "bytedesk_ai_mcp_server")
 public class McpServerEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * MCP Server name

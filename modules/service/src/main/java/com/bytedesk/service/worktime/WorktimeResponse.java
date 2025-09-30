@@ -28,6 +28,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WorktimeResponse extends BaseResponse {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String startTime;
 
     private String endTime;

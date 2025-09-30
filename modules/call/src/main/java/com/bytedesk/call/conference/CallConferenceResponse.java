@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CallConferenceResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 会议室名称

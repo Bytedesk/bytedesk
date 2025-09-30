@@ -48,6 +48,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({AutoReplyFixedEntityListener.class})
 @Table(name = "bytedesk_kbase_auto_reply_fixed")
 public class AutoReplyFixedEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     @Builder.Default
     // 如果使用int存储，enum中类型的顺序改变，会导致数据库中的数据类型改变，导致无法查询到数据

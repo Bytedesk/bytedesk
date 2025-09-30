@@ -33,6 +33,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class IntentionSettingsRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

@@ -32,6 +32,9 @@ import java.util.List;
 @NoArgsConstructor
 public class RelationResponse extends BaseResponse {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String type;
 
     // ==================== 社交关系相关字段 ====================

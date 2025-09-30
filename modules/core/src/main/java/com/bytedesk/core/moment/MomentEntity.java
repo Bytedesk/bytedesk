@@ -44,6 +44,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({MomentEntityListener.class})
 @Table(name = "bytedesk_core_moment")
 public class MomentEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the moment

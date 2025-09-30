@@ -34,6 +34,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RatedownSettingsRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 设置名称，用于区分不同的邀请设置模板

@@ -38,6 +38,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KbaseCommentRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     // private String content;
 

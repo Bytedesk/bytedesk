@@ -47,6 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @Table(name = "bytedesk_kbase_llm_website_crawl_task")
 public class WebsiteCrawlTask extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
     
     /**
      * 任务ID

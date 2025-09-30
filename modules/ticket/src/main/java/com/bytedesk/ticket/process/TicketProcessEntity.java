@@ -39,6 +39,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Table(name = "bytedesk_ticket_process")
 public class TicketProcessEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     @Column(name = "process_name")
     private String name;

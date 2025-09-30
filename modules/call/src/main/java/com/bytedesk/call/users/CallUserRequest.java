@@ -35,6 +35,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CallUserRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 用户名（SIP用户名）

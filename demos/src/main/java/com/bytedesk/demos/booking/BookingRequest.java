@@ -31,6 +31,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     // Booking specific fields
     private String bookingNumber;

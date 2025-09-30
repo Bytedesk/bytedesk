@@ -52,6 +52,8 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_core_notice")
 public class NoticeEntity extends BaseEntity {
     
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Title of the notice or announcement
      */

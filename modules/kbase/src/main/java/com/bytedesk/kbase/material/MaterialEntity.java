@@ -44,6 +44,9 @@ import lombok.Setter;
 @Table(name = "bytedesk_kbase_material")
 public class MaterialEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

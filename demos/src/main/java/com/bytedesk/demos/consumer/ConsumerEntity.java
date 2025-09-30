@@ -49,6 +49,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({ConsumerEntityListener.class})
 @Table(name = "bytedesk_ai_consumer")
 public class ConsumerEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the consumer

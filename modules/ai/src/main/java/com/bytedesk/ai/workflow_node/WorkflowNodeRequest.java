@@ -33,6 +33,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowNodeRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 节点名称

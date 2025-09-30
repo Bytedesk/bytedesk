@@ -30,6 +30,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrganizationRequest extends BaseRequestNoOrg {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     private String logo;

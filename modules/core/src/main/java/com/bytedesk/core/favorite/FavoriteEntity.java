@@ -45,6 +45,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Table(name = "bytedesk_core_favorite")
 public class FavoriteEntity extends BaseEntityNoOrg {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 收藏名称/标题

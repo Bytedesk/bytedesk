@@ -29,6 +29,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UploadResponse extends BaseResponse {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String fileName;
 
     private String fileSize;

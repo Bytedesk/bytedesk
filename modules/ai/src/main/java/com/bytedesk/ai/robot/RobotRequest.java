@@ -38,6 +38,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class RobotRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
     
     private String nickname;

@@ -39,6 +39,10 @@ import lombok.experimental.SuperBuilder;
 public class PushTokenEntity extends BaseEntity {
     
 
+    private static final long serialVersionUID = 1L;
+
+    
+
     private String token;
 
     // dev or prod

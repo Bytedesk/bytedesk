@@ -36,6 +36,9 @@ import com.bytedesk.core.utils.BdDateUtils;
 @NoArgsConstructor
 public class FaqRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String question;
 
     @Builder.Default

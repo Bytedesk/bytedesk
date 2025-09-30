@@ -26,6 +26,9 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketAttachmentResponse extends BaseResponse {
+    
+    private static final long serialVersionUID = 1L;
+
 
     // 防止循环引用
     // private TicketResponse ticket;

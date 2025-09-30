@@ -50,6 +50,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({TaskEntityListener.class})
 @Table(name = "bytedesk_plugin_kanban_task")
 public class TaskEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name or title of the task

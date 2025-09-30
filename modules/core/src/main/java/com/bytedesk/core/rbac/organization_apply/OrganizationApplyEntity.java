@@ -37,6 +37,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_team_organization_apply")
 public class OrganizationApplyEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

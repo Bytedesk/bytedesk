@@ -33,6 +33,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CallCdrResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 通话UUID

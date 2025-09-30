@@ -32,6 +32,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CustomerRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String nickname;
 
     private String email;

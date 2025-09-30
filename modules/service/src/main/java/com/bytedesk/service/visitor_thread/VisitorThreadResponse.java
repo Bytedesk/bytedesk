@@ -29,5 +29,8 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class VisitorThreadResponse extends BaseResponse {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String visitorUid;
 }

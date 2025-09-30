@@ -40,6 +40,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({TicketTemplateEntityListener.class})
 @Table(name = "bytedesk_ticket_template")
 public class TicketTemplateEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the ticketTemplate

@@ -30,6 +30,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class KbaseCommentResponse extends BaseResponse {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String content;
 
     private String type;

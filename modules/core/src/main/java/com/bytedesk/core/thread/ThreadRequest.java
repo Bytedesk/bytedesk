@@ -34,6 +34,8 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class ThreadRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
     // 
     private String topic;
     

@@ -34,6 +34,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageLeaveResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     // 客户称呼
     private String nickname;

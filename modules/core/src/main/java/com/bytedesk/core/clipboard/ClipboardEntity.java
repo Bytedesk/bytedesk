@@ -42,6 +42,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({ClipboardEntityListener.class})
 @Table(name = "bytedesk_core_clipboard")
 public class ClipboardEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     //
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

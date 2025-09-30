@@ -38,6 +38,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_team_group_invite")
 public class GroupInviteEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

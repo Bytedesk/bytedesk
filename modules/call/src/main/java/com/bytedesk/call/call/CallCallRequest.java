@@ -30,6 +30,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CallCallRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 呼叫UUID

@@ -36,6 +36,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class QueueMemberRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String queueUid;  // 关联队列
 
     private String queueNickname;  // 队列昵称

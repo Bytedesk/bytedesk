@@ -30,6 +30,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RobotMessageRequest extends BaseRequest {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String topic;
 
     private String threadUid;

@@ -35,6 +35,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberRequest extends BaseRequest {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 群组的uid，用于查询特定群组的成员

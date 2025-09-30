@@ -45,6 +45,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({FormResultEntityListener.class})
 @Table(name = "bytedesk_service_form_result")
 public class FormResultEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 结果标题或名称

@@ -45,6 +45,8 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @Table(name = "bytedesk_core_server")
 public class ServerEntity extends BaseEntityNoOrg {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Server hostname or identifier

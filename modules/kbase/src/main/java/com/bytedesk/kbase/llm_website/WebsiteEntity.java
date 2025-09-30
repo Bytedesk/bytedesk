@@ -47,6 +47,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Table(name = "bytedesk_kbase_llm_website")
 public class WebsiteEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     // 网站名称
     private String name;

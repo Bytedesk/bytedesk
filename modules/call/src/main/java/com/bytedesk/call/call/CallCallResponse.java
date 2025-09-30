@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CallCallResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
     
     /**
      * 呼叫UUID

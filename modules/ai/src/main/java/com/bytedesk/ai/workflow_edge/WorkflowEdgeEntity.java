@@ -60,6 +60,8 @@ import java.time.ZonedDateTime;
     @Index(name = "idx_workflow_edge_target_node", columnList = "target_node_id")
 })
 public class WorkflowEdgeEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 边名称

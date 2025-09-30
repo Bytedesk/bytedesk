@@ -51,6 +51,8 @@ import java.util.List;
 // @EntityListeners({RelationEntityListener.class})
 @Table(name = "bytedesk_core_relation")
 public class RelationEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
 
     /**

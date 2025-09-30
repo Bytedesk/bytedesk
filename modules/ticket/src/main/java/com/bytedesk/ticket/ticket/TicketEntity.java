@@ -53,6 +53,8 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
     
     /**
      * Title of the support ticket (required field)

@@ -33,6 +33,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "bytedesk_core_feature")
 @EqualsAndHashCode(callSuper = true)
 public class FeatureEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Unique feature code identifier (e.g., im.chat, ticket.basic)

@@ -42,6 +42,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({CallConferenceEntityListener.class})
 @Table(name = "bytedesk_call_conference")
 public class CallConferenceEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 会议室名称

@@ -30,6 +30,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class MenuResponse extends BaseResponse {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     private String type;

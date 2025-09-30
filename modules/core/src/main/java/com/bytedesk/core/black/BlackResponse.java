@@ -29,6 +29,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlackResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     // AI: 考虑到黑名单功能主要用于用户访问控制,需要频繁查询和过滤,我建议使用单独字段存储的方式:
     // 黑名单用户uid

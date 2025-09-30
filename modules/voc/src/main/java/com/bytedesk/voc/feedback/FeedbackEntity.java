@@ -56,6 +56,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({FeedbackEntityListener.class})
 @Table(name = "bytedesk_voc_feedback")
 public class FeedbackEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Feedback title/subject

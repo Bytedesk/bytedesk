@@ -47,6 +47,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({CallCdrEntityListener.class})
 @Table(name = "bytedesk_call_cdr")
 public class CallCdrEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
     
     /**
      * Caller's display name

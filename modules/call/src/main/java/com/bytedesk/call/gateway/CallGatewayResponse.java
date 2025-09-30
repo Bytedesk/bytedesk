@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CallGatewayResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 网关名称

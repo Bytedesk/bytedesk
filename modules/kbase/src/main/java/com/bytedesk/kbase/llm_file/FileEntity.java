@@ -51,6 +51,9 @@ import com.bytedesk.core.utils.BdDateUtils;
 @Table(name = "bytedesk_kbase_llm_file")
 public class FileEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String fileName;
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

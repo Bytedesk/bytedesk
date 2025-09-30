@@ -37,6 +37,8 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketCommentEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
     
     @ManyToOne
     private TicketEntity ticket;         // 关联的工单

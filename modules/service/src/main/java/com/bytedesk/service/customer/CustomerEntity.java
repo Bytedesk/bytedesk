@@ -51,6 +51,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "bytedesk_service_customer")
 public class CustomerEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Customer's display name or nickname

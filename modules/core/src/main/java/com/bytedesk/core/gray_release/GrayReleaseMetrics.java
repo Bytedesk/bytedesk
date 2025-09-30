@@ -37,6 +37,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "bytedesk_core_gray_release_metrics")
 @EqualsAndHashCode(callSuper = true)
 public class GrayReleaseMetrics extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     @Column(nullable = false)
     private String userUid;      // 用户ID

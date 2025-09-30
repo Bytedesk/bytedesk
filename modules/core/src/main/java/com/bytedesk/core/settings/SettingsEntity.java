@@ -44,6 +44,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({SettingsEntityListener.class})
 @Table(name = "bytedesk_core_settings")
 public class SettingsEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the settings

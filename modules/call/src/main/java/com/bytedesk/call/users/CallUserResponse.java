@@ -33,6 +33,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CallUserResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 用户名（SIP用户名）

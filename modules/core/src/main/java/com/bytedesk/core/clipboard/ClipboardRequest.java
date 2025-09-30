@@ -26,6 +26,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClipboardRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     // private String content;
 
     private String userUid;

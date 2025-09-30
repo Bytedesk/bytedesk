@@ -37,6 +37,8 @@ import lombok.experimental.Accessors;
 // @NoArgsConstructor
 @Table(name = "bytedesk_ticket_message")
 public class TicketMessageEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     // private String ticketUid;
     // private String processInstanceId;

@@ -50,6 +50,8 @@ import java.time.ZonedDateTime;
     @Index(name = "idx_server_metrics_server_timestamp", columnList = "serverUid, timestamp")
 })
 public class ServerMetricsEntity extends BaseEntityNoOrg {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Reference to the server entity

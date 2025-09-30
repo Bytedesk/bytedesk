@@ -46,6 +46,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_service_worktime_setting")
 public class WorktimeSettingEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

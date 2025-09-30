@@ -35,6 +35,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class MemberResponse extends BaseResponse {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String nickname;
 
     private String avatar;

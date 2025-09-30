@@ -34,6 +34,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class TopicRequest extends BaseRequest {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String topic;
 
     @Builder.Default

@@ -35,6 +35,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_core_menu")
 public class MenuEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

@@ -35,6 +35,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorktimeEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     @Builder.Default
     @Column(name = "start_time")

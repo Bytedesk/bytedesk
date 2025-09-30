@@ -16,5 +16,7 @@ package com.bytedesk.core.feature;
 import com.bytedesk.core.base.BaseResponse;
 
 public class FeatureResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
     
 }

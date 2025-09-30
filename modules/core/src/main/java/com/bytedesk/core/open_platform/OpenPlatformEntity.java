@@ -43,6 +43,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({OpenPlatformEntityListener.class})
 @Table(name = "bytedesk_core_open_platform")
 public class OpenPlatformEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the openPlatform

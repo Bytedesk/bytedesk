@@ -43,6 +43,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class ArticleRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String title;
 
     private String summary;

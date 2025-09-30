@@ -36,6 +36,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServerRequest extends BaseRequestNoOrg {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Server hostname or identifier

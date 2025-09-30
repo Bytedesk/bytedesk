@@ -25,6 +25,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class UrlRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String url;
 
     private String name;

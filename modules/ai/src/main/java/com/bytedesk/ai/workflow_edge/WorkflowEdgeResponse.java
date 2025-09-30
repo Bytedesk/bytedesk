@@ -33,6 +33,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowEdgeResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 边名称

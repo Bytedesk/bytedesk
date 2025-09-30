@@ -41,6 +41,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_service_message_template")
 public class MessageTemplateEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

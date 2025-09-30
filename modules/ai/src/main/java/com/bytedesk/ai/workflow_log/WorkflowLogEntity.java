@@ -38,6 +38,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_ai_workflow_log")
 public class WorkflowLogEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

@@ -40,6 +40,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Table(name = "bytedesk_core_workflow_variable")
 public class WorkflowVariableEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 变量名称

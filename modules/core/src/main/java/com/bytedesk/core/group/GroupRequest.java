@@ -34,6 +34,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class GroupRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     private String avatar;

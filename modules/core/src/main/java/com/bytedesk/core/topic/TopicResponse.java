@@ -33,6 +33,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class TopicResponse extends BaseResponse {
         
+    private static final long serialVersionUID = 1L;
+
+        
     private Set<String> topics;
 
     // private Integer qos;

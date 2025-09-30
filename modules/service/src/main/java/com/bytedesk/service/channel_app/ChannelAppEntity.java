@@ -37,6 +37,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_service_channel_app")
 public class ChannelAppEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     @Builder.Default

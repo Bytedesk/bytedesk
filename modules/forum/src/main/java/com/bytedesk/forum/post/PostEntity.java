@@ -38,6 +38,8 @@ import lombok.EqualsAndHashCode;
 )
 @EqualsAndHashCode(callSuper = true)
 public class PostEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Title of the forum post

@@ -44,6 +44,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({CallIvrEntityListener.class})
 @Table(name = "bytedesk_call_ivr")
 public class CallIvrEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the ivr

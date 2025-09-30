@@ -25,6 +25,9 @@ import lombok.EqualsAndHashCode;
 // @Entity(name = "bytedesk_ticket_flow")
 public class TicketFlowEntity extends BaseEntity {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String name;
     private String description;
     private String status;

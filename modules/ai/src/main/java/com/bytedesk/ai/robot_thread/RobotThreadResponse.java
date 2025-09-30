@@ -30,5 +30,9 @@ import lombok.experimental.Accessors;
 public class RobotThreadResponse extends BaseResponse {
     
 
+    private static final long serialVersionUID = 1L;
+
+    
+
     private String visitorUid;
 }

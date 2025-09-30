@@ -35,6 +35,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class RobotMessageResponse extends BaseResponse {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String topic;
 
     private String threadUid;

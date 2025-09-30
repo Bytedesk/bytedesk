@@ -44,6 +44,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({OpinionEntityListener.class})
 @Table(name = "bytedesk_voc_opinion")
 public class OpinionEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the opinion

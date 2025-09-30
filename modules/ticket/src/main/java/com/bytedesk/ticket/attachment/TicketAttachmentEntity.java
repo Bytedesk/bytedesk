@@ -34,6 +34,8 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketAttachmentEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
     
     @ManyToOne(cascade = CascadeType.PERSIST)
     private TicketEntity ticket; 

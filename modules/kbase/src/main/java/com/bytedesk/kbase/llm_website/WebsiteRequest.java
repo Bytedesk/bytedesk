@@ -37,6 +37,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class WebsiteRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String name;
 
     private String url;

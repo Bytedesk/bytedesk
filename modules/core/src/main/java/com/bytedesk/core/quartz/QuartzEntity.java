@@ -41,6 +41,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "bytedesk_core_quartz")
 public class QuartzEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the scheduled job

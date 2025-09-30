@@ -26,6 +26,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TicketAttachmentRequest extends BaseRequest {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String ticketUid;
     private String commentUid;
     private String uploadUid;

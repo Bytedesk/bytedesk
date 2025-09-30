@@ -45,6 +45,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "bytedesk_service_form")
 public class FormEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name or title of the form

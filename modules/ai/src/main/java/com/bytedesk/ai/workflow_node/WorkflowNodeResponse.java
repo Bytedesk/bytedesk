@@ -35,6 +35,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowNodeResponse extends BaseResponse {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 节点名称

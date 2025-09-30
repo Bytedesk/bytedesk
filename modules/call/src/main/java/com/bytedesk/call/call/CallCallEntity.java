@@ -25,6 +25,8 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "bytedesk_call_call")
 public class CallCallEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 呼叫UUID

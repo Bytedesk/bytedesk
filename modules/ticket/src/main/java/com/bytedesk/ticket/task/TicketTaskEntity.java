@@ -26,6 +26,9 @@ import lombok.EqualsAndHashCode;
 @Table(name = "bytedesk_ticket_task")
 public class TicketTaskEntity extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
+
     private String title;
 
     private String description;

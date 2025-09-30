@@ -41,6 +41,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({SettingsTemplateEntityListener.class})
 @Table(name = "bytedesk_service_settings_template")
 public class SettingsTemplateEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Name of the agentTemplate

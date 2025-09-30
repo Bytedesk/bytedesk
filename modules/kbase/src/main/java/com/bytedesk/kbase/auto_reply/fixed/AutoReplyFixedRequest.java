@@ -32,6 +32,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AutoReplyFixedRequest extends BaseRequest {
     
+    private static final long serialVersionUID = 1L;
+
+    
     private String content;
 
     @Builder.Default

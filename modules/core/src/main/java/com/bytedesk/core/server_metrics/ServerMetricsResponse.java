@@ -36,6 +36,8 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServerMetricsResponse extends BaseResponseNoOrg {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Server UID reference

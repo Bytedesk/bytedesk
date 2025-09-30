@@ -43,6 +43,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({RatedownSettingsEntityListener.class})
 @Table(name = "bytedesk_kbase_settings_ratedown")
 public class RatedownSettingsEntity extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * 设置名称，用于区分不同的邀请设置模板
