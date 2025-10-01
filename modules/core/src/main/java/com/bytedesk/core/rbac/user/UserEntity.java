@@ -381,6 +381,7 @@ public class UserEntity extends BaseEntityNoOrg {
 		FEISHU,
 		FACEBOOK,
 		DOUYIN,
+		APPLE,
 		LDAP,
 		OIDC,
 		OPENID,
