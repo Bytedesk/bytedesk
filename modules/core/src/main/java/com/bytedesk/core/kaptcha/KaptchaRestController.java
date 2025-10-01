@@ -42,9 +42,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/kaptcha/api/v1")
 public class KaptchaRestController {
     
-    private final Producer captchaProducer;
+    private final Producer kaptchaProducer;
 
-    private final KaptchaRedisService kaptchaCacheService;
+    private final KaptchaRedisService kaptchaRedisService;
 
     // 获取验证码
     // http://127.0.0.1:9003/kaptcha/api/v1/get
@@ -53,9 +53,9 @@ public class KaptchaRestController {
     public ResponseEntity<?> getKaptcha() {
         //
         String captchaUid = Utils.uuid();
-        String code = captchaProducer.createText();
+        String code = kaptchaProducer.createText();
         log.info("getKaptcha captchaUid {} code {}", captchaUid, code);
-        BufferedImage image = captchaProducer.createImage(code);
+        BufferedImage image = kaptchaProducer.createImage(code);
         // 转换流信息写出x
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -67,7 +67,7 @@ public class KaptchaRestController {
             jsonObject.put("captchaUid", captchaUid);
             jsonObject.put("captchaImage", imageString);
             // 缓存，用于做匹配
-            kaptchaCacheService.putKaptcha(captchaUid, code);
+            kaptchaRedisService.putKaptcha(captchaUid, code);
             //
             return ResponseEntity.ok(JsonResult.success("kaptcha success", jsonObject));
         } catch (Exception e) {
@@ -86,7 +86,7 @@ public class KaptchaRestController {
         String captchaCode = userRequest.getCaptchaCode();
         String channel = userRequest.getChannel();
         log.info("checkKaptcha captchaUid {} captchaCode {}", captchaUid, captchaCode);
-        if (kaptchaCacheService.checkKaptcha(captchaUid, captchaCode, channel)) {
+        if (kaptchaRedisService.checkKaptcha(captchaUid, captchaCode, channel)) {
             return ResponseEntity.ok(JsonResult.success("kaptcha success"));
         } else {
             return ResponseEntity.ok(JsonResult.error("kaptcha check failed", -1));
