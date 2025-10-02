@@ -180,28 +180,12 @@ bytedesk/
 
 ## 联系
 
-<!-- - [Email](mailto:270580156@qq.com) -->
-<!-- - [微信](./images/wechat.png) -->
 - 扫码加微信，入群，备注：微语
-
-![微信二维码](./images/wechat.png)
-<!-- - 微语技术支持群：
-![微信群二维码](./images/wechat_group.jpg) -->
-- 服务号
-
-![微信服务号二维码](./images/wechat_mp.jpg)
-
-- 订阅号
-
-![微信订阅号二维码](./images/wechatai_mp.jpg)
-
-- 软著
-
-![软件著作权证书](./images/copyright.png)
-
-- 商标
-
-![商标证书](./images/trademark.jpg)
+- [微信二维码](./images/wechat.png)
+- [微信服务号二维码](./images/wechat_mp.jpg)
+- [微信订阅号二维码](./images/wechatai_mp.jpg)
+- [软件著作权证书](./images/copyright.png)
+- [商标证书](./images/trademark.jpg)
 
 ## License
 
