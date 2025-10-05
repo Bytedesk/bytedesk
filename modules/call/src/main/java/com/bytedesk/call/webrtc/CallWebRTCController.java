@@ -22,7 +22,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import com.bytedesk.call.call.CallService;
+import com.bytedesk.call.call.CallCallService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class WebRTCSignalingController {
+public class CallWebRTCController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final CallService freeSwitchService;
+    private final CallCallService freeSwitchService;
 
     /**
      * 处理WebRTC Offer
