@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallController {
 
-    private final CallService freeSwitchService;
+    private final CallService callService;
 
     /**
      * http://127.0.0.1:9003/test/api/freeswitch/status
@@ -46,11 +46,11 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            boolean connected = freeSwitchService.isConnected();
-            String status = freeSwitchService.getStatus();
+            boolean connected = callService.isConnected();
+            String status = callService.getStatus();
             
             // 获取配置信息并过滤敏感信息
-            CallFreeswitchProperties properties = freeSwitchService.getProperties();
+            CallFreeswitchProperties properties = callService.getProperties();
             Map<String, Object> safeProperties = new HashMap<>();
             safeProperties.put("enabled", properties.isEnabled());
             safeProperties.put("server", properties.getServer());
@@ -88,7 +88,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.originate(caller, destination, context);
+            String response = callService.originate(caller, destination, context);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -114,7 +114,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.hangup(uuid, cause);
+            String response = callService.hangup(uuid, cause);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -136,7 +136,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.answer(uuid);
+            String response = callService.answer(uuid);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -162,7 +162,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.transfer(uuid, destination, context);
+            String response = callService.transfer(uuid, destination, context);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -188,7 +188,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.playback(uuid, filePath);
+            String response = callService.playback(uuid, filePath);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -214,7 +214,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.record(uuid, filePath);
+            String response = callService.record(uuid, filePath);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -240,7 +240,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.stopRecord(uuid, filePath);
+            String response = callService.stopRecord(uuid, filePath);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -266,7 +266,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.sendDtmf(uuid, digits);
+            String response = callService.sendDtmf(uuid, digits);
             
             result.put("success", response != null);
             result.put("response", response);
@@ -289,7 +289,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String channels = freeSwitchService.showChannels();
+            String channels = callService.showChannels();
             
             result.put("success", true);
             result.put("channels", channels);
@@ -310,7 +310,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String calls = freeSwitchService.showCalls();
+            String calls = callService.showCalls();
             
             result.put("success", true);
             result.put("calls", calls);
@@ -334,7 +334,7 @@ public class CallController {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            String response = freeSwitchService.executeApiCommand(command, args);
+            String response = callService.executeApiCommand(command, args);
             
             result.put("success", response != null);
             result.put("response", response);
