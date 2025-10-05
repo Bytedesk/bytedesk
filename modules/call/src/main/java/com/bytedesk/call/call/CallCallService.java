@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.call.cdr.CallCdrEntity;
 import com.bytedesk.call.cdr.CallCdrService;
-import com.bytedesk.call.config.CallService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;

@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.call.config;
+package com.bytedesk.call.call;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +19,8 @@ import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.bytedesk.call.config.CallFreeswitchProperties;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,9 +49,23 @@ public class CallController {
             boolean connected = freeSwitchService.isConnected();
             String status = freeSwitchService.getStatus();
             
+            // 获取配置信息并过滤敏感信息
+            CallFreeswitchProperties properties = freeSwitchService.getProperties();
+            Map<String, Object> safeProperties = new HashMap<>();
+            safeProperties.put("enabled", properties.isEnabled());
+            safeProperties.put("server", properties.getServer());
+            safeProperties.put("eslPort", properties.getEslPort());
+            safeProperties.put("sipPort", properties.getSipPort());
+            safeProperties.put("webrtcPort", properties.getWebrtcPort());
+            safeProperties.put("wsPort", properties.getWsPort());
+            safeProperties.put("callTimeout", properties.getCallTimeout());
+            safeProperties.put("rtpPortStart", properties.getRtpPortStart());
+            safeProperties.put("rtpPortEnd", properties.getRtpPortEnd());
+            // eslPassword 已被过滤，不包含在返回结果中
+            
             result.put("connected", connected);
             result.put("status", status);
-            result.put("properties", freeSwitchService.getProperties());
+            result.put("properties", safeProperties);
             
             return ResponseEntity.ok(result);
         } catch (Exception e) {
