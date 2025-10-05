@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "bytedesk.call.freeswitch.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "false", matchIfMissing = true)
 public class CallDefaultConfig {
 
     /**

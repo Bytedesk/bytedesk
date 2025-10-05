@@ -61,11 +61,11 @@
 		<!-- https://github.com/zhouhailin/freeswitch-externals -->
 		<!-- https://zhouhailin.github.io/freeswitch-externals/ -->
 		<!-- https://mvnrepository.com/artifact/link.thingscloud/freeswitch-esl -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>link.thingscloud</groupId>
 			<artifactId>freeswitch-esl</artifactId>
 			<version>2.2.0</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- RTP媒体处理 -->
 		<!-- https://github.com/RestComm/jain-sip -->

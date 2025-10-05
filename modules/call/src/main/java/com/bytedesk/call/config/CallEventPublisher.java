@@ -17,6 +17,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.call.call.event.CallCallAnsweredEvent;
+import com.bytedesk.call.call.event.CallCallHangupEvent;
+import com.bytedesk.call.call.event.CallCallStartEvent;
+import com.bytedesk.call.call.event.CallDtmfEvent;
 import com.bytedesk.call.cdr.event.CallCdrCreateEvent;
 import com.bytedesk.call.cdr.event.CallCdrUpdateEvent;
 import com.bytedesk.call.conference.event.CallConferenceCreateEvent;
@@ -71,6 +75,23 @@ public class CallEventPublisher {
     }
     
     public void publishEvent(CallUserUpdateEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+    
+    // Call事件
+    public void publishEvent(CallCallStartEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+    
+    public void publishEvent(CallCallAnsweredEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+    
+    public void publishEvent(CallCallHangupEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+    
+    public void publishEvent(CallDtmfEvent event) {
         applicationEventPublisher.publishEvent(event);
     }
 }

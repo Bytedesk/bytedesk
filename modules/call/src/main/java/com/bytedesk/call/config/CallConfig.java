@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallConfig {
         
-    private final CallFreeswitchProperties callProperties;
+    private final CallFreeswitchProperties callFreeswitchProperties;
     
     private final CallEventListener callEventListener;
 
@@ -55,13 +55,13 @@ public class CallConfig {
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 log.info("第{}次尝试连接Call ESL: {}:{}", 
-                        attempt, callProperties.getServer(), callProperties.getEslPort());
+                        attempt, callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
                         
                 // 设置更长的超时时间
                 inboundClient.connect(
-                    callProperties.getServer(), 
-                    callProperties.getEslPort(), 
-                    callProperties.getEslPassword(),
+                    callFreeswitchProperties.getServer(), 
+                    callFreeswitchProperties.getEslPort(), 
+                    callFreeswitchProperties.getEslPassword(),
                     20); // 增加超时时间到20秒
                     
                 // 验证连接是否真正建立
@@ -73,7 +73,7 @@ public class CallConfig {
                     inboundClient.setEventSubscriptions("plain", "all");
                     
                     log.info("Call ESL连接成功，服务器: {}:{}", 
-                            callProperties.getServer(), callProperties.getEslPort());
+                            callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
                     
                     // 连接成功，跳出重试循环
                     break;
@@ -89,7 +89,7 @@ public class CallConfig {
                 if (e.getMessage() != null) {
                     if (e.getMessage().contains("rude-rejection") || e.getMessage().contains("Access Denied")) {
                         log.error("Call ESL拒绝连接 - 可能的原因:");
-                        log.error("1. ESL密码错误 (当前密码: {})", callProperties.getEslPassword());
+                        log.error("1. ESL密码错误 (当前密码: {})", callFreeswitchProperties.getEslPassword());
                         log.error("2. IP地址不在Call的访问控制列表(ACL)中");
                         log.error("3. Call的event_socket.conf.xml配置限制了外部连接");
                         log.error("4. 防火墙阻止了连接");
@@ -101,7 +101,7 @@ public class CallConfig {
                     } else if (e.getMessage().contains("Connection refused") || e.getMessage().contains("timeout")) {
                         log.error("网络连接问题 - 可能的原因:");
                         log.error("1. Call服务未运行");
-                        log.error("2. 端口{}未开放或被防火墙阻止", callProperties.getEslPort());
+                        log.error("2. 端口{}未开放或被防火墙阻止", callFreeswitchProperties.getEslPort());
                         log.error("3. 网络连接超时");
                     }
                 }

@@ -3,7 +3,6 @@ package com.bytedesk.call.config;
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.call.call.event.CallCallAnsweredEvent;
@@ -22,9 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallEventListener implements IEslEventListener {
 
-    private final ApplicationEventPublisher eventPublisher;
-
-    // private final CallCdrService cdrService;
+    private final CallEventPublisher eventPublisher;
 
     /**
      * 处理Call事件
