@@ -411,13 +411,14 @@
             <a href="https://github.com/Bytedesk/bytedesk" target="_blank" class="github-link">GitHub</a>
         </div>
         
-        <h1 lang="en">微语 Project Architecture</h1>
+        <h1 lang="en">Bytedesk Project Architecture</h1>
         <h1 lang="zh">微语 项目架构</h1>
         
         <!-- 选项卡导航 -->
         <div class="tabs">
             <button class="tab-button active" onclick="openTab('layered-view')">分层视图</button>
             <button class="tab-button" onclick="openTab('module-view')">模块视图</button>
+            <button class="tab-button" onclick="openTab('ecommerce-view')">业务模块</button>
             <button class="tab-button" onclick="openTab('frontend-view')">前端技术栈</button>
             <button class="tab-button" onclick="openTab('roadmap-view')">产品路线图</button>
         </div>
@@ -519,6 +520,231 @@
                         <div class="layer-component">阿里云主机</div>
                         <div class="layer-component">独立服务器</div>
                         <div class="layer-component">第三方VPS主机</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 客服系统架构选项卡 -->
+        <div id="ecommerce-view" class="tab-content">
+            <div class="ecommerce-architecture">
+                <!-- <h2>客服系统架构</h2> -->
+                <!-- <p style="text-align: center; color: #666; margin-bottom: 30px;">基于微语的完整客服解决方案</p> -->
+                
+                <div style="position: relative; padding: 20px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-radius: 10px; margin-bottom: 20px;">
+                    <!-- 顶层：客服人员 -->
+                    <!-- <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="display: inline-block; background: rgba(255,255,255,0.95); padding: 15px 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                            <h3 style="margin: 0; color: #2c3e50;">客服人员</h3>
+                        </div>
+                    </div> -->
+                    
+                    <!-- 业务系统层 -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; margin-bottom: 20px;">
+                        <!-- 左侧：业务系统 -->
+                        <div style="flex: 1; min-width: 300px;">
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">业务系统</h4>
+                                
+                                <!-- 客户关系管理 -->
+                                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 12px; margin-bottom: 10px;">
+                                    <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">客户关系管理</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">会员基础信息</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">会员其他信息</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 呼叫模块 -->
+                                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 12px; margin-bottom: 10px;">
+                                    <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">呼叫模块</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">基础呼叫</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">IVR管理</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">软电话</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">语音转文本</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">联络历史</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">录音管理</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 在线客服 -->
+                                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 12px;">
+                                    <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">在线客服</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">对外接口</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">留言管理</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">AI客服</span>
+                                        <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 5px 10px; border-radius: 3px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">页面客服</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 第三方呼叫集成 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                <h4 style="color: #ffd700; margin: 0 0 10px 0;">第三方呼叫集成</h4>
+                                <div style="color: #fff; font-size: 14px;">微信、APP、网页、邮件</div>
+                            </div>
+                            
+                            <!-- 质量检查 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">质量检查</h4>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">评分模板</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">抽样任务</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">案例库</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">任务分配</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">分数统计</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">AI评分质检</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间：工单模块 -->
+                        <div style="flex: 1; min-width: 300px;">
+                            <!-- 工单模块 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">工单模块</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">工单新增/新增</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">工单分类</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">工单查询</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">流程引擎</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">工单分派</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">流程通知</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问卷设计</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">答案手机</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问卷发布</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问卷编辑</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 知识库 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">知识库</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">分类管理</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">页面检索</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">版本控制</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">页面编辑</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">收藏统计</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">文件管理</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 客服管理 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">客服管理</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">人员管理</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">组织架构</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">班次管理</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">排班规则</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">排班管理</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">考勤管理</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧：调查问卷模块、组织模块、报表模块、帮助中心 -->
+                        <div style="flex: 1; min-width: 300px;">
+                            <!-- 调查问卷模块 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">调查问卷模块</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问题管理</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问卷统计</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问卷设计</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">答案手机</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问卷发布</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">问卷编辑</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 组织模块 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">组织模块</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">组织结构</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">账号权限分配</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 报表模块 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">报表模块</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">运营报表</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">监控报表</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 帮助中心 -->
+                            <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px;">
+                                <h4 style="color: #ffd700; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">帮助中心</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">知识库</span>
+                                    <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">系统教程</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 系统管理层 -->
+                    <div style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <h4 style="color: #ffd700; margin: 0 0 15px 0; text-align: center; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.3);">系统管理</h4>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                            <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">字段管理</span>
+                            <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">操作日志</span>
+                            <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">用户管理</span>
+                            <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">模块开关</span>
+                            <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">权限管理</span>
+                            <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">架构管理</span>
+                            <span style="background: rgba(255,255,255,0.15); color: #fff; padding: 10px 15px; border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3);">公告管理</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 数据存储层 -->
+                    <div style="display: flex; gap: 20px; justify-content: center;">
+                        <div style="background: rgba(52, 152, 219, 0.3); border: 2px solid rgba(52, 152, 219, 0.6); border-radius: 8px; padding: 20px 40px; text-align: center;">
+                            <h4 style="color: #fff; margin: 0; font-size: 18px;">MYSQL</h4>
+                            <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">关系数据库</div>
+                        </div>
+                        <div style="background: rgba(231, 76, 60, 0.3); border: 2px solid rgba(231, 76, 60, 0.6); border-radius: 8px; padding: 20px 40px; text-align: center;">
+                            <h4 style="color: #fff; margin: 0; font-size: 18px;">REDIS</h4>
+                            <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">缓存数据库</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 模块说明 -->
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">模块说明</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                        <div>
+                            <h4 style="color: #3498db; margin-bottom: 8px;">🎯 业务层</h4>
+                            <p style="color: #666; line-height: 1.6; margin: 0;">包含客户关系管理、呼叫中心、在线客服等核心业务模块，支持全渠道客户服务</p>
+                        </div>
+                        <div>
+                            <h4 style="color: #3498db; margin-bottom: 8px;">📊 工单系统</h4>
+                            <p style="color: #666; line-height: 1.6; margin: 0;">完整的工单流程管理，从创建、分派、跟踪到解决，支持自定义工作流</p>
+                        </div>
+                        <div>
+                            <h4 style="color: #3498db; margin-bottom: 8px;">📚 知识库</h4>
+                            <p style="color: #666; line-height: 1.6; margin: 0;">知识库系统，支持版本控制、分类管理、智能检索等功能</p>
+                        </div>
+                        <div>
+                            <h4 style="color: #3498db; margin-bottom: 8px;">👥 客服管理</h4>
+                            <p style="color: #666; line-height: 1.6; margin: 0;">人员管理、组织架构、班次排班、考勤管理等全方位客服团队管理</p>
+                        </div>
+                        <div>
+                            <h4 style="color: #3498db; margin-bottom: 8px;">🔍 质量检查</h4>
+                            <p style="color: #666; line-height: 1.6; margin: 0;">评分模板、抽样任务、AI评分质检，全面提升服务质量</p>
+                        </div>
+                        <div>
+                            <h4 style="color: #3498db; margin-bottom: 8px;">📈 数据分析</h4>
+                            <p style="color: #666; line-height: 1.6; margin: 0;">运营报表、监控报表，实时掌握客服团队绩效和服务质量</p>
+                        </div>
                     </div>
                 </div>
             </div>
