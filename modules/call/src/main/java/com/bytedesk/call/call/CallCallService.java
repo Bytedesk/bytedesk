@@ -40,11 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 public class CallCallService {
 
     private final Client eslClient;
-    // private final CallProperties freeSwitchProperties;
-    private final CallService freeSwitchService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final CallService callService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private final CallCdrService cdrService;
-    // private final CallNumberService userService;
     
     // 存储活动呼叫信息
     private final Map<String, CallCallRequest> activeCallMap = new ConcurrentHashMap<>();
@@ -66,7 +64,7 @@ public class CallCallService {
         
         try {
             // 使用CallService发起呼叫
-            String result = freeSwitchService.originate(fromUser, toUser, "default");
+            String result = callService.originate(fromUser, toUser, "default");
             
             if (result != null && !result.contains("ERR")) {
                 // 生成呼叫ID
@@ -124,7 +122,7 @@ public class CallCallService {
             
             // 如果呼叫尚未应答，则发送应答命令
             if (callInfo.getCallUuid() != null) {
-                freeSwitchService.answer(callInfo.getCallUuid());
+                callService.answer(callInfo.getCallUuid());
             }
             
             // 通知用户呼叫已应答
@@ -421,7 +419,7 @@ public class CallCallService {
             );
             
             log.debug("发送呼叫事件: {} -> {} {}", destination, eventType, data);
-            messagingTemplate.convertAndSendToUser(userId, "/queue/call-events", payload);
+            simpMessagingTemplate.convertAndSendToUser(userId, "/queue/call-events", payload);
         } catch (Exception e) {
             log.error("发送呼叫事件失败: {}", e.getMessage(), e);
         }

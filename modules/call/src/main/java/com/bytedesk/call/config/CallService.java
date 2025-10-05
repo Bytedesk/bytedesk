@@ -33,7 +33,7 @@ public class CallService {
 
     private final Client eslClient;
     
-    private final CallFreeswitchProperties callProperties;
+    private final CallFreeswitchProperties callFreeswitchProperties;
 
     /**
      * 执行Call API命令
@@ -230,6 +230,6 @@ public class CallService {
      * 获取配置信息
      */
     public CallFreeswitchProperties getProperties() {
-        return callProperties;
+        return callFreeswitchProperties;
     }
 }
