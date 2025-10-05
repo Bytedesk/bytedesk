@@ -22,7 +22,8 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.redis.RedisService;
 import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
-import com.bytedesk.core.socket.stomp.StompConnectedEvent;
+import com.bytedesk.core.socket.stomp.event.StompConnectedEvent;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

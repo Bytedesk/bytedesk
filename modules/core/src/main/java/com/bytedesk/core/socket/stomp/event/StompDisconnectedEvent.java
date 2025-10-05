@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-23 14:43:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-08-04 10:43:16
+ * @LastEditTime: 2024-07-03 16:20:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.socket.stomp;
+package com.bytedesk.core.socket.stomp.event;
 
 import org.springframework.context.ApplicationEvent;
 
@@ -20,16 +20,15 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class StompUnsubscribeEvent extends ApplicationEvent {
+public class StompDisconnectedEvent extends ApplicationEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private String topic;
     private String clientId;
 
-    public StompUnsubscribeEvent(Object source, String topic, String clientId) {
+    public StompDisconnectedEvent(Object source, String clientId) {
         super(source);
-        this.topic = topic;
         this.clientId = clientId;
     }
+
 }

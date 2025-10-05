@@ -70,6 +70,14 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         // for mini program
         stompEndpointRegistry.addEndpoint("/mini")
                 .setAllowedOriginPatterns("*");
+        
+        // WebRTC signaling endpoints for call module (freeswitch)
+        stompEndpointRegistry.addEndpoint("/ws/freeswitch")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
+        // Native WebSocket endpoint for call module (without SockJS)
+        stompEndpointRegistry.addEndpoint("/ws/freeswitch/native")
+                .setAllowedOriginPatterns("*");
     }
 
     // https://docs.spring.io/spring-framework/reference/web/websocket/stomp/server-config.html
