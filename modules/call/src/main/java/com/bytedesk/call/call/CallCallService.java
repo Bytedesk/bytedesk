@@ -503,9 +503,7 @@ public class CallCallService {
                 log.info("已关联UUID到呼叫: {} -> UUID {}", entry.getKey(), uuid);
                 return;
             }
-        }
-        
-        log.warn("无法找到匹配的呼叫: {} -> {}", callerId, destination);
+        }        
     }
 
     /**
@@ -534,9 +532,7 @@ public class CallCallService {
                 log.info("通话已应答: {}", entry.getKey());
                 return;
             }
-        }
-        
-        log.warn("无法找到匹配的呼叫: UUID {}", uuid);
+        }        
     }
 
     /**
@@ -573,9 +569,7 @@ public class CallCallService {
                 log.info("通话已结束: {}", entry.getKey());
                 return;
             }
-        }
-        
-        log.warn("无法找到匹配的呼叫: UUID {}", uuid);
+        }        
     }
 
     /**
@@ -601,9 +595,7 @@ public class CallCallService {
                 
                 return;
             }
-        }
-        
-        log.warn("无法找到匹配的呼叫: UUID {}", uuid);
+        }        
     }
     
     /**
