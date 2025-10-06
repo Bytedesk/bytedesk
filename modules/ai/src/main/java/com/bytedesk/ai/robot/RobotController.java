@@ -49,9 +49,9 @@ import reactor.core.publisher.Flux;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/ai/chat/v1")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class RobotChatController {
+public class RobotController {
 
     @Autowired(required = false)
     private ChatModel primaryChatModel;
