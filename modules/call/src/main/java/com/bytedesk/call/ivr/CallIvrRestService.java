@@ -25,14 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -213,18 +209,18 @@ public class CallIvrRestService extends BaseRestServiceWithExport<CallIvrEntity,
     
     public void initCallIvrs(String orgUid) {
         // log.info("initThreadCallIvr");
-        for (String tag : CallIvrInitData.getAllCallIvrs()) {
-            CallIvrRequest tagRequest = CallIvrRequest.builder()
-                    .uid(Utils.formatUid(orgUid, tag))
-                    .name(tag)
-                    .order(0)
-                    .type(CallIvrTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            create(tagRequest);
-        }
+        // for (String tag : CallIvrInitData.getAllCallIvrs()) {
+        //     CallIvrRequest tagRequest = CallIvrRequest.builder()
+        //             .uid(Utils.formatUid(orgUid, tag))
+        //             .name(tag)
+        //             .order(0)
+        //             .type(CallIvrTypeEnum.THREAD.name())
+        //             .level(LevelEnum.ORGANIZATION.name())
+        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+        //             .orgUid(orgUid)
+        //             .build();
+        //     create(tagRequest);
+        // }
     }
     
 }
