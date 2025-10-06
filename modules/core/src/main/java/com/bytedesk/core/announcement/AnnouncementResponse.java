@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 
 import com.bytedesk.core.base.BaseResponse;
@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationResponse extends BaseResponse {
+public class AnnouncementResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 

@@ -11,20 +11,20 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface NotificationRepository extends JpaRepository<NotificationEntity, Long>, JpaSpecificationExecutor<NotificationEntity> {
+public interface AnnouncementRepository extends JpaRepository<AnnouncementEntity, Long>, JpaSpecificationExecutor<AnnouncementEntity> {
 
-    Optional<NotificationEntity> findByUid(String uid);
+    Optional<AnnouncementEntity> findByUid(String uid);
 
     Boolean existsByUid(String uid);
 
-    Optional<NotificationEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+    Optional<AnnouncementEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
     // Boolean existsByPlatform(String platform);
 }

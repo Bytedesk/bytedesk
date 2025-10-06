@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
@@ -22,21 +22,21 @@ import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class NotificationInitializer implements SmartInitializingSingleton {
+public class AnnouncementInitializer implements SmartInitializingSingleton {
 
-    private final NotificationRestService notificationRestService;
+    private final AnnouncementRestService announcementRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        notificationRestService.initNotifications(orgUid);
+        announcementRestService.initAnnouncements(orgUid);
     }
 
     private void initPermissions() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = NotificationPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = AnnouncementPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

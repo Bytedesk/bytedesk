@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -26,9 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class NotificationEventListener {
+public class AnnouncementEventListener {
 
-    private final NotificationRestService notificationRestService;
+    private final AnnouncementRestService announcementRestService;
 
     @Order(3)
     @EventListener
@@ -36,7 +36,7 @@ public class NotificationEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("thread - organization created: {}", organization.getName());
-        notificationRestService.initNotifications(orgUid);
+        announcementRestService.initAnnouncements(orgUid);
     }
 
  

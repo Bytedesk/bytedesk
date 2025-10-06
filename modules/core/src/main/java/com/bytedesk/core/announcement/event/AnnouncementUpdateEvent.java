@@ -11,26 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification.event;
+package com.bytedesk.core.announcement.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.notification.NotificationEntity;
+import com.bytedesk.core.announcement.AnnouncementEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NotificationUpdateEvent extends ApplicationEvent {
+public class AnnouncementUpdateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private NotificationEntity notification;
+    private AnnouncementEntity announcement;
 
-    public NotificationUpdateEvent(NotificationEntity notification) {
-        super(notification);
-        this.notification = notification;
+    public AnnouncementUpdateEvent(AnnouncementEntity announcement) {
+        super(announcement);
+        this.announcement = announcement;
     }
 
 }

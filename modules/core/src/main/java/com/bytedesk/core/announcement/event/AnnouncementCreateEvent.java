@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-02-25 12:31:16
+ * @Date: 2025-02-25 09:59:29
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-02-25 12:31:19
+ * @LastEditTime: 2025-02-25 10:00:34
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -11,25 +11,26 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification.event;
+package com.bytedesk.core.announcement.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.core.notification.NotificationEntity;
+import com.bytedesk.core.announcement.AnnouncementEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class NotificationDeleteEvent extends ApplicationEvent {
+public class AnnouncementCreateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private NotificationEntity notification;
+    private AnnouncementEntity announcement;
 
-    public NotificationDeleteEvent(NotificationEntity notification) {
-        super(notification);
-        this.notification = notification;
+    public AnnouncementCreateEvent(AnnouncementEntity announcement) {
+        super(announcement);
+        this.announcement = announcement;
     }
+
 }

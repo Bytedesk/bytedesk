@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -28,13 +28,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 同于发布平台动态和通知的通知实体
- * 
- * Notification entity for content categorization and organization
- * Provides notification management functionality for various system entities
- * 
- * Database Table: bytedesk_core_notification
- * Purpose: Stores notification definitions, colors, and organization settings
+ * 公告
  */
 @Entity
 @Data
@@ -43,29 +37,29 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({NotificationEntityListener.class})
-@Table(name = "bytedesk_core_notification")
-public class NotificationEntity extends BaseEntity {
+// @EntityListeners({AnnouncementEntityListener.class})
+@Table(name = "bytedesk_core_announcement")
+public class AnnouncementEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
 
     /**
-     * Name of the notification
+     * Name of the announcement
      */
     private String name;
 
     /**
-     * Description of the notification
+     * Description of the announcement
      */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of notification (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Type of announcement (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "notification_type")
-    private String type = NotificationTypeEnum.CUSTOMER.name();
+    @Column(name = "announcement_type")
+    private String type = AnnouncementTypeEnum.CUSTOMER.name();
 
 
 }

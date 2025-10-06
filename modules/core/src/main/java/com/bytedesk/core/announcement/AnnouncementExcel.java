@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import java.time.ZonedDateTime;
 
@@ -25,7 +25,7 @@ import lombok.Data;
  * https://github.com/alibaba/easyexcel
  */
 @Data
-public class NotificationExcel {
+public class AnnouncementExcel {
 
     @ExcelProperty(index = 0, value = "标签名称")
     @ColumnWidth(20)

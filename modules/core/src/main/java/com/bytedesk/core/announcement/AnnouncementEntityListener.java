@@ -11,14 +11,14 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
+import com.bytedesk.core.announcement.event.AnnouncementCreateEvent;
+import com.bytedesk.core.announcement.event.AnnouncementUpdateEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.notification.event.NotificationCreateEvent;
-import com.bytedesk.core.notification.event.NotificationUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.PostPersist;
@@ -28,24 +28,24 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class NotificationEntityListener {
+public class AnnouncementEntityListener {
 
     @PostPersist
-    public void onPostPersist(NotificationEntity notification) {
-        log.info("onPostPersist: {}", notification);
-        NotificationEntity cloneNotification = SerializationUtils.clone(notification);
+    public void onPostPersist(AnnouncementEntity announcement) {
+        log.info("onPostPersist: {}", announcement);
+        AnnouncementEntity cloneAnnouncement = SerializationUtils.clone(announcement);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new NotificationCreateEvent(cloneNotification));
+        bytedeskEventPublisher.publishEvent(new AnnouncementCreateEvent(cloneAnnouncement));
     }
 
     @PostUpdate
-    public void onPostUpdate(NotificationEntity notification) {
-        log.info("onPostUpdate: {}", notification);
-        NotificationEntity cloneNotification = SerializationUtils.clone(notification);
+    public void onPostUpdate(AnnouncementEntity announcement) {
+        log.info("onPostUpdate: {}", announcement);
+        AnnouncementEntity cloneAnnouncement = SerializationUtils.clone(announcement);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new NotificationUpdateEvent(cloneNotification));
+        bytedeskEventPublisher.publishEvent(new AnnouncementUpdateEvent(cloneAnnouncement));
     }
     
 }

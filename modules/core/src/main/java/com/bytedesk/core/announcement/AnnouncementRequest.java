@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationRequest extends BaseRequest {
+public class AnnouncementRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,6 +37,6 @@ public class NotificationRequest extends BaseRequest {
     private String description;
 
     // @Builder.Default
-    // private String type = NotificationTypeEnum.CUSTOMER.name();
+    // private String type = AnnouncementTypeEnum.CUSTOMER.name();
 
 }

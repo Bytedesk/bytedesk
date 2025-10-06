@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.notification;
+package com.bytedesk.core.announcement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,9 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class NotificationSpecification extends BaseSpecification<NotificationEntity, NotificationRequest> {
+public class AnnouncementSpecification extends BaseSpecification<AnnouncementEntity, AnnouncementRequest> {
     
-    public static Specification<NotificationEntity> search(NotificationRequest request, AuthService authService) {
+    public static Specification<AnnouncementEntity> search(AnnouncementRequest request, AuthService authService) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
         //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
