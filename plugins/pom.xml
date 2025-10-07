@@ -21,7 +21,7 @@
         <!-- <module>elearning</module> -->
         <!-- <module>note</module> -->
         <!-- <module>pdf</module> -->
-        <module>remote</module>
+        <!-- <module>remote</module> -->
         <!-- <module>socialhub</module> -->
         <!-- <module>form</module> -->
         <module>kanban</module>
