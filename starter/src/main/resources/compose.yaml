@@ -298,30 +298,66 @@ services:
       retries: 5
 
   # FreeSwitch 语音通话服务
-  # bytedesk-freeswitch:
-  #   image: safarov/freeswitch:latest # linux镜像
-  #   container_name: freeswitch-bytedesk
-  #   ports:
-  #     - "15060:5060/tcp"   # SIP
-  #     - "15060:5060/udp"   # SIP
-  #     - "15080:5080/tcp"   # SIP 安全端口
-  #     - "15080:5080/udp"   # SIP 安全端口
-  #     - "8021:8021"        # 控制台
-  #     - "18081-18082:8081-8082"  # 事件
-  #     - "17443:7443"       # WebRTC HTTPS
-  #     - "15066:5066"       # WebSocket 信令
-  #     - "16000-16129:16000-16129/udp" # RTP 媒体端口范围
-  #   environment:
-  #     - FREESWITCH_PASSWORD=bytedesk123
-  #   volumes:
-  #     - freeswitch_data:/usr/local/freeswitch/
-  #   networks:
-  #     - bytedesk-network
-  #   healthcheck:
-  #     test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
+  # 使用自定义构建的 FreeSWITCH 镜像
+  # 构建镜像: cd deploy/freeswitch/docker && ./build.sh
+  # 推送镜像: cd deploy/freeswitch/docker && ./push.sh
+  bytedesk-freeswitch:
+    image: bytedesk/freeswitch:1.10.12
+    container_name: freeswitch-bytedesk
+    restart: always
+    ports:
+      # SIP 端口
+      - "15060:5060/tcp"   # SIP 内部
+      - "15060:5060/udp"   # SIP 内部
+      - "15080:5080/tcp"   # SIP 外部
+      - "15080:5080/udp"   # SIP 外部
+      - "15061:5061/tcp"   # SIP 内部 TLS
+      - "15081:5081/tcp"   # SIP 外部 TLS
+      # WebRTC 端口
+      - "15066:5066/tcp"   # WebSocket 信令
+      - "17443:7443/tcp"   # WebRTC WSS
+      # ESL 管理端口
+      - "8021:8021/tcp"
+      # HTTP 服务端口
+      - "18081-18082:8081-8082/tcp"
+      # RTP 媒体端口范围
+      - "16000-16129:16000-16129/udp"
+      # STUN 端口 (可选)
+      # - "13478:3478/udp"
+      # - "13479:3479/udp"
+    environment:
+      # ESL 连接密码 (必填)
+      - FREESWITCH_ESL_PASSWORD=bytedesk123
+      # SIP 域名 (替换为您的域名或 IP)
+      - FREESWITCH_DOMAIN=localhost
+      # 外部 IP 地址 (用于 NAT 穿透，生产环境必填)
+      # - FREESWITCH_EXTERNAL_IP=your-public-ip
+      # RTP 端口范围
+      - FREESWITCH_RTP_START=16000
+      - FREESWITCH_RTP_END=16129
+      # 数据库配置 (可选，连接到 bytedesk-mysql)
+      # - FREESWITCH_DB_HOST=bytedesk-mysql
+      # - FREESWITCH_DB_NAME=freeswitch
+      # - FREESWITCH_DB_USER=root
+      # - FREESWITCH_DB_PASSWORD=r8FqfdbWUaN3
+      # - FREESWITCH_DB_PORT=3306
+      # 时区设置
+      - TZ=Asia/Shanghai
+    volumes:
+      # 配置文件目录 (可选，自定义配置时取消注释)
+      # - ../deploy/freeswitch/docker/conf:/usr/local/freeswitch/conf
+      # 数据持久化
+      - freeswitch_data:/usr/local/freeswitch
+    networks:
+      - bytedesk-network
+    # depends_on:
+    #   - bytedesk-mysql
+    healthcheck:
+      test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
 volumes:
   mysql_data:
