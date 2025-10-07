@@ -50,22 +50,38 @@ public abstract class BaseSpecification<T, TRequest> {
      * 
      * @param root 查询根对象
      * @param criteriaBuilder 条件构建器
-     * @param orgUid 组织ID
+     * @param request 请求对象
+     * @param authService 认证服务
      * @return 基础查询条件列表
      */
     protected static List<Predicate> getBasicPredicates(Root<?> root, CriteriaBuilder criteriaBuilder, BaseRequest request, AuthService authService) {
         // 验证超级管理员权限（如有必要会修改 request.superUser）
         validateSuperUserPermission(request, authService);
+        
         // 非超级管理员必须提供 orgUid
         if (!Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
             throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
         }
+        
+        // 验证请求的 orgUid 是否与当前用户的 orgUid 相同
+        if (StringUtils.hasText(request.getOrgUid())) {
+            UserEntity user = authService.getUser();
+            if (user != null && !Boolean.TRUE.equals(request.getSuperUser())) {
+                String userOrgUid = user.getOrgUid();
+                if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
+                    throw new IllegalArgumentException("无权访问其他组织的数据");
+                }
+            }
+        }
+        
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+        
         // 只有非超级管理员且有 orgUid 时才加 orgUid 条件
         if (!Boolean.TRUE.equals(request.getSuperUser()) && StringUtils.hasText(request.getOrgUid())) {
             predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
         }
+        
         return predicates;
     }
 
