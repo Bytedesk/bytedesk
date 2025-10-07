@@ -299,10 +299,9 @@ services:
 
   # FreeSwitch 语音通话服务
   # 使用自定义构建的 FreeSWITCH 镜像
-  # 构建镜像: cd deploy/freeswitch/docker && ./build.sh
-  # 推送镜像: cd deploy/freeswitch/docker && ./push.sh
   bytedesk-freeswitch:
-    image: bytedesk/freeswitch:1.10.12
+    # image: bytedesk/freeswitch:latest
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
     container_name: freeswitch-bytedesk
     restart: always
     ports:
@@ -317,7 +316,7 @@ services:
       - "15066:5066/tcp"   # WebSocket 信令
       - "17443:7443/tcp"   # WebRTC WSS
       # ESL 管理端口
-      - "8021:8021/tcp"
+      - "18021:8021/tcp"
       # HTTP 服务端口
       - "18081-18082:8081-8082/tcp"
       # RTP 媒体端口范围
@@ -345,9 +344,10 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       # 配置文件目录 (可选，自定义配置时取消注释)
-      # - ../deploy/freeswitch/docker/conf:/usr/local/freeswitch/conf
+      # - ../deploy/freeswitch/conf:/usr/local/freeswitch/conf
       # 数据持久化
-      - freeswitch_data:/usr/local/freeswitch
+      # - freeswitch_data:/usr/local/freeswitch
+      - freeswitch_data:/Users/ningjinpeng/Desktop/git/private/github/bytedesk-private/deploy/freeswitch/conf
     networks:
       - bytedesk-network
     # depends_on:
