@@ -58,14 +58,14 @@ public abstract class BaseSpecification<T, TRequest> {
         // 验证超级管理员权限（如有必要会修改 request.superUser）
         validateSuperUserPermission(request, authService);
         
+        UserEntity user = authService.getUser();
         // 非超级管理员必须提供 orgUid
-        if (!Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
+        if (user != null && !Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
             throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
         }
         
         // 验证请求的 orgUid 是否与当前用户的 orgUid 相同
         if (StringUtils.hasText(request.getOrgUid())) {
-            UserEntity user = authService.getUser();
             if (user != null && !Boolean.TRUE.equals(request.getSuperUser())) {
                 String userOrgUid = user.getOrgUid();
                 if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
