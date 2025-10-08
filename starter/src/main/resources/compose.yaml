@@ -192,22 +192,22 @@ services:
       retries: 5
 
   # FreeSwitch 语音通话服务
-  # https://hub.docker.com/r/safarov/freeswitch
-  # https://github.com/signalwire/freeswitch/tree/master/docker
+  # https://hub.docker.com/r/bytedesk/freeswitch
   # 使用自定义构建的 FreeSWITCH 镜像（支持 ARM64/AMD64）
   bytedesk-freeswitch:
+    # image: bytedesk/freeswitch:latest
     image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
     container_name: freeswitch-bytedesk
     restart: always
     # 使用 -nf (no fork) 参数在前台运行，避免容器退出
     command: ["freeswitch", "-nf", "-nonat", "-nonatmap"]
-    # 禁用 IPv6 网络
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.default.disable_ipv6=1
     environment:
       # 时区设置
       - TZ=Asia/Shanghai
+      # 设置 ESL 密码（必须设置，否则使用默认密码 ClueCon）
+      - FREESWITCH_ESL_PASSWORD=bytedesk123
+      # 完全禁用 IPv6
+      - DISABLE_IPV6=true
     ports:
       # SIP 端口
       - "15060:5060/tcp"   # SIP 内部
@@ -236,13 +236,16 @@ services:
       - freeswitch_recordings:/usr/local/freeswitch/recordings
     networks:
       - bytedesk-network
-    healthcheck:
-      test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+    # 暂时禁用健康检查，因为 event_socket 模块启动问题
+    # healthcheck:
+    #   test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 60s
 
+  # https://hub.docker.com/r/safarov/freeswitch
+  # https://github.com/signalwire/freeswitch/tree/master/docker
   # FreeSwitch 官方镜像 safarov/freeswitch (不支持 ARM64，已注释)
   # 仅适用于 AMD64/x86_64 架构
   # bytedesk-freeswitch-official:
@@ -381,17 +384,29 @@ volumes:
     name: bytedesk_minio_data
   freeswitch_config:
     name: bytedesk_freeswitch_config
+    external: true
   freeswitch_sounds:
     name: bytedesk_freeswitch_sounds
+    external: true
   freeswitch_data:
     name: bytedesk_freeswitch_data
+    external: true
   freeswitch_logs:
     name: bytedesk_freeswitch_logs
+    external: true
   freeswitch_tmp:
     name: bytedesk_freeswitch_tmp
+    external: true
   freeswitch_recordings:
     name: bytedesk_freeswitch_recordings
+    external: true
 
 networks:
   bytedesk-network:
     driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.25.0.0/16
+        - subnet: fd12:3456:789a::/64

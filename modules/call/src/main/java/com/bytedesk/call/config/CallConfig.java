@@ -49,20 +49,20 @@ public class CallConfig {
         Client inboundClient = new Client();
         
         // 连接重试配置
-        int maxRetries = 3;
-        int retryDelayMs = 2000;
+        int maxRetries = 5;
+        int retryDelayMs = 3000;
         
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 log.info("第{}次尝试连接Call ESL: {}:{}", 
                         attempt, callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
                         
-                // 设置更长的超时时间
+                // 增加更长的超时时间
                 inboundClient.connect(
                     callFreeswitchProperties.getServer(), 
                     callFreeswitchProperties.getEslPort(), 
                     callFreeswitchProperties.getEslPassword(),
-                    20); // 增加超时时间到20秒
+                    30); // 增加超时时间到30秒
                     
                 // 验证连接是否真正建立
                 if (inboundClient.canSend()) {
