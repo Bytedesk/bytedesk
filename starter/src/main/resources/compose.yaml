@@ -199,7 +199,11 @@ services:
     container_name: freeswitch-bytedesk
     restart: always
     # 使用 -nf (no fork) 参数在前台运行，避免容器退出
-    command: ["freeswitch", "-nf", "-nonat"]
+    command: ["freeswitch", "-nf", "-nonat", "-nonatmap"]
+    # 禁用 IPv6 解决 ESL 绑定问题
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
     ports:
       # SIP 端口
       - "15060:5060/tcp"   # SIP 内部
