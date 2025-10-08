@@ -131,6 +131,130 @@ services:
       timeout: 10s
       retries: 5
 
+  # etcd 分布式键值存储
+  # http://localhost:12379 - etcd API
+  bytedesk-etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: etcd-bytedesk
+    restart: always
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+      - TZ=Asia/Shanghai
+    ports:
+      - "12379:2379"   # Client API
+      - "12380:2380"   # Peer communication
+    volumes:
+      - etcd_data:/etcd
+    command:
+      - /usr/local/bin/etcd
+      - --name=bytedesk-etcd-node
+      - --advertise-client-urls=http://bytedesk-etcd:2379
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --initial-advertise-peer-urls=http://bytedesk-etcd:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-cluster=bytedesk-etcd-node=http://bytedesk-etcd:2380
+      - --initial-cluster-state=new
+      - --data-dir=/etcd
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO Console
+  # http://localhost:19001 - MinIO API
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # FreeSwitch 语音通话服务
+  # 使用自定义构建的 FreeSWITCH 镜像
+  bytedesk-freeswitch:
+    # image: bytedesk/freeswitch:latest
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
+    container_name: freeswitch-bytedesk
+    restart: always
+    # 使用 -nf (no fork) 参数在前台运行，避免容器退出
+    command: ["freeswitch", "-nf", "-nonat"]
+    ports:
+      # SIP 端口
+      - "15060:5060/tcp"   # SIP 内部
+      - "15060:5060/udp"   # SIP 内部
+      - "15080:5080/tcp"   # SIP 外部
+      - "15080:5080/udp"   # SIP 外部
+      - "15061:5061/tcp"   # SIP 内部 TLS
+      - "15081:5081/tcp"   # SIP 外部 TLS
+      # WebRTC 端口
+      - "15066:5066/tcp"   # WebSocket 信令
+      - "17443:7443/tcp"   # WebRTC WSS
+      # ESL 管理端口
+      - "18021:8021/tcp"
+      # HTTP 服务端口
+      - "18081-18082:8081-8082/tcp"
+      # RTP 媒体端口范围
+      - "16000-16129:16000-16129/udp"
+      # STUN 端口 (可选)
+      # - "13478:3478/udp"
+      # - "13479:3479/udp"
+    environment:
+      # ESL 连接密码 (必填)
+      - FREESWITCH_ESL_PASSWORD=bytedesk123
+      # SIP 域名 (替换为您的域名或 IP)
+      - FREESWITCH_DOMAIN=localhost
+      # 外部 IP 地址 (用于 NAT 穿透，生产环境必填)
+      # - FREESWITCH_EXTERNAL_IP=your-public-ip
+      # RTP 端口范围
+      - FREESWITCH_RTP_START=16000
+      - FREESWITCH_RTP_END=16129
+      # 数据库配置 (可选，连接到 bytedesk-mysql)
+      # - FREESWITCH_DB_HOST=bytedesk-mysql
+      # - FREESWITCH_DB_NAME=freeswitch
+      # - FREESWITCH_DB_USER=root
+      # - FREESWITCH_DB_PASSWORD=r8FqfdbWUaN3
+      # - FREESWITCH_DB_PORT=3306
+      # 时区设置
+      - TZ=Asia/Shanghai
+    volumes:
+      # 配置文件目录 (可选，自定义配置时取消注释)
+      # - ../deploy/freeswitch/conf:/usr/local/freeswitch/conf
+      # 数据持久化
+      - freeswitch_data:/usr/local/freeswitch
+      # - freeswitch_data:/Users/ningjinpeng/Desktop/git/private/github/bytedesk-private/deploy/freeswitch/conf
+    networks:
+      - bytedesk-network
+    # depends_on:
+    #   - bytedesk-mysql
+    healthcheck:
+      test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
   # bytedesk-ldap:
   #   image: osixia/openldap:latest
   #   container_name: ldap-bytedesk
@@ -202,127 +326,6 @@ services:
   #   depends_on:
   #     - bytedesk-prometheus
 
-  # etcd 分布式键值存储
-  # http://localhost:12379 - etcd API
-  bytedesk-etcd:
-    image: quay.io/coreos/etcd:v3.5.5
-    container_name: etcd-bytedesk
-    restart: always
-    environment:
-      - ETCD_AUTO_COMPACTION_MODE=revision
-      - ETCD_AUTO_COMPACTION_RETENTION=1000
-      - ETCD_QUOTA_BACKEND_BYTES=4294967296
-      - ETCD_SNAPSHOT_COUNT=50000
-      - TZ=Asia/Shanghai
-    ports:
-      - "12379:2379"   # Client API
-      - "12380:2380"   # Peer communication
-    volumes:
-      - etcd_data:/etcd
-    command:
-      - /usr/local/bin/etcd
-      - --name=bytedesk-etcd-node
-      - --advertise-client-urls=http://bytedesk-etcd:2379
-      - --listen-client-urls=http://0.0.0.0:2379
-      - --initial-advertise-peer-urls=http://bytedesk-etcd:2380
-      - --listen-peer-urls=http://0.0.0.0:2380
-      - --initial-cluster=bytedesk-etcd-node=http://bytedesk-etcd:2380
-      - --initial-cluster-state=new
-      - --data-dir=/etcd
-    networks:
-      - bytedesk-network
-    healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # MinIO 对象存储服务
-  # http://localhost:19000 - MinIO Console
-  # http://localhost:19001 - MinIO API
-  bytedesk-minio:
-    image: minio/minio:latest
-    container_name: minio-bytedesk
-    restart: always
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin123
-      - TZ=Asia/Shanghai
-    ports:
-      - "19000:9000"   # API
-      - "19001:9001"   # Console
-    volumes:
-      - minio_data:/data
-    command: minio server /data --console-address ":9001"
-    networks:
-      - bytedesk-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # FreeSwitch 语音通话服务
-  # 使用自定义构建的 FreeSWITCH 镜像
-  bytedesk-freeswitch:
-    # image: bytedesk/freeswitch:latest
-    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
-    container_name: freeswitch-bytedesk
-    restart: always
-    ports:
-      # SIP 端口
-      - "15060:5060/tcp"   # SIP 内部
-      - "15060:5060/udp"   # SIP 内部
-      - "15080:5080/tcp"   # SIP 外部
-      - "15080:5080/udp"   # SIP 外部
-      - "15061:5061/tcp"   # SIP 内部 TLS
-      - "15081:5081/tcp"   # SIP 外部 TLS
-      # WebRTC 端口
-      - "15066:5066/tcp"   # WebSocket 信令
-      - "17443:7443/tcp"   # WebRTC WSS
-      # ESL 管理端口
-      - "18021:8021/tcp"
-      # HTTP 服务端口
-      - "18081-18082:8081-8082/tcp"
-      # RTP 媒体端口范围
-      - "16000-16129:16000-16129/udp"
-      # STUN 端口 (可选)
-      # - "13478:3478/udp"
-      # - "13479:3479/udp"
-    environment:
-      # ESL 连接密码 (必填)
-      - FREESWITCH_ESL_PASSWORD=bytedesk123
-      # SIP 域名 (替换为您的域名或 IP)
-      - FREESWITCH_DOMAIN=localhost
-      # 外部 IP 地址 (用于 NAT 穿透，生产环境必填)
-      # - FREESWITCH_EXTERNAL_IP=your-public-ip
-      # RTP 端口范围
-      - FREESWITCH_RTP_START=16000
-      - FREESWITCH_RTP_END=16129
-      # 数据库配置 (可选，连接到 bytedesk-mysql)
-      # - FREESWITCH_DB_HOST=bytedesk-mysql
-      # - FREESWITCH_DB_NAME=freeswitch
-      # - FREESWITCH_DB_USER=root
-      # - FREESWITCH_DB_PASSWORD=r8FqfdbWUaN3
-      # - FREESWITCH_DB_PORT=3306
-      # 时区设置
-      - TZ=Asia/Shanghai
-    volumes:
-      # 配置文件目录 (可选，自定义配置时取消注释)
-      # - ../deploy/freeswitch/conf:/usr/local/freeswitch/conf
-      # 数据持久化
-      # - freeswitch_data:/usr/local/freeswitch
-      - freeswitch_data:/Users/ningjinpeng/Desktop/git/private/github/bytedesk-private/deploy/freeswitch/conf
-    networks:
-      - bytedesk-network
-    # depends_on:
-    #   - bytedesk-mysql
-    healthcheck:
-      test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
 
 volumes:
   mysql_data:
@@ -339,18 +342,12 @@ volumes:
     name: bytedesk_ldap_data
   ldap_config:
     name: bytedesk_ldap_config
-  # chroma_data:
-  #   name: bytedesk_chroma_data
   elasticsearch_data:
     name: bytedesk_elasticsearch_data
   zipkin_data:
     name: bytedesk_zipkin_data
   artemis_data:
     name: bytedesk_artemis_data
-  # weaviate_data:
-  #   name: bytedesk_weaviate_data
-  # milvus_data:
-  #   name: bytedesk_milvus_data
   etcd_data:
     name: bytedesk_etcd_data
   minio_data:
