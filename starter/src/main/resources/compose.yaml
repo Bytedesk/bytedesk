@@ -202,75 +202,40 @@ services:
   #   depends_on:
   #     - bytedesk-prometheus
 
-  # Chroma 向量数据库
-  # bytedesk-chroma:
-  #   image: ghcr.io/chroma-core/chroma:latest
-  #   container_name: chroma-bytedesk
-  #   ports:
-  #     - "18000:8000"
-  #   volumes:
-  #     - chroma_data:/chroma/chroma
-  #   environment:
-  #     - CHROMA_SERVER_CORS_ALLOW_ORIGINS=*
-  #     - CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.basic.BasicAuthCredentialsProvider
-  #     - CHROMA_SERVER_AUTH_CREDENTIALS_FILE=/chroma/chroma_users.json
-  #     - PERSIST_DIRECTORY=/chroma/chroma
-  #   networks:
-  #     - bytedesk-network
-
-  # Weaviate 向量数据库
-  # bytedesk-weaviate:
-  #   image: semitechnologies/weaviate:1.24.5
-  #   container_name: weaviate-bytedesk
-  #   ports:
-  #     - "18080:8080"
-  #   environment:
-  #     - QUERY_DEFAULTS_LIMIT=25
-  #     - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
-  #     - PERSISTENCE_DATA_PATH=/var/lib/weaviate
-  #     - DEFAULT_VECTORIZER_MODULE=none
-  #     - CLUSTER_HOSTNAME=node1
-  #   volumes:
-  #     - weaviate_data:/var/lib/weaviate
-  #   networks:
-  #     - bytedesk-network
-
-  # Milvus 向量数据库
-  # bytedesk-milvus:
-  #   image: milvusdb/milvus:v2.3.7
-  #   container_name: milvus-bytedesk
-  #   command: ["milvus", "run", "standalone"]
-  #   environment:
-  #     - ETCD_ENDPOINTS=etcd:2379
-  #     - MINIO_ADDRESS=minio:9000
-  #   volumes:
-  #     - milvus_data:/var/lib/milvus
-  #   ports:
-  #     - "19530:19530"
-  #     - "19531:9091"
-  #   networks:
-  #     - bytedesk-network
-  #   depends_on:
-  #     - bytedesk-etcd
-  #     - bytedesk-minio
-
-  # bytedesk-etcd:
-  #   image: quay.io/coreos/etcd:v3.5.5
-  #   container_name: etcd-bytedesk
-  #   environment:
-  #     - ETCD_AUTO_COMPACTION_MODE=revision
-  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
-  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
-  #     - ETCD_SNAPSHOT_COUNT=50000
-  #   volumes:
-  #     - etcd_data:/etcd
-  #   command:
-  #     - /usr/local/bin/etcd
-  #     - --advertise-client-urls=http://etcd:2379
-  #     - --listen-client-urls=http://0.0.0.0:2379
-  #     - --data-dir=/etcd
-  #   networks:
-  #     - bytedesk-network
+  # etcd 分布式键值存储
+  # http://localhost:12379 - etcd API
+  bytedesk-etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: etcd-bytedesk
+    restart: always
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+      - TZ=Asia/Shanghai
+    ports:
+      - "12379:2379"   # Client API
+      - "12380:2380"   # Peer communication
+    volumes:
+      - etcd_data:/etcd
+    command:
+      - /usr/local/bin/etcd
+      - --name=bytedesk-etcd-node
+      - --advertise-client-urls=http://bytedesk-etcd:2379
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --initial-advertise-peer-urls=http://bytedesk-etcd:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-cluster=bytedesk-etcd-node=http://bytedesk-etcd:2380
+      - --initial-cluster-state=new
+      - --data-dir=/etcd
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # MinIO 对象存储服务
   # http://localhost:19000 - MinIO Console
@@ -386,8 +351,8 @@ volumes:
   #   name: bytedesk_weaviate_data
   # milvus_data:
   #   name: bytedesk_milvus_data
-  # etcd_data:
-  #   name: bytedesk_etcd_data
+  etcd_data:
+    name: bytedesk_etcd_data
   minio_data:
     name: bytedesk_minio_data
   freeswitch_data:
