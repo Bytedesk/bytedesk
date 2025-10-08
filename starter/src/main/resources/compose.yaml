@@ -224,7 +224,7 @@ services:
       # HTTP 服务端口
       - "18081-18082:8081-8082/tcp"
       # RTP 媒体端口范围
-      - "16000-16129:16000-16129/udp"
+      - "16000-16129:6000-6129/udp"
     volumes:
       # 配置文件目录 - 使用本地配置文件（注意：FreeSWITCH 实际使用 /usr/local/freeswitch/etc/freeswitch）
       - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
