@@ -17,15 +17,15 @@ fi
 # 测试 ESL 认证
 echo ""
 echo "[2] 测试 ESL 认证..."
-(
-    sleep 1
+{
+    sleep 2
     echo "auth bytedesk123"
-    sleep 1
+    sleep 2
     echo "api status"
-    sleep 1
+    sleep 2
     echo "exit"
     sleep 1
-) | telnet 127.0.0.1 18021 2>&1
+} | nc 127.0.0.1 18021
 
 echo ""
 echo "========================================"
