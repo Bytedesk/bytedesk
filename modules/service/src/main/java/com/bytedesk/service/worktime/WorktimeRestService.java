@@ -22,8 +22,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -58,9 +56,7 @@ public class WorktimeRestService extends BaseRestService<WorktimeEntity, Worktim
     @Override
     public Page<WorktimeResponse> queryByUser(WorktimeRequest request) {
         UserEntity user = authService.getCurrentUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         request.setUserUid(user.getUid());
         // 
         return queryByOrg(request);

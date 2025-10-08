@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -68,9 +66,7 @@ public class ArticleArchiveRestService extends BaseRestService<ArticleArchiveEnt
     @Override
     public ArticleArchiveResponse create(ArticleArchiveRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
 
         ArticleArchiveEntity entity = modelMapper.map(request, ArticleArchiveEntity.class);
         entity.setUid(uidUtils.getUid());

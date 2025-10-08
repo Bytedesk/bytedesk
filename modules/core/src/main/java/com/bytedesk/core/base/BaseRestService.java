@@ -20,8 +20,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 
@@ -76,9 +74,7 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
      */
     public Page<TResponse> queryByUser(TRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         setUserUidToRequest(request, user.getUid());
         return queryByOrg(request);
     }

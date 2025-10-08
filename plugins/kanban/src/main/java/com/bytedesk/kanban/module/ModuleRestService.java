@@ -24,8 +24,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kanban.project.ProjectEntity;
@@ -93,9 +91,7 @@ public class ModuleRestService extends BaseRestService<ModuleEntity, ModuleReque
     @Override
     public ModuleResponse create(ModuleRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         request.setUserUid(user.getUid());
 
         // ModuleEntity entity = modelMapper.map(request, ModuleEntity.class);

@@ -28,7 +28,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Description;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRequest;
@@ -92,9 +91,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
     @Override
     public Page<QueueResponse> queryByUser(QueueRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
+        
         // set user uid
         request.setUserUid(user.getUid());
         return queryByOrg(request);
@@ -102,9 +99,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
     public Page<ThreadResponse> queryQueuing(ThreadRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }        
+               
         // 设置查询条件：状态为排队中
         request.setStatus(ThreadProcessStatusEnum.QUEUING.name());
         

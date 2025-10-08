@@ -26,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -83,9 +81,7 @@ public class VisitorTokenRestService extends BaseRestService<VisitorTokenEntity,
         entity.setUid(uidUtils.getUid());
         // 
         UserEntity user = authService.getCurrentUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         entity.setUserUid(user.getUid());
         
         // 非永久有效，且未设置过期时间，则根据channel设置默认过期时间
@@ -175,9 +171,7 @@ public class VisitorTokenRestService extends BaseRestService<VisitorTokenEntity,
      */
     public String generateAccessVisitorToken(VisitorTokenRequest request) {
         UserEntity user = authService.getCurrentUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         String username = user.getUsername();
         String platform = request.getPlatform();
         if (!StringUtils.hasText(platform)) {

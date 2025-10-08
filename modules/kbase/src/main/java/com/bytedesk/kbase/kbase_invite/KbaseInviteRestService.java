@@ -24,8 +24,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -61,9 +59,7 @@ public class KbaseInviteRestService extends BaseRestService<KbaseInviteEntity, K
     @Override
     public KbaseInviteResponse create(KbaseInviteRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         request.setUserUid(user.getUid());
         
         KbaseInviteEntity entity = modelMapper.map(request, KbaseInviteEntity.class);

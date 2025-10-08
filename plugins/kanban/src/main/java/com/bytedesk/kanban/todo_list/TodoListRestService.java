@@ -18,8 +18,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kanban.module.ModuleEntity;
@@ -87,9 +85,7 @@ public class TodoListRestService extends BaseRestService<TodoListEntity, TodoLis
     @Override
     public TodoListResponse create(TodoListRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         request.setUserUid(user.getUid());
         
         TodoListEntity entity = modelMapper.map(request, TodoListEntity.class);

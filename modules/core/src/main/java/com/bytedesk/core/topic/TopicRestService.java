@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -220,9 +218,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     public Boolean isSubscribed(TopicRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
         if (topicOptional.isPresent()) {
             TopicEntity topicElement = topicOptional.get();
@@ -286,9 +282,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     @Transactional
     public TopicResponse subscribe(TopicRequest request) {
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         String topic = request.getTopic();
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
         if (topicOptional.isPresent()) {
@@ -329,9 +323,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     public TopicResponse unsubscribe(TopicRequest request) { 
         UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        
         String topic = request.getTopic();
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
         if (topicOptional.isPresent()) {
