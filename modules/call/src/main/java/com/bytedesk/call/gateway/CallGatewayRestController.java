@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
  * Call网关REST控制器
  */
 @RestController
-@RequestMapping("/api/v1/freeswitch/gateway")
+@RequestMapping("/api/v1/call/gateway")
 @AllArgsConstructor
 public class CallGatewayRestController extends BaseRestController<CallGatewayRequest, CallGatewayRestService> {
 

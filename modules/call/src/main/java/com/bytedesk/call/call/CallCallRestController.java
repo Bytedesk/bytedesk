@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/freeswitch/call")
+@RequestMapping("/api/v1/call")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallCallRestController extends BaseRestController<CallCallRequest, CallCallRestService> {
