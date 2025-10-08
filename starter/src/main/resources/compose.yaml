@@ -192,18 +192,22 @@ services:
       retries: 5
 
   # FreeSwitch 语音通话服务
-  # 使用自定义构建的 FreeSWITCH 镜像
+  # https://hub.docker.com/r/safarov/freeswitch
+  # https://github.com/signalwire/freeswitch/tree/master/docker
+  # 使用自定义构建的 FreeSWITCH 镜像（支持 ARM64/AMD64）
   bytedesk-freeswitch:
-    # image: bytedesk/freeswitch:latest
     image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
     container_name: freeswitch-bytedesk
     restart: always
     # 使用 -nf (no fork) 参数在前台运行，避免容器退出
     command: ["freeswitch", "-nf", "-nonat", "-nonatmap"]
-    # 禁用 IPv6 解决 ESL 绑定问题
+    # 禁用 IPv6 网络
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
       - net.ipv6.conf.default.disable_ipv6=1
+    environment:
+      # 时区设置
+      - TZ=Asia/Shanghai
     ports:
       # SIP 端口
       - "15060:5060/tcp"   # SIP 内部
@@ -221,43 +225,62 @@ services:
       - "18081-18082:8081-8082/tcp"
       # RTP 媒体端口范围
       - "16000-16129:16000-16129/udp"
-      # STUN 端口 (可选)
-      # - "13478:3478/udp"
-      # - "13479:3479/udp"
-    environment:
-      # ESL 连接密码 (必填)
-      - FREESWITCH_ESL_PASSWORD=bytedesk123
-      # SIP 域名 (替换为您的域名或 IP)
-      - FREESWITCH_DOMAIN=localhost
-      # 外部 IP 地址 (用于 NAT 穿透，生产环境必填)
-      # - FREESWITCH_EXTERNAL_IP=your-public-ip
-      # RTP 端口范围
-      - FREESWITCH_RTP_START=16000
-      - FREESWITCH_RTP_END=16129
-      # 数据库配置 (可选，连接到 bytedesk-mysql)
-      # - FREESWITCH_DB_HOST=bytedesk-mysql
-      # - FREESWITCH_DB_NAME=freeswitch
-      # - FREESWITCH_DB_USER=root
-      # - FREESWITCH_DB_PASSWORD=r8FqfdbWUaN3
-      # - FREESWITCH_DB_PORT=3306
-      # 时区设置
-      - TZ=Asia/Shanghai
     volumes:
-      # 配置文件目录 (可选，自定义配置时取消注释)
-      # - ../deploy/freeswitch/conf:/usr/local/freeswitch/conf
-      # 数据持久化
-      - freeswitch_data:/usr/local/freeswitch
-      # - freeswitch_data:/Users/ningjinpeng/Desktop/git/private/github/bytedesk-private/deploy/freeswitch/conf
+      # 配置文件目录 - 使用本地配置文件
+      - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/conf
+      # 数据持久化目录
+      - freeswitch_data:/usr/local/freeswitch/db
+      # 日志目录
+      - freeswitch_logs:/usr/local/freeswitch/log
+      # 录音目录
+      - freeswitch_recordings:/usr/local/freeswitch/recordings
     networks:
       - bytedesk-network
-    # depends_on:
-    #   - bytedesk-mysql
     healthcheck:
       test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
+
+  # FreeSwitch 官方镜像 safarov/freeswitch (不支持 ARM64，已注释)
+  # 仅适用于 AMD64/x86_64 架构
+  # bytedesk-freeswitch-official:
+  #   image: safarov/freeswitch:latest
+  #   container_name: freeswitch-bytedesk-official
+  #   restart: always
+  #   command: ["freeswitch"]
+  #   environment:
+  #     - SOUND_RATES=8000:16000
+  #     - SOUND_TYPES=music:en-us-callie
+  #     - EPMD=false
+  #     - TZ=Asia/Shanghai
+  #   ports:
+  #     - "15060:5060/tcp"
+  #     - "15060:5060/udp"
+  #     - "15080:5080/tcp"
+  #     - "15080:5080/udp"
+  #     - "15061:5061/tcp"
+  #     - "15081:5081/tcp"
+  #     - "15066:5066/tcp"
+  #     - "17443:7443/tcp"
+  #     - "18021:8021/tcp"
+  #     - "16384-32768:16384-32768/udp"
+  #     - "64535-65535:64535-65535/udp"
+  #   volumes:
+  #     - freeswitch_config:/etc/freeswitch
+  #     - freeswitch_sounds:/usr/share/freeswitch/sounds
+  #     - freeswitch_data:/var/lib/freeswitch
+  #     - freeswitch_logs:/var/log/freeswitch
+  #     - freeswitch_tmp:/tmp
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "fs_cli", "-x", "status"]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 60s
 
   # bytedesk-ldap:
   #   image: osixia/openldap:latest
@@ -356,8 +379,18 @@ volumes:
     name: bytedesk_etcd_data
   minio_data:
     name: bytedesk_minio_data
+  freeswitch_config:
+    name: bytedesk_freeswitch_config
+  freeswitch_sounds:
+    name: bytedesk_freeswitch_sounds
   freeswitch_data:
     name: bytedesk_freeswitch_data
+  freeswitch_logs:
+    name: bytedesk_freeswitch_logs
+  freeswitch_tmp:
+    name: bytedesk_freeswitch_tmp
+  freeswitch_recordings:
+    name: bytedesk_freeswitch_recordings
 
 networks:
   bytedesk-network:
