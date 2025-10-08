@@ -74,6 +74,7 @@ public class MessageUnreadRestService
             // request.setUserUid(request.getUid());
         } else {
             request.setUid(user.getUid());
+            request.setOrgUid(user.getOrgUid());
         }
         //
         Page<MessageUnreadResponse> page = queryByOrg(request);
