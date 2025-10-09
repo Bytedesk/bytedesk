@@ -39,6 +39,8 @@ nginx version: nginx/1.18.0 (Ubuntu)
 # load_module /usr/lib/nginx/modules/ngx_stream_module.so;
 # 缓存路径，创建文件夹，在nginx.conf文件中用到
 mkdir -p /var/www/html/nginx/cache/webserver
+# 检查nginx配置文件是否有语法错误
+sudo nginx -t
 # 重新加载配置文件
 nginx -s reload
 # 或者 重启nginx

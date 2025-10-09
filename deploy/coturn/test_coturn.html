@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coturn STUN/TURN 服务器测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        #result {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .candidate {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background: #e8f5e9;
+            border-left: 3px solid #4caf50;
+        }
+        .candidate.relay {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+        .candidate.host {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #d32f2f;
+        }
+        .success {
+            color: #388e3c;
+            background: #e8f5e9;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #388e3c;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .info ul {
+            margin-left: 20px;
+            color: #555;
+            font-size: 14px;
+        }
+        .info li {
+            margin: 5px 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Coturn STUN/TURN 服务器测试</h1>
+        <p class="subtitle">测试您的 STUN/TURN 服务器配置和连通性</p>
+
+        <div class="info">
+            <h3>📋 测试说明</h3>
+            <ul>
+                <li><strong>STUN</strong>: 用于 NAT 穿透，获取公网 IP 和端口</li>
+                <li><strong>TURN</strong>: 用于中继传输，当 P2P 连接失败时使用</li>
+                <li><strong>成功标志</strong>: 看到 <code>srflx</code>（STUN）或 <code>relay</code>（TURN）类型的候选地址</li>
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <label for="protocol">协议类型</label>
+            <select id="protocol">
+                <option value="stun">STUN (端口 3478)</option>
+                <option value="turn">TURN (端口 3478)</option>
+                <option value="turns">TURNS/TLS (端口 5349)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="serverUrl">服务器地址</label>
+            <input type="text" id="serverUrl" placeholder="例如: 14.103.165.199 或 coturn.weiyuai.cn" value="14.103.165.199">
+        </div>
+
+        <div class="form-group">
+            <label for="port">端口（可选，默认 3478 或 5349）</label>
+            <input type="text" id="port" placeholder="留空使用默认端口">
+        </div>
+
+        <div class="form-group">
+            <label for="username">用户名（仅 TURN 需要）</label>
+            <input type="text" id="username" placeholder="例如: username1" value="username1">
+        </div>
+
+        <div class="form-group">
+            <label for="password">密码（仅 TURN 需要）</label>
+            <input type="password" id="password" placeholder="例如: password1" value="password1">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-primary" onclick="startTest()">🚀 开始测试</button>
+            <button class="btn-secondary" onclick="clearResult()">🗑️ 清空结果</button>
+        </div>
+
+        <div class="result-section">
+            <div class="result-title">📊 测试结果</div>
+            <div id="result">点击 "开始测试" 按钮开始...</div>
+        </div>
+    </div>
+
+    <script>
+        let pc = null;
+
+        function log(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            let className = '';
+            let icon = 'ℹ️';
+            
+            if (type === 'error') {
+                className = 'error';
+                icon = '❌';
+            } else if (type === 'success') {
+                className = 'success';
+                icon = '✅';
+            } else if (type === 'candidate') {
+                className = 'candidate';
+                icon = '🎯';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = className;
+            messageDiv.innerHTML = `[${timestamp}] ${icon} ${message}`;
+            resultDiv.appendChild(messageDiv);
+            resultDiv.scrollTop = resultDiv.scrollHeight;
+        }
+
+        function clearResult() {
+            document.getElementById('result').innerHTML = '';
+            if (pc) {
+                pc.close();
+                pc = null;
+            }
+        }
+
+        function getIceServer() {
+            const protocol = document.getElementById('protocol').value;
+            const serverUrl = document.getElementById('serverUrl').value.trim();
+            const port = document.getElementById('port').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!serverUrl) {
+                throw new Error('请输入服务器地址');
+            }
+
+            let url;
+            if (protocol === 'stun') {
+                url = `stun:${serverUrl}${port ? ':' + port : ':3478'}`;
+                return { urls: url };
+            } else if (protocol === 'turn') {
+                url = `turn:${serverUrl}${port ? ':' + port : ':3478'}`;
+                if (!username || !password) {
+                    throw new Error('TURN 协议需要提供用户名和密码');
+                }
+                return {
+                    urls: url,
+                    username: username,
+                    credential: password
+                };
+            } else if (protocol === 'turns') {
+                url = `turns:${serverUrl}${port ? ':' + port : ':5349'}`;
+                if (!username || !password) {
+                    throw new Error('TURNS 协议需要提供用户名和密码');
+                }
+                return {
+                    urls: url,
+                    username: username,
+                    credential: password
+                };
+            }
+        }
+
+        async function startTest() {
+            clearResult();
+            
+            try {
+                const iceServer = getIceServer();
+                log(`🔧 配置信息: ${JSON.stringify(iceServer, null, 2)}`);
+                log('🌐 开始创建 PeerConnection...');
+
+                const config = {
+                    iceServers: [iceServer],
+                    iceCandidatePoolSize: 10
+                };
+
+                pc = new RTCPeerConnection(config);
+                let candidateCount = 0;
+                let relayCount = 0;
+                let srflxCount = 0;
+
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        candidateCount++;
+                        const candidate = event.candidate;
+                        const type = candidate.type;
+                        
+                        let emoji = '📍';
+                        if (type === 'relay') {
+                            emoji = '🔄';
+                            relayCount++;
+                        } else if (type === 'srflx') {
+                            emoji = '🌐';
+                            srflxCount++;
+                        }
+                        
+                        log(`${emoji} [${type.toUpperCase()}] ${candidate.candidate}`, 'candidate');
+                    } else {
+                        log('✅ ICE 候选收集完成', 'success');
+                        log(`📊 统计: 总共 ${candidateCount} 个候选, ${srflxCount} 个 STUN (srflx), ${relayCount} 个 TURN (relay)`, 'success');
+                        
+                        if (candidateCount === 0) {
+                            log('⚠️ 未获取到任何 ICE 候选，请检查服务器配置和网络连接', 'error');
+                        } else if (relayCount > 0) {
+                            log('🎉 TURN 服务器测试成功！已获取到 relay 候选', 'success');
+                        } else if (srflxCount > 0) {
+                            log('🎉 STUN 服务器测试成功！已获取到 srflx 候选', 'success');
+                        }
+                    }
+                };
+
+                pc.onicecandidateerror = (event) => {
+                    log(`❌ ICE 错误: ${event.errorText || 'Unknown error'} (code: ${event.errorCode})`, 'error');
+                };
+
+                pc.oniceconnectionstatechange = () => {
+                    log(`🔗 ICE 连接状态: ${pc.iceConnectionState}`);
+                };
+
+                pc.onicegatheringstatechange = () => {
+                    log(`📡 ICE 收集状态: ${pc.iceGatheringState}`);
+                };
+
+                // 创建一个数据通道来触发 ICE 收集
+                pc.createDataChannel('test');
+                
+                // 创建 offer
+                log('📝 创建 SDP Offer...');
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                log('✅ SDP Offer 创建成功，开始收集 ICE 候选...');
+
+            } catch (error) {
+                log(`❌ 测试失败: ${error.message}`, 'error');
+                console.error('Test error:', error);
+            }
+        }
+
+        // 页面加载时的提示
+        window.onload = function() {
+            log('👋 欢迎使用 Coturn 测试工具');
+            log('📖 请填写服务器信息后点击 "开始测试" 按钮');
+        };
+    </script>
+</body>
+</html>

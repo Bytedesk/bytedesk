@@ -68,9 +68,87 @@ sudo systemctl restart coturn
 
 ## 测试
 
-- [WebRTC 测试](https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/)
+### 重要说明
+
+⚠️ **Coturn 是 STUN/TURN 服务器，使用 UDP/TCP 协议，不是 HTTP 服务器！**
+
+- ❌ 不能通过浏览器直接访问 `http://14.103.165.199:3478`
+- ❌ Nginx 无法直接代理 STUN/TURN 协议到 HTTPS
+- ✅ 需要使用专门的 WebRTC 测试工具
+
+### 测试方法
+
+#### 方法 1: 使用在线 WebRTC 测试工具（推荐）
+
+访问：[WebRTC Trickle ICE 测试](https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/)
+
+填写信息：
+```
+STUN URI: stun:14.103.165.199:3478
+或
+TURN URI: turn:14.103.165.199:3478
+Username: username1
+Password: password1
+```
+
+点击 "Gather candidates" 按钮，成功会显示 `srflx` 或 `relay` 类型的候选地址。
 
 ![WebRTC 测试](/img/deploy/webrtc/coturn_turn_stun_test.png)
+
+#### 方法 2: 使用本地测试页面
+
+在浏览器中打开：`file:///path/to/test_coturn.html`
+
+或者将 `test_coturn.html` 部署到 Web 服务器，通过 HTTPS 访问。
+
+#### 方法 3: 启用 Prometheus 监控
+
+编辑 `/etc/turnserver.conf`，添加：
+```bash
+prometheus
+```
+
+重启服务：
+```bash
+sudo systemctl restart coturn
+```
+
+开放端口：
+```bash
+sudo ufw allow 9641
+```
+
+访问监控数据：`http://14.103.165.199:9641/metrics`
+
+#### 方法 4: 使用命令行工具
+
+```bash
+# 测试 STUN
+turnutils_stunclient 14.103.165.199
+
+# 测试 TURN
+turnutils_uclient -v -u username1 -w password1 14.103.165.199
+
+# 测试端口连通性
+telnet 14.103.165.199 3478
+```
+
+### 查看运行状态
+
+```bash
+# 查看服务状态
+sudo systemctl status coturn
+
+# 实时日志
+sudo journalctl -u coturn -f
+
+# 查看端口监听
+sudo netstat -tulnp | grep turnserver
+```
+
+### 详细测试指南
+
+参见 [test_coturn.md](./test_coturn.md) 获取完整测试说明。
 
 ## 参考资料
 
