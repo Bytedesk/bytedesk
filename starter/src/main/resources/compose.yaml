@@ -226,8 +226,9 @@ services:
       # RTP 媒体端口范围
       - "16000-16129:6000-6129/udp"
     volumes:
-      # 配置文件目录 - 使用本地配置文件（注意：FreeSWITCH 实际使用 /usr/local/freeswitch/etc/freeswitch）
+      # 配置文件目录 - 使用本地配置文件覆盖容器内的配置（经验证实际使用 /usr/local/freeswitch/etc/freeswitch）
       - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
+      # - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/conf # 不使用此路径
       # 数据持久化目录
       - freeswitch_data:/usr/local/freeswitch/db
       # 日志目录
