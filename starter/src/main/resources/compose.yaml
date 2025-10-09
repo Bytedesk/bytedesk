@@ -396,22 +396,16 @@ volumes:
     name: bytedesk_minio_data
   freeswitch_config:
     name: bytedesk_freeswitch_config
-    external: true
   freeswitch_sounds:
     name: bytedesk_freeswitch_sounds
-    external: true
   freeswitch_data:
     name: bytedesk_freeswitch_data
-    external: true
   freeswitch_logs:
     name: bytedesk_freeswitch_logs
-    external: true
   freeswitch_tmp:
     name: bytedesk_freeswitch_tmp
-    external: true
   freeswitch_recordings:
     name: bytedesk_freeswitch_recordings
-    external: true
 
 networks:
   bytedesk-network:
