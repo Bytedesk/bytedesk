@@ -179,6 +179,29 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+            padding: 4px 8px;
+            transition: color 0.3s;
+            user-select: none;
+        }
+        .password-toggle:hover {
+            color: #667eea;
+        }
+        .password-wrapper input {
+            padding-right: 45px;
+        }
     </style>
 </head>
 <body>
@@ -221,7 +244,12 @@
 
         <div class="form-group">
             <label for="password">密码（仅 TURN 需要）</label>
-            <input type="password" id="password" placeholder="例如: password1" value="password1">
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="例如: password1" value="password1">
+                <button type="button" class="password-toggle" onclick="togglePasswordVisibility()" title="显示/隐藏密码">
+                    <span id="toggleIcon">👁️</span>
+                </button>
+            </div>
         </div>
 
         <div class="btn-group">
@@ -237,6 +265,19 @@
 
     <script>
         let pc = null;
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
 
         function log(message, type = 'info') {
             const resultDiv = document.getElementById('result');

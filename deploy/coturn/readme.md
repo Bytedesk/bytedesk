@@ -150,6 +150,48 @@ sudo netstat -tulnp | grep turnserver
 
 参见 [test_coturn.md](./test_coturn.md) 获取完整测试说明。
 
+## Web Admin 管理界面
+
+### 快速启用 Web Admin
+
+使用自动化脚本（推荐）：
+```bash
+sudo bash setup_web_admin.sh
+```
+
+### 手动配置
+
+编辑 `/etc/turnserver.conf`：
+```bash
+web-admin
+web-admin-ip=0.0.0.0
+web-admin-port=8080
+web-admin-listen-on-workers
+```
+
+重启服务：
+```bash
+sudo systemctl restart coturn
+sudo ufw allow 8080/tcp
+```
+
+### 访问 Web Admin
+
+直接访问（HTTPS）：
+```
+https://14.103.165.199:8080
+```
+
+⚠️ 浏览器会显示 SSL 证书警告（自签名证书），点击"高级" → "继续访问"
+
+### 通过 Nginx 代理（推荐）
+
+```
+https://coturn.weiyuai.cn/admin
+```
+
+详细配置参见 [WEB_ADMIN_SETUP.md](./WEB_ADMIN_SETUP.md)
+
 ## 参考资料
 
 - [Samples](https://webrtc.github.io/samples/)
