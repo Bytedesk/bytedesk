@@ -10,5 +10,7 @@
     <include file="db/changelog/migration/250922_rename_content_to_process_schema.xml" />
     <include file="db/changelog/migration/250923_rename_provider_name_to_provider_type.xml" />
     <include file="db/changelog/migration/250928_add_register_source_to_user.xml" />
+    <include file="db/changelog/migration/251010_create_service_statistic_views.xml" />
+    <include file="db/changelog/migration/251010_create_quality_statistic_views.xml" />
 
 </databaseChangeLog>

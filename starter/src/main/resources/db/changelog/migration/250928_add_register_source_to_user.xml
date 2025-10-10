@@ -6,6 +6,7 @@
 
     <changeSet id="250928-add-register-source-to-user" author="copilot">
         <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_user"/>
             <not>
                 <columnExists tableName="bytedesk_core_user" columnName="register_source"/>
             </not>
