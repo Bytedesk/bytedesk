@@ -53,7 +53,7 @@ public class MqttAuthService {
             if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
                 return true;
             } else {
-                log.debug("mqtt auth Token is invalid or revoked");
+                // log.debug("mqtt auth Token is invalid or revoked");
                 return false;
             }
         }
