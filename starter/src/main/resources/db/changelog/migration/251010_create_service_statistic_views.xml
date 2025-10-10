@@ -15,6 +15,7 @@
         <preConditions onFail="MARK_RAN">
             <and>
                 <tableExists tableName="bytedesk_service_queue_member"/>
+                <tableExists tableName="bytedesk_core_thread"/>
                 <not>
                     <viewExists viewName="bytedesk_service_view_agent_thread_stats"/>
                 </not>
@@ -23,7 +24,7 @@
         
         <createView viewName="bytedesk_service_view_agent_thread_stats" replaceIfExists="true">
             SELECT 
-                JSON_UNQUOTE(JSON_EXTRACT(qm.thread, '$.agent')) AS agent_uid,
+                JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')) AS agent_uid,
                 qm.org_uid,
                 DATE(qm.created_at) AS stat_date,
                 HOUR(qm.created_at) AS stat_hour,
@@ -33,10 +34,31 @@
                 COUNT(CASE WHEN qm.agent_accept_type = 'INVITE' THEN 1 END) AS invited_threads,
                 COUNT(CASE WHEN qm.agent_accept_type = 'AUTO' THEN 1 END) AS auto_assigned_threads,
                 COUNT(CASE WHEN qm.agent_accept_type = 'MANUAL' THEN 1 END) AS manual_assigned_threads,
-                COALESCE(AVG(qm.wait_length), 0) AS avg_wait_time,
-                COALESCE(MAX(qm.wait_length), 0) AS max_wait_time,
-                COALESCE(MIN(qm.wait_length), 0) AS min_wait_time,
-                COALESCE(AVG(qm.agent_max_response_length), 0) AS avg_response_time,
+                COALESCE(AVG(
+                    CASE 
+                        WHEN qm.agent_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.agent_accepted_at)
+                        WHEN qm.robot_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.robot_accepted_at)
+                    END
+                ), 0) AS avg_wait_time,
+                COALESCE(MAX(
+                    CASE 
+                        WHEN qm.agent_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.agent_accepted_at)
+                        WHEN qm.robot_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.robot_accepted_at)
+                    END
+                ), 0) AS max_wait_time,
+                COALESCE(MIN(
+                    CASE 
+                        WHEN qm.agent_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.agent_accepted_at)
+                        WHEN qm.robot_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.robot_accepted_at)
+                    END
+                ), 0) AS min_wait_time,
+                COALESCE(AVG(qm.agent_avg_response_length), 0) AS avg_response_time,
                 COALESCE(MAX(qm.agent_max_response_length), 0) AS max_response_time,
                 COALESCE(AVG(
                     CASE 
@@ -53,13 +75,16 @@
                 COALESCE(SUM(qm.agent_message_count), 0) AS total_agent_messages,
                 COALESCE(SUM(qm.visitor_message_count), 0) AS total_visitor_messages,
                 COALESCE(AVG(qm.agent_message_count + qm.visitor_message_count), 0) AS avg_messages_per_thread,
-                COUNT(CASE WHEN qm.resolved = 1 THEN 1 END) AS first_solved_count,
+                COUNT(CASE WHEN qm.is_resolved = 1 THEN 1 END) AS first_solved_count,
                 NOW() AS view_updated_at
             FROM bytedesk_service_queue_member qm
-            WHERE qm.deleted = 0
-              AND JSON_EXTRACT(qm.thread, '$.agent') IS NOT NULL
+            INNER JOIN bytedesk_core_thread t ON qm.thread_id = t.id
+            WHERE qm.is_deleted = 0
+              AND t.agent IS NOT NULL 
+              AND t.agent != ''
+              AND JSON_EXTRACT(t.agent, '$.uid') IS NOT NULL
             GROUP BY 
-                JSON_UNQUOTE(JSON_EXTRACT(qm.thread, '$.agent')),
+                JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')),
                 qm.org_uid,
                 DATE(qm.created_at),
                 HOUR(qm.created_at)
@@ -83,7 +108,7 @@
         
         <createView viewName="bytedesk_service_view_workgroup_thread_stats" replaceIfExists="true">
             SELECT 
-                qm.workgroup_queue AS workgroup_uid,
+                qm.workgroup_queue_id AS workgroup_uid,
                 qm.org_uid,
                 DATE(qm.created_at) AS stat_date,
                 HOUR(qm.created_at) AS stat_hour,
@@ -92,17 +117,27 @@
                 COUNT(CASE WHEN qm.agent_accept_type = 'AUTO' THEN 1 END) AS auto_assigned_threads,
                 COUNT(CASE WHEN qm.agent_accept_type = 'MANUAL' THEN 1 END) AS manual_assigned_threads,
                 COUNT(CASE WHEN qm.agent_accept_type = 'INVITE' THEN 1 END) AS invited_threads,
-                COALESCE(AVG(qm.wait_length), 0) AS avg_wait_time,
-                COALESCE(MAX(qm.wait_length), 0) AS max_wait_time,
-                COALESCE(AVG(qm.agent_max_response_length), 0) AS avg_response_time,
+                COALESCE(AVG(
+                    CASE 
+                        WHEN qm.agent_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.agent_accepted_at)
+                    END
+                ), 0) AS avg_wait_time,
+                COALESCE(MAX(
+                    CASE 
+                        WHEN qm.agent_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.agent_accepted_at)
+                    END
+                ), 0) AS max_wait_time,
+                COALESCE(AVG(qm.agent_avg_response_length), 0) AS avg_response_time,
                 COALESCE(SUM(qm.agent_message_count), 0) AS total_agent_messages,
                 COALESCE(SUM(qm.visitor_message_count), 0) AS total_visitor_messages,
                 NOW() AS view_updated_at
             FROM bytedesk_service_queue_member qm
-            WHERE qm.deleted = 0
-              AND qm.workgroup_queue IS NOT NULL
+            WHERE qm.is_deleted = 0
+              AND qm.workgroup_queue_id IS NOT NULL
             GROUP BY 
-                qm.workgroup_queue,
+                qm.workgroup_queue_id,
                 qm.org_uid,
                 DATE(qm.created_at),
                 HOUR(qm.created_at)
@@ -118,6 +153,7 @@
         <preConditions onFail="MARK_RAN">
             <and>
                 <tableExists tableName="bytedesk_service_thread_rating"/>
+                <tableExists tableName="bytedesk_core_thread"/>
                 <not>
                     <viewExists viewName="bytedesk_service_view_agent_rating_stats"/>
                 </not>
@@ -126,7 +162,7 @@
         
         <createView viewName="bytedesk_service_view_agent_rating_stats" replaceIfExists="true">
             SELECT 
-                JSON_UNQUOTE(JSON_EXTRACT(tr.agent, '$.uid')) AS agent_uid,
+                JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')) AS agent_uid,
                 tr.org_uid,
                 DATE(tr.created_at) AS stat_date,
                 COUNT(*) AS total_ratings,
@@ -146,10 +182,13 @@
                 ) AS satisfaction_rate,
                 NOW() AS view_updated_at
             FROM bytedesk_service_thread_rating tr
-            WHERE tr.deleted = 0
-              AND JSON_EXTRACT(tr.agent, '$.uid') IS NOT NULL
+            INNER JOIN bytedesk_core_thread t ON tr.thread_id = t.id
+            WHERE tr.is_deleted = 0
+              AND t.agent IS NOT NULL
+              AND t.agent != ''
+              AND JSON_EXTRACT(t.agent, '$.uid') IS NOT NULL
             GROUP BY 
-                JSON_UNQUOTE(JSON_EXTRACT(tr.agent, '$.uid')),
+                JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')),
                 tr.org_uid,
                 DATE(tr.created_at)
         </createView>
@@ -164,6 +203,7 @@
         <preConditions onFail="MARK_RAN">
             <and>
                 <tableExists tableName="bytedesk_service_queue_member"/>
+                <tableExists tableName="bytedesk_core_thread"/>
                 <not>
                     <viewExists viewName="bytedesk_service_view_org_service_stats"/>
                 </not>
@@ -178,12 +218,22 @@
                 COUNT(*) AS total_incoming_threads,
                 COUNT(CASE WHEN qm.agent_accepted_at IS NOT NULL THEN 1 END) AS accepted_threads,
                 COUNT(CASE WHEN qm.agent_accepted_at IS NULL THEN 1 END) AS abandoned_threads,
-                COUNT(CASE WHEN qm.resolved = 1 THEN 1 END) AS resolved_threads,
+                COUNT(CASE WHEN qm.is_resolved = 1 THEN 1 END) AS resolved_threads,
                 COUNT(CASE WHEN qm.agent_accept_type = 'AUTO' THEN 1 END) AS auto_assigned_count,
                 COUNT(CASE WHEN qm.agent_accept_type = 'MANUAL' THEN 1 END) AS manual_assigned_count,
                 COUNT(CASE WHEN qm.agent_accept_type = 'INVITE' THEN 1 END) AS invited_count,
-                COALESCE(AVG(qm.wait_length), 0) AS avg_wait_time,
-                COALESCE(MAX(qm.wait_length), 0) AS max_wait_time,
+                COALESCE(AVG(
+                    CASE 
+                        WHEN qm.agent_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.agent_accepted_at)
+                    END
+                ), 0) AS avg_wait_time,
+                COALESCE(MAX(
+                    CASE 
+                        WHEN qm.agent_accepted_at IS NOT NULL AND qm.visitor_enqueue_at IS NOT NULL
+                        THEN TIMESTAMPDIFF(SECOND, qm.visitor_enqueue_at, qm.agent_accepted_at)
+                    END
+                ), 0) AS max_wait_time,
                 COALESCE(AVG(
                     CASE 
                         WHEN qm.agent_closed_at IS NOT NULL AND qm.agent_accepted_at IS NOT NULL
@@ -198,10 +248,11 @@
                 ), 0) AS avg_first_response_time,
                 COALESCE(SUM(qm.agent_message_count), 0) AS total_agent_messages,
                 COALESCE(SUM(qm.visitor_message_count), 0) AS total_visitor_messages,
-                COUNT(DISTINCT JSON_UNQUOTE(JSON_EXTRACT(qm.thread, '$.user'))) AS unique_visitors,
+                COUNT(DISTINCT JSON_UNQUOTE(JSON_EXTRACT(t.thread_user, '$.uid'))) AS unique_visitors,
                 NOW() AS view_updated_at
             FROM bytedesk_service_queue_member qm
-            WHERE qm.deleted = 0
+            INNER JOIN bytedesk_core_thread t ON qm.thread_id = t.id
+            WHERE qm.is_deleted = 0
             GROUP BY 
                 qm.org_uid,
                 DATE(qm.created_at),
@@ -227,20 +278,20 @@
         <createView viewName="bytedesk_service_view_thread_transfer_stats" replaceIfExists="true">
             SELECT 
                 tt.org_uid,
-                JSON_UNQUOTE(JSON_EXTRACT(tt.from_agent, '$.uid')) AS from_agent_uid,
-                JSON_UNQUOTE(JSON_EXTRACT(tt.to_agent, '$.uid')) AS to_agent_uid,
+                JSON_UNQUOTE(JSON_EXTRACT(tt.sender, '$.uid')) AS from_agent_uid,
+                JSON_UNQUOTE(JSON_EXTRACT(tt.receiver, '$.uid')) AS to_agent_uid,
                 DATE(tt.created_at) AS stat_date,
                 COUNT(*) AS total_transfers,
-                COUNT(CASE WHEN tt.status = 'TRANSFER_ACCEPTED' THEN 1 END) AS accepted_transfers,
-                COUNT(CASE WHEN tt.status = 'TRANSFER_TIMEOUT' THEN 1 END) AS timeout_transfers,
-                COUNT(CASE WHEN tt.status = 'TRANSFER_REJECTED' THEN 1 END) AS rejected_transfers,
+                COUNT(CASE WHEN tt.transfer_status = 'TRANSFER_ACCEPTED' THEN 1 END) AS accepted_transfers,
+                COUNT(CASE WHEN tt.transfer_status = 'TRANSFER_TIMEOUT' THEN 1 END) AS timeout_transfers,
+                COUNT(CASE WHEN tt.transfer_status = 'TRANSFER_REJECTED' THEN 1 END) AS rejected_transfers,
                 NOW() AS view_updated_at
             FROM bytedesk_service_thread_transfer tt
-            WHERE tt.deleted = 0
+            WHERE tt.is_deleted = 0
             GROUP BY 
                 tt.org_uid,
-                JSON_UNQUOTE(JSON_EXTRACT(tt.from_agent, '$.uid')),
-                JSON_UNQUOTE(JSON_EXTRACT(tt.to_agent, '$.uid')),
+                JSON_UNQUOTE(JSON_EXTRACT(tt.sender, '$.uid')),
+                JSON_UNQUOTE(JSON_EXTRACT(tt.receiver, '$.uid')),
                 DATE(tt.created_at)
         </createView>
         
@@ -262,7 +313,7 @@
         
         <createView viewName="bytedesk_service_view_robot_thread_stats" replaceIfExists="true">
             SELECT 
-                qm.robot_queue AS robot_uid,
+                qm.robot_queue_id AS robot_uid,
                 qm.org_uid,
                 DATE(qm.created_at) AS stat_date,
                 HOUR(qm.created_at) AS stat_hour,
@@ -277,10 +328,10 @@
                 COALESCE(AVG(qm.visitor_message_count), 0) AS avg_messages_per_thread,
                 NOW() AS view_updated_at
             FROM bytedesk_service_queue_member qm
-            WHERE qm.deleted = 0
-              AND qm.robot_queue IS NOT NULL
+            WHERE qm.is_deleted = 0
+              AND qm.robot_queue_id IS NOT NULL
             GROUP BY 
-                qm.robot_queue,
+                qm.robot_queue_id,
                 qm.org_uid,
                 DATE(qm.created_at),
                 HOUR(qm.created_at)

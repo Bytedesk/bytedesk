@@ -10,14 +10,15 @@
          Date: 2025-10-10
          ========================================== -->
 
-    <!-- 1. 质检统计视图 -->
+    <!-- 1. 质检统计视图 - TEMPORARILY DISABLED: Needs redesign for non-existent columns -->
     <changeSet id="251010-create-view-quality-check-stats" author="bytedesk">
         <preConditions onFail="MARK_RAN">
             <and>
-                <tableExists tableName="bytedesk_service_quality_check"/>
-                <not>
-                    <viewExists viewName="bytedesk_service_view_quality_check_stats"/>
-                </not>
+                <sqlCheck expectedResult="1">SELECT 0</sqlCheck>
+                <!-- DISABLED: This VIEW tries to access non-existent columns:
+                     - agent_uid, workgroup_uid, inspector_uid (need JOINs)
+                     - quality_level, total_score, bonus_score, deduction_score (Java calculated methods)
+                     Needs complete redesign with proper JOINs and SQL calculations -->
             </and>
         </preConditions>
         
@@ -66,14 +67,12 @@
         </rollback>
     </changeSet>
 
-    <!-- 2. 质检申诉统计视图 -->
+    <!-- 2. 质检申诉统计视图 - TEMPORARILY DISABLED: Needs verification of column names -->
     <changeSet id="251010-create-view-quality-appeal-stats" author="bytedesk">
         <preConditions onFail="MARK_RAN">
             <and>
-                <tableExists tableName="bytedesk_service_quality_appeal"/>
-                <not>
-                    <viewExists viewName="bytedesk_service_view_quality_appeal_stats"/>
-                </not>
+                <sqlCheck expectedResult="1">SELECT 0</sqlCheck>
+                <!-- DISABLED: Needs verification that agent_uid, workgroup_uid columns exist -->
             </and>
         </preConditions>
         
@@ -119,6 +118,7 @@
             <and>
                 <tableExists tableName="bytedesk_service_quality_check"/>
                 <tableExists tableName="bytedesk_service_queue_member"/>
+                <tableExists tableName="bytedesk_core_thread"/>
                 <not>
                     <viewExists viewName="bytedesk_service_view_quality_coverage"/>
                 </not>
@@ -128,28 +128,31 @@
         <createView viewName="bytedesk_service_view_quality_coverage" replaceIfExists="true">
             SELECT 
                 qm.org_uid,
-                qm.agent_uid,
-                qm.workgroup_queue AS workgroup_uid,
+                JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')) AS agent_uid,
+                qm.workgroup_queue_id AS workgroup_uid,
                 DATE(qm.created_at) AS stat_date,
-                COUNT(DISTINCT qm.thread_uid) AS total_threads,
-                COUNT(DISTINCT CASE WHEN qc.uid IS NOT NULL THEN qm.thread_uid END) AS checked_threads,
-                COUNT(DISTINCT CASE WHEN qc.uid IS NULL THEN qm.thread_uid END) AS unchecked_threads,
+                COUNT(DISTINCT t.uid) AS total_threads,
+                COUNT(DISTINCT CASE WHEN qc.uid IS NOT NULL THEN t.uid END) AS checked_threads,
+                COUNT(DISTINCT CASE WHEN qc.uid IS NULL THEN t.uid END) AS unchecked_threads,
                 ROUND(
-                    COUNT(DISTINCT CASE WHEN qc.uid IS NOT NULL THEN qm.thread_uid END) * 100.0 / 
-                    COUNT(DISTINCT qm.thread_uid),
+                    COUNT(DISTINCT CASE WHEN qc.uid IS NOT NULL THEN t.uid END) * 100.0 / 
+                    COUNT(DISTINCT t.uid),
                     2
                 ) AS coverage_rate,
                 NOW() AS view_updated_at
             FROM bytedesk_service_queue_member qm
+            INNER JOIN bytedesk_core_thread t ON qm.thread_id = t.id
             LEFT JOIN bytedesk_service_quality_check qc 
-                ON qm.thread_uid = qc.thread_uid 
-                AND qc.deleted = 0
-            WHERE qm.deleted = 0
+                ON t.uid = qc.thread_uid 
+                AND qc.is_deleted = 0
+            WHERE qm.is_deleted = 0
               AND qm.agent_accepted_at IS NOT NULL
+              AND t.agent IS NOT NULL
+              AND t.agent != ''
             GROUP BY 
                 qm.org_uid,
-                qm.agent_uid,
-                qm.workgroup_queue,
+                JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')),
+                qm.workgroup_queue_id,
                 DATE(qm.created_at)
         </createView>
         
@@ -158,14 +161,12 @@
         </rollback>
     </changeSet>
 
-    <!-- 4. 质检员工作量统计视图 -->
+    <!-- 4. 质检员工作量统计视图 - TEMPORARILY DISABLED: Needs redesign for non-existent columns -->
     <changeSet id="251010-create-view-inspector-workload-stats" author="bytedesk">
         <preConditions onFail="MARK_RAN">
             <and>
-                <tableExists tableName="bytedesk_service_quality_check"/>
-                <not>
-                    <viewExists viewName="bytedesk_service_view_inspector_workload_stats"/>
-                </not>
+                <sqlCheck expectedResult="1">SELECT 0</sqlCheck>
+                <!-- DISABLED: Same issues as quality-check-stats - non-existent columns -->
             </and>
         </preConditions>
         
@@ -203,14 +204,12 @@
         </rollback>
     </changeSet>
 
-    <!-- 5. 组织级质检综合统计视图 -->
+    <!-- 5. 组织级质检综合统计视图 - TEMPORARILY DISABLED: Needs redesign for non-existent columns -->
     <changeSet id="251010-create-view-org-quality-summary" author="bytedesk">
         <preConditions onFail="MARK_RAN">
             <and>
-                <tableExists tableName="bytedesk_service_quality_check"/>
-                <not>
-                    <viewExists viewName="bytedesk_service_view_org_quality_summary"/>
-                </not>
+                <sqlCheck expectedResult="1">SELECT 0</sqlCheck>
+                <!-- DISABLED: Same issues - non-existent columns need redesign -->
             </and>
         </preConditions>
         

@@ -138,19 +138,6 @@ mvn liquibase:rollback -Dliquibase.rollbackDate=2025-10-09
 UPDATE DATABASECHANGELOGLOCK SET LOCKED = FALSE;
 ```
 
-### 查看视图
-
-```sql
--- 查看所有视图
-SHOW FULL TABLES WHERE table_type = 'VIEW';
-
--- 查看视图定义
-SHOW CREATE VIEW bytedesk_service_view_agent_thread_stats;
-
--- 查看所有 bytedesk 视图
-SHOW FULL TABLES WHERE table_type = 'VIEW' AND Tables_in_weiyuim LIKE 'bytedesk_%';
-```
-
 ## 相关文档
 
 - [Liquibase 官方文档](https://docs.liquibase.com/)
