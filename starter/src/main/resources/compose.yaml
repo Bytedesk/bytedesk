@@ -238,6 +238,9 @@ services:
       # 配置文件目录 - 使用本地配置文件覆盖容器内的配置（经验证实际使用 /usr/local/freeswitch/etc/freeswitch）
       - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
       # - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/conf # 不使用此路径
+      # 添加自定义odbc.ini文件
+      # - ../../../../deploy/freeswitch/etc/odbc.ini:/etc/odbc.ini
+      # 语音文件目录
       # 数据持久化目录
       - freeswitch_data:/usr/local/freeswitch/db
       # 日志目录
