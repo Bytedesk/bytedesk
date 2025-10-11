@@ -121,6 +121,13 @@ public class WorkflowEdgeEntity extends BaseEntity {
     private String conditionExpression;
 
     /**
+     * 是否为默认分支（用于 Exclusive/Inclusive 网关的 default 出边）
+     */
+    @Builder.Default
+    @Column(name = "is_default_branch")
+    private Boolean defaultBranch = false;
+
+    /**
      * 边完整配置数据（JSON格式存储WorkflowEdge的完整数据）
      * 包含：data(EdgeData), 自定义属性等
      */

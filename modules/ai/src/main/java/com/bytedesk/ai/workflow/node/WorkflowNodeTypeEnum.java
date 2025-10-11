@@ -56,7 +56,23 @@ public enum WorkflowNodeTypeEnum {
     /**
      * 分组节点
      */
-    GROUP("group");
+    GROUP("group"),
+
+    // === 新增：网关 ===
+    EXCLUSIVE_GATEWAY("exclusiveGateway"),
+    PARALLEL_GATEWAY("parallelGateway"),
+    INCLUSIVE_GATEWAY("inclusiveGateway"),
+
+    // === 新增：用户任务 ===
+    USER_TASK("userTask"),
+
+    // === 新增：事件 ===
+    TIMER_EVENT("timerEvent"),
+    MESSAGE_EVENT("messageEvent"),
+    SIGNAL_EVENT("signalEvent"),
+
+    // === 新增：DMN 决策 ===
+    DECISION_DMN("decisionDmn");
     
     private final String value;
     
