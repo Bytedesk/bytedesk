@@ -317,7 +317,7 @@ services:
       # zhipuai
       # 申请智谱AI API Key：https://www.bigmodel.cn/usercenter/proj-mgmt/apikeys
       # SPRING_AI_ZHIPUAI_BASE_URL: https://open.bigmodel.cn/api/paas
-      SPRING_AI_ZHIPUAI_API_KEY: 'cac8396570a14d1a87157fb9841dcd28.FqUKIOF609GutWFz'
+      SPRING_AI_ZHIPUAI_API_KEY: 'sk-xxx'
       SPRING_AI_ZHIPUAI_CHAT_ENABLED: "true"
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4.5-flash
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
