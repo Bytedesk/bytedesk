@@ -36,21 +36,21 @@ public class InterfaceEntity {
      * 接口类型 - 复合主键之一
      */
     @Id
-    @Column(name = "type", length = 128)
+    @Column(name = "type", length = 64)
     private String type;
 
     /**
      * 接口名称 - 复合主键之一
      */
     @Id
-    @Column(name = "name", length = 1024)
+    @Column(name = "name", length = 128)
     private String name;
 
     /**
      * 主机名 - 复合主键之一
      */
     @Id
-    @Column(name = "hostname", length = 256)
+    @Column(name = "hostname", length = 128)
     private String hostname;
 
     /**

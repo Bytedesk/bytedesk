@@ -50,6 +50,8 @@ docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 docker compose -p bytedesk -f docker-compose.yaml down
 # 停止，内含ollama
 docker compose -p bytedesk -f docker-compose-ollama.yaml down
+# 
+docker compose -p bytedesk -f docker-compose-noai.yaml down
 ```
 
 ## 停止和重启服务
