@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-01-29 16:21:46
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-11-20 18:17:36
+ * @LastEditTime: 2025-10-13 10:20:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -23,16 +23,16 @@ import lombok.AllArgsConstructor;
 // @Slf4j
 @Service
 @AllArgsConstructor
-public class MqttService {
+public class MqttEventPublisher {
 
   private final BytedeskEventPublisher bytedeskEventPublisher;
 
-  public void publishMqttConnectedEvent(String client) {
-    bytedeskEventPublisher.publishMqttConnectedEvent(client);
+  public void publishMqttConnectedEvent(String clientId) {
+    bytedeskEventPublisher.publishMqttConnectedEvent(clientId);
   }
 
-  public void publishMqttDisconnectedEvent(String client) {
-    bytedeskEventPublisher.publishMqttDisconnectedEvent(client);
+  public void publishMqttDisconnectedEvent(String clientId) {
+    bytedeskEventPublisher.publishMqttDisconnectedEvent(clientId);
   }
 
   public void publishMqttSubscribeEvent(String topic, String clientId) {

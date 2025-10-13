@@ -4,7 +4,7 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.socket.mqtt.service.MqttAuthService;
 import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
 import com.bytedesk.core.socket.mqtt.service.MqttMessageIdService;
-import com.bytedesk.core.socket.mqtt.service.MqttService;
+import com.bytedesk.core.socket.mqtt.service.MqttEventPublisher;
 import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
 
 import lombok.Data;
@@ -26,7 +26,7 @@ public class ProtocolProcess {
     private MqttMessageIdService mqttMessageIdService;
 
     @Autowired
-    private MqttService mqService;
+    private MqttEventPublisher mqService;
 
     @Autowired
     private IMessageSendService messageSendService;

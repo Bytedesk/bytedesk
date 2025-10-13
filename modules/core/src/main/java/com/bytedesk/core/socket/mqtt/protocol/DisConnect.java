@@ -17,7 +17,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessage;
 
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
-import com.bytedesk.core.socket.mqtt.service.MqttService;
+import com.bytedesk.core.socket.mqtt.service.MqttEventPublisher;
 import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ public class DisConnect {
 
     private final MqttSessionService mqttSessionStoreService;
 
-    private final MqttService mqService;
+    private final MqttEventPublisher mqService;
 
     public void processDisConnect(final Channel channel, final MqttMessage mqttMessage) {
         // log.debug("processDisConnect {}", mqttMessage.toString());

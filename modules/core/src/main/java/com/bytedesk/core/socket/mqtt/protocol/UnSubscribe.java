@@ -17,7 +17,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
-import com.bytedesk.core.socket.mqtt.service.MqttService;
+import com.bytedesk.core.socket.mqtt.service.MqttEventPublisher;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UnSubscribe {
 
-    private final MqttService mqService;
+    private final MqttEventPublisher mqService;
 
     public void processUnSubscribe(Channel channel, MqttUnsubscribeMessage mqttUnsubscribeMessage) {
         // log.debug("processUnSubscribe {}", mqttUnsubscribeMessage.toString());

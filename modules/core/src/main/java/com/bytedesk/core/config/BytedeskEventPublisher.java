@@ -72,10 +72,6 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new UserUpdateEvent(user));
     }
 
-    // public void publishMessageProtoEvent(byte[] messageBytes) {
-    //     applicationEventPublisher.publishEvent(new MessageProtoEvent(this, messageBytes));
-    // }
-
     public void publishMessageJsonEvent(String json) {
         applicationEventPublisher.publishEvent(new MessageJsonEvent(this, json));
     }
