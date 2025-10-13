@@ -53,7 +53,7 @@ public class ServerEventListener {
      */
     @EventListener
     public void onQuartzFiveMinEvent(QuartzFiveMinEvent event) {
-        log.info("ServerEventListener: Processing 5-minute server update event");
+        // log.info("ServerEventListener: Processing 5-minute server update event");
         
         try {
             // 获取当前服务器指标
@@ -96,8 +96,7 @@ public class ServerEventListener {
                 
                 // 记录历史指标数据（每次创建新记录）
                 serverMetricsRestService.recordMetrics(existingServer);
-                
-                log.debug("Updated server and recorded metrics for: {}", serverName);
+                // log.debug("Updated server and recorded metrics for: {}", serverName);
             } else {
                 // 创建新的服务器记录
                 currentMetrics.setUid(uidUtils.getUid());
@@ -114,8 +113,7 @@ public class ServerEventListener {
                 
                 // 记录历史指标数据
                 serverMetricsRestService.recordMetrics(savedServer);
-                
-                log.info("Created new server and recorded metrics for: {}", serverName);
+                // log.info("Created new server and recorded metrics for: {}", serverName);
             }
             
         } catch (Exception e) {
