@@ -71,10 +71,11 @@ public class AiBotHttapiController {
             @RequestParam(name = "variable_httapi_stage", required = false) String stage,
             @RequestParam(name = "variable_turn", required = false) String turnParam,
             @RequestHeader(name = "Unique-ID", required = false) String uniqueId,
+            @RequestParam(name = "Unique-ID", required = false) String uniqueIdParam,
             HttpServletResponse response
     ) throws Exception {
 
-        String uuid = StringUtils.hasText(uniqueId) ? uniqueId : ("no-uuid-" + Instant.now().toEpochMilli());
+        String uuid = StringUtils.hasText(uniqueId) ? uniqueId : (StringUtils.hasText(uniqueIdParam) ? uniqueIdParam : ("no-uuid-" + Instant.now().toEpochMilli()));
         int turn = parseTurn(turnParam);
         String currentStage = (StringUtils.hasText(stage) ? stage : "init");
 
