@@ -17,7 +17,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttMessage;
 
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
-import com.bytedesk.core.socket.mqtt.service.MqttEventPublisher;
+import com.bytedesk.core.socket.mqtt.event.MqttEventPublisher;
 import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
 
 import lombok.AllArgsConstructor;

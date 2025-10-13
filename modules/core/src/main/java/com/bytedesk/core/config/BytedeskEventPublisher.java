@@ -69,7 +69,6 @@ public class BytedeskEventPublisher {
         applicationEventPublisher.publishEvent(new MessageUpdateEvent(this, message));
     }
     
-
     public void publishThreadCreateEvent(ThreadEntity thread) {
         applicationEventPublisher.publishEvent(new ThreadCreateEvent(this, thread));
     }

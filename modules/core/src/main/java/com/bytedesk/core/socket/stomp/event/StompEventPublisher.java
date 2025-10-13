@@ -3,15 +3,10 @@
  * @Date: 2025-10-13
  * @Description: STOMP domain event facade
  */
-package com.bytedesk.core.socket.stomp.service;
+package com.bytedesk.core.socket.stomp.event;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-
-import com.bytedesk.core.socket.stomp.event.StompConnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompDisconnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompSubscribeEvent;
-import com.bytedesk.core.socket.stomp.event.StompUnsubscribeEvent;
 
 import lombok.AllArgsConstructor;
 
