@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
@@ -38,10 +39,49 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            // 使用基类方法处理超级管理员权限和组织过滤
-            // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
+            // 基础过滤：deleted=false + 权限校验 + 组织过滤
+            // 使用自定义逻辑以便在特定场景放宽 orgUid 限制
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+
+            // 校验超级管理员标识（如果前端设置了 superUser，则确保确实有权限）
+            validateSuperUserPermission(request, authService);
+
+            var user = authService.getUser();
+            // 非超级管理员必须提供 orgUid
+            if (user != null && !Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
+                throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
+            }
+            // 验证请求的 orgUid 是否与当前用户的 orgUid 相同（非超级管理员）
+            if (StringUtils.hasText(request.getOrgUid())) {
+                if (user != null && !Boolean.TRUE.equals(request.getSuperUser())) {
+                    String userOrgUid = user.getOrgUid();
+                    if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
+                        throw new IllegalArgumentException("无权访问其他组织的数据");
+                    }
+                }
+            }
+
+            boolean isMergeByTopicAndOwner = Boolean.TRUE.equals(request.getMergeByTopic()) && StringUtils.hasText(request.getOwnerUid());
+            // 组织过滤：
+            // - 默认与 BaseSpecification 一致：非超级管理员且有 orgUid => 等于指定 orgUid
+            // - 当 mergeByTopic=true 且 ownerUid 有值时，额外允许 (orgUid IS NULL AND level=USER)
+            if (!Boolean.TRUE.equals(request.getSuperUser())) {
+                if (StringUtils.hasText(request.getOrgUid())) {
+                    if (isMergeByTopicAndOwner) {
+                        predicates.add(
+                                criteriaBuilder.or(
+                                        criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()),
+                                        criteriaBuilder.and(
+                                                criteriaBuilder.isNull(root.get("orgUid")),
+                                                criteriaBuilder.equal(root.get("level"), LevelEnum.USER.name())
+                                        )
+                                )
+                        );
+                    } else {
+                        predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                    }
+                }
+            }
 
             // 仅当mergeByTopic为true时才应用topic合并逻辑
             if (Boolean.TRUE.equals(request.getMergeByTopic())) {
