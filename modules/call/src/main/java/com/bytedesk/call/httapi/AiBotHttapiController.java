@@ -14,6 +14,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@ConditionalOnProperty(prefix = "bytedesk.features.ai-bot", name = "enabled", havingValue = "true", matchIfMissing = false)
 @RequiredArgsConstructor
 public class AiBotHttapiController {
 
@@ -45,8 +47,8 @@ public class AiBotHttapiController {
     @Value("${bytedesk.call.ai.welcome:/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-welcome.wav}")
     private String welcomeFile;
 
-    // 录音保存路径模板（放在 FS 本地），支持 ${uuid} 与 ${turn}
-    @Value("${bytedesk.call.ai.recordPath:/usr/local/freeswitch/recordings/ai-bot-${uuid}-${turn}.wav}")
+    // 录音保存路径模板（放在 FS 本地），支持 {uuid} 与 {turn}（避免 Spring 解析 ${...} 占位符导致启动失败）
+    @Value("${bytedesk.call.ai.recordPath:/usr/local/freeswitch/recordings/ai-bot-{uuid}-{turn}.wav}")
     private String recordPathTpl;
 
     // 最大录音秒数
@@ -178,7 +180,12 @@ public class AiBotHttapiController {
 
     private String resolveRecordPath(String tpl, String uuid, int turn) {
         String path = Objects.requireNonNullElse(tpl, "/usr/local/freeswitch/recordings/ai-bot-" + uuid + "-" + turn + ".wav");
-        return path.replace("${uuid}", uuid).replace("${turn}", Integer.toString(turn));
+        // 同时兼容 ${uuid}/${turn} 与 {uuid}/{turn} 两种模板写法
+        return path
+            .replace("${uuid}", uuid)
+            .replace("${turn}", Integer.toString(turn))
+            .replace("{uuid}", uuid)
+            .replace("{turn}", Integer.toString(turn));
     }
 
     private String safeAsr(String recordPath, String uuid, int turn) {

@@ -23,15 +23,21 @@
 
 ## 2. 关键配置
 
-### 2.1 Spring Boot（端口、录音与调用）
+### 2.1 Spring Boot（启用开关、端口、录音与调用）
 
-确保以下属性生效（可放在应用的 `application.properties` 或等效配置源中）：
+默认不开启。要启用对话中枢 HTTAPI 控制器，请显式添加：
+
+```
+bytedesk.features.ai-bot.enabled=true
+```
+
+然后确保以下属性生效（可放在应用的 `application.properties` 或等效配置源中）：
 
 - `server.port=9003`（需与 dialplan 中的 HTTAPI URL 对齐）
 - modules/call（对话编排）
   - `bytedesk.call.ai.useSpeak=true`（可选：使用 `execute speak` 兜底）
   - `bytedesk.call.ai.welcome=/usr/local/freeswitch/sounds/en/us/callie/ivr/ivr-welcome.wav`（可改为自定义欢迎音）
-  - `bytedesk.call.ai.recordPath=/usr/local/freeswitch/recordings/ai-bot-${uuid}-${turn}.wav`
+  - `bytedesk.call.ai.recordPath=/usr/local/freeswitch/recordings/ai-bot-{uuid}-{turn}.wav`（支持 {uuid}/{turn}，也向后兼容 ${uuid}/${turn}）
   - `bytedesk.call.ai.recordMaxSec=10`
   - `bytedesk.call.ai.silenceSec=2`
   - `bytedesk.ai.service.baseUrl=http://127.0.0.1:9003`（指向本机 `modules/ai` 服务）
