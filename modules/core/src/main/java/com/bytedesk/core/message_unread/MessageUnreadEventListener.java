@@ -21,9 +21,6 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.redis.RedisService;
-import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompConnectedEvent;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -95,24 +92,24 @@ public class MessageUnreadEventListener {
         }
     }
 
-    @EventListener
-    public void onMqttConnectEvent(MqttConnectedEvent event) {
-        // 用户clientId格式: uid/client/deviceUid
-        // String clientId = event.getClientId();
-        // log.info("message unread mqtt connect event: {}", clientId);
-        // String[] clientIdArray = clientId.split("/");
-        // if (clientIdArray.length != 3) {
-        // return;
-        // }
-        // String userUid = clientIdArray[0];
-        // TODO: 将缓存消息推送给相应客服端
-    }
+    // @EventListener
+    // public void onMqttConnectEvent(MqttConnectedEvent event) {
+    //     // 用户clientId格式: uid/client/deviceUid
+    //     // String clientId = event.getClientId();
+    //     // log.info("message unread mqtt connect event: {}", clientId);
+    //     // String[] clientIdArray = clientId.split("/");
+    //     // if (clientIdArray.length != 3) {
+    //     // return;
+    //     // }
+    //     // String userUid = clientIdArray[0];
+    //     // TODO: 将缓存消息推送给相应客服端
+    // }
 
-    @EventListener
-    public void onStompSessionConnectedEvent(StompConnectedEvent event) {
-        // TODO: 将缓存消息推送给相应访客端
-        // log.info("message unread stomp session connect event: {}",
-        // event.getClientId());
-    }
+    // @EventListener
+    // public void onStompSessionConnectedEvent(StompConnectedEvent event) {
+    //     // TODO: 将缓存消息推送给相应访客端
+    //     // log.info("message unread stomp session connect event: {}",
+    //     // event.getClientId());
+    // }
 
 }
