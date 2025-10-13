@@ -93,7 +93,7 @@ public class ThreadRestService
 
     public Page<ThreadResponse> query(ThreadRequest request) {
         UserEntity user = authService.getUser();
-        
+        // 
         request.setUserUid(user.getUid());
         request.setOwnerUid(user.getUid());
         //
