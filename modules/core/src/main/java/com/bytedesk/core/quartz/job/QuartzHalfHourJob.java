@@ -20,7 +20,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.quartz.service.QuartzEventPublisher;
 
 import java.io.Serializable;
 
@@ -36,12 +36,12 @@ public class QuartzHalfHourJob extends QuartzJobBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final QuartzEventPublisher quartzEventPublisher;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         // log.info("HalfHourJob");
-        bytedeskEventPublisher.publishQuartzHalfHourEvent();
+        quartzEventPublisher.publishQuartzHalfHourEvent();
     }
 
    

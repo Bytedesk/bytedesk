@@ -17,13 +17,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.quartz.event.QuartzDay0Event;
-import com.bytedesk.core.quartz.event.QuartzDay8Event;
-import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
-import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
-import com.bytedesk.core.quartz.event.QuartzHalfHourEvent;
-import com.bytedesk.core.quartz.event.QuartzHourlyEvent;
-import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.message.event.MessageJsonEvent;
@@ -33,14 +26,6 @@ import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.event.UserCreateEvent;
 import com.bytedesk.core.rbac.user.event.UserUpdateEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttSubscribeEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttUnsubscribeEvent;
-import com.bytedesk.core.socket.stomp.event.StompConnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompDisconnectedEvent;
-import com.bytedesk.core.socket.stomp.event.StompSubscribeEvent;
-import com.bytedesk.core.socket.stomp.event.StompUnsubscribeEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
@@ -83,66 +68,7 @@ public class BytedeskEventPublisher {
     public void publishMessageUpdateEvent(MessageEntity message) {
         applicationEventPublisher.publishEvent(new MessageUpdateEvent(this, message));
     }
-
-    public void publishQuartzDay8Event() {
-        applicationEventPublisher.publishEvent(new QuartzDay8Event(this));
-    }
-
-    public void publishQuartzDay0Event() {
-        applicationEventPublisher.publishEvent(new QuartzDay0Event(this));
-    }
-
-    public void publishQuartzHourlyEvent() {
-        applicationEventPublisher.publishEvent(new QuartzHourlyEvent(this));
-    }
-
-    public void publishQuartzHalfHourEvent() {
-        applicationEventPublisher.publishEvent(new QuartzHalfHourEvent(this));
-    }
-
-    public void publishQuartzFiveSecondEvent() {
-        applicationEventPublisher.publishEvent(new QuartzFiveSecondEvent(this));
-    }
-
-    public void publishQuartzFiveMinEvent() {
-        applicationEventPublisher.publishEvent(new QuartzFiveMinEvent(this));
-    }
-
-    public void publishQuartzOneMinEvent() {
-        applicationEventPublisher.publishEvent(new QuartzOneMinEvent(this));
-    }
-
-    public void publishMqttConnectedEvent(String clientId) {
-        applicationEventPublisher.publishEvent(new MqttConnectedEvent(this, clientId));
-    }
-
-    public void publishMqttDisconnectedEvent(String clientId) {
-        applicationEventPublisher.publishEvent(new MqttDisconnectedEvent(this, clientId));
-    }
-
-    public void publishMqttSubscribeEvent(String topic, String clientId) {
-        applicationEventPublisher.publishEvent(new MqttSubscribeEvent(this, topic, clientId));
-    }
-
-    public void publishMqttUnsubscribeEvent(String topic, String clientId) {
-        applicationEventPublisher.publishEvent(new MqttUnsubscribeEvent(this, topic, clientId));
-    }
-
-    public void publishStompConnectedEvent(String clientId) {
-        applicationEventPublisher.publishEvent(new StompConnectedEvent(this, clientId));
-    }
-
-    public void publishStompDisconnectedEvent(String clientId) {
-        applicationEventPublisher.publishEvent(new StompDisconnectedEvent(this, clientId));
-    }
-
-    public void publishStompSubscribeEvent(String topic, String clientId) {
-        applicationEventPublisher.publishEvent(new StompSubscribeEvent(this, topic, clientId));
-    }
-
-    public void publishStompUnsubscribeEvent(String topic, String clientId) {
-        applicationEventPublisher.publishEvent(new StompUnsubscribeEvent(this, topic, clientId));
-    }
+    
 
     public void publishThreadCreateEvent(ThreadEntity thread) {
         applicationEventPublisher.publishEvent(new ThreadCreateEvent(this, thread));
@@ -151,10 +77,6 @@ public class BytedeskEventPublisher {
     public void publishThreadUpdateEvent(ThreadEntity thread) {
         applicationEventPublisher.publishEvent(new ThreadUpdateEvent(this, thread));
     }
-
-    // public void publishThreadUpdateStatusEvent(Thread thread, String status) {
-    //     applicationEventPublisher.publishEvent(new ThreadUpdateStatusEvent(this, thread, status));
-    // }
 
     public void publishOrganizationCreateEvent(OrganizationEntity organization) {
         applicationEventPublisher.publishEvent(new OrganizationCreateEvent(organization));

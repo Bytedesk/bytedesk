@@ -13,10 +13,13 @@
  */
 package com.bytedesk.core.socket.mqtt.service;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.config.BytedeskEventPublisher;
-
+import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttSubscribeEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttUnsubscribeEvent;
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
 
@@ -25,22 +28,22 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MqttEventPublisher {
 
-  private final BytedeskEventPublisher bytedeskEventPublisher;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   public void publishMqttConnectedEvent(String clientId) {
-    bytedeskEventPublisher.publishMqttConnectedEvent(clientId);
+    applicationEventPublisher.publishEvent(new MqttConnectedEvent(this, clientId));
   }
 
   public void publishMqttDisconnectedEvent(String clientId) {
-    bytedeskEventPublisher.publishMqttDisconnectedEvent(clientId);
+    applicationEventPublisher.publishEvent(new MqttDisconnectedEvent(this, clientId));
   }
 
   public void publishMqttSubscribeEvent(String topic, String clientId) {
-    bytedeskEventPublisher.publishMqttSubscribeEvent(topic, clientId);
+    applicationEventPublisher.publishEvent(new MqttSubscribeEvent(this, topic, clientId));
   }
 
   public void publishMqttUnsubscribeEvent(String topic, String clientId) {
-    bytedeskEventPublisher.publishMqttUnsubscribeEvent(topic, clientId);
+    applicationEventPublisher.publishEvent(new MqttUnsubscribeEvent(this, topic, clientId));
   }
 
 }

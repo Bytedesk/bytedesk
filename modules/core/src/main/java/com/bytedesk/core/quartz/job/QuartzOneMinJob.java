@@ -21,7 +21,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.quartz.service.QuartzEventPublisher;
 
 import lombok.AllArgsConstructor;
 
@@ -37,12 +37,12 @@ public class QuartzOneMinJob extends QuartzJobBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final QuartzEventPublisher quartzEventPublisher;
 
     @Override
     protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException {
         // log.info("OneMinJob");
-        bytedeskEventPublisher.publishQuartzOneMinEvent();
+        quartzEventPublisher.publishQuartzOneMinEvent();
     }
 
 }
