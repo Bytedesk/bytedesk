@@ -39,7 +39,7 @@ public class PushService {
     
     // 业务服务组件
     private final PushSendService codeSendService;
-    private final AuthScanService scanLoginService;
+    private final AuthScanService authScanService;
 
     // =============== REST接口方法 ===============
 
@@ -54,21 +54,21 @@ public class PushService {
      * 扫码查询
      */
     public PushResponse scanQuery(PushRequest pushRequest, HttpServletRequest request) {
-        return scanLoginService.scanQuery(pushRequest, request);
+        return authScanService.scanQuery(pushRequest, request);
     }
 
     /**
      * 扫码确认
      */
     public PushResponse scan(PushRequest pushRequest, HttpServletRequest request) {
-        return scanLoginService.scan(pushRequest, request);
+        return authScanService.scan(pushRequest, request);
     }
 
     /**
      * 扫码登录确认
      */
     public PushResponse scanConfirm(PushRequest pushRequest, HttpServletRequest request) {
-        return scanLoginService.scanConfirm(pushRequest, request);
+        return authScanService.scanConfirm(pushRequest, request);
     }
 
     // =============== 业务逻辑方法 ===============
