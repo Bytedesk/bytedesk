@@ -20,7 +20,6 @@ import com.bytedesk.core.push.service.PushSendService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.push.service.PushSendResult;
 import com.bytedesk.core.rbac.auth.AuthRequest;
-import com.bytedesk.core.rbac.auth.AuthScanService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class PushService {
     
     // 业务服务组件
     private final PushSendService codeSendService;
-    private final AuthScanService authScanService;
+   
 
     // =============== REST接口方法 ===============
 
@@ -50,26 +49,7 @@ public class PushService {
         return codeSendService.sendCode(authRequest, request);
     }
 
-    /**
-     * 扫码查询
-     */
-    public PushResponse scanQuery(PushRequest pushRequest, HttpServletRequest request) {
-        return authScanService.scanQuery(pushRequest, request);
-    }
-
-    /**
-     * 扫码确认
-     */
-    public PushResponse scan(PushRequest pushRequest, HttpServletRequest request) {
-        return authScanService.scan(pushRequest, request);
-    }
-
-    /**
-     * 扫码登录确认
-     */
-    public PushResponse scanConfirm(PushRequest pushRequest, HttpServletRequest request) {
-        return authScanService.scanConfirm(pushRequest, request);
-    }
+    
 
     // =============== 业务逻辑方法 ===============
 
