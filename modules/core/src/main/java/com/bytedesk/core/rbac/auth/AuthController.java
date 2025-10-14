@@ -74,17 +74,6 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
-        // 显式设置注册来源，避免遗漏
-        if (!StringUtils.hasText(userRequest.getRegisterSource())) {
-            if (StringUtils.hasText(userRequest.getMobile())) {
-                userRequest.setRegisterSource("MOBILE");
-            } else if (StringUtils.hasText(userRequest.getEmail())) {
-                userRequest.setRegisterSource("EMAIL");
-            } else if (StringUtils.hasText(userRequest.getUsername())) {
-                userRequest.setRegisterSource("USERNAME");
-            }
-        }
-
         UserResponse userResponse = userService.register(userRequest);
 
         return ResponseEntity.ok(JsonResult.success("register success", userResponse));
@@ -301,6 +290,5 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(authResponse));
     }
 
-    
 
 }

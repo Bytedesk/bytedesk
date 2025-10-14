@@ -38,7 +38,6 @@ public class UserRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String uid;
 
 	private String num;
