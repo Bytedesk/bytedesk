@@ -64,7 +64,6 @@ public class AuthScanService {
     }
 
     public PushResponse scan(PushRequest pushRequest, HttpServletRequest request) {
-        
         // 参数非空校验
         Assert.notNull(pushRequest, "PushRequest cannot be null");
         Assert.notNull(request, "HttpServletRequest cannot be null");
@@ -72,7 +71,6 @@ public class AuthScanService {
         
         PushEntity push = pushRestService.findByDeviceUid(pushRequest.getDeviceUid())
                 .orElseThrow(() -> new RuntimeException("scan deviceUid " + pushRequest.getDeviceUid() + " not found"));
-        
         push.setStatus(PushStatusEnum.SCANNED.name());
         
         PushEntity savedPush = pushRestService.save(push);
