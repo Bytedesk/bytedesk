@@ -187,7 +187,7 @@ private void handleTtsEvent(MrcpEvent event) {
 }
 ```
 
-## �� 业务场景示例
+## 业务场景示例
 
 ### 场景 1: 简单查询
 - 用户说:"查询余额"
@@ -295,10 +295,3 @@ private void handleTtsEvent(MrcpEvent event) {
    - 验证用户输入
    - 限制请求频率
    - 保护敏感信息
-
-## 📧 联系支持
-
-如有问题或建议,请联系:
-- Email: support@bytedesk.com
-- Website: https://www.bytedesk.com
-- GitHub: https://github.com/Bytedesk/bytedesk
