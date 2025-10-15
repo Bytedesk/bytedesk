@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.bytedesk.call.mrcp4j.MrcpMethodName;
+import com.bytedesk.call.mrcp4j.common.MrcpMethodName;
 import com.bytedesk.call.mrcp4j.message.MrcpEvent;
 import com.bytedesk.call.mrcp4j.message.MrcpMessage;
 import com.bytedesk.call.mrcp4j.message.MrcpResponse;

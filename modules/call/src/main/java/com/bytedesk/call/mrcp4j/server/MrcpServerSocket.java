@@ -29,9 +29,10 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import java.net.InetSocketAddress;
-import com.bytedesk.call.mrcp4j.MrcpEventName;
-import com.bytedesk.call.mrcp4j.MrcpRequestState;
-import com.bytedesk.call.mrcp4j.MrcpResourceType;
+
+import com.bytedesk.call.mrcp4j.common.MrcpEventName;
+import com.bytedesk.call.mrcp4j.common.MrcpRequestState;
+import com.bytedesk.call.mrcp4j.common.MrcpResourceType;
 import com.bytedesk.call.mrcp4j.message.MrcpEvent;
 import com.bytedesk.call.mrcp4j.message.MrcpResponse;
 import com.bytedesk.call.mrcp4j.message.request.MrcpRequest;

@@ -20,13 +20,13 @@
  * Contact: ngodfredsen@users.sourceforge.net
  *
  */
-package com.bytedesk.call.mrcp4j;
+package com.bytedesk.call.mrcp4j.common;
 
 /**
  * Defines the event names that are valid values for MRCPv2 event messages.
  * 
  * @author Niels Godfredsen {@literal <}<a href="mailto:ngodfredsen@users.sourceforge.net">ngodfredsen@users.sourceforge.net</a>{@literal >}
- * @see com.bytedesk.call.mrcp4j.server.MrcpSession#createEvent(com.bytedesk.call.mrcp4j.MrcpEventName, com.bytedesk.call.mrcp4j.MrcpRequestState)
+ * @see com.bytedesk.call.mrcp4j.server.MrcpSession#createEvent(com.bytedesk.call.mrcp4j.common.MrcpEventName, com.bytedesk.call.mrcp4j.MrcpRequestState)
  */
 public enum MrcpEventName {
 

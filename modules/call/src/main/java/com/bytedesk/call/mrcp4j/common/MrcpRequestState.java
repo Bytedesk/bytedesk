@@ -20,14 +20,14 @@
  * Contact: ngodfredsen@users.sourceforge.net
  *
  */
-package com.bytedesk.call.mrcp4j;
+package com.bytedesk.call.mrcp4j.common;
 
 /**
  * Defines the request states that are valid for MRCPv2.
  * 
  * @author Niels Godfredsen {@literal <}<a href="mailto:ngodfredsen@users.sourceforge.net">ngodfredsen@users.sourceforge.net</a>{@literal >}
- * @see com.bytedesk.call.mrcp4j.server.MrcpSession#createResponse(short, com.bytedesk.call.mrcp4j.MrcpRequestState)
- * @see com.bytedesk.call.mrcp4j.server.MrcpSession#createEvent(com.bytedesk.call.mrcp4j.MrcpEventName, com.bytedesk.call.mrcp4j.MrcpRequestState)
+ * @see com.bytedesk.call.mrcp4j.server.MrcpSession#createResponse(short, com.bytedesk.call.mrcp4j.common.MrcpRequestState)
+ * @see com.bytedesk.call.mrcp4j.server.MrcpSession#createEvent(com.bytedesk.call.mrcp4j.MrcpEventName, com.bytedesk.call.mrcp4j.common.MrcpRequestState)
  */
 public enum MrcpRequestState {
 

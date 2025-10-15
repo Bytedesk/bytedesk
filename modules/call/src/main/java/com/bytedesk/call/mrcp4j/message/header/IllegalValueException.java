@@ -22,7 +22,7 @@
  */
 package com.bytedesk.call.mrcp4j.message.header;
 
-import com.bytedesk.call.mrcp4j.MrcpException;
+import com.bytedesk.call.mrcp4j.common.MrcpException;
 
 /**
  *

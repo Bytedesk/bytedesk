@@ -22,9 +22,9 @@
  */
 package com.bytedesk.call.mrcp4j.message.header;
 
-import com.bytedesk.call.mrcp4j.MrcpResourceType;
-
 import java.util.EnumSet;
+
+import com.bytedesk.call.mrcp4j.common.MrcpResourceType;
 
 /**
  * Defines all valid MRCPv2 header names and provides factory methods for creating header value objects from header value strings.

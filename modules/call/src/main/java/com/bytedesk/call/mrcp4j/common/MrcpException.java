@@ -20,7 +20,7 @@
  * Contact: ngodfredsen@users.sourceforge.net
  *
  */
-package com.bytedesk.call.mrcp4j;
+package com.bytedesk.call.mrcp4j.common;
 
 /**
  * Base class for all MRCP4J exception types.

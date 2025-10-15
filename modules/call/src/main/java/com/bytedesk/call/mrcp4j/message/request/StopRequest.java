@@ -22,11 +22,7 @@
  */
 package com.bytedesk.call.mrcp4j.message.request;
 
-/**
- *
- * @author Niels Godfredsen {@literal <}<a href="mailto:ngodfredsen@users.sourceforge.net">ngodfredsen@users.sourceforge.net</a>{@literal >}
- */
-import com.bytedesk.call.mrcp4j.MrcpMethodName;
+import com.bytedesk.call.mrcp4j.common.MrcpMethodName;
 
 public class StopRequest extends MrcpRequest {
 
