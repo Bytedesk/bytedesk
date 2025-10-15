@@ -62,8 +62,8 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     /**
      * 根据设备UID查找
      */
-    public Optional<PushEntity> findByDeviceUid(String deviceUid) {
-        return pushRepository.findTopByDeviceUidOrderByUpdatedAtDesc(deviceUid);
+    public Optional<PushEntity> findByDeviceUid(String deviceUid, String status, String type) {
+        return pushRepository.findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(deviceUid, status, type);
     }
 
     /**
@@ -102,7 +102,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     @Override
     public PushEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, PushEntity entity) {
         try {
-            Optional<PushEntity> latest = pushRepository.findTopByDeviceUidOrderByUpdatedAtDesc(entity.getDeviceUid());
+            Optional<PushEntity> latest = pushRepository.findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(entity.getDeviceUid(), entity.getStatus(), entity.getType());
             if (latest.isPresent()) {
                 PushEntity latestEntity = latest.get();
                 return pushRepository.save(latestEntity);

@@ -28,7 +28,7 @@ public interface PushRepository extends JpaRepository<PushEntity, Long>, JpaSpec
     Optional<PushEntity> findByStatusAndReceiverAndContent(String status, String receiver, String content);
 
     // 注意：历史上同一 deviceUid 可能存在多条记录，这里提供按更新时间倒序取最新一条，避免非唯一结果异常
-    Optional<PushEntity> findTopByDeviceUidOrderByUpdatedAtDesc(String deviceUid);
+    Optional<PushEntity> findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(String deviceUid, String status, String type);
 
     Optional<PushEntity> findByDeviceUidAndContent(String deviceUid, String code);
 
