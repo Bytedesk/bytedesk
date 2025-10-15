@@ -20,6 +20,9 @@
 		<protobuf.version>4.28.2</protobuf.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<os-maven-plugin.version>1.7.1</os-maven-plugin.version>
+		<!-- gRPC 相关版本 -->
+		<grpc.version>1.74.0</grpc.version>
+		<spring-grpc.version>0.11.0</spring-grpc.version>
 	</properties>
 
 	<dependencies>
@@ -101,6 +104,23 @@
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java-util</artifactId>
 			<version>${protobuf.version}</version>
+		</dependency>
+
+		<!-- gRPC 核心依赖 -->
+		<!-- https://mvnrepository.com/artifact/io.grpc/grpc-services -->
+		<!-- 版本由 spring-grpc-dependencies BOM 管理 -->
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-services</artifactId>
+		</dependency>
+
+		<!-- Spring gRPC 集成 -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.grpc/spring-grpc-spring-boot-starter -->
+		<!-- 版本由 spring-grpc-dependencies BOM 管理 -->
+		<!-- 作为核心功能的一部分，会自动传递到最终应用（starter） -->
+		<dependency>
+			<groupId>org.springframework.grpc</groupId>
+			<artifactId>spring-grpc-spring-boot-starter</artifactId>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
@@ -287,6 +307,19 @@
 
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Spring gRPC BOM - 统一管理 gRPC 相关依赖版本 -->
+			<dependency>
+				<groupId>org.springframework.grpc</groupId>
+				<artifactId>spring-grpc-dependencies</artifactId>
+				<version>${spring-grpc.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -327,7 +360,7 @@
 			</extension>
 		</extensions>
 		<plugins>
-			<!--自动生成protobuf java类-->
+			<!--自动生成protobuf java类 和 gRPC 服务代码-->
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
@@ -337,12 +370,17 @@
 					<protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
 					<outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>
 					<clearOutputDirectory>false</clearOutputDirectory>
+					<!-- 添加 gRPC 插件配置 -->
+					<pluginId>grpc-java</pluginId>
+					<pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
 							<goal>compile</goal>
+							<goal>compile-custom</goal>
 							<goal>test-compile</goal>
+							<goal>test-compile-custom</goal>
 						</goals>
 					</execution>
 				</executions>
