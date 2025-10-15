@@ -1,6 +1,8 @@
 /**
  * MRCP4J - Media Resource Control Protocol v2 (MRCPv2) 实现库
  * 
+ * github地址：https://github.com/JVoiceXML/mrcp4j
+ * 
  * <p>
  * 本包提供了 MRCP 协议的完整 Java 实现,用于与语音识别(ASR)和语音合成(TTS)服务器通信。
  * MRCP 是一种基于 SIP 和 RTP 的应用层协议,广泛用于 VoIP 和 IVR 系统。

@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
  * gRPC Server Service
  * https://docs.spring.io/spring-grpc/reference/getting-started.html
  * 
- * test: grpcurl -d '{"name":"Hi"}' -plaintext localhost:9003 Simple.SayHello
+ * test: grpcurl -d '{"name":"Hi"}' -plaintext 127.0.0.1:9003 Simple.SayHello
  *
  * @author bytedesk.com
  */

@@ -2,6 +2,8 @@
 
 MRCP4J 是一个完整的 Media Resource Control Protocol Version 2 (MRCPv2) Java 实现库,用于构建语音识别(ASR)和语音合成(TTS)应用。
 
+[Github Mrcp4j](https://github.com/JVoiceXML/mrcp4j)
+
 ## 📋 目录
 
 - [特性](#特性)
@@ -314,16 +316,3 @@ request.setHeader(MrcpHeaderName.CONTENT_TYPE, "audio/x-wav");
 - [RFC 4463 - MRCPv1](https://tools.ietf.org/html/rfc4463)
 - [SRGS Grammar Specification](https://www.w3.org/TR/speech-grammar/)
 - [SSML Specification](https://www.w3.org/TR/speech-synthesis/)
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request!
-
-## 📄 许可证
-
-本项目采用 [LICENSE](../../../../../../../LICENSE) 许可证。
-
----
-
-**维护者**: bytedesk.com  
-**更新时间**: 2025-10-15
