@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,8 +25,6 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
     private final PushRepository pushRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
-
-    // =============== CRUD 增删改查方法 ===============
 
     /**
      * 创建推送记录
@@ -78,20 +74,6 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
      */
     public List<PushEntity> findStatusPending() {
         return pushRepository.findByStatus(PushStatusEnum.PENDING.name());
-    }
-
-    /**
-     * 保存实体（带缓存）
-     */
-    @Caching(put = {
-            @CachePut(value = "push", key = "#push.receiver"),
-    })
-    public PushEntity save(PushEntity push) {
-        try {
-            return doSave(push);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, push);
-        }
     }
 
     @Override
