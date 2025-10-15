@@ -117,7 +117,6 @@
 		<!-- Spring gRPC 集成 -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.grpc/spring-grpc-spring-boot-starter -->
 		<!-- 版本由 spring-grpc-dependencies BOM 管理 -->
-		<!-- 作为核心功能的一部分，会自动传递到最终应用（starter） -->
 		<dependency>
 			<groupId>org.springframework.grpc</groupId>
 			<artifactId>spring-grpc-spring-boot-starter</artifactId>
