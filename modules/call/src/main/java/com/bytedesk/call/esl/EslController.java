@@ -34,6 +34,7 @@ public class EslController {
 
     // 健康与通用
     /** FreeSWITCH 运行状态 */
+    // http://127.0.0.1:9003/freeswitch/api/v1/esl/status
     @GetMapping("/status")
     public ResponseEntity<JsonResult<?>> status() {
         Map<String, Object> res = eslService.status();
@@ -56,18 +57,21 @@ public class EslController {
 
     // 配置相关
     /** 触发 reloadxml（重载 XML 配置与拨号计划） */
+    // http://127.0.0.1:9003/freeswitch/api/v1/esl/reloadxml
     @PostMapping("/reloadxml")
     public ResponseEntity<JsonResult<?>> reloadxml() {
         return ResponseEntity.ok(JsonResult.success("reloadxml", eslService.reloadXml()));
     }
 
     /** 触发 reloadacl（重载 ACL） */
+    // http://127.0.0.1:9003/freeswitch/api/v1/esl/reloadacl
     @PostMapping("/reloadacl")
     public ResponseEntity<JsonResult<?>> reloadacl() {
         return ResponseEntity.ok(JsonResult.success("reloadacl", eslService.reloadAcl()));
     }
 
     /** 刷新 XML 缓存（配合 mod_xml_curl） */
+    // http://127.0.0.1:9003/freeswitch/api/v1/esl/xml_flush_cache
     @PostMapping("/xml_flush_cache")
     public ResponseEntity<JsonResult<?>> xmlFlushCache() {
         return ResponseEntity.ok(JsonResult.success("xml_flush_cache", eslService.xmlFlushCache()));
@@ -81,6 +85,7 @@ public class EslController {
 
     // sofia
     /** 获取 sofia 总览状态 */
+    // http://127.0.0.1:9003/freeswitch/api/v1/esl/sofia/status
     @GetMapping("/sofia/status")
     public ResponseEntity<JsonResult<?>> sofiaStatus() {
         return ResponseEntity.ok(JsonResult.success("sofia status", eslService.sofiaStatus()));

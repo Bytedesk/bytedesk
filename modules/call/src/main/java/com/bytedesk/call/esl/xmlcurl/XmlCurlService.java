@@ -63,6 +63,28 @@ public class XmlCurlService {
             "</document>\n";
     }
 
+    /**
+     * 标准错误 XML。
+     */
+    public String buildError(String code, String message) {
+        String c = (code == null || code.isBlank()) ? "error" : code;
+        String m = (message == null || message.isBlank()) ? "unknown" : message;
+        return "" +
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<document type=\"freeswitch/xml\">\n" +
+            "  <section name=\"result\">\n" +
+            "    <result status=\"not found\" code=\"" + xml(c) + "\" text=\"" + xml(m) + "\"/>\n" +
+            "  </section>\n" +
+            "</document>\n";
+    }
+
+    /**
+     * 未找到/无匹配结果 XML。
+     */
+    public String buildNotFound() {
+        return buildError("not_found", "no matching document");
+    }
+
     private static String xml(String s) {
         return s.replace("&", "&amp;")
                 .replace("\"", "&quot;")

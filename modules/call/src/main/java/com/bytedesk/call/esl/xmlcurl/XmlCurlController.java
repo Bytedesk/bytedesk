@@ -6,7 +6,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,19 +45,57 @@ public class XmlCurlController {
         // 可在此处增加鉴权/签名/白名单校验
         log.debug("xml_curl request: type={}, domain={}, user={}, context={}, dest={}", type, domain, user, context, destinationNumber);
 
-        String xml;
-        switch (type) {
-            case "directory":
-                xml = xmlCurlService.buildDirectoryUser(domain, user);
-                break;
-            case "dialplan":
-                xml = xmlCurlService.buildDialplan(context, destinationNumber);
-                break;
-            default:
-                xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><document type=\"freeswitch/xml\"></document>";
-        }
+        String xml = route(type, domain, user, context, destinationNumber);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_XML)
                 .body(xml);
+    }
+
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<String> fetchPost(
+            @RequestParam MultiValueMap<String, String> form,
+            @RequestHeader HttpHeaders headers
+    ) {
+        // FreeSWITCH 常见 POST 字段兼容：section/type、domain/user/context、dest/destination_number/Caller-Destination-Number
+        String type = firstNonEmpty(form, "type", "section");
+        String domain = firstNonEmpty(form, "domain", "Realm");
+        String user = firstNonEmpty(form, "user", "User-Name");
+        String context = firstNonEmpty(form, "context");
+        String dest = firstNonEmpty(form, "dest", "destination_number", "Caller-Destination-Number");
+
+        log.debug("xml_curl POST: type={}, domain={}, user={}, context={}, dest={}", type, domain, user, context, dest);
+
+        if (type == null || type.isBlank()) {
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_XML)
+                    .body(xmlCurlService.buildError("bad_request", "missing type/section"));
+        }
+
+        String xml = route(type, domain, user, context, dest);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_XML).body(xml);
+    }
+
+    private String route(String type, String domain, String user, String context, String destinationNumber) {
+        switch (type) {
+            case "directory":
+            case "directory_user":
+                return xmlCurlService.buildDirectoryUser(domain, user);
+            case "dialplan":
+                return xmlCurlService.buildDialplan(context, destinationNumber);
+            default:
+                return xmlCurlService.buildNotFound();
+        }
+    }
+
+    private static String firstNonEmpty(MultiValueMap<String, String> form, String... keys) {
+        for (String k : keys) {
+            if (form.containsKey(k)) {
+                for (String v : form.get(k)) {
+                    if (v != null && !v.isBlank()) {
+                        return v;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

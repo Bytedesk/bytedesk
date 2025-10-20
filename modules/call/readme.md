@@ -58,6 +58,7 @@
 - ✅ **呼叫中心功能**: 队列管理、坐席管理、通话录音
 - ✅ **REST API**: 完整的 HTTP 接口用于呼叫控制和状态查询
 - ✅ **WebSocket 信令**: 支持 WebRTC 信令交换和实时消息推送
+- ✅ **mod_xml_curl**: 通过 HTTP 动态返回 Directory 和 Dialplan XML（可选开启）
 
 ## 项目结构
 
@@ -112,6 +113,7 @@ cp deploy/private/freeswitch/conf/vars_bytedesk.xml /usr/local/freeswitch/conf/
 cp deploy/private/freeswitch/conf/directory/bytedesk.xml /usr/local/freeswitch/conf/directory/
 cp deploy/private/freeswitch/conf/autoload_configs/event_socket.conf.xml /usr/local/freeswitch/conf/autoload_configs/
 cp deploy/private/freeswitch/conf/autoload_configs/verto_bytedesk.conf.xml /usr/local/freeswitch/conf/autoload_configs/
+cp deploy/freeswitch/conf/autoload_configs/xml_curl.conf.xml /usr/local/freeswitch/conf/autoload_configs/
 ```
 
 ### 3. 启动 FreeSwitch
@@ -142,6 +144,13 @@ freeswitch.webrtc.wss.url=wss://127.0.0.1:17443
 # 呼叫中心配置
 freeswitch.callcenter.queue.default=bytedesk_queue
 freeswitch.callcenter.recording.enabled=true
+
+# 可选：启用 xml_curl
+bytedesk.call.freeswitch.xmlcurl.enabled=true
+# 建议设置访问 token
+bytedesk.call.freeswitch.xmlcurl.token=change_me
+# 允许来源 IP（可选）
+bytedesk.call.freeswitch.xmlcurl.ip-whitelist=127.0.0.1,::1
 ```
 
 ### 5. 启动应用
@@ -152,6 +161,49 @@ mvn spring-boot:run
 ```
 
 ## API 使用示例
+## xml_curl 使用指南
+
+应用提供固定端点：/freeswitch/xmlcurl
+
+1) Directory 示例（GET）
+
+可用于 FreeSWITCH 注册鉴权与用户变量：
+
+GET /freeswitch/xmlcurl?type=directory&domain=default&user=1000
+
+2) Dialplan 示例（GET）
+
+GET /freeswitch/xmlcurl?type=dialplan&context=default&dest=1000
+
+3) FreeSWITCH POST（application/x-www-form-urlencoded）
+
+应用兼容多种别名：type/section、dest/destination_number/Caller-Destination-Number、user/User-Name、domain/Realm。
+
+4) curl 本地验证
+
+当开启了 token 时：
+
+curl -H "X-XMLCURL-TOKEN: change_me" "http://127.0.0.1:9003/freeswitch/xmlcurl?type=directory&domain=default&user=1000"
+
+curl -H "X-XMLCURL-TOKEN: change_me" "http://127.0.0.1:9003/freeswitch/xmlcurl?type=dialplan&context=default&dest=1000"
+
+5) FreeSWITCH xml_curl.conf.xml 示例
+
+<configuration name="xml_curl.conf" description="cURL XML Gateway">
+  <bindings>
+    <binding name="bytedesk">
+      <param name="gateway-url" value="http://127.0.0.1:9003/freeswitch/xmlcurl" bindings="dialplan|directory"/>
+      <param name="timeout" value="10"/>
+      <!-- 若使用 token，可加 basic/headers 或者把 token 拼到 url 上；建议通过反向代理统一加头 -->
+    </binding>
+  </bindings>
+  </configuration>
+
+6) 常见问题
+
+- 返回 401：缺少或错误的 X-XMLCURL-TOKEN，请检查配置 bytedesk.call.freeswitch.xmlcurl.token 或在请求中附带 header/参数 token。
+- 返回 403：请求来源 IP 不在白名单，调整 bytedesk.call.freeswitch.xmlcurl.ip-whitelist。
+- FreeSWITCH 仍未调用 HTTP：确认模块已加载并启用 xml_curl.conf.xml，检查 bindings 与 gateway-url 是否可访问。
 
 ### 呼叫控制 API
 
