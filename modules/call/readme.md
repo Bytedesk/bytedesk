@@ -175,6 +175,12 @@ GET /freeswitch/xmlcurl?type=directory&domain=default&user=1000
 
 GET /freeswitch/xmlcurl?type=dialplan&context=default&dest=1000
 
+2.1) 启动 IVR 示例（在 dialplan 中调用 IVR 菜单）
+
+生成的 configuration 支持一个默认菜单 main_menu，可在拨号计划里这样触发：
+
+<action application="ivr" data="main_menu"/>
+
 3) FreeSWITCH POST（application/x-www-form-urlencoded）
 
 应用兼容多种别名：type/section、dest/destination_number/Caller-Destination-Number、user/User-Name、domain/Realm。
@@ -192,12 +198,28 @@ curl -H "X-XMLCURL-TOKEN: change_me" "http://127.0.0.1:9003/freeswitch/xmlcurl?t
 <configuration name="xml_curl.conf" description="cURL XML Gateway">
   <bindings>
     <binding name="bytedesk">
-      <param name="gateway-url" value="http://127.0.0.1:9003/freeswitch/xmlcurl" bindings="dialplan|directory"/>
+      <param name="gateway-url" value="http://127.0.0.1:9003/freeswitch/xmlcurl" bindings="dialplan|directory|configuration|phrases"/>
       <param name="timeout" value="10"/>
       <!-- 若使用 token，可加 basic/headers 或者把 token 拼到 url 上；建议通过反向代理统一加头 -->
     </binding>
   </bindings>
   </configuration>
+
+6) IVR 配置获取
+
+当 FreeSWITCH 请求 configuration 时，会带上 key_value/name 参数作为配置名；本服务已兼容：
+
+GET /freeswitch/xmlcurl?type=configuration&key_value=ivr.conf
+
+或
+
+GET /freeswitch/xmlcurl?type=configuration&conf_name=ivr
+
+返回的 ivr.conf 默认包含一个名为 main_menu 的菜单：
+- 1 转 1000（XML default）
+- 2 转 2000（XML default）
+- 0 转 1000（人工）
+- * 退出
 
 6) 常见问题
 

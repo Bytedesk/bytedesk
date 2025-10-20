@@ -13,22 +13,14 @@
  */
 package com.bytedesk.call.config;
 
-import org.springframework.context.ApplicationEventPublisher;
+// import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.call.call.event.CallCallAnsweredEvent;
-import com.bytedesk.call.call.event.CallCallHangupEvent;
-import com.bytedesk.call.call.event.CallCallStartEvent;
-import com.bytedesk.call.call.event.CallDtmfEvent;
-import com.bytedesk.call.cdr.event.CallCdrCreateEvent;
-import com.bytedesk.call.cdr.event.CallCdrUpdateEvent;
-import com.bytedesk.call.conference.event.CallConferenceCreateEvent;
-import com.bytedesk.call.conference.event.CallConferenceUpdateEvent;
-import com.bytedesk.call.gateway.event.CallGatewayCreateEvent;
-import com.bytedesk.call.gateway.event.CallGatewayUpdateEvent;
-import com.bytedesk.call.users.event.CallUserCreateEvent;
-import com.bytedesk.call.users.event.CallUserUpdateEvent;
+// import com.bytedesk.call.gateway.event.CallGatewayCreateEvent;
+// import com.bytedesk.call.gateway.event.CallGatewayUpdateEvent;
+// import com.bytedesk.call.users.event.CallUserCreateEvent;
+// import com.bytedesk.call.users.event.CallUserUpdateEvent;
 
 import lombok.AllArgsConstructor;
 
@@ -40,58 +32,58 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CallEventPublisher {
     
-    private final ApplicationEventPublisher applicationEventPublisher;
+    // private final ApplicationEventPublisher applicationEventPublisher;
     
     // CDR事件
-    public void publishEvent(CallCdrCreateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallCdrCreateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    public void publishEvent(CallCdrUpdateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallCdrUpdateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    // Conference事件
-    public void publishEvent(CallConferenceCreateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // // Conference事件
+    // public void publishEvent(CallConferenceCreateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    public void publishEvent(CallConferenceUpdateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallConferenceUpdateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
     // Gateway事件
-    public void publishEvent(CallGatewayCreateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallGatewayCreateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    public void publishEvent(CallGatewayUpdateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallGatewayUpdateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
     // User事件
-    public void publishEvent(CallUserCreateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallUserCreateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    public void publishEvent(CallUserUpdateEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallUserUpdateEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
     // Call事件
-    public void publishEvent(CallCallStartEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallCallStartEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    public void publishEvent(CallCallAnsweredEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallCallAnsweredEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    public void publishEvent(CallCallHangupEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallCallHangupEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
     
-    public void publishEvent(CallDtmfEvent event) {
-        applicationEventPublisher.publishEvent(event);
-    }
+    // public void publishEvent(CallDtmfEvent event) {
+    //     applicationEventPublisher.publishEvent(event);
+    // }
 }

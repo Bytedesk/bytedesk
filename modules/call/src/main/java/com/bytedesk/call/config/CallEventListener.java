@@ -5,10 +5,6 @@ import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.call.call.event.CallCallAnsweredEvent;
-import com.bytedesk.call.call.event.CallCallHangupEvent;
-import com.bytedesk.call.call.event.CallCallStartEvent;
-import com.bytedesk.call.call.event.CallDtmfEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CallEventListener implements com.bytedesk.call.esl.client.inbound.IEslEventListener {
 
-    private final CallEventPublisher eventPublisher;
+    // private final CallEventPublisher eventPublisher;
 
     // 实现 IEslEventListener 的回调
     @Override
@@ -83,7 +79,7 @@ public class CallEventListener implements com.bytedesk.call.esl.client.inbound.I
         log.debug("已更新用户在线状态: 主叫 {} 被叫 {}", callerId, destination);
 
         // 发布通话开始事件
-        eventPublisher.publishEvent(new CallCallStartEvent(this, uuid, callerId, destination));
+        // eventPublisher.publishEvent(new CallCallStartEvent(this, uuid, callerId, destination));
     }
 
     /**
@@ -103,7 +99,7 @@ public class CallEventListener implements com.bytedesk.call.esl.client.inbound.I
         }
 
         // 发布通话应答事件
-        eventPublisher.publishEvent(new CallCallAnsweredEvent(this, uuid));
+        // eventPublisher.publishEvent(new CallCallAnsweredEvent(this, uuid));
     }
 
     /**
@@ -124,7 +120,7 @@ public class CallEventListener implements com.bytedesk.call.esl.client.inbound.I
         }
 
         // 发布通话挂断事件
-        eventPublisher.publishEvent(new CallCallHangupEvent(this, uuid, hangupCause));
+        // eventPublisher.publishEvent(new CallCallHangupEvent(this, uuid, hangupCause));
     }
 
     /**
@@ -139,7 +135,7 @@ public class CallEventListener implements com.bytedesk.call.esl.client.inbound.I
         // 调用通话服务处理
         // callService.handleDtmf(uuid, digit);
         // 发布DTMF事件
-        eventPublisher.publishEvent(new CallDtmfEvent(this, uuid, digit));
+        // eventPublisher.publishEvent(new CallDtmfEvent(this, uuid, digit));
     }
 
     /**
