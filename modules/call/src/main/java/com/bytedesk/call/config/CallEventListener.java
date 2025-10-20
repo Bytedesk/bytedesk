@@ -1,7 +1,7 @@
 package com.bytedesk.call.config;
 
-import org.freeswitch.esl.client.IEslEventListener;
-import org.freeswitch.esl.client.transport.event.EslEvent;
+import com.bytedesk.call.esl.client.internal.Context;
+import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -19,51 +19,36 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class CallEventListener implements IEslEventListener {
+public class CallEventListener implements com.bytedesk.call.esl.client.inbound.IEslEventListener {
 
     private final CallEventPublisher eventPublisher;
 
-    /**
-     * 处理Call事件
-     */
+    // 实现 IEslEventListener 的回调
     @Override
-    public void eventReceived(EslEvent eslEvent) {
+    public void onEslEvent(Context ctx, EslEvent eslEvent) {
         String eventName = eslEvent.getEventName();
 
         log.debug("收到Call事件: {} / {}", eventName, eslEvent.getEventHeaders());
 
-        // 处理不同类型的事件
         switch (eventName) {
             case "CHANNEL_CREATE":
                 handleChannelCreate(eslEvent);
                 break;
-
             case "CHANNEL_ANSWER":
                 handleChannelAnswer(eslEvent);
                 break;
-
             case "CHANNEL_HANGUP":
                 handleChannelHangup(eslEvent);
                 break;
-
             case "DTMF":
                 handleDtmf(eslEvent);
                 break;
-
             case "CUSTOM":
                 handleCustomEvent(eslEvent);
                 break;
-
             default:
-                // 其他事件暂不处理
                 break;
         }
-    }
-
-    @Override
-    public void backgroundJobResultReceived(EslEvent event) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'backgroundJobResultReceived'");
     }
 
     /**
@@ -187,4 +172,6 @@ public class CallEventListener implements IEslEventListener {
             log.error("更新用户在线状态失败: {} - {}", username, e.getMessage(), e);
         }
     }
+
+    
 }

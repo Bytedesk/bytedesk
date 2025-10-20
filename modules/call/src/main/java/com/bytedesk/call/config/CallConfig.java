@@ -13,8 +13,10 @@
  */
 package com.bytedesk.call.config;
 
-import org.freeswitch.esl.client.inbound.Client;
-import org.freeswitch.esl.client.inbound.InboundConnectionFailure;
+import com.bytedesk.call.esl.client.inbound.Client;
+import com.bytedesk.call.esl.client.inbound.InboundConnectionFailure;
+import com.bytedesk.call.esl.client.internal.IModEslApi;
+import java.net.InetSocketAddress;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,10 +61,13 @@ public class CallConfig {
                         
                 // 增加更长的超时时间
                 inboundClient.connect(
-                    callFreeswitchProperties.getServer(), 
-                    callFreeswitchProperties.getEslPort(), 
+                    new InetSocketAddress(
+                        callFreeswitchProperties.getServer(),
+                        callFreeswitchProperties.getEslPort()
+                    ),
                     callFreeswitchProperties.getEslPassword(),
-                    30); // 增加超时时间到30秒
+                    30
+                ); // 增加超时时间到30秒
                     
                 // 验证连接是否真正建立
                 if (inboundClient.canSend()) {
@@ -70,7 +75,7 @@ public class CallConfig {
                     inboundClient.addEventListener(callEventListener);
                     
                     // 订阅所有事件
-                    inboundClient.setEventSubscriptions("plain", "all");
+                    inboundClient.setEventSubscriptions(IModEslApi.EventFormat.PLAIN, "all");
                     
                     log.info("Call ESL连接成功，服务器: {}:{}", 
                             callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());

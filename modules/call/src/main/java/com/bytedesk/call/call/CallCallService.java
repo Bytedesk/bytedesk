@@ -17,9 +17,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.freeswitch.esl.client.inbound.Client;
-import org.freeswitch.esl.client.transport.SendMsg;
-import org.freeswitch.esl.client.transport.message.EslMessage;
+import com.bytedesk.call.esl.client.inbound.Client;
+import com.bytedesk.call.esl.client.transport.SendMsg;
+import com.bytedesk.call.esl.client.transport.message.EslMessage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -60,7 +60,7 @@ public class CallCallService {
      */
     public String executeApiCommand(String command, String args) {
         try {
-            EslMessage response = eslClient.sendSyncApiCommand(command, args);
+            EslMessage response = eslClient.sendApiCommand(command, args);
             if (response != null) {
                 return response.getBodyLines().toString();
             }
@@ -359,7 +359,7 @@ public class CallCallService {
             
             // 如果呼叫UUID存在，则挂断
             if (callInfo.getCallUuid() != null) {
-                eslClient.sendSyncApiCommand("uuid_kill", callInfo.getCallUuid());
+                eslClient.sendApiCommand("uuid_kill", callInfo.getCallUuid());
             }
             
             // 通知用户呼叫已拒绝
@@ -398,7 +398,7 @@ public class CallCallService {
             
             // 如果呼叫UUID存在，则挂断
             if (callInfo.getCallUuid() != null) {
-                eslClient.sendSyncApiCommand("uuid_kill", callInfo.getCallUuid());
+                eslClient.sendApiCommand("uuid_kill", callInfo.getCallUuid());
             }
             
             // 通知用户呼叫已结束
@@ -434,7 +434,7 @@ public class CallCallService {
             }
             
             // 发送DTMF命令
-            eslClient.sendSyncApiCommand("uuid_send_dtmf", 
+            eslClient.sendApiCommand("uuid_send_dtmf", 
                 String.format("%s %s", callInfo.getCallUuid(), digit));
             
             return true;
@@ -464,7 +464,7 @@ public class CallCallService {
             
             // 发送静音/取消静音命令
             String command = mute ? "uuid_audio mute" : "uuid_audio unmute";
-            eslClient.sendSyncApiCommand(command, 
+            eslClient.sendApiCommand(command, 
                 String.format("%s read", callInfo.getCallUuid()));
             
             return true;
