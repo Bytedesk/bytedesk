@@ -106,6 +106,16 @@ public class CallCdrEntity extends BaseEntity {
     private String accountcode;
 
     /**
+     * B-Leg UUID（如存在）
+     */
+    private String blegUuid;
+
+    /**
+     * 域名（来自 FS 变量 domain_name）
+     */
+    private String domainName;
+
+    /**
      * Audio codec used for receiving audio
      */
     private String readCodec;
@@ -129,6 +139,21 @@ public class CallCdrEntity extends BaseEntity {
      * Call direction (inbound/outbound)
      */
     private String direction;
+
+    /**
+     * 主叫 ANI（自动号码识别）
+     */
+    private String ani;
+
+    /**
+     * 主叫 ANI-II（号码识别信息指示）
+     */
+    private String aniii;
+
+    /**
+     * 远端网络地址（如 SIP 源地址）
+     */
+    private String networkAddr;
 
     /**
      * Additional call information stored as JSON

@@ -46,3 +46,80 @@
 注意
 - 资源管理：在应用关闭时请正确关闭连接，避免资源泄露；
 - 错误处理：`Throwables.propagate` 等已弃用的用法已替换为标准 `RuntimeException` 包装。
+
+## 对外 REST API（bytedesk-call.esl）
+
+在同目录提供了基于 Spring 的对外接口封装：
+- `EslService`：封装常见 ESL 命令（api/bgapi、reloadxml/acl、status/show、sofia、originate、uuid_*、conference 等）
+- `EslController`：暴露 REST 接口，前缀 `/freeswitch/api/v1/esl`
+ - `xmlcurl/XmlCurlController` + `XmlCurlService`：提供最小可用的 mod_xml_curl HTTP 服务端（演示版）
+
+启用条件：
+- ESL：`bytedesk.call.freeswitch.enabled=true`，`CallConfig` 将建立 Inbound 连接并订阅事件
+- XML-Curl：`bytedesk.call.freeswitch.xmlcurl.enabled=true` 开启 HTTP 服务端
+
+常用端点：
+- GET `/freeswitch/api/v1/esl/status`：等价 `status`
+- POST `/freeswitch/api/v1/esl/api`：通用 API，Body: `{ "command":"reloadxml", "args":"" }`
+- POST `/freeswitch/api/v1/esl/bgapi`：通用 BGAPI，返回 BACKGROUND_JOB 事件数据
+- POST `/freeswitch/api/v1/esl/reloadxml`、`/reloadacl`
+- GET `/freeswitch/api/v1/esl/show/{what}`：`what` 取值如 `channels/calls/registrations`
+- GET `/freeswitch/api/v1/esl/sofia/status`
+- POST `/freeswitch/api/v1/esl/sofia/profile/{profile}/{action}`：`action` 如 `rescan/restart/start/stop`
+- POST `/freeswitch/api/v1/esl/xml_flush_cache`：清空 XML 缓存（常与 xml_curl 配合）
+- 呼叫控制：
+	- POST `/freeswitch/api/v1/esl/originate` Body: `{ "args":"{ignore_early_media=true}sofia/gateway/gw/1001 &park" }`
+	- POST `/freeswitch/api/v1/esl/uuid/answer/{uuid}`
+	- POST `/freeswitch/api/v1/esl/uuid/kill/{uuid}?cause=USER_BUSY`
+	- POST `/freeswitch/api/v1/esl/uuid/transfer` Body: `{ "uuid":"...", "dest":"1000", "dialplan":"XML", "context":"default", "leg":"-bleg" }`
+	- POST `/freeswitch/api/v1/esl/uuid/bridge` Body: `{ "uuidA":"...", "uuidB":"..." }`
+	- POST `/freeswitch/api/v1/esl/uuid/broadcast` Body: `{ "uuid":"...", "file":"/path/file.wav", "legs":"both" }`
+	- POST `/freeswitch/api/v1/esl/uuid/record` Body: `{ "uuid":"...", "action":"start|stop", "path":"/path/rec.wav" }`
+	- POST `/freeswitch/api/v1/esl/uuid/setvar` Body: `{ "uuid":"...", "var":"X", "value":"Y" }`
+	- GET `/freeswitch/api/v1/esl/uuid/getvar?uuid=...&var=...`
+	- POST `/freeswitch/api/v1/esl/uuid/dtmf` Body: `{ "uuid":"...", "dtmf":"1234#" }`
+- 会议控制：
+	- POST `/freeswitch/api/v1/esl/conference` Body: `{ "room":"9000", "subCommand":"list" }`
+	- 例如踢人：`{ "room":"9000", "subCommand":"kick", "args":"<uuid>" }`
+
+返回结果说明：
+- 通用 API 返回 `{ ok, replyText, contentType, body }`，便于日志与界面展示
+- BGAPI 返回 `{ eventName, headers, bodyLines }`
+
+注意事项：
+- ESL 无法直接编辑磁盘文件；动态配置需由应用/运维写入 XML 后，再调用 `reloadxml`
+- SIP Profile 变更通常需 `sofia profile <name> rescan`，必要时 `restart`（可能影响在呼通话）
+- 部分变更仅对新通话生效；生产环境操作需审慎
+
+## mod_xml_curl 最小可用方案（演示）
+
+服务端（本项目）：
+- 开启 `bytedesk.call.freeswitch.xmlcurl.enabled=true` 后，提供 HTTP 端点：
+	- GET `/freeswitch/xmlcurl?type=directory&user=1000&domain=default`
+	- GET `/freeswitch/xmlcurl?type=dialplan&context=default&dest=1000`
+	- 返回 `application/xml`，示例实现见 `XmlCurlService`，生产应改为从数据库/配置中心读取
+
+FreeSWITCH 侧配置要点（参考）：
+- 启用 `mod_xml_curl`，并在 `xml_curl.conf.xml` 设置对应 URL（建议内网/HTTPS + 鉴权）
+- 可启用缓存提升性能；变更后通过 `fsctl xml_flush_cache` 或上述 API 端点刷新缓存
+- 保留基础配置文件作为兜底，动态内容由 xml_curl 提供
+
+安全建议：
+- 将 xml_curl 服务端限于内网，开启身份校验/白名单/签名校验
+- 对请求与返回做审计与速率限制，防止滥用或失效导致拨号失败
+
+## 接入 mod_xml_cdr（CDR 后台沉淀）
+
+本模块提供了接收 XML CDR 的接口：
+- POST `/freeswitch/cdr/xml`（Content-Type: application/xml 或 text/xml）
+- 控制器：`com.bytedesk.call.cdr.XmlCdrController`
+- 解析器：`com.bytedesk.call.cdr.XmlCdrParser`（支持 epoch 优先、常见字段映射到 `CallCdrEntity`）
+
+FreeSWITCH 配置要点（参考）：
+- 启用 `mod_xml_cdr`
+- 配置写文件或 HTTP POST 到上述接口（建议内网/HTTPS + 鉴权）
+- 建议开启重试/幂等（以 UUID 为幂等键），保障投递可靠
+
+注意：
+- 生产环境务必加鉴权、IP 白名单、速率限制与审计；确保存储脱敏与合规
+- 若先落地文件再由 Agent 推送，可保持 FS 简洁并提高可观测性
