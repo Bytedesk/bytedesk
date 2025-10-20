@@ -11,6 +11,8 @@ services:
       - "13306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      # 初始化 SQL 目录：首次启动且数据卷为空时会执行其中的脚本
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
     networks:
       - bytedesk-network
     # healthcheck:
