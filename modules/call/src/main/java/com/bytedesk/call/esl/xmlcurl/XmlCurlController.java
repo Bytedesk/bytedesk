@@ -79,6 +79,7 @@ public class XmlCurlController {
                 ivrMenu, queueName, recordFile,
                 phrasesLang, finalConfName,
                 ccDsn, ccClientAddress, ccDebug, ccCdrLogDir, ccCreateTables);
+
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_XML)
                 .body(xml);
