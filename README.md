@@ -153,6 +153,8 @@ bytedesk/
 
 - [desktop](https://github.com/Bytedesk/bytedesk-desktop)
 - [mobile](https://github.com/Bytedesk/bytedesk-mobile)
+- [phone](https://github.com/Bytedesk/bytedesk-phone)
+- [conference](https://github.com/Bytedesk/bytedesk-conference)
 
 ## Open Source Demo + SDK
 

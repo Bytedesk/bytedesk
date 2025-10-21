@@ -146,6 +146,8 @@ bytedesk/
 
 - [桌面客户端](https://github.com/Bytedesk/bytedesk-desktop)
 - [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
+- [SipPhone](https://github.com/Bytedesk/bytedesk-phone)
+- [视频会议](https://github.com/Bytedesk/bytedesk-conference)
 
 ## 开源Demo + SDK
 
