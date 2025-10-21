@@ -2,6 +2,10 @@ package com.bytedesk.call.xmlcurl;
 
 import org.junit.jupiter.api.Test;
 
+import com.bytedesk.call.xml_curl.DialplanOptions;
+import com.bytedesk.call.xml_curl.DirectoryOptions;
+import com.bytedesk.call.xml_curl.XmlCurlService;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class XmlCurlServiceTest {
