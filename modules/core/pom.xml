@@ -115,7 +115,8 @@
 		</dependency>
 
 		<!-- Spring gRPC 集成 -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.grpc/spring-grpc-spring-boot-starter -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.grpc/spring-grpc-spring-boot-starter -->
 		<!-- 版本由 spring-grpc-dependencies BOM 管理 -->
 		<dependency>
 			<groupId>org.springframework.grpc</groupId>
@@ -138,15 +139,15 @@
 			<artifactId>protobuf-java-format</artifactId>
 			<version>1.4</version>
 		</dependency>
-		
+
 		<!-- 汉字转拼音 -->
-        <!-- https://github.com/houbb/pinyin -->
-        <!-- https://mvnrepository.com/artifact/com.github.houbb/pinyin -->
-        <dependency>
-            <groupId>com.github.houbb</groupId>
-            <artifactId>pinyin</artifactId>
-            <version>0.4.0</version>
-        </dependency>
+		<!-- https://github.com/houbb/pinyin -->
+		<!-- https://mvnrepository.com/artifact/com.github.houbb/pinyin -->
+		<dependency>
+			<groupId>com.github.houbb</groupId>
+			<artifactId>pinyin</artifactId>
+			<version>0.4.0</version>
+		</dependency>
 
 		<!-- 敏感词过滤 -->
 		<!-- https://github.com/houbb/sensitive-word -->
@@ -259,7 +260,7 @@
 
 		<!-- Emoji -->
 		<!-- https://github.com/vdurmont/emoji-java -->
-		 <!-- https://www.webfx.com/tools/emoji-cheat-sheet/ -->
+		<!-- https://www.webfx.com/tools/emoji-cheat-sheet/ -->
 		<!-- https://mvnrepository.com/artifact/com.vdurmont/emoji-java -->
 		<dependency>
 			<groupId>com.vdurmont</groupId>
@@ -322,7 +323,8 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- Only for Eclipse/VS Code m2e: ignore protobuf plugin executions inside the IDE to avoid Problems view errors. -->
+				<!-- Only for Eclipse/VS Code m2e: ignore protobuf plugin executions inside the IDE
+				to avoid Problems view errors. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -337,11 +339,13 @@
 										<versionRange>[0.0.0,)</versionRange>
 										<goals>
 											<goal>compile</goal>
+											<goal>compile-custom</goal>
 											<goal>test-compile</goal>
+											<goal>test-compile-custom</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -359,19 +363,22 @@
 			</extension>
 		</extensions>
 		<plugins>
-			<!--自动生成protobuf java类 和 gRPC 服务代码-->
+			<!--自动生成protobuf
+			java类 和 gRPC 服务代码-->
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
 				<version>${protobuf-maven-plugin.version}</version>
 				<configuration>
-					<protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+					<protocArtifact>
+						com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
 					<protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
 					<outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>
 					<clearOutputDirectory>false</clearOutputDirectory>
 					<!-- 添加 gRPC 插件配置 -->
 					<pluginId>grpc-java</pluginId>
-					<pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+					<pluginArtifact>
+						io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
 				</configuration>
 				<executions>
 					<execution>
