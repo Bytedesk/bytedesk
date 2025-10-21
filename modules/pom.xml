@@ -229,6 +229,13 @@
             <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <!--  xml 格式处理 -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
 
         <!-- 跟Spring ai中swagger集成冲突，去掉 -->
         <!-- http://127.0.0.1:9003/swagger-ui/index.html -->
