@@ -425,11 +425,13 @@ sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_80.conf /etc/nginx/sites-e
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_demo_443.conf /etc/nginx/sites-enabled/ && \
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_janus_80.conf /etc/nginx/sites-enabled/ && \
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_janus_443.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_jitsi_80.conf /etc/nginx/sites-enabled/ && \
+sudo ln -s /etc/nginx/sites-available/weiyuai_cn_jitsi_443.conf /etc/nginx/sites-enabled/ && \
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_80.conf /etc/nginx/sites-enabled/ && \
 sudo ln -s /etc/nginx/sites-available/weiyuai_cn_sip_443.conf /etc/nginx/sites-enabled/
 
 # 方法2：使用 for 循环（推荐）
-for conf in weiyuai_cn_80 weiyuai_cn_443 weiyuai_cn_api_80 weiyuai_cn_api_443 weiyuai_cn_coturn_80.conf weiyuai_cn_coturn_443.conf weiyuai_cn_demo_80 weiyuai_cn_demo_443 weiyuai_cn_sip_80 weiyuai_cn_sip_443; do
+for conf in weiyuai_cn_80 weiyuai_cn_443 weiyuai_cn_api_80 weiyuai_cn_api_443 weiyuai_cn_coturn_80.conf weiyuai_cn_coturn_443.conf weiyuai_cn_demo_80 weiyuai_cn_demo_443 weiyuai_cn_janus_80 weiyuai_cn_janus_443 weiyuai_cn_jitsi_80 weiyuai_cn_jitsi_443  weiyuai_cn_sip_80 weiyuai_cn_sip_443; do
   sudo ln -s /etc/nginx/sites-available/${conf}.conf /etc/nginx/sites-enabled/
 done
 
