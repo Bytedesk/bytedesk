@@ -15,4 +15,6 @@ mkdir -p ~/.jitsi-meet-cfg/{web,transcripts,prosody/config,prosody/prosody-plugi
 open ~/.jitsi-meet-cfg
 # 运行
 docker compose up -d
+# 打开，浏览器默认拦截，点击继续
+https://localhost:8443/
 ```
