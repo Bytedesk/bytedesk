@@ -11,7 +11,7 @@ cp env.example .env
 ./gen-passwords.sh
 # 创建目录
 mkdir -p ~/.jitsi-meet-cfg/{web,transcripts,prosody/config,prosody/prosody-plugins-custom,jicofo,jvb,jigasi,jibri}
-# 打开目录
+# 打开目录 查看一下
 open ~/.jitsi-meet-cfg
 # 运行
 docker compose up -d
