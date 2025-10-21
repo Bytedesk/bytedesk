@@ -1175,8 +1175,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         return new PromptResult(response, aiPrompt);
     }
 
-    // 不再构造自定义 BD_MEDIA 前缀；媒体消息直接使用标准 JSON（BaseContent.toJson）在下游解析
-
+    // 媒体消息直接使用标准 JSON（BaseContent.toJson）在下游解析
     private void processDirectResponse(String query, List<FaqProtobuf> searchContentList, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {

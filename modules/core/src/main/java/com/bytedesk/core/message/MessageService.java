@@ -25,23 +25,29 @@ public class MessageService {
 
     private final MessagePersistCache messagePersistCache;
 
-    public String processMessageJson(String messageJson) {
+    public String processMessageJson(String messageJson, Boolean isRobot) {
 
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJson); 
 
         // 收到消息，更新消息状态为发送成功
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
             messageProtobuf.setStatus(MessageStatusEnum.SUCCESS);
+        } 
+        
+        // 机器人消息默认设置为已读
+        if (isRobot) {
+            messageProtobuf.setStatus(MessageStatusEnum.READ);
         }
 
         // 防止客户端时间错误，使用服务器时间戳，指定Asia/Shanghai时区
         messageProtobuf.setCreatedAt(BdDateUtils.now());
 
+        // 
+        String messageJsonResult = messageProtobuf.toJson();
         // 保存消息
-        // Cache message for persistence
-        messagePersistCache.pushForPersist(messageJson);
+        messagePersistCache.pushForPersist(messageJsonResult);
 
-        return messageJson;
+        return messageJsonResult;
     }
 
 

@@ -23,7 +23,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
-// import com.bytedesk.ai.springai.service.SpringAIService;
 import com.bytedesk.ai.segment.SegmentService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
@@ -385,14 +384,14 @@ public class RobotService extends AbstractRobotService {
         Assert.notNull(messageJson, "messageJson is null");
 
         // 处理消息JSON
-        String processedJson = messageService.processMessageJson(messageJson);
+        String processedJson = messageService.processMessageJson(messageJson, true);
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(processedJson);
-        // MessageTypeEnum messageType = messageProtobuf.getType();
         String query = messageProtobuf.getContent();
 
         ThreadProtobuf threadProtobuf = messageProtobuf.getThread();
         Assert.notNull(threadProtobuf, "thread is null");
 
+        // MessageTypeEnum messageType = messageProtobuf.getType();
         // 已经上线多模态能力，暂时不限制消息类型
         // 暂时仅支持文字消息类型，其他消息类型，大模型暂不处理。
         // if (!messageType.equals(MessageTypeEnum.TEXT) &&

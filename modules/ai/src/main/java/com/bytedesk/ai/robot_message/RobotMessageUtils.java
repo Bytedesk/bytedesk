@@ -28,7 +28,7 @@ public class RobotMessageUtils {
 
                 return MessageProtobuf.builder()
                         .uid(UidUtils.getInstance().getUid())
-                        .status(MessageStatusEnum.SUCCESS)
+                        .status(MessageStatusEnum.READ)
                         .thread(thread)
                         .user(robot.toUserProtobuf())
                         .channel(ChannelEnum.SYSTEM)
