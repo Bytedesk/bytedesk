@@ -256,7 +256,42 @@ services:
     #   interval: 30s
     #   timeout: 10s
     #   retries: 5
-    #   start_period: 60s
+  
+  
+  # Janus WebRTC Gateway (sucwangsr image from pengjinning repo)
+  bytedesk-janus:
+    image: 'sucwangsr/janus-webrtc-gateway-docker:1.3.2-muti'
+    container_name: janus-bytedesk
+    restart: always
+    # Using bridge network with explicit port mappings to support macOS/local testing
+    # (remove or change ports if you run on Linux and prefer host networking)
+    # network_mode: "host"
+    ports:
+      - "18086:80/tcp"    # nginx http (mapped to high port to avoid conflicts)
+      - "18089:8088/tcp"  # Janus admin HTTP (internal 8088)
+      - "18090:8089/tcp"  # Janus admin HTTPS (internal 8089)
+      - "18178:3478/udp"  # STUN/ICE (3478)
+      - "18179:3478/tcp"  # STUN/ICE TCP (if needed)
+      - "18180:80/tcp"    # optional web
+      - "18181:443/tcp"   # optional https
+      - "11000-11200:10000-10200/udp" # RTP/Media ports for WebRTC (mapped to 11000-11200 on host)
+    # Only start janus OR start nginx+janus together. Here we start nginx and janus like the README.
+    command: ["sh", "-c", "nginx && /usr/local/bin/janus -F /usr/local/etc/janus"]
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      # 挂载整个本地 janus 配置目录（相对于此 compose 文件）
+      - ../../../../deploy/janus/etc/janus:/usr/local/etc/janus:ro
+    depends_on:
+      - bytedesk-freeswitch
+    # no networks block since using host network_mode
+    healthcheck:
+      # Janus ping: POST {"janus":"ping"} to http admin (8088). Expect "PONG" in response
+      test: ["CMD-SHELL", "curl -sS -X POST -H 'Content-Type: application/json' --data '{\"janus\":\"ping\"}' http://127.0.0.1:8088/janus | grep -qi pong"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
 
   # https://hub.docker.com/r/safarov/freeswitch
   # https://github.com/signalwire/freeswitch/tree/master/docker
