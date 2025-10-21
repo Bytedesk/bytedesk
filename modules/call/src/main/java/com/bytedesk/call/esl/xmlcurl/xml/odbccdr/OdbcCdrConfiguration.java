@@ -1,10 +1,11 @@
 package com.bytedesk.call.esl.xmlcurl.xml.odbccdr;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.Configuration;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.sofia.setting.Settings;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.xmlcdr.OdbcCdrTables;
+import com.bytedesk.call.esl.xmlcurl.xml.Configuration;
+import com.bytedesk.call.esl.xmlcurl.xml.sofia.setting.Settings;
+import com.bytedesk.call.esl.xmlcurl.xml.xmlcdr.OdbcCdrTables;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.io.Serializable;
  * @date 2023年09月15日 16:44
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class OdbcCdrConfiguration extends Configuration implements Serializable {
 

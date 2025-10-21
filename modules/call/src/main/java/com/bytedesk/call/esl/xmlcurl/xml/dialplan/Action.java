@@ -1,5 +1,6 @@
 package com.bytedesk.call.esl.xmlcurl.xml.dialplan;
 
+import com.bytedesk.call.esl.xmlcurl.enums.AppEnum;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,9 +1,9 @@
 package com.bytedesk.call.esl.xmlcurl.xml.user;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.param.Params;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.sofia.gateway.Gateways;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.variables.Variables;
+import com.bytedesk.call.esl.xmlcurl.xml.param.Params;
+import com.bytedesk.call.esl.xmlcurl.xml.sofia.gateway.Gateways;
+import com.bytedesk.call.esl.xmlcurl.xml.variables.Variables;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.group.Groups;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.param.Params;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.variables.Variables;
+import com.bytedesk.call.esl.xmlcurl.xml.group.Groups;
+import com.bytedesk.call.esl.xmlcurl.xml.param.Params;
+import com.bytedesk.call.esl.xmlcurl.xml.variables.Variables;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

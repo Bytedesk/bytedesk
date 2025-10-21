@@ -1,7 +1,7 @@
 package com.bytedesk.call.esl.xmlcurl.xml.param;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.sofia.Param;
+import com.bytedesk.call.esl.xmlcurl.xml.sofia.Param;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

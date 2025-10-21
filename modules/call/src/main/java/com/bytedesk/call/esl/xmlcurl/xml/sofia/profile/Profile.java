@@ -1,10 +1,10 @@
 package com.bytedesk.call.esl.xmlcurl.xml.sofia.profile;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.sofia.aliase.Aliases;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.sofia.domain.Domains;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.sofia.gateway.Gateways;
-import com.bytedesk.call.esl.xmlcurl.xmlcurl.sofia.setting.Settings;
+import com.bytedesk.call.esl.xmlcurl.xml.sofia.aliase.Aliases;
+import com.bytedesk.call.esl.xmlcurl.xml.sofia.domain.Domains;
+import com.bytedesk.call.esl.xmlcurl.xml.sofia.gateway.Gateways;
+import com.bytedesk.call.esl.xmlcurl.xml.sofia.setting.Settings;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
