@@ -1,0 +1,168 @@
+## The Kamailio configuration file for the control tools.
+##
+## Here you can set variables used in the kamctl and kamdbctl setup
+## scripts. Per default all variables here are commented out, the control tools
+## will use their internal default values.
+
+## the SIP domain
+# SIP_DOMAIN=kamailio.org
+
+## chrooted directory
+# CHROOT_DIR="/path/to/chrooted/directory"
+
+## database type: MYSQL, PGSQL, ORACLE, DB_BERKELEY, DBTEXT, or SQLITE
+## by default none is loaded
+##
+## If you want to setup a database with kamdbctl, you must at least specify
+## this parameter.
+# DBENGINE=MYSQL
+
+## database host
+# DBHOST=localhost
+
+## database port
+# DBPORT=3306
+
+## database name (for ORACLE this is TNS name)
+# DBNAME=kamailio
+
+## database path used by dbtext, db_berkeley or sqlite
+# DB_PATH="/usr/local/etc/kamailio/dbtext"
+
+## database read/write user
+# DBRWUSER="kamailio"
+
+## password for database read/write user
+# DBRWPW="kamailiorw"
+
+## database read only user
+# DBROUSER="kamailioro"
+
+## password for database read only user
+# DBROPW="kamailioro"
+
+## database access host (from where is kamctl used)
+# DBACCESSHOST=192.168.0.1
+
+## database super user (for ORACLE this is 'scheme-creator' user)
+# DBROOTUSER="root"
+
+## password for database super user
+## - important: this is insecure, targeting the use only for automatic testing
+## - known to work for: mysql
+# DBROOTPW="dbrootpw"
+
+## option to ask confirmation for all database creation steps
+# DBINITASK=yes
+
+## database character set (used by MySQL when creating database)
+#CHARSET="latin1"
+
+## user name column
+# USERCOL="username"
+
+
+## SQL definitions
+## If you change this definitions here, then you must change them
+## in db/schema/entities.xml too.
+## FIXME
+
+# FOREVER="2030-05-28 21:32:15"
+# DEFAULT_Q="1.0"
+
+
+## Program to calculate a message-digest fingerprint
+# MD5="md5sum"
+
+## awk tool
+# AWK="awk"
+
+## gdb tool
+# GDB="gdb"
+
+## If you use a system with a grep and egrep that is not 100% gnu grep compatible,
+## e.g. solaris, install the gnu grep (ggrep) and specify this below.
+##
+## grep tool
+# GREP="grep"
+
+## egrep tool
+# EGREP="egrep"
+
+## sed tool
+# SED="sed"
+
+## tail tool
+# LAST_LINE="tail -n 1"
+
+## expr tool
+# EXPR="expr"
+
+
+## Describe what additional tables to install. Valid values for the variables
+## below are yes/no/ask. With ask (default) it will interactively ask the user
+## for an answer, while yes/no allow for automated, unassisted installs.
+
+## If to install tables for the modules in the EXTRA_MODULES variable.
+# INSTALL_EXTRA_TABLES=ask
+
+## If to install presence related tables.
+# INSTALL_PRESENCE_TABLES=ask
+
+## If to install uid modules related tables.
+# INSTALL_DBUID_TABLES=ask
+
+## Define what module tables should be installed.
+## If you use the postgres database and want to change the installed tables, then you
+## must also adjust the STANDARD_TABLES or EXTRA_TABLES variable accordingly in the
+## kamdbctl.base script.
+
+## Kamailio standard modules
+# STANDARD_MODULES="standard acc lcr domain group permissions registrar usrloc msilo
+#                   alias_db uri_db speeddial avpops auth_db pdt dialog dispatcher
+#                   dialplan"
+
+## Kamailio extra modules
+# EXTRA_MODULES="imc cpl siptrace domainpolicy carrierroute userblocklist htable purple sca"
+
+
+## type of aliases used: DB - database aliases; UL - usrloc aliases
+## - default: none
+# ALIASES_TYPE="DB"
+
+## control engine: RPCFIFO
+## - default RPCFIFO
+# CTLENGINE="RPCFIFO"
+
+## path to FIFO file for engine RPCFIFO
+# RPCFIFOPATH="/run/kamailio/kamailio_rpc.fifo"
+
+## check ACL names; default on (1); off (0)
+# VERIFY_ACL=1
+
+## ACL names - if VERIFY_ACL is set, only the ACL names from below list
+## are accepted
+# ACL_GROUPS="local ld int voicemail free-pstn"
+
+## check if user exists (used by some commands such as acl);
+## - default on (1); off (0)
+# VERIFY_USER=1
+
+## verbose - debug purposes - default '0'
+# VERBOSE=1
+
+## do (1) or don't (0) store plaintext passwords
+## in the subscriber table - default '1'
+# STORE_PLAINTEXT_PW=0
+
+## Kamailio START Options
+## PID file path - default is: /run/kamailio/kamailio.pid
+# PID_FILE=/run/kamailio/kamailio.pid
+
+## Kamailio Startup Configuration File
+## Default is: kamailio.cfg
+# STARTUP_CONFIG_FILE=kamailio.cfg
+
+## Extra start options - default is: not set
+## example: start Kamailio with 64MB shared memory: STARTOPTIONS="-m 64"
+# STARTOPTIONS=

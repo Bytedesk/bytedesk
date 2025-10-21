@@ -1,0 +1,3 @@
+1 sip:14.103.165.199:5060;transport=udp
+2 sip:14.103.165.199:5060;transport=tcp
+3 sip:14.103.165.199:5080;transport=tcp
