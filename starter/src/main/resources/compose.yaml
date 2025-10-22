@@ -239,13 +239,15 @@ services:
     volumes:
       # 配置文件目录 - 使用本地配置文件覆盖容器内的配置（经验证实际使用 /usr/local/freeswitch/etc/freeswitch）
       - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
-      # 语音文件目录
       # 数据持久化目录
-      - freeswitch_data:/usr/local/freeswitch/db
+      # - freeswitch_data:/usr/local/freeswitch/db
+      - ../../../../deploy/freeswitch/db:/usr/local/freeswitch/db
       # 日志目录
-      - freeswitch_logs:/usr/local/freeswitch/log
+      # - freeswitch_logs:/usr/local/freeswitch/log
+      - ../../../../deploy/freeswitch/log:/usr/local/freeswitch/log
       # 录音目录
-      - freeswitch_recordings:/usr/local/freeswitch/recordings
+      # - freeswitch_recordings:/usr/local/freeswitch/recordings
+      - ../../../../deploy/freeswitch/recordings:/usr/local/freeswitch/recordings
     depends_on:
       - bytedesk-mysql
     networks:

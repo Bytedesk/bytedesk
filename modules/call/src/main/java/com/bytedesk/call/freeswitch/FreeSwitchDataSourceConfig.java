@@ -93,20 +93,26 @@ public class FreeSwitchDataSourceConfig {
     @Bean(name = "freeswitchEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean freeswitchEntityManagerFactory(
             EntityManagerFactoryBuilder builder,
-            @Qualifier("freeswitchDataSource") DataSource dataSource) {
+            @Qualifier("freeswitchDataSource") DataSource dataSource,
+            org.springframework.core.env.Environment env) {
         log.info("Creating FreeSWITCH EntityManagerFactory");
+
+        // 允许通过属性覆盖，默认在启用时对 bytedesk_freeswitch 执行表结构创建/更新
+        // 支持值：none|validate|update|create|create-drop
+        String ddlAuto = env.getProperty("bytedesk.datasource.freeswitch.ddl-auto", "update");
+        log.info("FreeSWITCH JPA ddl-auto={}", ddlAuto);
+
+        java.util.Map<String, Object> jpaProps = new java.util.HashMap<>();
+        jpaProps.put("hibernate.hbm2ddl.auto", ddlAuto);
+        jpaProps.put("hibernate.show_sql", "false");
+        jpaProps.put("hibernate.format_sql", "false");
+        jpaProps.put("hibernate.jdbc.time_zone", "Asia/Shanghai");
+
         return builder
                 .dataSource(dataSource)
-                .packages("com.bytedesk.call.freeswitch")  // FreeSWITCH 实体类所在包
+                .packages("com.bytedesk.call.freeswitch")  // 仅扫描 freeswitch 实体
                 .persistenceUnit("freeswitch")
-                .properties(java.util.Map.of(
-                    // 只读取，不创建/更新表结构
-                    "hibernate.hbm2ddl.auto", "none",
-                    "hibernate.show_sql", "false",
-                    "hibernate.format_sql", "false",
-                    // 设置 Hibernate 时区
-                    "hibernate.jdbc.time_zone", "Asia/Shanghai"
-                ))
+                .properties(jpaProps)
                 .build();
     }
 
