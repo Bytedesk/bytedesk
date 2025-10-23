@@ -77,7 +77,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final ThreadRestService threadRestService;
     
-    private final com.bytedesk.service.agent_settings.AgentSettingsService agentSettingsService;
+    private final com.bytedesk.service.agent_settings.AgentSettingsRestService agentSettingsRestService;
 
     @Override
     protected Specification<AgentEntity> createSpecification(AgentRequest request) {
@@ -133,7 +133,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setUserUid(user.getUid());
         //
         // 设置默认配置
-        agent.setSettings(agentSettingsService.getOrCreateDefault(request.getOrgUid()));
+        agent.setSettings(agentSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         //
         Set<String> userIds = mqttConnectionService.getConnectedUserUids();
         if (userIds.contains(agent.getUserUid())) {

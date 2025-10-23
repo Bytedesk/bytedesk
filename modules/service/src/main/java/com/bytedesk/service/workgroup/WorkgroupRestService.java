@@ -55,7 +55,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     private final AuthService authService;
     
-    private final com.bytedesk.service.workgroup_settings.WorkgroupSettingsService workgroupSettingsService;
+    private final com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService workgroupSettingsRestService;
 
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
@@ -75,7 +75,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setOrgUid(request.getOrgUid());
         //
         // 设置默认配置
-        workgroup.setSettings(workgroupSettingsService.getOrCreateDefault(request.getOrgUid()));
+        workgroup.setSettings(workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         //
         Iterator<String> agentIterator = request.getAgentUids().iterator();
         while (agentIterator.hasNext()) {

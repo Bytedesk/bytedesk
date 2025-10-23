@@ -81,7 +81,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     private final LlmProviderRestService llmProviderRestService;
     
-    private final com.bytedesk.ai.robot_settings.RobotSettingsService robotSettingsService;
+    private final com.bytedesk.ai.robot_settings.RobotSettingsRestService robotSettingsRestService;
 
     @Override
     protected Specification<RobotEntity> createSpecification(RobotRequest request) {
@@ -142,7 +142,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
         //
         // 设置默认配置
-        robot.setSettings(robotSettingsService.getOrCreateDefault(request.getOrgUid()));
+        robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         
         // 设置llm相关属性
         if (request.getLlm() != null) {
