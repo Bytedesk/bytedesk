@@ -245,6 +245,8 @@ services:
       # 日志目录
       # - freeswitch_logs:/usr/local/freeswitch/log
       - ../../../../deploy/freeswitch/log:/usr/local/freeswitch/log
+      # 声音目录
+      - ../../../../deploy/freeswitch/sounds:/usr/local/freeswitch/sounds
       # 录音目录
       # - freeswitch_recordings:/usr/local/freeswitch/recordings
       - ../../../../deploy/freeswitch/recordings:/usr/local/freeswitch/recordings
