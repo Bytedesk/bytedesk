@@ -41,31 +41,58 @@ public class XmlCurlController {
 
     @RequestMapping(value = {"/fs-xml", "/xmlcurl"}, method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/xml;charset=UTF-8")
     public @ResponseBody byte[] fsXml(@RequestParam MultiValueMap<String, String> paramsRaw, HttpServletRequest request) {
+        long t0 = System.nanoTime();
         // 记录请求来源与代理链（ngrok）信息，定位转发问题
         try {
             String remote = (request.getRemoteAddr() == null ? "" : request.getRemoteAddr()) + ":" + request.getRemotePort();
             String xff = safe(request.getHeader("X-Forwarded-For"));
             String xfp = safe(request.getHeader("X-Forwarded-Proto"));
             String xfh = safe(request.getHeader("X-Forwarded-Host"));
-            String ua = truncate(safe(request.getHeader("User-Agent")), 160);
+            String ua = truncate(safe(request.getHeader("User-Agent")), 200);
             String ct = safe(request.getContentType());
-            String qs = safe(request.getQueryString());
-            log.info("XML-CURL remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}'", remote, xff, xfp, xfh, ua, ct, qs);
+            String qs = truncate(safe(request.getQueryString()), 512);
+            String method = safe(request.getMethod());
+            String uri = safe(request.getRequestURI());
+            log.info("XML-CURL req method={} uri={} remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}'",
+                    method, uri, remote, xff, xfp, xfh, ua, ct, qs);
+            if (log.isDebugEnabled()) {
+                log.debug("XML-CURL raw param keys: {}", paramsRaw.keySet());
+            }
         } catch (Exception ignore) {}
         Map<String, String> p = normalize(paramsRaw);
         String section = p.getOrDefault("section", "").toLowerCase(Locale.ROOT);
+        if (log.isDebugEnabled()) {
+            log.debug("XML-CURL normalized size={} sample={}", p.size(), truncate(p.toString(), 800));
+        }
+        byte[] out;
         switch (section) {
             case "dialplan":
-                return xmlCurlService.handleDialplan(p);
+                out = xmlCurlService.handleDialplan(p);
+                break;
             case "directory":
-                return xmlCurlService.handleDirectory(p);
+                out = xmlCurlService.handleDirectory(p);
+                break;
             case "configuration":
-                return xmlCurlService.handleConfiguration(p);
+                out = xmlCurlService.handleConfiguration(p);
+                break;
             case "phrases":
-                return xmlCurlService.handlePhrases(p);
+                out = xmlCurlService.handlePhrases(p);
+                break;
             default:
-                return xmlCurlService.resultNotFound();
+                out = xmlCurlService.resultNotFound();
+                break;
         }
+        long costMs = (System.nanoTime() - t0) / 1_000_000L;
+        try {
+            String status = (out != null && new String(out, StandardCharsets.UTF_8).contains("status=\"not found\"")) ? "not-found" : "ok";
+            int size = out == null ? 0 : out.length;
+            log.info("XML-CURL resp section='{}' status={} size={}B cost={}ms", section, status, size, costMs);
+            if (log.isDebugEnabled()) {
+                String preview = out == null ? "" : truncate(new String(out, StandardCharsets.UTF_8), 800);
+                log.debug("XML-CURL resp preview: {}", preview);
+            }
+        } catch (Exception ignore) {}
+        return out;
     }
 
     // 健康检查（用于 ngrok/反向代理连通性排查）

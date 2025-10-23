@@ -8,12 +8,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
  * 最小可用的 mod_xml_curl XML 生成服务。
  * 注意：当前为演示/占位实现，实际项目应从数据库/配置中心读取用户、网关、路由等信息。
  */
+@Slf4j
 @Service
 public class XmlCurlService {
 
@@ -29,13 +31,25 @@ public class XmlCurlService {
     private static final Set<String> CONFIG_WHITELIST = csvEnv("XMLCURL_CONFIG_WHITELIST", "");
 
     public byte[] handleDialplan(Map<String, String> p) {
-        if (!ENABLE_DIALPLAN) return resultNotFound();
+        if (!ENABLE_DIALPLAN) {
+            logDisabled("dialplan", "XMLCURL_ENABLE_DIALPLAN");
+            return resultNotFound();
+        }
         String context = pick(p, "Caller-Context", "context", "variable_context");
         if (context == null || context.isBlank()) context = "default";
         String dest = pick(p, "Caller-Destination-Number", "destination_number", "variable_destination_number");
-        if (dest == null) return resultNotFound();
+        if (dest == null) {
+            logNotFound("dialplan", "missing destination_number");
+            return resultNotFound();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("xmlcurl.dialplan context='{}' dest='{}'", context, dest);
+        }
         // 示例：仅对 9297 返回一个最小拨号计划片段（长音播放），其余走本地
-        if (!dest.equals("9297")) return resultNotFound();
+        if (!dest.equals("9297")) {
+            logNotFound("dialplan", "dest not match demo: " + dest);
+            return resultNotFound();
+        }
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<document type=\"freeswitch/xml\">\n" +
                 "  <section name=\"dialplan\">\n" +
@@ -54,18 +68,30 @@ public class XmlCurlService {
     }
 
     public byte[] handleDirectory(Map<String, String> p) {
-        if (!ENABLE_DIRECTORY) return resultNotFound();
+        if (!ENABLE_DIRECTORY) {
+            logDisabled("directory", "XMLCURL_ENABLE_DIRECTORY");
+            return resultNotFound();
+        }
         String user = pick(p, "user", "User", "login", "variable_user_name", "Caller-Username");
         String domain = pick(p, "domain", "Domain", "variable_domain_name", "sip_from_host");
         if (domain == null || domain.isBlank()) domain = "default";
-        if (user == null || user.isBlank()) return resultNotFound();
+        if (user == null || user.isBlank()) {
+            logNotFound("directory", "missing user");
+            return resultNotFound();
+        }
         String key = (user + "@" + domain).toLowerCase(Locale.ROOT);
         String pwd = DIRECTORY_USERS.get(key);
         if (pwd == null) {
             // 兼容仅配置 user:pwd 的情况（默认 domain=default）
             pwd = DIRECTORY_USERS.get((user + "@default").toLowerCase(Locale.ROOT));
         }
-        if (pwd == null) return resultNotFound();
+        if (pwd == null) {
+            logNotFound("directory", "user not in DIRECTORY_USERS: " + key);
+            return resultNotFound();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("xmlcurl.directory user='{}' domain='{}' found=true", user, domain);
+        }
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<document type=\"freeswitch/xml\">\n" +
                 "  <section name=\"directory\">\n" +
@@ -85,11 +111,23 @@ public class XmlCurlService {
     }
 
     public byte[] handleConfiguration(Map<String, String> p) {
-        if (!ENABLE_CONFIGURATION) return resultNotFound();
+        if (!ENABLE_CONFIGURATION) {
+            logDisabled("configuration", "XMLCURL_ENABLE_CONFIGURATION");
+            return resultNotFound();
+        }
         String cfgName = pick(p, "key_value", "Configuration-Name", "configuration", "name");
-        if (cfgName == null || cfgName.isBlank()) return resultNotFound();
+        if (cfgName == null || cfgName.isBlank()) {
+            logNotFound("configuration", "missing configuration name");
+            return resultNotFound();
+        }
         cfgName = cfgName.trim();
-        if (!CONFIG_WHITELIST.contains(cfgName)) return resultNotFound();
+        if (!CONFIG_WHITELIST.contains(cfgName)) {
+            logNotFound("configuration", "name not whitelisted: " + cfgName);
+            return resultNotFound();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("xmlcurl.configuration name='{}'", cfgName);
+        }
         if (cfgName.equals("ivr.conf")) {
             String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                     "<document type=\"freeswitch/xml\">\n" +
@@ -106,7 +144,13 @@ public class XmlCurlService {
     }
 
     public byte[] handlePhrases(Map<String, String> p) {
-        if (!ENABLE_PHRASES) return resultNotFound();
+        if (!ENABLE_PHRASES) {
+            logDisabled("phrases", "XMLCURL_ENABLE_PHRASES");
+            return resultNotFound();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("xmlcurl.phrases request");
+        }
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<document type=\"freeswitch/xml\">\n" +
                 "  <section name=\"phrases\">\n" +
@@ -134,6 +178,18 @@ public class XmlCurlService {
     }
 
     // --- helpers ---
+    private static void logDisabled(String section, String envKey) {
+        // 用 info 便于默认日志级别下也能观察到未启用原因
+        org.slf4j.LoggerFactory.getLogger(XmlCurlService.class)
+                .info("xmlcurl.{} disabled (enable by env {})", section, envKey);
+    }
+
+    private static void logNotFound(String section, String reason) {
+        if (org.slf4j.LoggerFactory.getLogger(XmlCurlService.class).isDebugEnabled()) {
+            org.slf4j.LoggerFactory.getLogger(XmlCurlService.class)
+                    .debug("xmlcurl.{} not-found: {}", section, reason);
+        }
+    }
     private static String pick(Map<String, String> m, String... keys) {
         for (String k : keys) {
             String v = m.get(k);
