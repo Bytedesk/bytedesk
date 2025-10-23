@@ -101,8 +101,9 @@ public class VisitorThreadService
         if (visitorRequest.isSocial()) {
             extra = visitorRequest.getExtra();
         } else {
-            extra = ServiceConvertUtils
-                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+            extra = workgroup.getSettings() != null 
+                ? ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getSettings().getServiceSettings())
+                : ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(new com.bytedesk.kbase.settings.ServiceSettings());
         }
         //
         ThreadEntity thread = ThreadEntity.builder()
@@ -130,8 +131,9 @@ public class VisitorThreadService
             String threadExtra = visitorRequest.getExtra();
             thread.setExtra(threadExtra);
         } else {
-            String extra = ServiceConvertUtils
-                    .convertToServiceSettingsResponseVisitorJSONString(workgroup.getServiceSettings());
+            String extra = workgroup.getSettings() != null 
+                ? ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getSettings().getServiceSettings())
+                : ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(new com.bytedesk.kbase.settings.ServiceSettings());
             thread.setExtra(extra);
         }
         // 保存
@@ -148,9 +150,11 @@ public class VisitorThreadService
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         // 访客信息
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        // 考虑到配置可能变化，更新配置
+        // 考虑到配置可能变化,更新配置
         String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+                .convertToServiceSettingsResponseVisitorJSONString(agent.getSettings() != null 
+                    ? agent.getSettings().getServiceSettings() 
+                    : new com.bytedesk.kbase.settings.ServiceSettings());
         //
         String orgUid = agent.getOrgUid();
         //
@@ -184,7 +188,9 @@ public class VisitorThreadService
 
     public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getServiceSettings());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getSettings() != null 
+            ? agent.getSettings().getServiceSettings() 
+            : new com.bytedesk.kbase.settings.ServiceSettings());
         thread.setExtra(extra);
         if (StringUtils.hasText(thread.getTransfer()) && !BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getTransfer())) {
             // 如果有转接信息，则使用转接信息
@@ -207,7 +213,9 @@ public class VisitorThreadService
         //
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(robot.getSettings() != null 
+            ? robot.getSettings().getServiceSettings() 
+            : new com.bytedesk.kbase.settings.ServiceSettings());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -231,7 +239,9 @@ public class VisitorThreadService
     public ThreadEntity reInitRobotThreadExtra(ThreadEntity thread, RobotEntity robot) {
         //
         String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(robot.getServiceSettings());
+                .convertToServiceSettingsResponseVisitorJSONString(robot.getSettings() != null 
+                    ? robot.getSettings().getServiceSettings() 
+                    : new com.bytedesk.kbase.settings.ServiceSettings());
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);

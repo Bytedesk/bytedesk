@@ -124,7 +124,9 @@ public class AgentEventListener {
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             // 发送欢迎语
-            String content = agent.getServiceSettings().getWelcomeTip();
+            String content = agent.getSettings() != null && agent.getSettings().getServiceSettings() != null
+                ? agent.getSettings().getServiceSettings().getWelcomeTip()
+                : null;
             MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);
             messageSendService.sendProtobufMessage(messageProtobuf);
         } else {

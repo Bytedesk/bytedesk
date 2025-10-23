@@ -456,7 +456,9 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         
         String customMessage = null;
         try {
-            customMessage = agent.getServiceSettings().getWelcomeTip();
+            customMessage = agent.getSettings() != null && agent.getSettings().getServiceSettings() != null
+                ? agent.getSettings().getServiceSettings().getWelcomeTip()
+                : null;
             log.debug("客服自定义欢迎消息 - agentUid: {}, 消息长度: {}", 
                     agent.getUid(), customMessage != null ? customMessage.length() : 0);
         } catch (Exception e) {
@@ -477,7 +479,9 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         
         String customMessage = null;
         try {
-            customMessage = agent.getMessageLeaveSettings().getMessageLeaveTip();
+            customMessage = agent.getSettings() != null && agent.getSettings().getMessageLeaveSettings() != null
+                ? agent.getSettings().getMessageLeaveSettings().getMessageLeaveTip()
+                : null;
             log.debug("客服自定义离线消息 - agentUid: {}, 消息长度: {}", 
                     agent.getUid(), customMessage != null ? customMessage.length() : 0);
         } catch (Exception e) {

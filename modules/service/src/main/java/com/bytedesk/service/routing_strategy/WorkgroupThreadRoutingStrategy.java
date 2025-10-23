@@ -229,7 +229,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         
         if (!visitorRequest.getForceAgent()) {
             // 重新初始化机器人会话
-            RobotEntity robotEntity = workgroup.getRobotSettings().getRobot();
+            RobotEntity robotEntity = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null 
+                ? workgroup.getSettings().getRobotSettings().getRobot() 
+                : null;
             if (robotEntity != null) {
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                 String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
@@ -304,16 +306,22 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         
         // 检查机器人配置和服务时间
         boolean isOffline = !workgroup.isConnected();
-        boolean isInServiceTime = workgroup.getMessageLeaveSettings().isInServiceTime();
+        boolean isInServiceTime = workgroup.getSettings() != null && workgroup.getSettings().getMessageLeaveSettings() != null
+            ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
+            : true;
         
         log.debug("路由决策参数 - 工作组离线状态: {}, 在服务时间内: {}", 
                 isOffline, isInServiceTime);
         
-        boolean transferToRobot = workgroup.getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime);
+        boolean transferToRobot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
+            ? workgroup.getSettings().getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime)
+            : false;
         log.debug("机器人设置决策结果: {}", transferToRobot);
         
         if (transferToRobot) {
-            RobotEntity robot = workgroup.getRobotSettings().getRobot();
+            RobotEntity robot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
+                ? workgroup.getSettings().getRobotSettings().getRobot()
+                : null;
             if (robot != null) {
                 log.info("满足机器人路由条件，将路由到机器人 - robotUid: {}, offline: {}, in service time: {}", 
                         robot.getUid(), isOffline, isInServiceTime);
@@ -332,7 +340,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 路由到机器人
      */
     private MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
-        RobotEntity robot = workgroup.getRobotSettings().getRobot();
+        RobotEntity robot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
+            ? workgroup.getSettings().getRobotSettings().getRobot()
+            : null;
         if (robot == null) {
             throw new IllegalStateException("Workgroup robot not found");
         }
@@ -351,7 +361,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 thread.getUid(), workgroup.getUid());
         
         // 检查是否在工作时间内
-        boolean isInServiceTime = workgroup.getMessageLeaveSettings().isInServiceTime();
+        boolean isInServiceTime = workgroup.getSettings() != null && workgroup.getSettings().getMessageLeaveSettings() != null
+            ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
+            : true;
         log.debug("服务时间检查 - 是否在服务时间内: {}", isInServiceTime);
         
         if (!isInServiceTime) {
@@ -650,7 +662,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取客服欢迎消息
      */
     private String getAgentWelcomeMessage(AgentEntity agentEntity) {
-        String customMessage = agentEntity.getServiceSettings().getWelcomeTip();
+        String customMessage = agentEntity.getSettings() != null && agentEntity.getSettings().getServiceSettings() != null
+            ? agentEntity.getSettings().getServiceSettings().getWelcomeTip()
+            : null;
         return getValidWelcomeMessage(customMessage);
     }
 
@@ -658,7 +672,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取机器人欢迎消息
      */
     private String getRobotWelcomeMessage(RobotEntity robotEntity) {
-        String customMessage = robotEntity.getServiceSettings().getWelcomeTip();
+        String customMessage = robotEntity.getSettings() != null && robotEntity.getSettings().getServiceSettings() != null
+            ? robotEntity.getSettings().getServiceSettings().getWelcomeTip()
+            : null;
         return getValidWelcomeMessage(customMessage);
     }
 
@@ -666,7 +682,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取工作组离线消息
      */
     private String getWorkgroupOfflineMessage(WorkgroupEntity workgroup) {
-        String customMessage = workgroup.getMessageLeaveSettings().getMessageLeaveTip();
+        String customMessage = workgroup.getSettings() != null && workgroup.getSettings().getMessageLeaveSettings() != null
+            ? workgroup.getSettings().getMessageLeaveSettings().getMessageLeaveTip()
+            : null;
         if (customMessage == null || customMessage.isEmpty()) {
             customMessage = "请稍后，客服会尽快回复您";
         }

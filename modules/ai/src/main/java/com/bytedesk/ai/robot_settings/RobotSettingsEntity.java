@@ -1,11 +1,11 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-10-23
- * @Description: Robot configuration template for reusable robot settings
+ * @Description: Robot configuration settings for reusable robot settings
  */
-package com.bytedesk.ai.robot;
+package com.bytedesk.ai.robot_settings;
 
-import com.bytedesk.kbase.settings.BaseTemplateEntity;
+import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 
 import jakarta.persistence.Entity;
@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Robot configuration template for reusable settings
+ * Robot configuration settings for reusable settings
  * 
  * Purpose:
  * - Store reusable robot configurations
@@ -29,18 +29,18 @@ import lombok.experimental.SuperBuilder;
  * - Simplify robot configuration management
  * 
  * Usage:
- * - Create templates for different robot types (e.g., "FAQ Robot", "Customer Service Robot", "Sales Robot")
- * - Assign templates to robots via RobotEntity.template reference
- * - Multiple robots can share the same template
+ * - Create settings for different robot types (e.g., "FAQ Robot", "Customer Service Robot", "Sales Robot")
+ * - Assign settings to robots via RobotEntity.settings reference
+ * - Multiple robots can share the same settings
  * 
- * Common fields (inherited from BaseTemplateEntity):
+ * Common fields (inherited from BaseSettingsEntity):
  * - name, description, isDefault, enabled
  * - serviceSettings, inviteSettings, intentionSettings
  * 
  * Robot-specific fields:
  * - rateDownSettings
  * 
- * Database Table: bytedesk_ai_robot_template
+ * Database Table: bytedesk_ai_robot_settings
  */
 @Entity
 @Data
@@ -50,13 +50,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
-    name = "bytedesk_ai_robot_template",
+    name = "bytedesk_ai_robot_settings",
     indexes = {
-        @Index(name = "idx_robot_template_org", columnList = "org_uid"),
-        @Index(name = "idx_robot_template_default", columnList = "is_default")
+        @Index(name = "idx_robot_settings_org", columnList = "org_uid"),
+        @Index(name = "idx_robot_settings_default", columnList = "is_default")
     }
 )
-public class RobotTemplateEntity extends BaseTemplateEntity {
+public class RobotSettingsEntity extends BaseSettingsEntity {
 
     private static final long serialVersionUID = 1L;
 

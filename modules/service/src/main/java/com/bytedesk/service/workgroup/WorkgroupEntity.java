@@ -24,14 +24,8 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
-import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue.settings.QueueSettings;
-import com.bytedesk.service.settings.RobotSettings;
-
+import com.bytedesk.service.workgroup_settings.WorkgroupSettingsEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -115,43 +109,11 @@ public class WorkgroupEntity extends BaseEntity {
     private String status = WorkgroupStateEnum.AVAILABLE.name();
 
     /**
-     * Configuration template reference (new approach)
-     * When set, settings from template take precedence over embedded fields
+     * Configuration settings reference
+     * All settings are managed through the settings entity
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    private WorkgroupTemplateEntity template;
-
-    /**
-     * Settings for handling offline messages
-     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
-     */
-    @Embedded
-    @Builder.Default
-    private MessageLeaveSettings messageLeaveSettings = new MessageLeaveSettings();
-
-    /**
-     * Robot service configuration settings
-     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
-     */
-    @Embedded
-    @Builder.Default
-    private RobotSettings robotSettings = new RobotSettings();
-
-    /**
-     * General service configuration settings
-     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
-     */
-    @Embedded
-    @Builder.Default
-    private ServiceSettings serviceSettings = new ServiceSettings();
-
-    /**
-     * Queue management settings
-     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
-     */
-    @Embedded
-    @Builder.Default
-    private QueueSettings queueSettings = new QueueSettings();
+    private WorkgroupSettingsEntity settings;
 
     /**
      * Agents assigned to this workgroup
@@ -178,20 +140,6 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
-
-    /**
-     * Invitation settings for the workgroup
-     * (deprecated - use serviceTemplate.inviteSettings instead, kept for backward compatibility)
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    private InviteSettingsEntity inviteSettings;
-
-    /**
-     * Intent recognition settings
-     * (deprecated - use serviceTemplate.intentionSettings instead, kept for backward compatibility)
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    private IntentionSettingsEntity intentionSetting;
 
     /**
      * Whether the workgroup is enabled and active
@@ -290,76 +238,4 @@ public class WorkgroupEntity extends BaseEntity {
         return this.agents.stream().filter(agent -> agent.isAway()).count();
     }
 
-    /**
-     * Get effective MessageLeaveSettings
-     * Priority: template > embedded field
-     */
-    @JsonIgnore
-    public MessageLeaveSettings getEffectiveMessageLeaveSettings() {
-        if (template != null && template.getMessageLeaveSettings() != null) {
-            return template.getMessageLeaveSettings();
-        }
-        return messageLeaveSettings;
-    }
-
-    /**
-     * Get effective ServiceSettings
-     * Priority: template > embedded field
-     */
-    @JsonIgnore
-    public ServiceSettings getEffectiveServiceSettings() {
-        if (template != null && template.getServiceSettings() != null) {
-            return template.getServiceSettings();
-        }
-        return serviceSettings;
-    }
-
-    /**
-     * Get effective RobotSettings
-     * Priority: template > embedded field
-     */
-    @JsonIgnore
-    public RobotSettings getEffectiveRobotSettings() {
-        if (template != null && template.getRobotSettings() != null) {
-            return template.getRobotSettings();
-        }
-        return robotSettings;
-    }
-
-    /**
-     * Get effective QueueSettings
-     * Priority: template > embedded field
-     */
-    @JsonIgnore
-    public QueueSettings getEffectiveQueueSettings() {
-        if (template != null && template.getQueueSettings() != null) {
-            return template.getQueueSettings();
-        }
-        return queueSettings;
-    }
-
-    /**
-     * Get effective InviteSettings
-     * Priority: template > direct field
-     */
-    @JsonIgnore
-    public InviteSettingsEntity getEffectiveInviteSettings() {
-        if (template != null && template.getInviteSettings() != null) {
-            return template.getInviteSettings();
-        }
-        return inviteSettings;
-    }
-
-    /**
-     * Get effective IntentionSettings
-     * Priority: template > direct field
-     */
-    @JsonIgnore
-    public IntentionSettingsEntity getEffectiveIntentionSettings() {
-        if (template != null && template.getIntentionSettings() != null) {
-            return template.getIntentionSettings();
-        }
-        return intentionSetting;
-    }
-    
 }

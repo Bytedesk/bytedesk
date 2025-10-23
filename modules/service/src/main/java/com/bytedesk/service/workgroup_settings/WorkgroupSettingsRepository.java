@@ -1,0 +1,29 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-10-23
+ * @Description: Workgroup settings repository
+ */
+package com.bytedesk.service.workgroup_settings;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+/**
+ * Repository for WorkgroupSettingsEntity
+ */
+@Repository
+public interface WorkgroupSettingsRepository extends JpaRepository<WorkgroupSettingsEntity, Long> {
+
+    Optional<WorkgroupSettingsEntity> findByUid(String uid);
+
+    List<WorkgroupSettingsEntity> findByOrgUid(String orgUid);
+
+    Optional<WorkgroupSettingsEntity> findByOrgUidAndIsDefaultTrue(String orgUid);
+
+    List<WorkgroupSettingsEntity> findByOrgUidAndEnabledTrue(String orgUid);
+
+    Boolean existsByNameAndOrgUid(String name, String orgUid);
+}

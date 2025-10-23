@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -44,13 +43,8 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.constant.I18ServiceConsts;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue.settings.QueueSettings;
-import com.bytedesk.service.settings.ServiceSettingsService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
@@ -65,7 +59,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final AgentRepository agentRepository;
 
-    private final ModelMapper modelMapper;
+    // private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
@@ -77,11 +71,13 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final ServiceSettingsService serviceSettingsService;
+    // private final ServiceSettingsService serviceSettingsService;
 
     private final MqttConnectionService mqttConnectionService;
 
     private final ThreadRestService threadRestService;
+    
+    private final com.bytedesk.service.agent_settings.AgentSettingsService agentSettingsService;
 
     @Override
     protected Specification<AgentEntity> createSpecification(AgentRequest request) {
@@ -135,6 +131,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setOrgUid(request.getOrgUid());
         agent.setMember(member);
         agent.setUserUid(user.getUid());
+        //
+        // 设置默认配置
+        agent.setSettings(agentSettingsService.getOrCreateDefault(request.getOrgUid()));
         //
         Set<String> userIds = mqttConnectionService.getConnectedUserUids();
         if (userIds.contains(agent.getUserUid())) {
@@ -192,26 +191,13 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
         //
-        MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatAgentMessageLeaveSettings(request);
-        agent.setMessageLeaveSettings(messageLeaveSettings);
-        //
-        // 一对一人工客服，不支持机器人接待
-        // RobotSettings robotSettings =
-        // serviceSettingsService.formatAgentRobotSettings(request);
-        // agent.setRobotSettings(robotSettings);
-        //
-        ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
-        agent.setServiceSettings(serviceSettings);
-        //
-        AutoReplySettings autoReplySettings = serviceSettingsService.formatAgentAutoReplySettings(request);
-        agent.setAutoReplySettings(autoReplySettings);
-        //
-        QueueSettings queueSettings = serviceSettingsService.formatAgentQueueSettings(request);
-        agent.setQueueSettings(queueSettings);
-        //
-        // InviteSettings inviteSettings =
-        // serviceSettingsService.formatAgentInviteSettings(request);
-        // agent.setInviteSettings(inviteSettings);
+        // TODO: Settings should be managed through AgentSettingsEntity
+        // All configuration settings are now managed via agent.getSettings() reference
+        // MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatAgentMessageLeaveSettings(request);
+        // ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
+        // AutoReplySettings autoReplySettings = serviceSettingsService.formatAgentAutoReplySettings(request);
+        // QueueSettings queueSettings = serviceSettingsService.formatAgentQueueSettings(request);
+        // These should be set on the AgentSettingsEntity, not directly on AgentEntity
         // 保存Agent，并检查返回值
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
@@ -331,9 +317,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentEntity agent = findByUid(request.getUid())
                 .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         //
-        AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
-                AutoReplySettings.class);
-        agent.setAutoReplySettings(autoReplySettings);
+        // TODO: Update settings through AgentSettingsEntity
+        // AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
+        //         AutoReplySettings.class);
+        // agent.setAutoReplySettings(autoReplySettings);
+        // These should be set on the AgentSettingsEntity via agent.getSettings()
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {

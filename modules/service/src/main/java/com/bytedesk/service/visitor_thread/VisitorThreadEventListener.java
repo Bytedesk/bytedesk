@@ -176,9 +176,11 @@ public class VisitorThreadEventListener {
         
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
-            return autoClose 
-                ? workgroup.getServiceSettings().getAutoCloseTip()
-                : workgroup.getServiceSettings().getAgentCloseTip();
+            if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
+                return autoClose 
+                    ? workgroup.getSettings().getServiceSettings().getAutoCloseTip()
+                    : workgroup.getSettings().getServiceSettings().getAgentCloseTip();
+            }
         }
         
         return autoClose ? I18Consts.I18N_AUTO_CLOSE_TIP : I18Consts.I18N_AGENT_CLOSE_TIP;
@@ -193,9 +195,11 @@ public class VisitorThreadEventListener {
         
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
-            return autoClose 
-                ? agent.getServiceSettings().getAutoCloseTip()
-                : agent.getServiceSettings().getAgentCloseTip();
+            if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
+                return autoClose 
+                    ? agent.getSettings().getServiceSettings().getAutoCloseTip()
+                    : agent.getSettings().getServiceSettings().getAgentCloseTip();
+            }
         }
         
         return autoClose ? I18Consts.I18N_AUTO_CLOSE_TIP : I18Consts.I18N_AGENT_CLOSE_TIP;
@@ -210,7 +214,9 @@ public class VisitorThreadEventListener {
         
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
-            return robot.getServiceSettings().getAutoCloseTip();
+            if (robot.getSettings() != null && robot.getSettings().getServiceSettings() != null) {
+                return robot.getSettings().getServiceSettings().getAutoCloseTip();
+            }
         }
         
         return I18Consts.I18N_AUTO_CLOSE_TIP;
@@ -240,13 +246,15 @@ public class VisitorThreadEventListener {
         
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
-            if (workgroup.getServiceSettings().getEnableProactiveTrigger()
-                    && diffInSeconds > workgroup.getServiceSettings().getNoResponseTimeout()) {
-                log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message", 
-                    thread.getUid());
-                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                        workgroup.getServiceSettings().getProactiveMessage());
-                messageSendService.sendProtobufMessage(messageProtobuf);
+            if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
+                if (workgroup.getSettings().getServiceSettings().getEnableProactiveTrigger()
+                        && diffInSeconds > workgroup.getSettings().getServiceSettings().getNoResponseTimeout()) {
+                    log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message", 
+                        thread.getUid());
+                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
+                            workgroup.getSettings().getServiceSettings().getProactiveMessage());
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                }
             }
         }
     }
@@ -260,13 +268,15 @@ public class VisitorThreadEventListener {
         
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
-            if (agent.getServiceSettings().getEnableProactiveTrigger()
-                    && diffInSeconds > agent.getServiceSettings().getNoResponseTimeout()) {
-                log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message", 
-                    thread.getUid());
-                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                        agent.getServiceSettings().getProactiveMessage());
-                messageSendService.sendProtobufMessage(messageProtobuf);
+            if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
+                if (agent.getSettings().getServiceSettings().getEnableProactiveTrigger()
+                        && diffInSeconds > agent.getSettings().getServiceSettings().getNoResponseTimeout()) {
+                    log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message", 
+                        thread.getUid());
+                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
+                            agent.getSettings().getServiceSettings().getProactiveMessage());
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                }
             }
         }
     }
@@ -280,13 +290,15 @@ public class VisitorThreadEventListener {
         
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
-            if (robot.getServiceSettings().getEnableProactiveTrigger()
-                    && diffInSeconds > robot.getServiceSettings().getNoResponseTimeout()) {
-                log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message", 
-                    thread.getUid());
-                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                        robot.getServiceSettings().getProactiveMessage());
-                messageSendService.sendProtobufMessage(messageProtobuf);
+            if (robot.getSettings() != null && robot.getSettings().getServiceSettings() != null) {
+                if (robot.getSettings().getServiceSettings().getEnableProactiveTrigger()
+                        && diffInSeconds > robot.getSettings().getServiceSettings().getNoResponseTimeout()) {
+                    log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message", 
+                        thread.getUid());
+                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
+                            robot.getSettings().getServiceSettings().getProactiveMessage());
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                }
             }
         }
     }

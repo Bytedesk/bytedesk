@@ -1,11 +1,11 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-10-23
- * @Description: Workgroup configuration template for reusable workgroup settings
+ * @Description: Workgroup configuration settings for reusable workgroup settings
  */
-package com.bytedesk.service.workgroup;
+package com.bytedesk.service.workgroup_settings;
 
-import com.bytedesk.kbase.settings.BaseTemplateEntity;
+import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Workgroup configuration template for reusable settings
+ * Workgroup configuration settings for reusable settings
  * 
  * Purpose:
  * - Store reusable workgroup configurations
@@ -30,18 +30,18 @@ import lombok.experimental.SuperBuilder;
  * - Simplify workgroup configuration management
  * 
  * Usage:
- * - Create templates for different workgroup types (e.g., "Standard Support", "VIP Support", "Technical Support")
- * - Assign templates to workgroups via WorkgroupEntity.template reference
- * - Multiple workgroups can share the same template
+ * - Create settings for different workgroup types (e.g., "Standard Support", "VIP Support", "Technical Support")
+ * - Assign settings to workgroups via WorkgroupEntity.settings reference
+ * - Multiple workgroups can share the same settings
  * 
- * Common fields (inherited from BaseTemplateEntity):
+ * Common fields (inherited from BaseSettingsEntity):
  * - name, description, isDefault, enabled
  * - serviceSettings, inviteSettings, intentionSettings
  * 
  * Workgroup-specific fields:
  * - messageLeaveSettings, robotSettings, queueSettings
  * 
- * Database Table: bytedesk_service_workgroup_template
+ * Database Table: bytedesk_service_workgroup_settings
  */
 @Entity
 @Data
@@ -51,13 +51,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
-    name = "bytedesk_service_workgroup_template",
+    name = "bytedesk_service_workgroup_settings",
     indexes = {
-        @Index(name = "idx_workgroup_template_org", columnList = "org_uid"),
-        @Index(name = "idx_workgroup_template_default", columnList = "is_default")
+        @Index(name = "idx_workgroup_settings_org", columnList = "org_uid"),
+        @Index(name = "idx_workgroup_settings_default", columnList = "is_default")
     }
 )
-public class WorkgroupTemplateEntity extends BaseTemplateEntity {
+public class WorkgroupSettingsEntity extends BaseSettingsEntity {
 
     private static final long serialVersionUID = 1L;
 

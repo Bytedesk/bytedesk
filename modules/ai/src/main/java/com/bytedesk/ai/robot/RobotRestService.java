@@ -80,6 +80,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     private final CategoryRestService categoryRestService;
 
     private final LlmProviderRestService llmProviderRestService;
+    
+    private final com.bytedesk.ai.robot_settings.RobotSettingsService robotSettingsService;
 
     @Override
     protected Specification<RobotEntity> createSpecification(RobotRequest request) {
@@ -138,6 +140,9 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setOrgUid(request.getOrgUid());
         robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
         robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
+        //
+        // 设置默认配置
+        robot.setSettings(robotSettingsService.getOrCreateDefault(request.getOrgUid()));
         
         // 设置llm相关属性
         if (request.getLlm() != null) {
@@ -316,7 +321,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 }
             }
         }
-        robot.setServiceSettings(serviceSettings);
+        // TODO: Settings should be managed through RobotSettingsEntity
+        // robot.setServiceSettings(serviceSettings);
 
         // Set Invite Settings
         // if (request == null || request.getInviteSettings() == null) {
@@ -752,15 +758,16 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setOrgUid(orgUid);
         robot.setKbEnabled(true);
         robot.setKbUid(kbUid);
+        // TODO: Settings should be managed through RobotSettingsEntity
         // 设置默认的服务设置
-        ServiceSettings serviceSettings = ServiceSettings.builder()
-                .showFaqs(true)
-                .showQuickFaqs(true)
-                .showGuessFaqs(true)
-                .showHotFaqs(true)
-                .showShortcutFaqs(true)
-                .build();
-        robot.setServiceSettings(serviceSettings);
+        // ServiceSettings serviceSettings = ServiceSettings.builder()
+        //         .showFaqs(true)
+        //         .showQuickFaqs(true)
+        //         .showGuessFaqs(true)
+        //         .showHotFaqs(true)
+        //         .showShortcutFaqs(true)
+        //         .build();
+        // robot.setServiceSettings(serviceSettings);
         return robot;
     }
 

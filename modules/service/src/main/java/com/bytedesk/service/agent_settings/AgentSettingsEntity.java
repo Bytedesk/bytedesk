@@ -1,12 +1,12 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-10-23
- * @Description: Agent configuration template for reusable agent settings
+ * @Description: Agent configuration settings for reusable agent settings
  */
-package com.bytedesk.service.agent;
+package com.bytedesk.service.agent_settings;
 
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.BaseTemplateEntity;
+import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Agent configuration template for reusable settings
+ * Agent configuration settings for reusable settings
  * 
  * Purpose:
  * - Store reusable agent configurations
@@ -33,18 +33,18 @@ import lombok.experimental.SuperBuilder;
  * - Simplify agent configuration management
  * 
  * Usage:
- * - Create templates for different agent roles (e.g., "Junior Support", "Senior Support", "VIP Agent")
- * - Assign templates to agents via AgentEntity.template reference
- * - Multiple agents can share the same template
+ * - Create settings for different agent roles (e.g., "Junior Support", "Senior Support", "VIP Agent")
+ * - Assign settings to agents via AgentEntity.settings reference
+ * - Multiple agents can share the same settings
  * 
- * Common fields (inherited from BaseTemplateEntity):
+ * Common fields (inherited from BaseSettingsEntity):
  * - name, description, isDefault, enabled
  * - serviceSettings, inviteSettings, intentionSettings
  * 
  * Agent-specific fields:
  * - messageLeaveSettings, autoReplySettings, queueSettings, rateDownSettings
  * 
- * Database Table: bytedesk_service_agent_template
+ * Database Table: bytedesk_service_agent_settings
  */
 @Entity
 @Data
@@ -54,13 +54,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
-    name = "bytedesk_service_agent_template",
+    name = "bytedesk_service_agent_settings",
     indexes = {
-        @Index(name = "idx_agent_template_org", columnList = "org_uid"),
-        @Index(name = "idx_agent_template_default", columnList = "is_default")
+        @Index(name = "idx_agent_settings_org", columnList = "org_uid"),
+        @Index(name = "idx_agent_settings_default", columnList = "is_default")
     }
 )
-public class AgentTemplateEntity extends BaseTemplateEntity {
+public class AgentSettingsEntity extends BaseSettingsEntity {
 
     private static final long serialVersionUID = 1L;
 

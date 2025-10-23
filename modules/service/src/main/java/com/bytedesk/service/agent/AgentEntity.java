@@ -20,6 +20,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
+import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.core.member.MemberEntity;
 
 import jakarta.persistence.Column;
@@ -82,11 +83,11 @@ public class AgentEntity extends BaseEntity {
     private Boolean connected = false;
 
     /**
-     * Configuration template reference
-     * All settings are managed through the template
+     * Configuration settings reference
+     * All settings are managed through the settings entity
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    private AgentTemplateEntity template;
+    private AgentSettingsEntity settings;
 
     // 最大同时接待数量
     @Builder.Default

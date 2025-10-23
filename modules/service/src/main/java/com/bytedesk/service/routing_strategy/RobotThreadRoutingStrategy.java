@@ -193,7 +193,9 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 获取机器人欢迎消息
      */
     private String getRobotWelcomeMessage(RobotEntity robotEntity) {
-        String customMessage = robotEntity.getServiceSettings().getWelcomeTip();
+        String customMessage = robotEntity.getSettings() != null && robotEntity.getSettings().getServiceSettings() != null
+            ? robotEntity.getSettings().getServiceSettings().getWelcomeTip()
+            : null;
         return getValidWelcomeMessage(customMessage);
     }
 

@@ -32,13 +32,8 @@ import org.springframework.context.annotation.Description;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue.settings.QueueSettings;
-import com.bytedesk.service.settings.RobotSettings;
-import com.bytedesk.service.settings.ServiceSettingsService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,9 +51,11 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     private final UidUtils uidUtils;
 
-    private final ServiceSettingsService serviceSettingsService;
+    // private final ServiceSettingsService serviceSettingsService;
 
     private final AuthService authService;
+    
+    private final com.bytedesk.service.workgroup_settings.WorkgroupSettingsService workgroupSettingsService;
 
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
@@ -76,21 +73,9 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             workgroup.setUid(request.getUid());
         }
         workgroup.setOrgUid(request.getOrgUid());
-        // 
-        MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatWorkgroupMessageLeaveSettings(request);
-        workgroup.setMessageLeaveSettings(messageLeaveSettings);
         //
-        RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
-        workgroup.setRobotSettings(robotSettings);
-        //
-        ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
-        workgroup.setServiceSettings(serviceSettings);
-        //
-        QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
-        workgroup.setQueueSettings(queueSettings);
-        //
-        // InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
-        // workgroup.setInviteSettings(inviteSettings);
+        // 设置默认配置
+        workgroup.setSettings(workgroupSettingsService.getOrCreateDefault(request.getOrgUid()));
         //
         Iterator<String> agentIterator = request.getAgentUids().iterator();
         while (agentIterator.hasNext()) {
@@ -137,18 +122,18 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setDescription(request.getDescription());
         workgroup.setRoutingMode(request.getRoutingMode());
         workgroup.setStatus(request.getStatus());
-        //
-        MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatWorkgroupMessageLeaveSettings(request);
-        workgroup.setMessageLeaveSettings(messageLeaveSettings);
-        //
-        RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
-        workgroup.setRobotSettings(robotSettings);
-        //
-        ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
-        workgroup.setServiceSettings(serviceSettings);
-        //
-        QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
-        workgroup.setQueueSettings(queueSettings);
+        // TODO: Settings should be managed through WorkgroupSettingsEntity
+        // MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatWorkgroupMessageLeaveSettings(request);
+        // workgroup.setMessageLeaveSettings(messageLeaveSettings);
+        // //
+        // RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
+        // workgroup.setRobotSettings(robotSettings);
+        // //
+        // ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
+        // workgroup.setServiceSettings(serviceSettings);
+        // //
+        // QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
+        // workgroup.setQueueSettings(queueSettings);
         //
         // InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
         // workgroup.setInviteSettings(inviteSettings);
@@ -216,19 +201,22 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         // 确保从数据库加载时所有依赖属性都被初始化，防止延迟加载的问题
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
-            // 确保robotSettings被初始化
-            if (workgroup.getRobotSettings() != null) {
-                workgroup.getRobotSettings().toString(); // 触发加载
-            }
-            // 确保其他可能需要的设置也被初始化
-            if (workgroup.getMessageLeaveSettings() != null) {
-                workgroup.getMessageLeaveSettings().toString();
-            }
-            if (workgroup.getServiceSettings() != null) {
-                workgroup.getServiceSettings().toString();
-            }
-            if (workgroup.getQueueSettings() != null) {
-                workgroup.getQueueSettings().toString();
+            // 确保settings被初始化
+            if (workgroup.getSettings() != null) {
+                workgroup.getSettings().toString(); // 触发加载
+                // 触发嵌套的settings加载
+                if (workgroup.getSettings().getRobotSettings() != null) {
+                    workgroup.getSettings().getRobotSettings().toString();
+                }
+                if (workgroup.getSettings().getMessageLeaveSettings() != null) {
+                    workgroup.getSettings().getMessageLeaveSettings().toString();
+                }
+                if (workgroup.getSettings().getServiceSettings() != null) {
+                    workgroup.getSettings().getServiceSettings().toString();
+                }
+                if (workgroup.getSettings().getQueueSettings() != null) {
+                    workgroup.getSettings().getQueueSettings().toString();
+                }
             }
             // 确保agents被初始化
             if (workgroup.getAgents() != null) {
@@ -293,12 +281,16 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 latestEntity.setAvatar(entity.getAvatar());
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setStatus(entity.getStatus());
-                // 配置信息
-                latestEntity.setMessageLeaveSettings(entity.getMessageLeaveSettings());
-                latestEntity.setRobotSettings(entity.getRobotSettings());
-                latestEntity.setServiceSettings(entity.getServiceSettings());
-                latestEntity.setQueueSettings(entity.getQueueSettings());
-                latestEntity.setInviteSettings(entity.getInviteSettings());
+                // TODO: Settings should be managed through WorkgroupSettingsEntity
+                // latestEntity.setMessageLeaveSettings(entity.getMessageLeaveSettings());
+                // latestEntity.setRobotSettings(entity.getRobotSettings());
+                // latestEntity.setServiceSettings(entity.getServiceSettings());
+                // latestEntity.setQueueSettings(entity.getQueueSettings());
+                // latestEntity.setInviteSettings(entity.getInviteSettings());
+                // Update settings reference instead
+                if (entity.getSettings() != null) {
+                    latestEntity.setSettings(entity.getSettings());
+                }
                 return workgroupRepository.save(latestEntity);
             }
         } catch (Exception ex) {
