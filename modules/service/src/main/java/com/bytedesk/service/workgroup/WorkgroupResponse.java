@@ -19,7 +19,7 @@ import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.kbase.settings.ServiceSettingsResponse;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
-import com.bytedesk.service.queue.settings.QueueSettingsResponse;
+import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 import com.bytedesk.service.settings.RobotSettingsResponse;
 
 import lombok.AllArgsConstructor;

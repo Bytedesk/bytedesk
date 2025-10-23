@@ -30,7 +30,7 @@ import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.kbase.settings.ToolbarSettings;
 import com.bytedesk.service.agent.AgentRequest;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue.settings.QueueSettings;
+import com.bytedesk.service.queue_settings.QueueSettings;
 import com.bytedesk.service.workgroup.WorkgroupRequest;
 import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.worktime.WorktimeRestService;

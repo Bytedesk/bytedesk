@@ -2,7 +2,9 @@ package com.bytedesk.service.agent_settings;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,24 +12,28 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.uid.UidUtils;
+
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class AgentSettingsRestService extends BaseRestService<AgentSettingsEntity, AgentSettingsRequest, AgentSettingsResponse> {
 
-    @Autowired
-    private AgentSettingsService agentSettingsService;
-    
-    @Autowired
-    private AgentSettingsRepository agentSettingsRepository;
+    private final AgentSettingsRepository agentSettingsRepository;
 
+    private final UidUtils uidUtils;
+
+    @Cacheable(value = "agentSettings", key = "#uid", unless = "#result == null")
     @Override
     public Optional<AgentSettingsEntity> findByUid(String uid) {
-        return agentSettingsService.findByUid(uid);
+        return agentSettingsRepository.findByUid(uid);
     }
 
     @Override
     public AgentSettingsResponse create(AgentSettingsRequest request) {
         AgentSettingsEntity entity = new AgentSettingsEntity();
+        entity.setUid(uidUtils.getUid());
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
         entity.setEnabled(request.getEnabled());
@@ -39,13 +45,13 @@ public class AgentSettingsRestService extends BaseRestService<AgentSettingsEntit
         entity.setQueueSettings(request.getQueueSettings());
         entity.setRateDownSettings(request.getRateDownSettings());
 
-        AgentSettingsEntity saved = agentSettingsService.create(entity);
+        AgentSettingsEntity saved = save(entity);
         return convertToResponse(saved);
     }
 
     @Override
     public AgentSettingsResponse update(AgentSettingsRequest request) {
-        Optional<AgentSettingsEntity> optional = agentSettingsService.findByUid(request.getUid());
+        Optional<AgentSettingsEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             AgentSettingsEntity entity = optional.get();
             entity.setName(request.getName());
@@ -56,15 +62,20 @@ public class AgentSettingsRestService extends BaseRestService<AgentSettingsEntit
             entity.setAutoReplySettings(request.getAutoReplySettings());
             entity.setQueueSettings(request.getQueueSettings());
             entity.setRateDownSettings(request.getRateDownSettings());
-            AgentSettingsEntity updated = agentSettingsService.update(entity);
+            AgentSettingsEntity updated = save(entity);
             return convertToResponse(updated);
         }
         throw new RuntimeException("AgentSettings not found: " + request.getUid());
     }
 
+    @CacheEvict(value = "agentSettings", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
-        agentSettingsService.findByUid(uid).ifPresent(entity -> agentSettingsService.delete(entity.getUid()));
+        Optional<AgentSettingsEntity> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            optional.get().setDeleted(true);
+            save(optional.get());
+        }
     }
 
     @Override
@@ -82,14 +93,47 @@ public class AgentSettingsRestService extends BaseRestService<AgentSettingsEntit
         return agentSettingsRepository.findAll(spec, pageable);
     }
 
+    @CachePut(value = "agentSettings", key = "#entity.uid", unless = "#result == null")
     @Override
     protected AgentSettingsEntity doSave(AgentSettingsEntity entity) {
-        return agentSettingsService.create(entity);
+        return agentSettingsRepository.save(entity);
     }
 
     @Override
     public AgentSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AgentSettingsEntity entity) {
-        throw new RuntimeException("Optimistic locking failure for AgentSettings: " + entity.getUid(), e);
+        try {
+            Optional<AgentSettingsEntity> latest = agentSettingsRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                AgentSettingsEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                return agentSettingsRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    /**
+     * Get or create default settings for organization
+     */
+    public AgentSettingsEntity getOrCreateDefault(String orgUid) {
+        Optional<AgentSettingsEntity> defaultSettings = agentSettingsRepository.findByOrgUidAndIsDefaultTrue(orgUid);
+        if (defaultSettings.isPresent()) {
+            return defaultSettings.get();
+        }
+        
+        // Create default settings
+        AgentSettingsEntity settings = AgentSettingsEntity.builder()
+                .uid(uidUtils.getUid())
+                .name("默认客服配置")
+                .description("系统默认客服配置")
+                .isDefault(true)
+                .enabled(true)
+                .orgUid(orgUid)
+                .build();
+        
+        return save(settings);
     }
 
     @Override

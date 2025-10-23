@@ -16,7 +16,7 @@ package com.bytedesk.service.workgroup_settings;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.kbase.settings.ServiceSettings;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue.settings.QueueSettings;
+import com.bytedesk.service.queue_settings.QueueSettings;
 import com.bytedesk.service.settings.RobotSettings;
 
 import lombok.AllArgsConstructor;

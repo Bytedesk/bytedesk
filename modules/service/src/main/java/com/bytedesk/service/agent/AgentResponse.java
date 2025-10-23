@@ -17,7 +17,7 @@ import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.ServiceSettingsResponse;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
-import com.bytedesk.service.queue.settings.QueueSettingsResponse;
+import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 import com.bytedesk.core.member.MemberProtobuf;
 
 import lombok.AllArgsConstructor;

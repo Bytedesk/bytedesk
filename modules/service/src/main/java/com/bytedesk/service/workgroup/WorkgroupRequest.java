@@ -21,7 +21,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.settings.ServiceSettingsRequest;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
-import com.bytedesk.service.queue.settings.QueueSettingsRequest;
+import com.bytedesk.service.queue_settings.QueueSettingsRequest;
 import com.bytedesk.service.settings.RobotSettingsRequest;
 
 import jakarta.validation.constraints.NotBlank;

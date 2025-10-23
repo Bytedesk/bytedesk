@@ -9,7 +9,7 @@ import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue.settings.QueueSettings;
+import com.bytedesk.service.queue_settings.QueueSettings;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

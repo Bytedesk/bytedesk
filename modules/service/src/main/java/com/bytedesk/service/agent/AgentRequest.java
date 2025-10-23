@@ -19,7 +19,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.settings.ServiceSettingsRequest;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
-import com.bytedesk.service.queue.settings.QueueSettings;
+import com.bytedesk.service.queue_settings.QueueSettings;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
