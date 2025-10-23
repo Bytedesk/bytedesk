@@ -203,4 +203,8 @@ public class ServiceSettingsRequest  implements Serializable {
 
     // 有效日期
     private Date validateUntil;
+
+    // 工具栏显示控制（固定字段，未设置则默认为显示）
+    @Builder.Default
+    private ToolbarSettings toolbar = ToolbarSettings.builder().build();
 }

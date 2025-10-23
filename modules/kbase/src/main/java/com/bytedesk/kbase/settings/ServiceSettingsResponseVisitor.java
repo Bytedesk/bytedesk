@@ -118,6 +118,9 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private Boolean showLogo;
 
+    // 工具栏显示控制（固定字段，未设置则默认为显示）
+    private ToolbarSettings toolbar;
+
     // robot
     // 是否允许转人工
     // private Boolean allowTransferToAgent;

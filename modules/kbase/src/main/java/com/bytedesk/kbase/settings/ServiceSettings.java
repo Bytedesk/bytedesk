@@ -28,6 +28,7 @@ import com.bytedesk.kbase.llm_faq.FaqEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -266,5 +267,12 @@ public class ServiceSettings implements Serializable {
 
     // validate until date, when expire the service will be disabled
     private Date validateUntil;
+    
+    //-----------------------------------------------------------------------------------
+
+    // 工具栏显示控制（固定字段，未设置则默认为显示）
+    @Builder.Default
+    @Embedded
+    private ToolbarSettings toolbar = new ToolbarSettings();
     
 }

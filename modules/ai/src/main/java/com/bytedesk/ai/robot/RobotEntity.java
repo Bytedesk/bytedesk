@@ -98,7 +98,15 @@ public class RobotEntity extends BaseEntity {
     private RobotLlm llm = new RobotLlm();
 
     /**
+     * Configuration template reference (new approach)
+     * When set, settings from template take precedence over embedded fields
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RobotTemplateEntity template;
+
+    /**
      * Service settings and parameters for the robot
+     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
      */
     @Embedded
     @Builder.Default
@@ -159,21 +167,68 @@ public class RobotEntity extends BaseEntity {
 
     /**
      * Invitation settings for the robot
+     * (deprecated - use serviceTemplate.inviteSettings instead, kept for backward compatibility)
      */
     @ManyToOne(fetch = FetchType.LAZY)
     private InviteSettingsEntity inviteSettings;
 
     /**
      * Rating down settings for feedback collection
+     * (deprecated - use serviceTemplate.rateDownSettings instead, kept for backward compatibility)
      */
     @ManyToOne(fetch = FetchType.LAZY)
     private RatedownSettingsEntity rateDownSettings;
 
     /**
      * Intention recognition settings for the robot
+     * (deprecated - use serviceTemplate.intentionSettings instead, kept for backward compatibility)
      */
     @ManyToOne(fetch = FetchType.LAZY)
     private IntentionSettingsEntity intentionSetting;
+
+    /**
+     * Get effective ServiceSettings
+     * Priority: template > embedded field
+     */
+    public ServiceSettings getEffectiveServiceSettings() {
+        if (template != null && template.getServiceSettings() != null) {
+            return template.getServiceSettings();
+        }
+        return serviceSettings;
+    }
+
+    /**
+     * Get effective InviteSettings
+     * Priority: template > direct field
+     */
+    public InviteSettingsEntity getEffectiveInviteSettings() {
+        if (template != null && template.getInviteSettings() != null) {
+            return template.getInviteSettings();
+        }
+        return inviteSettings;
+    }
+
+    /**
+     * Get effective RatedownSettings
+     * Priority: template > direct field
+     */
+    public RatedownSettingsEntity getEffectiveRateDownSettings() {
+        if (template != null && template.getRateDownSettings() != null) {
+            return template.getRateDownSettings();
+        }
+        return rateDownSettings;
+    }
+
+    /**
+     * Get effective IntentionSettings
+     * Priority: template > direct field
+     */
+    public IntentionSettingsEntity getEffectiveIntentionSettings() {
+        if (template != null && template.getIntentionSettings() != null) {
+            return template.getIntentionSettings();
+        }
+        return intentionSetting;
+    }
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()

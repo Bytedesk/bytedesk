@@ -27,6 +27,7 @@ import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings.ToolbarSettings;
 import com.bytedesk.service.agent.AgentRequest;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
 import com.bytedesk.service.queue.settings.QueueSettings;
@@ -81,6 +82,10 @@ public class ServiceSettingsService {
         }
         //
         ServiceSettings serviceSettings = modelMapper.map(request.getServiceSettings(), ServiceSettings.class);
+        // 确保 toolbar 非空（当请求未提供 toolbar 或映射覆盖为 null 时，使用默认全开）
+        if (serviceSettings.getToolbar() == null) {
+            serviceSettings.setToolbar(ToolbarSettings.builder().build());
+        }
 
         // Set Welcome FAQs
         if (request.getServiceSettings().getWelcomeFaqUids() != null
@@ -269,6 +274,10 @@ public class ServiceSettingsService {
         }
 
         ServiceSettings serviceSettings = modelMapper.map(request.getServiceSettings(), ServiceSettings.class);
+        // 确保 toolbar 非空（当请求未提供 toolbar 或映射覆盖为 null 时，使用默认全开）
+        if (serviceSettings.getToolbar() == null) {
+            serviceSettings.setToolbar(ToolbarSettings.builder().build());
+        }
 
         // Set Welcome FAQs
         if (request.getServiceSettings().getWelcomeFaqUids() != null

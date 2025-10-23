@@ -20,17 +20,9 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
-import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
-import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue.settings.QueueSettings;
 import com.bytedesk.core.member.MemberEntity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -89,22 +81,12 @@ public class AgentEntity extends BaseEntity {
     @Column(name = "is_connected")
     private Boolean connected = false;
 
-    // 留言设置
-    @Embedded
-    @Builder.Default
-    private MessageLeaveSettings messageLeaveSettings = new MessageLeaveSettings();
-
-    @Embedded
-    @Builder.Default
-    private ServiceSettings serviceSettings = new ServiceSettings();
-
-    @Embedded
-    @Builder.Default
-    private AutoReplySettings autoReplySettings = new AutoReplySettings();
-
-    @Embedded
-    @Builder.Default
-    private QueueSettings queueSettings = new QueueSettings();
+    /**
+     * Configuration template reference
+     * All settings are managed through the template
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    private AgentTemplateEntity template;
 
     // 最大同时接待数量
     @Builder.Default
@@ -136,18 +118,6 @@ public class AgentEntity extends BaseEntity {
     // org member
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
-
-    // 邀请设置
-    @ManyToOne(fetch = FetchType.LAZY)
-    private InviteSettingsEntity inviteSettings;
-
-    // 点踩设置
-    @ManyToOne(fetch = FetchType.LAZY)
-    private RatedownSettingsEntity rateDownSettings;
-
-    // 意图识别
-    @ManyToOne(fetch = FetchType.LAZY)
-    private IntentionSettingsEntity intentionSetting;
 
     public Boolean isAvailable() {
         return this.status.equals(AgentStatusEnum.AVAILABLE.name());

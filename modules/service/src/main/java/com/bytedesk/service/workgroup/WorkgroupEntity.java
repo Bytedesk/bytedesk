@@ -115,7 +115,15 @@ public class WorkgroupEntity extends BaseEntity {
     private String status = WorkgroupStateEnum.AVAILABLE.name();
 
     /**
+     * Configuration template reference (new approach)
+     * When set, settings from template take precedence over embedded fields
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    private WorkgroupTemplateEntity template;
+
+    /**
      * Settings for handling offline messages
+     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
      */
     @Embedded
     @Builder.Default
@@ -123,6 +131,7 @@ public class WorkgroupEntity extends BaseEntity {
 
     /**
      * Robot service configuration settings
+     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
      */
     @Embedded
     @Builder.Default
@@ -130,6 +139,7 @@ public class WorkgroupEntity extends BaseEntity {
 
     /**
      * General service configuration settings
+     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
      */
     @Embedded
     @Builder.Default
@@ -137,6 +147,7 @@ public class WorkgroupEntity extends BaseEntity {
 
     /**
      * Queue management settings
+     * (deprecated - use serviceTemplate instead, kept for backward compatibility)
      */
     @Embedded
     @Builder.Default
@@ -170,12 +181,14 @@ public class WorkgroupEntity extends BaseEntity {
 
     /**
      * Invitation settings for the workgroup
+     * (deprecated - use serviceTemplate.inviteSettings instead, kept for backward compatibility)
      */
     @ManyToOne(fetch = FetchType.LAZY)
     private InviteSettingsEntity inviteSettings;
 
     /**
      * Intent recognition settings
+     * (deprecated - use serviceTemplate.intentionSettings instead, kept for backward compatibility)
      */
     @ManyToOne(fetch = FetchType.LAZY)
     private IntentionSettingsEntity intentionSetting;
@@ -275,6 +288,78 @@ public class WorkgroupEntity extends BaseEntity {
             return 0;
         }
         return this.agents.stream().filter(agent -> agent.isAway()).count();
+    }
+
+    /**
+     * Get effective MessageLeaveSettings
+     * Priority: template > embedded field
+     */
+    @JsonIgnore
+    public MessageLeaveSettings getEffectiveMessageLeaveSettings() {
+        if (template != null && template.getMessageLeaveSettings() != null) {
+            return template.getMessageLeaveSettings();
+        }
+        return messageLeaveSettings;
+    }
+
+    /**
+     * Get effective ServiceSettings
+     * Priority: template > embedded field
+     */
+    @JsonIgnore
+    public ServiceSettings getEffectiveServiceSettings() {
+        if (template != null && template.getServiceSettings() != null) {
+            return template.getServiceSettings();
+        }
+        return serviceSettings;
+    }
+
+    /**
+     * Get effective RobotSettings
+     * Priority: template > embedded field
+     */
+    @JsonIgnore
+    public RobotSettings getEffectiveRobotSettings() {
+        if (template != null && template.getRobotSettings() != null) {
+            return template.getRobotSettings();
+        }
+        return robotSettings;
+    }
+
+    /**
+     * Get effective QueueSettings
+     * Priority: template > embedded field
+     */
+    @JsonIgnore
+    public QueueSettings getEffectiveQueueSettings() {
+        if (template != null && template.getQueueSettings() != null) {
+            return template.getQueueSettings();
+        }
+        return queueSettings;
+    }
+
+    /**
+     * Get effective InviteSettings
+     * Priority: template > direct field
+     */
+    @JsonIgnore
+    public InviteSettingsEntity getEffectiveInviteSettings() {
+        if (template != null && template.getInviteSettings() != null) {
+            return template.getInviteSettings();
+        }
+        return inviteSettings;
+    }
+
+    /**
+     * Get effective IntentionSettings
+     * Priority: template > direct field
+     */
+    @JsonIgnore
+    public IntentionSettingsEntity getEffectiveIntentionSettings() {
+        if (template != null && template.getIntentionSettings() != null) {
+            return template.getIntentionSettings();
+        }
+        return intentionSetting;
     }
     
 }

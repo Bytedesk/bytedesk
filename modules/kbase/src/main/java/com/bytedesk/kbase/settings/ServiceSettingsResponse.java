@@ -150,4 +150,7 @@ public class ServiceSettingsResponse implements Serializable {
     // 有效日期
     private Date validateUntil;
 
+    // 工具栏显示控制（固定字段，未设置则默认为显示）
+    private ToolbarSettings toolbar;
+
 }
