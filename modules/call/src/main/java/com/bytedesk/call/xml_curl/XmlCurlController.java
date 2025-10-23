@@ -2,17 +2,23 @@ package com.bytedesk.call.xml_curl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.http.HttpHeaders;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 最小可用的 mod_xml_curl HTTP 控制器。
@@ -27,190 +33,61 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "xmlcurl.enabled", havingValue = "true", matchIfMissing = false)
-@RequestMapping("/freeswitch/xmlcurl")
+// @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "xmlcurl.enabled", havingValue = "true", matchIfMissing = false)
+// @RequestMapping("/freeswitch/xmlcurl")
 public class XmlCurlController {
 
     private final XmlCurlService xmlCurlService;
 
-    @GetMapping(value = "", produces = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<String> fetch(
-            @RequestParam String type,
-            @RequestParam(required = false) String domain,
-            @RequestParam(required = false) String user,
-            @RequestParam(required = false) String context,
-            @RequestParam(required = false, name = "dest") String destinationNumber,
-            // directory 覆盖项
-            @RequestParam(required = false, name = "pwd") String password,
-            @RequestParam(required = false, name = "cid_name") String callerIdName,
-            @RequestParam(required = false, name = "cid_num") String callerIdNumber,
-            @RequestParam(required = false, name = "user_ctx") String userContext,
-            // dialplan 选项
-            @RequestParam(required = false, name = "bridge") String bridgeEndpoint,
-            @RequestParam(required = false, name = "playback") String playbackFile,
-            @RequestParam(required = false, name = "tts_engine") String ttsEngine,
-            @RequestParam(required = false, name = "tts_text") String ttsText,
-            @RequestParam(required = false, name = "sleep") Integer sleepMs,
-            @RequestParam(required = false, name = "no_answer") Boolean noAnswer,
-            @RequestParam(required = false, name = "ivr_menu") String ivrMenu,
-            @RequestParam(required = false, name = "queue") String queueName,
-            @RequestParam(required = false, name = "record") String recordFile,
-            // phrases/config
-            @RequestParam(required = false, name = "lang") String phrasesLang,
-            @RequestParam(required = false, name = "conf_name") String confName,
-            @RequestParam(required = false, name = "key_value") String confKeyValue,
-            // callcenter.conf 选项（可选）
-            @RequestParam(required = false, name = "cc_dsn") String ccDsn,
-            @RequestParam(required = false, name = "cc_client") String ccClientAddress,
-            @RequestParam(required = false, name = "cc_debug") String ccDebug,
-            @RequestParam(required = false, name = "cc_cdr") String ccCdrLogDir,
-            @RequestParam(required = false, name = "cc_create") String ccCreateTables,
-            @RequestHeader HttpHeaders headers) {
-        // 可在此处增加鉴权/签名/白名单校验
-        log.debug("xml_curl request: type={}, domain={}, user={}, context={}, dest={}", type, domain, user, context,
-                destinationNumber);
-
-        // 兼容 FreeSWITCH configuration 请求常见的 key_value 作为配置名
-        String finalConfName = (confName == null || confName.isBlank()) ? confKeyValue : confName;
-
-        String xml = route(type, domain, user, context, destinationNumber,
-                password, callerIdName, callerIdNumber, userContext,
-                bridgeEndpoint, playbackFile, ttsEngine, ttsText, sleepMs, noAnswer,
-                ivrMenu, queueName, recordFile,
-                phrasesLang, finalConfName,
-                ccDsn, ccClientAddress, ccDebug, ccCdrLogDir, ccCreateTables);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_XML)
-                .body(xml);
-    }
-
-    @PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<String> fetchPost(
-            @RequestParam MultiValueMap<String, String> form,
-            @RequestHeader HttpHeaders headers) {
-        // FreeSWITCH 常见 POST
-        // 字段兼容：section/type、domain/user/context、dest/destination_number/Caller-Destination-Number
-        String type = firstNonEmpty(form, "type", "section");
-        String domain = firstNonEmpty(form, "domain", "Realm");
-        String user = firstNonEmpty(form, "user", "User-Name");
-        String context = firstNonEmpty(form, "context");
-        String dest = firstNonEmpty(form, "dest", "destination_number", "Caller-Destination-Number");
-
-        // directory 覆盖项
-        String password = firstNonEmpty(form, "pwd", "Event-Calling-Function" /* placeholder fallback */);
-        String callerIdName = firstNonEmpty(form, "cid_name", "Caller-Caller-ID-Name");
-        String callerIdNumber = firstNonEmpty(form, "cid_num", "Caller-Caller-ID-Number");
-        String userContext = firstNonEmpty(form, "user_ctx", "user_context");
-        // dialplan 选项
-        String bridgeEndpoint = firstNonEmpty(form, "bridge");
-        String playbackFile = firstNonEmpty(form, "playback");
-        String ttsEngine = firstNonEmpty(form, "tts_engine");
-        String ttsText = firstNonEmpty(form, "tts_text");
-        Integer sleepMs = parseInt(firstNonEmpty(form, "sleep"));
-        Boolean noAnswer = parseBoolean(firstNonEmpty(form, "no_answer"));
-        String ivrMenu = firstNonEmpty(form, "ivr_menu");
-        String queueName = firstNonEmpty(form, "queue");
-        String recordFile = firstNonEmpty(form, "record");
-        // phrases/config
-        String phrasesLang = firstNonEmpty(form, "lang");
-        String confName = firstNonEmpty(form, "conf_name", "key_value");
-        String ccDsn = firstNonEmpty(form, "cc_dsn");
-        String ccClientAddress = firstNonEmpty(form, "cc_client");
-        String ccDebug = firstNonEmpty(form, "cc_debug");
-        String ccCdrLogDir = firstNonEmpty(form, "cc_cdr");
-        String ccCreateTables = firstNonEmpty(form, "cc_create");
-
-        log.debug("xml_curl POST: type={}, domain={}, user={}, context={}, dest={}", type, domain, user, context, dest);
-
-        if (type == null || type.isBlank()) {
-            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_XML)
-                    .body(xmlCurlService.buildError("bad_request", "missing type/section"));
-        }
-
-        String xml = route(type, domain, user, context, dest,
-                password, callerIdName, callerIdNumber, userContext,
-                bridgeEndpoint, playbackFile, ttsEngine, ttsText, sleepMs, noAnswer,
-                ivrMenu, queueName, recordFile,
-                phrasesLang, confName,
-                ccDsn, ccClientAddress, ccDebug, ccCdrLogDir, ccCreateTables);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_XML).body(xml);
-    }
-
-    private String route(String type, String domain, String user, String context, String destinationNumber,
-            String password, String callerIdName, String callerIdNumber, String userContext,
-            String bridgeEndpoint, String playbackFile, String ttsEngine, String ttsText, Integer sleepMs,
-            Boolean noAnswer,
-            String ivrMenu, String queueName, String recordFile,
-            String phrasesLang, String confName,
-            String ccDsn, String ccClientAddress, String ccDebug, String ccCdrLogDir, String ccCreateTables) {
-        switch (type) {
-            case "directory":
-            case "directory_user":
-                DirectoryOptions dOpt = DirectoryOptions.builder()
-                        .password(password)
-                        .callerIdName(callerIdName)
-                        .callerIdNumber(callerIdNumber)
-                        .userContext(userContext)
-                        .build();
-                return xmlCurlService.buildDirectoryUser(domain, user, dOpt);
-            case "dialplan":
-                DialplanOptions dpOpt = DialplanOptions.builder()
-                        .bridgeEndpoint(bridgeEndpoint)
-                        .playbackFile(playbackFile)
-                        .ttsEngine(ttsEngine)
-                        .ttsText(ttsText)
-                        .sleepMs(sleepMs)
-                        .noAnswer(noAnswer)
-                        .ivrMenu(ivrMenu)
-                        .queueName(queueName)
-                        .recordFile(recordFile)
-                        .build();
-                return xmlCurlService.buildDialplan(context, destinationNumber, dpOpt);
-            case "phrases":
-                return xmlCurlService.buildPhrases(phrasesLang);
-            case "configuration":
-                if (confName != null
-                        && ("callcenter".equalsIgnoreCase(confName) || "callcenter.conf".equalsIgnoreCase(confName))) {
-                    CallcenterOptions cc = CallcenterOptions.builder()
-                            .odbcDsn(ccDsn)
-                            .clientAddress(ccClientAddress)
-                            .debug(ccDebug)
-                            .cdrLogDir(ccCdrLogDir)
-                            .createTables(ccCreateTables)
-                            .build();
-                    return xmlCurlService.buildConfiguration(confName, cc);
-                }
-                return xmlCurlService.buildConfiguration(confName);
-            default:
-                return xmlCurlService.buildNotFound();
-        }
-    }
-
-    private static String firstNonEmpty(MultiValueMap<String, String> form, String... keys) {
-        for (String k : keys) {
-            if (form.containsKey(k)) {
-                for (String v : form.get(k)) {
-                    if (v != null && !v.isBlank()) {
-                        return v;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private static Integer parseInt(String v) {
+    @RequestMapping(value = {"/fs-xml", "/xmlcurl"}, method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/xml;charset=UTF-8")
+    public @ResponseBody byte[] fsXml(@RequestParam MultiValueMap<String, String> paramsRaw, HttpServletRequest request) {
+        // 记录请求来源与代理链（ngrok）信息，定位转发问题
         try {
-            return v == null ? null : Integer.parseInt(v);
-        } catch (Exception e) {
-            return null;
+            String remote = (request.getRemoteAddr() == null ? "" : request.getRemoteAddr()) + ":" + request.getRemotePort();
+            String xff = safe(request.getHeader("X-Forwarded-For"));
+            String xfp = safe(request.getHeader("X-Forwarded-Proto"));
+            String xfh = safe(request.getHeader("X-Forwarded-Host"));
+            String ua = truncate(safe(request.getHeader("User-Agent")), 160);
+            String ct = safe(request.getContentType());
+            String qs = safe(request.getQueryString());
+            log.info("XML-CURL remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}'", remote, xff, xfp, xfh, ua, ct, qs);
+        } catch (Exception ignore) {}
+        Map<String, String> p = normalize(paramsRaw);
+        String section = p.getOrDefault("section", "").toLowerCase(Locale.ROOT);
+        switch (section) {
+            case "dialplan":
+                return xmlCurlService.handleDialplan(p);
+            case "directory":
+                return xmlCurlService.handleDirectory(p);
+            case "configuration":
+                return xmlCurlService.handleConfiguration(p);
+            case "phrases":
+                return xmlCurlService.handlePhrases(p);
+            default:
+                return xmlCurlService.resultNotFound();
         }
     }
 
-    private static Boolean parseBoolean(String v) {
-        if (v == null)
-            return null;
-        return "1".equals(v) || "true".equalsIgnoreCase(v) || "yes".equalsIgnoreCase(v);
+    // 健康检查（用于 ngrok/反向代理连通性排查）
+    @GetMapping(value = "/_healthz", produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String health() { return "OK"; }
+
+    private static Map<String, String> normalize(MultiValueMap<String, String> raw) {
+        Map<String, String> m = new HashMap<>();
+        for (Map.Entry<String, java.util.List<String>> e : raw.entrySet()) {
+            String k = e.getKey();
+            String v = (e.getValue() != null && !e.getValue().isEmpty()) ? e.getValue().get(0) : "";
+            try { v = URLDecoder.decode(v, StandardCharsets.UTF_8.name()); } catch (Exception ignore) {}
+            m.put(k, v);
+            m.putIfAbsent("variable_" + k, v);
+            m.putIfAbsent(k.toUpperCase(Locale.ROOT), v);
+        }
+        return m;
+    }
+
+    private static String safe(String s) { return s == null ? "" : s; }
+    private static String truncate(String s, int max) {
+        if (s == null) return "";
+        return s.length() <= max ? s : s.substring(0, max) + "...";
     }
 }

@@ -1,5 +1,13 @@
 package com.bytedesk.call.xml_curl;
 
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,314 +17,189 @@ import org.springframework.stereotype.Service;
 @Service
 public class XmlCurlService {
 
-    /**
-     * 生成 Directory 用户 XML。
-     * 
-     * @param domain 域名
-     * @param user   用户/分机号
-     * @return freeswitch xml 文档
-     */
-    public String buildDirectoryUser(String domain, String user) {
-        String safeDomain = (domain == null || domain.isBlank()) ? "default" : domain;
-        String safeUser = (user == null || user.isBlank()) ? "1000" : user;
-        // 注意：password 为示例，生产需从安全存储读取并加固
-        String password = "1234";
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"directory\">\n" +
-                "    <domain name=\"" + xml(safeDomain) + "\">\n" +
-                "      <user id=\"" + xml(safeUser) + "\">\n" +
-                "        <params>\n" +
-                "          <param name=\"password\" value=\"" + xml(password) + "\"/>\n" +
-                "        </params>\n" +
-                "        <variables>\n" +
-                "          <variable name=\"effective_caller_id_name\" value=\"" + xml(safeUser) + "\"/>\n" +
-                "          <variable name=\"effective_caller_id_number\" value=\"" + xml(safeUser) + "\"/>\n" +
-                "          <variable name=\"user_context\" value=\"default\"/>\n" +
-                "        </variables>\n" +
-                "      </user>\n" +
-                "    </domain>\n" +
-                "  </section>\n" +
-                "</document>\n";
-    }
+    // 开关：默认全部关闭，仅在联调或按需开启对应 section 的动态返回
+    private static final boolean ENABLE_DIALPLAN       = boolEnv("XMLCURL_ENABLE_DIALPLAN", false);
+    private static final boolean ENABLE_DIRECTORY      = boolEnv("XMLCURL_ENABLE_DIRECTORY", false);
+    private static final boolean ENABLE_CONFIGURATION  = boolEnv("XMLCURL_ENABLE_CONFIGURATION", false);
+    private static final boolean ENABLE_PHRASES        = boolEnv("XMLCURL_ENABLE_PHRASES", false);
 
-    /**
-     * 生成 Directory 用户 XML，支持可选覆盖项。
-     */
-    public String buildDirectoryUser(String domain, String user, DirectoryOptions options) {
-        String safeDomain = (domain == null || domain.isBlank()) ? "default" : domain;
-        String safeUser = (user == null || user.isBlank()) ? "1000" : user;
-        String password = options != null && options.getPassword() != null && !options.getPassword().isBlank()
-                ? options.getPassword()
-                : "1234";
-        String cidName = options != null && options.getCallerIdName() != null && !options.getCallerIdName().isBlank()
-                ? options.getCallerIdName()
-                : safeUser;
-        String cidNumber = options != null && options.getCallerIdNumber() != null
-                && !options.getCallerIdNumber().isBlank() ? options.getCallerIdNumber() : safeUser;
-        String userCtx = options != null && options.getUserContext() != null && !options.getUserContext().isBlank()
-                ? options.getUserContext()
-                : "default";
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"directory\">\n" +
-                "    <domain name=\"" + xml(safeDomain) + "\">\n" +
-                "      <user id=\"" + xml(safeUser) + "\">\n" +
-                "        <params>\n" +
-                "          <param name=\"password\" value=\"" + xml(password) + "\"/>\n" +
-                "        </params>\n" +
-                "        <variables>\n" +
-                "          <variable name=\"effective_caller_id_name\" value=\"" + xml(cidName) + "\"/>\n" +
-                "          <variable name=\"effective_caller_id_number\" value=\"" + xml(cidNumber) + "\"/>\n" +
-                "          <variable name=\"user_context\" value=\"" + xml(userCtx) + "\"/>\n" +
-                "        </variables>\n" +
-                "      </user>\n" +
-                "    </domain>\n" +
-                "  </section>\n" +
-                "</document>\n";
-    }
+    // directory 用户清单（user@domain:password），未写域名默认 default
+    private static final Map<String, String> DIRECTORY_USERS = usersEnv("XMLCURL_DIRECTORY_USERS", "1000@default:1234");
+    // configuration 白名单（示例："ivr.conf,acl.conf"），默认空：不返回任何配置，由本地接管
+    private static final Set<String> CONFIG_WHITELIST = csvEnv("XMLCURL_CONFIG_WHITELIST", "");
 
-    /**
-     * 生成 Dialplan XML（示例：简单应答并挂断；可据 context/destination_number 定制）。
-     */
-    public String buildDialplan(String context, String destinationNumber) {
-        String ctx = (context == null || context.isBlank()) ? "default" : context;
-        String dest = (destinationNumber == null || destinationNumber.isBlank()) ? "(.*)" : destinationNumber;
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public byte[] handleDialplan(Map<String, String> p) {
+        if (!ENABLE_DIALPLAN) return resultNotFound();
+        String context = pick(p, "Caller-Context", "context", "variable_context");
+        if (context == null || context.isBlank()) context = "default";
+        String dest = pick(p, "Caller-Destination-Number", "destination_number", "variable_destination_number");
+        if (dest == null) return resultNotFound();
+        // 示例：仅对 9297 返回一个最小拨号计划片段（长音播放），其余走本地
+        if (!dest.equals("9297")) return resultNotFound();
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"dialplan\" description=\"Bytedesk XML Curl Dialplan\">\n" +
-                "    <context name=\"" + xml(ctx) + "\">\n" +
-                "      <extension name=\"xmlcurl_demo\">\n" +
-                "        <condition field=\"destination_number\" expression=\"^" + xml(dest) + "$\">\n" +
+                "  <section name=\"dialplan\">\n" +
+                "    <context name=\"" + xmlEscape(context) + "\">\n" +
+                "      <extension name=\"xmlcurl-9297-demo\">\n" +
+                "        <condition field=\"destination_number\" expression=\"^9297$\">\n" +
                 "          <action application=\"answer\"/>\n" +
-                "          <action application=\"sleep\" data=\"500\"/>\n" +
+                "          <action application=\"playback\" data=\"tone_stream://%(30000,0,440)\"/>\n" +
                 "          <action application=\"hangup\"/>\n" +
                 "        </condition>\n" +
                 "      </extension>\n" +
                 "    </context>\n" +
                 "  </section>\n" +
                 "</document>\n";
+        return xml.getBytes(StandardCharsets.UTF_8);
     }
 
-    /**
-     * 生成 Dialplan XML，支持可选自定义动作（bridge/playback/tts/noAnswer/sleep）。
-     */
-    public String buildDialplan(String context, String destinationNumber, DialplanOptions options) {
-        String ctx = (context == null || context.isBlank()) ? "default" : context;
-        String dest = (destinationNumber == null || destinationNumber.isBlank()) ? "(.*)" : destinationNumber;
-        StringBuilder actions = new StringBuilder();
-        boolean noAnswer = options != null && Boolean.TRUE.equals(options.getNoAnswer());
-        Integer sleepMs = options != null ? options.getSleepMs() : null;
-        String playback = options != null ? options.getPlaybackFile() : null;
-        String ttsEngine = options != null ? options.getTtsEngine() : null;
-        String ttsText = options != null ? options.getTtsText() : null;
-        String bridge = options != null ? options.getBridgeEndpoint() : null;
-        String ivrMenu = options != null ? options.getIvrMenu() : null;
-        String queueName = options != null ? options.getQueueName() : null;
-        String recordFile = options != null ? options.getRecordFile() : null;
-
-        if (!noAnswer) {
-            actions.append("          <action application=\"answer\"/>\n");
+    public byte[] handleDirectory(Map<String, String> p) {
+        if (!ENABLE_DIRECTORY) return resultNotFound();
+        String user = pick(p, "user", "User", "login", "variable_user_name", "Caller-Username");
+        String domain = pick(p, "domain", "Domain", "variable_domain_name", "sip_from_host");
+        if (domain == null || domain.isBlank()) domain = "default";
+        if (user == null || user.isBlank()) return resultNotFound();
+        String key = (user + "@" + domain).toLowerCase(Locale.ROOT);
+        String pwd = DIRECTORY_USERS.get(key);
+        if (pwd == null) {
+            // 兼容仅配置 user:pwd 的情况（默认 domain=default）
+            pwd = DIRECTORY_USERS.get((user + "@default").toLowerCase(Locale.ROOT));
         }
-        if (recordFile != null && !recordFile.isBlank()) {
-            actions.append("          <action application=\"record_session\" data=\"" + xml(recordFile) + "\"/>\n");
-        }
-        if (sleepMs != null && sleepMs > 0) {
-            actions.append("          <action application=\"sleep\" data=\"" + sleepMs + "\"/>\n");
-        }
-        if (ttsEngine != null && !ttsEngine.isBlank() && ttsText != null && !ttsText.isBlank()) {
-            actions.append("          <action application=\"tts_commandline\" data=\"" + xml(ttsEngine) + "|"
-                    + xml(ttsText) + "\"/>\n");
-        }
-        if (playback != null && !playback.isBlank()) {
-            actions.append("          <action application=\"playback\" data=\"" + xml(playback) + "\"/>\n");
-        }
-        if (ivrMenu != null && !ivrMenu.isBlank()) {
-            actions.append("          <action application=\"ivr\" data=\"" + xml(ivrMenu) + "\"/>\n");
-        }
-        if (queueName != null && !queueName.isBlank()) {
-            actions.append("          <action application=\"callcenter\" data=\"" + xml(queueName) + "\"/>\n");
-        }
-        if (bridge != null && !bridge.isBlank()) {
-            actions.append("          <action application=\"bridge\" data=\"" + xml(bridge) + "\"/>\n");
-        } else {
-            // 默认动作
-            actions.append("          <action application=\"sleep\" data=\"500\"/>\n");
-            actions.append("          <action application=\"hangup\"/>\n");
-        }
-
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        if (pwd == null) return resultNotFound();
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"dialplan\" description=\"Bytedesk XML Curl Dialplan\">\n" +
-                "    <context name=\"" + xml(ctx) + "\">\n" +
-                "      <extension name=\"xmlcurl_dynamic\">\n" +
-                "        <condition field=\"destination_number\" expression=\"^" + xml(dest) + "$\">\n" +
-                actions.toString() +
-                "        </condition>\n" +
-                "      </extension>\n" +
-                "    </context>\n" +
+                "  <section name=\"directory\">\n" +
+                "    <domain name=\"" + xmlEscape(domain) + "\">\n" +
+                "      <user id=\"" + xmlEscape(user) + "\">\n" +
+                "        <params>\n" +
+                "          <param name=\"password\" value=\"" + xmlEscape(pwd) + "\"/>\n" +
+                "        </params>\n" +
+                "        <variables>\n" +
+                "          <variable name=\"user_context\" value=\"default\"/>\n" +
+                "        </variables>\n" +
+                "      </user>\n" +
+                "    </domain>\n" +
                 "  </section>\n" +
                 "</document>\n";
+        return xml.getBytes(StandardCharsets.UTF_8);
     }
 
-    /**
-     * 标准错误 XML。
-     */
-    public String buildError(String code, String message) {
-        String c = (code == null || code.isBlank()) ? "error" : code;
-        String m = (message == null || message.isBlank()) ? "unknown" : message;
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"result\">\n" +
-                "    <result status=\"not found\" code=\"" + xml(c) + "\" text=\"" + xml(m) + "\"/>\n" +
-                "  </section>\n" +
-                "</document>\n";
+    public byte[] handleConfiguration(Map<String, String> p) {
+        if (!ENABLE_CONFIGURATION) return resultNotFound();
+        String cfgName = pick(p, "key_value", "Configuration-Name", "configuration", "name");
+        if (cfgName == null || cfgName.isBlank()) return resultNotFound();
+        cfgName = cfgName.trim();
+        if (!CONFIG_WHITELIST.contains(cfgName)) return resultNotFound();
+        if (cfgName.equals("ivr.conf")) {
+            String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "<document type=\"freeswitch/xml\">\n" +
+                    "  <section name=\"configuration\">\n" +
+                    "    <configuration name=\"ivr.conf\" description=\"xml_curl demo\">\n" +
+                    "      <menus/>\n" +
+                    "      <phrases/>\n" +
+                    "    </configuration>\n" +
+                    "  </section>\n" +
+                    "</document>\n";
+            return xml.getBytes(StandardCharsets.UTF_8);
+        }
+        return resultNotFound();
     }
 
-    /**
-     * 未找到/无匹配结果 XML。
-     */
-    public String buildNotFound() {
-        return buildError("not_found", "no matching document");
-    }
-
-    /**
-     * phrases 示例，用于 mod_phrases（基础示例）。
-     */
-    public String buildPhrases(String lang) {
-        String l = (lang == null || lang.isBlank()) ? "en" : lang;
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public byte[] handlePhrases(Map<String, String> p) {
+        if (!ENABLE_PHRASES) return resultNotFound();
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<document type=\"freeswitch/xml\">\n" +
                 "  <section name=\"phrases\">\n" +
-                "    <macros language=\"" + xml(l) + "\">\n" +
-                "      <macro name=\"welcome\">\n" +
-                "        <input pattern=\"(.*)\">\n" +
-                "          <match>\n" +
-                "            <action function=\"play-file\" data=\"ivr/ivr-welcome_to_freeswitch.wav\"/>\n" +
-                "          </match>\n" +
-                "        </input>\n" +
+                "    <macros>\n" +
+                "      <macro name=\"xmlcurl-demo\">\n" +
+                "        <input pattern=\"(.*)\"/>\n" +
+                "        <match>\n" +
+                "          <action function=\"speak-text\" data=\"unimrcp:default:你好，这里是 xml_curl 短语演示。\"/>\n" +
+                "        </match>\n" +
                 "      </macro>\n" +
                 "    </macros>\n" +
                 "  </section>\n" +
                 "</document>\n";
+        return xml.getBytes(StandardCharsets.UTF_8);
     }
 
-    /**
-     * configuration 示例（非常简化，仅占位）。
-     */
-    public String buildConfiguration(String name) {
-        String n = (name == null || name.isBlank()) ? "example" : name;
-        // 动态下发 ivr.conf（最小可用演示），便于通过 <action application="ivr" data="main_menu"/> 启动菜单
-        if ("ivr".equalsIgnoreCase(n) || "ivr.conf".equalsIgnoreCase(n)) {
-            return buildIvrConf();
-        }
-        // 动态下发 callcenter.conf（最小可用演示）
-        if ("callcenter".equalsIgnoreCase(n) || "callcenter.conf".equalsIgnoreCase(n)) {
-            return buildCallcenterConf(null);
-        }
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public byte[] resultNotFound() {
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"configuration\">\n" +
-                "    <configuration name=\"" + xml(n) + ".conf\" description=\"Bytedesk dynamic config\">\n" +
-                "      <settings>\n" +
-                "        <param name=\"dummy\" value=\"true\"/>\n" +
-                "      </settings>\n" +
-                "    </configuration>\n" +
+                "  <section name=\"result\">\n" +
+                "    <result status=\"not found\"/>\n" +
                 "  </section>\n" +
                 "</document>\n";
+        return xml.getBytes(StandardCharsets.UTF_8);
     }
 
-        public String buildConfiguration(String name, CallcenterOptions cc) {
-            String n = (name == null || name.isBlank()) ? "example" : name;
-            if ("callcenter".equalsIgnoreCase(n) || "callcenter.conf".equalsIgnoreCase(n)) {
-                return buildCallcenterConf(cc);
-            }
-            return buildConfiguration(n);
+    // --- helpers ---
+    private static String pick(Map<String, String> m, String... keys) {
+        for (String k : keys) {
+            String v = m.get(k);
+            if (v != null && !v.isBlank()) return v;
         }
-
-    /**
-     * 生成最小可用的 ivr.conf，用于演示/默认 IVR 菜单。
-     * 菜单名：main_menu
-     * - 1 转 1000（XML default）
-     * - 2 转 2000（XML default）
-     * - 0 转 1000（人工）
-     * - * 退出
-     */
-    private String buildIvrConf() {
-        return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"configuration\">\n" +
-                "    <configuration name=\"ivr.conf\" description=\"Bytedesk dynamic IVR\">\n" +
-                "      <menus>\n" +
-                "        <menu name=\"main_menu\"\n" +
-                "              greet-long=\"ivr/ivr-welcome_to_freeswitch.wav\"\n" +
-                "              greet-short=\"ivr/ivr-welcome_to_freeswitch.wav\"\n" +
-                "              invalid-sound=\"ivr/ivr-that_was_an_invalid_entry.wav\"\n" +
-                "              exit-sound=\"voicemail/vm-goodbye.wav\"\n" +
-                "              timeout=\"5000\" max-failures=\"3\" digit-len=\"1\">\n" +
-                "          <entry action=\"menu-exit\" digits=\"*\"/>\n" +
-                "          <entry action=\"transfer\" digits=\"1\" data=\"1000 XML default\"/>\n" +
-                "          <entry action=\"transfer\" digits=\"2\" data=\"2000 XML default\"/>\n" +
-                "          <entry action=\"transfer\" digits=\"0\" data=\"1000 XML default\"/>\n" +
-                "        </menu>\n" +
-                "      </menus>\n" +
-                "    </configuration>\n" +
-                "  </section>\n" +
-                "</document>\n";
+        return null;
     }
 
-        /**
-         * 生成最小可用的 callcenter.conf。
-         * 优先使用 ODBC DSN；未提供时仅输出基础 settings。
-         */
-        private String buildCallcenterConf(CallcenterOptions opt) {
-            String odbc = opt != null && opt.getOdbcDsn() != null && !opt.getOdbcDsn().isBlank() ? opt.getOdbcDsn() : null;
-            String clientAddr = opt != null && opt.getClientAddress() != null && !opt.getClientAddress().isBlank() ? opt.getClientAddress() : "127.0.0.1";
-            String debug = opt != null && opt.getDebug() != null && !opt.getDebug().isBlank() ? opt.getDebug() : "0";
-            String cdr = opt != null && opt.getCdrLogDir() != null && !opt.getCdrLogDir().isBlank() ? opt.getCdrLogDir() : null;
-            String create = opt != null && opt.getCreateTables() != null && !opt.getCreateTables().isBlank() ? opt.getCreateTables() : null;
+    private static String xmlEscape(String s) {
+        if (s == null) return "";
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&apos;");
+    }
 
-            StringBuilder settings = new StringBuilder();
-            settings.append("      <settings>\n");
-            if (odbc != null) {
-                settings.append("        <param name=\"odbc-dsn\" value=\"" + xml(odbc) + "\"/>\n");
-            }
-            settings.append("        <param name=\"cc-client-address\" value=\"" + xml(clientAddr) + "\"/>\n");
-            settings.append("        <param name=\"debug-level\" value=\"" + xml(debug) + "\"/>\n");
-            if (cdr != null) {
-                settings.append("        <param name=\"queue-cdr-log-dir\" value=\"" + xml(cdr) + "\"/>\n");
-            }
-            if (create != null) {
-                settings.append("        <param name=\"create-tables\" value=\"" + xml(create) + "\"/>\n");
-            }
-            settings.append("      </settings>\n");
+    private static boolean boolEnv(String key, boolean def) {
+        String v = System.getenv(key);
+        if (v == null) return def;
+        v = v.trim().toLowerCase(Locale.ROOT);
+        return v.equals("1") || v.equals("true") || v.equals("yes");
+    }
 
-            return "" +
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<document type=\"freeswitch/xml\">\n" +
-                "  <section name=\"configuration\">\n" +
-                "    <configuration name=\"callcenter.conf\" description=\"Bytedesk dynamic Callcenter\">\n" +
-                     settings.toString() +
-                "      <queues>\n" +
-                "        <!-- 按需通过 ESL 或 DB 初始化队列/agent/binding；也可在此静态下发 -->\n" +
-                "      </queues>\n" +
-                "    </configuration>\n" +
-                "  </section>\n" +
-                "</document>\n";
+    private static Map<String, String> usersEnv(String key, String def) {
+        String v = Optional.ofNullable(System.getenv(key)).filter(s -> !s.isBlank()).orElse(def);
+        Map<String, String> m = new HashMap<>();
+        for (String item : v.split(",")) {
+            String t = item.trim();
+            if (t.isEmpty()) continue;
+            int i = t.indexOf(':');
+            if (i <= 0) continue;
+            String left = t.substring(0, i).trim();
+            String pwd = t.substring(i + 1).trim();
+            String user;
+            String dom;
+            int j = left.indexOf('@');
+            if (j > 0) { user = left.substring(0, j); dom = left.substring(j + 1); }
+            else { user = left; dom = "default"; }
+            if (!user.isEmpty()) {
+                m.put((user + "@" + dom).toLowerCase(Locale.ROOT), pwd);
+            }
         }
+        return m;
+    }
 
-    private static String xml(String s) {
-        return s.replace("&", "&amp;")
-                .replace("\"", "&quot;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
+    private static Set<String> csvEnv(String key, String def) {
+        String v = Optional.ofNullable(System.getenv(key)).filter(s -> !s.isBlank()).orElse(def);
+        Set<String> set = new HashSet<>();
+        for (String p : v.split(",")) {
+            String token = p.trim();
+            if (token.isEmpty()) continue;
+            // 支持数字范围：如 1000-1019
+            if (token.matches("\\d+\\-\\d+")) {
+                try {
+                    String[] parts = token.split("-");
+                    int start = Integer.parseInt(parts[0]);
+                    int end = Integer.parseInt(parts[1]);
+                    if (start <= end && (end - start) <= 10000) {
+                        for (int i = start; i <= end; i++) {
+                            set.add(String.valueOf(i));
+                        }
+                        continue;
+                    }
+                } catch (NumberFormatException ignore) {
+                    // fallthrough
+                }
+            }
+            set.add(token);
+        }
+        return set;
     }
 }

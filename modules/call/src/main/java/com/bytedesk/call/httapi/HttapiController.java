@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class HttapiController {
 
     private final LlmClient llm;
-    
+
     // Accept GET and POST and be tolerant about Content-Type so FreeSWITCH requests
     // that don't set exact Content-Type still hit this handler.
     @RequestMapping(value = "/ai-bot", method = {RequestMethod.POST, RequestMethod.GET}, produces = "text/xml;charset=UTF-8")
@@ -45,14 +45,26 @@ public class HttapiController {
             }
         }
         String turn = vars.getOrDefault("turn", vars.getOrDefault("variable_turn", "1"));
-        boolean mrcpReady = mrcpUp("127.0.0.1", 8060, 300);
+        // MRCP 连通性探测：默认关闭（避免分离部署/容器环境中误判）。
+        // 可通过环境变量 HTTAPI_MRCP_PROBE=true 与 HTTAPI_MRCP_HOST/PORT 开启。
+        boolean probe = Boolean.parseBoolean(System.getenv().getOrDefault("HTTAPI_MRCP_PROBE", "false"));
+        String mrcpHost = System.getenv().getOrDefault("HTTAPI_MRCP_HOST", "127.0.0.1");
+        int mrcpPort = parseIntOrDefault(System.getenv().get("HTTAPI_MRCP_PORT"), 8060);
+        boolean mrcpReady = probe && mrcpUp(mrcpHost, mrcpPort, 300);
 
         // -- Incoming request trace for troubleshooting no-audio/hangup on 9201
         try {
             String botDid = Optional.ofNullable(vars.get("bot_did")).orElse(vars.getOrDefault("variable_bot_did", ""));
             String modeReq = Optional.ofNullable(vars.get("mode")).orElse(vars.getOrDefault("variable_mode", ""));
-            log.info("HTTAPI /ai-bot turn={} mode='{}' bot_did='{}' mrcpReady={} paramKeys={}",
-                    turn, modeReq, botDid, mrcpReady, vars.keySet());
+            String remote = safe(request.getRemoteAddr()) + ":" + request.getRemotePort();
+            String xff = safe(request.getHeader("X-Forwarded-For"));
+            String xfp = safe(request.getHeader("X-Forwarded-Proto"));
+            String xfh = safe(request.getHeader("X-Forwarded-Host"));
+            String ua = safe(request.getHeader("User-Agent"));
+            String ct = safe(request.getContentType());
+            String qs = safe(request.getQueryString());
+            log.info("HTTAPI /ai-bot turn={} mode='{}' bot_did='{}' mrcpReady={} (probe={}) remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}' paramKeys={}",
+                    turn, modeReq, botDid, mrcpReady, probe, remote, xff, xfp, xfh, truncate(ua, 120), ct, qs, vars.keySet());
             // Key recognition variables snapshot (shortened)
             String recog = Optional.ofNullable(vars.get("RECOG_RESULT")).orElse(vars.getOrDefault("variable_RECOG_RESULT", ""));
             String dsrt = Optional.ofNullable(vars.get("detect_speech_result_text")).orElse(vars.getOrDefault("variable_detect_speech_result_text", ""));
@@ -60,23 +72,15 @@ public class HttapiController {
         } catch (Exception ignore) {
         }
 
-    if ("1".equals(turn)) {
-        return firstTurn(vars, mrcpReady);
+        if ("1".equals(turn)) {
+            return firstTurn(vars /* no longer gate by mrcpReady */);
         }
-        return secondTurn(vars, mrcpReady);
+        return secondTurn(vars /* no longer gate by mrcpReady */);
     }
 
-    private byte[] firstTurn(Map<String, String> vars, boolean mrcpReady) {
+    private byte[] firstTurn(Map<String, String> vars) {
         HttapiXml x = new HttapiXml();
-        log.info("HTTAPI firstTurn mrcpReady={}", mrcpReady);
-    if (!mrcpReady) {
-            log.warn("UniMRCP server not reachable, using local fallback");
-            x.execute("answer", null);
-            x.execute("playback", "tone_stream://%(500,1000,440)");
-            x.execute("sleep", "200");
-            x.breakTag();
-            return x.build().getBytes(StandardCharsets.UTF_8);
-        }
+        log.info("HTTAPI firstTurn (no MRCP gating)");
     // 读取可选参数：setup（仅下发变量，不直接播报）、greet/greet_ssml（覆盖默认问候）
     String setup = Optional.ofNullable(vars.get("setup"))
         .orElse(vars.getOrDefault("variable_setup", ""))
@@ -93,28 +97,29 @@ public class HttapiController {
         ? customSsml
         : "<speak version='1.0' xml:lang='zh-CN'><p>" + HttapiXml.xmlEscape(greetText) + "</p></speak>";
 
-    // 下发变量给拨号计划，以便在本地使用 speak 播报（避免 HTTAPI 返回与后续步骤的竞态）
+        // 下发变量给拨号计划，以便在本地使用 speak 播报（避免 HTTAPI 返回与后续步骤的竞态）
     x.execute("export", "greet_ssml=" + greetSsml);
     x.execute("export", "greet_done=1");
     x.execute("set", "bot_state=awaiting_user");
 
-    // 若未指定 setup=1/true，则兼容性起见也在 HTTAPI 侧直接播报一遍（供通用入口使用）
-    boolean doSpeakHere = !("1".equals(setup) || "true".equals(setup));
-    if (doSpeakHere) {
-        x.execute("answer", null);
-        x.execute("set", "tts_engine=unimrcp");
-        x.execute("set", "tts_profile=baidu");
-        x.execute("set", "unimrcp:profile=baidu");
-        x.execute("set", "synth-content-type=application/ssml+xml");
-        x.execute("set", "unimrcp:header:Speech-Language=zh-CN");
-        x.speakSsml("unimrcp", greetSsml);
+        // 若未指定 setup=1/true，则在 HTTAPI 侧播报一遍（供通用入口使用）。
+        // 注意：不再做“MRCP 不可达”嘟声兜底，以免与拨号计划/代理时序打架。
+        boolean doSpeakHere = !("1".equals(setup) || "true".equals(setup));
+        if (doSpeakHere) {
+            x.execute("answer", null);
+            x.execute("set", "tts_engine=unimrcp");
+            x.execute("set", "tts_profile=baidu");
+            x.execute("set", "unimrcp:profile=baidu");
+            x.execute("set", "synth-content-type=application/ssml+xml");
+            x.execute("set", "unimrcp:header:Speech-Language=zh-CN");
+            x.speakSsml("unimrcp", greetSsml);
+        }
+
+        x.breakTag();
+        return x.build().getBytes(StandardCharsets.UTF_8);
     }
 
-    x.breakTag();
-    return x.build().getBytes(StandardCharsets.UTF_8);
-    }
-
-    private byte[] secondTurn(Map<String, String> vars, boolean mrcpReady) {
+    private byte[] secondTurn(Map<String, String> vars) {
         HttapiXml x = new HttapiXml();
         String userText = pickFirstNonEmpty(vars,
                 "RECOG_RESULT","detect_speech_result_text","speech_detection_result",
@@ -133,17 +138,8 @@ public class HttapiController {
                 .trim().toLowerCase(Locale.ROOT);
         boolean exitRequested = containsExitIntent(userText);
 
-        log.info("HTTAPI secondTurn mode='{}' mrcpReady={} exitIntent={} userText='{}'",
-                mode, mrcpReady, exitRequested, truncate(userText, 200));
-
-        if (!mrcpReady) {
-            log.warn("UniMRCP server not reachable, using local fallback");
-            x.execute("answer", null);
-            // 兜底仅播放提示音，避免依赖本地语音包与复杂逻辑
-            x.execute("playback", "tone_stream://%(500,1000,440)");
-            x.breakTag();
-            return x.build().getBytes(StandardCharsets.UTF_8);
-        }
+        log.info("HTTAPI secondTurn mode='{}' exitIntent={} userText='{}' (no MRCP gating)",
+                mode, exitRequested, truncate(userText, 200));
 
         if (userText == null || userText.isBlank()) {
             x.execute("set", "synth-content-type=application/ssml+xml");
@@ -197,6 +193,15 @@ public class HttapiController {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static int parseIntOrDefault(String s, int def) {
+        if (s == null || s.isBlank()) return def;
+        try { return Integer.parseInt(s.trim()); } catch (Exception ignore) { return def; }
+    }
+
+    private static String safe(String s) {
+        return s == null ? "" : s;
     }
 
     private static Map<String, String> flatten(MultiValueMap<String, String> form) {
