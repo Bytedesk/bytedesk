@@ -11,38 +11,38 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.workgroup_settings;
+package com.bytedesk.service.agent_settings;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.service.workgroup_settings.event.WorkgroupSettingsCreateEvent;
-import com.bytedesk.service.workgroup_settings.event.WorkgroupSettingsUpdateEvent;
+import com.bytedesk.service.agent_settings.event.AgentSettingsCreateEvent;
+import com.bytedesk.service.agent_settings.event.AgentSettingsUpdateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Event listener for WorkgroupSettings application events
+ * Event listener for AgentSettings application events
  */
 @Slf4j
 @Component
 @AllArgsConstructor
-public class WorkgroupSettingsEventListener {
+public class AgentSettingsEventListener {
 
     @EventListener
-    public void onWorkgroupSettingsCreateEvent(WorkgroupSettingsCreateEvent event) {
-        WorkgroupSettingsEntity workgroupSettings = event.getWorkgroupSettings();
-        log.info("WorkgroupSettings created: {} - {}", workgroupSettings.getUid(), workgroupSettings.getName());
+    public void onAgentSettingsCreateEvent(AgentSettingsCreateEvent event) {
+        AgentSettingsEntity agentSettings = event.getAgentSettings();
+        log.info("AgentSettings created: {} - {}", agentSettings.getUid(), agentSettings.getName());
         
         // Add additional logic here if needed
         // e.g., send notifications, update caches, etc.
     }
 
     @EventListener
-    public void onWorkgroupSettingsUpdateEvent(WorkgroupSettingsUpdateEvent event) {
-        WorkgroupSettingsEntity workgroupSettings = event.getWorkgroupSettings();
-        log.info("WorkgroupSettings updated: {} - {}", workgroupSettings.getUid(), workgroupSettings.getName());
+    public void onAgentSettingsUpdateEvent(AgentSettingsUpdateEvent event) {
+        AgentSettingsEntity agentSettings = event.getAgentSettings();
+        log.info("AgentSettings updated: {} - {}", agentSettings.getUid(), agentSettings.getName());
         
         // Add additional logic here if needed
         // e.g., invalidate caches, sync data, etc.

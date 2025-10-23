@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.workgroup_settings;
+package com.bytedesk.service.agent_settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +26,12 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Specification for querying WorkgroupSettings entities
+ * Specification for querying AgentSettings entities
  */
 @Slf4j
-public class WorkgroupSettingsSpecification extends BaseSpecification<WorkgroupSettingsEntity, WorkgroupSettingsRequest> {
+public class AgentSettingsSpecification extends BaseSpecification<AgentSettingsEntity, AgentSettingsRequest> {
 
-    public static Specification<WorkgroupSettingsEntity> search(WorkgroupSettingsRequest request, AuthService authService) {
+    public static Specification<AgentSettingsEntity> search(AgentSettingsRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             
