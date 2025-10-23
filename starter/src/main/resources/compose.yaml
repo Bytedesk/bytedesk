@@ -248,6 +248,9 @@ services:
       # 录音目录
       # - freeswitch_recordings:/usr/local/freeswitch/recordings
       - ../../../../deploy/freeswitch/recordings:/usr/local/freeswitch/recordings
+      # 挂载 ODBC 配置（ARM64 MariaDB 驱动）
+      - ../../../../deploy/freeswitch/etc/odbc.ini:/etc/odbc.ini:ro
+      - ../../../../deploy/freeswitch/etc/odbcinst.ini:/etc/odbcinst.ini:ro
     depends_on:
       - bytedesk-mysql
     networks:
