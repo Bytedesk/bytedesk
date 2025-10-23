@@ -29,11 +29,13 @@ public class HttapiController {
 
     // Accept GET and POST and be tolerant about Content-Type so FreeSWITCH requests
     // that don't set exact Content-Type still hit this handler.
-    @RequestMapping(value = "/ai-bot", method = {RequestMethod.POST, RequestMethod.GET}, produces = "text/xml;charset=UTF-8")
+    @RequestMapping(value = "/ai-bot", method = { RequestMethod.POST,
+            RequestMethod.GET }, produces = "text/xml;charset=UTF-8")
     public @ResponseBody byte[] aiBot(@RequestParam(required = false) MultiValueMap<String, String> form,
-                                      HttpServletRequest request) {
+            HttpServletRequest request) {
         Map<String, String> vars = (form != null && !form.isEmpty()) ? flatten(form) : new HashMap<>();
-        // If form params were empty, try to read the raw body and parse a query-string style body
+        // If form params were empty, try to read the raw body and parse a query-string
+        // style body
         if (vars.isEmpty()) {
             String body = readRequestBody(request);
             if (body != null && !body.isBlank()) {
@@ -63,12 +65,17 @@ public class HttapiController {
             String ua = safe(request.getHeader("User-Agent"));
             String ct = safe(request.getContentType());
             String qs = safe(request.getQueryString());
-            log.info("HTTAPI /ai-bot turn={} mode='{}' bot_did='{}' mrcpReady={} (probe={}) remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}' paramKeys={}",
-                    turn, modeReq, botDid, mrcpReady, probe, remote, xff, xfp, xfh, truncate(ua, 120), ct, qs, vars.keySet());
+            log.info(
+                    "HTTAPI /ai-bot turn={} mode='{}' bot_did='{}' mrcpReady={} (probe={}) remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}' paramKeys={}",
+                    turn, modeReq, botDid, mrcpReady, probe, remote, xff, xfp, xfh, truncate(ua, 120), ct, qs,
+                    vars.keySet());
             // Key recognition variables snapshot (shortened)
-            String recog = Optional.ofNullable(vars.get("RECOG_RESULT")).orElse(vars.getOrDefault("variable_RECOG_RESULT", ""));
-            String dsrt = Optional.ofNullable(vars.get("detect_speech_result_text")).orElse(vars.getOrDefault("variable_detect_speech_result_text", ""));
-            log.info("HTTAPI vars RECOG_RESULT='{}' detect_speech_result_text='{}'", truncate(recog, 200), truncate(dsrt, 200));
+            String recog = Optional.ofNullable(vars.get("RECOG_RESULT"))
+                    .orElse(vars.getOrDefault("variable_RECOG_RESULT", ""));
+            String dsrt = Optional.ofNullable(vars.get("detect_speech_result_text"))
+                    .orElse(vars.getOrDefault("variable_detect_speech_result_text", ""));
+            log.info("HTTAPI vars RECOG_RESULT='{}' detect_speech_result_text='{}'", truncate(recog, 200),
+                    truncate(dsrt, 200));
         } catch (Exception ignore) {
         }
 
@@ -81,26 +88,26 @@ public class HttapiController {
     private byte[] firstTurn(Map<String, String> vars) {
         HttapiXml x = new HttapiXml();
         log.info("HTTAPI firstTurn (no MRCP gating)");
-    // 读取可选参数：setup（仅下发变量，不直接播报）、greet/greet_ssml（覆盖默认问候）
-    String setup = Optional.ofNullable(vars.get("setup"))
-        .orElse(vars.getOrDefault("variable_setup", ""))
-        .trim().toLowerCase(Locale.ROOT);
-    String customSsml = Optional.ofNullable(vars.get("greet_ssml"))
-        .orElse(vars.getOrDefault("variable_greet_ssml", ""));
-    String customText = Optional.ofNullable(vars.get("greet"))
-        .orElse(vars.getOrDefault("variable_greet", ""));
+        // 读取可选参数：setup（仅下发变量，不直接播报）、greet/greet_ssml（覆盖默认问候）
+        String setup = Optional.ofNullable(vars.get("setup"))
+                .orElse(vars.getOrDefault("variable_setup", ""))
+                .trim().toLowerCase(Locale.ROOT);
+        String customSsml = Optional.ofNullable(vars.get("greet_ssml"))
+                .orElse(vars.getOrDefault("variable_greet_ssml", ""));
+        String customText = Optional.ofNullable(vars.get("greet"))
+                .orElse(vars.getOrDefault("variable_greet", ""));
 
-    String greetText = customText != null && !customText.isBlank()
-        ? customText.trim()
-        : "您好，我是微语智能助手，请问您有什么问题？";
-    String greetSsml = (customSsml != null && !customSsml.isBlank())
-        ? customSsml
-        : "<speak version='1.0' xml:lang='zh-CN'><p>" + HttapiXml.xmlEscape(greetText) + "</p></speak>";
+        String greetText = customText != null && !customText.isBlank()
+                ? customText.trim()
+                : "您好，我是微语智能助手，请问您有什么问题？";
+        String greetSsml = (customSsml != null && !customSsml.isBlank())
+                ? customSsml
+                : "<speak version='1.0' xml:lang='zh-CN'><p>" + HttapiXml.xmlEscape(greetText) + "</p></speak>";
 
         // 下发变量给拨号计划，以便在本地使用 speak 播报（避免 HTTAPI 返回与后续步骤的竞态）
-    x.execute("export", "greet_ssml=" + greetSsml);
-    x.execute("export", "greet_done=1");
-    x.execute("set", "bot_state=awaiting_user");
+        x.execute("export", "greet_ssml=" + greetSsml);
+        x.execute("export", "greet_done=1");
+        x.execute("set", "bot_state=awaiting_user");
 
         // 若未指定 setup=1/true，则在 HTTAPI 侧播报一遍（供通用入口使用）。
         // 注意：不再做“MRCP 不可达”嘟声兜底，以免与拨号计划/代理时序打架。
@@ -122,10 +129,10 @@ public class HttapiController {
     private byte[] secondTurn(Map<String, String> vars) {
         HttapiXml x = new HttapiXml();
         String userText = pickFirstNonEmpty(vars,
-                "RECOG_RESULT","detect_speech_result_text","speech_detection_result",
-                "bot_user_text","asr_text",
-                "variable_RECOG_RESULT","variable_detect_speech_result_text","variable_speech_detection_result",
-                "variable_bot_user_text","variable_asr_text");
+                "RECOG_RESULT", "detect_speech_result_text", "speech_detection_result",
+                "bot_user_text", "asr_text",
+                "variable_RECOG_RESULT", "variable_detect_speech_result_text", "variable_speech_detection_result",
+                "variable_bot_user_text", "variable_asr_text");
         if (userText == null || userText.isBlank()) {
             // try NLSML if present
             String nlsml = pickFirstNonEmpty(vars, "detect_speech_result", "variable_detect_speech_result");
@@ -180,7 +187,8 @@ public class HttapiController {
     }
 
     private static boolean containsExitIntent(String text) {
-        if (text == null) return false;
+        if (text == null)
+            return false;
         String t = text.toLowerCase(Locale.ROOT);
         return t.contains("退出") || t.contains("再见") || t.contains("挂断") || t.contains("结束")
                 || t.contains("bye") || t.contains("goodbye") || t.contains("exit") || t.contains("quit");
@@ -196,8 +204,13 @@ public class HttapiController {
     }
 
     private static int parseIntOrDefault(String s, int def) {
-        if (s == null || s.isBlank()) return def;
-        try { return Integer.parseInt(s.trim()); } catch (Exception ignore) { return def; }
+        if (s == null || s.isBlank())
+            return def;
+        try {
+            return Integer.parseInt(s.trim());
+        } catch (Exception ignore) {
+            return def;
+        }
     }
 
     private static String safe(String s) {
@@ -245,21 +258,25 @@ public class HttapiController {
                     m.putIfAbsent(k.toUpperCase(Locale.ROOT), v);
                 }
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
         return m;
     }
 
     private static String pickFirstNonEmpty(Map<String, String> vars, String... keys) {
         for (String k : keys) {
             String v = vars.get(k);
-            if (v != null && !v.isBlank()) return v;
+            if (v != null && !v.isBlank())
+                return v;
         }
         return null;
     }
 
     private static String truncate(String s, int max) {
-        if (s == null) return null;
-        if (s.length() <= max) return s;
+        if (s == null)
+            return null;
+        if (s.length() <= max)
+            return s;
         return s.substring(0, max) + "...";
     }
 }
