@@ -148,6 +148,8 @@ bytedesk/
 - [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
 - [SipPhone](https://github.com/Bytedesk/bytedesk-phone)
 - [视频会议](https://github.com/Bytedesk/bytedesk-conference)
+- [Freeswitch Docker](https://github.com/Bytedesk/bytedesk-freeswitch)
+- [Jitsi Docker](https://github.com/Bytedesk/bytedesk-jitsi)
 
 ## 开源Demo + SDK
 

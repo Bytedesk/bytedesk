@@ -155,6 +155,8 @@ bytedesk/
 - [mobile](https://github.com/Bytedesk/bytedesk-mobile)
 - [siphone](https://github.com/Bytedesk/bytedesk-phone)
 - [conference](https://github.com/Bytedesk/bytedesk-conference)
+- [freeswitch docker](https://github.com/Bytedesk/bytedesk-freeswitch)
+- [jitsi docker](https://github.com/Bytedesk/bytedesk-jitsi)
 
 ## Open Source Demo + SDK
 
