@@ -79,4 +79,15 @@ public class FormEntity extends BaseEntity {
     @Column(name = "form_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String schema;
 
+    /**
+     * Whether the server is enabled
+     */
+    @Builder.Default
+    private Boolean enabled = false;
+
+    /**
+     * Category UID for organizing servers (optional)
+     */
+    private String categoryUid;
+
 }

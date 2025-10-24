@@ -34,7 +34,6 @@ public class FormResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
@@ -44,4 +43,8 @@ public class FormResponse extends BaseResponse {
     private String status;
 
     private String schema;
+
+    private Boolean enabled;
+
+    private String categoryUid;
 }

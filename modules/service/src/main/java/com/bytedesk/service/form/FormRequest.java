@@ -43,4 +43,8 @@ public class FormRequest extends BaseRequest {
     private String status;
 
     private String schema;
+
+    private Boolean enabled;
+
+    private String categoryUid;
 }
