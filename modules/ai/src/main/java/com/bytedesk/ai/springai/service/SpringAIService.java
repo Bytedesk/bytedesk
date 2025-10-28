@@ -66,6 +66,6 @@ public interface SpringAIService {
      * @param messageProtobufReply
      * @param isUnanswered
      */
-    void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, Boolean isUnanswered);
+    // void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, Boolean isUnanswered);
 
 }

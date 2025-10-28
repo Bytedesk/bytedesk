@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.robot;
 
+import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -98,7 +99,7 @@ public class RobotEntity extends BaseEntity {
      * All settings are managed through the settings entity
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    private com.bytedesk.ai.robot_settings.RobotSettingsEntity settings;
+    private RobotSettingsEntity settings;
 
     /**
      * Type of robot service (SERVICE, ASK, CHAT)
@@ -110,9 +111,9 @@ public class RobotEntity extends BaseEntity {
     /**
      * Whether to use streaming responses for real-time interaction
      */
-    @Builder.Default
-    @Column(name = "is_stream")
-    private Boolean stream = true;
+    // @Builder.Default
+    // @Column(name = "is_stream")
+    // private Boolean stream = true;
 
     // @Builder.Default
     // private Boolean published = false;

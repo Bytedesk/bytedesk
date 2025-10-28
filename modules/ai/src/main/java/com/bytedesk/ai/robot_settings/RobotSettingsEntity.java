@@ -63,6 +63,14 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
     /**
      * Rating down settings
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity rateDownSettings;
+
+    /**
+     * Draft Rating down settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private RatedownSettingsEntity draftRateDownSettings;
 }

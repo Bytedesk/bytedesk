@@ -120,7 +120,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setNickname(request.getNickname());
         workgroup.setAvatar(request.getAvatar());
         workgroup.setDescription(request.getDescription());
-        workgroup.setRoutingMode(request.getRoutingMode());
+        // workgroup.setRoutingMode(request.getRoutingMode());
         workgroup.setStatus(request.getStatus());
         // TODO: Settings should be managed through WorkgroupSettingsEntity
         // MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatWorkgroupMessageLeaveSettings(request);

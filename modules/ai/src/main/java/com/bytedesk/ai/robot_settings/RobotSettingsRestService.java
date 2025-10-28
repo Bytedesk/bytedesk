@@ -2,6 +2,7 @@ package com.bytedesk.ai.robot_settings;
 
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,14 +14,21 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.settings.ServiceSettingsEntity;
+import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
+import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
+import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class RobotSettingsRestService extends BaseRestService<RobotSettingsEntity, RobotSettingsRequest, RobotSettingsResponse> {
+public class RobotSettingsRestService
+        extends BaseRestService<RobotSettingsEntity, RobotSettingsRequest, RobotSettingsResponse> {
 
     private final RobotSettingsRepository robotSettingsRepository;
+
+    private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
@@ -32,15 +40,42 @@ public class RobotSettingsRestService extends BaseRestService<RobotSettingsEntit
 
     @Override
     public RobotSettingsResponse create(RobotSettingsRequest request) {
-        RobotSettingsEntity entity = new RobotSettingsEntity();
+        RobotSettingsEntity entity = modelMapper.map(request, RobotSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription());
-        entity.setEnabled(request.getEnabled());
-        entity.setIsDefault(request.getIsDefault());
-        entity.setOrgUid(request.getOrgUid());
-        entity.setServiceSettings(request.getServiceSettings());
-        entity.setRateDownSettings(request.getRateDownSettings());
+
+        // 使用静态工厂方法处理嵌套的 ServiceSettings,传入 modelMapper,null 检查已内置
+        ServiceSettingsEntity svc = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
+        // 创建时统一强制生成 uid
+        svc.setUid(uidUtils.getUid());
+        entity.setServiceSettings(svc);
+        ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
+        draft.setUid(uidUtils.getUid());
+        entity.setDraftServiceSettings(draft);
+
+        // 发布与草稿：邀请配置（统一使用 fromRequest，内部已处理 null）
+        InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
+        inv.setUid(uidUtils.getUid());
+        entity.setInviteSettings(inv);
+        InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
+        invDraft.setUid(uidUtils.getUid());
+        entity.setDraftInviteSettings(invDraft);
+
+        // 发布与草稿：意图配置（统一使用 fromRequest，内部已处理 null）
+        IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
+        inte.setUid(uidUtils.getUid());
+        entity.setIntentionSettings(inte);
+        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(),
+                modelMapper);
+        inteDraft.setUid(uidUtils.getUid());
+        entity.setDraftIntentionSettings(inteDraft);
+
+        // 发布与草稿：差评配置（统一使用 fromRequest，内部已处理 null）
+        RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
+        r.setUid(uidUtils.getUid());
+        entity.setRateDownSettings(r);
+        RatedownSettingsEntity rd = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
+        rd.setUid(uidUtils.getUid());
+        entity.setDraftRateDownSettings(rd);
 
         RobotSettingsEntity saved = save(entity);
         return convertToResponse(saved);
@@ -49,17 +84,80 @@ public class RobotSettingsRestService extends BaseRestService<RobotSettingsEntit
     @Override
     public RobotSettingsResponse update(RobotSettingsRequest request) {
         Optional<RobotSettingsEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            RobotSettingsEntity entity = optional.get();
-            entity.setName(request.getName());
-            entity.setDescription(request.getDescription());
-            entity.setEnabled(request.getEnabled());
-            entity.setServiceSettings(request.getServiceSettings());
-            entity.setRateDownSettings(request.getRateDownSettings());
-            RobotSettingsEntity updated = save(entity);
-            return convertToResponse(updated);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("RobotSettings not found: " + request.getUid());
         }
-        throw new RuntimeException("RobotSettings not found: " + request.getUid());
+
+        RobotSettingsEntity entity = optional.get();
+        // 使用 ModelMapper 批量更新基础字段
+        modelMapper.map(request, entity);
+
+        // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
+        if (request.getServiceSettings() != null) {
+            // 复用并更新现有草稿
+            ServiceSettingsEntity draft = entity.getDraftServiceSettings();
+            if (draft == null) {
+                draft = new ServiceSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getServiceSettings(), draft);
+                entity.setDraftServiceSettings(draft);
+            } else {
+                // 保留草稿唯一标识，避免被请求体覆盖
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getServiceSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+        // 更新草稿：邀请/意图
+        if (request.getInviteSettings() != null) {
+            InviteSettingsEntity draft = entity.getDraftInviteSettings();
+            if (draft == null) {
+                draft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
+                if (draft != null && draft.getUid() == null) {
+                    draft.setUid(uidUtils.getUid());
+                }
+                entity.setDraftInviteSettings(draft);
+            } else {
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getInviteSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+        if (request.getIntentionSettings() != null) {
+            IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
+            if (draft == null) {
+                draft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
+                if (draft != null && draft.getUid() == null) {
+                    draft.setUid(uidUtils.getUid());
+                }
+                entity.setDraftIntentionSettings(draft);
+            } else {
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getIntentionSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+        if (request.getRateDownSettings() != null) {
+            RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
+            if (draft == null) {
+                draft = modelMapper.map(request.getRateDownSettings(), RatedownSettingsEntity.class);
+                if (draft.getUid() == null) {
+                    draft.setUid(uidUtils.getUid());
+                }
+                entity.setDraftRateDownSettings(draft);
+            } else {
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getRateDownSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        RobotSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
     }
 
     @CacheEvict(value = "robotSettings", key = "#uid")
@@ -79,7 +177,7 @@ public class RobotSettingsRestService extends BaseRestService<RobotSettingsEntit
 
     @Override
     protected Specification<RobotSettingsEntity> createSpecification(RobotSettingsRequest request) {
-        return (root, query, cb) -> cb.equal(root.get("orgUid"), request.getOrgUid());
+        return RobotSettingsSpecification.search(request, authService);
     }
 
     @Override
@@ -94,7 +192,8 @@ public class RobotSettingsRestService extends BaseRestService<RobotSettingsEntit
     }
 
     @Override
-    public RobotSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, RobotSettingsEntity entity) {
+    public RobotSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            RobotSettingsEntity entity) {
         try {
             Optional<RobotSettingsEntity> latest = robotSettingsRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -116,7 +215,7 @@ public class RobotSettingsRestService extends BaseRestService<RobotSettingsEntit
         if (defaultSettings.isPresent()) {
             return defaultSettings.get();
         }
-        
+
         // Create default settings
         RobotSettingsEntity settings = RobotSettingsEntity.builder()
                 .uid(uidUtils.getUid())
@@ -126,21 +225,45 @@ public class RobotSettingsRestService extends BaseRestService<RobotSettingsEntit
                 .enabled(true)
                 .orgUid(orgUid)
                 .build();
-        
+        ServiceSettingsEntity published = ServiceSettingsEntity.builder().build();
+        published.setUid(uidUtils.getUid());
+        ServiceSettingsEntity draft = ServiceSettingsEntity.builder().build();
+        draft.setUid(uidUtils.getUid());
+        settings.setServiceSettings(published);
+        settings.setDraftServiceSettings(draft);
+
         return save(settings);
+    }
+
+    /**
+     * Publish draft settings to online for robot
+     */
+    @CachePut(value = "robotSettings", key = "#uid", unless = "#result == null")
+    public RobotSettingsResponse publish(String uid) {
+        Optional<RobotSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("RobotSettings not found: " + uid);
+        }
+        RobotSettingsEntity entity = optional.get();
+        entity.setServiceSettings(entity.getDraftServiceSettings());
+        if (entity.getDraftRateDownSettings() != null) {
+            entity.setRateDownSettings(entity.getDraftRateDownSettings());
+        }
+        if (entity.getDraftInviteSettings() != null) {
+            entity.setInviteSettings(entity.getDraftInviteSettings());
+        }
+        if (entity.getDraftIntentionSettings() != null) {
+            entity.setIntentionSettings(entity.getDraftIntentionSettings());
+        }
+        entity.setHasUnpublishedChanges(false);
+        entity.setPublishedAt(java.time.ZonedDateTime.now());
+        RobotSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
     }
 
     @Override
     public RobotSettingsResponse convertToResponse(RobotSettingsEntity entity) {
-        return RobotSettingsResponse.builder()
-                .uid(entity.getUid())
-                .name(entity.getName())
-                .description(entity.getDescription())
-                .enabled(entity.getEnabled())
-                .isDefault(entity.getIsDefault())
-                .serviceSettings(entity.getServiceSettings())
-                .rateDownSettings(entity.getRateDownSettings())
-                .build();
+        return modelMapper.map(entity, RobotSettingsResponse.class);
     }
 
 }

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
@@ -43,8 +45,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({InviteSettingsEntityListener.class})
 @Table(name = "bytedesk_kbase_settings_invite")
 public class InviteSettingsEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * 设置名称，用于区分不同的邀请设置模板
@@ -264,4 +266,19 @@ public class InviteSettingsEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_ab_testing")
     private Boolean abTesting = false;
+
+    /**
+     * 从 InviteSettingsRequest 创建 InviteSettings 实体
+     * 如果 request 为 null，返回默认构建的实体
+     *
+     * @param request InviteSettingsRequest 对象，可以为 null
+     * @param modelMapper ModelMapper 实例用于字段映射
+     * @return InviteSettings 实体，永远不为 null
+     */
+    public static InviteSettingsEntity fromRequest(InviteSettingsRequest request, ModelMapper modelMapper) {
+        if (request == null) {
+            return InviteSettingsEntity.builder().build();
+        }
+        return modelMapper.map(request, InviteSettingsEntity.class);
+    }
 }

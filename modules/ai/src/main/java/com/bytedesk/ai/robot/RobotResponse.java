@@ -14,7 +14,6 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.settings.ServiceSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +43,10 @@ public class RobotResponse extends BaseResponse {
 
     private String type;
 
-    private ServiceSettingsResponse serviceSettings;
+    /**
+     * Robot settings (loaded from settings entity)
+     */
+    private com.bytedesk.ai.robot_settings.RobotSettingsResponse settings;
 
     // private InviteSettings inviteSettings;
 

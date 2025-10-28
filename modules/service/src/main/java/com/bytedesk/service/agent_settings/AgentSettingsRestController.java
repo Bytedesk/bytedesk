@@ -73,4 +73,29 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @Operation(summary = "启用客服配置", description = "启用指定的客服配置")
+    @ApiResponse(responseCode = "200", description = "启用成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    public ResponseEntity<?> enable(@RequestBody AgentSettingsRequest request) {
+        AgentSettingsResponse resp = agentSettingsRestService.enable(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
+    @Operation(summary = "停用客服配置", description = "停用指定的客服配置")
+    @ApiResponse(responseCode = "200", description = "停用成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    public ResponseEntity<?> disable(@RequestBody AgentSettingsRequest request) {
+        AgentSettingsResponse resp = agentSettingsRestService.disable(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
+    @Operation(summary = "发布客服配置", description = "将草稿版本发布为线上版本")
+    @ApiResponse(responseCode = "200", description = "发布成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @RequestMapping("/publish")
+    public ResponseEntity<?> publish(@RequestBody AgentSettingsRequest request) {
+        AgentSettingsResponse resp = agentSettingsRestService.publish(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
 }

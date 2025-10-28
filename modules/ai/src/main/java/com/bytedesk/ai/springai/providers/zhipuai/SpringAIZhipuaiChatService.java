@@ -32,11 +32,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.ai.springai.service.PromptHelper;
+import com.bytedesk.ai.springai.service.SseMessageHelper;
+import com.bytedesk.ai.springai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +61,15 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
     @Qualifier("bytedeskZhipuaiApi")
     private ZhiPuAiApi bytedeskZhipuaiApi;
 
+    @Autowired
+    private TokenUsageHelper tokenUsageHelper;
+
+    @Autowired
+    private SseMessageHelper sseMessageHelper;
+
+    @Autowired
+    private PromptHelper promptHelper;
+
     
     public SpringAIZhipuaiChatService() {
         super(); // 调用基类的无参构造函数
@@ -70,13 +82,19 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private ZhiPuAiChatOptions createDynamicOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> 
-            ZhiPuAiChatOptions.builder()
-                .model(robotLlm.getTextModel())
-                .temperature(robotLlm.getTemperature())
-                .topP(robotLlm.getTopP())
-                .build()
-        );
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return ZhiPuAiChatOptions.builder()
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .topP(llm.getTopP())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic ZhiPuAiChatOptions for model {}", llm.getTextModel(), e);
+            return null;
+        }
     }
 
     /**
@@ -129,7 +147,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
                         tokenUsage[0] = extractZhipuaiTokenUsage(response);
@@ -139,7 +157,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                 },
                 error -> {
                     log.error("Zhipuai API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -149,7 +167,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo";
                     log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
-                    recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -196,7 +214,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                         tokenUsage = extractZhipuaiTokenUsage(response);
                         log.info("Zhipuai API sync tokenUsage after manual extraction: {}", tokenUsage);
                         success = true;
-                        return extractTextFromResponse(response);
+                        return promptHelper.extractTextFromResponse(response);
                     }
                 }
                 
@@ -222,7 +240,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                 tokenUsage = extractZhipuaiTokenUsage(response);
                 log.info("Zhipuai API sync tokenUsage after manual extraction: {}", tokenUsage);
                 success = true;
-                return extractTextFromResponse(response);
+                return promptHelper.extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Zhipuai API call error: ", e);
                 success = false;
@@ -239,7 +257,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                     ? robot.getLlm().getTextModel() : "glm-3-turbo";
             log.info("Zhipuai API sync recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), tokenUsage.getTotalTokens(), modelType);
-            recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
+        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
@@ -249,14 +267,14 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
      */
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
         
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = {false};
@@ -294,19 +312,19 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                                 log.info("Zhipuai API SSE generation metadata {}, textContent {}", 
                                     generation.getMetadata(), textContent);
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             success[0] = true;
                         }
                     } catch (Exception e) {
                         log.error("Zhipuai API Error sending SSE event 1：", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         success[0] = false;
                     }
                 },
                 error -> {
                     log.error("Zhipuai API SSE error 2:", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
@@ -319,14 +337,14 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                     }
                     
                     // 发送流结束消息，包含token使用情况和prompt内容
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo");
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.ZHIPUAI, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo";
                     log.info("Zhipuai API SSE recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
-                    recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -502,7 +520,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
             
             // 方法4: 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
             log.info("Zhipuai API manual extraction failed, trying original extractTokenUsage method");
-            ChatTokenUsage fallbackUsage = extractTokenUsage(response);
+            ChatTokenUsage fallbackUsage = tokenUsageHelper.extractTokenUsage(response);
             if (fallbackUsage.getTotalTokens() > 0) {
                 log.info("Zhipuai API fallback extraction successful: {}", fallbackUsage);
                 return fallbackUsage;
@@ -522,7 +540,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
             // 如果手动提取出错，尝试使用原始的extractTokenUsage方法作为后备
             try {
                 log.info("Zhipuai API manual extraction error, trying original extractTokenUsage method");
-                ChatTokenUsage fallbackUsage = extractTokenUsage(response);
+                ChatTokenUsage fallbackUsage = tokenUsageHelper.extractTokenUsage(response);
                 if (fallbackUsage.getTotalTokens() > 0) {
                     log.info("Zhipuai API fallback extraction successful after error: {}", fallbackUsage);
                     return fallbackUsage;
@@ -549,7 +567,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
             }
             
             // 获取输出文本
-            String outputText = extractTextFromResponse(response);
+            String outputText = promptHelper.extractTextFromResponse(response);
             
             // 由于无法从ChatResponse直接获取输入文本，我们使用一个保守的估算
             // 假设输入文本长度约为输出文本的30%（这是一个常见的比例）
@@ -640,7 +658,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
             log.info("Zhipuai API test manual token extraction result: {}", manualUsage);
             
             // 测试原始token提取
-            ChatTokenUsage originalUsage = extractTokenUsage(response);
+            ChatTokenUsage originalUsage = tokenUsageHelper.extractTokenUsage(response);
             log.info("Zhipuai API test original token extraction result: {}", originalUsage);
             
             // 测试token估算功能
@@ -653,7 +671,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
             log.info("Zhipuai API test token estimation for text '{}': {} tokens", testText, estimatedTokens);
             
             // 提取文本内容
-            String textContent = extractTextFromResponse(response);
+            String textContent = promptHelper.extractTextFromResponse(response);
             log.info("Zhipuai API test response text: {}", textContent);
             
         } catch (Exception e) {

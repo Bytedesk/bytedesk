@@ -17,10 +17,6 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.kbase.settings.ServiceSettingsResponse;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
-import com.bytedesk.service.queue_settings.QueueSettingsResponse;
-import com.bytedesk.service.settings.RobotSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,25 +41,14 @@ public class WorkgroupResponse extends BaseResponse {
 
     private String description;
 
-    private String routingMode;
+    // routingMode moved to settings; read from settings.routingMode
 
     private String status;
 
-    private MessageLeaveSettingsResponse messageLeaveSettings;
-
-    private RobotSettingsResponse robotSettings;
-
-    private ServiceSettingsResponse serviceSettings;
-
-    private QueueSettingsResponse queueSettings;
-
-    // private InviteSettings inviteSettings;
-
-    // 是否统一入口
-    // private Boolean isUnifiedEntry;
-
-    // 路由技能组，仅用于统一入口技能组
-    // private List<WorkgroupResponse> routingWorkgroups;
+    /**
+     * Workgroup settings (loaded from settings entity)
+     */
+    private com.bytedesk.service.workgroup_settings.WorkgroupSettingsResponse settings;
 
     // 
     private List<UserProtobuf> agents;

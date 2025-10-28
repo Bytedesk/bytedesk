@@ -66,7 +66,6 @@ public class ServiceSettingsRequest  implements Serializable {
 
     @Builder.Default
     private Integer rateMsgCount = 3;
-    
 
     @Builder.Default
     private Boolean showPreForm = false;

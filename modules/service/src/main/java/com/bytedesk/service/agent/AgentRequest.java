@@ -16,10 +16,6 @@ package com.bytedesk.service.agent;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.ServiceSettingsRequest;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
-import com.bytedesk.service.queue_settings.QueueSettings;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -66,40 +62,11 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private Boolean enabled = true;
 
-    @Builder.Default
-    private MessageLeaveSettingsRequest messageLeaveSettings = new MessageLeaveSettingsRequest();
-
-    // 一对一人工客服，不支持机器人接待
-    // @Builder.Default
-    // private RobotSettingsRequest robotSettings = new RobotSettingsRequest();
-
-    @Builder.Default
-    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
-
-    @Builder.Default
-    private AutoReplySettings autoReplySettings = new AutoReplySettings();
-
-    @Builder.Default
-    private QueueSettings queueSettings = new QueueSettings();
-
-    // @Builder.Default
-    // private InviteSettings inviteSettings = new InviteSettings();
-
-    
-
-    @Builder.Default
-    private Integer maxThreadCount = 10;
-
-    // 是否开启超时提醒
-    @Builder.Default
-    private Boolean timeoutRemindEnabled = false;
-
-    @Builder.Default
-    private Integer timeoutRemindTime = 5;
-
-    // 超时提醒提示
-    @Builder.Default
-    private String timeoutRemindTip = I18Consts.I18N_AGENT_TIMEOUT_TIP;
+    /**
+     * Agent settings reference UID
+     * If not provided, will use the default settings
+     */
+    private String settingsUid;
 
     //
     @NotBlank

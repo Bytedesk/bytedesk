@@ -18,11 +18,12 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.ai.springai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -51,6 +52,9 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     @Autowired
     private LlmProviderRestService llmProviderRestService;
 
+    @Autowired
+    private TokenUsageHelper tokenUsageHelper;
+
     @Autowired(required = false)
     @Qualifier("siliconFlowChatModel")
     private OpenAiChatModel defaultChatModel;
@@ -66,13 +70,19 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> 
-            OpenAiChatOptions.builder()
-                .model(robotLlm.getTextModel())
-                .temperature(robotLlm.getTemperature())
-                .topP(robotLlm.getTopP())
-                .build()
-        );
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return OpenAiChatOptions.builder()
+                .model(llm.getTextModel())
+                .temperature(llm.getTemperature())
+                .topP(llm.getTopP())
+                .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic SiliconFlow options for model {}", llm.getTextModel(), e);
+            return null;
+        }
     }
 
     /**
@@ -124,7 +134,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
         // 创建动态chatModel
         OpenAiChatModel chatModel = createSiliconFlowChatModel(llm);
         if (chatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -149,16 +159,16 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractTokenUsage(response);
+                        tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                         success[0] = true;
                     }
                 },
                 error -> {
                     log.error("siliconFlow API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -166,8 +176,8 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmProviderConstants.SILICONFLOW;
-                    recordAiTokenUsage(robot, LlmProviderConstants.SILICONFLOW, modelType, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.SILICONFLOW, modelType, 
+                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }    // @Override
     // protected String generateFaqPairs(String prompt) {
@@ -198,16 +208,16 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
                         var response = chatModel.call(prompt);
-                        tokenUsage = extractTokenUsage(response);
+                        tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                         success = true;
-                        return extractTextFromResponse(response);
+                        return promptHelper.extractTextFromResponse(response);
                     }
                 }
                 
                 var response = chatModel.call(message);
-                tokenUsage = extractTokenUsage(response);
+                tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                 success = true;
-                return extractTextFromResponse(response);
+                return promptHelper.extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("siliconFlow API call error: ", e);
                 success = false;
@@ -222,28 +232,28 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
                     ? robot.getLlm().getTextModel() : LlmProviderConstants.SILICONFLOW;
-            recordAiTokenUsage(robot, LlmProviderConstants.SILICONFLOW, modelType, 
-                    tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
+        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.SILICONFLOW, modelType, 
+            tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("SiliconFlow API SSE ");
 
         // 创建动态chatModel
         OpenAiChatModel chatModel = createSiliconFlowChatModel(llm);
-        if (chatModel == null) {
-            handleSseError(new RuntimeException("SiliconFlow service not available"), messageProtobufQuery,
-                    messageProtobufReply, emitter);
+    if (chatModel == null) {
+        sseMessageHelper.handleSseError(new RuntimeException("SiliconFlow service not available"), messageProtobufQuery,
+            messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -266,34 +276,34 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                                 log.info("siliconFlow API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         success[0] = false;
                     }
                 },
                 error -> {
                     log.error("siliconFlow API SSE error: ", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
                     log.info("SiliconFlow API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
                     // String promptText = extractTextFromPrompt(prompt);
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+                    sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.SILICONFLOW, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "siliconflow-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : LlmProviderConstants.SILICONFLOW;
-                    recordAiTokenUsage(robot, LlmProviderConstants.SILICONFLOW, modelType, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.SILICONFLOW, modelType, 
+                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
 

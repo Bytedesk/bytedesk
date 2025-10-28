@@ -67,8 +67,6 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
-    // only support chinese mobile number, 
-    // @Pattern(regexp = "^1[3-9]\\d{9}$", message = I18Consts.I18N_MOBILE_FORMAT_ERROR)
     private String mobile;
 
     @Email(message = I18Consts.I18N_EMAIL_FORMAT_ERROR)
@@ -86,25 +84,12 @@ public class AgentEntity extends BaseEntity {
      * Configuration settings reference
      * All settings are managed through the settings entity
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    // @NotFound(action = NotFoundAction.IGNORE)
     private AgentSettingsEntity settings;
 
-    // 最大同时接待数量
-    @Builder.Default
-    private Integer maxThreadCount = 10;
-
-    // 是否开启超时提醒
-    @Builder.Default
-    private Boolean timeoutRemindEnabled = false;
-
-    // 超时提醒时间：分钟
-    // 当客服超过这个时间没有接待新的会话时，会提醒客服
-    @Builder.Default
-    private Integer timeoutRemindTime = 5;
-
-    // 超时提醒提示
-    @Builder.Default
-    private String timeoutRemindTip = I18Consts.I18N_AGENT_TIMEOUT_TIP;
+    // 以下设置项已迁移至 AgentSettingsEntity
+    // 为保持兼容性，保留委托型 getter，以 settings 中的值为准
 
     /** 存储当前接待数量等 */
     @Builder.Default
@@ -155,34 +140,39 @@ public class AgentEntity extends BaseEntity {
     }
 
     /**
-     主要用途：
-        精准分配：将会话分配给最合适的客服
-        专业服务：确保客服具备处理特定问题的能力
-        分层支持：实现初级/高级支持分流
-        多语言支持：按语言技能分配
-        产品线划分：不同产品对应不同技能组
+     * 兼容旧代码：获取最大同时接待数量
+     * 优先从 settings 读取；若无 settings 或为空，使用安全默认值 10
      */
-    // @Column(length = 1000)
-    // private String skills;  // 技能标签,逗号分隔,如: "java,python,database"
-    
-    // // 将skills字符串转换为List
-    // public List<String> getSkillList() {
-    //     if (skills == null || skills.isEmpty()) {
-    //         return new ArrayList<>();
-    //     }
-    //     return Arrays.asList(skills.split(","));
-    // }
-    
-    // // 检查是否具备某个技能
-    // public Boolean hasSkill(String skill) {
-    //     return getSkillList().contains(skill);
-    // }
-    
-    // // 检查是否具备所有必需技能
-    // public Boolean hasRequiredSkills(List<String> requiredSkills) {
-    //     return getSkillList().containsAll(requiredSkills);
-    // }
+    public Integer getMaxThreadCount() {
+        if (this.settings != null && this.settings.getMaxThreadCount() != null) {
+            return this.settings.getMaxThreadCount();
+        }
+        return 10;
+    }
 
+    /** 是否开启超时提醒（委托 settings） */
+    public Boolean getTimeoutRemindEnabled() {
+        if (this.settings != null && this.settings.getTimeoutRemindEnabled() != null) {
+            return this.settings.getTimeoutRemindEnabled();
+        }
+        return false;
+    }
+
+    /** 超时提醒时间分钟数（委托 settings） */
+    public Integer getTimeoutRemindTime() {
+        if (this.settings != null && this.settings.getTimeoutRemindTime() != null) {
+            return this.settings.getTimeoutRemindTime();
+        }
+        return 5;
+    }
+
+    /** 超时提醒提示（委托 settings） */
+    public String getTimeoutRemindTip() {
+        if (this.settings != null && this.settings.getTimeoutRemindTip() != null) {
+            return this.settings.getTimeoutRemindTip();
+        }
+        return I18Consts.I18N_AGENT_TIMEOUT_TIP;
+    }
 
 }
 

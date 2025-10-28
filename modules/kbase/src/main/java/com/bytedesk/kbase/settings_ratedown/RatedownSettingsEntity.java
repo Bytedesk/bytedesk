@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
@@ -43,8 +45,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({RatedownSettingsEntityListener.class})
 @Table(name = "bytedesk_kbase_settings_ratedown")
 public class RatedownSettingsEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * 设置名称，用于区分不同的邀请设置模板
@@ -151,4 +153,19 @@ public class RatedownSettingsEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "offer_human_agent")
     private Boolean offerHumanAgent = true;
+
+    /**
+     * 从 RatedownSettingsRequest 创建 RatedownSettings 实体
+     * 如果 request 为 null，返回默认构建的实体
+     *
+     * @param request RatedownSettingsRequest 对象，可以为 null
+     * @param modelMapper ModelMapper 实例用于字段映射
+     * @return RatedownSettings 实体，永远不为 null
+     */
+    public static RatedownSettingsEntity fromRequest(RatedownSettingsRequest request, ModelMapper modelMapper) {
+        if (request == null) {
+            return RatedownSettingsEntity.builder().build();
+        }
+        return modelMapper.map(request, RatedownSettingsEntity.class);
+    }
 }

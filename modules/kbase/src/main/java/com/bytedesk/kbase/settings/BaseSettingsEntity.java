@@ -9,11 +9,13 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 
+import java.time.ZonedDateTime;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +42,8 @@ import lombok.experimental.SuperBuilder;
  * - intentionSettings: Intention recognition settings
  * 
  * Usage:
- * - Extend this class in AgentSettingsEntity, WorkgroupSettingsEntity, RobotSettingsEntity
+ * - Extend this class in AgentSettingsEntity, WorkgroupSettingsEntity,
+ * RobotSettingsEntity
  * - Add specific settings fields in subclasses
  */
 @MappedSuperclass
@@ -76,22 +79,27 @@ public abstract class BaseSettingsEntity extends BaseEntity {
     private Boolean isDefault = false;
 
     /**
-     * Service settings (common to all settings)
+     * Service settings (published)
      */
-    @Embedded
-    @lombok.Builder.Default
-    private ServiceSettings serviceSettings = new ServiceSettings();
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private ServiceSettingsEntity serviceSettings;
 
     /**
      * Invitation settings
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
     private InviteSettingsEntity inviteSettings;
 
     /**
      * Intention recognition settings
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
     private IntentionSettingsEntity intentionSettings;
 
     /**
@@ -100,4 +108,40 @@ public abstract class BaseSettingsEntity extends BaseEntity {
     @lombok.Builder.Default
     @Column(name = "is_enabled")
     private Boolean enabled = true;
+
+    /**
+     * Draft service settings (used in admin editing/testing, not affecting online
+     * runtime until published)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private ServiceSettingsEntity draftServiceSettings;
+
+    /**
+     * Draft invitation settings (admin editing/testing only)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private InviteSettingsEntity draftInviteSettings;
+
+    /**
+     * Draft intention recognition settings (admin editing/testing only)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private IntentionSettingsEntity draftIntentionSettings;
+
+    /**
+     * Whether there are unpublished changes in draft
+     */
+    @lombok.Builder.Default
+    private Boolean hasUnpublishedChanges = false;
+
+    /**
+     * Last published time
+     */
+    private ZonedDateTime publishedAt;
 }

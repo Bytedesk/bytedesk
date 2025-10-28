@@ -217,6 +217,16 @@ services:
       # - FREESWITCH_DB_CHARSET=utf8mb4
       # - FREESWITCH_DB_SCHEME=mariadb
       # - FREESWITCH_DB_ODBC_DIALECT=mysql
+      # Baidu MRCP 配置（启用并在容器内随 FreeSWITCH 启动）
+      # - BAIDU_MRCP_ENABLE=1
+      # 避免与 FreeSWITCH 5060 冲突，默认使用 5070（无需对外暴露）
+      # - BAIDU_MRCP_SIP_PORT=5070
+      # 认证参数（请替换为真实值）
+      # - BAIDU_APPID=your_app_id
+      # - BAIDU_API_KEY=your_api_key
+      # - BAIDU_SECRET_KEY=your_secret_key
+      # 是否保存音频（1=保存，0=不保存）
+      # - BAIDU_MRCP_SAVE_AUDIO=1
       # 完全禁用 IPv6
       - DISABLE_IPV6=true
     ports:

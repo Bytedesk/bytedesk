@@ -401,6 +401,103 @@
             font-size: 12px;
             display: inline-block;
         }
+
+        /* 业务模块 - 新内容排版（参考截图） */
+        :root {
+            --bdx-blue-50: #f5faff;
+            --bdx-blue-100: #eaf2ff;
+            --bdx-blue-200: #d6e7ff;
+            --bdx-blue-300: #c7dcff;
+            --bdx-blue-400: #9ec5fe;
+            --bdx-blue-500: #6ea8fe;
+            --bdx-text: #1f3b64;
+        }
+        .biz-board {
+            background: var(--bdx-blue-50);
+            border: 1px solid #e1e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .biz-row-line {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 12px;
+            align-items: stretch;
+            margin-bottom: 14px;
+        }
+        .biz-row-line:last-child { margin-bottom: 0; }
+        .biz-tag {
+            background: linear-gradient(180deg, #2573e5 0%, #1c55c4 100%);
+            color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            user-select: none;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .biz-body { padding: 6px 0; }
+        .biz-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 6px 4px;
+        }
+        .biz-chip {
+            background: var(--bdx-blue-100);
+            border: 1px solid var(--bdx-blue-200);
+            color: #244a87;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1;
+        }
+        /* 卡片分组（右侧内容区） */
+        .biz-sections { display: grid; gap: 12px; }
+        .biz-sections.one { grid-template-columns: 1fr; }
+        .biz-sections.two { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
+        .biz-sections.three { grid-template-columns: repeat(3, minmax(240px, 1fr)); }
+        @media (max-width: 980px) {
+            .biz-sections.three { grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+        }
+        @media (max-width: 680px) {
+            .biz-row-line { grid-template-columns: 110px 1fr; }
+            .biz-sections.two, .biz-sections.three { grid-template-columns: 1fr; }
+        }
+        .biz-section {
+            background: #fff;
+            border: 1px dashed var(--bdx-blue-300);
+            border-radius: 10px;
+            padding: 12px;
+        }
+        /* 分区标题与内容 */
+        .sec-title {
+            font-weight: 700;
+            color: var(--bdx-text);
+            margin: 0 0 10px 0;
+            font-size: 15px;
+        }
+        .sec-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+        .pill {
+            background: var(--bdx-blue-100);
+            border: 1px solid var(--bdx-blue-200);
+            color: #27446f;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        /* 颜色区分 - 给不同分组轻微差异（边框色） */
+        .section-contact { border-color: #9ec5fe; }
+        .section-outbound { border-color: #a2d2ff; }
+        .section-center { border-color: #8ecaff; }
+        .section-dialog { border-color: #8fdcc8; }
+        .section-insight { border-color: #9fd0ff; }
+        .section-cloud { border-color: #b3e5ff; }
     </style>
 </head>
 <body>
@@ -530,6 +627,98 @@
             <div class="ecommerce-architecture">
                 <!-- <h2>客服系统架构</h2> -->
                 <!-- <p style="text-align: center; color: #666; margin-bottom: 30px;">基于微语的完整客服解决方案</p> -->
+                
+                <!-- 内容模块（参考截图：左侧竖向标签 + 分组卡片） -->
+                <div class="biz-board">
+                    <!-- 行业方案 -->
+                    <div class="biz-row-line">
+                        <div class="biz-tag">行业方案</div>
+                        <div class="biz-body">
+                            <div class="biz-chips">
+                                <span class="biz-chip">教育</span>
+                                <span class="biz-chip">医疗</span>
+                                <span class="biz-chip">金融</span>
+                                <span class="biz-chip">汽车</span>
+                                <span class="biz-chip">政务</span>
+                                <span class="biz-chip">能源</span>
+                                <span class="biz-chip">航空</span>
+                                <span class="biz-chip">大消费</span>
+                                <span class="biz-chip">互联网</span>
+                                <span class="biz-chip">...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 智能客服系统应用：三组分区 -->
+                    <div class="biz-row-line">
+                        <div class="biz-tag">系统应用</div>
+                        <div class="biz-body">
+                            <div class="biz-sections three">
+                                <!-- 智能联络平台 -->
+                                <div class="biz-section section-contact">
+                                    <h4 class="sec-title">智能联络平台</h4>
+                                    <div class="sec-pills">
+                                        <span class="pill">电话客服</span>
+                                        <span class="pill">在线客服</span>
+                                        <span class="pill">AI助手</span>
+                                        <span class="pill">客服质检</span>
+                                        <span class="pill">坐席助手</span>
+                                        <span class="pill">知识库</span>
+                                    </div>
+                                </div>
+
+                                <!-- 智能外呼 -->
+                                <div class="biz-section section-outbound">
+                                    <h4 class="sec-title">智能外呼</h4>
+                                    <div class="sec-pills">
+                                        <span class="pill">外呼机器人</span>
+                                        <span class="pill">呼叫策略平台</span>
+                                    </div>
+                                </div>
+
+                                <!-- 智能联络中心 -->
+                                <div class="biz-section section-center">
+                                    <h4 class="sec-title">智能联络中心</h4>
+                                    <div class="sec-pills">
+                                        <span class="pill">客户之声</span>
+                                        <span class="pill">服务洞察</span>
+                                        <span class="pill">营销挖掘</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 智能客服平台应用：两组分区 -->
+                    <div class="biz-row-line">
+                        <div class="biz-tag">平台应用</div>
+                        <div class="biz-body">
+                            <div class="biz-sections two">
+                                <!-- 智能对话平台 -->
+                                <div class="biz-section section-dialog">
+                                    <h4 class="sec-title">智能对话平台</h4>
+                                    <div class="sec-pills">
+                                        <span class="pill">大模型</span>
+                                        <span class="pill">语音引擎</span>
+                                        <span class="pill">对话管理</span>
+                                        <span class="pill">对话引擎</span>
+                                        <span class="pill">运营工具</span>
+                                    </div>
+                                </div>
+                                <!-- 对话洞察平台 -->
+                                <div class="biz-section section-insight">
+                                    <h4 class="sec-title">对话洞察平台</h4>
+                                    <div class="sec-pills">
+                                        <span class="pill">分析引擎</span>
+                                        <span class="pill">报表平台</span>
+                                        <span class="pill">标签管理</span>
+                                        <span class="pill">数据管理</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div style="position: relative; padding: 20px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-radius: 10px; margin-bottom: 20px;">
                     <!-- 业务系统层 - 按客服专家视角重新组织 -->

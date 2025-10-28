@@ -115,4 +115,9 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
     // void decrementWorkload(@Param("agentUid") String agentUid);
     
     Boolean existsByUid(String uid);
+
+    /**
+     * Check if any non-deleted agent references the given AgentSettings uid
+     */
+    Boolean existsBySettings_UidAndDeletedFalse(String settingsUid);
 }

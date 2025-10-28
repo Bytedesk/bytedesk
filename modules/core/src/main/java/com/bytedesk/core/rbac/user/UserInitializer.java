@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -42,6 +44,8 @@ public class UserInitializer {
     public void init() {
         // 系统只能存在一个超级管理员账号
         if (userService.existsBySuperUser()) {
+            // 仍需确保系统内置用户存在
+            initBuiltinSystemUsers();
             return;
         }
         log.info("init super administrator account...");
@@ -60,7 +64,46 @@ public class UserInitializer {
                 .mobileVerified(true)
                 .build();
         userService.save(superAdmin);
+
+        // 初始化系统内置用户（如系统通知、文件助手等）
+        initBuiltinSystemUsers();
     }
 
+    // 确保系统内置用户存在（可后续在后台修改昵称/头像）
+    private void initBuiltinSystemUsers() {
+        try {
+            // 系统通知用户
+            userService.findByUid(BytedeskConsts.DEFAULT_SYSTEM_UID).orElseGet(() -> {
+                log.info("init builtin user: system notification");
+                UserEntity systemUser = UserEntity.builder()
+                        .uid(BytedeskConsts.DEFAULT_SYSTEM_UID)
+                        .username(BytedeskConsts.DEFAULT_SYSTEM_UID) // username 必填，使用uid占位
+                        .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)
+                        .avatar(AvatarConsts.getDefaultSystemNotificationAvatarUrl())
+                        .enabled(true)
+                        .emailVerified(true)
+                        .mobileVerified(true)
+                        .build();
+                return userService.save(systemUser);
+            });
+
+            // 文件助手用户
+            userService.findByUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID).orElseGet(() -> {
+                log.info("init builtin user: file assistant");
+                UserEntity fileAssistant = UserEntity.builder()
+                        .uid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID)
+                        .username(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID)
+                        .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
+                        .avatar(AvatarConsts.getDefaultFileAssistantAvatarUrl())
+                        .enabled(true)
+                        .emailVerified(true)
+                        .mobileVerified(true)
+                        .build();
+                return userService.save(fileAssistant);
+            });
+        } catch (Exception e) {
+            log.warn("init builtin system users failed: {}", e.getMessage());
+        }
+    }
     
 }

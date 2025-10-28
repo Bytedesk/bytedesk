@@ -139,7 +139,7 @@ public class ServiceTrigger {
      * @param condition 触发条件
      * @return 是否可以触发
      */
-    public Boolean canTrigger(String userUid, ServiceSettings settings, TriggerCondition condition) {
+    public Boolean canTrigger(String userUid, ServiceSettingsEntity settings, TriggerCondition condition) {
         // 1. 检查基本开关
         if (!settings.getEnableProactiveTrigger()) {
             return false;

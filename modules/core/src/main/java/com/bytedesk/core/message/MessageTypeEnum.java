@@ -82,14 +82,21 @@ public enum MessageTypeEnum {
     FAQ_ANSWER, // 常见问题答案
     //
     ROBOT, // 机器人消息
-    ROBOT_QUESTION, // 机器人问题
-    ROBOT_ANSWER, // 机器人答案
-    ROBOT_UP, // 点赞
-    ROBOT_DOWN, // 点踩
+    ROBOT_CANCEL, // 机器人回答取消
+    ROBOT_UNANSWERED, // 机器人未回答
+    ROBOT_ERROR, // 机器人错误消息
     // 
     ROBOT_STREAM, // 机器人流式响应（包含源引用）
     ROBOT_STREAM_START, // 机器人流式响应开始
     ROBOT_STREAM_END, // 机器人流式响应结束
+    ROBOT_STREAM_CANCEL, // 机器人流式响应取消
+    ROBOT_STREAM_UNANSWERED, // 机器人流式响应未回答
+    ROBOT_STREAM_ERROR, // 机器人流式响应错误
+    // 
+    ROBOT_UP, // 点赞: 赞同机器人回答
+    ROBOT_DOWN, // 点踩: 反对机器人回答
+    // ROBOT_QUESTION, // 机器人问题：用户提问直接使用 TEXT/IMAGE/VIDEO 等消息类型
+    // ROBOT_ANSWER, // 机器人答案：非流式回答，直接使用 ROBOT 消息类型
     // 
     ARTICLE, // 文章
     // 

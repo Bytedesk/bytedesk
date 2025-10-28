@@ -31,7 +31,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.constant.I18Consts;
 
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +79,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
         log.info("Custom API websocket ");
         
         if (customChatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -100,25 +100,18 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                     }
                 },
                 error -> {
                     log.error("Custom API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                 },
                 () -> {
                     log.info("Chat stream completed");
                 });
     }
-
-    // @Override
-    // protected String generateFaqPairs(String prompt) {
-    //     return customChatModel != null ? customChatModel.call(prompt) : "";
-    // }
-
-
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
@@ -138,12 +131,12 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
                         var response = customChatModel.call(prompt);
-                        return extractTextFromResponse(response);
+                        return promptHelper.extractTextFromResponse(response);
                     }
                 }
                 
                 var response = customChatModel.call(message);
-                return extractTextFromResponse(response);
+                return promptHelper.extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Custom API call error: ", e);
                 return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
@@ -156,18 +149,18 @@ public class SpringAICustomChatService extends BaseSpringAIService {
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, 
-        MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+        MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Custom API SSE ");
 
         if (customChatModel == null) {
-            handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            sseMessageHelper.handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
@@ -187,21 +180,21 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                                 log.info("Custom API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                     }
                 },
                 error -> {
                     log.error("Custom API SSE error: ", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                 },
                 () -> {
                     log.info("Custom API SSE complete");
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
                             0, 0, 0, prompt, "custom", (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "custom-chat");
                 });
     }

@@ -24,7 +24,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
-import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.agent.AgentInitializer;
 import com.bytedesk.core.member.MemberInitializer;
 
@@ -75,25 +74,26 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .orgUid(orgUid)
                 .build();
         // 写入 faq uid 到 welcomeFaqUids
-        String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
-        workgroupRequest.getServiceSettings().setWelcomeKbUid(kbUid);
-        workgroupBeforeRequest.getServiceSettings().setWelcomeKbUid(kbUid);
-        // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
-        for (int i = 1; i <= 5; i++) {
-            String faqUid = Utils.formatUid(orgUid, "faq_00" + i);
-            workgroupRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
-            workgroupBeforeRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
-        }
-        workgroupRequest.getServiceSettings().setFaqKbUid(kbUid);
-        workgroupRequest.getRobotSettings().setDefaultRobot(true);
-        workgroupRequest.getRobotSettings().setOfflineRobot(true);
-        workgroupRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
+        // TODO: Settings should be managed through WorkgroupSettingsEntity
+        // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
+        // workgroupRequest.getServiceSettings().setWelcomeKbUid(kbUid);
+        // workgroupBeforeRequest.getServiceSettings().setWelcomeKbUid(kbUid);
+        // // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
+        // for (int i = 1; i <= 5; i++) {
+        //     String faqUid = Utils.formatUid(orgUid, "faq_00" + i);
+        //     workgroupRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
+        //     workgroupBeforeRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
+        // }
+        // workgroupRequest.getServiceSettings().setFaqKbUid(kbUid);
+        // workgroupRequest.getRobotSettings().setDefaultRobot(true);
+        // workgroupRequest.getRobotSettings().setOfflineRobot(true);
+        // workgroupRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
         workgroupService.create(workgroupRequest);
         // 
-        workgroupBeforeRequest.getServiceSettings().setFaqKbUid(kbUid);
-        workgroupBeforeRequest.getRobotSettings().setDefaultRobot(true);
-        workgroupBeforeRequest.getRobotSettings().setOfflineRobot(true);
-        workgroupBeforeRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
+        // workgroupBeforeRequest.getServiceSettings().setFaqKbUid(kbUid);
+        // workgroupBeforeRequest.getRobotSettings().setDefaultRobot(true);
+        // workgroupBeforeRequest.getRobotSettings().setOfflineRobot(true);
+        // workgroupBeforeRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
         workgroupService.create(workgroupBeforeRequest);
         // add workgroup after
         WorkgroupRequest workgroupAfterRequest = WorkgroupRequest.builder()

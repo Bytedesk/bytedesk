@@ -13,13 +13,35 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 
+@Component
 public class UserUtils {
+    // 通过Spring注入服务到静态上下文，便于静态方法读取数据库
+    private static UserService userService;
+
+    public UserUtils(UserService userService) {
+        UserUtils.userService = userService;
+    }
     
     public static UserProtobuf getFileAssistantUser() {
+        try {
+            if (userService != null) {
+                Optional<UserEntity> optional = userService.findByUid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID);
+                if (optional.isPresent()) {
+                    UserProtobuf u = UserProtobuf.fromEntity(optional.get());
+                    u.setType(UserTypeEnum.SYSTEM.name());
+                    return u;
+                }
+            }
+        } catch (Exception ignored) { }
+        // 兜底：未找到数据库记录时返回默认内置信息
         return UserProtobuf.builder()
                 .uid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID)
                 .nickname(I18Consts.I18N_FILE_ASSISTANT_NAME)
@@ -38,6 +60,17 @@ public class UserUtils {
     // }
 
     public static UserProtobuf getSystemUser() {
+        try {
+            if (userService != null) {
+                Optional<UserEntity> optional = userService.findByUid(BytedeskConsts.DEFAULT_SYSTEM_UID);
+                if (optional.isPresent()) {
+                    UserProtobuf u = UserProtobuf.fromEntity(optional.get());
+                    u.setType(UserTypeEnum.SYSTEM.name());
+                    return u;
+                }
+            }
+        } catch (Exception ignored) { }
+        // 兜底：未找到数据库记录时返回默认内置信息
         return UserProtobuf.builder()
                 .uid(BytedeskConsts.DEFAULT_SYSTEM_UID)
                 .nickname(I18Consts.I18N_SYSTEM_NOTIFICATION_NAME)

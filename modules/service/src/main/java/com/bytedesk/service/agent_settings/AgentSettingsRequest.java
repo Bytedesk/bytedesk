@@ -13,12 +13,11 @@
  */
 package com.bytedesk.service.agent_settings;
 
-import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue_settings.QueueSettings;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
+import com.bytedesk.kbase.settings.BaseSettingsRequest;
+import com.bytedesk.kbase.settings_ratedown.RatedownSettingsRequest;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
+import com.bytedesk.service.queue_settings.QueueSettingsRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,25 +32,47 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class AgentSettingsRequest extends BaseRequest {
+public class AgentSettingsRequest extends BaseSettingsRequest {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    /**
+     * Maximum concurrent threads the agent can handle
+     */
+    private Integer maxThreadCount;
 
-    private String description;
+    /**
+     * Whether timeout reminder is enabled for agent
+     */
+    private Boolean timeoutRemindEnabled;
 
-    private Boolean isDefault;
+    /**
+     * Timeout reminder time in minutes
+     */
+    private Integer timeoutRemindTime;
 
-    private Boolean enabled;
+    /**
+     * Timeout reminder tip message
+     */
+    private String timeoutRemindTip;
 
-    private ServiceSettings serviceSettings;
+    /**
+     * Message leave settings (Agent-specific)
+     */
+    private MessageLeaveSettingsRequest messageLeaveSettings;
 
-    private MessageLeaveSettings messageLeaveSettings;
+    /**
+     * Auto-reply settings (Agent-specific)
+     */
+    private AutoReplySettingsRequest autoReplySettings;
 
-    private AutoReplySettings autoReplySettings;
+    /**
+     * Queue settings (Agent-specific)
+     */
+    private QueueSettingsRequest queueSettings;
 
-    private QueueSettings queueSettings;
-
-    private RatedownSettingsEntity rateDownSettings;
+    /**
+     * Rating down settings (Agent-specific)
+     */
+    private RatedownSettingsRequest rateDownSettings;
 }

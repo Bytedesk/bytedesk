@@ -37,8 +37,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
+import com.bytedesk.ai.springai.service.TokenUsageHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +54,9 @@ public class SpringAITencentService extends BaseSpringAIService {
     @Qualifier("tencentChatModel")
     private OpenAiChatModel defaultChatModel;
 
+    @Autowired
+    private TokenUsageHelper tokenUsageHelper;
+
     public SpringAITencentService() {
         super(); // 调用基类的无参构造函数
     }
@@ -64,11 +68,19 @@ public class SpringAITencentService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> OpenAiChatOptions.builder()
-                .model(robotLlm.getTextModel())
-                .temperature(robotLlm.getTemperature())
-                .topP(robotLlm.getTopP())
-                .build());
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return OpenAiChatOptions.builder()
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .topP(llm.getTopP())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);
+            return null;
+        }
     }
 
     /**
@@ -122,7 +134,7 @@ public class SpringAITencentService extends BaseSpringAIService {
         // 创建动态chatModel
         OpenAiChatModel chatModel = createTencentChatModel(llm);
         if (chatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
 
@@ -147,16 +159,16 @@ public class SpringAITencentService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractTokenUsage(response);
+                        tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                         success[0] = true;
                     }
                 },
                 error -> {
                     log.error("Tencent API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -165,7 +177,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "hunyuan-pro";
-                    recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });
@@ -195,16 +207,16 @@ public class SpringAITencentService extends BaseSpringAIService {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
                         var response = chatModel.call(prompt);
-                        tokenUsage = extractTokenUsage(response);
+                        tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                         success = true;
-                        return extractTextFromResponse(response);
+                        return promptHelper.extractTextFromResponse(response);
                     }
                 }
 
                 var response = chatModel.call(message);
-                tokenUsage = extractTokenUsage(response);
+                tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                 success = true;
-                return extractTextFromResponse(response);
+                return promptHelper.extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Tencent API call error: ", e);
                 success = false;
@@ -221,14 +233,14 @@ public class SpringAITencentService extends BaseSpringAIService {
                     && StringUtils.hasText(robot.getLlm().getTextModel()))
                             ? robot.getLlm().getTextModel()
                             : "hunyuan-pro";
-            recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
+        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
         log.info("Tencent API SSE ");
@@ -236,13 +248,13 @@ public class SpringAITencentService extends BaseSpringAIService {
         // 创建动态chatModel
         OpenAiChatModel chatModel = createTencentChatModel(llm);
         if (chatModel == null) {
-            handleSseError(new RuntimeException("Tencent service not available"), messageProtobufQuery,
+        sseMessageHelper.handleSseError(new RuntimeException("Tencent service not available"), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -265,27 +277,27 @@ public class SpringAITencentService extends BaseSpringAIService {
                                 log.info("Tencent API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         success[0] = false;
                     }
                 },
                 error -> {
                     log.error("Tencent API SSE error: ", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
                     log.info("Tencent API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
                             tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.TENCENT,
                             (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
@@ -294,7 +306,7 @@ public class SpringAITencentService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "hunyuan-pro";
-                    recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.TENCENT, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });

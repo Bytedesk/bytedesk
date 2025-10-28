@@ -178,8 +178,6 @@ public class RobotService extends AbstractRobotService {
         return segmentService.filterWords(words, true, 1);
     }
 
-    // 检索与来源处理：统一交由 BaseSpringAIService 具体实现负责（避免重复和反射调用）
-
     /**
      * 基于分词结果构建扩展查询，提升召回。
      * - 去重

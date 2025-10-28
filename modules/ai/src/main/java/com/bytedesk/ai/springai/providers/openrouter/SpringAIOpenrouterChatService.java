@@ -32,8 +32,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
+import com.bytedesk.ai.springai.service.TokenUsageHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +45,9 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
 
     @Autowired(required = false)
     private OpenAiChatModel openrouterChatModel;
+
+    @Autowired
+    private TokenUsageHelper tokenUsageHelper;
 
     public SpringAIOpenrouterChatService() {
         super(); // 调用基类的无参构造函数
@@ -56,13 +60,19 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> 
-            OpenAiChatOptions.builder()
-                .model(robotLlm.getTextModel())
-                .temperature(robotLlm.getTemperature())
-                .topP(robotLlm.getTopP())
-                .build()
-        );
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return OpenAiChatOptions.builder()
+                .model(llm.getTextModel())
+                .temperature(llm.getTemperature())
+                .topP(llm.getTopP())
+                .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic Openrouter options for model {}", llm.getTextModel(), e);
+            return null;
+        }
     }
 
     @Override
@@ -73,7 +83,7 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         
         if (openrouterChatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -84,9 +94,9 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
         }
         
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = {false};
-        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
+    long startTime = System.currentTimeMillis();
+    final boolean[] success = {false};
+    final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
         
         // 使用同一个ChatModel实例，但传入不同的选项
         openrouterChatModel.stream(requestPrompt).subscribe(
@@ -98,16 +108,16 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
                             AssistantMessage assistantMessage = generation.getOutput();
                             String textContent = assistantMessage.getText();
 
-                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractTokenUsage(response);
+                        tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                         success[0] = true;
                     }
                 },
                 error -> {
                     log.error("Openrouter API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -115,7 +125,7 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "openrouter-chat";
-                    recordAiTokenUsage(robot, LlmProviderConstants.OPENROUTER, modelType, 
+                    tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENROUTER, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -140,16 +150,16 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
                     // 使用自定义选项创建Prompt
                     Prompt prompt = new Prompt(message, customOptions);
                     var response = openrouterChatModel.call(prompt);
-                    tokenUsage = extractTokenUsage(response);
+                    tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                     success = true;
-                    return extractTextFromResponse(response);
+                    return promptHelper.extractTextFromResponse(response);
                 }
             }
             
             var response = openrouterChatModel.call(message);
-            tokenUsage = extractTokenUsage(response);
+            tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
-            return extractTextFromResponse(response);
+            return promptHelper.extractTextFromResponse(response);
         } catch (Exception e) {
             log.error("Openrouter API sync error: ", e);
             success = false;
@@ -159,25 +169,25 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
                     ? robot.getLlm().getTextModel() : "openrouter-chat";
-            recordAiTokenUsage(robot, LlmProviderConstants.OPENROUTER, modelType, 
+        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENROUTER, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         log.info("SpringAIOpenrouterService processPromptSse with full prompt content");
         // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         RobotLlm llm = robot.getLlm();
 
         if (openrouterChatModel == null) {
-            handleSseError(new RuntimeException("OpenAI service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            sseMessageHelper.handleSseError(new RuntimeException("OpenAI service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -200,32 +210,32 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
                                 log.info("Openrouter API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         success[0] = false;
                     }
                 },
                 error -> {
                     log.error("Openrouter API SSE error: ", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
                     log.info("OpenRouter API SSE complete");
-                    // 发送流结束消息，包含token使用情况和prompt内容
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+            // 发送流结束消息，包含token使用情况和prompt内容
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.OPENROUTER, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "openrouter-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "openrouter-chat";
-                    recordAiTokenUsage(robot, LlmProviderConstants.OPENROUTER, modelType, 
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENROUTER, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }

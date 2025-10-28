@@ -13,12 +13,11 @@
  */
 package com.bytedesk.service.agent_settings;
 
-import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue_settings.QueueSettings;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
+import com.bytedesk.kbase.settings.BaseSettingsResponse;
+import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
+import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,25 +32,63 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AgentSettingsResponse extends BaseResponse {
+public class AgentSettingsResponse extends BaseSettingsResponse {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    /**
+     * Maximum concurrent threads the agent can handle
+     */
+    private Integer maxThreadCount;
 
-    private String description;
+    /**
+     * Whether timeout reminder is enabled for agent
+     */
+    private Boolean timeoutRemindEnabled;
 
-    private Boolean isDefault;
+    /**
+     * Timeout reminder time in minutes
+     */
+    private Integer timeoutRemindTime;
 
-    private Boolean enabled;
+    /**
+     * Timeout reminder tip message
+     */
+    private String timeoutRemindTip;
 
-    private ServiceSettings serviceSettings;
+    /**
+     * Message leave settings (Agent-specific)
+     */
+    private MessageLeaveSettingsResponse messageLeaveSettings;
+    /**
+     * Draft message leave settings (Agent-specific)
+     */
+    private MessageLeaveSettingsResponse draftMessageLeaveSettings;
 
-    private MessageLeaveSettings messageLeaveSettings;
+    /**
+     * Auto-reply settings (Agent-specific)
+     */
+    private AutoReplySettingsResponse autoReplySettings;
+    /**
+     * Draft auto-reply settings (Agent-specific)
+     */
+    private AutoReplySettingsResponse draftAutoReplySettings;
 
-    private AutoReplySettings autoReplySettings;
+    /**
+     * Queue settings (Agent-specific)
+     */
+    private QueueSettingsResponse queueSettings;
+    /**
+     * Draft queue settings (Agent-specific)
+     */
+    private QueueSettingsResponse draftQueueSettings;
 
-    private QueueSettings queueSettings;
-
-    private RatedownSettingsEntity rateDownSettings;
+    /**
+     * Rating down settings (Agent-specific)
+     */
+    private RatedownSettingsResponse rateDownSettings;
+    /**
+     * Draft rating down settings (Agent-specific)
+     */
+    private RatedownSettingsResponse draftRateDownSettings;
 }

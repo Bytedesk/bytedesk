@@ -32,11 +32,12 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.ai.springai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,9 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
     @Autowired
     private LlmProviderRestService llmProviderRestService;
+
+    @Autowired
+    private TokenUsageHelper tokenUsageHelper;
 
     @Autowired(required = false)
     @Qualifier("baiduChatModel")
@@ -63,11 +67,19 @@ public class SpringAIBaiduService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> OpenAiChatOptions.builder()
-                .model(robotLlm.getTextModel())
-                .temperature(robotLlm.getTemperature())
-                .topP(robotLlm.getTopP())
-                .build());
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return OpenAiChatOptions.builder()
+                .model(llm.getTextModel())
+                .temperature(llm.getTemperature())
+                .topP(llm.getTopP())
+                .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic Baidu options for model {}", llm.getTextModel(), e);
+            return null;
+        }
     }
 
     /**
@@ -123,7 +135,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         
         if (llm == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
 
@@ -131,7 +143,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         OpenAiChatModel baiduChatModel = createBaiduChatModel(llm);
         if (baiduChatModel == null) {
             log.error("Failed to create Baidu chat model and no default chat model available");
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
 
@@ -163,7 +175,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                                 fullResponseText[0].append(textContent);
                             }
                             
-                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况 - 使用百度专用的提取方法
                         tokenUsage[0] = extractBaiduTokenUsage(response);
@@ -172,7 +184,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                 },
                 error -> {
                     log.error("Baidu API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -190,7 +202,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "ernie-bot";
-                    recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });
@@ -226,7 +238,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                         var response = baiduChatModel.call(prompt);
                         tokenUsage = extractBaiduTokenUsage(response);
                         success = true;
-                        return extractTextFromResponse(response);
+                        return promptHelper.extractTextFromResponse(response);
                     }
                 }
 
@@ -235,7 +247,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                 var response = baiduChatModel.call(prompt);
                 tokenUsage = extractBaiduTokenUsage(response);
                 success = true;
-                return extractTextFromResponse(response);
+                return promptHelper.extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Baidu API call error: ", e);
                 success = false;
@@ -252,33 +264,33 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     && StringUtils.hasText(robot.getLlm().getTextModel()))
                             ? robot.getLlm().getTextModel()
                             : "ernie-bot";
-            recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
+        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
 
         if (llm == null) {
-            handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
-                    messageProtobufReply, emitter);
+        sseMessageHelper.handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
+            messageProtobufReply, emitter);
             return;
         }
 
         // 获取适当的模型实例
         OpenAiChatModel baiduChatModel = createBaiduChatModel(llm);
-        if (baiduChatModel == null) {
-            handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
-                    messageProtobufReply, emitter);
-            return;
-        }
+    if (baiduChatModel == null) {
+        sseMessageHelper.handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
+            messageProtobufReply, emitter);
+        return;
+    }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -309,7 +321,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                                     fullResponseText[0].append(textContent);
                                 }
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             // 提取token使用情况 - 使用百度专用的提取方法
                             tokenUsage[0] = extractBaiduTokenUsage(response);
@@ -317,13 +329,13 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         success[0] = false;
                     }
                 },
                 error -> {
                     log.error("Baidu API SSE error: ", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
@@ -338,7 +350,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     }
                     
                     // 发送流结束消息，包含token使用情况和prompt内容
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
                             tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.BAIDU,
                             (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
@@ -347,7 +359,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "ernie-bot";
-                    recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });
@@ -481,7 +493,7 @@ public class SpringAIBaiduService extends BaseSpringAIService {
 
             // 方法3: 如果手动提取失败，尝试使用原始的extractTokenUsage方法作为后备
             log.info("Baidu API manual extraction failed, trying original extractTokenUsage method");
-            ChatTokenUsage fallbackUsage = extractTokenUsage(response);
+            ChatTokenUsage fallbackUsage = tokenUsageHelper.extractTokenUsage(response);
             if (fallbackUsage.getTotalTokens() > 0) {
                 log.info("Baidu API fallback extraction successful: {}", fallbackUsage);
                 return fallbackUsage;

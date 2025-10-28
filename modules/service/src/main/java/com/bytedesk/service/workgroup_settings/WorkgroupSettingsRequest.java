@@ -13,11 +13,10 @@
  */
 package com.bytedesk.service.workgroup_settings;
 
-import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue_settings.QueueSettings;
-import com.bytedesk.service.settings.RobotSettings;
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
+import com.bytedesk.kbase.settings.BaseSettingsRequest;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
+import com.bytedesk.service.queue_settings.QueueSettingsRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,23 +31,27 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class WorkgroupSettingsRequest extends BaseRequest {
+public class WorkgroupSettingsRequest extends BaseSettingsRequest {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    /**
+     * Customer routing mode (ROUND_ROBIN, LEAST_BUSY, etc.)
+     */
+    private String routingMode;
 
-    private String description;
+    /**
+     * Message leave settings (Workgroup-specific)
+     */
+    private MessageLeaveSettingsRequest messageLeaveSettings;
 
-    private Boolean isDefault;
+    /**
+     * Robot routing settings (Workgroup-specific)
+     */
+    private RobotRoutingSettingsRequest robotSettings;
 
-    private Boolean enabled;
-
-    private ServiceSettings serviceSettings;
-
-    private MessageLeaveSettings messageLeaveSettings;
-
-    private RobotSettings robotSettings;
-
-    private QueueSettings queueSettings;
+    /**
+     * Queue settings (Workgroup-specific)
+     */
+    private QueueSettingsRequest queueSettings;
 }

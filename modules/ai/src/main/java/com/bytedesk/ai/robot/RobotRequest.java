@@ -18,7 +18,6 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.settings.ServiceSettingsRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,8 +47,11 @@ public class RobotRequest extends BaseRequest {
 
     private String description;
 
-    @Builder.Default
-    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
+    /**
+     * Robot settings reference UID
+     * If not provided, will use the default settings
+     */
+    private String settingsUid;
 
     // 方便前端搜索
     private String prompt;

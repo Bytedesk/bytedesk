@@ -33,12 +33,13 @@ import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.ai.springai.service.TokenUsageHelper;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,6 +68,9 @@ public class SpringAICustomService extends BaseSpringAIService {
     @Qualifier("customChatModel")
     private OpenAiChatModel defaultChatModel;
 
+    @Autowired
+    private TokenUsageHelper tokenUsageHelper;
+
     public SpringAICustomService() {
         super(); // 调用基类的无参构造函数
     }
@@ -78,13 +82,19 @@ public class SpringAICustomService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> 
-            OpenAiChatOptions.builder()
-                .model(robotLlm.getTextModel())
-                .temperature(robotLlm.getTemperature())
-                .topP(robotLlm.getTopP())
-                .build()
-        );
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return OpenAiChatOptions.builder()
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .topP(llm.getTopP())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);
+            return null;
+        }
     }
 
     /**
@@ -151,14 +161,14 @@ public class SpringAICustomService extends BaseSpringAIService {
         log.info("{} API websocket", providerName);
         
         if (llm == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
 
         // 获取适当的模型实例
         OpenAiChatModel chatModel = createChatModel(llm);
         if (chatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -189,16 +199,16 @@ public class SpringAICustomService extends BaseSpringAIService {
                                     fullResponseText[0].append(textContent);
                                 }
                                 
-                                sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                             success[0] = true;
                         }
                     },
                     error -> {
                         log.error("{} API error: ", providerName, error);
-                        sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                        sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                         success[0] = false;
                     },
                     () -> {
@@ -216,18 +226,18 @@ public class SpringAICustomService extends BaseSpringAIService {
                         long responseTime = System.currentTimeMillis() - startTime;
                         String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                 : "default-model";
-                        recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                                 responseTime);
                     });
         } catch (Exception e) {
             log.error("{} API websocket error: ", providerName, e);
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             // 记录失败的token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                     : "default-model";
-            recordAiTokenUsage(robot, getProviderConstant(llm), modelType, 0, 0, false, responseTime);
+            tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType, 0, 0, false, responseTime);
         }
     }
 
@@ -262,18 +272,18 @@ public class SpringAICustomService extends BaseSpringAIService {
                     // 使用自定义选项创建Prompt
                     Prompt prompt = new Prompt(message, customOptions);
                     var response = chatModel.call(prompt);
-                    tokenUsage = extractTokenUsage(response);
+                    tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                     success = true;
-                    return extractTextFromResponse(response);
+                    return promptHelper.extractTextFromResponse(response);
                 }
             }
 
             // 如果没有robot参数或自定义选项，使用默认方式
             Prompt prompt = new Prompt(message);
             var response = chatModel.call(prompt);
-            tokenUsage = extractTokenUsage(response);
+            tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
-            return extractTextFromResponse(response);
+            return promptHelper.extractTextFromResponse(response);
         } catch (Exception e) {
             log.error("{} API sync error: ", providerName, e);
             success = false;
@@ -285,35 +295,35 @@ public class SpringAICustomService extends BaseSpringAIService {
                     && StringUtils.hasText(robot.getLlm().getTextModel()))
                             ? robot.getLlm().getTextModel()
                             : "default-model";
-            recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
+        tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置和提供商信息
         RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
         log.info("{} API SSE: {}", providerName);
 
-        if (llm == null) {
-            handleSseError(new RuntimeException(providerName + " service not available"), messageProtobufQuery,
-                    messageProtobufReply, emitter);
-            return;
-        }
+    if (llm == null) {
+        sseMessageHelper.handleSseError(new RuntimeException(providerName + " service not available"), messageProtobufQuery,
+            messageProtobufReply, emitter);
+        return;
+    }
 
         // 获取适当的模型实例
         OpenAiChatModel chatModel = createChatModel(llm);
-        if (chatModel == null) {
-            handleSseError(new RuntimeException(providerName + " service not available"), messageProtobufQuery,
-                    messageProtobufReply, emitter);
-            return;
-        }
+    if (chatModel == null) {
+        sseMessageHelper.handleSseError(new RuntimeException(providerName + " service not available"), messageProtobufQuery,
+            messageProtobufReply, emitter);
+        return;
+    }
 
         // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -344,21 +354,21 @@ public class SpringAICustomService extends BaseSpringAIService {
                                     fullResponseText[0].append(textContent);
                                 }
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         success[0] = false;
                     }
                 },
                 error -> {
                     log.error("{} API SSE error: ", providerName, error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
@@ -373,7 +383,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                     }
                     
                     // 发送流结束消息，包含token使用情况和prompt内容
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
                             tokenUsage[0].getTotalTokens(), prompt, getProviderConstant(llm),
                             (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
@@ -382,7 +392,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "default-model";
-                    recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });

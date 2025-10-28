@@ -13,11 +13,10 @@
  */
 package com.bytedesk.service.workgroup_settings;
 
-import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue_settings.QueueSettings;
-import com.bytedesk.service.settings.RobotSettings;
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse;
+import com.bytedesk.kbase.settings.BaseSettingsResponse;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
+import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,23 +31,39 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class WorkgroupSettingsResponse extends BaseResponse {
+public class WorkgroupSettingsResponse extends BaseSettingsResponse {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    /**
+     * Customer routing mode (ROUND_ROBIN, LEAST_BUSY, etc.)
+     */
+    private String routingMode;
 
-    private String description;
+    /**
+     * Message leave settings (Workgroup-specific)
+     */
+    private MessageLeaveSettingsResponse messageLeaveSettings;
+    /**
+     * Draft message leave settings (Workgroup-specific)
+     */
+    private MessageLeaveSettingsResponse draftMessageLeaveSettings;
 
-    private Boolean isDefault;
+    /**
+     * Robot routing settings (Workgroup-specific)
+     */
+    private RobotRoutingSettingsResponse robotSettings;
+    /**
+     * Draft robot routing settings (Workgroup-specific)
+     */
+    private RobotRoutingSettingsResponse draftRobotSettings;
 
-    private Boolean enabled;
-
-    private ServiceSettings serviceSettings;
-
-    private MessageLeaveSettings messageLeaveSettings;
-
-    private RobotSettings robotSettings;
-
-    private QueueSettings queueSettings;
+    /**
+     * Queue settings (Workgroup-specific)
+     */
+    private QueueSettingsResponse queueSettings;
+    /**
+     * Draft queue settings (Workgroup-specific)
+     */
+    private QueueSettingsResponse draftQueueSettings;
 }

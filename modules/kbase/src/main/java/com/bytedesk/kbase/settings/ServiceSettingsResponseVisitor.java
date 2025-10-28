@@ -101,34 +101,8 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     // 快捷功能
     private List<FaqResponseVisitor> shortcutFaqs;
 
-    // 主动触发设置
-    // private Boolean enableProactiveTrigger;  // 是否启用主动触发
-
-    // private Integer noResponseTimeout;  // 访客无响应超时时间(秒)，默认5分钟
-
-    // private String proactiveMessage;  // 主动发送的消息内容
-
-    // private Integer maxProactiveCount;  // 最大主动触发次数，防止打扰用户
-
-    // private Integer proactiveInterval;  // 两次主动触发的最小间隔(秒)，默认10分钟
-
-    // private String triggerConditions;  // 触发条件配置，JSON格式
-
-    // private List<FaqResponseVisitor> proactiveFaqs;  // 主动推送的常见问题列表
-
     private Boolean showLogo;
 
     // 工具栏显示控制（固定字段，未设置则默认为显示）
     private ToolbarSettings toolbar;
-
-    // robot
-    // 是否允许转人工
-    // private Boolean allowTransferToAgent;
-
-    // // 限制仅允许：workgroup、appointed
-    // private ThreadTypeEnum transferType;
-
-    // // agentUid or workgroupUid
-    // private String transferToUid;
-
 }

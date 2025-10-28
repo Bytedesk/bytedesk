@@ -96,11 +96,8 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
-    /**
-     * Customer routing mode (ROUND_ROBIN, LEAST_BUSY, etc.)
-     */
-    @Builder.Default
-    private String routingMode = WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
+    // 路由模式迁移至 WorkgroupSettingsEntity
+    // 为保持兼容性，保留委托型 getter，从 settings 读取；空值使用默认
 
     /**
      * Current status of the workgroup (AVAILABLE, BUSY, OFFLINE, etc.)
@@ -190,6 +187,17 @@ public class WorkgroupEntity extends BaseEntity {
             .avatar(this.getAvatar())
             .type(UserTypeEnum.WORKGROUP.name())
             .build();
+    }
+
+    /**
+     * 兼容旧代码：获取路由模式
+     * 优先从 settings 读取；若无 settings 或为空，使用安全默认值 ROUND_ROBIN
+     */
+    public String getRoutingMode() {
+        if (this.settings != null && this.settings.getRoutingMode() != null) {
+            return this.settings.getRoutingMode();
+        }
+        return WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
     }
 
     // 监控客服组登录坐席、开启自动领取坐席数、空闲坐席数、领取会话数、已处理会话数、流失会话数、留言数。

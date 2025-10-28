@@ -14,11 +14,8 @@
 package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettings;
-import com.bytedesk.kbase.settings.ServiceSettingsResponse;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
-import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 import com.bytedesk.core.member.MemberProtobuf;
+import com.bytedesk.service.agent_settings.AgentSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,23 +50,10 @@ public class AgentResponse extends BaseResponse {
 
     private Boolean enabled;
 
-    private MessageLeaveSettingsResponse messageLeaveSettings;
-
-    private ServiceSettingsResponse serviceSettings;
-
-    private AutoReplySettings autoReplySettings;
-
-    private QueueSettingsResponse queueSettings;
-
-    // private InviteSettings inviteSettings;
-
-    private Integer maxThreadCount;
-
-    private Boolean timeoutRemindEnabled;
-
-    private Integer timeoutRemindTime;
-
-    private String timeoutRemindTip;
+    /**
+     * Agent settings (loaded from settings entity)
+     */
+    private AgentSettingsResponse settings;
 
     private MemberProtobuf member;
 

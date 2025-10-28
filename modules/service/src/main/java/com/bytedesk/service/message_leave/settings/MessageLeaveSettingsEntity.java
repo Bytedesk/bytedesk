@@ -13,19 +13,23 @@
  */
 package com.bytedesk.service.message_leave.settings;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.message_leave.MessageLeaveNotifyTypeEnum;
 import com.bytedesk.service.worktime.WorktimeEntity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,13 +37,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@lombok.EqualsAndHashCode(callSuper = true)
 @Builder
-@Embeddable
+@Entity
+@Table(
+    name = "bytedesk_service_message_leave_settings",
+    indexes = {
+        @Index(name = "idx_msgleave_settings_uid", columnList = "uuid")
+    }
+)
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageLeaveSettings implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class MessageLeaveSettingsEntity extends BaseEntity {
 
     // 留言开关
     @Builder.Default
@@ -86,7 +95,7 @@ public class MessageLeaveSettings implements Serializable {
     @OneToMany(fetch = FetchType.EAGER)
     private List<WorktimeEntity> worktimes = new ArrayList<>();
 
-    // TODO: 通知：邮箱、企业微信、钉钉、飞书、短信等
+    // TODO: 通知:邮箱、企业微信、钉钉、飞书、短信等
 
     //
     public Boolean isInServiceTime() {
@@ -95,6 +104,22 @@ public class MessageLeaveSettings implements Serializable {
         }
         return worktimes.stream()
             .anyMatch(WorktimeEntity::isWorkTime);
+    }
+
+    /**
+     * 从 MessageLeaveSettingsRequest 创建 MessageLeaveSettings 实体
+     * 如果 request 为 null，返回默认构建的实体
+     * 
+     * @param request MessageLeaveSettingsRequest 对象，可以为 null
+     * @param modelMapper ModelMapper 实例用于对象映射
+     * @return MessageLeaveSettings 实体，永远不为 null
+     */
+    public static MessageLeaveSettingsEntity fromRequest(MessageLeaveSettingsRequest request, ModelMapper modelMapper) {
+        if (request == null) {
+            return MessageLeaveSettingsEntity.builder().build();
+        }
+        
+        return modelMapper.map(request, MessageLeaveSettingsEntity.class);
     }
 
 }

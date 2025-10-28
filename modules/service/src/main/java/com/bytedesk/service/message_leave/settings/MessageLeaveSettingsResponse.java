@@ -79,4 +79,25 @@ public class MessageLeaveSettingsResponse  implements Serializable {
     @OneToMany(fetch = FetchType.EAGER)
     private List<WorktimeResponse> worktimes = new ArrayList<>();
     
+    /**
+     * 从 MessageLeaveSettings 实体创建 MessageLeaveSettingsResponse
+     * @param settings MessageLeaveSettings 实体
+     * @return MessageLeaveSettingsResponse 对象,如果 settings 为 null 则返回 null
+     */
+    public static MessageLeaveSettingsResponse fromEntity(MessageLeaveSettingsEntity settings) {
+        if (settings == null) {
+            return null;
+        }
+        return MessageLeaveSettingsResponse.builder()
+                .messageLeaveEnabled(settings.getMessageLeaveEnabled())
+                .messageLeaveTip(settings.getMessageLeaveTip())
+                .messageLeaveAgentUid(settings.getMessageLeaveAgentUid())
+                .messageLeaveNotify(settings.getMessageLeaveNotify())
+                .messageLeaveNotifyType(settings.getMessageLeaveNotifyType())
+                .messageLeaveNotifyEmail(settings.getMessageLeaveNotifyEmail())
+                .messageLeaveNotifyMobile(settings.getMessageLeaveNotifyMobile())
+                .messageLeaveForm(settings.getMessageLeaveForm())
+                .build();
+    }
+    
 }

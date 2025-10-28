@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
 import jakarta.persistence.criteria.Predicate;
@@ -29,7 +31,16 @@ public class PushSpecification extends BaseSpecification<PushEntity, PushRequest
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+            // 
+            // searchText
+            String searchText = request.getSearchText();
+            if (StringUtils.hasText(searchText)) {
+                Predicate p1 = criteriaBuilder.like(root.get("sender"), "%" + searchText + "%");
+                Predicate p2 = criteriaBuilder.like(root.get("content"), "%" + searchText + "%");
+                Predicate p3 = criteriaBuilder.like(root.get("receiver"), "%" + searchText + "%");
+                predicates.add(criteriaBuilder.or(p1, p2, p3));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

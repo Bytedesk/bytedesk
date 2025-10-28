@@ -60,4 +60,23 @@ public class AutoReplySettingsResponse implements Serializable {
     // 大模型回复类型所需要字段
     private String kbUid;
 
+    /**
+     * 从 AutoReplySettings 实体创建 AutoReplySettingsResponse
+     * @param settings AutoReplySettings 实体
+     * @return AutoReplySettingsResponse 对象,如果 settings 为 null 则返回 null
+     */
+    public static AutoReplySettingsResponse fromEntity(AutoReplySettingsEntity settings) {
+        if (settings == null) {
+            return null;
+        }
+        return AutoReplySettingsResponse.builder()
+                .autoReplyEnabled(settings.getAutoReplyEnabled())
+                .autoReplyType(settings.getAutoReplyType())
+                .autoReplyUid(settings.getAutoReplyUid())
+                .autoReplyContentType(settings.getAutoReplyContentType())
+                .autoReplyContent(settings.getAutoReplyContent())
+                .kbUid(settings.getKbUid())
+                .build();
+    }
+
 }

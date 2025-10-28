@@ -66,7 +66,7 @@ public class ZhipuaiController {
 
     private final ZhipuAiClient zhipuAiClient;
     private final BytedeskProperties bytedeskProperties;
-    private final ZhipuaiService zhipuaiService;
+    private final ZhipuaiMultiModelService zhipuaiMultiModelService;
     private final ZhipuaiChatService zhipuaiChatService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -81,7 +81,7 @@ public class ZhipuaiController {
         }
 
         try {
-            String result = zhipuaiService.processPromptSync(message, null);
+            String result = zhipuaiMultiModelService.processPromptSync(message, null);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             log.error("Error in chat sync", e);
@@ -120,7 +120,7 @@ public class ZhipuaiController {
                 // 创建简单的消息对象用于测试
                 // 这里需要创建MessageProtobuf对象，但为了简化，我们直接调用服务
                 // 在实际使用中，应该通过SpringAIServiceRegistry调用
-                String result = zhipuaiService.processPromptSync(message, null);
+                String result = zhipuaiMultiModelService.processPromptSync(message, null);
                 emitter.send("data: " + result + "\n\n");
                 emitter.complete();
             } catch (Exception e) {

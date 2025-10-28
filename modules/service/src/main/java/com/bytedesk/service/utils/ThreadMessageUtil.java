@@ -26,7 +26,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceTrigger;
 import lombok.experimental.UtilityClass;
 
@@ -225,7 +225,7 @@ public class ThreadMessageUtil {
     }
 
     // 检查无响应触发
-    public static void checkNoResponse(String userUid, long lastActiveTime, ServiceSettings settings) {
+    public static void checkNoResponse(String userUid, long lastActiveTime, ServiceSettingsEntity settings) {
         if (!settings.getEnableProactiveTrigger()) {
             return;
         }

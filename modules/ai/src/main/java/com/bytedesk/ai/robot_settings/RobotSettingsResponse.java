@@ -13,9 +13,8 @@
  */
 package com.bytedesk.ai.robot_settings;
 
-import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kbase.settings.ServiceSettings;
-import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
+import com.bytedesk.kbase.settings.BaseSettingsResponse;
+import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,19 +29,17 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RobotSettingsResponse extends BaseResponse {
+public class RobotSettingsResponse extends BaseSettingsResponse {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    /**
+     * Rating down settings (Robot-specific)
+     */
+    private RatedownSettingsResponse rateDownSettings;
 
-    private String description;
-
-    private Boolean isDefault;
-
-    private Boolean enabled;
-
-    private ServiceSettings serviceSettings;
-
-    private RatedownSettingsEntity rateDownSettings;
+    /**
+     * Draft rating down settings (Robot-specific)
+     */
+    private RatedownSettingsResponse draftRateDownSettings;
 }

@@ -150,7 +150,58 @@ public class ServiceSettingsResponse implements Serializable {
     // 有效日期
     private Date validateUntil;
 
-    // 工具栏显示控制（固定字段，未设置则默认为显示）
+    // 工具栏显示控制(固定字段,未设置则默认为显示)
     private ToolbarSettings toolbar;
+
+    /**
+     * 从 ServiceSettings 实体创建 ServiceSettingsResponse
+     * @param settings ServiceSettings 实体
+     * @return ServiceSettingsResponse 对象,如果 settings 为 null 则返回 null
+     */
+    public static ServiceSettingsResponse fromEntity(ServiceSettingsEntity settings) {
+        if (settings == null) {
+            return null;
+        }
+        return ServiceSettingsResponse.builder()
+                .language(settings.getLanguage() != null ? LanguageEnum.valueOf(settings.getLanguage()) : null)
+                .autoPopup(settings.getAutoPopup())
+                .showTopTip(settings.getShowTopTip())
+                .topTip(settings.getTopTip())
+                .topTipStart(settings.getTopTipStart())
+                .topTipEnd(settings.getTopTipEnd())
+                .showRateBtn(settings.getShowRateBtn())
+                .autoInviteRate(settings.getAutoInviteRate())
+                .inviteRateTip(settings.getInviteRateTip())
+                .rateMsgCount(settings.getRateMsgCount())
+                .showPreForm(settings.getShowPreForm())
+                .preFormRequired(settings.getPreFormRequired())
+                .showHistory(settings.getShowHistory())
+                .showInputAssociation(settings.getShowInputAssociation())
+                .showCaptcha(settings.getShowCaptcha())
+                .welcomeTip(settings.getWelcomeTip())
+                .welcomeKbUid(settings.getWelcomeKbUid())
+                .autoCloseMin(settings.getAutoCloseMin())
+                .autoCloseTip(settings.getAutoCloseTip())
+                .agentCloseTip(settings.getAgentCloseTip())
+                .showRightIframe(settings.getShowRightIframe())
+                .rightIframeUrl(settings.getRightIframeUrl())
+                .showPreSearch(settings.getShowPreSearch())
+                .showFaqs(settings.getShowFaqs())
+                .faqKbUid(settings.getFaqKbUid())
+                .showQuickFaqs(settings.getShowQuickFaqs())
+                .quickFaqKbUid(settings.getQuickFaqKbUid())
+                .showGuessFaqs(settings.getShowGuessFaqs())
+                .showHotFaqs(settings.getShowHotFaqs())
+                .showShortcutFaqs(settings.getShowShortcutFaqs())
+                .enableProactiveTrigger(settings.getEnableProactiveTrigger())
+                .noResponseTimeout(settings.getNoResponseTimeout())
+                .proactiveMessage(settings.getProactiveMessage())
+                .maxProactiveCount(settings.getMaxProactiveCount())
+                .proactiveInterval(settings.getProactiveInterval())
+                .triggerConditions(settings.getTriggerConditions())
+                .showLogo(settings.getShowLogo())
+                .validateUntil(settings.getValidateUntil())
+                .build();
+    }
 
 }

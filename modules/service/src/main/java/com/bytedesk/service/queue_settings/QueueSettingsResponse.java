@@ -38,4 +38,20 @@ public class QueueSettingsResponse implements Serializable {
     
     private String queueTip; // 排队提示
     
+    /**
+     * 从 QueueSettings 实体创建 QueueSettingsResponse
+     * @param settings QueueSettings 实体
+     * @return QueueSettingsResponse 对象,如果 settings 为 null 则返回 null
+     */
+    public static QueueSettingsResponse fromEntity(QueueSettingsEntity settings) {
+        if (settings == null) {
+            return null;
+        }
+        return QueueSettingsResponse.builder()
+                .maxWaiting(settings.getMaxWaiting())
+                .maxWaitTime(settings.getMaxWaitTime())
+                .queueTip(settings.getQueueTip())
+                .build();
+    }
+    
 }

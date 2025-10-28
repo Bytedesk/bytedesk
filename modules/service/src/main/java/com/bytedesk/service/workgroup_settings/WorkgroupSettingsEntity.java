@@ -5,12 +5,13 @@
  */
 package com.bytedesk.service.workgroup_settings;
 
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettings;
-import com.bytedesk.service.queue_settings.QueueSettings;
-import com.bytedesk.service.settings.RobotSettings;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
+import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 
-import jakarta.persistence.Embedded;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -62,23 +63,52 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Message leave settings
+     * Customer routing mode (ROUND_ROBIN, LEAST_BUSY, etc.)
+     * Moved from WorkgroupEntity to centralize configuration
      */
-    @Embedded
     @lombok.Builder.Default
-    private MessageLeaveSettings messageLeaveSettings = new MessageLeaveSettings();
+    private String routingMode = com.bytedesk.service.workgroup.WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
 
     /**
-     * Robot settings
+     * Message leave settings
      */
-    @Embedded
-    @lombok.Builder.Default
-    private RobotSettings robotSettings = new RobotSettings();
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private MessageLeaveSettingsEntity messageLeaveSettings;
+
+    /**
+     * Draft Message leave settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private MessageLeaveSettingsEntity draftMessageLeaveSettings;
+
+    /**
+     * Robot routing settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private RobotRoutingSettingsEntity robotSettings;
+
+    /**
+     * Draft Robot routing settings
+     * Note: Override columns and association to avoid conflicts with published embedded fields
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private RobotRoutingSettingsEntity draftRobotSettings;
 
     /**
      * Queue settings
      */
-    @Embedded
-    @lombok.Builder.Default
-    private QueueSettings queueSettings = new QueueSettings();
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private QueueSettingsEntity queueSettings;
+
+    /**
+     * Draft Queue settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private QueueSettingsEntity draftQueueSettings;
 }

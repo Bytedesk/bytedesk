@@ -20,7 +20,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.ai.workflow.WorkflowEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -161,11 +161,11 @@ public class ServiceConvertUtils {
     
     //
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
-            ServiceSettings serviceSettings) {
+            ServiceSettingsEntity serviceSettings) {
         return getModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 
-    public static String convertToServiceSettingsResponseVisitorJSONString( ServiceSettings serviceSettings) {
+    public static String convertToServiceSettingsResponseVisitorJSONString( ServiceSettingsEntity serviceSettings) {
         return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
     }
 

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -46,8 +48,8 @@ import lombok.Setter;
 @Entity
 @Table(name = "bytedesk_kbase_settings_intention")
 public class IntentionSettingsEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * 设置名称，用于区分不同的邀请设置模板
@@ -160,4 +162,19 @@ public class IntentionSettingsEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "intention_switch_threshold")
     private Double intentionSwitchThreshold = 0.8;
+
+    /**
+     * 从 IntentionSettingsRequest 创建 IntentionSettings 实体
+     * 如果 request 为 null，返回默认构建的实体
+     *
+     * @param request IntentionSettingsRequest 对象，可以为 null
+     * @param modelMapper ModelMapper 实例用于字段映射
+     * @return IntentionSettings 实体，永远不为 null
+     */
+    public static IntentionSettingsEntity fromRequest(IntentionSettingsRequest request, ModelMapper modelMapper) {
+        if (request == null) {
+            return IntentionSettingsEntity.builder().build();
+        }
+        return modelMapper.map(request, IntentionSettingsEntity.class);
+    }
 }

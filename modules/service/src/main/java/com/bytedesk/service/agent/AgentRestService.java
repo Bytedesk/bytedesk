@@ -59,8 +59,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final AgentRepository agentRepository;
 
-    // private final ModelMapper modelMapper;
-
     private final UidUtils uidUtils;
 
     private final MemberRestService memberRestService;
@@ -70,8 +68,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     private final AuthService authService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
-
-    // private final ServiceSettingsService serviceSettingsService;
 
     private final MqttConnectionService mqttConnectionService;
 
@@ -132,8 +128,18 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setMember(member);
         agent.setUserUid(user.getUid());
         //
-        // 设置默认配置
-        agent.setSettings(agentSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+        // 设置客服配置：如果指定了 settingsUid，使用指定的配置；否则使用默认配置
+        if (StringUtils.hasText(request.getSettingsUid())) {
+            Optional<com.bytedesk.service.agent_settings.AgentSettingsEntity> settingsOptional = 
+                agentSettingsRestService.findByUid(request.getSettingsUid());
+            if (settingsOptional.isPresent()) {
+                agent.setSettings(settingsOptional.get());
+            } else {
+                agent.setSettings(agentSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+            }
+        } else {
+            agent.setSettings(agentSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+        }
         //
         Set<String> userIds = mqttConnectionService.getConnectedUserUids();
         if (userIds.contains(agent.getUserUid())) {
@@ -184,12 +190,21 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setMobile(request.getMobile());
         agent.setEmail(request.getEmail());
         agent.setDescription(request.getDescription());
-        agent.setStatus(request.getStatus()); // 更新接待状态
-        agent.setMaxThreadCount(request.getMaxThreadCount());
-        agent.setTimeoutRemindTime(request.getTimeoutRemindTime());
+        // agent.setStatus(request.getStatus()); // 更新接待状态
+        // agent.setMaxThreadCount(request.getMaxThreadCount());
+        // agent.setTimeoutRemindTime(request.getTimeoutRemindTime());
         // 暂不允许修改绑定成员
         // agent.setMember(memberOptional.get());
         // agent.setUserUid(memberOptional.get().getUser().getUid());
+        //
+        // 更新客服配置
+        if (StringUtils.hasText(request.getSettingsUid())) {
+            Optional<com.bytedesk.service.agent_settings.AgentSettingsEntity> settingsOptional = 
+                agentSettingsRestService.findByUid(request.getSettingsUid());
+            if (settingsOptional.isPresent()) {
+                agent.setSettings(settingsOptional.get());
+            }
+        }
         //
         // TODO: Settings should be managed through AgentSettingsEntity
         // All configuration settings are now managed via agent.getSettings() reference
@@ -316,12 +331,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     public AgentResponse updateAutoReply(AgentRequest request) {
         AgentEntity agent = findByUid(request.getUid())
                 .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
-        //
-        // TODO: Update settings through AgentSettingsEntity
-        // AutoReplySettings autoReplySettings = modelMapper.map(request.getAutoReplySettings(),
-        //         AutoReplySettings.class);
-        // agent.setAutoReplySettings(autoReplySettings);
-        // These should be set on the AgentSettingsEntity via agent.getSettings()
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {

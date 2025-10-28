@@ -13,12 +13,14 @@
  */
 package com.bytedesk.kbase.settings;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -26,11 +28,16 @@ import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,13 +48,19 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false)
-@Embeddable
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@Table(
+    name = "bytedesk_kbase_service_settings",
+    indexes = {
+        @Index(name = "idx_service_settings_uid", columnList = "uuid")
+    }
+)
 @Builder
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceSettings implements Serializable {
+public class ServiceSettingsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,12 +68,12 @@ public class ServiceSettings implements Serializable {
     @Builder.Default
     private String language = LanguageEnum.ZH_CN.name();
 
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean autoPopup = false;
 
     // 顶部提示开关
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean showTopTip = false;
     
@@ -74,12 +87,12 @@ public class ServiceSettings implements Serializable {
 
     // 满意度评价设置--------------------------------------------------
     // show rate btn on chat toolbar
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean showRateBtn = false;
 
     // 关闭会话时自动发送满意度评价
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean autoInviteRate = false;
 
@@ -88,7 +101,7 @@ public class ServiceSettings implements Serializable {
     private String inviteRateTip = I18Consts.I18N_INVITE_RATE_TIP;
     
     // 自定义评价最低消息数量，未达到最低对话消息数，禁止评价
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Integer rateMsgCount = 3;
 
@@ -106,12 +119,12 @@ public class ServiceSettings implements Serializable {
 
     // 询前表单
     // 是否显示询前表单
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean showPreForm = false;
 
     // 是否强制填写
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean preFormRequired = false;
 
@@ -122,17 +135,17 @@ public class ServiceSettings implements Serializable {
     //-----------------------------------------------------------------------------------
 
     // show history message or not
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean showHistory = false;
 
     // 输入联想开关
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean showInputAssociation = false;
 
     // 防骚扰验证开关，TODO: 自定义验证规则: 1. 访问频率 2. 发消息时间间隔
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean showCaptcha = false;
 
@@ -143,24 +156,20 @@ public class ServiceSettings implements Serializable {
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_kbase_service_settings_welcome_faqs",
+        joinColumns = @JoinColumn(name = "service_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "welcome_faqs_id")
+    )
     private List<FaqEntity> welcomeFaqs = new ArrayList<>();
 
     // 换一换-Faq常见问题知识库
     private String welcomeKbUid;
 
-    // ----------------------------------------------------
-    
-    // // 是否启用workflow
-    // @Builder.Default
-    // private Boolean enableWorkflow = false;
-
-    // // 工作流uid
-    // private String workflowUid;
-
     //-----------------------------------------------------------------------------------
 
     /** auto close time in minutes */
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Double autoCloseMin = Double.valueOf(25);
 
@@ -188,6 +197,11 @@ public class ServiceSettings implements Serializable {
     private Boolean showFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_kbase_service_settings_faqs",
+        joinColumns = @JoinColumn(name = "service_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "faqs_id")
+    )
     private List<FaqEntity> faqs = new ArrayList<>();
     // 常见问题知识库
     private String faqKbUid;
@@ -197,6 +211,11 @@ public class ServiceSettings implements Serializable {
     private Boolean showQuickFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_kbase_service_settings_quick_faqs",
+        joinColumns = @JoinColumn(name = "service_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "quick_faqs_id")
+    )
     private List<FaqEntity> quickFaqs = new ArrayList<>();
     // 快捷问题知识库
     private String quickFaqKbUid;
@@ -206,6 +225,11 @@ public class ServiceSettings implements Serializable {
     private Boolean showGuessFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_kbase_service_settings_guess_faqs",
+        joinColumns = @JoinColumn(name = "service_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "guess_faqs_id")
+    )
     private List<FaqEntity> guessFaqs = new ArrayList<>();
 
     // 热门问题
@@ -213,6 +237,11 @@ public class ServiceSettings implements Serializable {
     private Boolean showHotFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_kbase_service_settings_hot_faqs",
+        joinColumns = @JoinColumn(name = "service_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "hot_faqs_id")
+    )
     private List<FaqEntity> hotFaqs = new ArrayList<>();
 
     // 快捷功能
@@ -220,6 +249,11 @@ public class ServiceSettings implements Serializable {
     private Boolean showShortcutFaqs = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_kbase_service_settings_shortcut_faqs",
+        joinColumns = @JoinColumn(name = "service_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "shortcut_faqs_id")
+    )
     private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
     // 未知答案固定回复
@@ -259,9 +293,14 @@ public class ServiceSettings implements Serializable {
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_kbase_service_settings_proactive_faqs",
+        joinColumns = @JoinColumn(name = "service_settings_id"),
+        inverseJoinColumns = @JoinColumn(name = "proactive_faqs_id")
+    )
     private List<FaqEntity> proactiveFaqs = new ArrayList<>();  // 主动推送的常见问题列表
 
-    @NotBlank
+    @NotNull
     @Builder.Default
     private Boolean showLogo = true;
 
@@ -270,9 +309,34 @@ public class ServiceSettings implements Serializable {
     
     //-----------------------------------------------------------------------------------
 
-    // 工具栏显示控制（固定字段，未设置则默认为显示）
+    // 工具栏显示控制(固定字段,未设置则默认为显示)
     @Builder.Default
     @Embedded
     private ToolbarSettings toolbar = new ToolbarSettings();
+    
+    /**
+     * 从 ServiceSettingsRequest 创建 ServiceSettings 实体
+     * 如果 request 为 null，返回默认构建的实体
+     * 
+     * @param request ServiceSettingsRequest 对象，可以为 null
+     * @param modelMapper ModelMapper 实例用于字段映射
+     * @return ServiceSettings 实体，永远不为 null
+     */
+    public static ServiceSettingsEntity fromRequest(ServiceSettingsRequest request, ModelMapper modelMapper) {
+        // 如果 request 为 null，返回默认值
+        if (request == null) {
+            return ServiceSettingsEntity.builder().build();
+        }
+        
+        // 使用 ModelMapper 自动映射大部分字段
+        ServiceSettingsEntity settings = modelMapper.map(request, ServiceSettingsEntity.class);
+        
+        // 处理特殊字段: LanguageEnum 需要转换为 String
+        if (request.getLanguage() != null) {
+            settings.setLanguage(request.getLanguage().name());
+        }
+        
+        return settings;
+    }
     
 }

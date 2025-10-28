@@ -61,7 +61,7 @@ public class MessageTypeConverter {
         typeToChineseMap.put(MessageTypeEnum.FAQ_ANSWER.name(), "常见问题答案");
         // typeToChineseMap.put(MessageTypeEnum.FAQ_UP.name(), "常见问题点赞");
         // typeToChineseMap.put(MessageTypeEnum.FAQ_DOWN.name(), "常见问题点踩");
-        typeToChineseMap.put(MessageTypeEnum.ROBOT_ANSWER.name(), "机器人回答");
+        typeToChineseMap.put(MessageTypeEnum.ROBOT.name(), "机器人回答");
         // typeToChineseMap.put(MessageTypeEnum.ROBOT_UP.name(), "机器人点赞");
         // typeToChineseMap.put(MessageTypeEnum.ROBOT_DOWN.name(), "机器人点踩");
         typeToChineseMap.put(MessageTypeEnum.RATE.name(), "评价");

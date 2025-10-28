@@ -14,7 +14,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Robot流式回答内容
+ * Robot回答内容
  * 包含问题、答案以及引用来源信息
  */
 @Getter
@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StreamContent extends BaseContent {
+public class RobotContent extends BaseContent {
     
     private static final long serialVersionUID = 1L;
 
@@ -117,6 +117,7 @@ public class StreamContent extends BaseContent {
             return code;
         }
     }
+    
     /**
      * 来源引用信息
      */
@@ -149,4 +150,5 @@ public class StreamContent extends BaseContent {
         // 是否高亮显示
         private Boolean highlighted;
     }
+
 }

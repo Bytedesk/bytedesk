@@ -19,10 +19,6 @@ import java.util.List;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kbase.settings.ServiceSettingsRequest;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
-import com.bytedesk.service.queue_settings.QueueSettingsRequest;
-import com.bytedesk.service.settings.RobotSettingsRequest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -53,28 +49,18 @@ public class WorkgroupRequest extends BaseRequest {
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
-    @Builder.Default
-    private String routingMode = WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
+    // routingMode moved to WorkgroupSettings; use settings APIs instead
 
     @Builder.Default
     private String status = WorkgroupStateEnum.AVAILABLE.name();
     
-    @Builder.Default
-    private MessageLeaveSettingsRequest messageLeaveSettings = new MessageLeaveSettingsRequest();
-
-    @Builder.Default
-    private RobotSettingsRequest robotSettings = new RobotSettingsRequest();
-
-    @Builder.Default
-    private ServiceSettingsRequest serviceSettings = new ServiceSettingsRequest();
-
-    @Builder.Default
-    private QueueSettingsRequest queueSettings = new QueueSettingsRequest();
+    /**
+     * Workgroup settings reference UID
+     * If not provided, will use the default settings
+     */
+    private String settingsUid;
 
     private Boolean enabled;
-
-    // @Builder.Default
-    // private InviteSettings inviteSettings = new InviteSettings();
 
     // 是否统一入口
     // @Builder.Default

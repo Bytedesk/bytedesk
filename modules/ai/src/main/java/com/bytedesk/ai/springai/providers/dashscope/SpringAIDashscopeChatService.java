@@ -29,11 +29,12 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.ai.springai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,9 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
     @Qualifier("bytedeskDashscopeChatModel")
     private ChatModel bytedeskDashscopeChatModel;
 
+    @Autowired
+    private TokenUsageHelper tokenUsageHelper;
+
     public SpringAIDashscopeChatService() {
         super(); // 调用基类的无参构造函数
     }
@@ -58,15 +62,19 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private DashScopeChatOptions createDynamicOptions(RobotLlm llm) {
-        return super.createDynamicOptions(llm, robotLlm -> 
-            DashScopeChatOptions.builder()
-                .withModel(robotLlm.getTextModel())
-                .withTemperature(robotLlm.getTemperature())
-                .withTopP(robotLlm.getTopP())
-                // .withEnableSearch(robotLlm.getEnableSearch())
-                // .withEnableThinking(robotLlm.getEnableThinking())
-                .build()
-        );
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return DashScopeChatOptions.builder()
+                    .withModel(llm.getTextModel())
+                    .withTemperature(llm.getTemperature())
+                    .withTopP(llm.getTopP())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);
+            return null;
+        }
     }
 
     @Override
@@ -75,7 +83,7 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
         RobotLlm llm = robot.getLlm();
         
         if (bytedeskDashscopeChatModel == null) {
-            sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
             return;
         }
         
@@ -104,16 +112,16 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
                             // 累积完整响应文本
                             fullResponseText[0].append(textContent);
 
-                            sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
                         }
                         // 提取token使用情况
-                        tokenUsage[0] = extractTokenUsage(response);
+                        tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                         success[0] = true;
                     }
                 },
                 error -> {
                     log.error("Dashscope API error: ", error);
-                    sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
                     success[0] = false;
                 },
                 () -> {
@@ -121,7 +129,7 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "qwen-turbo";
-                    recordAiTokenUsage(robot, LlmProviderConstants.DASHSCOPE, modelType, 
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.DASHSCOPE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
@@ -146,16 +154,16 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
                         var response = bytedeskDashscopeChatModel.call(prompt);
-                        tokenUsage = extractTokenUsage(response);
+                        tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                         success = true;
-                        return extractTextFromResponse(response);
+                        return promptHelper.extractTextFromResponse(response);
                     }
                 }
                 
                 var response = bytedeskDashscopeChatModel.call(message);
-                tokenUsage = extractTokenUsage(response);
+                tokenUsage = tokenUsageHelper.extractTokenUsage(response);
                 success = true;
-                return extractTextFromResponse(response);
+                return promptHelper.extractTextFromResponse(response);
             } catch (Exception e) {
                 log.error("Dashscope API call error: ", e);
                 success = false;
@@ -170,23 +178,23 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
                     ? robot.getLlm().getTextModel() : "qwen-turbo";
-            recordAiTokenUsage(robot, LlmProviderConstants.DASHSCOPE, modelType, 
+        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.DASHSCOPE, modelType, 
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-     List<StreamContent.SourceReference> sourceReferences, SseEmitter emitter) {
+     List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         RobotLlm llm = robot.getLlm();
         
         if (bytedeskDashscopeChatModel == null) {
-            handleSseError(new RuntimeException("Dashscope service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            sseMessageHelper.handleSseError(new RuntimeException("Dashscope service not available"), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 
-        // 发送起始消息
-        sendStreamStartMessage(messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+        // 发送起始消息（带上原始提问）
+        sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         DashScopeChatOptions customOptions = createDynamicOptions(llm);
@@ -209,32 +217,32 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
                                 log.info("Dashscope API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
-                                sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
                             }
                             // 提取token使用情况
-                            tokenUsage[0] = extractTokenUsage(response);
+                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
                             success[0] = true;
                         }
                     } catch (Exception e) {
                         log.error("Error sending SSE event", e);
-                        handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
+                        sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);
                         success[0] = false;
                     }
                 },
                 error -> {
                     log.error("Dashscope API SSE error: ", error);
-                    handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
+                    sseMessageHelper.handleSseError(error, messageProtobufQuery, messageProtobufReply, emitter);
                     success[0] = false;
                 },
                 () -> {
                     log.info("Dashscope API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
-                    sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.DASHSCOPE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "qwen-turbo");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "qwen-turbo";
-                    recordAiTokenUsage(robot, LlmProviderConstants.DASHSCOPE, modelType, 
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.DASHSCOPE, modelType, 
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }

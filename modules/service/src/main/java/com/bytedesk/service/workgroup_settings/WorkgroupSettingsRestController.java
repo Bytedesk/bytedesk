@@ -73,4 +73,13 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @Operation(summary = "发布技能组配置", description = "将草稿版本发布为线上版本")
+    @ApiResponse(responseCode = "200", description = "发布成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @RequestMapping("/publish")
+    public ResponseEntity<?> publish(@RequestBody WorkgroupSettingsRequest request) {
+        WorkgroupSettingsResponse resp = workgroupSettingsRestService.publish(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
 }

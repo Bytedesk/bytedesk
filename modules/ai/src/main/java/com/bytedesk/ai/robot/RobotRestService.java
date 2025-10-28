@@ -52,9 +52,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
-import com.bytedesk.kbase.llm_faq.FaqEntity;
-import com.bytedesk.kbase.llm_faq.FaqRestService;
-import com.bytedesk.kbase.settings.ServiceSettings;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +64,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     private final RobotRepository robotRepository;
 
-    private final FaqRestService faqRestService;
+    // private final FaqRestService faqRestService;  // No longer needed after settings migration
 
     private final ModelMapper modelMapper;
 
@@ -177,7 +174,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             robot.setLlm(llm);
         }
         // Set common settings
-        setRobotSettings(robot, request);
+        // TODO: Settings should be managed through RobotSettingsEntity, not directly in RobotRequest
+        // setRobotSettings(robot, request);
         //
         RobotEntity updatedRobot = save(robot);
         if (updatedRobot == null) {
@@ -210,7 +208,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
         //
         // Set common settings
-        setRobotSettings(robot, request);
+        // TODO: Settings should be managed through RobotSettingsEntity, not directly in RobotRequest
+        // setRobotSettings(robot, request);
         //
         RobotEntity updateRobot = save(robot);
         if (updateRobot == null) {
@@ -223,122 +222,18 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     /**
      * Sets common settings for both create and update operations
      * 
+     * DEPRECATED: This method is no longer used as settings are now managed through RobotSettingsEntity
+     * Settings should be managed through the RobotSettingsRestService instead
+     * 
      * @param robot   The robot entity to update
      * @param request The request containing settings
      */
+    @Deprecated
+    @SuppressWarnings("unused")
     private void setRobotSettings(RobotEntity robot, RobotRequest request) {
-
-        ServiceSettings serviceSettings = modelMapper.map(
-                request.getServiceSettings(), ServiceSettings.class);
-
-        // Set Welcome FAQs
-        if (request.getServiceSettings().getWelcomeFaqUids() != null
-                && request.getServiceSettings().getWelcomeFaqUids().size() > 0) {
-            for (String welcomeFaqUid : request.getServiceSettings().getWelcomeFaqUids()) {
-                Optional<FaqEntity> welcomeFaqOptional = faqRestService.findByUid(welcomeFaqUid);
-                if (welcomeFaqOptional.isPresent()) {
-                    FaqEntity welcomeFaqEntity = welcomeFaqOptional.get();
-                    // log.info("welcomeFaqUid added {}", welcomeFaqUid);
-                    serviceSettings.getWelcomeFaqs().add(welcomeFaqEntity);
-                } else {
-                    throw new RuntimeException("welcomeFaq " + welcomeFaqUid + " not found");
-                }
-            }
-        }
-
-        // Set FAQs
-        if (request.getServiceSettings().getFaqUids() != null
-                && request.getServiceSettings().getFaqUids().size() > 0) {
-            for (String faqUid : request.getServiceSettings().getFaqUids()) {
-                Optional<FaqEntity> faqOptional = faqRestService.findByUid(faqUid);
-                if (faqOptional.isPresent()) {
-                    FaqEntity faqEntity = faqOptional.get();
-                    log.info("faqUid added {}", faqUid);
-                    serviceSettings.getFaqs().add(faqEntity);
-                } else {
-                    throw new RuntimeException("faq " + faqUid + " not found");
-                }
-            }
-        }
-
-        // Set Quick FAQs
-        if (request.getServiceSettings() != null
-                && request.getServiceSettings().getQuickFaqUids() != null
-                && request.getServiceSettings().getQuickFaqUids().size() > 0) {
-            for (String quickFaqUid : request.getServiceSettings().getQuickFaqUids()) {
-                Optional<FaqEntity> quickFaqOptional = faqRestService.findByUid(quickFaqUid);
-                if (quickFaqOptional.isPresent()) {
-                    FaqEntity quickFaqEntity = quickFaqOptional.get();
-                    log.info("quickFaqUid added {}", quickFaqUid);
-                    serviceSettings.getQuickFaqs().add(quickFaqEntity);
-                } else {
-                    throw new RuntimeException("quickFaq " + quickFaqUid + " not found");
-                }
-            }
-        }
-
-        // Set Guess FAQs
-        if (request.getServiceSettings().getGuessFaqUids() != null
-                && request.getServiceSettings().getGuessFaqUids().size() > 0) {
-            for (String guessFaqUid : request.getServiceSettings().getGuessFaqUids()) {
-                Optional<FaqEntity> guessFaqOptional = faqRestService.findByUid(guessFaqUid);
-                if (guessFaqOptional.isPresent()) {
-                    FaqEntity guessFaq = guessFaqOptional.get();
-                    log.info("guessFaqUid added {}", guessFaqUid);
-                    serviceSettings.getGuessFaqs().add(guessFaq);
-                } else {
-                    throw new RuntimeException("guessFaq " + guessFaqUid + " not found");
-                }
-            }
-        }
-
-        // Set Hot FAQs
-        if (request.getServiceSettings().getHotFaqUids() != null
-                && request.getServiceSettings().getHotFaqUids().size() > 0) {
-            for (String hotFaqUid : request.getServiceSettings().getHotFaqUids()) {
-                Optional<FaqEntity> hotFaqOptional = faqRestService.findByUid(hotFaqUid);
-                if (hotFaqOptional.isPresent()) {
-                    FaqEntity hotFaq = hotFaqOptional.get();
-                    log.info("hotFaqUid added {}", hotFaqUid);
-                    serviceSettings.getHotFaqs().add(hotFaq);
-                } else {
-                    throw new RuntimeException("hotFaq " + hotFaqUid + " not found");
-                }
-            }
-        }
-
-        // Set Shortcut FAQs
-        if (request.getServiceSettings().getShortcutFaqUids() != null
-                && request.getServiceSettings().getShortcutFaqUids().size() > 0) {
-            for (String shortcutFaqUid : request.getServiceSettings().getShortcutFaqUids()) {
-                Optional<FaqEntity> shortcutFaqOptional = faqRestService.findByUid(shortcutFaqUid);
-                if (shortcutFaqOptional.isPresent()) {
-                    FaqEntity shortcutFaq = shortcutFaqOptional.get();
-                    log.info("shortcutFaqUid added {}", shortcutFaqUid);
-                    serviceSettings.getShortcutFaqs().add(shortcutFaq);
-                } else {
-                    throw new RuntimeException("shortcutFaq " + shortcutFaqUid + " not found");
-                }
-            }
-        }
-        // TODO: Settings should be managed through RobotSettingsEntity
-        // robot.setServiceSettings(serviceSettings);
-
-        // Set Invite Settings
-        // if (request == null || request.getInviteSettings() == null) {
-        //     robot.setInviteSettings(InviteSettings.builder().build());
-        // } else {
-        //     InviteSettings inviteSettings = modelMapper.map(request.getInviteSettings(), InviteSettings.class);
-        //     robot.setInviteSettings(inviteSettings);
-        // }
-
-        // Set LLM
-        if (request.getLlm() == null) {
-            RobotLlm robotLlm = RobotLlm.builder().build();
-            robot.setLlm(robotLlm);
-        } else {
-            robot.setLlm(request.getLlm());
-        }
+        // TODO: Remove this method after confirming all callers have been updated
+        // Settings should now be managed through RobotSettingsEntity
+        log.warn("setRobotSettings is deprecated and should not be called");
     }
 
     @Transactional
@@ -526,20 +421,21 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 .kbUid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID))
                 .build();
         //
-        robotRequest.getServiceSettings().setShowFaqs(true);
-        robotRequest.getServiceSettings().setShowQuickFaqs(true);
-        robotRequest.getServiceSettings().setShowGuessFaqs(true);
-        robotRequest.getServiceSettings().setShowHotFaqs(true);
-        robotRequest.getServiceSettings().setShowShortcutFaqs(true);
+        // TODO: Service settings should be managed through RobotSettingsEntity
+        // robotRequest.getServiceSettings().setShowFaqs(true);
+        // robotRequest.getServiceSettings().setShowQuickFaqs(true);
+        // robotRequest.getServiceSettings().setShowGuessFaqs(true);
+        // robotRequest.getServiceSettings().setShowHotFaqs(true);
+        // robotRequest.getServiceSettings().setShowShortcutFaqs(true);
         //
         // 写入 faq uid 到 welcomeFaqUids
-        if (orgUid.equals(BytedeskConsts.DEFAULT_ORGANIZATION_UID)) {
-            // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
-            for (int i = 1; i <= 5; i++) {
-                String faqUid = Utils.formatUid(orgUid, "faq_00" + i);
-                robotRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
-            }
-        }
+        // if (orgUid.equals(BytedeskConsts.DEFAULT_ORGANIZATION_UID)) {
+        //     // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
+        //     for (int i = 1; i <= 5; i++) {
+        //         String faqUid = Utils.formatUid(orgUid, "faq_00" + i);
+        //         robotRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
+        //     }
+        // }
         //
         return create(robotRequest);
     }

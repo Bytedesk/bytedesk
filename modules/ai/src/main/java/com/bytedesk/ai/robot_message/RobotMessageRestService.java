@@ -31,7 +31,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.MessageTypeConverter;
-import com.bytedesk.core.message.content.StreamContent;
+import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,18 +107,18 @@ public class RobotMessageRestService extends
                 String existingJson = entity.getAnswer();
                 String incomingJson = request.getAnswer();
 
-                StreamContent existing = null;
-                StreamContent incoming = null;
+                RobotContent existing = null;
+                RobotContent incoming = null;
                 try {
                     if (existingJson != null && !existingJson.isEmpty()) {
-                        existing = StreamContent.fromJson(existingJson, StreamContent.class);
+                        existing = RobotContent.fromJson(existingJson, RobotContent.class);
                     }
                 } catch (Exception ignore) {
                     // 旧数据或非JSON，忽略
                 }
                 try {
                     if (incomingJson != null && !incomingJson.isEmpty()) {
-                        incoming = StreamContent.fromJson(incomingJson, StreamContent.class);
+                        incoming = RobotContent.fromJson(incomingJson, RobotContent.class);
                     }
                 } catch (Exception ignore) {
                 }
@@ -131,7 +131,7 @@ public class RobotMessageRestService extends
                     String mergedAnswer = concatSafe(existing.getAnswer(), incoming.getAnswer());
                     String mergedReason = concatSafe(existing.getReasonContent(), incoming.getReasonContent());
 
-                    StreamContent merged = StreamContent.builder()
+                    RobotContent merged = RobotContent.builder()
                             .question(existing.getQuestion() != null ? existing.getQuestion()
                                     : incoming.getQuestion())
                             .answer(mergedAnswer)

@@ -17,24 +17,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
+import org.modelmapper.ModelMapper;
 
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Data
+@lombok.EqualsAndHashCode(callSuper = true)
 @Builder
-@Embeddable
+@Entity
+@Table(
+    name = "bytedesk_service_queue_settings",
+    indexes = {
+        @Index(name = "idx_queue_settings_uid", columnList = "uuid")
+    }
+)
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class QueueSettings implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class QueueSettingsEntity extends BaseEntity {
 
     // 当排队人数超过指定值时，自动分配机器人
     // 仅适用于workgroup，对一对一人工客服无效
@@ -50,6 +58,22 @@ public class QueueSettings implements Serializable {
     @NotBlank
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP;
+    
+    /**
+     * 从 QueueSettingsRequest 创建 QueueSettings 实体
+     * 如果 request 为 null，返回默认构建的实体
+     * 
+     * @param request QueueSettingsRequest 对象，可以为 null
+     * @param modelMapper ModelMapper 实例用于对象映射
+     * @return QueueSettings 实体，永远不为 null
+     */
+    public static QueueSettingsEntity fromRequest(QueueSettingsRequest request, ModelMapper modelMapper) {
+        if (request == null) {
+            return QueueSettingsEntity.builder().build();
+        }
+        
+        return modelMapper.map(request, QueueSettingsEntity.class);
+    }
     
 }
 

@@ -27,7 +27,7 @@ import com.bytedesk.core.utils.ApplicationContextHolder;
 // import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.settings.ServiceSettings;
+import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 
 @UtilityClass
@@ -61,7 +61,7 @@ public class ConvertAiUtils {
     }
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
-            ServiceSettings serviceSettings) {
+            ServiceSettingsEntity serviceSettings) {
         return getModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
     }
 
