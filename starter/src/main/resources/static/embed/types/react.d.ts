@@ -76,11 +76,13 @@ declare interface ChatConfig {
     mobile?: string;
     email?: string;
     note?: string;
-    extra?: string;
     goodsInfo?: string;
     orderInfo?: string;
+    extra?: string;
     vipLevel?: string;
-    [key: string]: string | number | undefined;
+    debug?: boolean;
+    loadHistory?: boolean;
+    [key: string]: string | number | boolean | undefined;
 }
 
 declare interface FeedbackConfig {

@@ -1,7 +1,7 @@
 var _ = Object.defineProperty;
-var V = (O, e, i) => e in O ? _(O, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : O[e] = i;
-var p = (O, e, i) => V(O, typeof e != "symbol" ? e + "" : e, i);
-import { BYTEDESK_UID as M, BYTEDESK_VISITOR_UID as F, BYTEDESK_BROWSE_FAILED_TIMESTAMP as L, POST_MESSAGE_LOCALSTORAGE_RESPONSE as P, POST_MESSAGE_INVITE_VISITOR_REJECT as H, POST_MESSAGE_INVITE_VISITOR_ACCEPT as A, POST_MESSAGE_INVITE_VISITOR as Y, POST_MESSAGE_RECEIVE_MESSAGE as N, POST_MESSAGE_MINIMIZE_WINDOW as j, POST_MESSAGE_MAXIMIZE_WINDOW as X, POST_MESSAGE_CLOSE_CHAT_WINDOW as q } from "../../utils/constants/index.js";
+var V = (L, e, i) => e in L ? _(L, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : L[e] = i;
+var p = (L, e, i) => V(L, typeof e != "symbol" ? e + "" : e, i);
+import { BYTEDESK_UID as W, BYTEDESK_VISITOR_UID as U, BYTEDESK_BROWSE_FAILED_TIMESTAMP as z, POST_MESSAGE_LOCALSTORAGE_RESPONSE as P, POST_MESSAGE_INVITE_VISITOR_REJECT as H, POST_MESSAGE_INVITE_VISITOR_ACCEPT as A, POST_MESSAGE_INVITE_VISITOR as Y, POST_MESSAGE_RECEIVE_MESSAGE as N, POST_MESSAGE_MINIMIZE_WINDOW as j, POST_MESSAGE_MAXIMIZE_WINDOW as X, POST_MESSAGE_CLOSE_CHAT_WINDOW as q } from "../../utils/constants/index.js";
 import t, { setGlobalConfig as G } from "../../utils/logger/index.js";
 class Q {
   constructor(e) {
@@ -149,7 +149,7 @@ class Q {
     var n, a, d, l;
     if (this.initVisitorPromise)
       return t.debug("访客初始化请求正在进行中，返回现有Promise"), this.initVisitorPromise;
-    const e = localStorage.getItem(M), i = localStorage.getItem(F);
+    const e = localStorage.getItem(W), i = localStorage.getItem(U);
     t.debug("localUid: ", e), t.debug("localVisitorUid: ", i);
     const s = ((n = this.config.chatConfig) == null ? void 0 : n.visitorUid) && i ? ((a = this.config.chatConfig) == null ? void 0 : a.visitorUid) === i : !0;
     return e && i && s ? (t.debug("访客信息相同，直接返回本地访客信息"), (l = (d = this.config).onVisitorInfo) == null || l.call(d, e || "", i || ""), {
@@ -157,9 +157,9 @@ class Q {
       visitorUid: i
     }) : (t.debug("开始创建访客初始化Promise"), this.initVisitorPromise = import("../../apis/visitor/index.js").then(
       async ({ initVisitor: h }) => {
-        var c, r, g, b, u, w, m, k, C, T, E, S, I, U, f, D, B, v, x;
+        var c, r, g, b, u, w, m, x, C, v, E, S, M, I, f, D, B, T, y, F, O, $;
         try {
-          const W = {
+          const R = {
             uid: String(((c = this.config.chatConfig) == null ? void 0 : c.uid) || e || ""),
             visitorUid: String(
               ((r = this.config.chatConfig) == null ? void 0 : r.visitorUid) || i || ""
@@ -169,22 +169,25 @@ class Q {
             avatar: String(((u = this.config.chatConfig) == null ? void 0 : u.avatar) || ""),
             mobile: String(((w = this.config.chatConfig) == null ? void 0 : w.mobile) || ""),
             email: String(((m = this.config.chatConfig) == null ? void 0 : m.email) || ""),
-            note: String(((k = this.config.chatConfig) == null ? void 0 : k.note) || ""),
-            extra: typeof ((C = this.config.chatConfig) == null ? void 0 : C.extra) == "string" ? this.config.chatConfig.extra : JSON.stringify(((T = this.config.chatConfig) == null ? void 0 : T.extra) || {})
-          }, y = await h(W);
-          return t.debug("访客初始化API响应:", y.data, W), ((E = y.data) == null ? void 0 : E.code) === 200 ? ((I = (S = y.data) == null ? void 0 : S.data) != null && I.uid && (localStorage.setItem(M, y.data.data.uid), t.debug("已保存uid到localStorage:", y.data.data.uid)), (f = (U = y.data) == null ? void 0 : U.data) != null && f.visitorUid && (localStorage.setItem(
-            F,
-            y.data.data.visitorUid
+            note: String(((x = this.config.chatConfig) == null ? void 0 : x.note) || ""),
+            extra: typeof ((C = this.config.chatConfig) == null ? void 0 : C.extra) == "string" ? this.config.chatConfig.extra : JSON.stringify(((v = this.config.chatConfig) == null ? void 0 : v.extra) || {}),
+            vipLevel: String(((E = this.config.chatConfig) == null ? void 0 : E.vipLevel) || ""),
+            debug: ((S = this.config.chatConfig) == null ? void 0 : S.debug) || !1,
+            loadHistory: ((M = this.config.chatConfig) == null ? void 0 : M.loadHistory) || !1
+          }, k = await h(R);
+          return t.debug("访客初始化API响应:", k.data, R), ((I = k.data) == null ? void 0 : I.code) === 200 ? ((D = (f = k.data) == null ? void 0 : f.data) != null && D.uid && (localStorage.setItem(W, k.data.data.uid), t.debug("已保存uid到localStorage:", k.data.data.uid)), (T = (B = k.data) == null ? void 0 : B.data) != null && T.visitorUid && (localStorage.setItem(
+            U,
+            k.data.data.visitorUid
           ), t.debug(
             "已保存visitorUid到localStorage:",
-            y.data.data.visitorUid
-          )), (D = y.data) != null && D.data && (t.debug("触发onVisitorInfo回调"), (v = (B = this.config).onVisitorInfo) == null || v.call(
-            B,
-            y.data.data.uid || "",
-            y.data.data.visitorUid || ""
-          )), y.data.data) : (t.error("访客初始化失败:", (x = y.data) == null ? void 0 : x.message), null);
-        } catch (W) {
-          return t.error("访客初始化出错:", W), null;
+            k.data.data.visitorUid
+          )), (y = k.data) != null && y.data && (t.debug("触发onVisitorInfo回调"), (O = (F = this.config).onVisitorInfo) == null || O.call(
+            F,
+            k.data.data.uid || "",
+            k.data.data.visitorUid || ""
+          )), k.data.data) : (t.error("访客初始化失败:", ($ = k.data) == null ? void 0 : $.message), null);
+        } catch (R) {
+          return t.error("访客初始化出错:", R), null;
         } finally {
           t.debug("访客初始化Promise完成，清除引用"), this.initVisitorPromise = null;
         }
@@ -195,17 +198,17 @@ class Q {
   async _browseVisitor() {
     var e, i, o, s;
     try {
-      const n = localStorage.getItem(L);
+      const n = localStorage.getItem(z);
       if (n) {
-        const I = parseInt(n), U = Date.now(), f = 60 * 60 * 1e3;
-        if (U - I < f) {
-          const D = Math.ceil((f - (U - I)) / 1e3 / 60);
+        const M = parseInt(n), I = Date.now(), f = 60 * 60 * 1e3;
+        if (I - M < f) {
+          const D = Math.ceil((f - (I - M)) / 1e3 / 60);
           t.warn(`浏览记录发送失败后1小时内禁止发送，还需等待 ${D} 分钟`);
           return;
         } else
-          localStorage.removeItem(L);
+          localStorage.removeItem(z);
       }
-      const a = window.location.href, d = document.title, l = document.referrer, h = navigator.userAgent, c = this.getBrowserInfo(h), r = this.getOSInfo(h), g = this.getDeviceInfo(h), b = `${screen.width}x${screen.height}`, u = new URLSearchParams(window.location.search), w = u.get("utm_source") || void 0, m = u.get("utm_medium") || void 0, k = u.get("utm_campaign") || void 0, C = localStorage.getItem(M), T = {
+      const a = window.location.href, d = document.title, l = document.referrer, h = navigator.userAgent, c = this.getBrowserInfo(h), r = this.getOSInfo(h), g = this.getDeviceInfo(h), b = `${screen.width}x${screen.height}`, u = new URLSearchParams(window.location.search), w = u.get("utm_source") || void 0, m = u.get("utm_medium") || void 0, x = u.get("utm_campaign") || void 0, C = localStorage.getItem(W), v = {
         url: a,
         title: d,
         referrer: l,
@@ -216,7 +219,7 @@ class Q {
         screenResolution: b,
         utmSource: w,
         utmMedium: m,
-        utmCampaign: k,
+        utmCampaign: x,
         status: "ONLINE",
         // 注意这里就是uid，不是visitorUid，使用访客系统生成uid
         visitorUid: String(
@@ -224,14 +227,14 @@ class Q {
         ),
         orgUid: ((i = this.config.chatConfig) == null ? void 0 : i.org) || ""
       };
-      if (!T.visitorUid) {
+      if (!v.visitorUid) {
         t.warn("访客uid为空，跳过browse操作");
         return;
       }
-      const { browse: E } = await import("../../apis/visitor/index.js"), S = await E(T);
-      ((o = S.data) == null ? void 0 : o.code) === 200 ? localStorage.removeItem(L) : (t.error("浏览记录发送失败:", (s = S.data) == null ? void 0 : s.message), localStorage.setItem(L, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
+      const { browse: E } = await import("../../apis/visitor/index.js"), S = await E(v);
+      ((o = S.data) == null ? void 0 : o.code) === 200 ? localStorage.removeItem(z) : (t.error("浏览记录发送失败:", (s = S.data) == null ? void 0 : s.message), localStorage.setItem(z, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
     } catch (n) {
-      t.error("发送浏览记录时出错:", n), localStorage.setItem(L, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
+      t.error("发送浏览记录时出错:", n), localStorage.setItem(z, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
     }
   }
   // 获取浏览器信息
@@ -251,7 +254,7 @@ class Q {
       async ({ getUnreadMessageCount: e }) => {
         var i, o, s, n, a;
         try {
-          const d = String(((i = this.config.chatConfig) == null ? void 0 : i.visitorUid) || ""), l = localStorage.getItem(M), h = localStorage.getItem(F), c = {
+          const d = String(((i = this.config.chatConfig) == null ? void 0 : i.visitorUid) || ""), l = localStorage.getItem(W), h = localStorage.getItem(U), c = {
             uid: l || "",
             visitorUid: d || h || "",
             orgUid: ((o = this.config.chatConfig) == null ? void 0 : o.org) || ""
@@ -282,11 +285,11 @@ class Q {
   }
   // 清除浏览记录发送失败的限制
   clearBrowseFailedLimit() {
-    localStorage.removeItem(L), t.info("已清除浏览记录发送失败的限制");
+    localStorage.removeItem(z), t.info("已清除浏览记录发送失败的限制");
   }
   // 清除本地访客信息，强制重新初始化
   clearVisitorInfo() {
-    localStorage.removeItem(M), localStorage.removeItem(F), t.info("已清除本地访客信息");
+    localStorage.removeItem(W), localStorage.removeItem(U), t.info("已清除本地访客信息");
   }
   // 强制重新初始化访客信息（忽略本地缓存）
   async forceInitVisitor() {
@@ -339,7 +342,7 @@ class Q {
       async ({ clearUnreadMessages: e }) => {
         var i, o;
         try {
-          const s = String(((i = this.config.chatConfig) == null ? void 0 : i.visitorUid) || ""), n = localStorage.getItem(M), a = localStorage.getItem(F), d = {
+          const s = String(((i = this.config.chatConfig) == null ? void 0 : i.visitorUid) || ""), n = localStorage.getItem(W), a = localStorage.getItem(U), d = {
             uid: n || "",
             visitorUid: s || a || "",
             orgUid: ((o = this.config.chatConfig) == null ? void 0 : o.org) || ""
@@ -354,7 +357,7 @@ class Q {
     ), this.clearUnreadMessagesPromise);
   }
   createBubble() {
-    var r, g, b, u, w, m, k, C, T, E, S, I, U;
+    var r, g, b, u, w, m, x, C, v, E, S, M, I;
     if (this.bubble && document.body.contains(this.bubble)) {
       t.debug("createBubble: 气泡已存在，不重复创建");
       return;
@@ -398,35 +401,35 @@ class Q {
       );
       const D = document.createElement("span");
       D.textContent = ((u = this.config.bubbleConfig) == null ? void 0 : u.icon) || "", D.style.fontSize = "20px", f.appendChild(D);
-      const B = document.createElement("div"), v = document.createElement("div");
-      v.textContent = ((w = this.config.bubbleConfig) == null ? void 0 : w.title) || "", v.style.fontWeight = "bold", v.style.color = ((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#e5e7eb" : "#1f2937", v.style.marginBottom = "4px", v.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", B.appendChild(v);
-      const x = document.createElement("div");
-      x.textContent = ((k = this.config.bubbleConfig) == null ? void 0 : k.subtitle) || "", x.style.fontSize = "0.9em", x.style.color = ((C = this.config.theme) == null ? void 0 : C.mode) === "dark" ? "#9ca3af" : "#4b5563", x.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", B.appendChild(x), f.appendChild(B), i.appendChild(f);
-      const W = document.createElement("div");
-      W.style.cssText = `
+      const B = document.createElement("div"), T = document.createElement("div");
+      T.textContent = ((w = this.config.bubbleConfig) == null ? void 0 : w.title) || "", T.style.fontWeight = "bold", T.style.color = ((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#e5e7eb" : "#1f2937", T.style.marginBottom = "4px", T.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", B.appendChild(T);
+      const y = document.createElement("div");
+      y.textContent = ((x = this.config.bubbleConfig) == null ? void 0 : x.subtitle) || "", y.style.fontSize = "0.9em", y.style.color = ((C = this.config.theme) == null ? void 0 : C.mode) === "dark" ? "#9ca3af" : "#4b5563", y.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", B.appendChild(y), f.appendChild(B), i.appendChild(f);
+      const F = document.createElement("div");
+      F.style.cssText = `
         position: absolute;
         bottom: -6px;
         ${this.config.placement === "bottom-left" ? "left: 24px" : "right: 24px"};
         width: 12px;
         height: 12px;
-        background: ${((T = this.config.theme) == null ? void 0 : T.mode) === "dark" ? "#1f2937" : "white"};
+        background: ${((v = this.config.theme) == null ? void 0 : v.mode) === "dark" ? "#1f2937" : "white"};
         transform: rotate(45deg);
         box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
       `;
-      const y = document.createElement("div");
-      y.style.cssText = `
+      const O = document.createElement("div");
+      O.style.cssText = `
         position: absolute;
         bottom: 0;
         ${this.config.placement === "bottom-left" ? "left: 18px" : "right: 18px"};
         width: 24px;
         height: 12px;
         background: ${((E = this.config.theme) == null ? void 0 : E.mode) === "dark" ? "#1f2937" : "white"};
-      `, i.appendChild(W), i.appendChild(y), e.appendChild(i), setTimeout(() => {
+      `, i.appendChild(F), i.appendChild(O), e.appendChild(i), setTimeout(() => {
         i && (i.style.opacity = "1", i.style.transform = "translateY(0)");
       }, 500);
     }
     this.bubble = document.createElement("button");
-    const o = this.config.buttonConfig || {}, s = o.width || 60, n = o.height || 60, a = Math.min(s, n) / 2, d = ((S = this.config.theme) == null ? void 0 : S.mode) === "dark", l = d ? "#3B82F6" : "#0066FF", h = ((I = this.config.theme) == null ? void 0 : I.backgroundColor) || l;
+    const o = this.config.buttonConfig || {}, s = o.width || 60, n = o.height || 60, a = Math.min(s, n) / 2, d = ((S = this.config.theme) == null ? void 0 : S.mode) === "dark", l = d ? "#3B82F6" : "#0066FF", h = ((M = this.config.theme) == null ? void 0 : M.backgroundColor) || l;
     this.bubble.style.cssText = `
       background-color: ${h};
       width: ${s}px;
@@ -464,7 +467,7 @@ class Q {
     if (o.text) {
       const f = document.createElement("span");
       f.textContent = o.text, f.style.cssText = `
-        color: ${((U = this.config.theme) == null ? void 0 : U.textColor) || "#ffffff"};
+        color: ${((I = this.config.theme) == null ? void 0 : I.textColor) || "#ffffff"};
         font-size: ${n * 0.25}px;
         white-space: nowrap;
       `, c.appendChild(f);
@@ -474,19 +477,19 @@ class Q {
     }), this.bubble.addEventListener("mouseleave", () => {
       this.bubble.style.transform = "scale(1)";
     }), e.appendChild(this.bubble), this.config.draggable) {
-      let f = 0, D = 0, B = 0, v = 0;
-      this.bubble.addEventListener("mousedown", (x) => {
-        x.button === 0 && (this.isDragging = !0, f = x.clientX, D = x.clientY, B = e.offsetLeft, v = e.offsetTop, e.style.transition = "none");
-      }), document.addEventListener("mousemove", (x) => {
+      let f = 0, D = 0, B = 0, T = 0;
+      this.bubble.addEventListener("mousedown", (y) => {
+        y.button === 0 && (this.isDragging = !0, f = y.clientX, D = y.clientY, B = e.offsetLeft, T = e.offsetTop, e.style.transition = "none");
+      }), document.addEventListener("mousemove", (y) => {
         if (!this.isDragging) return;
-        x.preventDefault();
-        const W = x.clientX - f, y = x.clientY - D, $ = B + W, R = v + y, z = window.innerHeight - e.offsetHeight;
+        y.preventDefault();
+        const F = y.clientX - f, O = y.clientY - D, $ = B + F, R = T + O, k = window.innerHeight - e.offsetHeight;
         $ <= window.innerWidth / 2 ? (e.style.left = `${Math.max(0, $)}px`, e.style.right = "auto", e.style.alignItems = "flex-start", this.config.placement = "bottom-left") : (e.style.right = `${Math.max(
           0,
           window.innerWidth - $ - e.offsetWidth
         )}px`, e.style.left = "auto", e.style.alignItems = "flex-end", this.config.placement = "bottom-right"), e.style.bottom = `${Math.min(
           Math.max(0, window.innerHeight - R - e.offsetHeight),
-          z
+          k
         )}px`;
       }), document.addEventListener("mouseup", () => {
         this.isDragging && (this.isDragging = !1, e.style.transition = "all 0.3s ease", this.config.marginSide = parseInt(
@@ -556,7 +559,7 @@ class Q {
   }
   generateChatUrl(e = "messages") {
     t.debug("this.config: ", this.config, e);
-    const i = new URLSearchParams(), o = localStorage.getItem(M), s = localStorage.getItem(F);
+    const i = new URLSearchParams(), o = localStorage.getItem(W), s = localStorage.getItem(U);
     o && o.trim() !== "" && i.append("uid", o), s && s.trim() !== "" && i.append("visitorUid", s), Object.entries(this.config.chatConfig || {}).forEach(([a, d]) => {
       if (a === "goodsInfo" || a === "orderInfo")
         try {
@@ -616,12 +619,12 @@ class Q {
     var a, d;
     const { uid: i, visitorUid: o } = e.data;
     t.debug("handleLocalStorageData 被调用", i, o, e.data);
-    const s = localStorage.getItem(M), n = localStorage.getItem(F);
+    const s = localStorage.getItem(W), n = localStorage.getItem(U);
     if (s === i && n === o) {
       t.debug("handleLocalStorageData: 值相同，跳过设置");
       return;
     }
-    localStorage.setItem(M, i), localStorage.setItem(F, o), t.debug("handleLocalStorageData: 已更新localStorage", {
+    localStorage.setItem(W, i), localStorage.setItem(U, o), t.debug("handleLocalStorageData: 已更新localStorage", {
       uid: i,
       visitorUid: o
     }), (d = (a = this.config).onVisitorInfo) == null || d.call(a, i, o);
@@ -1081,18 +1084,18 @@ class Q {
     try {
       const m = document.createRange();
       m.setStart(s.startContainer, s.startOffset);
-      let k = s.startOffset;
+      let x = s.startOffset;
       const C = s.startContainer.textContent || "";
       if (s.startContainer.nodeType === Node.TEXT_NODE) {
-        for (; k < Math.min(C.length, s.endOffset); ) {
-          const T = document.createRange();
-          T.setStart(s.startContainer, s.startOffset), T.setEnd(s.startContainer, k + 1);
-          const E = T.getBoundingClientRect(), S = m.getBoundingClientRect();
+        for (; x < Math.min(C.length, s.endOffset); ) {
+          const v = document.createRange();
+          v.setStart(s.startContainer, s.startOffset), v.setEnd(s.startContainer, x + 1);
+          const E = v.getBoundingClientRect(), S = m.getBoundingClientRect();
           if (Math.abs(E.top - S.top) > 5)
             break;
-          k++;
+          x++;
         }
-        m.setEnd(s.startContainer, Math.max(k, s.startOffset + 1)), n = m.getBoundingClientRect();
+        m.setEnd(s.startContainer, Math.max(x, s.startOffset + 1)), n = m.getBoundingClientRect();
       } else
         n = s.getBoundingClientRect();
     } catch (m) {
@@ -1628,7 +1631,7 @@ class Q {
         const C = await this.generateAndUploadScreenshot();
         C && (m.push(C), this.config.isDebug && t.debug("BytedeskWeb: 截图上传成功:", C)), n && (n.textContent = "正在提交反馈...");
       }
-      const k = {
+      const x = {
         selectedText: this.selectedText,
         ...m.length > 0 && { images: m },
         // 将截图URL放入images数组
@@ -1640,7 +1643,7 @@ class Q {
         orgUid: ((g = this.config.chatConfig) == null ? void 0 : g.org) || "",
         ...o.length > 0 && { categoryNames: o.join(",") }
       };
-      (b = this.config.feedbackConfig) != null && b.onSubmit ? this.config.feedbackConfig.onSubmit(k) : await this.submitFeedbackToServer(k), this.showFeedbackSuccess(), setTimeout(() => {
+      (b = this.config.feedbackConfig) != null && b.onSubmit ? this.config.feedbackConfig.onSubmit(x) : await this.submitFeedbackToServer(x), this.showFeedbackSuccess(), setTimeout(() => {
         this.hideFeedbackDialog();
       }, 2e3);
     } catch (u) {
