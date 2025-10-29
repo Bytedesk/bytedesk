@@ -104,7 +104,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         if (isExistingActiveThread(thread)) {
             log.info("检测到现有活跃线程，直接返回 - threadUid: {}, 状态: {}", 
                     thread.getUid(), thread.getStatus());
-            MessageProtobuf result = handleExistingThread(thread, agentEntity);
+            MessageProtobuf result = handleExistingThread(visitorRequest, thread, agentEntity);
             log.info("创建客服线程完成(现有线程) - 总耗时: {}ms", System.currentTimeMillis() - startTime);
             return result;
         }
@@ -184,10 +184,10 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理已存在的线程
      */
-    private MessageProtobuf handleExistingThread(ThreadEntity thread, AgentEntity agentEntity) {
+    private MessageProtobuf handleExistingThread(VisitorRequest request, ThreadEntity thread, AgentEntity agentEntity) {
         if (thread.isChatting()) {
             // 重新初始化会话额外信息
-            ThreadEntity updatedThread = visitorThreadService.reInitAgentThreadExtra(thread, agentEntity);
+            ThreadEntity updatedThread = visitorThreadService.reInitAgentThreadExtra(request, thread, agentEntity);
             log.info("Already have a processing thread {}", updatedThread.getAgent());
             return getAgentContinueMessage(updatedThread);
         } else if (thread.isQueuing()) {

@@ -123,8 +123,7 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
-            WorkgroupEntity workgroup) {
+    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
         //
         if (visitorRequest.isSocial()) {
             String threadExtra = visitorRequest.getExtra();
@@ -182,10 +181,10 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
+    public ThreadEntity reInitAgentThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                agent.getSettings(), false);
+                agent.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
         thread.setExtra(extra);
         if (StringUtils.hasText(thread.getTransfer())
                 && !BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getTransfer())) {
@@ -231,10 +230,10 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitRobotThreadExtra(ThreadEntity thread, RobotEntity robot) {
+    public ThreadEntity reInitRobotThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
         //
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                robot.getSettings(), false);
+                robot.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);

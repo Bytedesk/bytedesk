@@ -135,7 +135,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             } else if (existingThread.isRoboting()) {
                 log.debug("Found existing roboting thread: {}", topic);
                 // 重新初始化会话用于测试
-                return visitorThreadService.reInitRobotThreadExtra(existingThread, robotEntity);
+                return visitorThreadService.reInitRobotThreadExtra(request, existingThread, robotEntity);
             }
         }
 
