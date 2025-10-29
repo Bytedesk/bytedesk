@@ -14,7 +14,9 @@ import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -60,6 +62,13 @@ import lombok.experimental.SuperBuilder;
 public class RobotSettingsEntity extends BaseSettingsEntity {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 是否显示答案匹配知识库来源
+     */
+    @Builder.Default
+    @Column(name = "is_kb_source_enabled")
+    private Boolean kbSourceEnabled = true;
 
     /**
      * Rating down settings

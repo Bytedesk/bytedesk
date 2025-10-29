@@ -108,13 +108,6 @@ public class RobotEntity extends BaseEntity {
     @Column(name = "robot_type")
     private String type = RobotTypeEnum.SERVICE.name();
 
-    /**
-     * Whether to use streaming responses for real-time interaction
-     */
-    // @Builder.Default
-    // @Column(name = "is_stream")
-    // private Boolean stream = true;
-
     // @Builder.Default
     // private Boolean published = false;
 

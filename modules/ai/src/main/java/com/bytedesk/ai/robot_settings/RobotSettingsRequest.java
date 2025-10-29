@@ -33,6 +33,8 @@ public class RobotSettingsRequest extends BaseSettingsRequest {
 
     private static final long serialVersionUID = 1L;
 
+     private Boolean kbSourceEnabled;
+
     /**
      * Rating down settings (Robot-specific)
      */
