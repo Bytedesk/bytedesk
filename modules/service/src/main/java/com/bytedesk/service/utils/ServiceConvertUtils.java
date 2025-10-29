@@ -173,7 +173,6 @@ public class ServiceConvertUtils {
         return getModelMapper().map(entity, QueueResponse.class);
     }
 
-
     public static MessageLeaveResponse convertToMessageLeaveResponse(MessageLeaveEntity entity) {
         MessageLeaveResponse messageLeaveResponse = getModelMapper().map(entity, MessageLeaveResponse.class);
         

@@ -42,6 +42,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -190,7 +191,7 @@ public class VisitorThreadService
         // 考虑到配置可能变化，更新配置
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getSettings() != null 
             ? agent.getSettings().getServiceSettings() 
-            : new com.bytedesk.kbase.settings.ServiceSettingsEntity());
+            : new ServiceSettingsEntity());
         thread.setExtra(extra);
         if (StringUtils.hasText(thread.getTransfer()) && !BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getTransfer())) {
             // 如果有转接信息，则使用转接信息
@@ -215,7 +216,7 @@ public class VisitorThreadService
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(robot.getSettings() != null 
             ? robot.getSettings().getServiceSettings() 
-            : new com.bytedesk.kbase.settings.ServiceSettingsEntity());
+            : new ServiceSettingsEntity());
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -241,7 +242,7 @@ public class VisitorThreadService
         String extra = ServiceConvertUtils
                 .convertToServiceSettingsResponseVisitorJSONString(robot.getSettings() != null 
                     ? robot.getSettings().getServiceSettings() 
-                    : new com.bytedesk.kbase.settings.ServiceSettingsEntity());
+                    : new ServiceSettingsEntity());
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
