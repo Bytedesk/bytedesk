@@ -264,6 +264,7 @@ declare interface ChatConfig {
     extra?: string;
     vipLevel?: string;
     debug?: boolean;
+    settingsUid?: string;
     loadHistory?: boolean;
     [key: string]: string | number | boolean | undefined;
 }
