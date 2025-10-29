@@ -16,6 +16,7 @@ package com.bytedesk.service.agent_settings;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
+import com.bytedesk.service.agent_status.settings.AgentStatusSettingResponse;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 
@@ -91,4 +92,13 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
      * Draft rating down settings (Agent-specific)
      */
     private RatedownSettingsResponse draftRateDownSettings;
+
+    /**
+     * Agent status settings (Agent-specific)
+     */
+    private AgentStatusSettingResponse agentStatusSettings;
+    /**
+     * Draft agent status settings (Agent-specific)
+     */
+    private AgentStatusSettingResponse draftAgentStatusSettings;
 }

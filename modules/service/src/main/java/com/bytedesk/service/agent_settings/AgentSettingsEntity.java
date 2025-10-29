@@ -8,6 +8,7 @@ package com.bytedesk.service.agent_settings;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
+import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 
@@ -144,4 +145,16 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity draftRateDownSettings;
+
+    /**
+     * Agent status settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private AgentStatusSettingEntity agentStatusSettings;
+
+    /**
+     * Draft agent status settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private AgentStatusSettingEntity draftAgentStatusSettings;
 }

@@ -27,6 +27,7 @@ import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.agent.AgentRepository;
 import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.worktime.WorktimeRepository;
@@ -143,6 +144,17 @@ public class AgentSettingsRestService
         RatedownSettingsEntity rd = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
         rd.setUid(uidUtils.getUid());
         entity.setDraftRateDownSettings(rd);
+
+        // Agent status settings (published and draft)
+        if (request.getAgentStatusSettings() != null) {
+            AgentStatusSettingEntity st = modelMapper.map(request.getAgentStatusSettings(), AgentStatusSettingEntity.class);
+            st.setUid(uidUtils.getUid());
+            entity.setAgentStatusSettings(st);
+
+            AgentStatusSettingEntity stDraft = modelMapper.map(request.getAgentStatusSettings(), AgentStatusSettingEntity.class);
+            stDraft.setUid(uidUtils.getUid());
+            entity.setDraftAgentStatusSettings(stDraft);
+        }
 
         AgentSettingsEntity saved = save(entity);
         return convertToResponse(saved);
@@ -267,6 +279,23 @@ public class AgentSettingsRestService
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getRateDownSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        // Update draft: agent status settings
+        if (request.getAgentStatusSettings() != null) {
+            AgentStatusSettingEntity draft = entity.getDraftAgentStatusSettings();
+            if (draft == null) {
+                draft = modelMapper.map(request.getAgentStatusSettings(), AgentStatusSettingEntity.class);
+                if (draft != null && draft.getUid() == null) {
+                    draft.setUid(uidUtils.getUid());
+                }
+                entity.setDraftAgentStatusSettings(draft);
+            } else {
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getAgentStatusSettings(), draft);
                 draft.setUid(originalUid);
             }
             entity.setHasUnpublishedChanges(true);
@@ -427,6 +456,9 @@ public class AgentSettingsRestService
         }
         if (entity.getDraftIntentionSettings() != null) {
             entity.setIntentionSettings(entity.getDraftIntentionSettings());
+        }
+        if (entity.getDraftAgentStatusSettings() != null) {
+            entity.setAgentStatusSettings(entity.getDraftAgentStatusSettings());
         }
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
