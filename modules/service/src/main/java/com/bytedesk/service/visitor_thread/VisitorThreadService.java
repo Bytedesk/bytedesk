@@ -50,6 +50,12 @@ import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.agent_settings.AgentSettingsEntity;
+import com.bytedesk.service.agent_settings.AgentSettingsRestService;
+import com.bytedesk.service.workgroup_settings.WorkgroupSettingsEntity;
+import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
+import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
+import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.ai.workflow.WorkflowEntity;
 
@@ -76,6 +82,11 @@ public class VisitorThreadService
 
     private final IMessageSendService messageSendService;
 
+    // For debug preview: allow overriding settings by uid when debug=true
+    private final AgentSettingsRestService agentSettingsRestService;
+    private final RobotSettingsRestService robotSettingsRestService;
+    private final WorkgroupSettingsRestService workgroupSettingsRestService;
+
     @Cacheable(value = "visitor_thread", key = "#uid", unless = "#result == null")
     @Override
     public Optional<VisitorThreadEntity> findByUid(String uid) {
@@ -96,14 +107,7 @@ public class VisitorThreadService
         String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
         //
-        String extra = "";
-        // 处理渠道相关额外信息
-        if (visitorRequest.isSocial()) {
-            extra = visitorRequest.getExtra();
-        } else {
-            extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                    workgroup.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
-        }
+        String extra = buildWorkgroupExtra(visitorRequest, workgroup);
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -125,14 +129,8 @@ public class VisitorThreadService
 
     public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
         //
-        if (visitorRequest.isSocial()) {
-            String threadExtra = visitorRequest.getExtra();
-            thread.setExtra(threadExtra);
-        } else {
-            String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                    workgroup.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
-            thread.setExtra(extra);
-        }
+        String extra = buildWorkgroupExtra(visitorRequest, workgroup);
+        thread.setExtra(extra);
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {
@@ -140,16 +138,15 @@ public class VisitorThreadService
         }
         return savedEntity;
     }
-
+    
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         // 考虑到客服信息发生变化，更新客服信息
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
         // 访客信息
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        // 考虑到配置可能变化,更新配置
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                agent.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
+        // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
+        String extra = buildAgentExtra(visitorRequest, agent);
         //
         String orgUid = agent.getOrgUid();
         //
@@ -182,9 +179,8 @@ public class VisitorThreadService
     }
 
     public ThreadEntity reInitAgentThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, AgentEntity agent) {
-        // 考虑到配置可能变化，更新配置
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                agent.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
+        // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
+        String extra = buildAgentExtra(visitorRequest, agent);
         thread.setExtra(extra);
         if (StringUtils.hasText(thread.getTransfer())
                 && !BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getTransfer())) {
@@ -208,8 +204,8 @@ public class VisitorThreadService
         //
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                robot.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
+        // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
+        String extra = buildRobotExtra(visitorRequest, robot);
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -232,8 +228,7 @@ public class VisitorThreadService
 
     public ThreadEntity reInitRobotThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, RobotEntity robot) {
         //
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                robot.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
+        String extra = buildRobotExtra(visitorRequest, robot);
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
@@ -246,6 +241,75 @@ public class VisitorThreadService
         }
         //
         return savedEntity;
+    }
+
+    /**
+     * 根据请求与技能组实体构建 thread.extra
+     * - 社交渠道：直接使用请求中的 extra
+     * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
+     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     */
+    private String buildWorkgroupExtra(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
+        // 社交渠道直接透传
+        if (visitorRequest.isSocial()) {
+            return visitorRequest.getExtra();
+        }
+
+        // 默认使用实体上的 settings
+        WorkgroupSettingsEntity settings = workgroup.getSettings();
+        // debug 预览指定 settings
+        if (Boolean.TRUE.equals(visitorRequest.getDebug()) && StringUtils.hasText(visitorRequest.getSettingsUid())) {
+            try {
+                settings = workgroupSettingsRestService
+                        .findByUid(visitorRequest.getSettingsUid())
+                        .orElse(settings);
+            } catch (Exception e) {
+                log.warn("Debug preview: workgroup settingsUid not found: {}", visitorRequest.getSettingsUid());
+            }
+        }
+
+        return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                settings, Boolean.TRUE.equals(visitorRequest.getDebug()));
+    }
+
+    /**
+     * 根据请求与客服实体构建 thread.extra
+     * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
+     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     */
+    private String buildAgentExtra(VisitorRequest visitorRequest, AgentEntity agent) {
+        AgentSettingsEntity settings = agent.getSettings();
+        if (Boolean.TRUE.equals(visitorRequest.getDebug()) && StringUtils.hasText(visitorRequest.getSettingsUid())) {
+            try {
+                settings = agentSettingsRestService
+                        .findByUid(visitorRequest.getSettingsUid())
+                        .orElse(settings);
+            } catch (Exception e) {
+                log.warn("Debug preview: agent settingsUid not found: {}", visitorRequest.getSettingsUid());
+            }
+        }
+        return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                settings, Boolean.TRUE.equals(visitorRequest.getDebug()));
+    }
+
+    /**
+     * 根据请求与机器人实体构建 thread.extra
+     * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
+     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     */
+    private String buildRobotExtra(VisitorRequest visitorRequest, RobotEntity robot) {
+        RobotSettingsEntity settings = robot.getSettings();
+        if (Boolean.TRUE.equals(visitorRequest.getDebug()) && StringUtils.hasText(visitorRequest.getSettingsUid())) {
+            try {
+                settings = robotSettingsRestService
+                        .findByUid(visitorRequest.getSettingsUid())
+                        .orElse(settings);
+            } catch (Exception e) {
+                log.warn("Debug preview: robot settingsUid not found: {}", visitorRequest.getSettingsUid());
+            }
+        }
+        return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                settings, Boolean.TRUE.equals(visitorRequest.getDebug()));
     }
 
     public ThreadEntity createWorkflowThread(VisitorRequest visitorRequest, WorkflowEntity workflow, String topic) {

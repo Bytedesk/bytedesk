@@ -117,6 +117,7 @@ public class VisitorRequest extends BaseRequest {
 	// 用于区分本地测试还是线上环境
 	@Builder.Default
 	private Boolean debug = false;
+	private String settingsUid;
 
 	/**
 	 * 判断是否为社交渠道（微信、Meta、Telegram、WhatsApp）
