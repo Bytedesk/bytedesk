@@ -134,7 +134,7 @@ public class VisitorThreadService
         } else {
             String extra = workgroup.getSettings() != null 
                 ? ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getSettings().getServiceSettings())
-                : ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(new com.bytedesk.kbase.settings.ServiceSettingsEntity());
+                : ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(new ServiceSettingsEntity());
             thread.setExtra(extra);
         }
         // 保存

@@ -114,6 +114,10 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Integer vipLevel = 0;
 
+	// 用于区分本地测试还是线上环境
+	@Builder.Default
+	private Boolean debug = false;
+
 	/**
 	 * 判断是否为社交渠道（微信、Meta、Telegram、WhatsApp）
 	 * @return true 如果为社交渠道，否则为 false
