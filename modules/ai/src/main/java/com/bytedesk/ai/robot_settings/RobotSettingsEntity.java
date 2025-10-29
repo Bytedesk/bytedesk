@@ -13,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -63,14 +64,14 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
     /**
      * Rating down settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity rateDownSettings;
 
     /**
      * Draft Rating down settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity draftRateDownSettings;
 }
