@@ -118,6 +118,9 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Boolean debug = false;
 	private String settingsUid;
+	// 强制创建新会话，每次都创建新会话，主要用于测试
+	@Builder.Default
+	private Boolean forceNewThread = false;
 
 	/**
 	 * 判断是否为社交渠道（微信、Meta、Telegram、WhatsApp）

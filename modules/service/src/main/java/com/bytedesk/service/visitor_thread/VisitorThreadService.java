@@ -57,7 +57,6 @@ import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.ai.workflow.WorkflowEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -310,41 +309,6 @@ public class VisitorThreadService
         }
         return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
                 settings, Boolean.TRUE.equals(visitorRequest.getDebug()));
-    }
-
-    public ThreadEntity createWorkflowThread(VisitorRequest visitorRequest, WorkflowEntity workflow, String topic) {
-        //
-        String workflowString = ServiceConvertUtils.convertToUserProtobufString(workflow);
-        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        //
-        ThreadEntity thread = ThreadEntity.builder()
-                .uid(uidUtils.getUid())
-                .topic(topic)
-                .type(ThreadTypeEnum.WORKFLOW.name())
-                .robot(workflowString) // 工作流
-                .userUid(workflow.getUid()) // 工作流uid
-                .user(visitor)
-                .channel(visitorRequest.getChannel())
-                .orgUid(workflow.getOrgUid())
-                .build();
-        ThreadEntity savedEntity = threadRestService.save(thread);
-        if (savedEntity == null) {
-            throw new RuntimeException("Could not save visitor thread");
-        }
-        return savedEntity;
-    }
-
-    public ThreadEntity reInitWorkflowThreadExtra(ThreadEntity thread, WorkflowEntity workflow) {
-        //
-        String workflowString = ServiceConvertUtils.convertToUserProtobufString(workflow);
-        thread.setRobot(workflowString); // 工作流
-        // 保存
-        ThreadEntity savedEntity = threadRestService.save(thread);
-        if (savedEntity == null) {
-            throw new RuntimeException("Could not save visitor thread");
-        }
-        //
-        return savedEntity;
     }
 
     public VisitorThreadEntity update(ThreadEntity thread) {

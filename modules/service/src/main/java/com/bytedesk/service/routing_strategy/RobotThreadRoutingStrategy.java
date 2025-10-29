@@ -123,6 +123,12 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 获取或创建机器人会话
      */
     private ThreadEntity getOrCreateRobotThread(VisitorRequest request, RobotEntity robotEntity, String topic) {
+        // 当强制新建会话时，直接创建新会话，跳过复用逻辑
+        if (Boolean.TRUE.equals(request.getForceNewThread())) {
+            log.debug("forceNewThread=true, creating new robot thread for topic: {}", topic);
+            return visitorThreadService.createRobotThread(request, robotEntity, topic);
+        }
+
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         
         if (threadOptional.isPresent()) {

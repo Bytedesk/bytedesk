@@ -162,6 +162,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取或创建工作组会话
      */
     private ThreadEntity getOrCreateWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
+        // 当强制新建会话时，直接创建新会话，跳过复用逻辑
+        if (Boolean.TRUE.equals(visitorRequest.getForceNewThread())) {
+            log.debug("forceNewThread=true, creating new workgroup thread for topic: {}", topic);
+            return visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
+        }
+
         long dbStartTime = System.currentTimeMillis();
         log.debug("开始查询现有工作组线程 - topic: {}", topic);
         

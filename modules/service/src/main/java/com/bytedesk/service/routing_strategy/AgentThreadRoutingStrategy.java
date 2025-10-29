@@ -126,6 +126,15 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
                 topic, visitorRequest.getUid(), agentEntity.getUid());
         
         try {
+        // 当强制新建会话时，直接创建新会话，跳过复用逻辑
+        if (Boolean.TRUE.equals(visitorRequest.getForceNewThread())) {
+        log.debug("forceNewThread=true, 创建新的客服线程 - topic: {}", topic);
+        ThreadEntity newThread = visitorThreadService.createAgentThread(visitorRequest, agentEntity, topic);
+        log.info("新线程创建完成(强制) - threadUid: {}, 总耗时: {}ms", 
+            newThread.getUid(), System.currentTimeMillis() - startTime);
+        return newThread;
+        }
+
             // 查询现有线程
             long dbStartTime = System.currentTimeMillis();
             log.debug("开始查询现有线程 - topic: {}", topic);
