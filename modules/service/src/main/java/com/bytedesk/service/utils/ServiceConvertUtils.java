@@ -20,6 +20,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.ai.workflow.WorkflowEntity;
@@ -159,14 +160,25 @@ public class ServiceConvertUtils {
         return getModelMapper().map(workgroup, WorkgroupResponse.class);
     }
     
-    //
-    public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
-            ServiceSettingsEntity serviceSettings) {
-        return getModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
-    }
-
-    public static String convertToServiceSettingsResponseVisitorJSONString( ServiceSettingsEntity serviceSettings) {
-        return JSON.toJSONString(convertToServiceSettingsResponseVisitor(serviceSettings));
+    /**
+     * Build ServiceSettingsResponseVisitor JSON from settings container.
+     * If debug=true and draft exists, prefer draft; otherwise use published.
+     * Falls back to a new ServiceSettingsEntity when missing.
+     */
+    public static String convertToServiceSettingsResponseVisitorJSONString(BaseSettingsEntity settingsContainer, boolean debug) {
+        ServiceSettingsEntity svc = null;
+        if (settingsContainer != null) {
+            if (debug && settingsContainer.getDraftServiceSettings() != null) {
+                svc = settingsContainer.getDraftServiceSettings();
+            } else if (settingsContainer.getServiceSettings() != null) {
+                svc = settingsContainer.getServiceSettings();
+            }
+        }
+        if (svc == null) {
+            svc = ServiceSettingsEntity.builder().build();
+        }
+        ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+        return JSON.toJSONString(resp);
     }
 
     public static QueueResponse convertToQueueResponse(QueueEntity entity) {

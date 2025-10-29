@@ -42,7 +42,6 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -102,9 +101,8 @@ public class VisitorThreadService
         if (visitorRequest.isSocial()) {
             extra = visitorRequest.getExtra();
         } else {
-            extra = workgroup.getSettings() != null 
-                ? ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getSettings().getServiceSettings())
-                : ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(new com.bytedesk.kbase.settings.ServiceSettingsEntity());
+            extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                    workgroup.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
         }
         //
         ThreadEntity thread = ThreadEntity.builder()
@@ -132,9 +130,8 @@ public class VisitorThreadService
             String threadExtra = visitorRequest.getExtra();
             thread.setExtra(threadExtra);
         } else {
-            String extra = workgroup.getSettings() != null 
-                ? ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(workgroup.getSettings().getServiceSettings())
-                : ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(new ServiceSettingsEntity());
+            String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                    workgroup.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
             thread.setExtra(extra);
         }
         // 保存
@@ -152,10 +149,8 @@ public class VisitorThreadService
         // 访客信息
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 考虑到配置可能变化,更新配置
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(agent.getSettings() != null 
-                    ? agent.getSettings().getServiceSettings() 
-                    : new com.bytedesk.kbase.settings.ServiceSettingsEntity());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                agent.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
         //
         String orgUid = agent.getOrgUid();
         //
@@ -189,11 +184,11 @@ public class VisitorThreadService
 
     public ThreadEntity reInitAgentThreadExtra(ThreadEntity thread, AgentEntity agent) {
         // 考虑到配置可能变化，更新配置
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(agent.getSettings() != null 
-            ? agent.getSettings().getServiceSettings() 
-            : new ServiceSettingsEntity());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                agent.getSettings(), false);
         thread.setExtra(extra);
-        if (StringUtils.hasText(thread.getTransfer()) && !BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getTransfer())) {
+        if (StringUtils.hasText(thread.getTransfer())
+                && !BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getTransfer())) {
             // 如果有转接信息，则使用转接信息
             UserProtobuf transferUser = thread.getTransferProtobuf();
             transferUser.setType(UserTypeEnum.AGENT.name());
@@ -214,9 +209,8 @@ public class VisitorThreadService
         //
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
-        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(robot.getSettings() != null 
-            ? robot.getSettings().getServiceSettings() 
-            : new ServiceSettingsEntity());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                robot.getSettings(), Boolean.TRUE.equals(visitorRequest.getDebug()));
         //
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -239,10 +233,8 @@ public class VisitorThreadService
 
     public ThreadEntity reInitRobotThreadExtra(ThreadEntity thread, RobotEntity robot) {
         //
-        String extra = ServiceConvertUtils
-                .convertToServiceSettingsResponseVisitorJSONString(robot.getSettings() != null 
-                    ? robot.getSettings().getServiceSettings() 
-                    : new ServiceSettingsEntity());
+        String extra = ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
+                robot.getSettings(), false);
         thread.setExtra(extra);
         // 使用agent的serviceSettings配置
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
@@ -337,7 +329,7 @@ public class VisitorThreadService
 
         // 处理自动关闭
         handleAutoClose(thread, diffInMinutes);
-        
+
         // 处理超时提醒
         handleTimeoutReminder(thread, diffInMinutes);
     }
@@ -349,16 +341,16 @@ public class VisitorThreadService
         // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
         long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
         long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
-        
+
         // 移除Math.abs()，确保时间顺序正确
         long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
-        
+
         // 如果updatedAt在未来，说明时间有问题，跳过处理
         if (diffInMilliseconds < 0) {
             log.warn("Thread {} updatedAt is in the future, skipping auto close check", thread.getUid());
             return -1;
         }
-        
+
         // 转换为分钟
         return TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
     }
@@ -369,7 +361,7 @@ public class VisitorThreadService
     private void handleAutoClose(ThreadEntity thread, long diffInMinutes) {
         ServiceSettingsResponseVisitor settings = parseThreadSettings(thread);
         double autoCloseValue = getAutoCloseMinutes(settings);
-        
+
         if (diffInMinutes > autoCloseValue) {
             threadRestService.autoClose(thread);
         }
@@ -382,7 +374,7 @@ public class VisitorThreadService
         if (!StringUtils.hasText(thread.getExtra())) {
             return null;
         }
-        
+
         try {
             return JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
         } catch (Exception e) {
@@ -398,7 +390,7 @@ public class VisitorThreadService
         if (settings == null) {
             return 30.0; // 默认30分钟
         }
-        
+
         Double autoCloseMinutes = settings.getAutoCloseMin();
         return (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
     }
