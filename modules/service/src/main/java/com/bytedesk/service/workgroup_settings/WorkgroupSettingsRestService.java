@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
@@ -42,6 +43,7 @@ public class WorkgroupSettingsRestService
     }
 
     @Override
+    @Transactional
     public WorkgroupSettingsResponse create(WorkgroupSettingsRequest request) {
         WorkgroupSettingsEntity entity = modelMapper.map(request, WorkgroupSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
@@ -94,11 +96,17 @@ public class WorkgroupSettingsRestService
         qsDraft.setUid(uidUtils.getUid());
         entity.setDraftQueueSettings(qsDraft);
 
+        // 如果请求或实体标记为默认，则保证同 org 仅一个默认
+        if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
+            ensureSingleDefault(entity.getOrgUid(), entity);
+        }
+
         WorkgroupSettingsEntity saved = save(entity);
         return convertToResponse(saved);
     }
 
     @Override
+    @Transactional
     public WorkgroupSettingsResponse update(WorkgroupSettingsRequest request) {
         Optional<WorkgroupSettingsEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
@@ -202,6 +210,11 @@ public class WorkgroupSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
+        // 若本次更新将其设为默认，需取消同 org 其他默认
+        if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
+            ensureSingleDefault(entity.getOrgUid(), entity);
+        }
+
         WorkgroupSettingsEntity updated = save(entity);
         return convertToResponse(updated);
     }
@@ -257,9 +270,11 @@ public class WorkgroupSettingsRestService
     /**
      * Get or create default settings for organization
      */
+    @Transactional
     public WorkgroupSettingsEntity getOrCreateDefault(String orgUid) {
+        // 加锁读取，防止并发创建多个默认
         Optional<WorkgroupSettingsEntity> defaultSettings = workgroupSettingsRepository
-                .findByOrgUidAndIsDefaultTrue(orgUid);
+                .findDefaultForUpdate(orgUid);
         if (defaultSettings.isPresent()) {
             return defaultSettings.get();
         }
@@ -281,6 +296,8 @@ public class WorkgroupSettingsRestService
         settings.setServiceSettings(published);
         settings.setDraftServiceSettings(draft);
 
+        // 刚创建的即为默认，确保同 org 唯一
+        ensureSingleDefault(orgUid, settings);
         return save(settings);
     }
 
@@ -322,6 +339,25 @@ public class WorkgroupSettingsRestService
     @Override
     public WorkgroupSettingsResponse convertToResponse(WorkgroupSettingsEntity entity) {
         return modelMapper.map(entity, WorkgroupSettingsResponse.class);
+    }
+
+    /**
+     * 保证同一个 orgUid 下仅有一个 isDefault=true。
+     * 在事务内使用，借助悲观锁串行化并发修改。
+     */
+    private void ensureSingleDefault(String orgUid, WorkgroupSettingsEntity target) {
+        if (orgUid == null) {
+            return;
+        }
+        Optional<WorkgroupSettingsEntity> existingOpt = workgroupSettingsRepository.findDefaultForUpdate(orgUid);
+        if (existingOpt.isPresent()) {
+            WorkgroupSettingsEntity existing = existingOpt.get();
+            if (!existing.getUid().equals(target.getUid())) {
+                existing.setIsDefault(false);
+                save(existing);
+            }
+        }
+        target.setIsDefault(true);
     }
 
 }

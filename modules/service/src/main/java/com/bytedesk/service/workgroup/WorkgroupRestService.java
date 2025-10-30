@@ -74,8 +74,15 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         workgroup.setOrgUid(request.getOrgUid());
         //
-        // 设置默认配置
+    // 绑定技能组配置：优先使用请求中的 settingsUid，否则使用组织默认配置
+    if (StringUtils.hasText(request.getSettingsUid())) {
+        workgroupSettingsRestService.findByUid(request.getSettingsUid())
+            .ifPresentOrElse(workgroup::setSettings,
+                () -> workgroup.setSettings(
+                    workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid())));
+    } else {
         workgroup.setSettings(workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+    }
         //
         if (request.getAgentUids() != null) {
             Iterator<String> agentIterator = request.getAgentUids().iterator();
@@ -139,8 +146,9 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         // workgroup.setInviteSettings(inviteSettings);
         //
         // 如果前端未传 agentUids，则不改动现有客服列表；只有在明确传入时才覆盖
-        boolean agentsChanged = request.getAgentUids() != null;
-        if (agentsChanged) {
+        boolean agentsChanged = false;
+        if (request.getAgentUids() != null && !request.getAgentUids().isEmpty()) {
+            agentsChanged = true;
             workgroup.getAgents().clear();
             Iterator<String> iterator = request.getAgentUids().iterator();
             while (iterator.hasNext()) {

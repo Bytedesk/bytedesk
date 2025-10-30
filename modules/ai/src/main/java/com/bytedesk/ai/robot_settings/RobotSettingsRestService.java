@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -39,6 +40,7 @@ public class RobotSettingsRestService
     }
 
     @Override
+    @Transactional
     public RobotSettingsResponse create(RobotSettingsRequest request) {
         RobotSettingsEntity entity = modelMapper.map(request, RobotSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
@@ -77,11 +79,17 @@ public class RobotSettingsRestService
         rd.setUid(uidUtils.getUid());
         entity.setDraftRateDownSettings(rd);
 
+        // 如果请求或实体标记为默认，则保证同 org 仅一个默认
+        if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
+            ensureSingleDefault(entity.getOrgUid(), entity);
+        }
+
         RobotSettingsEntity saved = save(entity);
         return convertToResponse(saved);
     }
 
     @Override
+    @Transactional
     public RobotSettingsResponse update(RobotSettingsRequest request) {
         Optional<RobotSettingsEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
@@ -156,6 +164,11 @@ public class RobotSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
+        // 若本次更新将其设为默认，需取消同 org 其他默认
+        if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
+            ensureSingleDefault(entity.getOrgUid(), entity);
+        }
+
         RobotSettingsEntity updated = save(entity);
         return convertToResponse(updated);
     }
@@ -210,8 +223,10 @@ public class RobotSettingsRestService
     /**
      * Get or create default settings for organization
      */
+    @Transactional
     public RobotSettingsEntity getOrCreateDefault(String orgUid) {
-        Optional<RobotSettingsEntity> defaultSettings = robotSettingsRepository.findByOrgUidAndIsDefaultTrue(orgUid);
+        // 加锁读取，防止并发创建多个默认
+        Optional<RobotSettingsEntity> defaultSettings = robotSettingsRepository.findDefaultForUpdate(orgUid);
         if (defaultSettings.isPresent()) {
             return defaultSettings.get();
         }
@@ -232,6 +247,8 @@ public class RobotSettingsRestService
         settings.setServiceSettings(published);
         settings.setDraftServiceSettings(draft);
 
+        // 刚创建的即为默认，确保同 org 唯一
+        ensureSingleDefault(orgUid, settings);
         return save(settings);
     }
 
@@ -264,6 +281,25 @@ public class RobotSettingsRestService
     @Override
     public RobotSettingsResponse convertToResponse(RobotSettingsEntity entity) {
         return modelMapper.map(entity, RobotSettingsResponse.class);
+    }
+
+    /**
+     * 保证同一个 orgUid 下仅有一个 isDefault=true。
+     * 在事务内使用，借助悲观锁串行化并发修改。
+     */
+    private void ensureSingleDefault(String orgUid, RobotSettingsEntity target) {
+        if (orgUid == null) {
+            return;
+        }
+        Optional<RobotSettingsEntity> existingOpt = robotSettingsRepository.findDefaultForUpdate(orgUid);
+        if (existingOpt.isPresent()) {
+            RobotSettingsEntity existing = existingOpt.get();
+            if (!existing.getUid().equals(target.getUid())) {
+                existing.setIsDefault(false);
+                save(existing);
+            }
+        }
+        target.setIsDefault(true);
     }
 
 }

@@ -138,8 +138,24 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
         robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
         //
-        // 设置默认配置
-        robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+        // 设置配置：若传入 settingsUid 则按 uid 关联，否则使用组织默认配置
+        try {
+            if (StringUtils.hasText(request.getSettingsUid())) {
+                Optional<com.bytedesk.ai.robot_settings.RobotSettingsEntity> settingsOpt = robotSettingsRestService
+                        .findByUid(request.getSettingsUid());
+                if (settingsOpt.isPresent()) {
+                    robot.setSettings(settingsOpt.get());
+                } else {
+                    log.warn("create robot: settings not found by uid={}, fallback to default", request.getSettingsUid());
+                    robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+                }
+            } else {
+                robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+            }
+        } catch (Exception ex) {
+            log.warn("create robot settings resolve failed, fallback to default. orgUid={}, err={}", request.getOrgUid(), ex.getMessage());
+            robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+        }
         
         // 设置llm相关属性
         if (request.getLlm() != null) {
@@ -201,6 +217,23 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         // robot.setPublished(request.getPublished());
         robot.setKbEnabled(request.getKbEnabled());
         robot.setKbUid(request.getKbUid());
+        
+        // 如果传入新的 settingsUid，则更新关联的配置
+        if (StringUtils.hasText(request.getSettingsUid())) {
+            try {
+                Optional<com.bytedesk.ai.robot_settings.RobotSettingsEntity> settingsOpt = robotSettingsRestService
+                        .findByUid(request.getSettingsUid());
+                if (settingsOpt.isPresent()) {
+                    if (robot.getSettings() == null || !request.getSettingsUid().equals(robot.getSettings().getUid())) {
+                        robot.setSettings(settingsOpt.get());
+                    }
+                } else {
+                    log.warn("update robot: settings not found by uid={}, keep original settings", request.getSettingsUid());
+                }
+            } catch (Exception ex) {
+                log.warn("update robot settings resolve failed, uid={}, err={}", request.getSettingsUid(), ex.getMessage());
+            }
+        }
         
         // 设置llm相关属性
         if (request.getLlm() != null) {
