@@ -82,15 +82,13 @@ public class RobotSettingsRestService
         rd.setUid(uidUtils.getUid());
         entity.setDraftRateDownSettings(rd);
 
-        // LLM: 如果请求包含 llm，则创建并关联（同时初始化 draft）
-        if (request.getLlm() != null) {
-            RobotLlmEntity llm = modelMapper.map(request.getLlm(), RobotLlmEntity.class);
-            llm.setUid(uidUtils.getUid());
-            entity.setLlm(llm);
-            RobotLlmEntity draftLlm = modelMapper.map(request.getLlm(), RobotLlmEntity.class);
-            draftLlm.setUid(uidUtils.getUid());
-            entity.setDraftLlm(draftLlm);
-        }
+        // LLM: 统一使用 fromRequest（其内部已对 null 做处理），同时初始化发布与草稿
+        RobotLlmEntity llm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
+        llm.setUid(uidUtils.getUid());
+        entity.setLlm(llm);
+        RobotLlmEntity draftLlm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
+        draftLlm.setUid(uidUtils.getUid());
+        entity.setDraftLlm(draftLlm);
 
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
@@ -118,14 +116,18 @@ public class RobotSettingsRestService
             ServiceSettingsEntity draft = entity.getDraftServiceSettings();
             if (draft == null) {
                 draft = new ServiceSettingsEntity();
-                draft.setUid(uidUtils.getUid());
                 entity.setDraftServiceSettings(draft);
             }
             // 保存原有uid及实体id，避免被 modelMapper 覆盖
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getServiceSettings(), draft);
-            draft.setUid(originalUid);
+            // 恢复或设置 uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
             if (originalId != null) {
                 draft.setId(originalId);
             }
@@ -138,14 +140,18 @@ public class RobotSettingsRestService
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
             if (draft == null) {
                 draft = new InviteSettingsEntity();
-                draft.setUid(uidUtils.getUid());
                 entity.setDraftInviteSettings(draft);
             }
             // 保存原有uid及实体id，避免被 modelMapper 覆盖
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getInviteSettings(), draft);
-            draft.setUid(originalUid);
+            // 恢复或设置 uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
             if (originalId != null) {
                 draft.setId(originalId);
             }
@@ -155,14 +161,18 @@ public class RobotSettingsRestService
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
             if (draft == null) {
                 draft = new IntentionSettingsEntity();
-                draft.setUid(uidUtils.getUid());
                 entity.setDraftIntentionSettings(draft);
             }
             // 保存原有uid及实体id，避免被 modelMapper 覆盖
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getIntentionSettings(), draft);
-            draft.setUid(originalUid);
+            // 恢复或设置 uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
             if (originalId != null) {
                 draft.setId(originalId);
             }
@@ -172,14 +182,18 @@ public class RobotSettingsRestService
             RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
             if (draft == null) {
                 draft = new RatedownSettingsEntity();
-                draft.setUid(uidUtils.getUid());
                 entity.setDraftRateDownSettings(draft);
             }
             // 保存原有uid及实体id，避免被 modelMapper 覆盖
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getRateDownSettings(), draft);
-            draft.setUid(originalUid);
+            // 恢复或设置 uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
             if (originalId != null) {
                 draft.setId(originalId);
             }
@@ -191,14 +205,18 @@ public class RobotSettingsRestService
             RobotLlmEntity draft = entity.getDraftLlm();
             if (draft == null) {
                 draft = new RobotLlmEntity();
-                draft.setUid(uidUtils.getUid());
                 entity.setDraftLlm(draft);
             }
             // 保存原有uid及实体id，避免被 modelMapper 覆盖
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getLlm(), draft);
-            draft.setUid(originalUid);
+            // 恢复或设置 uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
             if (originalId != null) {
                 draft.setId(originalId);
             }

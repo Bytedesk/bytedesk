@@ -6,6 +6,8 @@ package com.bytedesk.ai.robot_settings;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -170,4 +172,23 @@ public class RobotLlmEntity extends BaseEntity {
 
     @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+
+    /**
+     * 从 RobotLlmRequest 创建 RobotLlmEntity 实体
+     * - 若 request 为 null，返回默认构建的实体
+     * - 使用 ModelMapper 映射常规字段
+     *
+     * @param request RobotLlmRequest 对象，允许为 null
+     * @param modelMapper ModelMapper 实例
+     * @return RobotLlmEntity 实体，非空
+     */
+    public static RobotLlmEntity fromRequest(RobotLlmRequest request, ModelMapper modelMapper) {
+        if (request == null) {
+            return RobotLlmEntity.builder().build();
+        }
+        RobotLlmEntity entity = modelMapper.map(request, RobotLlmEntity.class);
+        // 目前无特殊类型转换需求，保留占位以备后续扩展
+        // 如需将枚举转换为字符串，或处理集合空值，可在此补充
+        return entity;
+    }
 }
