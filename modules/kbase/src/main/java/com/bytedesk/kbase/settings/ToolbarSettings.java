@@ -6,14 +6,19 @@
 package com.bytedesk.kbase.settings;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Convert;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import com.bytedesk.core.converter.StringListConverter;
 
 @Getter
 @Setter
@@ -56,4 +61,16 @@ public class ToolbarSettings implements Serializable {
 
     @Builder.Default
     private Boolean tel = true;
+
+    // 工具栏排列顺序（从左到右），未设置则按默认顺序
+    // 说明：
+    // - 仅控制排序，不影响开关是否显示；是否显示由上面的 Boolean 字段决定
+    // - 为兼容性与简化持久化，使用 StringListConverter 在单列中以逗号分隔方式持久化
+    // - 默认顺序覆盖所有内置项，新增项请追加到末尾
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    private List<String> order = Arrays.asList(
+        "smile", "image", "file", "rate", "leavemsg",
+        "orderSelector", "ticket", "audio", "video", "tel"
+    );
 }
