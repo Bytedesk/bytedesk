@@ -114,96 +114,105 @@ public class RobotSettingsRestService
         if (request.getServiceSettings() != null) {
             // 复用并更新现有草稿
             ServiceSettingsEntity draft = entity.getDraftServiceSettings();
+            // 保存原有uid(如果存在)
+            String originalUid = (draft != null) ? draft.getUid() : null;
+            
             if (draft == null) {
                 draft = new ServiceSettingsEntity();
-                draft.setUid(uidUtils.getUid());
-                modelMapper.map(request.getServiceSettings(), draft);
-                // 确保 uid 不被覆盖
-                if (draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
-                entity.setDraftServiceSettings(draft);
-            } else {
-                // 保留草稿唯一标识,避免被请求体覆盖
-                String originalUid = draft.getUid();
-                modelMapper.map(request.getServiceSettings(), draft);
-                draft.setUid(originalUid);
             }
+            modelMapper.map(request.getServiceSettings(), draft);
+            
+            // 根据原有uid决定是保留还是创建新uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            
+            entity.setDraftServiceSettings(draft);
             entity.setHasUnpublishedChanges(true);
         }
         // 更新草稿:邀请/意图
         if (request.getInviteSettings() != null) {
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
+            // 保存原有uid(如果存在)
+            String originalUid = (draft != null) ? draft.getUid() : null;
+            
             if (draft == null) {
                 draft = new InviteSettingsEntity();
-                draft.setUid(uidUtils.getUid());
-                modelMapper.map(request.getInviteSettings(), draft);
-                // 确保 uid 不被覆盖
-                if (draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
-                entity.setDraftInviteSettings(draft);
-            } else {
-                String originalUid = draft.getUid();
-                modelMapper.map(request.getInviteSettings(), draft);
-                draft.setUid(originalUid);
             }
+            modelMapper.map(request.getInviteSettings(), draft);
+            
+            // 根据原有uid决定是保留还是创建新uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            
+            entity.setDraftInviteSettings(draft);
             entity.setHasUnpublishedChanges(true);
         }
         if (request.getIntentionSettings() != null) {
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
+            // 保存原有uid(如果存在)
+            String originalUid = (draft != null) ? draft.getUid() : null;
+            
             if (draft == null) {
                 draft = new IntentionSettingsEntity();
-                draft.setUid(uidUtils.getUid());
-                modelMapper.map(request.getIntentionSettings(), draft);
-                // 确保 uid 不被覆盖
-                if (draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
-                entity.setDraftIntentionSettings(draft);
-            } else {
-                String originalUid = draft.getUid();
-                modelMapper.map(request.getIntentionSettings(), draft);
-                draft.setUid(originalUid);
             }
+            modelMapper.map(request.getIntentionSettings(), draft);
+            
+            // 根据原有uid决定是保留还是创建新uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            
+            entity.setDraftIntentionSettings(draft);
             entity.setHasUnpublishedChanges(true);
         }
         if (request.getRateDownSettings() != null) {
             RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
+            // 保存原有uid(如果存在)
+            String originalUid = (draft != null) ? draft.getUid() : null;
+            
             if (draft == null) {
                 draft = new RatedownSettingsEntity();
-                draft.setUid(uidUtils.getUid());
-                modelMapper.map(request.getRateDownSettings(), draft);
-                // 确保 uid 不被覆盖
-                if (draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
-                entity.setDraftRateDownSettings(draft);
-            } else {
-                String originalUid = draft.getUid();
-                modelMapper.map(request.getRateDownSettings(), draft);
-                draft.setUid(originalUid);
             }
+            modelMapper.map(request.getRateDownSettings(), draft);
+            
+            // 根据原有uid决定是保留还是创建新uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            
+            entity.setDraftRateDownSettings(draft);
             entity.setHasUnpublishedChanges(true);
         }
 
         // 更新 LLM(仅更新草稿;发布时再覆盖线上)
         if (request.getLlm() != null) {
             RobotLlmEntity draft = entity.getDraftLlm();
+            // 保存原有uid(如果存在)
+            String originalUid = (draft != null) ? draft.getUid() : null;
+            
             if (draft == null) {
                 draft = new RobotLlmEntity();
-                draft.setUid(uidUtils.getUid());
-                modelMapper.map(request.getLlm(), draft);
-                // 确保 uid 不被覆盖
-                if (draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
-                entity.setDraftLlm(draft);
-            } else {
-                String originalUid = draft.getUid();
-                modelMapper.map(request.getLlm(), draft);
-                draft.setUid(originalUid);
             }
+            modelMapper.map(request.getLlm(), draft);
+            
+            // 根据原有uid决定是保留还是创建新uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            
+            entity.setDraftLlm(draft);
             entity.setHasUnpublishedChanges(true);
         }
 
