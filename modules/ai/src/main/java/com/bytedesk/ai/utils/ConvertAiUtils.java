@@ -43,7 +43,12 @@ public class ConvertAiUtils {
 
     public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
         RobotProtobuf robotProtobuf = getModelMapper().map(entity, RobotProtobuf.class);
-        robotProtobuf.setKbEnabled(entity.getKbEnabled());
+        // kbEnabled moved to RobotSettingsEntity; derive from settings if available
+        boolean kbEnabled = false;
+        if (entity.getSettings() != null && entity.getSettings().getKbEnabled() != null) {
+            kbEnabled = entity.getSettings().getKbEnabled();
+        }
+        robotProtobuf.setKbEnabled(kbEnabled);
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
         return robotProtobuf;
     }

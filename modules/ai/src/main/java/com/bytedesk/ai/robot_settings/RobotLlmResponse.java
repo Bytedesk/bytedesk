@@ -3,17 +3,20 @@
  */
 package com.bytedesk.ai.robot_settings;
 
+import com.bytedesk.core.base.BaseResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RobotLlmResponse {
-    private String uid;
+@EqualsAndHashCode(callSuper = false)
+public class RobotLlmResponse extends BaseResponse {
     private Boolean enabled;
     private Boolean enableThinking;
     private Boolean enableStreaming;
