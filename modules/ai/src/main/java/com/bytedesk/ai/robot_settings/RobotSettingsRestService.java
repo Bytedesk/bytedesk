@@ -318,19 +318,83 @@ public class RobotSettingsRestService
             throw new RuntimeException("RobotSettings not found: " + uid);
         }
         RobotSettingsEntity entity = optional.get();
-        entity.setServiceSettings(entity.getDraftServiceSettings());
+        
+        // 复制草稿到发布版本，保留发布版本的原 uid
+        if (entity.getDraftServiceSettings() != null) {
+            ServiceSettingsEntity published = entity.getServiceSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
+            modelMapper.map(entity.getDraftServiceSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setServiceSettings(newPublished);
+        }
+        
         if (entity.getDraftLlm() != null) {
-            entity.setLlm(entity.getDraftLlm());
+            RobotLlmEntity published = entity.getLlm();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            RobotLlmEntity newPublished = new RobotLlmEntity();
+            modelMapper.map(entity.getDraftLlm(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setLlm(newPublished);
         }
+        
         if (entity.getDraftRateDownSettings() != null) {
-            entity.setRateDownSettings(entity.getDraftRateDownSettings());
+            RatedownSettingsEntity published = entity.getRateDownSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            RatedownSettingsEntity newPublished = new RatedownSettingsEntity();
+            modelMapper.map(entity.getDraftRateDownSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setRateDownSettings(newPublished);
         }
+        
         if (entity.getDraftInviteSettings() != null) {
-            entity.setInviteSettings(entity.getDraftInviteSettings());
+            InviteSettingsEntity published = entity.getInviteSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            InviteSettingsEntity newPublished = new InviteSettingsEntity();
+            modelMapper.map(entity.getDraftInviteSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setInviteSettings(newPublished);
         }
+        
         if (entity.getDraftIntentionSettings() != null) {
-            entity.setIntentionSettings(entity.getDraftIntentionSettings());
+            IntentionSettingsEntity published = entity.getIntentionSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
+            modelMapper.map(entity.getDraftIntentionSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setIntentionSettings(newPublished);
         }
+        
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         RobotSettingsEntity updated = save(entity);

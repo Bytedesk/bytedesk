@@ -311,16 +311,98 @@ public class WorkgroupSettingsRestService
             throw new RuntimeException("WorkgroupSettings not found: " + uid);
         }
         WorkgroupSettingsEntity entity = optional.get();
-        entity.setServiceSettings(entity.getDraftServiceSettings());
-        entity.setMessageLeaveSettings(entity.getDraftMessageLeaveSettings());
-        entity.setRobotSettings(entity.getDraftRobotSettings());
-        entity.setQueueSettings(entity.getDraftQueueSettings());
+        
+        // 复制草稿到发布版本，保留发布版本的原 uid
+        if (entity.getDraftServiceSettings() != null) {
+            ServiceSettingsEntity published = entity.getServiceSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
+            modelMapper.map(entity.getDraftServiceSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setServiceSettings(newPublished);
+        }
+        
+        if (entity.getDraftMessageLeaveSettings() != null) {
+            MessageLeaveSettingsEntity published = entity.getMessageLeaveSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            MessageLeaveSettingsEntity newPublished = new MessageLeaveSettingsEntity();
+            modelMapper.map(entity.getDraftMessageLeaveSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setMessageLeaveSettings(newPublished);
+        }
+        
+        if (entity.getDraftRobotSettings() != null) {
+            RobotRoutingSettingsEntity published = entity.getRobotSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            RobotRoutingSettingsEntity newPublished = new RobotRoutingSettingsEntity();
+            modelMapper.map(entity.getDraftRobotSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setRobotSettings(newPublished);
+        }
+        
+        if (entity.getDraftQueueSettings() != null) {
+            QueueSettingsEntity published = entity.getQueueSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            QueueSettingsEntity newPublished = new QueueSettingsEntity();
+            modelMapper.map(entity.getDraftQueueSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setQueueSettings(newPublished);
+        }
+        
         if (entity.getDraftInviteSettings() != null) {
-            entity.setInviteSettings(entity.getDraftInviteSettings());
+            InviteSettingsEntity published = entity.getInviteSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            InviteSettingsEntity newPublished = new InviteSettingsEntity();
+            modelMapper.map(entity.getDraftInviteSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setInviteSettings(newPublished);
         }
+        
         if (entity.getDraftIntentionSettings() != null) {
-            entity.setIntentionSettings(entity.getDraftIntentionSettings());
+            IntentionSettingsEntity published = entity.getIntentionSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
+            modelMapper.map(entity.getDraftIntentionSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setIntentionSettings(newPublished);
         }
+        
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         WorkgroupSettingsEntity updated = save(entity);

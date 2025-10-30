@@ -452,23 +452,128 @@ public class AgentSettingsRestService
         }
 
         AgentSettingsEntity entity = optional.get();
-        // 将发布版本指向草稿版本（草稿已是独立实体）
-        entity.setServiceSettings(entity.getDraftServiceSettings());
-        entity.setMessageLeaveSettings(entity.getDraftMessageLeaveSettings());
-        entity.setAutoReplySettings(entity.getDraftAutoReplySettings());
-        entity.setQueueSettings(entity.getDraftQueueSettings());
+        
+        // 复制草稿到发布版本，保留发布版本的原 uid
+        if (entity.getDraftServiceSettings() != null) {
+            ServiceSettingsEntity published = entity.getServiceSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
+            modelMapper.map(entity.getDraftServiceSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setServiceSettings(newPublished);
+        }
+        
+        if (entity.getDraftMessageLeaveSettings() != null) {
+            MessageLeaveSettingsEntity published = entity.getMessageLeaveSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            MessageLeaveSettingsEntity newPublished = new MessageLeaveSettingsEntity();
+            modelMapper.map(entity.getDraftMessageLeaveSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setMessageLeaveSettings(newPublished);
+        }
+        
+        if (entity.getDraftAutoReplySettings() != null) {
+            AutoReplySettingsEntity published = entity.getAutoReplySettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            AutoReplySettingsEntity newPublished = new AutoReplySettingsEntity();
+            modelMapper.map(entity.getDraftAutoReplySettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setAutoReplySettings(newPublished);
+        }
+        
+        if (entity.getDraftQueueSettings() != null) {
+            QueueSettingsEntity published = entity.getQueueSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            QueueSettingsEntity newPublished = new QueueSettingsEntity();
+            modelMapper.map(entity.getDraftQueueSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setQueueSettings(newPublished);
+        }
+        
         if (entity.getDraftRateDownSettings() != null) {
-            entity.setRateDownSettings(entity.getDraftRateDownSettings());
+            RatedownSettingsEntity published = entity.getRateDownSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            RatedownSettingsEntity newPublished = new RatedownSettingsEntity();
+            modelMapper.map(entity.getDraftRateDownSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setRateDownSettings(newPublished);
         }
+        
         if (entity.getDraftInviteSettings() != null) {
-            entity.setInviteSettings(entity.getDraftInviteSettings());
+            InviteSettingsEntity published = entity.getInviteSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            InviteSettingsEntity newPublished = new InviteSettingsEntity();
+            modelMapper.map(entity.getDraftInviteSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setInviteSettings(newPublished);
         }
+        
         if (entity.getDraftIntentionSettings() != null) {
-            entity.setIntentionSettings(entity.getDraftIntentionSettings());
+            IntentionSettingsEntity published = entity.getIntentionSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
+            modelMapper.map(entity.getDraftIntentionSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setIntentionSettings(newPublished);
         }
+        
         if (entity.getDraftAgentStatusSettings() != null) {
-            entity.setAgentStatusSettings(entity.getDraftAgentStatusSettings());
+            AgentStatusSettingEntity published = entity.getAgentStatusSettings();
+            String publishedUid = (published != null) ? published.getUid() : null;
+            
+            AgentStatusSettingEntity newPublished = new AgentStatusSettingEntity();
+            modelMapper.map(entity.getDraftAgentStatusSettings(), newPublished);
+            
+            if (publishedUid != null) {
+                newPublished.setUid(publishedUid);
+            } else {
+                newPublished.setUid(uidUtils.getUid());
+            }
+            entity.setAgentStatusSettings(newPublished);
         }
+        
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         AgentSettingsEntity updated = save(entity);
