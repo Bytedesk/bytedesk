@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,6 +70,7 @@ public class ToolbarSettings implements Serializable {
     // - 默认顺序覆盖所有内置项，新增项请追加到末尾
     @Builder.Default
     @Convert(converter = StringListConverter.class)
+    @Column(name = "toolbar_order", length = 1024)
     private List<String> order = Arrays.asList(
         "smile", "image", "file", "rate", "leavemsg",
         "orderSelector", "ticket", "audio", "video", "tel"
