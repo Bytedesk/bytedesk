@@ -15,6 +15,7 @@ package com.bytedesk.kbase.settings_invite;
 
 
 import com.bytedesk.core.base.BaseResponse;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,11 +39,136 @@ public class InviteSettingsResponse extends BaseResponse {
 
     private String description;
 
-    private String type;
+    /**
+     * 是否为默认设置模板
+     */
+    private Boolean defaultTemplate;
 
-    private String color;
+    /**
+     * 是否显示邀请
+     */
+    private Boolean show;
 
-    private Integer order;
+    /**
+     * 邀请文本
+     */
+    private String text;
+
+    /**
+     * 邀请图标
+     */
+    private String icon;
+
+    /**
+     * 邀请延迟时间,单位:毫秒
+     */
+    private Long delay;
+
+    /**
+     * 是否循环
+     */
+    private Boolean loop;
+
+    /**
+     * 循环延迟时间,单位:毫秒
+     */
+    private Long loopDelay;
+
+    /**
+     * 循环次数
+     */
+    private Integer loopCount;
+
+    /**
+     * 邀请消息列表
+     */
+    private List<String> messageList;
+
+    /**
+     * 定向邀请设置 - 针对特定页面启用邀请
+     */
+    private Boolean targetedInvite;
+
+    /**
+     * 定向邀请页面URL匹配模式
+     */
+    private List<String> targetedInviteUrls;
+
+    /**
+     * 智能触发邀请 - 基于用户行为
+     */
+    private Boolean smartTrigger;
+
+    /**
+     * 页面停留时间触发，单位:秒
+     */
+    private Integer pageStayTriggerSeconds;
+
+    /**
+     * 页面滚动触发
+     */
+    private Boolean scrollTrigger;
+
+    /**
+     * 页面滚动触发百分比 (0-100)
+     * 注意：与后端实体字段保持一致命名
+     */
+    private Integer scrollTriggerPerceninviteSettinge;
+
+    /**
+     * 退出意图触发
+     */
+    private Boolean exitIntentTrigger;
+
+    /**
+     * 访客来源触发
+     */
+    private Boolean referrerTrigger;
+
+    /**
+     * 来源URL匹配模式
+     */
+    private List<String> referrerPatterns;
+
+    /**
+     * 访客设备类型触发 - 可选: desktop, mobile, tablet
+     */
+    private List<String> deviceTypes;
+
+    /**
+     * 是否启用访客分段邀请
+     */
+    private Boolean visitorSegmentation;
+
+    /**
+     * 新访客专属邀请消息
+     */
+    private String newVisitorMessage;
+
+    /**
+     * 回访访客专属邀请消息
+     */
+    private String returningVisitorMessage;
+
+    /**
+     * VIP访客专属邀请消息
+     */
+    private String vipVisitorMessage;
+
+    /**
+     * 邀请样式设置: bubble, card, modal, banner
+     */
+    private String inviteStyle;
+
+    /**
+     * 邀请动画效果: fade, slide, bounce, none
+     */
+    private String inviteAnimation;
+
+    /**
+     * 是否启用A/B测试
+     */
+    private Boolean abTesting;
 
     // private ZonedDateTime createdAt;
 }
