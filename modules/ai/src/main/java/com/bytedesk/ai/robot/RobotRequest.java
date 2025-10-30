@@ -60,24 +60,19 @@ public class RobotRequest extends BaseRequest {
     // private String content;
 
     @Builder.Default
-    private RobotLlm llm = new RobotLlm();
-
-    @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
 
     // 机器人分类
     private String categoryUid;
 
-    private Boolean kbEnabled;
-
-    private String kbUid;
+    // kbEnabled/kbUid 已迁移到 RobotSettings
 
     // 优先判断是否启用流程，流程优先于知识库
     // flow enabled
-    private Boolean flowEnabled;
+    // private Boolean flowEnabled;
 
     // flow uid
-    private String flowUid;
+    // private String flowUid;
 
     // 是否是系统自带
     @Builder.Default

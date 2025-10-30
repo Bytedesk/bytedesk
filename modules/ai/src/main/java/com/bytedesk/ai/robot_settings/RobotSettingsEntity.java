@@ -102,4 +102,10 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private RobotLlmEntity llm;
+
+    /**
+     * 草稿版 LLM 配置（发布时覆盖线上）
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private RobotLlmEntity draftLlm;
 }

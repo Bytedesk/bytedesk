@@ -79,11 +79,14 @@ public class RobotSettingsRestService
         rd.setUid(uidUtils.getUid());
         entity.setDraftRateDownSettings(rd);
 
-        // LLM: 如果请求包含 llm，则创建并关联
+        // LLM: 如果请求包含 llm，则创建并关联（同时初始化 draft）
         if (request.getLlm() != null) {
             RobotLlmEntity llm = modelMapper.map(request.getLlm(), RobotLlmEntity.class);
             llm.setUid(uidUtils.getUid());
             entity.setLlm(llm);
+            RobotLlmEntity draftLlm = modelMapper.map(request.getLlm(), RobotLlmEntity.class);
+            draftLlm.setUid(uidUtils.getUid());
+            entity.setDraftLlm(draftLlm);
         }
 
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
@@ -171,17 +174,17 @@ public class RobotSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
-        // 更新 LLM
+        // 更新 LLM（仅更新草稿；发布时再覆盖线上）
         if (request.getLlm() != null) {
-            RobotLlmEntity llm = entity.getLlm();
-            if (llm == null) {
-                llm = modelMapper.map(request.getLlm(), RobotLlmEntity.class);
-                llm.setUid(uidUtils.getUid());
-                entity.setLlm(llm);
+            RobotLlmEntity draft = entity.getDraftLlm();
+            if (draft == null) {
+                draft = modelMapper.map(request.getLlm(), RobotLlmEntity.class);
+                draft.setUid(uidUtils.getUid());
+                entity.setDraftLlm(draft);
             } else {
-                String uid = llm.getUid();
-                modelMapper.map(request.getLlm(), llm);
-                llm.setUid(uid);
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getLlm(), draft);
+                draft.setUid(originalUid);
             }
             entity.setHasUnpublishedChanges(true);
         }
@@ -289,6 +292,9 @@ public class RobotSettingsRestService
         }
         RobotSettingsEntity entity = optional.get();
         entity.setServiceSettings(entity.getDraftServiceSettings());
+        if (entity.getDraftLlm() != null) {
+            entity.setLlm(entity.getDraftLlm());
+        }
         if (entity.getDraftRateDownSettings() != null) {
             entity.setRateDownSettings(entity.getDraftRateDownSettings());
         }

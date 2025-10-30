@@ -50,8 +50,6 @@ public class RobotResponse extends BaseResponse {
 
     // private InviteSettings inviteSettings;
 
-    private RobotLlm llm;
-
     private String defaultReply;
 
     // 机器人分类
@@ -59,15 +57,13 @@ public class RobotResponse extends BaseResponse {
 
     // private Boolean published;
 
-    private Boolean kbEnabled;
-
-    private String kbUid; // 对应知识库
+    // kbEnabled/kbUid 已迁移到 RobotSettings
 
     // flow enabled
-    private Boolean flowEnabled;
+    // private Boolean flowEnabled;
 
     // flow uid
-    private String flowUid;
+    // private String flowUid;
 
     private Boolean system;
 }

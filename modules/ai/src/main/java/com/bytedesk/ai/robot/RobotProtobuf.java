@@ -63,14 +63,63 @@ public class RobotProtobuf implements Serializable {
     }
 
     public static RobotProtobuf convertFromRobotEntity(RobotEntity robotEntity) {
+        RobotLlm mappedLlm = null;
+        Boolean kbEnabled = null;
+        String kbUid = null;
+        if (robotEntity.getSettings() != null) {
+            com.bytedesk.ai.robot_settings.RobotSettingsEntity settings = robotEntity.getSettings();
+            kbEnabled = settings.getKbEnabled();
+            kbUid = settings.getKbUid();
+            if (settings.getLlm() != null) {
+                com.bytedesk.ai.robot_settings.RobotLlmEntity s = settings.getLlm();
+                mappedLlm = RobotLlm.builder()
+                        .enabled(s.getEnabled())
+                        .enableThinking(s.getEnableThinking())
+                        .enableStreaming(s.getEnableStreaming())
+                        .enableSearch(s.getEnableSearch())
+                        .textProvider(s.getTextProvider())
+                        .textProviderUid(s.getTextProviderUid())
+                        .textModel(s.getTextModel())
+                        .audioEnabled(s.getAudioEnabled())
+                        .audioProvider(s.getAudioProvider())
+                        .audioProviderUid(s.getAudioProviderUid())
+                        .audioModel(s.getAudioModel())
+                        .rerankEnabled(s.getRerankEnabled())
+                        .rerankProvider(s.getRerankProvider())
+                        .rerankProviderUid(s.getRerankProviderUid())
+                        .rerankModel(s.getRerankModel())
+                        .rewriteEnabled(s.getRewriteEnabled())
+                        .rewriteProvider(s.getRewriteProvider())
+                        .rewriteProviderUid(s.getRewriteProviderUid())
+                        .rewriteModel(s.getRewriteModel())
+                        .rewritePrompt(s.getRewritePrompt())
+                        .searchType(s.getSearchType())
+                        .topK(s.getTopK())
+                        .scoreThreshold(s.getScoreThreshold())
+                        .doSample(s.getDoSample())
+                        .maxTokens(s.getMaxTokens())
+                        .temperature(s.getTemperature())
+                        .topP(s.getTopP())
+                        .tools(s.getTools())
+                        .toolChoice(s.getToolChoice())
+                        .stops(s.getStops())
+                        .responseFormat(s.getResponseFormat())
+                        .requestId(s.getRequestId())
+                        .userId(s.getUserId())
+                        .prompt(s.getPrompt())
+                        .contextMsgCount(s.getContextMsgCount())
+                        .defaultReply(s.getDefaultReply())
+                        .build();
+            }
+        }
         return RobotProtobuf.builder()
                 .uid(robotEntity.getUid())
                 .nickname(robotEntity.getNickname())
                 .avatar(robotEntity.getAvatar())
                 .type(UserTypeEnum.ROBOT.name())
-                .kbEnabled(robotEntity.getKbEnabled()) // 确保正确设置
-                .kbUid(robotEntity.getKbUid())
-                .llm(robotEntity.getLlm())
+                .kbEnabled(kbEnabled)
+                .kbUid(kbUid)
+                .llm(mappedLlm)
                 .build();
     }
 

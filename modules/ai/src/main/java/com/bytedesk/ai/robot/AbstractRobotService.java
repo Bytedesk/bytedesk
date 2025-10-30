@@ -69,7 +69,7 @@ public abstract class AbstractRobotService {
             if (robotOptional.get().getSettings() != null && robotOptional.get().getSettings().getLlm() != null) {
                 provider = robotOptional.get().getSettings().getLlm().getTextProvider();
             } else {
-                provider = robotOptional.get().getLlm().getTextProvider();
+                throw new RuntimeException(errorMessage);
             }
             log.info("processSyncRequest provider: {}", provider);
 
@@ -100,7 +100,7 @@ public abstract class AbstractRobotService {
             if (robotOptional.get().getSettings() != null && robotOptional.get().getSettings().getLlm() != null) {
                 provider = robotOptional.get().getSettings().getLlm().getTextProvider();
             } else {
-                provider = robotOptional.get().getLlm().getTextProvider();
+                throw new RuntimeException(errorMessage);
             }
             log.info("processMultiModalSyncRequest provider: {}", provider);
 

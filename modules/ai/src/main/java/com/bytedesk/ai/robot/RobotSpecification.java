@@ -58,20 +58,28 @@ public class RobotSpecification extends BaseSpecification<RobotEntity, RobotRequ
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
-            // kbEnabled
-            if (request.getKbEnabled() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("kbEnabled"), request.getKbEnabled()));
-            }
-            // kbUid
-            if (StringUtils.hasText(request.getKbUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
-            }
+            // 连接 Settings 以支持 LLM 提示词搜索等
+            jakarta.persistence.criteria.Join<Object, Object> settingsJoin = null;
+            try {
+                settingsJoin = root.join("settings", jakarta.persistence.criteria.JoinType.LEFT);
+            } catch (Exception ignored) {}
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
             // 方便前端搜索
             if (StringUtils.hasText(request.getPrompt())) {
-                predicates.add(criteriaBuilder.like(root.get("llm").get("prompt"), "%" + request.getPrompt() + "%"));
+                if (settingsJoin == null) {
+                    settingsJoin = root.join("settings", jakarta.persistence.criteria.JoinType.LEFT);
+                }
+                if (settingsJoin != null) {
+                    jakarta.persistence.criteria.Join<Object, Object> llmJoin = null;
+                    try {
+                        llmJoin = settingsJoin.join("llm", jakarta.persistence.criteria.JoinType.LEFT);
+                    } catch (Exception ignored) {}
+                    if (llmJoin != null) {
+                        predicates.add(criteriaBuilder.like(llmJoin.get("prompt"), "%" + request.getPrompt() + "%"));
+                    }
+                }
             }
             // searchText
             if (StringUtils.hasText(request.getSearchText())) {

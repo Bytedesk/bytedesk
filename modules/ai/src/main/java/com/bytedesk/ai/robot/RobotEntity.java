@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -87,12 +86,7 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
     
-    /**
-     * LLM configuration settings for the robot
-     */
-    @Embedded
-    @Builder.Default
-    private RobotLlm llm = new RobotLlm();
+    // LLM 配置已迁移至 RobotSettingsEntity
 
     /**
      * Configuration settings reference
@@ -111,17 +105,7 @@ public class RobotEntity extends BaseEntity {
     // @Builder.Default
     // private Boolean published = false;
 
-    /**
-     * Whether knowledge base integration is enabled
-     */
-    @Builder.Default
-    @Column(name = "is_kb_enabled")
-    private Boolean kbEnabled = false;
-
-    /**
-     * Associated knowledge base UID for AI responses
-     */
-    private String kbUid; // 对应知识库
+    // 知识库相关字段已迁移至 RobotSettingsEntity
 
     /**
      * Whether workflow/flow integration is enabled

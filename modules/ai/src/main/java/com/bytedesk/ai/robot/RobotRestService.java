@@ -135,8 +135,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
-        robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
-        robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
+        // robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
+        // robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
         //
         // 设置配置：若传入 settingsUid 则按 uid 关联，否则使用组织默认配置
         try {

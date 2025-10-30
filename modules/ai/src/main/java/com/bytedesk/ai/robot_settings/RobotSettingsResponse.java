@@ -41,6 +41,8 @@ public class RobotSettingsResponse extends BaseSettingsResponse {
 
     // LLM 配置（实体引用）
     private RobotLlmResponse llm;
+    // Draft LLM 配置（实体引用）
+    private RobotLlmResponse draftLlm;
     
     /**
      * Rating down settings (Robot-specific)
