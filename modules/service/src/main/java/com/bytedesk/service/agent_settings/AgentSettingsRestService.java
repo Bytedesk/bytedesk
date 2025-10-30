@@ -17,23 +17,17 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
-import com.bytedesk.kbase.llm_faq.FaqEntity;
-import com.bytedesk.kbase.llm_faq.FaqRepository;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
-import com.bytedesk.kbase.settings.ServiceSettingsRequest;
+import com.bytedesk.kbase.settings.ServiceSettingsHelper;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsRequest;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.agent.AgentRepository;
-import com.bytedesk.service.worktime.WorktimeEntity;
-import com.bytedesk.service.worktime.WorktimeRepository;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,9 +46,9 @@ public class AgentSettingsRestService
 
     private final AgentRepository agentRepository;
 
-    private final FaqRepository faqRepository;
+    private final ServiceSettingsHelper serviceSettingsHelper;
 
-    private final WorktimeRepository worktimeRepository;
+    private final MessageLeaveSettingsHelper messageLeaveSettingsHelper;
 
     @Cacheable(value = "agentSettings", key = "#uid", unless = "#result == null")
     @Override
@@ -77,7 +71,7 @@ public class AgentSettingsRestService
         service.setUid(uidUtils.getUid());
         // 处理 ServiceSettings 关联（FAQ 列表等）
         if (request.getServiceSettings() != null) {
-            updateFaqAssociationsIfPresent(service, request.getServiceSettings());
+            serviceSettingsHelper.updateFaqAssociationsIfPresent(service, request.getServiceSettings());
         }
         entity.setServiceSettings(service);
 
@@ -86,7 +80,7 @@ public class AgentSettingsRestService
         // 保证草稿与发布是不同实体，强制新的 uid
         draft.setUid(uidUtils.getUid());
         if (request.getServiceSettings() != null) {
-            updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
+            serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
         }
         entity.setDraftServiceSettings(draft);
 
@@ -112,14 +106,14 @@ public class AgentSettingsRestService
         mls.setUid(uidUtils.getUid());
     // 处理 MessageLeaveSettings 关联（工作时间段）
     if (request.getMessageLeaveSettings() != null) {
-        updateWorktimesIfPresent(mls, request.getMessageLeaveSettings());
+        messageLeaveSettingsHelper.updateWorktimesIfPresent(mls, request.getMessageLeaveSettings());
     }
         entity.setMessageLeaveSettings(mls);
         MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
                 modelMapper);
         mlsDraft.setUid(uidUtils.getUid());
     if (request.getMessageLeaveSettings() != null) {
-        updateWorktimesIfPresent(mlsDraft, request.getMessageLeaveSettings());
+        messageLeaveSettingsHelper.updateWorktimesIfPresent(mlsDraft, request.getMessageLeaveSettings());
     }
         entity.setDraftMessageLeaveSettings(mlsDraft);
 
@@ -188,7 +182,7 @@ public class AgentSettingsRestService
                 draft.setUid(originalUid);
             }
             // 根据 request 中的 Faq uids 映射关联
-            updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
+            serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
             entity.setHasUnpublishedChanges(true);
         }
         if (request.getMessageLeaveSettings() != null) {
@@ -205,7 +199,7 @@ public class AgentSettingsRestService
                 draft.setUid(originalUid);
             }
             // 根据 request 中的 worktime uids 映射关联
-            updateWorktimesIfPresent(draft, request.getMessageLeaveSettings());
+            messageLeaveSettingsHelper.updateWorktimesIfPresent(draft, request.getMessageLeaveSettings());
             entity.setHasUnpublishedChanges(true);
         }
         if (request.getAutoReplySettings() != null) {
@@ -578,85 +572,6 @@ public class AgentSettingsRestService
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         AgentSettingsEntity updated = save(entity);
         return convertToResponse(updated);
-    }
-
-    /**
-     * 根据请求中的 FAQ UID 列表，解析并设置到目标 ServiceSettings 草稿(或发布)实体。
-     * 仅当对应 UID 列表不为 null 才会更新；为 [] 时表示清空；为 null 时保持不变。
-     */
-    private void updateFaqAssociationsIfPresent(ServiceSettingsEntity target, ServiceSettingsRequest req) {
-        if (req.getWelcomeFaqUids() != null) {
-            target.setWelcomeFaqs(resolveFaqs(req.getWelcomeFaqUids()));
-        }
-        if (req.getFaqUids() != null) {
-            target.setFaqs(resolveFaqs(req.getFaqUids()));
-        }
-        if (req.getQuickFaqUids() != null) {
-            target.setQuickFaqs(resolveFaqs(req.getQuickFaqUids()));
-        }
-        if (req.getGuessFaqUids() != null) {
-            target.setGuessFaqs(resolveFaqs(req.getGuessFaqUids()));
-        }
-        if (req.getHotFaqUids() != null) {
-            target.setHotFaqs(resolveFaqs(req.getHotFaqUids()));
-        }
-        if (req.getShortcutFaqUids() != null) {
-            target.setShortcutFaqs(resolveFaqs(req.getShortcutFaqUids()));
-        }
-        if (req.getProactiveFaqUids() != null) {
-            target.setProactiveFaqs(resolveFaqs(req.getProactiveFaqUids()));
-        }
-    }
-
-    /**
-     * 将 uid 列表解析为 FaqEntity 列表。忽略无效 uid。
-     */
-    private List<FaqEntity> resolveFaqs(List<String> uids) {
-        if (uids == null) {
-            return null;
-        }
-        if (uids.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<FaqEntity> result = new ArrayList<>(uids.size());
-        for (String uid : uids) {
-            if (uid == null || uid.isEmpty()) {
-                continue;
-            }
-            faqRepository.findByUid(uid).ifPresent(result::add);
-        }
-        return result;
-    }
-
-    /**
-     * 根据请求中的 worktime UID 列表，解析并设置到目标 MessageLeaveSettings 草稿(或发布)实体。
-     * 仅当 UID 列表不为 null 才会更新；为空列表表示清空；为 null 时保持不变。
-     */
-    private void updateWorktimesIfPresent(MessageLeaveSettingsEntity target, MessageLeaveSettingsRequest req) {
-        if (req.getWorktimeUids() == null) {
-            return;
-        }
-        target.setWorktimes(resolveWorktimes(req.getWorktimeUids()));
-    }
-
-    /**
-     * 将 uid 列表解析为 WorktimeEntity 列表。忽略无效 uid。
-     */
-    private List<WorktimeEntity> resolveWorktimes(List<String> uids) {
-        if (uids == null) {
-            return null;
-        }
-        if (uids.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<WorktimeEntity> result = new ArrayList<>(uids.size());
-        for (String uid : uids) {
-            if (uid == null || uid.isEmpty()) {
-                continue;
-            }
-            worktimeRepository.findByUid(uid).ifPresent(result::add);
-        }
-        return result;
     }
 
     @Override

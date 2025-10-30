@@ -18,6 +18,7 @@ import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
+import com.bytedesk.kbase.settings.ServiceSettingsHelper;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
@@ -35,6 +36,8 @@ public class WorkgroupSettingsRestService
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    private final ServiceSettingsHelper serviceSettingsHelper;
 
     @Cacheable(value = "workgroupSettings", key = "#uid", unless = "#result == null")
     @Override
@@ -128,9 +131,15 @@ public class WorkgroupSettingsRestService
             } else {
                 // 保留草稿唯一标识，避免被请求体覆盖
                 String originalUid = draft.getUid();
+                Long originalId = draft.getId();
                 modelMapper.map(request.getServiceSettings(), draft);
                 draft.setUid(originalUid);
+                if (originalId != null) {
+                    draft.setId(originalId);
+                }
             }
+            // 处理 ServiceSettings 关联（FAQ 列表等）
+            serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
             entity.setHasUnpublishedChanges(true);
         }
         // 更新草稿：邀请/意图
