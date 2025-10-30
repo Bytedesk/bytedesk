@@ -77,26 +77,26 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         // 设置默认配置
         workgroup.setSettings(workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         //
-        Iterator<String> agentIterator = request.getAgentUids().iterator();
-        while (agentIterator.hasNext()) {
-            String agentUid = agentIterator.next();
-            Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
-            if (agentOptional.isPresent()) {
-                AgentEntity agentEntity = agentOptional.get();
-                workgroup.getAgents().add(agentEntity);
-            } else {
-                throw new RuntimeException(agentUid + " is not found.");
+        if (request.getAgentUids() != null) {
+            Iterator<String> agentIterator = request.getAgentUids().iterator();
+            while (agentIterator.hasNext()) {
+                String agentUid = agentIterator.next();
+                Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
+                if (agentOptional.isPresent()) {
+                    AgentEntity agentEntity = agentOptional.get();
+                    workgroup.getAgents().add(agentEntity);
+                } else {
+                    throw new RuntimeException(agentUid + " is not found.");
+                }
             }
         }
-        // 如果未设置messageLeaveAgentUid，则使用第一个agent作为messageLeaveAgentUid
+        // messageLeaveAgent 兜底：优先使用请求指定，其次使用第一个客服，最后保持为空
         if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
             Optional<AgentEntity> agentOptional = agentService.findByUid(request.getMessageLeaveAgentUid());
-            if (agentOptional.isPresent()) {
-                workgroup.setMessageLeaveAgent(agentOptional.get());
-            }
-        } else {
+            agentOptional.ifPresent(workgroup::setMessageLeaveAgent);
+        } else if (workgroup.getAgents() != null && !workgroup.getAgents().isEmpty()) {
             workgroup.setMessageLeaveAgent(workgroup.getAgents().get(0));
-        }
+        } // else: 保持为 null
         //
         WorkgroupEntity updatedWorkgroup = save(workgroup);
         if (updatedWorkgroup == null) {
@@ -138,27 +138,39 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         // InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
         // workgroup.setInviteSettings(inviteSettings);
         //
-        workgroup.getAgents().clear();
-        Iterator<String> iterator = request.getAgentUids().iterator();
-        while (iterator.hasNext()) {
-            String agentUid = iterator.next();
-            Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
-            if (agentOptional.isPresent()) {
-                AgentEntity agentEntity = agentOptional.get();
-                workgroup.getAgents().add(agentEntity);
-            } else {
-                throw new RuntimeException(agentUid + " is not found.");
+        // 如果前端未传 agentUids，则不改动现有客服列表；只有在明确传入时才覆盖
+        boolean agentsChanged = request.getAgentUids() != null;
+        if (agentsChanged) {
+            workgroup.getAgents().clear();
+            Iterator<String> iterator = request.getAgentUids().iterator();
+            while (iterator.hasNext()) {
+                String agentUid = iterator.next();
+                Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
+                if (agentOptional.isPresent()) {
+                    AgentEntity agentEntity = agentOptional.get();
+                    workgroup.getAgents().add(agentEntity);
+                } else {
+                    throw new RuntimeException(agentUid + " is not found.");
+                }
             }
         }
-        // 如果未设置messageLeaveAgentUid，则使用第一个agent作为messageLeaveAgentUid
+
+        // 同步更新 settings 引用（支持仅更新 settings）
+        if (StringUtils.hasText(request.getSettingsUid())) {
+            workgroupSettingsRestService.findByUid(request.getSettingsUid()).ifPresent(workgroup::setSettings);
+        }
+
+        // robust 设置留言处理坐席：
         if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
-            Optional<AgentEntity> agentOptional = agentService.findByUid(request.getMessageLeaveAgentUid());
-            if (agentOptional.isPresent()) {
-                workgroup.setMessageLeaveAgent(agentOptional.get());
+            agentService.findByUid(request.getMessageLeaveAgentUid()).ifPresent(workgroup::setMessageLeaveAgent);
+        } else if (agentsChanged) {
+            // 当客服列表被修改但未显式指定留言坐席时：若列表非空取第一个，否则置空，避免越界
+            if (workgroup.getAgents() != null && !workgroup.getAgents().isEmpty()) {
+                workgroup.setMessageLeaveAgent(workgroup.getAgents().get(0));
+            } else {
+                workgroup.setMessageLeaveAgent(null);
             }
-        } else {
-            workgroup.setMessageLeaveAgent(workgroup.getAgents().get(0));
-        }
+        } // 未修改客服且未指定留言坐席时，保留原有设置
         //
         WorkgroupEntity updatedWorkgroup = save(workgroup);
         if (updatedWorkgroup == null) {
