@@ -118,21 +118,28 @@ public class RobotSettingsRestService
                 draft = new ServiceSettingsEntity();
                 draft.setUid(uidUtils.getUid());
                 modelMapper.map(request.getServiceSettings(), draft);
+                // 确保 uid 不被覆盖
+                if (draft.getUid() == null) {
+                    draft.setUid(uidUtils.getUid());
+                }
                 entity.setDraftServiceSettings(draft);
             } else {
-                // 保留草稿唯一标识，避免被请求体覆盖
+                // 保留草稿唯一标识,避免被请求体覆盖
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getServiceSettings(), draft);
                 draft.setUid(originalUid);
             }
             entity.setHasUnpublishedChanges(true);
         }
-        // 更新草稿：邀请/意图
+        // 更新草稿:邀请/意图
         if (request.getInviteSettings() != null) {
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
             if (draft == null) {
-                draft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
+                draft = new InviteSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getInviteSettings(), draft);
+                // 确保 uid 不被覆盖
+                if (draft.getUid() == null) {
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftInviteSettings(draft);
@@ -146,8 +153,11 @@ public class RobotSettingsRestService
         if (request.getIntentionSettings() != null) {
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
             if (draft == null) {
-                draft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
+                draft = new IntentionSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getIntentionSettings(), draft);
+                // 确保 uid 不被覆盖
+                if (draft.getUid() == null) {
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftIntentionSettings(draft);
@@ -161,7 +171,10 @@ public class RobotSettingsRestService
         if (request.getRateDownSettings() != null) {
             RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
             if (draft == null) {
-                draft = modelMapper.map(request.getRateDownSettings(), RatedownSettingsEntity.class);
+                draft = new RatedownSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getRateDownSettings(), draft);
+                // 确保 uid 不被覆盖
                 if (draft.getUid() == null) {
                     draft.setUid(uidUtils.getUid());
                 }
@@ -174,12 +187,17 @@ public class RobotSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
-        // 更新 LLM（仅更新草稿；发布时再覆盖线上）
+        // 更新 LLM(仅更新草稿;发布时再覆盖线上)
         if (request.getLlm() != null) {
             RobotLlmEntity draft = entity.getDraftLlm();
             if (draft == null) {
-                draft = modelMapper.map(request.getLlm(), RobotLlmEntity.class);
+                draft = new RobotLlmEntity();
                 draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getLlm(), draft);
+                // 确保 uid 不被覆盖
+                if (draft.getUid() == null) {
+                    draft.setUid(uidUtils.getUid());
+                }
                 entity.setDraftLlm(draft);
             } else {
                 String originalUid = draft.getUid();
