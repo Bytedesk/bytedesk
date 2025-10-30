@@ -36,6 +36,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -134,6 +135,17 @@ public class GlobalControllerAdvice {
         e.printStackTrace();
         log.error("not handled exception 1:", e.getMessage());
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    /**
+     * 乐观锁冲突：返回 409，提示客户端重试或刷新
+     */
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<?> handleOptimisticLock(ObjectOptimisticLockingFailureException e) {
+        log.warn("Optimistic locking failure: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error("资源已被并发修改，请刷新后重试", 409));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

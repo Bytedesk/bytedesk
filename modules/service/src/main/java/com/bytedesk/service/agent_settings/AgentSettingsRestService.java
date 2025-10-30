@@ -35,6 +35,7 @@ import com.bytedesk.service.worktime.WorktimeRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -359,45 +360,53 @@ public class AgentSettingsRestService
     /**
      * Get or create default settings for organization
      */
+    @Transactional
     public AgentSettingsEntity getOrCreateDefault(String orgUid) {
-        Optional<AgentSettingsEntity> defaultSettings = agentSettingsRepository.findByOrgUidAndIsDefaultTrue(orgUid);
-        if (defaultSettings.isPresent()) {
-            return defaultSettings.get();
+        // 先尝试加锁读取，避免并发下重复创建
+        Optional<AgentSettingsEntity> locked = agentSettingsRepository.findDefaultForUpdate(orgUid);
+        if (locked.isPresent()) {
+            return locked.get();
         }
 
-        // Create default settings
-        AgentSettingsEntity settings = AgentSettingsEntity.builder()
-                .uid(uidUtils.getUid())
-                .name("默认客服配置")
-                .description("系统默认客服配置")
-                .isDefault(true)
-                .enabled(true)
-                .orgUid(orgUid)
-                .build();
-        // 初始化发布与草稿版本
-        ServiceSettingsEntity published = ServiceSettingsEntity.builder().build();
-        published.setUid(uidUtils.getUid());
-        ServiceSettingsEntity draft = ServiceSettingsEntity.builder().build();
-        draft.setUid(uidUtils.getUid());
-        settings.setServiceSettings(published);
-        settings.setDraftServiceSettings(draft);
+        // 双检：未找到则创建；若并发创建被约束/锁冲突，再查一次返回
+        try {
+            AgentSettingsEntity settings = AgentSettingsEntity.builder()
+                    .uid(uidUtils.getUid())
+                    .name("默认客服配置")
+                    .description("系统默认客服配置")
+                    .isDefault(true)
+                    .enabled(true)
+                    .orgUid(orgUid)
+                    .build();
+            // 初始化发布与草稿版本
+            ServiceSettingsEntity published = ServiceSettingsEntity.builder().build();
+            published.setUid(uidUtils.getUid());
+            ServiceSettingsEntity draft = ServiceSettingsEntity.builder().build();
+            draft.setUid(uidUtils.getUid());
+            settings.setServiceSettings(published);
+            settings.setDraftServiceSettings(draft);
 
-        // 初始化邀请/意图的发布与草稿
-        InviteSettingsEntity inv = InviteSettingsEntity.builder().build();
-        inv.setUid(uidUtils.getUid());
-        InviteSettingsEntity invDraft = InviteSettingsEntity.builder().build();
-        invDraft.setUid(uidUtils.getUid());
-        settings.setInviteSettings(inv);
-        settings.setDraftInviteSettings(invDraft);
+            // 初始化邀请/意图的发布与草稿
+            InviteSettingsEntity inv = InviteSettingsEntity.builder().build();
+            inv.setUid(uidUtils.getUid());
+            InviteSettingsEntity invDraft = InviteSettingsEntity.builder().build();
+            invDraft.setUid(uidUtils.getUid());
+            settings.setInviteSettings(inv);
+            settings.setDraftInviteSettings(invDraft);
 
-        IntentionSettingsEntity inte = IntentionSettingsEntity.builder().build();
-        inte.setUid(uidUtils.getUid());
-        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.builder().build();
-        inteDraft.setUid(uidUtils.getUid());
-        settings.setIntentionSettings(inte);
-        settings.setDraftIntentionSettings(inteDraft);
+            IntentionSettingsEntity inte = IntentionSettingsEntity.builder().build();
+            inte.setUid(uidUtils.getUid());
+            IntentionSettingsEntity inteDraft = IntentionSettingsEntity.builder().build();
+            inteDraft.setUid(uidUtils.getUid());
+            settings.setIntentionSettings(inte);
+            settings.setDraftIntentionSettings(inteDraft);
 
-        return save(settings);
+            return save(settings);
+        } catch (Exception ex) {
+            // 并发下若出现冲突，退避后返回现有默认配置
+            return agentSettingsRepository.findByOrgUidAndIsDefaultTrue(orgUid)
+                    .orElseThrow(() -> new RuntimeException("获取或创建默认客服配置失败"));
+        }
     }
 
     /**
