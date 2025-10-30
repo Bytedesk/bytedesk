@@ -125,9 +125,27 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         boolean kbEnabled = StringUtils.hasText(robot.getKbUid()) && robot.getKbEnabled();
 
-        // 知识库未启用：直接基于提示词走 LLM 流式
+        // 知识库未启用:直接基于提示词走 LLM 流式
         if (!kbEnabled) {
             log.info("知识库未启用或未指定知识库UID");
+            // 检查 LLM 是否配置
+            if (robot.getLlm() == null) {
+                log.error("robot.getLlm() 为 null,无法处理请求");
+                String answer = I18Consts.I18N_ROBOT_PROCESSING_ERROR;
+                String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer,
+                        new ArrayList<>(), robot);
+                sseMessageHelper.sendStreamMessage(
+                        messageProtobufQuery,
+                        messageProtobufReply,
+                        emitter,
+                        robotStreamContent,
+                        null,
+                        null,
+                        true,
+                        true,
+                        true);
+                return;
+            }
             List<Message> messages = promptHelper.buildMessagesForSse(query, "", robot, messageProtobufQuery);
             Prompt aiPrompt = promptHelper.toPrompt(messages);
             try {
@@ -153,8 +171,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
             log.info("LLM 模式，KB 结果数 {}, 来源数 {}", kbResults.size(), sourceReferences.size());
 
             if (kbResults.isEmpty()) {
-                // 未命中 KB，直接返回默认回复（ROBOT_STREAM），并结束 SSE
-                String answer = robot.getLlm().getDefaultReply();
+                // 未命中 KB,直接返回默认回复(ROBOT_STREAM),并结束 SSE
+                String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
+                    ? robot.getLlm().getDefaultReply() 
+                    : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
                 String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer,
                         new ArrayList<>(), robot);
                 sseMessageHelper.sendStreamMessage(
@@ -195,7 +215,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
         String answer;
         if (kbResults.isEmpty()) {
             isUnanswered = true;
-            answer = robot.getLlm().getDefaultReply();
+            answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
+                ? robot.getLlm().getDefaultReply() 
+                : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
         } else {
             FaqProtobuf firstFaq = kbResults.get(0);
             if (kbResults.size() > 1) {
@@ -278,7 +300,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             if (llmEnabled) {
                 // LLM 启用：KB 为空→默认文本；KB 非空→带上下文调用 LLM
                 if (kbResults.isEmpty()) {
-                    String answer = robot.getLlm().getDefaultReply();
+                    String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
+                        ? robot.getLlm().getDefaultReply() 
+                        : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
                     RobotContent streamContent = RobotContent.builder()
                             .question(query)
                             .answer(answer)
@@ -323,7 +347,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageTypeEnum messageType;
             boolean isUnanswered;
             if (kbResults.isEmpty()) {
-                answer = robot.getLlm().getDefaultReply();
+                answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
+                    ? robot.getLlm().getDefaultReply() 
+                    : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
                 messageType = MessageTypeEnum.ROBOT;
                 isUnanswered = true;
             } else {

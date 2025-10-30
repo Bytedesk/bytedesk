@@ -359,6 +359,7 @@ public class I18Consts {
     public static final String I18N_SYSTEM_PREFIX = "[系统] "; // [系统] 
     public static final String I18N_USER_PREFIX = "[用户] "; // [用户] 
     public static final String I18N_ASSISTANT_PREFIX = "[助手] "; // [助手] 
+    public static final String I18N_DEFAULT_SYSTEM_PROMPT = "你是一个智能助手,请根据用户的问题提供有帮助的回答。"; // 默认系统提示词
 
     // 线程路由策略相关常量
     /** 默认欢迎消息 */

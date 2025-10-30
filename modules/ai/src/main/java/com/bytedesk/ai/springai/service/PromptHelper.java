@@ -33,6 +33,18 @@ public class PromptHelper {
 
     public List<Message> buildMessagesForSse(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery) {
+        // 添加空值检查
+        if (robot.getLlm() == null) {
+            log.error("robot.getLlm() 为 null,使用默认系统提示词");
+            List<Message> messages = new ArrayList<>();
+            messages.add(new SystemMessage(I18Consts.I18N_DEFAULT_SYSTEM_PROMPT));
+            if (StringUtils.hasText(context)) {
+                messages.add(new SystemMessage(I18Consts.I18N_SEARCH_RESULT_PREFIX + context));
+            }
+            messages.add(new UserMessage(query));
+            return messages;
+        }
+        
         String systemPrompt = robot.getLlm().getPrompt();
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(systemPrompt));
@@ -70,6 +82,18 @@ public class PromptHelper {
 
     public List<Message> buildMessagesForSync(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery) {
+        // 添加空值检查
+        if (robot.getLlm() == null) {
+            log.error("robot.getLlm() 为 null,使用默认系统提示词");
+            List<Message> messages = new ArrayList<>();
+            messages.add(new SystemMessage(I18Consts.I18N_DEFAULT_SYSTEM_PROMPT));
+            if (StringUtils.hasText(context)) {
+                messages.add(new SystemMessage(I18Consts.I18N_SEARCH_RESULT_PREFIX + context));
+            }
+            messages.add(new UserMessage(query));
+            return messages;
+        }
+        
         String systemPrompt = robot.getLlm().getPrompt();
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(systemPrompt));
