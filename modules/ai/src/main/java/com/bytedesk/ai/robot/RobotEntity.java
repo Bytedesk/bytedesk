@@ -126,14 +126,14 @@ public class RobotEntity extends BaseEntity {
     /**
      * Whether workflow/flow integration is enabled
      */
-    @Builder.Default
-    @Column(name = "is_flow_enabled")
-    private Boolean flowEnabled = false;
+    // @Builder.Default
+    // @Column(name = "is_flow_enabled")
+    // private Boolean flowEnabled = false;
 
     /**
      * Associated workflow/flow UID for automated processes
      */
-    private String flowUid;
+    // private String flowUid;
 
     /**
      * Associated category UID for robot classification

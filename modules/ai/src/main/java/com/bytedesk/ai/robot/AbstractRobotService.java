@@ -65,7 +65,12 @@ public abstract class AbstractRobotService {
 
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
         if (robotOptional.isPresent()) {
-            String provider = robotOptional.get().getLlm().getTextProvider();
+            String provider;
+            if (robotOptional.get().getSettings() != null && robotOptional.get().getSettings().getLlm() != null) {
+                provider = robotOptional.get().getSettings().getLlm().getTextProvider();
+            } else {
+                provider = robotOptional.get().getLlm().getTextProvider();
+            }
             log.info("processSyncRequest provider: {}", provider);
 
             try {
@@ -91,7 +96,12 @@ public abstract class AbstractRobotService {
 
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
         if (robotOptional.isPresent()) {
-            String provider = robotOptional.get().getLlm().getTextProvider();
+            String provider;
+            if (robotOptional.get().getSettings() != null && robotOptional.get().getSettings().getLlm() != null) {
+                provider = robotOptional.get().getSettings().getLlm().getTextProvider();
+            } else {
+                provider = robotOptional.get().getLlm().getTextProvider();
+            }
             log.info("processMultiModalSyncRequest provider: {}", provider);
 
             try {

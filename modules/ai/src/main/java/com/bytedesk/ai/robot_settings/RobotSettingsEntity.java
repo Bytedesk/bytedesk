@@ -83,4 +83,23 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity draftRateDownSettings;
+
+    /**
+     * 是否启用知识库问答
+     */
+    @Builder.Default
+    @Column(name = "is_kb_enabled")
+    private Boolean kbEnabled = false;
+
+    /**
+     * 关联的知识库UID
+     */
+    @Column(name = "kb_uid")
+    private String kbUid;
+
+    /**
+     * LLM 配置（已从 RobotEntity 迁移到 Settings）
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private RobotLlmEntity llm;
 }
