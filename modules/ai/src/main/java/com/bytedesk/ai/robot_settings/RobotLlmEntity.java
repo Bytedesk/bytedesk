@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 
+import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -164,7 +165,7 @@ public class RobotLlmEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "llm_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String prompt = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+    private String prompt = RobotConsts.ROBOT_LLM_DEFAULT_PROMPT;
 
     @Builder.Default
     @Column(name = "llm_context_msg_count")
