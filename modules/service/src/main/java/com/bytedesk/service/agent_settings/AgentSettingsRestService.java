@@ -104,10 +104,10 @@ public class AgentSettingsRestService
         MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
                 modelMapper);
         mls.setUid(uidUtils.getUid());
-    // 处理 MessageLeaveSettings 关联（工作时间段）
-    if (request.getMessageLeaveSettings() != null) {
-        messageLeaveSettingsHelper.updateWorktimesIfPresent(mls, request.getMessageLeaveSettings());
-    }
+        // 处理 MessageLeaveSettings 关联（工作时间段）
+        if (request.getMessageLeaveSettings() != null) {
+            messageLeaveSettingsHelper.updateWorktimesIfPresent(mls, request.getMessageLeaveSettings());
+        }
         entity.setMessageLeaveSettings(mls);
         MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
                 modelMapper);
@@ -447,174 +447,165 @@ public class AgentSettingsRestService
 
         AgentSettingsEntity entity = optional.get();
         
-        // 复制草稿到发布版本，保留发布版本的原 uid
+        // 复制草稿到发布版本：若已发布不为空，则原地复制（保留 id/uid/version）；否则创建新对象
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
-            modelMapper.map(entity.getDraftServiceSettings(), newPublished);
-            
-            // 关键点：不要带入草稿的数据库主键 id，避免 Hibernate 认为同一 id 的两个不同实例同时被合并
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftServiceSettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
+                modelMapper.map(entity.getDraftServiceSettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setServiceSettings(newPublished);
             }
-            entity.setServiceSettings(newPublished);
         }
         
         if (entity.getDraftMessageLeaveSettings() != null) {
             MessageLeaveSettingsEntity published = entity.getMessageLeaveSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            MessageLeaveSettingsEntity newPublished = new MessageLeaveSettingsEntity();
-            modelMapper.map(entity.getDraftMessageLeaveSettings(), newPublished);
-            
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftMessageLeaveSettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                MessageLeaveSettingsEntity newPublished = new MessageLeaveSettingsEntity();
+                modelMapper.map(entity.getDraftMessageLeaveSettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setMessageLeaveSettings(newPublished);
             }
-            entity.setMessageLeaveSettings(newPublished);
         }
         
         if (entity.getDraftAutoReplySettings() != null) {
             AutoReplySettingsEntity published = entity.getAutoReplySettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            AutoReplySettingsEntity newPublished = new AutoReplySettingsEntity();
-            modelMapper.map(entity.getDraftAutoReplySettings(), newPublished);
-            
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftAutoReplySettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                AutoReplySettingsEntity newPublished = new AutoReplySettingsEntity();
+                modelMapper.map(entity.getDraftAutoReplySettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setAutoReplySettings(newPublished);
             }
-            entity.setAutoReplySettings(newPublished);
         }
         
         if (entity.getDraftQueueSettings() != null) {
             QueueSettingsEntity published = entity.getQueueSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            QueueSettingsEntity newPublished = new QueueSettingsEntity();
-            modelMapper.map(entity.getDraftQueueSettings(), newPublished);
-            
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftQueueSettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                QueueSettingsEntity newPublished = new QueueSettingsEntity();
+                modelMapper.map(entity.getDraftQueueSettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setQueueSettings(newPublished);
             }
-            entity.setQueueSettings(newPublished);
         }
         
         if (entity.getDraftRateDownSettings() != null) {
             RatedownSettingsEntity published = entity.getRateDownSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            RatedownSettingsEntity newPublished = new RatedownSettingsEntity();
-            modelMapper.map(entity.getDraftRateDownSettings(), newPublished);
-            
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftRateDownSettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                RatedownSettingsEntity newPublished = new RatedownSettingsEntity();
+                modelMapper.map(entity.getDraftRateDownSettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setRateDownSettings(newPublished);
             }
-            entity.setRateDownSettings(newPublished);
         }
         
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            InviteSettingsEntity newPublished = new InviteSettingsEntity();
-            modelMapper.map(entity.getDraftInviteSettings(), newPublished);
-            
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftInviteSettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                InviteSettingsEntity newPublished = new InviteSettingsEntity();
+                modelMapper.map(entity.getDraftInviteSettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setInviteSettings(newPublished);
             }
-            entity.setInviteSettings(newPublished);
         }
         
         if (entity.getDraftIntentionSettings() != null) {
             IntentionSettingsEntity published = entity.getIntentionSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
-            modelMapper.map(entity.getDraftIntentionSettings(), newPublished);
-            
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftIntentionSettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
+                modelMapper.map(entity.getDraftIntentionSettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setIntentionSettings(newPublished);
             }
-            entity.setIntentionSettings(newPublished);
         }
         
         if (entity.getDraftAgentStatusSettings() != null) {
             AgentStatusSettingEntity published = entity.getAgentStatusSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            Long publishedId = (published != null) ? published.getId() : null;
-            int publishedVersion = (published != null) ? published.getVersion() : 0;
-            
-            AgentStatusSettingEntity newPublished = new AgentStatusSettingEntity();
-            modelMapper.map(entity.getDraftAgentStatusSettings(), newPublished);
-            
-            if (publishedId != null) {
-                newPublished.setId(publishedId);
-                newPublished.setUid(publishedUid);
-                newPublished.setVersion(publishedVersion);
+            if (published != null) {
+                Long originalId = published.getId();
+                String originalUid = published.getUid();
+                int originalVersion = published.getVersion();
+                modelMapper.map(entity.getDraftAgentStatusSettings(), published);
+                published.setId(originalId);
+                published.setUid(originalUid);
+                published.setVersion(originalVersion);
             } else {
+                AgentStatusSettingEntity newPublished = new AgentStatusSettingEntity();
+                modelMapper.map(entity.getDraftAgentStatusSettings(), newPublished);
                 newPublished.setId(null);
                 newPublished.setUid(uidUtils.getUid());
                 newPublished.setVersion(0);
+                entity.setAgentStatusSettings(newPublished);
             }
-            entity.setAgentStatusSettings(newPublished);
         }
         
         entity.setHasUnpublishedChanges(false);
