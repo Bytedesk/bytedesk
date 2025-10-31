@@ -71,7 +71,6 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final MessageRestService messageRestService;
 
-
     @Override
     protected ThreadRestService getThreadRestService() {
         return threadRestService;

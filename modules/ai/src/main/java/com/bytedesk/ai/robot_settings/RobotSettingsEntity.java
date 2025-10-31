@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+// import com.bytedesk.core.constant.I18Consts;
+
 /**
  * Robot configuration settings for reusable settings
  * 
@@ -70,19 +72,8 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
     @Column(name = "is_kb_source_enabled")
     private Boolean kbSourceEnabled = true;
 
-    /**
-     * Rating down settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
-    private RatedownSettingsEntity rateDownSettings;
-
-    /**
-     * Draft Rating down settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
-    private RatedownSettingsEntity draftRateDownSettings;
+    // @Builder.Default
+    // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
 
     /**
      * 是否启用知识库问答
@@ -108,4 +99,19 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private RobotLlmEntity draftLlm;
+
+    /**
+     * Rating down settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private RatedownSettingsEntity rateDownSettings;
+
+    /**
+     * Draft Rating down settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // @NotFound(action = NotFoundAction.IGNORE)
+    private RatedownSettingsEntity draftRateDownSettings;
+    
 }

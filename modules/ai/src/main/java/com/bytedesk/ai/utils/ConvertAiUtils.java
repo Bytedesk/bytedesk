@@ -43,12 +43,35 @@ public class ConvertAiUtils {
 
     public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
         RobotProtobuf robotProtobuf = getModelMapper().map(entity, RobotProtobuf.class);
-        // kbEnabled moved to RobotSettingsEntity; derive from settings if available
-        boolean kbEnabled = false;
-        if (entity.getSettings() != null && entity.getSettings().getKbEnabled() != null) {
-            kbEnabled = entity.getSettings().getKbEnabled();
+        // 从 Settings 中提取 kbEnabled/kbUid/llm
+        if (entity.getSettings() != null) {
+            var settings = entity.getSettings();
+            // kbSourceEnabled
+            if (settings.getKbSourceEnabled() != null) {
+                robotProtobuf.setKbSourceEnabled(settings.getKbSourceEnabled());
+            } else {
+                robotProtobuf.setKbSourceEnabled(false);
+            }
+            // kbEnabled
+            if (settings.getKbEnabled() != null) {
+                robotProtobuf.setKbEnabled(settings.getKbEnabled());
+            } else {
+                robotProtobuf.setKbEnabled(false);
+            }
+            // kbUid
+            if (settings.getKbUid() != null) {
+                robotProtobuf.setKbUid(settings.getKbUid());
+            }
+            // llm -> RobotLlmResponse
+            if (settings.getLlm() != null) {
+                var llmResponse = getModelMapper().map(settings.getLlm(),
+                        com.bytedesk.ai.robot_settings.RobotLlmResponse.class);
+                robotProtobuf.setLlm(llmResponse);
+            }
+        } else {
+            robotProtobuf.setKbEnabled(false);
         }
-        robotProtobuf.setKbEnabled(kbEnabled);
+
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
         return robotProtobuf;
     }

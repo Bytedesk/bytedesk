@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ai.springai.providers.siliconflow;
 
-import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot_settings.RobotLlmResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.PromptHelper;
@@ -71,7 +71,7 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+    private OpenAiChatOptions createDynamicOptions(RobotLlmResponse llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -90,7 +90,7 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("SiliconFlow API websocket ");
         
         if (!siliconFlowChatModel.isPresent()) {
@@ -199,7 +199,7 @@ public class SpringAISiliconFlowChatService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("SiliconFlow API SSE ");
 
         if (!siliconFlowChatModel.isPresent()) {

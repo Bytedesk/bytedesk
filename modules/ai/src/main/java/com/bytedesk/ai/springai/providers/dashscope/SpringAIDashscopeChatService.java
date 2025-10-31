@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot_settings.RobotLlmResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -61,7 +61,7 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private DashScopeChatOptions createDynamicOptions(RobotLlm llm) {
+    private DashScopeChatOptions createDynamicOptions(RobotLlmResponse llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -80,7 +80,7 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         
         if (bytedeskDashscopeChatModel == null) {
             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -186,7 +186,7 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
      List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         
         if (bytedeskDashscopeChatModel == null) {
             sseMessageHelper.handleSseError(new RuntimeException("Dashscope service not available"), messageProtobufQuery, messageProtobufReply, emitter);

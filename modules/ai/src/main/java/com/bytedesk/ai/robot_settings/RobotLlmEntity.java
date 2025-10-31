@@ -9,10 +9,11 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 
 import com.bytedesk.ai.robot.RobotConsts;
+import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.llm.LlmDefaults;
+import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,9 +50,9 @@ public class RobotLlmEntity extends BaseEntity {
     @Column(name = "is_streaming_enabled")
     private Boolean enableStreaming = false;
 
-    @Builder.Default
-    @Column(name = "is_search_enabled")
-    private Boolean enableSearch = false;
+    // @Builder.Default
+    // @Column(name = "is_search_enabled")
+    // private Boolean enableSearch = false;
 
     @Builder.Default
     @Column(name = "llm_text_provider")
@@ -115,7 +116,7 @@ public class RobotLlmEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "llm_search_type")
-    private String searchType = "FULLTEXT";
+    private String searchType = RobotSearchTypeEnum.FULLTEXT.name(); //"FULLTEXT";
 
     @Builder.Default
     @Column(name = "llm_top_k")

@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot_settings.RobotLlmResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.ChatTokenUsage;
@@ -69,7 +69,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OllamaChatOptions createOllamaChatOptions(RobotLlm llm) {
+    private OllamaChatOptions createOllamaChatOptions(RobotLlmResponse llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -120,7 +120,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("Ollama API websocket ");
         if (llm == null) {
             log.info("Ollama API not available");
@@ -194,7 +194,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
         log.info("Ollama API sync ");
 
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("Ollama API websocket ");
 
         if (llm == null) {
@@ -252,7 +252,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         Assert.notNull(emitter, "SseEmitter must not be null");
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("Ollama API SSE ");
 
         if (llm == null) {

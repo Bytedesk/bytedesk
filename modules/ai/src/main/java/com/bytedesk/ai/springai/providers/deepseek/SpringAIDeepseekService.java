@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot_settings.RobotLlmResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.I18Consts;
@@ -66,7 +66,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDeepseekOptions(RobotLlm llm) {
+    private OpenAiChatOptions createDeepseekOptions(RobotLlmResponse llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -95,7 +95,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的OpenAiChatModel
      */
-    private OpenAiChatModel createDeepseekChatModel(RobotLlm llm) {
+    private OpenAiChatModel createDeepseekChatModel(RobotLlmResponse llm) {
         if (llm == null || llm.getTextProviderUid() == null) {
             log.warn("RobotLlm or textProviderUid is null, using default chat model");
             return defaultChatModel;
@@ -136,7 +136,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("Deepseek API websocket ");
         if (llm == null) {
             log.info("Deepseek API not available");
@@ -208,7 +208,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         log.info("Deepseek API sync ");
         
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("Deepseek API websocket ");
 
         if (llm == null) {
@@ -263,7 +263,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("Deepseek API SSE ");
 
         if (llm == null) {

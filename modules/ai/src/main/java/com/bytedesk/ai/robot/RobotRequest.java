@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.I18Consts;
+// import com.bytedesk.core.constant.I18Consts;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,8 +59,8 @@ public class RobotRequest extends BaseRequest {
     // 使用基类中content，可能是用户输入问题：question，也可能是会话内容，或者是工单内容，或者是消息内容
     // private String content;
 
-    @Builder.Default
-    private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+    // @Builder.Default
+    // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
 
     // 机器人分类
     private String categoryUid;

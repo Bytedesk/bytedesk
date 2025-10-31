@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot_settings.RobotLlmResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.I18Consts;
@@ -60,7 +60,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+    private OpenAiChatOptions createDynamicOptions(RobotLlmResponse llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -81,7 +81,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply) {
         log.info("SpringAIGiteeService processPromptWebsocket with full prompt content");
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         
         if (giteeChatModel == null) {
             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -186,7 +186,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         log.info("SpringAIGiteeService processPromptSse with full prompt content");
         // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
 
     if (giteeChatModel == null) {
         sseMessageHelper.handleSseError(new RuntimeException("Gitee service not available"), messageProtobufQuery,

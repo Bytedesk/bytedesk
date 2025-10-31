@@ -29,7 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot_settings.RobotLlmResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -91,7 +91,7 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
     /**
      * 根据机器人配置动态创建 ZhipuAiClient，优先使用 provider apiKey，失败则回退默认 Bean。
      */
-    private ZhipuAiClient createDynamicClient(RobotLlm llm) {
+    private ZhipuAiClient createDynamicClient(RobotLlmResponse llm) {
         try {
             if (llm == null || llm.getTextProviderUid() == null) {
                 log.warn("RobotLlm or textProviderUid is null, using default ZhipuAiClient");

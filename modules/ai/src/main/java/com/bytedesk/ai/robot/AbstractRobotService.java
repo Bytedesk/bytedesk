@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -75,7 +76,7 @@ public abstract class AbstractRobotService {
 
             try {
                 BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
-                RobotProtobuf robot = RobotProtobuf.convertFromRobotEntity(robotOptional.get());
+                RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotOptional.get());
                 //
                 return service.processSyncRequest(query, robot, searchKnowledgeBase);
 
@@ -106,7 +107,7 @@ public abstract class AbstractRobotService {
 
             try {
                 BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
-                RobotProtobuf robot = RobotProtobuf.convertFromRobotEntity(robotOptional.get());
+                RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotOptional.get());
                 
                 // 如果服务支持多模态处理（如ZhipuMultiModelService），使用多模态方法
                 if (service instanceof com.bytedesk.ai.zhipuai.ZhipuaiMultiModelService) {

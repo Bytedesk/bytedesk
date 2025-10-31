@@ -15,7 +15,7 @@ package com.bytedesk.ai.springai.providers.siliconflow;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot.RobotLlm;
+import com.bytedesk.ai.robot_settings.RobotLlmResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -69,7 +69,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+    private OpenAiChatOptions createDynamicOptions(RobotLlmResponse llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -91,7 +91,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的OpenAiChatModel
      */
-    private OpenAiChatModel createSiliconFlowChatModel(RobotLlm llm) {
+    private OpenAiChatModel createSiliconFlowChatModel(RobotLlmResponse llm) {
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
@@ -128,7 +128,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     @Override
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("SiliconFlow API websocket ");
         
         // 创建动态chatModel
@@ -241,7 +241,7 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    RobotLlmResponse llm = robot.getLlm();
         log.info("SiliconFlow API SSE ");
 
         // 创建动态chatModel
