@@ -318,6 +318,7 @@ public class RobotSettingsRestService
     /**
      * Publish draft settings to online for robot
      */
+    @Transactional
     @CachePut(value = "robotSettings", key = "#uid", unless = "#result == null")
     public RobotSettingsResponse publish(String uid) {
         Optional<RobotSettingsEntity> optional = findByUid(uid);
@@ -326,86 +327,145 @@ public class RobotSettingsRestService
         }
         RobotSettingsEntity entity = optional.get();
         
-        // 复制草稿到发布版本，保留发布版本的原 uid
+        // 复制草稿到发布版本
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            
-            ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
-            modelMapper.map(entity.getDraftServiceSettings(), newPublished);
-            
-            if (publishedUid != null) {
-                newPublished.setUid(publishedUid);
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftServiceSettings(), published);
             } else {
+                ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftServiceSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
+                entity.setServiceSettings(newPublished);
             }
-            entity.setServiceSettings(newPublished);
         }
         
         if (entity.getDraftLlm() != null) {
             RobotLlmEntity published = entity.getLlm();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            
-            RobotLlmEntity newPublished = new RobotLlmEntity();
-            modelMapper.map(entity.getDraftLlm(), newPublished);
-            
-            if (publishedUid != null) {
-                newPublished.setUid(publishedUid);
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftLlm(), published);
             } else {
+                RobotLlmEntity newPublished = new RobotLlmEntity();
+                copyPropertiesExcludingIds(entity.getDraftLlm(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
+                entity.setLlm(newPublished);
             }
-            entity.setLlm(newPublished);
         }
         
         if (entity.getDraftRateDownSettings() != null) {
             RatedownSettingsEntity published = entity.getRateDownSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            
-            RatedownSettingsEntity newPublished = new RatedownSettingsEntity();
-            modelMapper.map(entity.getDraftRateDownSettings(), newPublished);
-            
-            if (publishedUid != null) {
-                newPublished.setUid(publishedUid);
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftRateDownSettings(), published);
             } else {
+                RatedownSettingsEntity newPublished = new RatedownSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftRateDownSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
+                entity.setRateDownSettings(newPublished);
             }
-            entity.setRateDownSettings(newPublished);
         }
         
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            
-            InviteSettingsEntity newPublished = new InviteSettingsEntity();
-            modelMapper.map(entity.getDraftInviteSettings(), newPublished);
-            
-            if (publishedUid != null) {
-                newPublished.setUid(publishedUid);
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftInviteSettings(), published);
             } else {
+                InviteSettingsEntity newPublished = new InviteSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftInviteSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
+                entity.setInviteSettings(newPublished);
             }
-            entity.setInviteSettings(newPublished);
         }
         
         if (entity.getDraftIntentionSettings() != null) {
             IntentionSettingsEntity published = entity.getIntentionSettings();
-            String publishedUid = (published != null) ? published.getUid() : null;
-            
-            IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
-            modelMapper.map(entity.getDraftIntentionSettings(), newPublished);
-            
-            if (publishedUid != null) {
-                newPublished.setUid(publishedUid);
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftIntentionSettings(), published);
             } else {
+                IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftIntentionSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
+                entity.setIntentionSettings(newPublished);
             }
-            entity.setIntentionSettings(newPublished);
         }
         
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         RobotSettingsEntity updated = save(entity);
         return convertToResponse(updated);
+    }
+
+    // 仅复制业务字段,忽略 id/uid/version 与时间字段
+    private void copyPropertiesExcludingIds(Object source, Object target) {
+        if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
+            ServiceSettingsEntity sourceSettings = (ServiceSettingsEntity) source;
+            ServiceSettingsEntity targetSettings = (ServiceSettingsEntity) target;
+            
+            // 保存集合引用
+            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> welcomeFaqs = sourceSettings.getWelcomeFaqs();
+            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> faqs = sourceSettings.getFaqs();
+            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> quickFaqs = sourceSettings.getQuickFaqs();
+            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> guessFaqs = sourceSettings.getGuessFaqs();
+            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> hotFaqs = sourceSettings.getHotFaqs();
+            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> shortcutFaqs = sourceSettings.getShortcutFaqs();
+            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> proactiveFaqs = sourceSettings.getProactiveFaqs();
+            
+            // 执行属性复制
+            org.springframework.beans.BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt",
+                    "welcomeFaqs", "faqs", "quickFaqs", "guessFaqs", "hotFaqs", "shortcutFaqs", "proactiveFaqs");
+            
+            // 恢复集合引用
+            if (welcomeFaqs != null) {
+                if (targetSettings.getWelcomeFaqs() == null) {
+                    targetSettings.setWelcomeFaqs(new java.util.ArrayList<>());
+                }
+                targetSettings.getWelcomeFaqs().clear();
+                targetSettings.getWelcomeFaqs().addAll(welcomeFaqs);
+            }
+            if (faqs != null) {
+                if (targetSettings.getFaqs() == null) {
+                    targetSettings.setFaqs(new java.util.ArrayList<>());
+                }
+                targetSettings.getFaqs().clear();
+                targetSettings.getFaqs().addAll(faqs);
+            }
+            if (quickFaqs != null) {
+                if (targetSettings.getQuickFaqs() == null) {
+                    targetSettings.setQuickFaqs(new java.util.ArrayList<>());
+                }
+                targetSettings.getQuickFaqs().clear();
+                targetSettings.getQuickFaqs().addAll(quickFaqs);
+            }
+            if (guessFaqs != null) {
+                if (targetSettings.getGuessFaqs() == null) {
+                    targetSettings.setGuessFaqs(new java.util.ArrayList<>());
+                }
+                targetSettings.getGuessFaqs().clear();
+                targetSettings.getGuessFaqs().addAll(guessFaqs);
+            }
+            if (hotFaqs != null) {
+                if (targetSettings.getHotFaqs() == null) {
+                    targetSettings.setHotFaqs(new java.util.ArrayList<>());
+                }
+                targetSettings.getHotFaqs().clear();
+                targetSettings.getHotFaqs().addAll(hotFaqs);
+            }
+            if (shortcutFaqs != null) {
+                if (targetSettings.getShortcutFaqs() == null) {
+                    targetSettings.setShortcutFaqs(new java.util.ArrayList<>());
+                }
+                targetSettings.getShortcutFaqs().clear();
+                targetSettings.getShortcutFaqs().addAll(shortcutFaqs);
+            }
+            if (proactiveFaqs != null) {
+                if (targetSettings.getProactiveFaqs() == null) {
+                    targetSettings.setProactiveFaqs(new java.util.ArrayList<>());
+                }
+                targetSettings.getProactiveFaqs().clear();
+                targetSettings.getProactiveFaqs().addAll(proactiveFaqs);
+            }
+        } else {
+            org.springframework.beans.BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
+        }
     }
 
     @Override

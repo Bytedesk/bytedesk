@@ -1,5 +1,7 @@
 package com.bytedesk.service.agent_settings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -11,12 +13,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.BeanUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsHelper;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
@@ -25,12 +31,14 @@ import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.worktime.WorktimeEntity;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.agent.AgentRepository;
 
 import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AgentSettingsRestService
@@ -112,9 +120,9 @@ public class AgentSettingsRestService
         MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
                 modelMapper);
         mlsDraft.setUid(uidUtils.getUid());
-    if (request.getMessageLeaveSettings() != null) {
-        messageLeaveSettingsHelper.updateWorktimesIfPresent(mlsDraft, request.getMessageLeaveSettings());
-    }
+        if (request.getMessageLeaveSettings() != null) {
+            messageLeaveSettingsHelper.updateWorktimesIfPresent(mlsDraft, request.getMessageLeaveSettings());
+        }
         entity.setDraftMessageLeaveSettings(mlsDraft);
 
         AutoReplySettingsEntity ars = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
@@ -438,32 +446,25 @@ public class AgentSettingsRestService
     /**
      * Publish draft settings to online
      */
+    @Transactional
     @CachePut(value = "agentSettings", key = "#uid", unless = "#result == null")
     public AgentSettingsResponse publish(String uid) {
-        Optional<AgentSettingsEntity> optional = findByUid(uid);
+        Optional<AgentSettingsEntity> optional = agentSettingsRepository.findByUidWithCollections(uid);
         if (!optional.isPresent()) {
             throw new RuntimeException("AgentSettings not found: " + uid);
         }
 
         AgentSettingsEntity entity = optional.get();
         
-        // 复制草稿到发布版本：若已发布不为空，则原地复制（保留 id/uid/version）；否则创建新对象
+        // 复制草稿到发布版本
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftServiceSettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftServiceSettings(), published);
             } else {
                 ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
-                modelMapper.map(entity.getDraftServiceSettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftServiceSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setServiceSettings(newPublished);
             }
         }
@@ -471,19 +472,11 @@ public class AgentSettingsRestService
         if (entity.getDraftMessageLeaveSettings() != null) {
             MessageLeaveSettingsEntity published = entity.getMessageLeaveSettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftMessageLeaveSettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftMessageLeaveSettings(), published);
             } else {
                 MessageLeaveSettingsEntity newPublished = new MessageLeaveSettingsEntity();
-                modelMapper.map(entity.getDraftMessageLeaveSettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftMessageLeaveSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setMessageLeaveSettings(newPublished);
             }
         }
@@ -491,19 +484,11 @@ public class AgentSettingsRestService
         if (entity.getDraftAutoReplySettings() != null) {
             AutoReplySettingsEntity published = entity.getAutoReplySettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftAutoReplySettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftAutoReplySettings(), published);
             } else {
                 AutoReplySettingsEntity newPublished = new AutoReplySettingsEntity();
-                modelMapper.map(entity.getDraftAutoReplySettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftAutoReplySettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setAutoReplySettings(newPublished);
             }
         }
@@ -511,19 +496,11 @@ public class AgentSettingsRestService
         if (entity.getDraftQueueSettings() != null) {
             QueueSettingsEntity published = entity.getQueueSettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftQueueSettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftQueueSettings(), published);
             } else {
                 QueueSettingsEntity newPublished = new QueueSettingsEntity();
-                modelMapper.map(entity.getDraftQueueSettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftQueueSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setQueueSettings(newPublished);
             }
         }
@@ -531,19 +508,11 @@ public class AgentSettingsRestService
         if (entity.getDraftRateDownSettings() != null) {
             RatedownSettingsEntity published = entity.getRateDownSettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftRateDownSettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftRateDownSettings(), published);
             } else {
                 RatedownSettingsEntity newPublished = new RatedownSettingsEntity();
-                modelMapper.map(entity.getDraftRateDownSettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftRateDownSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setRateDownSettings(newPublished);
             }
         }
@@ -551,19 +520,11 @@ public class AgentSettingsRestService
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftInviteSettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftInviteSettings(), published);
             } else {
                 InviteSettingsEntity newPublished = new InviteSettingsEntity();
-                modelMapper.map(entity.getDraftInviteSettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftInviteSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setInviteSettings(newPublished);
             }
         }
@@ -571,19 +532,11 @@ public class AgentSettingsRestService
         if (entity.getDraftIntentionSettings() != null) {
             IntentionSettingsEntity published = entity.getIntentionSettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftIntentionSettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftIntentionSettings(), published);
             } else {
                 IntentionSettingsEntity newPublished = new IntentionSettingsEntity();
-                modelMapper.map(entity.getDraftIntentionSettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftIntentionSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setIntentionSettings(newPublished);
             }
         }
@@ -591,25 +544,18 @@ public class AgentSettingsRestService
         if (entity.getDraftAgentStatusSettings() != null) {
             AgentStatusSettingEntity published = entity.getAgentStatusSettings();
             if (published != null) {
-                Long originalId = published.getId();
-                String originalUid = published.getUid();
-                int originalVersion = published.getVersion();
-                modelMapper.map(entity.getDraftAgentStatusSettings(), published);
-                published.setId(originalId);
-                published.setUid(originalUid);
-                published.setVersion(originalVersion);
+                copyPropertiesExcludingIds(entity.getDraftAgentStatusSettings(), published);
             } else {
                 AgentStatusSettingEntity newPublished = new AgentStatusSettingEntity();
-                modelMapper.map(entity.getDraftAgentStatusSettings(), newPublished);
-                newPublished.setId(null);
+                copyPropertiesExcludingIds(entity.getDraftAgentStatusSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
-                newPublished.setVersion(0);
                 entity.setAgentStatusSettings(newPublished);
             }
         }
         
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
+        
         AgentSettingsEntity updated = save(entity);
         return convertToResponse(updated);
     }
@@ -619,4 +565,95 @@ public class AgentSettingsRestService
         return modelMapper.map(entity, AgentSettingsResponse.class);
     }
 
-}
+    // 仅复制业务字段,忽略 id/uid/version 与时间字段,避免发布时两边主键被覆盖或引用被替换
+    // 重要：对于懒加载的 @ManyToMany 集合，BeanUtils.copyProperties 可能复制未初始化的代理对象
+    // 导致数据丢失。因此需要在复制前保存集合引用，复制后恢复，确保数据完整性
+    private void copyPropertiesExcludingIds(Object source, Object target) {
+        if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
+            ServiceSettingsEntity sourceSettings = (ServiceSettingsEntity) source;
+            ServiceSettingsEntity targetSettings = (ServiceSettingsEntity) target;
+            
+            // 在 BeanUtils.copyProperties 之前，保存 source 中的集合引用
+            // 调用 getter 会触发懒加载，确保获取实际数据而非代理
+            List<FaqEntity> welcomeFaqs = sourceSettings.getWelcomeFaqs();
+            List<FaqEntity> faqs = sourceSettings.getFaqs();
+            List<FaqEntity> quickFaqs = sourceSettings.getQuickFaqs();
+            List<FaqEntity> guessFaqs = sourceSettings.getGuessFaqs();
+            List<FaqEntity> hotFaqs = sourceSettings.getHotFaqs();
+            List<FaqEntity> shortcutFaqs = sourceSettings.getShortcutFaqs();
+            List<FaqEntity> proactiveFaqs = sourceSettings.getProactiveFaqs();
+            
+            // 执行属性复制，排除 id/uid/version 等字段和所有集合字段
+            BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt",
+                    "welcomeFaqs", "faqs", "quickFaqs", "guessFaqs", "hotFaqs", "shortcutFaqs", "proactiveFaqs");
+            
+            // 复制后，将保存的集合引用设置到 target
+            // 对于 JPA 管理的 @ManyToMany 集合，使用 clear() + addAll() 来修改集合内容，保持 Hibernate 对集合的管理
+            if (welcomeFaqs != null) {
+                if (targetSettings.getWelcomeFaqs() == null) {
+                    targetSettings.setWelcomeFaqs(new ArrayList<>());
+                }
+                targetSettings.getWelcomeFaqs().clear();
+                targetSettings.getWelcomeFaqs().addAll(welcomeFaqs);
+            }
+            if (faqs != null) {
+                if (targetSettings.getFaqs() == null) {
+                    targetSettings.setFaqs(new ArrayList<>());
+                }
+                targetSettings.getFaqs().clear();
+                targetSettings.getFaqs().addAll(faqs);
+            }
+            if (quickFaqs != null) {
+                if (targetSettings.getQuickFaqs() == null) {
+                    targetSettings.setQuickFaqs(new ArrayList<>());
+                }
+                targetSettings.getQuickFaqs().clear();
+                targetSettings.getQuickFaqs().addAll(quickFaqs);
+            }
+            if (guessFaqs != null) {
+                if (targetSettings.getGuessFaqs() == null) {
+                    targetSettings.setGuessFaqs(new ArrayList<>());
+                }
+                targetSettings.getGuessFaqs().clear();
+                targetSettings.getGuessFaqs().addAll(guessFaqs);
+            }
+            if (hotFaqs != null) {
+                if (targetSettings.getHotFaqs() == null) {
+                    targetSettings.setHotFaqs(new ArrayList<>());
+                }
+                targetSettings.getHotFaqs().clear();
+                targetSettings.getHotFaqs().addAll(hotFaqs);
+            }
+            if (shortcutFaqs != null) {
+                if (targetSettings.getShortcutFaqs() == null) {
+                    targetSettings.setShortcutFaqs(new ArrayList<>());
+                }
+                targetSettings.getShortcutFaqs().clear();
+                targetSettings.getShortcutFaqs().addAll(shortcutFaqs);
+            }
+            if (proactiveFaqs != null) {
+                if (targetSettings.getProactiveFaqs() == null) {
+                    targetSettings.setProactiveFaqs(new ArrayList<>());
+                }
+                targetSettings.getProactiveFaqs().clear();
+                targetSettings.getProactiveFaqs().addAll(proactiveFaqs);
+            }
+        } else if (source instanceof MessageLeaveSettingsEntity && target instanceof MessageLeaveSettingsEntity) {
+            MessageLeaveSettingsEntity sourceSettings = (MessageLeaveSettingsEntity) source;
+            MessageLeaveSettingsEntity targetSettings = (MessageLeaveSettingsEntity) target;
+            
+            // 保存 worktimes 集合引用
+            List<WorktimeEntity> worktimes = sourceSettings.getWorktimes();
+            
+            // 执行属性复制，排除集合字段
+            BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt", "worktimes");
+            
+            // 恢复集合引用
+            if (worktimes != null) {
+                targetSettings.setWorktimes(new ArrayList<>(worktimes));
+            }
+        } else {
+            // 其他类型的实体，直接使用 BeanUtils.copyProperties
+            BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
+        }
+    }}
