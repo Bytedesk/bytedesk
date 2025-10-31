@@ -143,16 +143,13 @@ public class AgentSettingsRestService
         rd.setUid(uidUtils.getUid());
         entity.setDraftRateDownSettings(rd);
 
-        // Agent status settings (published and draft)
-        if (request.getAgentStatusSettings() != null) {
-            AgentStatusSettingEntity st = modelMapper.map(request.getAgentStatusSettings(), AgentStatusSettingEntity.class);
-            st.setUid(uidUtils.getUid());
-            entity.setAgentStatusSettings(st);
-
-            AgentStatusSettingEntity stDraft = modelMapper.map(request.getAgentStatusSettings(), AgentStatusSettingEntity.class);
-            stDraft.setUid(uidUtils.getUid());
-            entity.setDraftAgentStatusSettings(stDraft);
-        }
+        // 发布与草稿：客服状态设置（统一使用 fromRequest，内部已处理 null）
+        AgentStatusSettingEntity st = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
+        st.setUid(uidUtils.getUid());
+        entity.setAgentStatusSettings(st);
+        AgentStatusSettingEntity stDraft = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
+        stDraft.setUid(uidUtils.getUid());
+        entity.setDraftAgentStatusSettings(stDraft);
 
         AgentSettingsEntity saved = save(entity);
         return convertToResponse(saved);
@@ -188,6 +185,7 @@ public class AgentSettingsRestService
             serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getMessageLeaveSettings() != null) {
             MessageLeaveSettingsEntity draft = entity.getDraftMessageLeaveSettings();
             if (draft == null) {
@@ -205,6 +203,7 @@ public class AgentSettingsRestService
             messageLeaveSettingsHelper.updateWorktimesIfPresent(draft, request.getMessageLeaveSettings());
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getAutoReplySettings() != null) {
             AutoReplySettingsEntity draft = entity.getDraftAutoReplySettings();
             if (draft == null) {
@@ -220,6 +219,7 @@ public class AgentSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         // 更新草稿：邀请/意图
         if (request.getInviteSettings() != null) {
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
@@ -236,6 +236,7 @@ public class AgentSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getIntentionSettings() != null) {
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
             if (draft == null) {
@@ -251,6 +252,7 @@ public class AgentSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getQueueSettings() != null) {
             QueueSettingsEntity draft = entity.getDraftQueueSettings();
             if (draft == null) {
@@ -266,11 +268,12 @@ public class AgentSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getRateDownSettings() != null) {
             RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
             if (draft == null) {
-                draft = modelMapper.map(request.getRateDownSettings(), RatedownSettingsEntity.class);
-                if (draft.getUid() == null) {
+                draft = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
+                if (draft != null && draft.getUid() == null) {
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftRateDownSettings(draft);
@@ -282,11 +285,10 @@ public class AgentSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
-        // Update draft: agent status settings
         if (request.getAgentStatusSettings() != null) {
             AgentStatusSettingEntity draft = entity.getDraftAgentStatusSettings();
             if (draft == null) {
-                draft = modelMapper.map(request.getAgentStatusSettings(), AgentStatusSettingEntity.class);
+                draft = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
                 if (draft != null && draft.getUid() == null) {
                     draft.setUid(uidUtils.getUid());
                 }
@@ -444,7 +446,7 @@ public class AgentSettingsRestService
     @Transactional
     @CachePut(value = "agentSettings", key = "#uid", unless = "#result == null")
     public AgentSettingsResponse publish(String uid) {
-        Optional<AgentSettingsEntity> optional = agentSettingsRepository.findByUidWithCollections(uid);
+        Optional<AgentSettingsEntity> optional = agentSettingsRepository.findByUid(uid);
         if (!optional.isPresent()) {
             throw new RuntimeException("AgentSettings not found: " + uid);
         }

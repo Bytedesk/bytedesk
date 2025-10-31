@@ -145,6 +145,7 @@ public class WorkgroupSettingsRestService
             serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
             entity.setHasUnpublishedChanges(true);
         }
+
         // 更新草稿：邀请/意图
         if (request.getInviteSettings() != null) {
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
@@ -161,6 +162,7 @@ public class WorkgroupSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getIntentionSettings() != null) {
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
             if (draft == null) {
@@ -176,6 +178,7 @@ public class WorkgroupSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getMessageLeaveSettings() != null) {
             MessageLeaveSettingsEntity draft = entity.getDraftMessageLeaveSettings();
             if (draft == null) {
@@ -191,6 +194,7 @@ public class WorkgroupSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getRobotSettings() != null) {
             RobotRoutingSettingsEntity draft = entity.getDraftRobotSettings();
             if (draft == null) {
@@ -206,6 +210,7 @@ public class WorkgroupSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+        
         if (request.getQueueSettings() != null) {
             QueueSettingsEntity draft = entity.getDraftQueueSettings();
             if (draft == null) {
