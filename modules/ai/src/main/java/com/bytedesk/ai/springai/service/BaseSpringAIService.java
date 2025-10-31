@@ -167,14 +167,16 @@ public abstract class BaseSpringAIService implements SpringAIService {
             SearchResultWithSources aggregated = knowledgeBaseSearchHelper
                     .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot), robot);
             List<FaqProtobuf> kbResults = aggregated.getSearchResults();
-            List<RobotContent.SourceReference> sourceReferences = aggregated.getSourceReferences();
+            List<RobotContent.SourceReference> sourceReferences = Boolean.TRUE.equals(robot.getKbSourceEnabled())
+                    ? aggregated.getSourceReferences()
+                    : new ArrayList<>();
             log.info("LLM 模式，KB 结果数 {}, 来源数 {}", kbResults.size(), sourceReferences.size());
 
             if (kbResults.isEmpty()) {
                 // 未命中 KB,直接返回默认回复(ROBOT_STREAM),并结束 SSE
-                String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
-                    ? robot.getLlm().getDefaultReply() 
-                    : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+                String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+                        ? robot.getLlm().getDefaultReply()
+                        : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
                 String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer,
                         new ArrayList<>(), robot);
                 sseMessageHelper.sendStreamMessage(
@@ -209,15 +211,17 @@ public abstract class BaseSpringAIService implements SpringAIService {
         SearchResultWithSources aggregated = knowledgeBaseSearchHelper
                 .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot), robot);
         List<FaqProtobuf> kbResults = aggregated.getSearchResults();
-        List<RobotContent.SourceReference> sourceReferences = aggregated.getSourceReferences();
+        List<RobotContent.SourceReference> sourceReferences = Boolean.TRUE.equals(robot.getKbSourceEnabled())
+                ? aggregated.getSourceReferences()
+                : new ArrayList<>();
 
         boolean isUnanswered;
         String answer;
         if (kbResults.isEmpty()) {
             isUnanswered = true;
-            answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
-                ? robot.getLlm().getDefaultReply() 
-                : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+            answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+                    ? robot.getLlm().getDefaultReply()
+                    : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
         } else {
             FaqProtobuf firstFaq = kbResults.get(0);
             if (kbResults.size() > 1) {
@@ -233,14 +237,19 @@ public abstract class BaseSpringAIService implements SpringAIService {
             contextBuilder.append("Content: ").append(source.getContentSummary()).append("\n\n");
         }
 
-        RobotContent streamContent = RobotContent.builder()
+        RobotContent.RobotContentBuilder<?, ?> streamContentBuilder = RobotContent.builder()
                 .question(query)
                 .answer(answer)
-                .sources(sourceReferences)
                 .regenerationContext(contextBuilder.toString())
                 .kbUid(robot.getKbUid())
-                .robotUid(robot.getUid())
-                .build();
+                .robotUid(robot.getUid());
+
+        // 仅当显式开启来源展示时，才设置 sources
+        if (Boolean.TRUE.equals(robot.getKbSourceEnabled())) {
+            streamContentBuilder.sources(sourceReferences);
+        }
+
+        RobotContent streamContent = streamContentBuilder.build();
 
         sseMessageHelper.sendStreamMessage(
                 messageProtobufQuery,
@@ -300,9 +309,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             if (llmEnabled) {
                 // LLM 启用：KB 为空→默认文本；KB 非空→带上下文调用 LLM
                 if (kbResults.isEmpty()) {
-                    String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
-                        ? robot.getLlm().getDefaultReply() 
-                        : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+                    String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+                            ? robot.getLlm().getDefaultReply()
+                            : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
                     RobotContent streamContent = RobotContent.builder()
                             .question(query)
                             .answer(answer)
@@ -347,9 +356,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             MessageTypeEnum messageType;
             boolean isUnanswered;
             if (kbResults.isEmpty()) {
-                answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null 
-                    ? robot.getLlm().getDefaultReply() 
-                    : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+                answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+                        ? robot.getLlm().getDefaultReply()
+                        : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
                 messageType = MessageTypeEnum.ROBOT;
                 isUnanswered = true;
             } else {
