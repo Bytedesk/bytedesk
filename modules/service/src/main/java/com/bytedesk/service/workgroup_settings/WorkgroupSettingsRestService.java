@@ -22,6 +22,7 @@ import com.bytedesk.kbase.settings.ServiceSettingsHelper;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
+import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 
 import lombok.AllArgsConstructor;
@@ -38,6 +39,8 @@ public class WorkgroupSettingsRestService
     private final UidUtils uidUtils;
 
     private final ServiceSettingsHelper serviceSettingsHelper;
+    
+    private final MessageLeaveSettingsHelper messageLeaveSettingsHelper;
 
     @Cacheable(value = "workgroupSettings", key = "#uid", unless = "#result == null")
     @Override
@@ -402,86 +405,15 @@ public class WorkgroupSettingsRestService
     }
 
     // 仅复制业务字段,忽略 id/uid/version 与时间字段
+    // 仅复制业务字段,忽略 id/uid/version 与时间字段
+    // 使用 Helper 类处理懒加载集合的正确复制
     private void copyPropertiesExcludingIds(Object source, Object target) {
         if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
-            ServiceSettingsEntity sourceSettings = (ServiceSettingsEntity) source;
-            ServiceSettingsEntity targetSettings = (ServiceSettingsEntity) target;
-            
-            // 保存集合引用
-            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> welcomeFaqs = sourceSettings.getWelcomeFaqs();
-            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> faqs = sourceSettings.getFaqs();
-            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> quickFaqs = sourceSettings.getQuickFaqs();
-            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> guessFaqs = sourceSettings.getGuessFaqs();
-            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> hotFaqs = sourceSettings.getHotFaqs();
-            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> shortcutFaqs = sourceSettings.getShortcutFaqs();
-            java.util.List<com.bytedesk.kbase.llm_faq.FaqEntity> proactiveFaqs = sourceSettings.getProactiveFaqs();
-            
-            // 执行属性复制
-            org.springframework.beans.BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt",
-                    "welcomeFaqs", "faqs", "quickFaqs", "guessFaqs", "hotFaqs", "shortcutFaqs", "proactiveFaqs");
-            
-            // 恢复集合引用
-            if (welcomeFaqs != null) {
-                if (targetSettings.getWelcomeFaqs() == null) {
-                    targetSettings.setWelcomeFaqs(new java.util.ArrayList<>());
-                }
-                targetSettings.getWelcomeFaqs().clear();
-                targetSettings.getWelcomeFaqs().addAll(welcomeFaqs);
-            }
-            if (faqs != null) {
-                if (targetSettings.getFaqs() == null) {
-                    targetSettings.setFaqs(new java.util.ArrayList<>());
-                }
-                targetSettings.getFaqs().clear();
-                targetSettings.getFaqs().addAll(faqs);
-            }
-            if (quickFaqs != null) {
-                if (targetSettings.getQuickFaqs() == null) {
-                    targetSettings.setQuickFaqs(new java.util.ArrayList<>());
-                }
-                targetSettings.getQuickFaqs().clear();
-                targetSettings.getQuickFaqs().addAll(quickFaqs);
-            }
-            if (guessFaqs != null) {
-                if (targetSettings.getGuessFaqs() == null) {
-                    targetSettings.setGuessFaqs(new java.util.ArrayList<>());
-                }
-                targetSettings.getGuessFaqs().clear();
-                targetSettings.getGuessFaqs().addAll(guessFaqs);
-            }
-            if (hotFaqs != null) {
-                if (targetSettings.getHotFaqs() == null) {
-                    targetSettings.setHotFaqs(new java.util.ArrayList<>());
-                }
-                targetSettings.getHotFaqs().clear();
-                targetSettings.getHotFaqs().addAll(hotFaqs);
-            }
-            if (shortcutFaqs != null) {
-                if (targetSettings.getShortcutFaqs() == null) {
-                    targetSettings.setShortcutFaqs(new java.util.ArrayList<>());
-                }
-                targetSettings.getShortcutFaqs().clear();
-                targetSettings.getShortcutFaqs().addAll(shortcutFaqs);
-            }
-            if (proactiveFaqs != null) {
-                if (targetSettings.getProactiveFaqs() == null) {
-                    targetSettings.setProactiveFaqs(new java.util.ArrayList<>());
-                }
-                targetSettings.getProactiveFaqs().clear();
-                targetSettings.getProactiveFaqs().addAll(proactiveFaqs);
-            }
+            serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source, (ServiceSettingsEntity) target);
         } else if (source instanceof MessageLeaveSettingsEntity && target instanceof MessageLeaveSettingsEntity) {
-            MessageLeaveSettingsEntity sourceSettings = (MessageLeaveSettingsEntity) source;
-            MessageLeaveSettingsEntity targetSettings = (MessageLeaveSettingsEntity) target;
-            
-            java.util.List<com.bytedesk.service.worktime.WorktimeEntity> worktimes = sourceSettings.getWorktimes();
-            org.springframework.beans.BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt", "worktimes");
-            
-            if (worktimes != null) {
-                targetSettings.setWorktimes(new java.util.ArrayList<>(worktimes));
-            }
+            messageLeaveSettingsHelper.copyMessageLeaveSettingsProperties((MessageLeaveSettingsEntity) source, (MessageLeaveSettingsEntity) target);
         } else {
-            org.springframework.beans.BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
+            messageLeaveSettingsHelper.copyPropertiesExcludingIds(source, target);
         }
     }
 

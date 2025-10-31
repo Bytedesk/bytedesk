@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[9286],{30367:function(n,e,t){t.r(e);var i=t(31549);e.default=function(){return(0,i.jsx)("div",{children:"Robot Settings"})}}}]);
