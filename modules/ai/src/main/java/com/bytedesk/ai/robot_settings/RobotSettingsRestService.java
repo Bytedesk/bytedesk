@@ -299,12 +299,47 @@ public class RobotSettingsRestService
                 .enabled(true)
                 .orgUid(orgUid)
                 .build();
-        ServiceSettingsEntity published = ServiceSettingsEntity.builder().build();
+
+        // 参考 create() 的初始化逻辑：为各嵌套配置同时初始化“发布 + 草稿”两份，并分配独立 UID
+        // Service settings
+        ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
         published.setUid(uidUtils.getUid());
-        ServiceSettingsEntity draft = ServiceSettingsEntity.builder().build();
+        ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
         draft.setUid(uidUtils.getUid());
         settings.setServiceSettings(published);
         settings.setDraftServiceSettings(draft);
+
+        // Invite settings（发布 + 草稿）
+        InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
+        inv.setUid(uidUtils.getUid());
+        settings.setInviteSettings(inv);
+        InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(null, modelMapper);
+        invDraft.setUid(uidUtils.getUid());
+        settings.setDraftInviteSettings(invDraft);
+
+        // Intention settings（发布 + 草稿）
+        IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(null, modelMapper);
+        inte.setUid(uidUtils.getUid());
+        settings.setIntentionSettings(inte);
+        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(null, modelMapper);
+        inteDraft.setUid(uidUtils.getUid());
+        settings.setDraftIntentionSettings(inteDraft);
+
+        // Ratedown settings（发布 + 草稿）
+        RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(null, modelMapper);
+        r.setUid(uidUtils.getUid());
+        settings.setRateDownSettings(r);
+        RatedownSettingsEntity rd = RatedownSettingsEntity.fromRequest(null, modelMapper);
+        rd.setUid(uidUtils.getUid());
+        settings.setDraftRateDownSettings(rd);
+
+        // LLM settings（发布 + 草稿）
+        RobotLlmEntity llm = RobotLlmEntity.fromRequest(null, modelMapper);
+        llm.setUid(uidUtils.getUid());
+        settings.setLlm(llm);
+        RobotLlmEntity draftLlm = RobotLlmEntity.fromRequest(null, modelMapper);
+        draftLlm.setUid(uidUtils.getUid());
+        settings.setDraftLlm(draftLlm);
 
         // 默认：关闭知识库，空 LLM 配置
         settings.setKbEnabled(false);

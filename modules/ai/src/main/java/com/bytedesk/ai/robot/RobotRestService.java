@@ -30,10 +30,8 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
-import com.bytedesk.ai.robot_settings.RobotLlmRequest;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
-import com.bytedesk.ai.robot_settings.RobotSettingsRequest;
-import com.bytedesk.ai.robot_settings.RobotSettingsResponse;
+import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -81,7 +79,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     private final LlmProviderRestService llmProviderRestService;
 
-    private final com.bytedesk.ai.robot_settings.RobotSettingsRestService robotSettingsRestService;
+    private final RobotSettingsRestService robotSettingsRestService;
 
     @Override
     protected Specification<RobotEntity> createSpecification(RobotRequest request) {
@@ -194,7 +192,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         // 如果传入新的 settingsUid，则更新关联的配置
         if (StringUtils.hasText(request.getSettingsUid())) {
             try {
-                Optional<com.bytedesk.ai.robot_settings.RobotSettingsEntity> settingsOpt = robotSettingsRestService
+                Optional<RobotSettingsEntity> settingsOpt = robotSettingsRestService
                         .findByUid(request.getSettingsUid());
                 if (settingsOpt.isPresent()) {
                     if (robot.getSettings() == null || !request.getSettingsUid().equals(robot.getSettings().getUid())) {
@@ -437,21 +435,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         if (StringUtils.hasText(robotUid) && existsByUid(robotUid)) {
             return convertToResponse(findByUid(robotUid).get());
         }
-        // 创建带有默认提示词的 Settings 并绑定
-        RobotSettingsRequest settingsReq = RobotSettingsRequest
-                .builder()
-                .orgUid(orgUid)
-                .name("空白智能体配置")
-                .llm(RobotLlmRequest.builder().prompt("请回答用户提出的问题").build())
-                .build();
-        RobotSettingsResponse settingsResp = robotSettingsRestService
-                .create(settingsReq);
-
-        // 使用已持久化的 Settings 实体，避免出现未保存的瞬态引用
-        RobotSettingsEntity persistedSettings = robotSettingsRestService
-                .findByUid(settingsResp.getUid())
-                .orElseThrow(() -> new RuntimeException("persisted settings not found: " + settingsResp.getUid()));
-
+        // 使用组织默认 Settings（若不存在则创建）并绑定
+        RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
         RobotEntity robot = RobotEntity.builder()
                 .uid(robotUid)
                 .name(RobotConsts.ROBOT_NAME_VOID_AGENT)
@@ -504,22 +489,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         ? robotJson.getI18n().getZh_cn()
                         : robotJson.getI18n().getEn();
 
-                // 创建 Settings 并设置 LLM 提示词
-                RobotSettingsRequest settingsReq = RobotSettingsRequest
-                        .builder()
-                        .orgUid(orgUid)
-                        .name(robotJson.getName() + "配置")
-                        .llm(RobotLlmRequest.builder().prompt(localeData.getPrompt())
-                                .build())
-                        .build();
-                RobotSettingsResponse settingsResp = robotSettingsRestService
-                        .create(settingsReq);
-
-                // Create RobotEntity with data from both Robot and LocaleData
-                RobotSettingsEntity persistedSettings = robotSettingsRestService
-                        .findByUid(settingsResp.getUid())
-                        .orElseThrow(() -> new RuntimeException(
-                                "persisted settings not found: " + settingsResp.getUid()));
+                // Use organization default settings (ignore per-robot custom prompt)
+                RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
                 RobotEntity robot = RobotEntity.builder()
                         .uid(uidUtils.getUid())
                         .name(robotJson.getName())

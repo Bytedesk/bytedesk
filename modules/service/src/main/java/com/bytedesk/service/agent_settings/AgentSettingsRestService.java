@@ -377,28 +377,70 @@ public class AgentSettingsRestService
                     .enabled(true)
                     .orgUid(orgUid)
                     .build();
-            // 初始化发布与草稿版本
-            ServiceSettingsEntity published = ServiceSettingsEntity.builder().build();
+            // 参考 create()：为各嵌套配置初始化“发布 + 草稿”并分配独立 UID
+            // Service settings（发布 + 草稿）
+            ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
             published.setUid(uidUtils.getUid());
-            ServiceSettingsEntity draft = ServiceSettingsEntity.builder().build();
+            ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
             draft.setUid(uidUtils.getUid());
             settings.setServiceSettings(published);
             settings.setDraftServiceSettings(draft);
 
-            // 初始化邀请/意图的发布与草稿
-            InviteSettingsEntity inv = InviteSettingsEntity.builder().build();
+            // 邀请配置（发布 + 草稿）
+            InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
             inv.setUid(uidUtils.getUid());
-            InviteSettingsEntity invDraft = InviteSettingsEntity.builder().build();
+            InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(null, modelMapper);
             invDraft.setUid(uidUtils.getUid());
             settings.setInviteSettings(inv);
             settings.setDraftInviteSettings(invDraft);
 
-            IntentionSettingsEntity inte = IntentionSettingsEntity.builder().build();
+            // 意图配置（发布 + 草稿）
+            IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(null, modelMapper);
             inte.setUid(uidUtils.getUid());
-            IntentionSettingsEntity inteDraft = IntentionSettingsEntity.builder().build();
+            IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(null, modelMapper);
             inteDraft.setUid(uidUtils.getUid());
             settings.setIntentionSettings(inte);
             settings.setDraftIntentionSettings(inteDraft);
+
+            // 留言设置（发布 + 草稿）
+            MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
+            mls.setUid(uidUtils.getUid());
+            MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
+            mlsDraft.setUid(uidUtils.getUid());
+            settings.setMessageLeaveSettings(mls);
+            settings.setDraftMessageLeaveSettings(mlsDraft);
+
+            // 自动回复设置（发布 + 草稿）
+            AutoReplySettingsEntity ars = AutoReplySettingsEntity.fromRequest(null, modelMapper);
+            ars.setUid(uidUtils.getUid());
+            AutoReplySettingsEntity arsDraft = AutoReplySettingsEntity.fromRequest(null, modelMapper);
+            arsDraft.setUid(uidUtils.getUid());
+            settings.setAutoReplySettings(ars);
+            settings.setDraftAutoReplySettings(arsDraft);
+
+            // 排队设置（发布 + 草稿）
+            QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(null, modelMapper);
+            qs.setUid(uidUtils.getUid());
+            QueueSettingsEntity qsDraft = QueueSettingsEntity.fromRequest(null, modelMapper);
+            qsDraft.setUid(uidUtils.getUid());
+            settings.setQueueSettings(qs);
+            settings.setDraftQueueSettings(qsDraft);
+
+            // 差评设置（发布 + 草稿）
+            RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(null, modelMapper);
+            r.setUid(uidUtils.getUid());
+            RatedownSettingsEntity rd = RatedownSettingsEntity.fromRequest(null, modelMapper);
+            rd.setUid(uidUtils.getUid());
+            settings.setRateDownSettings(r);
+            settings.setDraftRateDownSettings(rd);
+
+            // 客服状态设置（发布 + 草稿）
+            AgentStatusSettingEntity st = AgentStatusSettingEntity.fromRequest(null, modelMapper);
+            st.setUid(uidUtils.getUid());
+            AgentStatusSettingEntity stDraft = AgentStatusSettingEntity.fromRequest(null, modelMapper);
+            stDraft.setUid(uidUtils.getUid());
+            settings.setAgentStatusSettings(st);
+            settings.setDraftAgentStatusSettings(stDraft);
 
             return save(settings);
         } catch (Exception ex) {

@@ -305,13 +305,54 @@ public class WorkgroupSettingsRestService
                 .enabled(true)
                 .orgUid(orgUid)
                 .build();
-        // 初始化 service 的发布与草稿
-        ServiceSettingsEntity published = ServiceSettingsEntity.builder().build();
-        published.setUid(uidUtils.getUid());
-        ServiceSettingsEntity draft = ServiceSettingsEntity.builder().build();
-        draft.setUid(uidUtils.getUid());
-        settings.setServiceSettings(published);
-        settings.setDraftServiceSettings(draft);
+    // 参考 create()：为各嵌套配置初始化“发布 + 草稿”并分配独立 UID
+    // Service settings（发布 + 草稿）
+    ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
+    published.setUid(uidUtils.getUid());
+    ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
+    draft.setUid(uidUtils.getUid());
+    settings.setServiceSettings(published);
+    settings.setDraftServiceSettings(draft);
+
+    // 邀请配置（发布 + 草稿）
+    InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
+    inv.setUid(uidUtils.getUid());
+    InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(null, modelMapper);
+    invDraft.setUid(uidUtils.getUid());
+    settings.setInviteSettings(inv);
+    settings.setDraftInviteSettings(invDraft);
+
+    // 意图配置（发布 + 草稿）
+    IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(null, modelMapper);
+    inte.setUid(uidUtils.getUid());
+    IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(null, modelMapper);
+    inteDraft.setUid(uidUtils.getUid());
+    settings.setIntentionSettings(inte);
+    settings.setDraftIntentionSettings(inteDraft);
+
+    // 留言设置（发布 + 草稿）
+    MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
+    mls.setUid(uidUtils.getUid());
+    MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
+    mlsDraft.setUid(uidUtils.getUid());
+    settings.setMessageLeaveSettings(mls);
+    settings.setDraftMessageLeaveSettings(mlsDraft);
+
+    // 机器人路由设置（发布 + 草稿）
+    RobotRoutingSettingsEntity rrs = convertRobotRoutingSettingsRequestToEntity(null);
+    rrs.setUid(uidUtils.getUid());
+    RobotRoutingSettingsEntity rrsDraft = convertRobotRoutingSettingsRequestToEntity(null);
+    rrsDraft.setUid(uidUtils.getUid());
+    settings.setRobotSettings(rrs);
+    settings.setDraftRobotSettings(rrsDraft);
+
+    // 排队设置（发布 + 草稿）
+    QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(null, modelMapper);
+    qs.setUid(uidUtils.getUid());
+    QueueSettingsEntity qsDraft = QueueSettingsEntity.fromRequest(null, modelMapper);
+    qsDraft.setUid(uidUtils.getUid());
+    settings.setQueueSettings(qs);
+    settings.setDraftQueueSettings(qsDraft);
 
         // 刚创建的即为默认，确保同 org 唯一
         ensureSingleDefault(orgUid, settings);
