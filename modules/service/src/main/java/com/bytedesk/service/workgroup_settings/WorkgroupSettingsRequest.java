@@ -48,7 +48,7 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
     /**
      * Robot routing settings (Workgroup-specific)
      */
-    private RobotRoutingSettingsRequest robotSettings;
+    private RobotRoutingSettingsRequest robotRoutingSettings;
 
     /**
      * Queue settings (Workgroup-specific)

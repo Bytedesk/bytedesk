@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRepository;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
@@ -39,8 +41,10 @@ public class WorkgroupSettingsRestService
     private final UidUtils uidUtils;
 
     private final ServiceSettingsHelper serviceSettingsHelper;
-    
+
     private final MessageLeaveSettingsHelper messageLeaveSettingsHelper;
+
+    private final RobotRepository robotRepository;
 
     @Cacheable(value = "workgroupSettings", key = "#uid", unless = "#result == null")
     @Override
@@ -88,10 +92,11 @@ public class WorkgroupSettingsRestService
         mlsDraft.setUid(uidUtils.getUid());
         entity.setDraftMessageLeaveSettings(mlsDraft);
 
-        RobotRoutingSettingsEntity rrs = convertRobotRoutingSettingsRequestToEntity(request.getRobotSettings());
+        RobotRoutingSettingsEntity rrs = convertRobotRoutingSettingsRequestToEntity(request.getRobotRoutingSettings());
         rrs.setUid(uidUtils.getUid());
         entity.setRobotSettings(rrs);
-        RobotRoutingSettingsEntity rrsDraft = convertRobotRoutingSettingsRequestToEntity(request.getRobotSettings());
+        RobotRoutingSettingsEntity rrsDraft = convertRobotRoutingSettingsRequestToEntity(
+                request.getRobotRoutingSettings());
         rrsDraft.setUid(uidUtils.getUid());
         entity.setDraftRobotSettings(rrsDraft);
 
@@ -134,12 +139,8 @@ public class WorkgroupSettingsRestService
             } else {
                 // 保留草稿唯一标识，避免被请求体覆盖
                 String originalUid = draft.getUid();
-                Long originalId = draft.getId();
                 modelMapper.map(request.getServiceSettings(), draft);
                 draft.setUid(originalUid);
-                if (originalId != null) {
-                    draft.setId(originalId);
-                }
             }
             // 处理 ServiceSettings 关联（FAQ 列表等）
             serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
@@ -195,22 +196,25 @@ public class WorkgroupSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
-        if (request.getRobotSettings() != null) {
+        if (request.getRobotRoutingSettings() != null) {
             RobotRoutingSettingsEntity draft = entity.getDraftRobotSettings();
             if (draft == null) {
-                draft = convertRobotRoutingSettingsRequestToEntity(request.getRobotSettings());
+                draft = convertRobotRoutingSettingsRequestToEntity(request.getRobotRoutingSettings());
                 if (draft != null && draft.getUid() == null) {
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftRobotSettings(draft);
             } else {
                 String originalUid = draft.getUid();
-                modelMapper.map(request.getRobotSettings(), draft);
+                // 先用 mapper 覆盖简单字段
+                modelMapper.map(request.getRobotRoutingSettings(), draft);
+                // 再根据 robotUid 解析为 RobotEntity 进行关联
+                applyRobotUidToEntity(request.getRobotRoutingSettings(), draft);
                 draft.setUid(originalUid);
             }
             entity.setHasUnpublishedChanges(true);
         }
-        
+
         if (request.getQueueSettings() != null) {
             QueueSettingsEntity draft = entity.getDraftQueueSettings();
             if (draft == null) {
@@ -305,54 +309,54 @@ public class WorkgroupSettingsRestService
                 .enabled(true)
                 .orgUid(orgUid)
                 .build();
-    // 参考 create()：为各嵌套配置初始化“发布 + 草稿”并分配独立 UID
-    // Service settings（发布 + 草稿）
-    ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
-    published.setUid(uidUtils.getUid());
-    ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
-    draft.setUid(uidUtils.getUid());
-    settings.setServiceSettings(published);
-    settings.setDraftServiceSettings(draft);
+        // 参考 create()：为各嵌套配置初始化“发布 + 草稿”并分配独立 UID
+        // Service settings（发布 + 草稿）
+        ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
+        published.setUid(uidUtils.getUid());
+        ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
+        draft.setUid(uidUtils.getUid());
+        settings.setServiceSettings(published);
+        settings.setDraftServiceSettings(draft);
 
-    // 邀请配置（发布 + 草稿）
-    InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
-    inv.setUid(uidUtils.getUid());
-    InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(null, modelMapper);
-    invDraft.setUid(uidUtils.getUid());
-    settings.setInviteSettings(inv);
-    settings.setDraftInviteSettings(invDraft);
+        // 邀请配置（发布 + 草稿）
+        InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
+        inv.setUid(uidUtils.getUid());
+        InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(null, modelMapper);
+        invDraft.setUid(uidUtils.getUid());
+        settings.setInviteSettings(inv);
+        settings.setDraftInviteSettings(invDraft);
 
-    // 意图配置（发布 + 草稿）
-    IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(null, modelMapper);
-    inte.setUid(uidUtils.getUid());
-    IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(null, modelMapper);
-    inteDraft.setUid(uidUtils.getUid());
-    settings.setIntentionSettings(inte);
-    settings.setDraftIntentionSettings(inteDraft);
+        // 意图配置（发布 + 草稿）
+        IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(null, modelMapper);
+        inte.setUid(uidUtils.getUid());
+        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(null, modelMapper);
+        inteDraft.setUid(uidUtils.getUid());
+        settings.setIntentionSettings(inte);
+        settings.setDraftIntentionSettings(inteDraft);
 
-    // 留言设置（发布 + 草稿）
-    MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
-    mls.setUid(uidUtils.getUid());
-    MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
-    mlsDraft.setUid(uidUtils.getUid());
-    settings.setMessageLeaveSettings(mls);
-    settings.setDraftMessageLeaveSettings(mlsDraft);
+        // 留言设置（发布 + 草稿）
+        MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
+        mls.setUid(uidUtils.getUid());
+        MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
+        mlsDraft.setUid(uidUtils.getUid());
+        settings.setMessageLeaveSettings(mls);
+        settings.setDraftMessageLeaveSettings(mlsDraft);
 
-    // 机器人路由设置（发布 + 草稿）
-    RobotRoutingSettingsEntity rrs = convertRobotRoutingSettingsRequestToEntity(null);
-    rrs.setUid(uidUtils.getUid());
-    RobotRoutingSettingsEntity rrsDraft = convertRobotRoutingSettingsRequestToEntity(null);
-    rrsDraft.setUid(uidUtils.getUid());
-    settings.setRobotSettings(rrs);
-    settings.setDraftRobotSettings(rrsDraft);
+        // 机器人路由设置（发布 + 草稿）
+        RobotRoutingSettingsEntity rrs = convertRobotRoutingSettingsRequestToEntity(null);
+        rrs.setUid(uidUtils.getUid());
+        RobotRoutingSettingsEntity rrsDraft = convertRobotRoutingSettingsRequestToEntity(null);
+        rrsDraft.setUid(uidUtils.getUid());
+        settings.setRobotSettings(rrs);
+        settings.setDraftRobotSettings(rrsDraft);
 
-    // 排队设置（发布 + 草稿）
-    QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(null, modelMapper);
-    qs.setUid(uidUtils.getUid());
-    QueueSettingsEntity qsDraft = QueueSettingsEntity.fromRequest(null, modelMapper);
-    qsDraft.setUid(uidUtils.getUid());
-    settings.setQueueSettings(qs);
-    settings.setDraftQueueSettings(qsDraft);
+        // 排队设置（发布 + 草稿）
+        QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(null, modelMapper);
+        qs.setUid(uidUtils.getUid());
+        QueueSettingsEntity qsDraft = QueueSettingsEntity.fromRequest(null, modelMapper);
+        qsDraft.setUid(uidUtils.getUid());
+        settings.setQueueSettings(qs);
+        settings.setDraftQueueSettings(qsDraft);
 
         // 刚创建的即为默认，确保同 org 唯一
         ensureSingleDefault(orgUid, settings);
@@ -370,7 +374,7 @@ public class WorkgroupSettingsRestService
             throw new RuntimeException("WorkgroupSettings not found: " + uid);
         }
         WorkgroupSettingsEntity entity = optional.get();
-        
+
         // 复制草稿到发布版本
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
@@ -383,7 +387,7 @@ public class WorkgroupSettingsRestService
                 entity.setServiceSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftMessageLeaveSettings() != null) {
             MessageLeaveSettingsEntity published = entity.getMessageLeaveSettings();
             if (published != null) {
@@ -395,7 +399,7 @@ public class WorkgroupSettingsRestService
                 entity.setMessageLeaveSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftRobotSettings() != null) {
             RobotRoutingSettingsEntity published = entity.getRobotSettings();
             if (published != null) {
@@ -407,7 +411,7 @@ public class WorkgroupSettingsRestService
                 entity.setRobotSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftQueueSettings() != null) {
             QueueSettingsEntity published = entity.getQueueSettings();
             if (published != null) {
@@ -419,7 +423,7 @@ public class WorkgroupSettingsRestService
                 entity.setQueueSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
             if (published != null) {
@@ -431,7 +435,7 @@ public class WorkgroupSettingsRestService
                 entity.setInviteSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftIntentionSettings() != null) {
             IntentionSettingsEntity published = entity.getIntentionSettings();
             if (published != null) {
@@ -443,7 +447,7 @@ public class WorkgroupSettingsRestService
                 entity.setIntentionSettings(newPublished);
             }
         }
-        
+
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         WorkgroupSettingsEntity updated = save(entity);
@@ -455,9 +459,11 @@ public class WorkgroupSettingsRestService
     // 使用 Helper 类处理懒加载集合的正确复制
     private void copyPropertiesExcludingIds(Object source, Object target) {
         if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
-            serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source, (ServiceSettingsEntity) target);
+            serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source,
+                    (ServiceSettingsEntity) target);
         } else if (source instanceof MessageLeaveSettingsEntity && target instanceof MessageLeaveSettingsEntity) {
-            messageLeaveSettingsHelper.copyMessageLeaveSettingsProperties((MessageLeaveSettingsEntity) source, (MessageLeaveSettingsEntity) target);
+            messageLeaveSettingsHelper.copyMessageLeaveSettingsProperties((MessageLeaveSettingsEntity) source,
+                    (MessageLeaveSettingsEntity) target);
         } else {
             messageLeaveSettingsHelper.copyPropertiesExcludingIds(source, target);
         }
@@ -469,7 +475,28 @@ public class WorkgroupSettingsRestService
             return RobotRoutingSettingsEntity.builder().build();
         }
         // 使用 ModelMapper 简化转换
-        return modelMapper.map(request, RobotRoutingSettingsEntity.class);
+        RobotRoutingSettingsEntity entity = modelMapper.map(request, RobotRoutingSettingsEntity.class);
+        // 将 robotUid 解析为 RobotEntity 并设置
+        applyRobotUidToEntity(request, entity);
+        return entity;
+    }
+
+    /**
+     * 根据请求中的 robotUid 解析并设置到目标实体上；若为空则清空关联。
+     */
+    private void applyRobotUidToEntity(RobotRoutingSettingsRequest request, RobotRoutingSettingsEntity target) {
+        if (request == null || target == null) {
+            return;
+        }
+        String robotUid = request.getRobotUid();
+        if (robotUid == null || robotUid.isBlank()) {
+            // 允许通过传空来移除关联机器人
+            target.setRobot(null);
+            return;
+        }
+        RobotEntity robot = robotRepository.findByUid(robotUid)
+                .orElseThrow(() -> new RuntimeException("Robot not found by uid: " + robotUid));
+        target.setRobot(robot);
     }
 
     @Override
