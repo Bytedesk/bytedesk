@@ -30,7 +30,10 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
+import com.bytedesk.ai.robot_settings.RobotLlmRequest;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
+import com.bytedesk.ai.robot_settings.RobotSettingsRequest;
+import com.bytedesk.ai.robot_settings.RobotSettingsResponse;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -435,14 +438,19 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             return convertToResponse(findByUid(robotUid).get());
         }
         // 创建带有默认提示词的 Settings 并绑定
-        com.bytedesk.ai.robot_settings.RobotSettingsRequest settingsReq = com.bytedesk.ai.robot_settings.RobotSettingsRequest
+        RobotSettingsRequest settingsReq = RobotSettingsRequest
                 .builder()
                 .orgUid(orgUid)
                 .name("空白智能体配置")
-                .llm(com.bytedesk.ai.robot_settings.RobotLlmRequest.builder().prompt("请回答用户提出的问题").build())
+                .llm(RobotLlmRequest.builder().prompt("请回答用户提出的问题").build())
                 .build();
-        com.bytedesk.ai.robot_settings.RobotSettingsResponse settingsResp = robotSettingsRestService
+        RobotSettingsResponse settingsResp = robotSettingsRestService
                 .create(settingsReq);
+
+        // 使用已持久化的 Settings 实体，避免出现未保存的瞬态引用
+        RobotSettingsEntity persistedSettings = robotSettingsRestService
+                .findByUid(settingsResp.getUid())
+                .orElseThrow(() -> new RuntimeException("persisted settings not found: " + settingsResp.getUid()));
 
         RobotEntity robot = RobotEntity.builder()
                 .uid(robotUid)
@@ -450,7 +458,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 .nickname("空白智能体")
                 .type(RobotTypeEnum.LLM.name())
                 .orgUid(orgUid)
-                .settings(modelMapper.map(settingsResp, com.bytedesk.ai.robot_settings.RobotSettingsEntity.class))
+                .settings(persistedSettings)
                 .build();
         //
         RobotEntity updatedRobot = save(robot);
@@ -497,17 +505,21 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         : robotJson.getI18n().getEn();
 
                 // 创建 Settings 并设置 LLM 提示词
-                com.bytedesk.ai.robot_settings.RobotSettingsRequest settingsReq = com.bytedesk.ai.robot_settings.RobotSettingsRequest
+                RobotSettingsRequest settingsReq = RobotSettingsRequest
                         .builder()
                         .orgUid(orgUid)
                         .name(robotJson.getName() + "配置")
-                        .llm(com.bytedesk.ai.robot_settings.RobotLlmRequest.builder().prompt(localeData.getPrompt())
+                        .llm(RobotLlmRequest.builder().prompt(localeData.getPrompt())
                                 .build())
                         .build();
-                com.bytedesk.ai.robot_settings.RobotSettingsResponse settingsResp = robotSettingsRestService
+                RobotSettingsResponse settingsResp = robotSettingsRestService
                         .create(settingsReq);
 
                 // Create RobotEntity with data from both Robot and LocaleData
+                RobotSettingsEntity persistedSettings = robotSettingsRestService
+                        .findByUid(settingsResp.getUid())
+                        .orElseThrow(() -> new RuntimeException(
+                                "persisted settings not found: " + settingsResp.getUid()));
                 RobotEntity robot = RobotEntity.builder()
                         .uid(uidUtils.getUid())
                         .name(robotJson.getName())
@@ -518,8 +530,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         .categoryUid(categoryUid)
                         .level(level)
                         .orgUid(orgUid)
-                        .settings(
-                                modelMapper.map(settingsResp, com.bytedesk.ai.robot_settings.RobotSettingsEntity.class))
+                        .settings(persistedSettings)
                         .system(true)
                         .build();
                 //
