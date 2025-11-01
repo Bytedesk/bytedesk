@@ -426,6 +426,8 @@ services:
 volumes:
   mysql_data:
     name: bytedesk_mysql_data
+  kingbase_data:
+    name: bytedesk_kingbase_data
   redis_data:
     name: bytedesk_redis_data
   ollama_models:
