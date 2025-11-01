@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 -->
-# 技能组
+# 工作组
 
 ## WorkgroupEntity和skills的区别主要在于
 

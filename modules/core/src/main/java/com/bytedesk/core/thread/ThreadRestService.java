@@ -732,7 +732,7 @@ public class ThreadRestService
         return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
-    // 找到某个访客当前对应某技能组未关闭会话
+    // 找到某个访客当前对应某工作组未关闭会话
     @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
         List<String> states = Arrays.asList(new String[] { ThreadProcessStatusEnum.CLOSED.name() });

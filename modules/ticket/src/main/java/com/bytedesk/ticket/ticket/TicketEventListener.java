@@ -164,7 +164,7 @@ public class TicketEventListener {
     public void handleTicketUpdateDepartmentEvent(TicketUpdateDepartmentEvent event) {
         log.info("TicketEventListener handleTicketUpdateDepartmentEvent: {}", event);
         TicketEntity ticket = event.getTicket();
-        // 更新当前技能组DepartmentUid
+        // 更新当前工作组DepartmentUid
         runtimeService.setVariable(ticket.getProcessInstanceId(), TicketConsts.TICKET_VARIABLE_DEPARTMENT_UID,
                 event.getNewDepartmentUid());
     }

@@ -54,7 +54,7 @@ package com.bytedesk.ticket.thread.listener;
 //  * 9. 设置任务变量
 //  * 
 //  * 注意：
-//  * 1. 这里仅处理了基本的会话类型，如一对一客服接待、技能组接待、机器人接待等
+//  * 1. 这里仅处理了基本的会话类型，如一对一客服接待、工作组接待、机器人接待等
 //  * 
 //  */
 // @Slf4j
@@ -162,12 +162,12 @@ package com.bytedesk.ticket.thread.listener;
 //                 log.error("一对一客服接待，但客服信息为空");
 //             }
 //         } else if (thread.isWorkgroupType()) {
-//             // 技能组接待，设置candidateGroups为技能组ID
+//             // 工作组接待，设置candidateGroups为工作组ID
 //             if (thread.getWorkgroupProtobuf() != null) {
 //                 variables.put(ThreadConsts.THREAD_VARIABLE_WORKGROUP_UID, thread.getWorkgroupProtobuf().getUid());
-//                 log.info("技能组接待，设置candidateGroups为: {}", thread.getWorkgroupProtobuf().getUid());
+//                 log.info("工作组接待，设置candidateGroups为: {}", thread.getWorkgroupProtobuf().getUid());
 //             } else {
-//                 log.error("技能组接待，但技能组信息为空");
+//                 log.error("工作组接待，但工作组信息为空");
 //             }
 //         } else if (thread.isRobotType()) {
 //             // 机器人接待

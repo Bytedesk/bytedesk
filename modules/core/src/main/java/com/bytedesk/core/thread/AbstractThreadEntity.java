@@ -160,7 +160,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String robot = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 技能组客服对话中，存储技能组信息
+    // 工作组客服对话中，存储工作组信息
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;

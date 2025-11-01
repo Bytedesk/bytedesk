@@ -243,7 +243,7 @@ public class VisitorThreadService
     }
 
     /**
-     * 根据请求与技能组实体构建 thread.extra
+     * 根据请求与工作组实体构建 thread.extra
      * - 社交渠道：直接使用请求中的 extra
      * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
      *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览

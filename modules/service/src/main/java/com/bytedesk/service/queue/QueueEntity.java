@@ -77,7 +77,7 @@ public class QueueEntity extends BaseEntity {
     @Column(name = "queue_status")
     private String status = QueueStatusEnum.ACTIVE.name(); // 队列状态
 
-    // 仅用于在工作组情况下，记录存储robot/agent接待来自技能组数量
+    // 仅用于在工作组情况下，记录存储robot/agent接待来自工作组数量
     // 添加新的一对多关系 - 作为工作组队列
     @OneToMany(mappedBy = "workgroupQueue", cascade = CascadeType.ALL, orphanRemoval = false)
     @JsonManagedReference("workgroupQueueMembers")

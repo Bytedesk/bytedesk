@@ -299,8 +299,8 @@ public class WorkgroupSettingsRestService
         // Create default settings
         WorkgroupSettingsEntity settings = WorkgroupSettingsEntity.builder()
                 .uid(uidUtils.getUid())
-                .name("默认技能组配置")
-                .description("系统默认技能组配置")
+                .name("默认工作组配置")
+                .description("系统默认工作组配置")
                 .isDefault(true)
                 .enabled(true)
                 .orgUid(orgUid)

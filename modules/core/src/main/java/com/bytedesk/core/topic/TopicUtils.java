@@ -90,8 +90,8 @@ public class TopicUtils {
     // 客服:
     // 用户默认订阅客服uid：org/agent/{agent_uid}
     // 一对一客服会话：org/agent/{agent_uid}/{visitor_uid}
-    // 用户默认订阅技能组uid：org/workgroup/{workgroup_uid}
-    // 技能组客服会话：org/workgroup/{workgroup_uid}/{visitor_uid}
+    // 用户默认订阅工作组uid：org/workgroup/{workgroup_uid}
+    // 工作组客服会话：org/workgroup/{workgroup_uid}/{visitor_uid}
     // 统一客服入口：org/unified/{unified_uid}/{visitor_uid}
     // 部门ticket会话：org/ticket/department/{department_uid}/{visitor_uid}
     private static final String TOPIC_ORG_AGENT_PATTERN = TOPIC_ORG_AGENT_PREFIX + "%s"; // "org/agent/%s";
@@ -106,7 +106,7 @@ public class TopicUtils {
 
     /**
      * 判断一个主题是否为客服相关主题
-     * 包括：客服、技能组、统一入口和部门工单等
+     * 包括：客服、工作组、统一入口和部门工单等
      * 
      * @param topic 需要判断的主题
      * @return 如果是客服相关主题返回true，否则返回false

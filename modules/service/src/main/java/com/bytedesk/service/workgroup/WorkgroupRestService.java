@@ -74,7 +74,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         workgroup.setOrgUid(request.getOrgUid());
         //
-    // 绑定技能组配置：优先使用请求中的 settingsUid，否则使用组织默认配置
+    // 绑定工作组配置：优先使用请求中的 settingsUid，否则使用组织默认配置
     if (StringUtils.hasText(request.getSettingsUid())) {
         workgroupSettingsRestService.findByUid(request.getSettingsUid())
             .ifPresentOrElse(workgroup::setSettings,

@@ -39,7 +39,7 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Column(name = "message_type")
     private String type = MessageTypeEnum.TEXT.name();
 
-    // 仅对一对一/客服/技能组聊天有效，表示对方是否已读。群聊无效
+    // 仅对一对一/客服/工作组聊天有效，表示对方是否已读。群聊无效
     @Builder.Default
     private String status = MessageStatusEnum.SUCCESS.name();
 

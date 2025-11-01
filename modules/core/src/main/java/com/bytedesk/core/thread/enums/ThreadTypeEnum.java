@@ -18,7 +18,7 @@ package com.bytedesk.core.thread.enums;
  */
 public enum ThreadTypeEnum {
     AGENT(0), // 一对一客服，不支持机器人接待
-    WORKGROUP(1), // 技能组客服，支持机器人接待，支持转人工
+    WORKGROUP(1), // 工作组客服，支持机器人接待，支持转人工
     ROBOT(2), // 机器人客服，不支持转人工
     // 
     MEMBER(3), // 组织成员对话
@@ -71,7 +71,7 @@ public enum ThreadTypeEnum {
             case AGENT:
                 return "一对一客服";
             case WORKGROUP:
-                return "技能组客服";
+                return "工作组客服";
             case ROBOT:
                 return "机器人客服";
             case MEMBER:

@@ -27,7 +27,7 @@ public enum HangupCauseEnum {
      */
     OVERFLOW(1006, "溢出挂机"),
 
-    SKILL_NO_AGENT(1007, "技能组未配置坐席"),
+    SKILL_NO_AGENT(1007, "工作组未配置坐席"),
     ;
 
     private Integer code;

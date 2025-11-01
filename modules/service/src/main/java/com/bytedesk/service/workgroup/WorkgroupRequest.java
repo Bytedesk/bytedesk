@@ -66,7 +66,7 @@ public class WorkgroupRequest extends BaseRequest {
     // @Builder.Default
     // private Boolean isUnifiedEntry = false;
 
-    // 路由技能组，仅用于统一入口技能组
+    // 路由工作组，仅用于统一入口工作组
     // @Builder.Default
     // private List<String> routingWorkgroupUids = new ArrayList<>();
 

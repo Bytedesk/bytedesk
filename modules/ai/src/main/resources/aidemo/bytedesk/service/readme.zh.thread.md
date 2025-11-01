@@ -7,7 +7,7 @@
 - 轮询分配(Round Robin)
 - 最少会话优先(Least Connection)
 - 最长空闲优先(Longest Idle)
-- 技能组优先(Skill Based)
+- 工作组优先(Skill Based)
 - 客服评分权重(Rating Based)
 
 ### 1.2 分配规则引擎
@@ -44,7 +44,7 @@
 
 - 手动转接
 - 自动转接
-- 技能组转接
+- 工作组转接
 - 会话升级
 - 跨部门转接
 

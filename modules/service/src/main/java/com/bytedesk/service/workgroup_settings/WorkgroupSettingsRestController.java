@@ -17,7 +17,7 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Tag(name = "技能组配置管理", description = "技能组配置相关接口")
+@Tag(name = "工作组配置管理", description = "工作组配置相关接口")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -26,7 +26,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
 
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
-    @Operation(summary = "查询组织下的技能组配置", description = "根据组织ID查询技能组配置列表")
+    @Operation(summary = "查询组织下的工作组配置", description = "根据组织ID查询工作组配置列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @Override
@@ -35,7 +35,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "根据UID查询技能组配置", description = "根据UID查询技能组配置详情")
+    @Operation(summary = "根据UID查询工作组配置", description = "根据UID查询工作组配置详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @Override
@@ -44,7 +44,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "创建技能组配置", description = "创建新的技能组配置")
+    @Operation(summary = "创建工作组配置", description = "创建新的工作组配置")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @Override
@@ -56,7 +56,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "更新技能组配置", description = "更新技能组配置信息")
+    @Operation(summary = "更新工作组配置", description = "更新工作组配置信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @Override
@@ -65,7 +65,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "删除技能组配置", description = "删除指定的技能组配置")
+    @Operation(summary = "删除工作组配置", description = "删除指定的工作组配置")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @Override
     public ResponseEntity<?> delete(@RequestBody WorkgroupSettingsRequest request) {
@@ -73,7 +73,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
-    @Operation(summary = "发布技能组配置", description = "将草稿版本发布为线上版本")
+    @Operation(summary = "发布工作组配置", description = "将草稿版本发布为线上版本")
     @ApiResponse(responseCode = "200", description = "发布成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @RequestMapping("/publish")
