@@ -92,10 +92,11 @@ public class WorkgroupSettingsRestService
         mlsDraft.setUid(uidUtils.getUid());
         entity.setDraftMessageLeaveSettings(mlsDraft);
 
-        RobotRoutingSettingsEntity rrs = convertRobotRoutingSettingsRequestToEntity(request.getRobotRoutingSettings());
+        // create 场景：不将 robotUid 解析成 RobotEntity，统一使用 Entity.fromRequest 风格
+        RobotRoutingSettingsEntity rrs = RobotRoutingSettingsEntity.fromRequest(request.getRobotRoutingSettings());
         rrs.setUid(uidUtils.getUid());
         entity.setRobotSettings(rrs);
-        RobotRoutingSettingsEntity rrsDraft = convertRobotRoutingSettingsRequestToEntity(
+        RobotRoutingSettingsEntity rrsDraft = RobotRoutingSettingsEntity.fromRequest(
                 request.getRobotRoutingSettings());
         rrsDraft.setUid(uidUtils.getUid());
         entity.setDraftRobotSettings(rrsDraft);
@@ -343,9 +344,9 @@ public class WorkgroupSettingsRestService
         settings.setDraftMessageLeaveSettings(mlsDraft);
 
         // 机器人路由设置（发布 + 草稿）
-        RobotRoutingSettingsEntity rrs = convertRobotRoutingSettingsRequestToEntity(null);
+        RobotRoutingSettingsEntity rrs = RobotRoutingSettingsEntity.fromRequest(null);
         rrs.setUid(uidUtils.getUid());
-        RobotRoutingSettingsEntity rrsDraft = convertRobotRoutingSettingsRequestToEntity(null);
+        RobotRoutingSettingsEntity rrsDraft = RobotRoutingSettingsEntity.fromRequest(null);
         rrsDraft.setUid(uidUtils.getUid());
         settings.setRobotSettings(rrs);
         settings.setDraftRobotSettings(rrsDraft);

@@ -52,11 +52,11 @@ public class WorkgroupSettingsResponse extends BaseSettingsResponse {
     /**
      * Robot routing settings (Workgroup-specific)
      */
-    private RobotRoutingSettingsResponse robotSettings;
+    private RobotRoutingSettingsResponse robotRoutingSettings;
     /**
      * Draft robot routing settings (Workgroup-specific)
      */
-    private RobotRoutingSettingsResponse draftRobotSettings;
+    private RobotRoutingSettingsResponse draftRobotRoutingSettings;
 
     /**
      * Queue settings (Workgroup-specific)

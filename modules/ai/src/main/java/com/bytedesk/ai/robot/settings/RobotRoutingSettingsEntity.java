@@ -70,6 +70,25 @@ public class RobotRoutingSettingsEntity extends BaseEntity {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private RobotEntity robot;
 
+    /**
+     * 从请求对象创建 RobotRoutingSettingsEntity。
+     * create 场景下不解析 robotUid，不做实体关联，仅拷贝基础布尔字段，保持与其他 *SettingsEntity.fromRequest 风格一致。
+     * 
+     * @param request RobotRoutingSettingsRequest，可为 null
+     * @return 非空的 RobotRoutingSettingsEntity 实例
+     */
+    public static RobotRoutingSettingsEntity fromRequest(RobotRoutingSettingsRequest request) {
+        if (request == null) {
+            return RobotRoutingSettingsEntity.builder().build();
+        }
+        return RobotRoutingSettingsEntity.builder()
+                .defaultRobot(Boolean.TRUE.equals(request.getDefaultRobot()))
+                .offlineRobot(Boolean.TRUE.equals(request.getOfflineRobot()))
+                .nonWorktimeRobot(Boolean.TRUE.equals(request.getNonWorktimeRobot()))
+                // create 阶段不设置 robot 关联
+                .build();
+    }
+
     // 是否应该转接到机器人
     public Boolean shouldTransferToRobot(Boolean isOffline, Boolean isInServiceTime) {
 
