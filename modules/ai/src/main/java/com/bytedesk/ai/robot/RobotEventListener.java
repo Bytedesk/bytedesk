@@ -51,7 +51,7 @@ public class RobotEventListener {
         log.info("robot - organization created: {}", organization.getName());
         // 为新创建组织创建一个默认机器人
         String robotUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_ROBOT_UID);
-        robotRestService.initDefaultRobot(orgUid, robotUid);
+        robotRestService.createDefaultRobot(orgUid, robotUid);
         // 导入组织智能体
         String level = LevelEnum.ORGANIZATION.name();
         robotRestService.initRobotJson(level, orgUid);

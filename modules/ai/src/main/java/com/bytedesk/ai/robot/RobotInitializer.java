@@ -49,7 +49,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         String robotUid = BytedeskConsts.DEFAULT_ROBOT_UID; // 默认机器人UID
         // 为初始组织创建一个机器人
-        robotRestService.initDefaultRobot(orgUid, robotUid);
+        robotRestService.createDefaultRobot(orgUid, robotUid);
         // 
         robotRestService.initRobotJson(LevelEnum.ORGANIZATION.name(), orgUid);
     }

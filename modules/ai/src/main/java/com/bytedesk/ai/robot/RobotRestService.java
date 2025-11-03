@@ -41,6 +41,7 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.llm.LlmProviderConfigDefault;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -138,7 +139,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setOrgUid(request.getOrgUid());
         // robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
         // robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
-        //
+
         // 设置配置：若传入 settingsUid 则按 uid 关联，否则使用组织默认配置
         try {
             if (StringUtils.hasText(request.getSettingsUid())) {
@@ -160,11 +161,43 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
 
-        // LLM 配置已迁移至 RobotSettings，不再从 RobotRequest 中设置
-        // Set common settings
-        // TODO: Settings should be managed through RobotSettingsEntity, not directly in
-        // RobotRequest
-        // setRobotSettings(robot, request);
+        // LLM 配置
+        // 设置llm相关属性
+        if (request.getLlm() != null) {
+            RobotLlm llm = request.getLlm();
+            // Get default model config if not provided
+            LlmProviderConfigDefault modelConfig = llmProviderRestService.getLlmProviderConfigDefault();
+            
+            // Set default chat provider and model if not provided
+            if (!StringUtils.hasText(llm.getTextProvider()) || !StringUtils.hasText(llm.getTextModel())) {
+                llm.setTextProvider(llm.getTextProvider() != null ? llm.getTextProvider() : modelConfig.getDefaultChatProvider());
+                llm.setTextModel(llm.getTextModel() != null ? llm.getTextModel() : modelConfig.getDefaultChatModel());
+            }
+            
+            // Set default vision provider and model if not provided
+            // if (!StringUtils.hasText(llm.getVisionProvider()) || !StringUtils.hasText(llm.getVisionModel())) {
+            //     llm.setVisionProvider(llm.getVisionProvider() != null ? llm.getVisionProvider() : modelConfig.getDefaultVisionProvider());
+            //     llm.setVisionModel(llm.getVisionModel() != null ? llm.getVisionModel() : modelConfig.getDefaultVisionModel());
+            // }
+            
+            // Set default voice provider and model if not provided
+            if (!StringUtils.hasText(llm.getAudioProvider()) || !StringUtils.hasText(llm.getAudioModel())) {
+                llm.setAudioProvider(llm.getAudioProvider() != null ? llm.getAudioProvider() : modelConfig.getDefaultVoiceProvider());
+                llm.setAudioModel(llm.getAudioModel() != null ? llm.getAudioModel() : modelConfig.getDefaultVoiceModel());
+            }
+            
+            // Set default rerank provider and model if not provided
+            if (!StringUtils.hasText(llm.getRerankProvider()) || !StringUtils.hasText(llm.getRerankModel())) {
+                llm.setRerankProvider(llm.getRerankProvider() != null ? llm.getRerankProvider() : modelConfig.getDefaultRerankProvider());
+                llm.setRerankModel(llm.getRerankModel() != null ? llm.getRerankModel() : modelConfig.getDefaultRerankModel());
+            }
+            
+            robot.setLlm(llm);
+        } else {
+            RobotLlm robotLlm = RobotLlm.builder().build();
+            robot.setLlm(robotLlm);
+        }
+
         //
         RobotEntity updatedRobot = save(robot);
         if (updatedRobot == null) {
@@ -188,6 +221,9 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setAvatar(request.getAvatar());
         robot.setDescription(request.getDescription());
         // robot.setPublished(request.getPublished());
+        robot.setKbSourceEnabled(request.getKbSourceEnabled());
+        robot.setKbEnabled(request.getKbEnabled());
+        robot.setKbUid(request.getKbUid());
 
         // 如果传入新的 settingsUid，则更新关联的配置
         if (StringUtils.hasText(request.getSettingsUid())) {
@@ -208,12 +244,11 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             }
         }
 
-        // LLM 配置已迁移至 RobotSettings，不再从 RobotRequest 中设置
-        //
-        // Set common settings
-        // TODO: Settings should be managed through RobotSettingsEntity, not directly in
-        // RobotRequest
-        // setRobotSettings(robot, request);
+        // 设置llm相关属性
+        if (request.getLlm() != null) {
+            robot.setLlm(request.getLlm());
+        }
+
         //
         RobotEntity updateRobot = save(robot);
         if (updateRobot == null) {
@@ -384,15 +419,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         return modelMapper.map(entity, RobotResponse.class);
     }
 
-    // 初始化
-    public void initDefaultRobot(String orgUid, String uid) {
-        // 为每个组织创建一个机器人
-        createDefaultRobot(orgUid, uid);
-        // 为每个组织创建一个空白智能体，已经在 initRobotJson 中创建
-        // createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid,
-        // RobotConsts.ROBOT_NAME_VOID_AGENT));
-    }
-
     // 创建一个机器人
     @Transactional
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
@@ -409,22 +435,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 .orgUid(orgUid)
                 .build();
         //
-        // TODO: Service settings should be managed through RobotSettingsEntity
-        // robotRequest.getServiceSettings().setShowFaqs(true);
-        // robotRequest.getServiceSettings().setShowQuickFaqs(true);
-        // robotRequest.getServiceSettings().setShowGuessFaqs(true);
-        // robotRequest.getServiceSettings().setShowHotFaqs(true);
-        // robotRequest.getServiceSettings().setShowShortcutFaqs(true);
-        //
-        // 写入 faq uid 到 welcomeFaqUids
-        // if (orgUid.equals(BytedeskConsts.DEFAULT_ORGANIZATION_UID)) {
-        // // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
-        // for (int i = 1; i <= 5; i++) {
-        // String faqUid = Utils.formatUid(orgUid, "faq_00" + i);
-        // robotRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
-        // }
-        // }
-        //
         return create(robotRequest);
     }
 
@@ -437,6 +447,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
         // 使用组织默认 Settings（若不存在则创建）并绑定
         RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
+        // 
         RobotEntity robot = RobotEntity.builder()
                 .uid(robotUid)
                 .name(RobotConsts.ROBOT_NAME_VOID_AGENT)
@@ -495,26 +506,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
                 // Use organization default settings (ignore per-robot custom prompt)
                 RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
-                // Create or reuse published LLM settings and ensure uid is assigned
-                // RobotLlmEntity llmSettings = persistedSettings.getLlm() != null
-                //         ? persistedSettings.getLlm()
-                //         : RobotLlmEntity.builder().uid(uidUtils.getUid()).build();
-                // if (llmSettings.getUid() == null || llmSettings.getUid().isEmpty()) {
-                //     llmSettings.setUid(uidUtils.getUid());
-                // }
-                // llmSettings.setPrompt(localeData.getPrompt());
-                // persistedSettings.setLlm(llmSettings);
-                // // Create or reuse draft LLM settings and ensure uid is assigned
-                // RobotLlmEntity draftLlmSettings = persistedSettings.getDraftLlm() != null
-                //         ? persistedSettings.getDraftLlm()
-                //         : RobotLlmEntity.builder().uid(uidUtils.getUid()).build();
-                // if (draftLlmSettings.getUid() == null || draftLlmSettings.getUid().isEmpty()) {
-                //     draftLlmSettings.setUid(uidUtils.getUid());
-                // }
-                // draftLlmSettings.setPrompt(localeData.getPrompt());
-                // persistedSettings.setDraftLlm(draftLlmSettings);
-                // // Persist settings with valid nested LLM entities
-                // robotSettingsRestService.save(persistedSettings);
 
                 // Create robot entity
                 RobotEntity robot = RobotEntity.builder()
@@ -589,46 +580,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         return convertToResponse(robotOptional.get());
     }
 
-    // public void initDemoBytedesk() {
-    // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    // // 首先redis中是否已经初始化此数据，如果没有，继续执行演示数据初始化
-    // String isInit =
-    // stringRedisTemplate.opsForValue().get(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY);
-
-    // if (isInit == null) {
-    // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
-    // // 默认使用演示文档内容，填充且只填充超级管理员演示机器人
-    // List<FileContent> files = springAIBytedeskService.getAllFiles();
-    // // 计数器
-    // final int[] count = { 0 };
-    // final int MAX_CALLS = 1;
-
-    // // 写入到redis vector 中
-    // for (FileContent file : files) {
-    // // springAIVectorService.ifPresent(service -> {
-    // // // service.readTextDemo(file.getFilename(), file.getContent(), kbUid,
-    // orgUid);
-    // // });
-    // // 只在前两次调用zhipuaiChatService
-    // if (count[0] < MAX_CALLS) {
-    // // springAIZhipuaiChatService.ifPresent(service -> {
-    // // String qaPairs = service.generateFaqPairsAsync(file.getContent());
-    // // log.info("zhipuaiChatService generateFaqPairsAsync qaPairs {}", qaPairs);
-    // // faqRestService.saveFaqPairs(qaPairs, kbUid, orgUid, "");
-    // // count[0]++;
-    // // });
-    // }
-    // }
-    // // 设置redis key 为已初始化
-    // stringRedisTemplate.opsForValue().set(RobotConsts.ROBOT_INIT_DEMO_BYTEDESK_KEY,
-    // "true");
-    // // 删除 redis key
-    // // redisTemplate.delete(RobotConsts.ROBOT_INIT_DEMO_KEY);
-    // } else {
-    // log.info("initDemoBytedesk already initialized");
-    // }
-    // }
-
     @Override
     public RobotExcel convertToExcel(RobotEntity entity) {
         RobotExcel robotExcel = modelMapper.map(entity, RobotExcel.class);
@@ -649,18 +600,18 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setType(RobotTypeEnum.LLM.name());
         robot.setAvatar(AvatarConsts.getDefaultRobotAvatar());
         robot.setOrgUid(orgUid);
-        // 知识库关联迁移到 RobotSettings，此处不再设置
-        // TODO: Settings should be managed through RobotSettingsEntity
-        // 设置默认的服务设置
-        // ServiceSettings serviceSettings = ServiceSettings.builder()
-        // .showFaqs(true)
-        // .showQuickFaqs(true)
-        // .showGuessFaqs(true)
-        // .showHotFaqs(true)
-        // .showShortcutFaqs(true)
-        // .build();
-        // robot.setServiceSettings(serviceSettings);
+
         return robot;
     }
+
+
+    // 初始化
+    // public void initDefaultRobot(String orgUid, String uid) {
+    //     // 为每个组织创建一个机器人
+    //     createDefaultRobot(orgUid, uid);
+    //     // 为每个组织创建一个空白智能体，已经在 initRobotJson 中创建
+    //     // createDefaultPromptRobot(orgUid, Utils.formatUid(orgUid,
+    //     // RobotConsts.ROBOT_NAME_VOID_AGENT));
+    // }
 
 }
