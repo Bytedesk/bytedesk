@@ -133,6 +133,11 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         } else {
             robot.setUid(uidUtils.getUid());
         }
+        if (StringUtils.hasText(request.getAvatar())) {
+            robot.setAvatar(request.getAvatar());
+        } else {
+            robot.setAvatar(AvatarConsts.getDefaultRobotAvatar());
+        }
         robot.setName(request.getName());
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
