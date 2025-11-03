@@ -28,7 +28,9 @@ import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class WorkgroupSettingsRestService
@@ -200,13 +202,17 @@ public class WorkgroupSettingsRestService
         if (request.getRobotRoutingSettings() != null) {
             RobotRoutingSettingsEntity draft = entity.getDraftRobotSettings();
             if (draft == null) {
-                draft = convertRobotRoutingSettingsRequestToEntity(request.getRobotRoutingSettings());
+                draft = RobotRoutingSettingsEntity.fromRequest(request.getRobotRoutingSettings());
                 if (draft != null && draft.getUid() == null) {
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftRobotSettings(draft);
             } else {
                 String originalUid = draft.getUid();
+                log.info("defaultRobot {}, offlineRobot {}, nonWorktimeRobot {}", 
+                    request.getRobotRoutingSettings().getDefaultRobot(),
+                    request.getRobotRoutingSettings().getOfflineRobot(),
+                    request.getRobotRoutingSettings().getNonWorktimeRobot());
                 // 先用 mapper 覆盖简单字段
                 modelMapper.map(request.getRobotRoutingSettings(), draft);
                 // 再根据 robotUid 解析为 RobotEntity 进行关联
@@ -470,18 +476,6 @@ public class WorkgroupSettingsRestService
         }
     }
 
-    // RobotRoutingSettings 转换方法 (TODO: 将来可以迁移到静态工厂方法)
-    private RobotRoutingSettingsEntity convertRobotRoutingSettingsRequestToEntity(RobotRoutingSettingsRequest request) {
-        if (request == null) {
-            return RobotRoutingSettingsEntity.builder().build();
-        }
-        // 使用 ModelMapper 简化转换
-        RobotRoutingSettingsEntity entity = modelMapper.map(request, RobotRoutingSettingsEntity.class);
-        // 将 robotUid 解析为 RobotEntity 并设置
-        applyRobotUidToEntity(request, entity);
-        return entity;
-    }
-
     /**
      * 根据请求中的 robotUid 解析并设置到目标实体上；若为空则清空关联。
      */
@@ -502,7 +496,29 @@ public class WorkgroupSettingsRestService
 
     @Override
     public WorkgroupSettingsResponse convertToResponse(WorkgroupSettingsEntity entity) {
-        return modelMapper.map(entity, WorkgroupSettingsResponse.class);
+        // 注意：Entity 与 Response 的字段命名不一致：
+        // - Entity: robotSettings / draftRobotSettings
+        // - Response: robotRoutingSettings / draftRobotRoutingSettings
+        // 直接使用 ModelMapper 会导致这两个字段为 null，这里手动补齐映射。
+        WorkgroupSettingsResponse resp = modelMapper.map(entity, WorkgroupSettingsResponse.class);
+
+        // 机器人路由（发布）
+        if (entity.getRobotSettings() != null) {
+            resp.setRobotRoutingSettings(modelMapper.map(entity.getRobotSettings(),
+                    com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse.class));
+        } else {
+            resp.setRobotRoutingSettings(null);
+        }
+
+        // 机器人路由（草稿）
+        if (entity.getDraftRobotSettings() != null) {
+            resp.setDraftRobotRoutingSettings(modelMapper.map(entity.getDraftRobotSettings(),
+                    com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse.class));
+        } else {
+            resp.setDraftRobotRoutingSettings(null);
+        }
+
+        return resp;
     }
 
     /**

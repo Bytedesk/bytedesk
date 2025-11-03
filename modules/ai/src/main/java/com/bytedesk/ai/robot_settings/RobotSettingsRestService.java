@@ -284,12 +284,13 @@ public class RobotSettingsRestService
      */
     @Transactional
     public RobotSettingsEntity getOrCreateDefault(String orgUid) {
+        // 不使用公用，每次都创建新的配置
         // 加锁读取，防止并发创建多个默认
-        Optional<RobotSettingsEntity> defaultSettings = robotSettingsRepository.findDefaultForUpdate(orgUid);
-        if (defaultSettings.isPresent()) {
-            return defaultSettings.get();
-        }
-
+        // Optional<RobotSettingsEntity> defaultSettings = robotSettingsRepository.findDefaultForUpdate(orgUid);
+        // if (defaultSettings.isPresent()) {
+        //     return defaultSettings.get();
+        // }
+        // 
         // Create default settings
         RobotSettingsEntity settings = RobotSettingsEntity.builder()
                 .uid(uidUtils.getUid())
