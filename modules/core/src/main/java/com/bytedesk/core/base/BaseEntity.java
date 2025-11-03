@@ -104,10 +104,13 @@ public abstract class BaseEntity implements Serializable {
 
     private String userUid;
 
+    // "level" 在部分数据库（如 Kingbase/Oracle 兼容方言）中为保留关键字，避免直接作为列名
     @Builder.Default
+    @Column(name = "level_type")
     private String level = LevelEnum.ORGANIZATION.name();
 
     @Builder.Default
+    @Column(name = "platform_type")
     private String platform = PlatformEnum.BYTEDESK.name();
 
     public String getCreatedAtString() {

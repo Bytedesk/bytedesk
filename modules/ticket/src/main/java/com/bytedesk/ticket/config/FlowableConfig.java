@@ -13,57 +13,87 @@
  */
 package com.bytedesk.ticket.config;
 
+import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
+import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
+import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Description;
+import org.springframework.util.StringUtils;
 
+/**
+ * Force Flowable to use the PostgreSQL databaseType for KingbaseES.
+ * Kingbase is PostgreSQL-compatible, but Flowable can't detect it from
+ * the product name "KingbaseES". Setting databaseType to "postgres"
+ * avoids the startup failure.
+ */
 @Configuration
-@Description("Flowable Workflow Configuration - Flowable BPMN workflow engine configuration for ticket processing")
 public class FlowableConfig {
 
-    // @Autowired
-    // private RepositoryService repositoryService;
-    
-    // @Autowired
-    // private TicketProcessInstanceListener processInstanceListener;
-    
-    // @Autowired
-    // private RuntimeService runtimeService;
-    
-    // @PostConstruct
-    // public void init() {
-    //     runtimeService.addEventListener(processInstanceListener);
-    // }
-    
-    @Bean
-    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> engineConfigurationConfigurer() {
-        return engineConfiguration -> {
-            engineConfiguration.setEnableProcessDefinitionInfoCache(true);
-            engineConfiguration.setDatabaseSchemaUpdate("true");
-        };
+    /**
+     * Make database type configurable via application properties.
+     * Examples:
+     * - flowable.database-type=postgres   (for Kingbase/PostgreSQL)
+     * - flowable.database-type=mysql      (for MySQL)
+     * If not set, Flowable will try to auto-detect. For Kingbase please set to postgres.
+     */
+    @Value("${flowable.database-type:}")
+    private String configuredDbType;
+
+    private String normalizeDbType(String dbType) {
+        if (!StringUtils.hasText(dbType)) {
+            return null;
+        }
+        String v = dbType.trim().toLowerCase();
+        // Normalize common aliases
+        if (v.equals("postgresql") || v.equals("pg")) {
+            return "postgres";
+        }
+        if (v.startsWith("kingbase")) { // kingbase / kingbasees -> postgres
+            return "postgres";
+        }
+        return v; // mysql, oracle, mssql, db2, h2, etc.
     }
 
-    // @PostConstruct
-    // public void deployProcessDefinitions() {
-    //     // 部署流程定义和规则文件
-    //     repositoryService.createDeployment()
-    //         .addClasspathResource("processes/agent-ticket-process.bpmn20.xml")
-    //         .addClasspathResource("processes/group-ticket-process.bpmn20.xml")
-    //         .addClasspathResource("dmn/ticket-priority-rules.dmn")  // 添加规则文件
-    //         .deploy();
-    // }
-    
-    // 可选：实现多租户数据源
-    // private MultiTenantDataSource createMultiTenantDataSource() {
-    //     // 实现多租户数据源逻辑
-    //     return new MultiTenantDataSource() {
-    //         @Override
-    //         public DataSource getDataSource(String tenantId) {
-    //             // 根据tenantId返回对应的数据源
-    //             return null;
-    //         }
-    //     };
-    // }
-} 
+    private void applyDbType(org.flowable.common.engine.impl.AbstractEngineConfiguration configuration) {
+        String normalized = normalizeDbType(configuredDbType);
+        if (StringUtils.hasText(normalized)) {
+            configuration.setDatabaseType(normalized);
+        }
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> processEngineConfigurer() {
+        // engineConfiguration.setEnableProcessDefinitionInfoCache(true);
+        return configuration -> applyDbType(configuration);
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringDmnEngineConfiguration> dmnEngineConfigurer() {
+        return configuration -> applyDbType(configuration);
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringCmmnEngineConfiguration> cmmnEngineConfigurer() {
+        return configuration -> applyDbType(configuration);
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringAppEngineConfiguration> appEngineConfigurer() {
+        return configuration -> applyDbType(configuration);
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringIdmEngineConfiguration> idmEngineConfigurer() {
+        return configuration -> applyDbType(configuration);
+    }
+
+    @Bean
+    public EngineConfigurationConfigurer<SpringEventRegistryEngineConfiguration> eventRegistryEngineConfigurer() {
+        return configuration -> applyDbType(configuration);
+    }
+}

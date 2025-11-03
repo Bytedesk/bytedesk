@@ -102,11 +102,14 @@ public abstract class BaseEntityNoOrg implements Serializable {
 
     private String userUid;
 
+    // "level" 在部分数据库中为保留关键字，统一映射为 level_type
     @Builder.Default
+    @Column(name = "level_type")
     private String level = LevelEnum.ORGANIZATION.name();
 
     // 默认bytedesk平台
     @Builder.Default
+    @Column(name = "platform_type")
     private String platform = PlatformEnum.BYTEDESK.name();
 
     public String getCreatedAtString() {
