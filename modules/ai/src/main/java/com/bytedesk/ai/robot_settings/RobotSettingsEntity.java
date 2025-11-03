@@ -14,9 +14,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -65,40 +63,40 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 是否显示答案匹配知识库来源
-     */
-    @Builder.Default
-    @Column(name = "is_kb_source_enabled")
-    private Boolean kbSourceEnabled = true;
-
+    // /**
+    //  * 是否显示答案匹配知识库来源
+    //  */
     // @Builder.Default
-    // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+    // @Column(name = "is_kb_source_enabled")
+    // private Boolean kbSourceEnabled = true;
 
-    /**
-     * 是否启用知识库问答
-     */
-    @Builder.Default
-    @Column(name = "is_kb_enabled")
-    private Boolean kbEnabled = false;
+    // // @Builder.Default
+    // // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
 
-    /**
-     * 关联的知识库UID
-     */
-    @Column(name = "kb_uid")
-    private String kbUid;
+    // /**
+    //  * 是否启用知识库问答
+    //  */
+    // @Builder.Default
+    // @Column(name = "is_kb_enabled")
+    // private Boolean kbEnabled = false;
 
-    /**
-     * LLM 配置（已从 RobotEntity 迁移到 Settings）
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    private RobotLlmEntity llm;
+    // /**
+    //  * 关联的知识库UID
+    //  */
+    // @Column(name = "kb_uid")
+    // private String kbUid;
 
-    /**
-     * 草稿版 LLM 配置（发布时覆盖线上）
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    private RobotLlmEntity draftLlm;
+    // /**
+    //  * LLM 配置（已从 RobotEntity 迁移到 Settings）
+    //  */
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    // private RobotLlmEntity llm;
+
+    // /**
+    //  * 草稿版 LLM 配置（发布时覆盖线上）
+    //  */
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    // private RobotLlmEntity draftLlm;
 
     /**
      * Rating down settings

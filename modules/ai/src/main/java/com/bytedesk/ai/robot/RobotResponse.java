@@ -51,10 +51,30 @@ public class RobotResponse extends BaseResponse {
 
     // private InviteSettings inviteSettings;
 
-    private String defaultReply;
+    // private String defaultReply;
 
     // 机器人分类
     private String categoryUid;
+
+    /**
+     * Whether KB source is enabled
+     */
+    private Boolean kbSourceEnabled;
+
+    /**
+     * Whether knowledge base is enabled
+     */
+    private Boolean kbEnabled;
+
+    /**
+     * Associated knowledge base UID
+     */
+    private String kbUid;
+
+    /**
+     * Embedded LLM configuration for the robot
+     */
+    private RobotLlm llm;
 
     // private Boolean published;
 

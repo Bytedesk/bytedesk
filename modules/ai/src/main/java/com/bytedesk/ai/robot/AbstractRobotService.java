@@ -67,8 +67,8 @@ public abstract class AbstractRobotService {
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
         if (robotOptional.isPresent()) {
             String provider;
-            if (robotOptional.get().getSettings() != null && robotOptional.get().getSettings().getLlm() != null) {
-                provider = robotOptional.get().getSettings().getLlm().getTextProvider();
+            if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
+                provider = robotOptional.get().getLlm().getTextProvider();
             } else {
                 throw new RuntimeException(errorMessage);
             }
@@ -98,8 +98,8 @@ public abstract class AbstractRobotService {
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
         if (robotOptional.isPresent()) {
             String provider;
-            if (robotOptional.get().getSettings() != null && robotOptional.get().getSettings().getLlm() != null) {
-                provider = robotOptional.get().getSettings().getLlm().getTextProvider();
+            if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
+                provider = robotOptional.get().getLlm().getTextProvider();
             } else {
                 throw new RuntimeException(errorMessage);
             }

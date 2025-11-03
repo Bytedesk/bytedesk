@@ -83,12 +83,12 @@ public class RobotSettingsRestService
         entity.setDraftRateDownSettings(rd);
 
         // LLM: 统一使用 fromRequest（其内部已对 null 做处理），同时初始化发布与草稿
-        RobotLlmEntity llm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
-        llm.setUid(uidUtils.getUid());
-        entity.setLlm(llm);
-        RobotLlmEntity draftLlm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
-        draftLlm.setUid(uidUtils.getUid());
-        entity.setDraftLlm(draftLlm);
+        // RobotLlmEntity llm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
+        // llm.setUid(uidUtils.getUid());
+        // entity.setLlm(llm);
+        // RobotLlmEntity draftLlm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
+        // draftLlm.setUid(uidUtils.getUid());
+        // entity.setDraftLlm(draftLlm);
 
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
@@ -201,27 +201,27 @@ public class RobotSettingsRestService
         }
 
         // 更新 LLM(仅更新草稿;发布时再覆盖线上)
-        if (request.getLlm() != null) {
-            RobotLlmEntity draft = entity.getDraftLlm();
-            if (draft == null) {
-                draft = new RobotLlmEntity();
-                entity.setDraftLlm(draft);
-            }
-            // 保存原有uid及实体id，避免被 modelMapper 覆盖
-            String originalUid = draft.getUid();
-            Long originalId = draft.getId();
-            modelMapper.map(request.getLlm(), draft);
-            // 恢复或设置 uid
-            if (originalUid != null) {
-                draft.setUid(originalUid);
-            } else {
-                draft.setUid(uidUtils.getUid());
-            }
-            if (originalId != null) {
-                draft.setId(originalId);
-            }
-            entity.setHasUnpublishedChanges(true);
-        }
+        // if (request.getLlm() != null) {
+        //     RobotLlmEntity draft = entity.getDraftLlm();
+        //     if (draft == null) {
+        //         draft = new RobotLlmEntity();
+        //         entity.setDraftLlm(draft);
+        //     }
+        //     // 保存原有uid及实体id，避免被 modelMapper 覆盖
+        //     String originalUid = draft.getUid();
+        //     Long originalId = draft.getId();
+        //     modelMapper.map(request.getLlm(), draft);
+        //     // 恢复或设置 uid
+        //     if (originalUid != null) {
+        //         draft.setUid(originalUid);
+        //     } else {
+        //         draft.setUid(uidUtils.getUid());
+        //     }
+        //     if (originalId != null) {
+        //         draft.setId(originalId);
+        //     }
+        //     entity.setHasUnpublishedChanges(true);
+        // }
 
         // 若本次更新将其设为默认，需取消同 org 其他默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
@@ -284,12 +284,11 @@ public class RobotSettingsRestService
      */
     @Transactional
     public RobotSettingsEntity getOrCreateDefault(String orgUid) {
-        // 不使用公用，每次都创建新的配置
         // 加锁读取，防止并发创建多个默认
-        // Optional<RobotSettingsEntity> defaultSettings = robotSettingsRepository.findDefaultForUpdate(orgUid);
-        // if (defaultSettings.isPresent()) {
-        //     return defaultSettings.get();
-        // }
+        Optional<RobotSettingsEntity> defaultSettings = robotSettingsRepository.findDefaultForUpdate(orgUid);
+        if (defaultSettings.isPresent()) {
+            return defaultSettings.get();
+        }
         // 
         // Create default settings
         RobotSettingsEntity settings = RobotSettingsEntity.builder()
@@ -335,16 +334,16 @@ public class RobotSettingsRestService
         settings.setDraftRateDownSettings(rd);
 
         // LLM settings（发布 + 草稿）
-        RobotLlmEntity llm = RobotLlmEntity.fromRequest(null, modelMapper);
-        llm.setUid(uidUtils.getUid());
-        settings.setLlm(llm);
-        RobotLlmEntity draftLlm = RobotLlmEntity.fromRequest(null, modelMapper);
-        draftLlm.setUid(uidUtils.getUid());
-        settings.setDraftLlm(draftLlm);
+        // RobotLlmEntity llm = RobotLlmEntity.fromRequest(null, modelMapper);
+        // llm.setUid(uidUtils.getUid());
+        // settings.setLlm(llm);
+        // RobotLlmEntity draftLlm = RobotLlmEntity.fromRequest(null, modelMapper);
+        // draftLlm.setUid(uidUtils.getUid());
+        // settings.setDraftLlm(draftLlm);
 
-        // 默认：关闭知识库，空 LLM 配置
-        settings.setKbEnabled(false);
-        settings.setKbUid(null);
+        // // 默认：关闭知识库，空 LLM 配置
+        // settings.setKbEnabled(false);
+        // settings.setKbUid(null);
 
         // 刚创建的即为默认，确保同 org 唯一
         ensureSingleDefault(orgUid, settings);
@@ -376,17 +375,17 @@ public class RobotSettingsRestService
             }
         }
         
-        if (entity.getDraftLlm() != null) {
-            RobotLlmEntity published = entity.getLlm();
-            if (published != null) {
-                copyPropertiesExcludingIds(entity.getDraftLlm(), published);
-            } else {
-                RobotLlmEntity newPublished = new RobotLlmEntity();
-                copyPropertiesExcludingIds(entity.getDraftLlm(), newPublished);
-                newPublished.setUid(uidUtils.getUid());
-                entity.setLlm(newPublished);
-            }
-        }
+        // if (entity.getDraftLlm() != null) {
+        //     RobotLlmEntity published = entity.getLlm();
+        //     if (published != null) {
+        //         copyPropertiesExcludingIds(entity.getDraftLlm(), published);
+        //     } else {
+        //         RobotLlmEntity newPublished = new RobotLlmEntity();
+        //         copyPropertiesExcludingIds(entity.getDraftLlm(), newPublished);
+        //         newPublished.setUid(uidUtils.getUid());
+        //         entity.setLlm(newPublished);
+        //     }
+        // }
         
         if (entity.getDraftRateDownSettings() != null) {
             RatedownSettingsEntity published = entity.getRateDownSettings();

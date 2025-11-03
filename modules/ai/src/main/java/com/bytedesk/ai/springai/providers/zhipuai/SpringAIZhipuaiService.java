@@ -29,7 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -65,7 +65,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private ZhiPuAiChatOptions createZhipuaiOptions(RobotLlmResponse llm) {
+    private ZhiPuAiChatOptions createZhipuaiOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -93,7 +93,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的ZhiPuAiChatModel
      */
-    private ZhiPuAiChatModel createZhipuaiChatModel(RobotLlmResponse llm) {
+    private ZhiPuAiChatModel createZhipuaiChatModel(RobotLlm llm) {
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
@@ -114,7 +114,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         if (llm == null) {
             log.info("Zhipuai API not available");
             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -184,7 +184,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
         
         
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
 
         if (llm == null) {
             log.info("Zhipuai API not available");
@@ -238,7 +238,7 @@ public class SpringAIZhipuaiService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
 
     if (llm == null) {
         log.info("Zhipuai API not available");

@@ -33,14 +33,14 @@ public class RobotSettingsRequest extends BaseSettingsRequest {
 
     private static final long serialVersionUID = 1L;
 
-    private Boolean kbSourceEnabled;
+    // private Boolean kbSourceEnabled;
 
-    // 从 RobotEntity 迁移
-    private Boolean kbEnabled;
-    private String kbUid;
+    // // 从 RobotEntity 迁移
+    // private Boolean kbEnabled;
+    // private String kbUid;
 
     // LLM 配置（实体引用通过 uid 关联或内联创建）
-    private RobotLlmRequest llm;
+    // private RobotLlmRequest llm;
 
     /**
      * Rating down settings (Robot-specific)

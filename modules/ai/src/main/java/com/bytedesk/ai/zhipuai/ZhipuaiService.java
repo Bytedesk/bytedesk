@@ -30,7 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -83,7 +83,7 @@ public class ZhipuaiService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定参数的ClientV4
      */
-    private ClientV4 createDynamicClient(RobotLlmResponse llm) {
+    private ClientV4 createDynamicClient(RobotLlm llm) {
         if (llm == null || llm.getTextProviderUid() == null) {
             log.warn("RobotLlm or textProviderUid is null, using default client");
             return defaultClient;
@@ -119,7 +119,7 @@ public class ZhipuaiService extends BaseSpringAIService {
     /**
      * 根据机器人配置创建动态的聊天选项
      */
-    private ChatCompletionRequest createDynamicRequest(RobotLlmResponse llm, String message, boolean stream) {
+    private ChatCompletionRequest createDynamicRequest(RobotLlm llm, String message, boolean stream) {
         if (llm == null || llm.getTextModel() == null) {
             log.warn("RobotLlm or textModel is null, using default model");
             throw new IllegalArgumentException("RobotLlm or textModel cannot be null");
@@ -151,7 +151,7 @@ public class ZhipuaiService extends BaseSpringAIService {
     /**
      * 根据机器人配置创建动态的聊天选项（支持完整的Prompt对象）
      */
-    private ChatCompletionRequest createDynamicRequestFromPrompt(RobotLlmResponse llm, Prompt prompt, boolean stream) {
+    private ChatCompletionRequest createDynamicRequestFromPrompt(RobotLlm llm, Prompt prompt, boolean stream) {
         List<ChatMessage> messages = new ArrayList<>();
 
         // 将Spring AI的Message转换为智谱AI的ChatMessage
@@ -203,7 +203,7 @@ public class ZhipuaiService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API websocket prompt: {}", prompt);
 
         long startTime = System.currentTimeMillis();
@@ -356,7 +356,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             return "Error: Robot or RobotLlm is not configured";
         }
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         //
         long startTime = System.currentTimeMillis();
         boolean success = false;
@@ -419,7 +419,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             return;
         }
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API SSE prompt: {}", prompt);
 
         // 发送起始消息

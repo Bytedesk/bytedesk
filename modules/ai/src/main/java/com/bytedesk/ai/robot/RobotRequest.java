@@ -47,6 +47,8 @@ public class RobotRequest extends BaseRequest {
 
     private String description;
 
+    // type 字段已在 BaseRequest 中定义，这里不再重复定义
+
     /**
      * Robot settings reference UID
      * If not provided, will use the default settings
@@ -64,6 +66,26 @@ public class RobotRequest extends BaseRequest {
 
     // 机器人分类
     private String categoryUid;
+
+    /**
+     * Whether KB source is enabled
+     */
+    private Boolean kbSourceEnabled;
+
+    /**
+     * Whether knowledge base is enabled
+     */
+    private Boolean kbEnabled;
+
+    /**
+     * Associated knowledge base UID
+     */
+    private String kbUid;
+
+    /**
+     * Embedded LLM configuration for the robot
+     */
+    private RobotLlm llm;
 
     // kbEnabled/kbUid 已迁移到 RobotSettings
 

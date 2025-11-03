@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.core.constant.I18Consts;
@@ -59,7 +59,7 @@ public class SpringAIVolcengineChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlmResponse llm) {
+    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -79,7 +79,7 @@ public class SpringAIVolcengineChatService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         
         if (volcengineChatModel == null) {
             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -183,7 +183,7 @@ public class SpringAIVolcengineChatService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
 
         if (volcengineChatModel == null) {
             sseMessageHelper.handleSseError(new RuntimeException("Volcengine service not available"), messageProtobufQuery, messageProtobufReply, emitter);

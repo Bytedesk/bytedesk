@@ -30,7 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -75,7 +75,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlmResponse llm) {
+    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -97,7 +97,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的OpenAiChatModel
      */
-    private OpenAiChatModel createOpenrouterChatModel(RobotLlmResponse llm) {
+    private OpenAiChatModel createOpenrouterChatModel(RobotLlm llm) {
 
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isEmpty()) {
@@ -136,7 +136,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply) {
         log.info("SpringAIOpenrouterService processPromptWebsocket with full prompt content");
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         
         // 创建动态chatModel
         OpenAiChatModel chatModel = createOpenrouterChatModel(llm);
@@ -239,7 +239,7 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         log.info("SpringAIOpenrouterService processPromptSse with full prompt content");
         // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
 
         // 创建动态chatModel
         OpenAiChatModel chatModel = createOpenrouterChatModel(llm);

@@ -30,7 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -81,7 +81,7 @@ public class SpringAICustomService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlmResponse llm) {
+    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -117,7 +117,7 @@ public class SpringAICustomService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的OpenAiChatModel
      */
-    private OpenAiChatModel createChatModel(RobotLlmResponse llm) {
+    private OpenAiChatModel createChatModel(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextProviderUid())) {
             log.warn("RobotLlm is null or textProviderUid is empty");
             return defaultChatModel;
@@ -156,7 +156,7 @@ public class SpringAICustomService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置和提供商信息
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
         log.info("{} API websocket", providerName);
         
@@ -248,7 +248,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         
         // 从robot中获取llm配置和提供商信息
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
         log.info("{} API sync: {}", providerName);
 
@@ -304,7 +304,7 @@ public class SpringAICustomService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置和提供商信息
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
         log.info("{} API SSE: {}", providerName);
 
@@ -463,7 +463,7 @@ public class SpringAICustomService extends BaseSpringAIService {
     /**
      * 根据LLM配置获取提供商名称（用于日志）
      */
-    private String getProviderType(RobotLlmResponse llm) {
+    private String getProviderType(RobotLlm llm) {
         if (llm == null) {
             return "Unknown";
         }
@@ -479,7 +479,7 @@ public class SpringAICustomService extends BaseSpringAIService {
     /**
      * 根据LLM配置获取提供商常量（用于统计）
      */
-    private String getProviderConstant(RobotLlmResponse llm) {
+    private String getProviderConstant(RobotLlm llm) {
         if (llm == null) {
             return LlmProviderConstants.CUSTOM;
         }

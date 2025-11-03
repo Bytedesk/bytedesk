@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -76,7 +76,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private MiniMaxChatOptions createDynamicOptions(RobotLlmResponse llm) {
+    private MiniMaxChatOptions createDynamicOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -98,7 +98,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的MiniMaxChatModel
      */
-    private MiniMaxChatModel createMinimaxChatModel(RobotLlmResponse llm) {
+    private MiniMaxChatModel createMinimaxChatModel(RobotLlm llm) {
         if (llm == null || llm.getTextProviderUid() == null) {
             log.warn("RobotLlm or textProviderUid is null, using default chat model");
             return defaultChatModel;
@@ -141,7 +141,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply) {
         log.info("SpringAIMinimaxService processPromptWebsocket with full prompt content");
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         
         // 创建动态chatModel
         MiniMaxChatModel chatModel = createMinimaxChatModel(llm);
@@ -250,7 +250,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         log.info("SpringAIMinimaxService processPromptSse with full prompt content");
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
 
         // 创建动态chatModel
         MiniMaxChatModel chatModel = createMinimaxChatModel(llm);

@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.TokenUsageHelper;
@@ -63,7 +63,7 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private MiniMaxChatOptions createDynamicOptions(RobotLlmResponse llm) {
+    private MiniMaxChatOptions createDynamicOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -84,7 +84,7 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply) {
         log.info("SpringAIMinimaxService processPromptWebsocket with full prompt content");
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         
         if (minimaxChatModel == null) {
             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
@@ -189,7 +189,7 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         log.info("SpringAIMinimaxService processPromptSse with full prompt content");
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
 
         if (minimaxChatModel == null) {
             sseMessageHelper.handleSseError(new RuntimeException("Minimax service not available"), messageProtobufQuery, messageProtobufReply, emitter);

@@ -30,7 +30,6 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
-import com.bytedesk.ai.robot_settings.RobotLlmEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
@@ -490,28 +489,32 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         ? robotJson.getI18n().getZh_cn()
                         : robotJson.getI18n().getEn();
 
+                RobotLlm robotLlm = RobotLlm.builder()
+                    .prompt(localeData.getPrompt())
+                    .build();
+
                 // Use organization default settings (ignore per-robot custom prompt)
                 RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
                 // Create or reuse published LLM settings and ensure uid is assigned
-                RobotLlmEntity llmSettings = persistedSettings.getLlm() != null
-                        ? persistedSettings.getLlm()
-                        : RobotLlmEntity.builder().uid(uidUtils.getUid()).build();
-                if (llmSettings.getUid() == null || llmSettings.getUid().isEmpty()) {
-                    llmSettings.setUid(uidUtils.getUid());
-                }
-                llmSettings.setPrompt(localeData.getPrompt());
-                persistedSettings.setLlm(llmSettings);
-                // Create or reuse draft LLM settings and ensure uid is assigned
-                RobotLlmEntity draftLlmSettings = persistedSettings.getDraftLlm() != null
-                        ? persistedSettings.getDraftLlm()
-                        : RobotLlmEntity.builder().uid(uidUtils.getUid()).build();
-                if (draftLlmSettings.getUid() == null || draftLlmSettings.getUid().isEmpty()) {
-                    draftLlmSettings.setUid(uidUtils.getUid());
-                }
-                draftLlmSettings.setPrompt(localeData.getPrompt());
-                persistedSettings.setDraftLlm(draftLlmSettings);
-                // Persist settings with valid nested LLM entities
-                robotSettingsRestService.save(persistedSettings);
+                // RobotLlmEntity llmSettings = persistedSettings.getLlm() != null
+                //         ? persistedSettings.getLlm()
+                //         : RobotLlmEntity.builder().uid(uidUtils.getUid()).build();
+                // if (llmSettings.getUid() == null || llmSettings.getUid().isEmpty()) {
+                //     llmSettings.setUid(uidUtils.getUid());
+                // }
+                // llmSettings.setPrompt(localeData.getPrompt());
+                // persistedSettings.setLlm(llmSettings);
+                // // Create or reuse draft LLM settings and ensure uid is assigned
+                // RobotLlmEntity draftLlmSettings = persistedSettings.getDraftLlm() != null
+                //         ? persistedSettings.getDraftLlm()
+                //         : RobotLlmEntity.builder().uid(uidUtils.getUid()).build();
+                // if (draftLlmSettings.getUid() == null || draftLlmSettings.getUid().isEmpty()) {
+                //     draftLlmSettings.setUid(uidUtils.getUid());
+                // }
+                // draftLlmSettings.setPrompt(localeData.getPrompt());
+                // persistedSettings.setDraftLlm(draftLlmSettings);
+                // // Persist settings with valid nested LLM entities
+                // robotSettingsRestService.save(persistedSettings);
 
                 // Create robot entity
                 RobotEntity robot = RobotEntity.builder()
@@ -521,6 +524,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         .avatar(AvatarConsts.getDefaultRobotAvatar())
                         .description(localeData.getDescription())
                         .type(robotJson.getType())
+                        .llm(robotLlm)
                         .categoryUid(categoryUid)
                         .level(level)
                         .orgUid(orgUid)
@@ -629,8 +633,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     public RobotExcel convertToExcel(RobotEntity entity) {
         RobotExcel robotExcel = modelMapper.map(entity, RobotExcel.class);
         try {
-            if (entity.getSettings() != null && entity.getSettings().getLlm() != null) {
-                robotExcel.setPrompt(entity.getSettings().getLlm().getPrompt());
+            if (entity.getSettings() != null && entity.getLlm() != null) {
+                robotExcel.setPrompt(entity.getLlm().getPrompt());
             }
         } catch (Exception ignored) {
         }

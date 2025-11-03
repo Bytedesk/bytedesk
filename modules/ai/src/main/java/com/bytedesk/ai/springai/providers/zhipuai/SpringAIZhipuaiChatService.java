@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.service.BaseSpringAIService;
 import com.bytedesk.ai.springai.service.PromptHelper;
@@ -81,7 +81,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private ZhiPuAiChatOptions createDynamicOptions(RobotLlmResponse llm) {
+    private ZhiPuAiChatOptions createDynamicOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -103,7 +103,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
      * @param llm 机器人LLM配置
      * @return 配置了特定模型的ZhiPuAiChatModel
      */
-    private ZhiPuAiChatModel createDynamicChatModel(RobotLlmResponse llm) {
+    private ZhiPuAiChatModel createDynamicChatModel(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             // 如果没有指定模型或设置，使用默认配置
             return bytedeskZhipuaiChatModel;
@@ -129,7 +129,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
 
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
@@ -269,7 +269,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         // 从robot中获取llm配置
-    RobotLlmResponse llm = robot.getLlm();
+    RobotLlm llm = robot.getLlm();
         // 获取适当的模型实例
         ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
         

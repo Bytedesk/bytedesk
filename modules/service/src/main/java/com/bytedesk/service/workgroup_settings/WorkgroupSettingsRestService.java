@@ -209,10 +209,6 @@ public class WorkgroupSettingsRestService
                 entity.setDraftRobotSettings(draft);
             } else {
                 String originalUid = draft.getUid();
-                log.info("defaultRobot {}, offlineRobot {}, nonWorktimeRobot {}", 
-                    request.getRobotRoutingSettings().getDefaultRobot(),
-                    request.getRobotRoutingSettings().getOfflineRobot(),
-                    request.getRobotRoutingSettings().getNonWorktimeRobot());
                 // 先用 mapper 覆盖简单字段
                 modelMapper.map(request.getRobotRoutingSettings(), draft);
                 // 再根据 robotUid 解析为 RobotEntity 进行关联

@@ -16,7 +16,7 @@ package com.bytedesk.ai.robot;
 import java.io.Serializable;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.ai.robot_settings.RobotLlmResponse;
+// import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 
@@ -56,8 +56,8 @@ public class RobotProtobuf implements Serializable {
 
     private String kbUid; // 对应知识库
 
+    private RobotLlm llm;
     // private RobotLlm llm;
-    private RobotLlmResponse llm;
 
     public static RobotProtobuf fromJson(String user) {
         return JSON.parseObject(user, RobotProtobuf.class);

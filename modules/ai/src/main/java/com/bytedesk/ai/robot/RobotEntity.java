@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -101,6 +102,40 @@ public class RobotEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "robot_type")
     private String type = RobotTypeEnum.SERVICE.name();
+
+    @Builder.Default
+    @Column(name = "is_kb_source_enabled")
+    private Boolean kbSourceEnabled = true;
+
+    // @Builder.Default
+    // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+
+    /**
+     * 是否启用知识库问答
+     */
+    @Builder.Default
+    @Column(name = "is_kb_enabled")
+    private Boolean kbEnabled = false;
+
+    /**
+     * 关联的知识库UID
+     */
+    @Column(name = "kb_uid")
+    private String kbUid;
+
+    /**
+     * LLM configuration settings for the robot
+     */
+    @Embedded
+    @Builder.Default
+    private RobotLlm llm = new RobotLlm();
+    
+    /**
+     * LLM 配置（已从 RobotEntity 迁移到 Settings）
+     * llm每个robot不同，可以单独配置，不需要模板
+     */
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    // private RobotLlmEntity llm;
 
     // @Builder.Default
     // private Boolean published = false;
