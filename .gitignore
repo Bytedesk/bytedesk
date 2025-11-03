@@ -43,6 +43,7 @@ deploy/z*
 hs_err_pid*
 /starter/logs
 h2db/
+application-kingbase.properties
 application-prod.properties
 application-prod-pg.properties
 application-prod-mysql.properties
