@@ -30,7 +30,7 @@ import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+// import org.springframework.security.access.prepost.PreAuthorize;
 
 @Slf4j
 @RestController
@@ -87,7 +87,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize("hasAuthority('TICKET_CREATE')")
+    // @PreAuthorize("hasAuthority('TICKET_CREATE')")
     @ActionAnnotation(title = "工单", action = "新建", description = "create ticket")
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
@@ -97,7 +97,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize("hasAuthority('TICKET_UPDATE')")
+    // @PreAuthorize("hasAuthority('TICKET_UPDATE')")
     @ActionAnnotation(title = "工单", action = "更新", description = "update ticket")
     @Override
     public ResponseEntity<?> update(TicketRequest request) {
@@ -107,7 +107,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize("hasAuthority('TICKET_DELETE')")
+    // @PreAuthorize("hasAuthority('TICKET_DELETE')")
     @ActionAnnotation(title = "工单", action = "删除", description = "delete ticket")
     @Override
     public ResponseEntity<?> delete(TicketRequest request) {
@@ -129,7 +129,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @PreAuthorize("hasAuthority('TICKET_EXPORT')")
+    // @PreAuthorize("hasAuthority('TICKET_EXPORT')")
     @ActionAnnotation(title = "工单", action = "导出", description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
