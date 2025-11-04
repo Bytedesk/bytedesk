@@ -197,7 +197,7 @@ public class TicketProcessRestService
                 .list();
 
         if (!existingDeployments.isEmpty()) {
-            log.info("工单流程已存在，跳过部署: tenantId={}", orgUid);
+            // log.info("工单流程已存在，跳过部署: tenantId={}", orgUid);
             return;
         }
 
@@ -256,7 +256,7 @@ public class TicketProcessRestService
                 .list();
 
         if (!existingDeployments.isEmpty()) {
-            log.info("会话工单流程已存在，跳过部署: tenantId={}", orgUid);
+            // log.info("会话工单流程已存在，跳过部署: tenantId={}", orgUid);
             return;
         }
 

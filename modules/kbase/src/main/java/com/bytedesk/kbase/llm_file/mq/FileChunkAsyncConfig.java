@@ -58,8 +58,8 @@ public class FileChunkAsyncConfig {
         
         executor.initialize();
         
-        log.info("FileChunk异步线程池初始化完成: coreSize={}, maxSize={}, queueCapacity={}", 
-                executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
+        // log.info("FileChunk异步线程池初始化完成: coreSize={}, maxSize={}, queueCapacity={}", 
+        //         executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
         
         return executor;
     }

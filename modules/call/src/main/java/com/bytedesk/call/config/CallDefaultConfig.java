@@ -33,7 +33,7 @@ public class CallDefaultConfig {
     @Bean
     @ConditionalOnMissingBean(Client.class)
     public Client defaultEslClient() {
-        log.info("创建Call默认Client实例（未连接）");
+        // log.info("创建Call默认Client实例（未连接）");
         return new Client();
     }
 }
