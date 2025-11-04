@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[1096,8715],{81096:(i,t,n)=>{n.r(t),n.d(t,{browse:()=>a,initVisitor:()=>r});var s=n(12219),e=n(52459);async function r(i){return(0,e.A)("/visitor/api/v1/init",{method:"POST",data:{...i,client:s.Hz}})}async function a(i){return(0,e.A)("/visitor/api/v1/browse",{method:"POST",data:{...i,client:s.Hz}})}}}]);

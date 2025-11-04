@@ -4,10 +4,92 @@
         <title>Bytedesk Blog</title>
         <link>https://www.weiyuai.cn/docs/blog</link>
         <description>Bytedesk Blog</description>
-        <lastBuildDate>Fri, 20 Jun 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 23 Sep 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[微语多模态]]></title>
+            <link>https://www.weiyuai.cn/docs/blog/model_multi</link>
+            <guid>https://www.weiyuai.cn/docs/blog/model_multi</guid>
+            <pubDate>Tue, 23 Sep 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[微语系统支持多模态能力，可以理解和处理用户上传的图片、视频和音频内容，并结合知识库给出精准回答。本文档将介绍微语系统的多模态功能及其应用场景。]]></description>
+            <content:encoded><![CDATA[<p>微语系统支持多模态能力，可以理解和处理用户上传的图片、视频和音频内容，并结合知识库给出精准回答。本文档将介绍微语系统的多模态功能及其应用场景。</p>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="概述">概述<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E6%A6%82%E8%BF%B0" class="hash-link" aria-label="Direct link to 概述" title="Direct link to 概述" translate="no">​</a></h2>
+<p>多模态集成是指系统能够处理文本、图像、视频、音频等多种形式的信息输入，并将其转化为统一的知识表示，从而实现跨模态的信息理解与响应。微语系统集成了先进的多模态模型，使客服机器人能够：</p>
+<ul>
+<li>读取并理解用户上传的图片内容</li>
+<li>提取视频中的关键信息和场景</li>
+<li>转录并理解音频内容</li>
+<li>结合企业知识库，对多模态内容进行专业解答</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="视觉理解能力">视觉理解能力<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E8%A7%86%E8%A7%89%E7%90%86%E8%A7%A3%E8%83%BD%E5%8A%9B" class="hash-link" aria-label="Direct link to 视觉理解能力" title="Direct link to 视觉理解能力" translate="no">​</a></h2>
+<p>微语系统的视觉理解模块可以处理多种类型的图像内容，为用户提供智能分析和解答。</p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="图像处理场景">图像处理场景<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86%E5%9C%BA%E6%99%AF" class="hash-link" aria-label="Direct link to 图像处理场景" title="Direct link to 图像处理场景" translate="no">​</a></h3>
+<table><thead><tr><th>能力类型</th><th>具体场景</th><th>功能描述</th></tr></thead><tbody><tr><td><strong>文字识别 (OCR)</strong></td><td>纯文本图像识别</td><td>提取密集文本图片、文档截图等内容，并支持格式化输出</td></tr><tr><td></td><td>日常图像文字提取</td><td>识别菜单、路标、证件等日常拍摄图片中的文字内容</td></tr><tr><td></td><td>表格内容提取</td><td>识别图表、表格中的文字、数字等内容，并保持格式化输出</td></tr><tr><td><strong>图像问答</strong></td><td>图片描述生成</td><td>提供图片的详细或简短描述，并进行内容分类</td></tr><tr><td></td><td>图像内容问答</td><td>针对图片中的具体内容回答用户提问</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="应用场景示例">应用场景示例<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E7%A4%BA%E4%BE%8B" class="hash-link" aria-label="Direct link to 应用场景示例" title="Direct link to 应用场景示例" translate="no">​</a></h3>
+<ul>
+<li><strong>智能客服场景</strong>：用户上传产品图片，系统自动识别产品型号并提供相关信息</li>
+<li><strong>文档处理</strong>：将图像类文档解析为结构化文本，精准识别文字并提取表格信息</li>
+<li><strong>图像问答</strong>：识别图像中的人物、物体、场景等，并进行分类标记</li>
+<li><strong>数学题解答</strong>：识别并解答用户拍摄的数学题目，适用于各教育阶段</li>
+<li><strong>物体定位</strong>：在图像中准确定位特定物体，返回坐标信息</li>
+<li><strong>表单信息提取</strong>：从票据、证件、表单中提取关键信息并格式化输出</li>
+</ul>
+<p>微语系统支持多语言文字识别，包括：中文、英语、日语、韩语、阿拉伯语、越南语、法语、德语、意大利语、西班牙语、俄语和葡萄牙语。</p>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="视频理解能力">视频理解能力<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E8%A7%86%E9%A2%91%E7%90%86%E8%A7%A3%E8%83%BD%E5%8A%9B" class="hash-link" aria-label="Direct link to 视频理解能力" title="Direct link to 视频理解能力" translate="no">​</a></h2>
+<p>微语系统能够分析视频内容，提取关键信息，为用户提供更全面的服务支持。</p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="视频处理功能">视频处理功能<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E8%A7%86%E9%A2%91%E5%A4%84%E7%90%86%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="Direct link to 视频处理功能" title="Direct link to 视频处理功能" translate="no">​</a></h3>
+<ul>
+<li><strong>场景识别</strong>：自动识别视频中的关键场景和内容</li>
+<li><strong>事件定位</strong>：定位视频中的特定事件并生成时间戳</li>
+<li><strong>内容摘要</strong>：生成视频关键时间段的文字摘要</li>
+<li><strong>视频问答</strong>：针对视频内容回答用户提问</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="视频应用场景示例">视频应用场景示例<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E8%A7%86%E9%A2%91%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E7%A4%BA%E4%BE%8B" class="hash-link" aria-label="Direct link to 视频应用场景示例" title="Direct link to 视频应用场景示例" translate="no">​</a></h3>
+<ul>
+<li><strong>教学视频分析</strong>：从教学视频中提取关键知识点</li>
+<li><strong>产品演示理解</strong>：分析产品演示视频，提取操作步骤和要点</li>
+<li><strong>视频故障诊断</strong>：识别设备故障视频中的异常状况</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="音频理解能力">音频理解能力<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E9%9F%B3%E9%A2%91%E7%90%86%E8%A7%A3%E8%83%BD%E5%8A%9B" class="hash-link" aria-label="Direct link to 音频理解能力" title="Direct link to 音频理解能力" translate="no">​</a></h2>
+<p>微语系统集成了先进的音频语言模型，能够处理多种音频输入并提供智能理解和分析。</p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="音频处理功能">音频处理功能<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E9%9F%B3%E9%A2%91%E5%A4%84%E7%90%86%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="Direct link to 音频处理功能" title="Direct link to 音频处理功能" translate="no">​</a></h3>
+<ul>
+<li><strong>语音转文字</strong>：将用户语音准确转录为文本</li>
+<li><strong>音频语义理解</strong>：理解语音内容的深层含义</li>
+<li><strong>情感分析</strong>：分析语音中的情感色彩和语气</li>
+<li><strong>音频事件检测</strong>：识别特定音频事件和场景</li>
+<li><strong>多语言支持</strong>：支持多种语言的语音识别和理解</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="音频应用场景示例">音频应用场景示例<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E9%9F%B3%E9%A2%91%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E7%A4%BA%E4%BE%8B" class="hash-link" aria-label="Direct link to 音频应用场景示例" title="Direct link to 音频应用场景示例" translate="no">​</a></h3>
+<ul>
+<li><strong>客服语音交互</strong>：理解用户语音问题并给出专业回答</li>
+<li><strong>语音指令处理</strong>：执行用户通过语音发出的各类指令</li>
+<li><strong>会议记录整理</strong>：自动转录会议内容并提取关键信息</li>
+<li><strong>情感分析</strong>：分析客户语音反馈中的情感倾向</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="与知识库结合">与知识库结合<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E4%B8%8E%E7%9F%A5%E8%AF%86%E5%BA%93%E7%BB%93%E5%90%88" class="hash-link" aria-label="Direct link to 与知识库结合" title="Direct link to 与知识库结合" translate="no">​</a></h2>
+<p>微语系统的多模态能力与企业知识库深度结合，实现了更加智能的用户服务体验：</p>
+<ol>
+<li><strong>多模态输入理解</strong>：系统首先理解用户上传的图片、视频或音频内容</li>
+<li><strong>知识库联动查询</strong>：将理解的内容与企业知识库进行关联查询</li>
+<li><strong>专业解答生成</strong>：结合多模态理解与知识库信息，生成专业、准确的回答</li>
+</ol>
+<p>这种结合使客服系统能够：</p>
+<ul>
+<li>对用户上传的产品照片进行型号识别并提供相应的使用指南</li>
+<li>分析用户提交的故障视频并给出针对性的解决方案</li>
+<li>理解用户的语音描述并匹配知识库中的相关信息</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="总结">总结<a href="https://www.weiyuai.cn/docs/blog/model_multi#%E6%80%BB%E7%BB%93" class="hash-link" aria-label="Direct link to 总结" title="Direct link to 总结" translate="no">​</a></h2>
+<p>微语系统的多模态集成能力大大拓展了智能客服的服务边界，使系统能够处理更加丰富的用户输入形式，提供更加全面、精准的服务。通过结合企业知识库，微语系统不仅能够"看懂"和"听懂"用户问题，还能给出专业的解答，真正实现智能化的客户服务体验。</p>]]></content:encoded>
+            <category>Developer</category>
+            <category>Bytedesk</category>
+            <category>AI</category>
+            <category>Qwen3</category>
+            <category>LLM</category>
+        </item>
         <item>
             <title><![CDATA[MCP在微语系统中的应用]]></title>
             <link>https://www.weiyuai.cn/docs/blog/mcp</link>
@@ -43,7 +125,7 @@
             <pubDate>Wed, 30 Apr 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[在本篇博客中，我们将介绍如何将微语客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。]]></description>
             <content:encoded><![CDATA[<p>在本篇博客中，我们将介绍如何将微语客服系统对接通义千问Qwen3大模型，使您的客服系统拥有强大的AI能力。通过这个集成，您可以为用户提供更智能、更高效的自动化客服体验。</p>
-<h2 class="anchor anchorWithStickyNavbar_FOGJ" id="qwen3大模型介绍">Qwen3大模型介绍<a href="https://www.weiyuai.cn/docs/blog/qwen3#qwen3%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D" class="hash-link" aria-label="Direct link to Qwen3大模型介绍" title="Direct link to Qwen3大模型介绍">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="qwen3大模型介绍">Qwen3大模型介绍<a href="https://www.weiyuai.cn/docs/blog/qwen3#qwen3%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D" class="hash-link" aria-label="Direct link to Qwen3大模型介绍" title="Direct link to Qwen3大模型介绍" translate="no">​</a></h2>
 <p>通义千问Qwen3是阿里云推出的大型语言模型，具有强大的理解能力和生成能力。Qwen3系列模型在多轮对话、文本生成、问答解析等方面表现出色，非常适合客服场景应用。</p>
 <p>Qwen3是千问系列大语言模型的最新一代，提供了全面的稠密模型和混合专家模型（Mixture-of-Experts，MoE）。您可以访问<a href="https://ollama.com/library/qwen3" target="_blank" rel="noopener noreferrer">Ollama官方库</a>获取更多详细信息。</p>
 <p>目前Qwen3系列提供多种不同参数规模的模型版本，以适应不同的应用场景和硬件环境：</p>
@@ -59,73 +141,73 @@
 <li>Qwen3-234b: 超大规模模型，顶级性能表现</li>
 </ul>
 <p>在本指南中，我们将使用Qwen3-4b版本进行演示，这是一个非常平衡的选择，既能提供良好的对话质量，又不会对普通设备造成过大负担。</p>
-<h2 class="anchor anchorWithStickyNavbar_FOGJ" id="一ollama安装qwen3">一、Ollama安装Qwen3<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%B8%80ollama%E5%AE%89%E8%A3%85qwen3" class="hash-link" aria-label="Direct link to 一、Ollama安装Qwen3" title="Direct link to 一、Ollama安装Qwen3">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="一ollama安装qwen3">一、Ollama安装Qwen3<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%B8%80ollama%E5%AE%89%E8%A3%85qwen3" class="hash-link" aria-label="Direct link to 一、Ollama安装Qwen3" title="Direct link to 一、Ollama安装Qwen3" translate="no">​</a></h2>
 <p><a href="https://ollama.ai/" target="_blank" rel="noopener noreferrer">Ollama</a>是一个开源的大模型运行框架，可以在本地部署运行多种大型语言模型，包括Qwen3。下面是安装和配置步骤：</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="1-安装ollama">1. 安装Ollama<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E5%AE%89%E8%A3%85ollama" class="hash-link" aria-label="Direct link to 1. 安装Ollama" title="Direct link to 1. 安装Ollama">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="1-安装ollama">1. 安装Ollama<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E5%AE%89%E8%A3%85ollama" class="hash-link" aria-label="Direct link to 1. 安装Ollama" title="Direct link to 1. 安装Ollama" translate="no">​</a></h3>
 <p>根据您的操作系统，选择相应的安装方法：</p>
 <p><strong>MacOS</strong>:</p>
-<div class="language-bash codeBlockContainer__5Rl theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wpOC"><pre tabindex="0" class="prism-code language-bash codeBlock_UNI2 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_tunX"><span class="token-line" style="color:#393A34"><span class="token function" style="color:#d73a49">curl</span><span class="token plain"> </span><span class="token parameter variable" style="color:#36acaa">-fsSL</span><span class="token plain"> https://ollama.ai/install.sh </span><span class="token operator" style="color:#393A34">|</span><span class="token plain"> </span><span class="token function" style="color:#d73a49">sh</span><br></span></code></pre></div></div>
+<div class="language-bash codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-bash codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token function" style="color:#d73a49">curl</span><span class="token plain"> </span><span class="token parameter variable" style="color:#36acaa">-fsSL</span><span class="token plain"> https://ollama.ai/install.sh </span><span class="token operator" style="color:#393A34">|</span><span class="token plain"> </span><span class="token function" style="color:#d73a49">sh</span><br></span></code></pre></div></div>
 <p><strong>Linux</strong>:</p>
-<div class="language-bash codeBlockContainer__5Rl theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wpOC"><pre tabindex="0" class="prism-code language-bash codeBlock_UNI2 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_tunX"><span class="token-line" style="color:#393A34"><span class="token function" style="color:#d73a49">curl</span><span class="token plain"> </span><span class="token parameter variable" style="color:#36acaa">-fsSL</span><span class="token plain"> https://ollama.ai/install.sh </span><span class="token operator" style="color:#393A34">|</span><span class="token plain"> </span><span class="token function" style="color:#d73a49">sh</span><br></span></code></pre></div></div>
+<div class="language-bash codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-bash codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token function" style="color:#d73a49">curl</span><span class="token plain"> </span><span class="token parameter variable" style="color:#36acaa">-fsSL</span><span class="token plain"> https://ollama.ai/install.sh </span><span class="token operator" style="color:#393A34">|</span><span class="token plain"> </span><span class="token function" style="color:#d73a49">sh</span><br></span></code></pre></div></div>
 <p><strong>Windows</strong>:
 从<a href="https://ollama.ai/download" target="_blank" rel="noopener noreferrer">Ollama官网</a>下载并安装Windows版本。</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="2-拉取qwen3模型">2. 拉取Qwen3模型<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E6%8B%89%E5%8F%96qwen3%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="Direct link to 2. 拉取Qwen3模型" title="Direct link to 2. 拉取Qwen3模型">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="2-拉取qwen3模型">2. 拉取Qwen3模型<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E6%8B%89%E5%8F%96qwen3%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="Direct link to 2. 拉取Qwen3模型" title="Direct link to 2. 拉取Qwen3模型" translate="no">​</a></h3>
 <p>安装完成后，通过命令行拉取Qwen3模型：</p>
-<div class="language-bash codeBlockContainer__5Rl theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wpOC"><pre tabindex="0" class="prism-code language-bash codeBlock_UNI2 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_tunX"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic"># 拉取Qwen3 4b模型</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">ollama pull qwen3:4b</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># 如果需要更大参数的模型，也可以选择其他版本</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># ollama pull qwen3:8b</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># ollama pull qwen3:14b</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="3-验证模型安装">3. 验证模型安装<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9E%8B%E5%AE%89%E8%A3%85" class="hash-link" aria-label="Direct link to 3. 验证模型安装" title="Direct link to 3. 验证模型安装">​</a></h3>
+<div class="language-bash codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-bash codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic"># 拉取Qwen3 4b模型</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">ollama pull qwen3:4b</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># 如果需要更大参数的模型，也可以选择其他版本</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># ollama pull qwen3:8b</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># ollama pull qwen3:14b</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="3-验证模型安装">3. 验证模型安装<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9E%8B%E5%AE%89%E8%A3%85" class="hash-link" aria-label="Direct link to 3. 验证模型安装" title="Direct link to 3. 验证模型安装" translate="no">​</a></h3>
 <p>通过以下命令验证Qwen3模型是否安装成功：</p>
-<div class="language-bash codeBlockContainer__5Rl theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wpOC"><pre tabindex="0" class="prism-code language-bash codeBlock_UNI2 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_tunX"><span class="token-line" style="color:#393A34"><span class="token plain">ollama list</span><br></span></code></pre></div></div>
+<div class="language-bash codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-bash codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token plain">ollama list</span><br></span></code></pre></div></div>
 <p>您应该能看到已下载的qwen3模型列表。</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="4-启动ollama服务">4. 启动Ollama服务<a href="https://www.weiyuai.cn/docs/blog/qwen3#4-%E5%90%AF%E5%8A%A8ollama%E6%9C%8D%E5%8A%A1" class="hash-link" aria-label="Direct link to 4. 启动Ollama服务" title="Direct link to 4. 启动Ollama服务">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="4-启动ollama服务">4. 启动Ollama服务<a href="https://www.weiyuai.cn/docs/blog/qwen3#4-%E5%90%AF%E5%8A%A8ollama%E6%9C%8D%E5%8A%A1" class="hash-link" aria-label="Direct link to 4. 启动Ollama服务" title="Direct link to 4. 启动Ollama服务" translate="no">​</a></h3>
 <p>确保Ollama服务正在运行：</p>
-<div class="language-bash codeBlockContainer__5Rl theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wpOC"><pre tabindex="0" class="prism-code language-bash codeBlock_UNI2 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_tunX"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic"># 在某些系统上，安装后会自动启动服务</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># 如果没有自动启动，请使用以下命令</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">ollama serve</span><br></span></code></pre></div></div>
+<div class="language-bash codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-bash codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic"># 在某些系统上，安装后会自动启动服务</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># 如果没有自动启动，请使用以下命令</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">ollama serve</span><br></span></code></pre></div></div>
 <p>默认情况下，Ollama服务会在<code>http://localhost:11434</code>端口运行。</p>
-<h2 class="anchor anchorWithStickyNavbar_FOGJ" id="二在微语管理后台设置qwen3对话模型">二、在微语管理后台设置Qwen3对话模型<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%BA%8C%E5%9C%A8%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E8%AE%BE%E7%BD%AEqwen3%E5%AF%B9%E8%AF%9D%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="Direct link to 二、在微语管理后台设置Qwen3对话模型" title="Direct link to 二、在微语管理后台设置Qwen3对话模型">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="二在微语管理后台设置qwen3对话模型">二、在微语管理后台设置Qwen3对话模型<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%BA%8C%E5%9C%A8%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E8%AE%BE%E7%BD%AEqwen3%E5%AF%B9%E8%AF%9D%E6%A8%A1%E5%9E%8B" class="hash-link" aria-label="Direct link to 二、在微语管理后台设置Qwen3对话模型" title="Direct link to 二、在微语管理后台设置Qwen3对话模型" translate="no">​</a></h2>
 <p>完成Ollama和Qwen3模型的安装后，我们需要在微语管理后台进行配置：</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="1-登录微语管理后台">1. 登录微语管理后台<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E7%99%BB%E5%BD%95%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0" class="hash-link" aria-label="Direct link to 1. 登录微语管理后台" title="Direct link to 1. 登录微语管理后台">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="1-登录微语管理后台">1. 登录微语管理后台<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E7%99%BB%E5%BD%95%E5%BE%AE%E8%AF%AD%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0" class="hash-link" aria-label="Direct link to 1. 登录微语管理后台" title="Direct link to 1. 登录微语管理后台" translate="no">​</a></h3>
 <p>访问您的微语管理后台，输入账号和密码登录系统。</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="2-导航到ai设置">2. 导航到AI设置<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E5%AF%BC%E8%88%AA%E5%88%B0ai%E8%AE%BE%E7%BD%AE" class="hash-link" aria-label="Direct link to 2. 导航到AI设置" title="Direct link to 2. 导航到AI设置">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="2-导航到ai设置">2. 导航到AI设置<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E5%AF%BC%E8%88%AA%E5%88%B0ai%E8%AE%BE%E7%BD%AE" class="hash-link" aria-label="Direct link to 2. 导航到AI设置" title="Direct link to 2. 导航到AI设置" translate="no">​</a></h3>
 <p>在左侧导航栏中，找到并点击"AI助手"-&gt;"机器人"选项。</p>
-<p><img decoding="async" loading="lazy" alt="导航到AI设置" src="https://www.weiyuai.cn/docs/assets/images/qwen3_1-35b801bc6ec7a2e3840fd179f626456c.png" width="3196" height="1748" class="img_tUaM">
+<p><img decoding="async" loading="lazy" alt="导航到AI设置" src="https://www.weiyuai.cn/docs/assets/images/qwen3_1-35b801bc6ec7a2e3840fd179f626456c.png" width="3196" height="1748" class="img_Xq2y">
 <em>图1：导航到AI设置</em></p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="3-切换qwen3模型配置">3. 切换Qwen3模型配置<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E5%88%87%E6%8D%A2qwen3%E6%A8%A1%E5%9E%8B%E9%85%8D%E7%BD%AE" class="hash-link" aria-label="Direct link to 3. 切换Qwen3模型配置" title="Direct link to 3. 切换Qwen3模型配置">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="3-切换qwen3模型配置">3. 切换Qwen3模型配置<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E5%88%87%E6%8D%A2qwen3%E6%A8%A1%E5%9E%8B%E9%85%8D%E7%BD%AE" class="hash-link" aria-label="Direct link to 3. 切换Qwen3模型配置" title="Direct link to 3. 切换Qwen3模型配置" translate="no">​</a></h3>
 <p>在AI设置页面中：</p>
-<p><img decoding="async" loading="lazy" alt="切换Qwen3模型配置" src="https://www.weiyuai.cn/docs/assets/images/qwen3_2-b50733fadab34e51db1a4d7d7c1f53f2.png" width="3202" height="1746" class="img_tUaM">
+<p><img decoding="async" loading="lazy" alt="切换Qwen3模型配置" src="https://www.weiyuai.cn/docs/assets/images/qwen3_2-b50733fadab34e51db1a4d7d7c1f53f2.png" width="3202" height="1746" class="img_Xq2y">
 <em>图2：切换Qwen3模型配置</em></p>
 <ol>
 <li>点击"AI模型选择"按钮</li>
 <li>选择模型类型为"Ollama-&gt;Qwen3"</li>
 <li>确认无误后，点击"确定"按钮</li>
 </ol>
-<h2 class="anchor anchorWithStickyNavbar_FOGJ" id="三开始使用qwen3进行智能对话">三、开始使用Qwen3进行智能对话<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%B8%89%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8qwen3%E8%BF%9B%E8%A1%8C%E6%99%BA%E8%83%BD%E5%AF%B9%E8%AF%9D" class="hash-link" aria-label="Direct link to 三、开始使用Qwen3进行智能对话" title="Direct link to 三、开始使用Qwen3进行智能对话">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="三开始使用qwen3进行智能对话">三、开始使用Qwen3进行智能对话<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E4%B8%89%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8qwen3%E8%BF%9B%E8%A1%8C%E6%99%BA%E8%83%BD%E5%AF%B9%E8%AF%9D" class="hash-link" aria-label="Direct link to 三、开始使用Qwen3进行智能对话" title="Direct link to 三、开始使用Qwen3进行智能对话" translate="no">​</a></h2>
 <p>配置完成后，您可以开始体验Qwen3赋能的智能客服功能：</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="1-创建知识库可选">1. 创建知识库（可选）<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E5%88%9B%E5%BB%BA%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%AF%E9%80%89" class="hash-link" aria-label="Direct link to 1. 创建知识库（可选）" title="Direct link to 1. 创建知识库（可选）">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="1-创建知识库可选">1. 创建知识库（可选）<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E5%88%9B%E5%BB%BA%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8F%AF%E9%80%89" class="hash-link" aria-label="Direct link to 1. 创建知识库（可选）" title="Direct link to 1. 创建知识库（可选）" translate="no">​</a></h3>
 <p>为了让AI回答更加准确，您可以创建和维护特定领域的知识库：</p>
 <ol>
 <li>导航到"知识库"或"AI训练"模块</li>
 <li>点击"新建知识库"，输入名称和描述</li>
 <li>上传文档或手动添加Q&amp;A对，丰富AI的专业知识</li>
 </ol>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="2-测试对话效果">2. 测试对话效果<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E6%B5%8B%E8%AF%95%E5%AF%B9%E8%AF%9D%E6%95%88%E6%9E%9C" class="hash-link" aria-label="Direct link to 2. 测试对话效果" title="Direct link to 2. 测试对话效果">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="2-测试对话效果">2. 测试对话效果<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E6%B5%8B%E8%AF%95%E5%AF%B9%E8%AF%9D%E6%95%88%E6%9E%9C" class="hash-link" aria-label="Direct link to 2. 测试对话效果" title="Direct link to 2. 测试对话效果" translate="no">​</a></h3>
 <p>您可以通过以下方式测试Qwen3的对话能力：</p>
 <ol>
 <li>在管理后台的"对话测试"功能中，输入问题进行测试</li>
 <li>通过客服端应用，模拟用户提问，验证AI回复效果</li>
 <li>通过访客端，体验实际用户视角下的AI交互</li>
 </ol>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="3-对话效果展示">3. 对话效果展示<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E5%AF%B9%E8%AF%9D%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA" class="hash-link" aria-label="Direct link to 3. 对话效果展示" title="Direct link to 3. 对话效果展示">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="3-对话效果展示">3. 对话效果展示<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E5%AF%B9%E8%AF%9D%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA" class="hash-link" aria-label="Direct link to 3. 对话效果展示" title="Direct link to 3. 对话效果展示" translate="no">​</a></h3>
 <p>以下是一些使用Qwen3进行智能对话的演示截图：</p>
-<p><img decoding="async" loading="lazy" alt="Qwen3对话示例" src="https://www.weiyuai.cn/docs/assets/images/qwen3_3-8ed4ac99e01c12ef0c7a1b457d0e7096.png" width="3206" height="1534" class="img_tUaM">
+<p><img decoding="async" loading="lazy" alt="Qwen3对话示例" src="https://www.weiyuai.cn/docs/assets/images/qwen3_3-8ed4ac99e01c12ef0c7a1b457d0e7096.png" width="3206" height="1534" class="img_Xq2y">
 <em>图3：Qwen3能够根据上下文提供连贯的多轮对话</em></p>
-<h2 class="anchor anchorWithStickyNavbar_FOGJ" id="四优化和调整">四、优化和调整<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E5%9B%9B%E4%BC%98%E5%8C%96%E5%92%8C%E8%B0%83%E6%95%B4" class="hash-link" aria-label="Direct link to 四、优化和调整" title="Direct link to 四、优化和调整">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="四优化和调整">四、优化和调整<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E5%9B%9B%E4%BC%98%E5%8C%96%E5%92%8C%E8%B0%83%E6%95%B4" class="hash-link" aria-label="Direct link to 四、优化和调整" title="Direct link to 四、优化和调整" translate="no">​</a></h2>
 <p>为了获得最佳的Qwen3对话效果，您可以进行以下优化：</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="1-调整模型参数">1. 调整模型参数<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E8%B0%83%E6%95%B4%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0" class="hash-link" aria-label="Direct link to 1. 调整模型参数" title="Direct link to 1. 调整模型参数">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="1-调整模型参数">1. 调整模型参数<a href="https://www.weiyuai.cn/docs/blog/qwen3#1-%E8%B0%83%E6%95%B4%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0" class="hash-link" aria-label="Direct link to 1. 调整模型参数" title="Direct link to 1. 调整模型参数" translate="no">​</a></h3>
 <p>根据实际需求调整模型参数，如温度值、最大token数等，以平衡回答的创造性和精确性。</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="2-优化系统提示词">2. 优化系统提示词<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E4%BC%98%E5%8C%96%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D" class="hash-link" aria-label="Direct link to 2. 优化系统提示词" title="Direct link to 2. 优化系统提示词">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="2-优化系统提示词">2. 优化系统提示词<a href="https://www.weiyuai.cn/docs/blog/qwen3#2-%E4%BC%98%E5%8C%96%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D" class="hash-link" aria-label="Direct link to 2. 优化系统提示词" title="Direct link to 2. 优化系统提示词" translate="no">​</a></h3>
 <p>系统提示词对AI的行为有重要影响，您可以根据业务场景定制专业的提示词，引导AI表现出理想的对话风格。</p>
-<h3 class="anchor anchorWithStickyNavbar_FOGJ" id="3-结合人工审核">3. 结合人工审核<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E7%BB%93%E5%90%88%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8" class="hash-link" aria-label="Direct link to 3. 结合人工审核" title="Direct link to 3. 结合人工审核">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="3-结合人工审核">3. 结合人工审核<a href="https://www.weiyuai.cn/docs/blog/qwen3#3-%E7%BB%93%E5%90%88%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8" class="hash-link" aria-label="Direct link to 3. 结合人工审核" title="Direct link to 3. 结合人工审核" translate="no">​</a></h3>
 <p>设置人工干预机制，对AI无法准确回答的问题进行人工接管，并将这些案例记录下来用于进一步训练和优化。</p>
-<h2 class="anchor anchorWithStickyNavbar_FOGJ" id="总结">总结<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E6%80%BB%E7%BB%93" class="hash-link" aria-label="Direct link to 总结" title="Direct link to 总结">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="总结">总结<a href="https://www.weiyuai.cn/docs/blog/qwen3#%E6%80%BB%E7%BB%93" class="hash-link" aria-label="Direct link to 总结" title="Direct link to 总结" translate="no">​</a></h2>
 <p>通过将微语客服系统与通义千问Qwen3大模型对接，您可以显著提升客服自动化水平和用户体验。本指南详细介绍了从安装Ollama、配置Qwen3模型到实际应用的完整流程。</p>
 <p>随着您不断优化提示词和积累领域知识库，AI助手的表现会越来越符合您的业务需求，为客户提供更加专业、高效的服务体验。</p>
 <p>如有任何问题或需要进一步的技术支持，请随时联系我们的技术团队。</p>
@@ -173,7 +255,7 @@
 <li><code>2019-05-30-welcome/index.md</code></li>
 </ul>
 <p>A blog post folder can be convenient to co-locate blog post images:</p>
-<p><img decoding="async" loading="lazy" alt="Docusaurus Plushie" src="https://www.weiyuai.cn/docs/assets/images/docusaurus-plushie-banner-a60f7593abca1e3eef26a9afa244e4fb.jpeg" width="1500" height="500" class="img_tUaM"></p>
+<p><img decoding="async" loading="lazy" alt="Docusaurus Plushie" src="https://www.weiyuai.cn/docs/assets/images/docusaurus-plushie-banner-a60f7593abca1e3eef26a9afa244e4fb.jpeg" width="1500" height="500" class="img_Xq2y"></p>
 <p>The blog supports tags as well!</p>
 <p><strong>And if you don't want a blog</strong>: just delete this directory, and use <code>blog: false</code> in your Docusaurus config.</p>]]></content:encoded>
             <category>Facebook</category>
@@ -187,10 +269,10 @@
             <pubDate>Sun, 01 Aug 2021 00:00:00 GMT</pubDate>
             <description><![CDATA[Blog posts support Docusaurus Markdown features, such as MDX.]]></description>
             <content:encoded><![CDATA[<p>Blog posts support <a href="https://docusaurus.io/docs/markdown-features" target="_blank" rel="noopener noreferrer">Docusaurus Markdown features</a>, such as <a href="https://mdxjs.com/" target="_blank" rel="noopener noreferrer">MDX</a>.</p>
-<div class="theme-admonition theme-admonition-tip admonition_VPQ_ alert alert--success"><div class="admonitionHeading_tvin"><span class="admonitionIcon_Yt4N"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Tip</div><div class="admonitionContent_kQJn"><p>Use the power of React to create interactive blog posts.</p></div></div>
+<div class="theme-admonition theme-admonition-tip admonition_LRQD alert alert--success"><div class="admonitionHeading_BUzK"><span class="admonitionIcon_xl5e"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Tip</div><div class="admonitionContent_Iox6"><p>Use the power of React to create interactive blog posts.</p></div></div>
 <!-- -->
 <p>For example, use JSX to create an interactive button:</p>
-<div class="language-js codeBlockContainer__5Rl theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wpOC"><pre tabindex="0" class="prism-code language-js codeBlock_UNI2 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_tunX"><span class="token-line" style="color:#393A34"><span class="token operator" style="color:#393A34">&lt;</span><span class="token plain">button onClick</span><span class="token operator" style="color:#393A34">=</span><span class="token punctuation" style="color:#393A34">{</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"> </span><span class="token arrow operator" style="color:#393A34">=&gt;</span><span class="token plain"> </span><span class="token function" style="color:#d73a49">alert</span><span class="token punctuation" style="color:#393A34">(</span><span class="token string" style="color:#e3116c">'button clicked!'</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">}</span><span class="token operator" style="color:#393A34">&gt;</span><span class="token maybe-class-name">Click</span><span class="token plain"> me</span><span class="token operator" style="color:#393A34">!</span><span class="token operator" style="color:#393A34">&lt;</span><span class="token operator" style="color:#393A34">/</span><span class="token plain">button</span><span class="token operator" style="color:#393A34">&gt;</span><br></span></code></pre></div></div>
+<div class="language-js codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-js codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token operator" style="color:#393A34">&lt;</span><span class="token plain">button onClick</span><span class="token operator" style="color:#393A34">=</span><span class="token punctuation" style="color:#393A34">{</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"> </span><span class="token arrow operator" style="color:#393A34">=&gt;</span><span class="token plain"> </span><span class="token function" style="color:#d73a49">alert</span><span class="token punctuation" style="color:#393A34">(</span><span class="token string" style="color:#e3116c">'button clicked!'</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">}</span><span class="token operator" style="color:#393A34">&gt;</span><span class="token maybe-class-name">Click</span><span class="token plain"> me</span><span class="token operator" style="color:#393A34">!</span><span class="token operator" style="color:#393A34">&lt;</span><span class="token operator" style="color:#393A34">/</span><span class="token plain">button</span><span class="token operator" style="color:#393A34">&gt;</span><br></span></code></pre></div></div>
 <button>Click me!</button>]]></content:encoded>
             <category>Docusaurus</category>
         </item>

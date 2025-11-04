@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="480" viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WebRTC 视频客服核心能力">
+  <rect width="1200" height="480" rx="24" fill="#0F172A"/>
+  <g font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" fill="#E2E8F0">
+    <text x="600" y="56" text-anchor="middle" font-size="28" font-weight="700">核心能力一览</text>
+    <g font-size="16">
+      <rect x="80" y="100" width="310" height="120" rx="12" fill="#1F2937"/>
+      <text x="235" y="140" text-anchor="middle" font-weight="600">实时音视频</text>
+      <text x="235" y="168" text-anchor="middle" opacity="0.85">WebRTC 自适应 · 多端一致</text>
+
+      <rect x="445" y="100" width="310" height="120" rx="12" fill="#1F2937"/>
+      <text x="600" y="140" text-anchor="middle" font-weight="600">远程协助</text>
+      <text x="600" y="168" text-anchor="middle" opacity="0.85">标注/脚本联动 · 安全可控</text>
+
+      <rect x="810" y="100" width="310" height="120" rx="12" fill="#1F2937"/>
+      <text x="965" y="140" text-anchor="middle" font-weight="600">录制与回放</text>
+      <text x="965" y="168" text-anchor="middle" opacity="0.85">分轨时间轴 · 片段导出</text>
+
+      <rect x="80" y="260" width="310" height="120" rx="12" fill="#1F2937"/>
+      <text x="235" y="300" text-anchor="middle" font-weight="600">AI 质检分析</text>
+      <text x="235" y="328" text-anchor="middle" opacity="0.85">转写摘要 · 合规评分</text>
+
+      <rect x="445" y="260" width="310" height="120" rx="12" fill="#1F2937"/>
+      <text x="600" y="300" text-anchor="middle" font-weight="600">系统打通</text>
+      <text x="600" y="328" text-anchor="middle" opacity="0.85">工单 · CRM · 知识库</text>
+
+      <rect x="810" y="260" width="310" height="120" rx="12" fill="#1F2937"/>
+      <text x="965" y="300" text-anchor="middle" font-weight="600">安全合规</text>
+      <text x="965" y="328" text-anchor="middle" opacity="0.85">加密留痕 · 访问控制</text>
+    </g>
+  </g>
+</svg>

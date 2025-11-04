@@ -1,0 +1,3 @@
+import{u as r,j as n,a as i}from"./index-Cfp_hilu.js";const d={title:"Bytedesk API Documentation",description:"Complete API reference for integrating with Bytedesk services"};function c(){const e=i();return n.jsx("p",{children:e.formatMessage({id:"home.welcome"})})}function s(e){const t={h1:"h1",...r(),...e.components},{I18nHome:o}=t;return o||m("I18nHome"),n.jsxs(n.Fragment,{children:[n.jsx(t.h1,{id:"微语-api-文档",children:"微语 API 文档"}),`
+`,n.jsx(c,{}),`
+`,n.jsx(o,{})]})}function u(e={}){const{wrapper:t}={...r(),...e.components};return t?n.jsx(t,{...e,children:n.jsx(s,{...e})}):s(e)}function m(e,t){throw new Error("Expected component `"+e+"` to be defined: you likely forgot to import, pass, or provide it.")}export{c as WelcomeMessage,u as default,d as frontmatter};

@@ -1,5 +1,0 @@
-/*!
- * allof-merge v0.6.7
- * Copyright (C) 2012-2025 Damir Yusipov
- * Date: Sun, 17 Aug 2025 19:54:52 GMT
- */
