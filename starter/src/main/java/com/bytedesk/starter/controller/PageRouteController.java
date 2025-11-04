@@ -90,14 +90,17 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/docs
 	 */
 	@GetMapping({
-			"/docs",
-			"/docs/",
-			"/docs/{lang:zh-CN|zh-TW}",
-			"/docs/{lang:zh-CN|zh-TW}/",
-			"/docs/{path:[^\\.]*}",
-			"/docs/{path:[^\\.]*}/{path2:[^\\.]*}",
-			"/docs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}",
-			"/docs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}/{path2:[^\\.]*}"
+		"/docs",
+		"/docs/",
+		"/docs/{lang:zh-CN|zh-TW}",
+		"/docs/{lang:zh-CN|zh-TW}/",
+		"/docs/{path:[^\\.]*}",
+		"/docs/{path:[^\\.]*}/{path2:[^\\.]*}",
+		"/docs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}",
+		"/docs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}/{path2:[^\\.]*}",
+		"/docs/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\\\.]*}",
+		"/docs/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\\\.]*}/{path4:[^\\\\\\\\.]*}",
+		"/docs/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\\\.]*}/{path4:[^\\\\\\\\.]*}/{path5:[^\\\\\\\\\\\\\\\\.]*}",
 	})
 	public String docs(
 			@PathVariable(required = false) String lang,
@@ -119,14 +122,17 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/apidocs
 	 */
 	@GetMapping({
-			"/apidocs",
-			"/apidocs/",
-			"/apidocs/{lang:zh-CN|zh-TW}",
-			"/apidocs/{lang:zh-CN|zh-TW}/",
-			"/apidocs/{path:[^\\.]*}",
-			"/apidocs/{path:[^\\.]*}/{path2:[^\\.]*}",
-			"/apidocs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}",
-			"/apidocs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}/{path2:[^\\.]*}"
+		"/apidocs",
+		"/apidocs/",
+		"/apidocs/{lang:zh-CN|zh-TW}",
+		"/apidocs/{lang:zh-CN|zh-TW}/",
+		"/apidocs/{path:[^\\.]*}",
+		"/apidocs/{path:[^\\.]*}/{path2:[^\\.]*}",
+		"/apidocs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}",
+		"/apidocs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}/{path2:[^\\.]*}",
+		"/apidocs/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\\\.]*}",
+		"/apidocs/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\\\.]*}/{path4:[^\\\\\\\\.]*}",
+		"/apidocs/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\\\.]*}/{path4:[^\\\\\\\\.]*}/{path5:[^\\\\\\\\\\\\\\\\.]*}",
 	})
 	public String apidocs(
 			@PathVariable(required = false) String lang,
