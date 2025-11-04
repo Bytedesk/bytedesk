@@ -44,8 +44,8 @@ public class TicketProcessResponse extends BaseResponse {
 
     private String schema;
 
-    // 是否已部署流程
-    private Boolean deployed;
+    // 是否已部署流程, 通过status字段表示状态，故此字段可选删去
+    // private Boolean deployed;
 
     // 部署id
     private String deploymentId;

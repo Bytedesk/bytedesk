@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,9 +80,11 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
 
         return ResponseEntity.ok(JsonResult.success());
     }
-    // 修改查询方法
-    @RequestMapping("/query/deployments")
+
+    // 查询流程定义列表
+    @GetMapping("/query/deployments")
     public ResponseEntity<?> queryProcesses(TicketProcessRequest request) {
+        
         List<ProcessDefinition> definitions = processService.query(request);
         
         List<TicketProcessDefinitionResponse> ticketProcessResponses = definitions.stream()
@@ -102,20 +105,10 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     // 部署流程
     @PostMapping("/deploy")
     public ResponseEntity<?> deployProcess(@RequestBody TicketProcessRequest request) {
-        ProcessDefinition definition = processService.deploy(request);
-        
-        // 转换为 DTO 返回
-        TicketProcessDefinitionResponse dto = TicketProcessDefinitionResponse.builder()
-            .id(definition.getId())
-            .key(definition.getKey())
-            .name(definition.getName())
-            .description(definition.getDescription())
-            .version(definition.getVersion())
-            .deploymentId(definition.getDeploymentId())
-            .tenantId(definition.getTenantId())
-            .build();
 
-        return ResponseEntity.ok(JsonResult.success(dto));
+        TicketProcessDefinitionResponse definition = processService.deploy(request);
+
+        return ResponseEntity.ok(JsonResult.success(definition));
     }
 
     // 取消部署流程

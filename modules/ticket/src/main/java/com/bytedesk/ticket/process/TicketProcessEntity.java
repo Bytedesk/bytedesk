@@ -73,10 +73,10 @@ public class TicketProcessEntity extends BaseEntity {
     @Column(name = "process_status")
     private String status = TicketProcessStatusEnum.DRAFT.name();
 
-    // 是否已部署流程
-    @Builder.Default
-    @Column(name = "is_deployed")
-    private Boolean deployed = false;
+    // 是否已部署流程，通过status字段表示状态，故此字段可选删去
+    // @Builder.Default
+    // @Column(name = "is_deployed")
+    // private Boolean deployed = false;
 
     // 部署id
     private String deploymentId;

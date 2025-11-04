@@ -77,7 +77,7 @@ public class TicketProcessService {
     }
 
     // 部署流程
-    public ProcessDefinition deploy(TicketProcessRequest request) {
+    public TicketProcessDefinitionResponse deploy(TicketProcessRequest request) {
         Optional<TicketProcessEntity> ticketProcess = ticketProcessRepository.findByUid(request.getUid());
         if (!ticketProcess.isPresent()) {
             throw new RuntimeException("流程定义不存在" + request.getUid());
@@ -93,7 +93,8 @@ public class TicketProcessService {
                 .deploy();
 
         // 更新流程定义
-        ticketProcess.get().setDeployed(true);
+        // ticketProcess.get().setDeployed(true);
+        ticketProcess.get().setStatus(TicketProcessStatusEnum.DEPLOYED.name());
         ticketProcess.get().setDeploymentId(deployment.getId());
         ticketProcessRepository.save(ticketProcess.get());
         
@@ -108,11 +109,23 @@ public class TicketProcessService {
             processDefinition.getKey(),
             processDefinition.getVersion());
 
-        return processDefinition;
+        // 转换为 DTO 返回
+        TicketProcessDefinitionResponse dto = TicketProcessDefinitionResponse.builder()
+            .id(processDefinition.getId())
+            .key(processDefinition.getKey())
+            .name(processDefinition.getName())
+            .description(processDefinition.getDescription())
+            .version(processDefinition.getVersion())
+            .deploymentId(processDefinition.getDeploymentId())
+            .tenantId(processDefinition.getTenantId())
+            .build();
+
+        return dto;
     }
 
     // 删除流程
     public List<ProcessDefinition> undeploy(TicketProcessRequest request) {
+
         Optional<TicketProcessEntity> ticketProcess = ticketProcessRepository.findByUid(request.getUid());
         if (!ticketProcess.isPresent()) {
             throw new RuntimeException("流程定义不存在" + request.getUid());
@@ -129,7 +142,6 @@ public class TicketProcessService {
         List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                 .deploymentId(deploymentId)  // 使用部署ID查询
                 .list();
-        
         log.info("删除前流程版本数量: {}", processes.size());
         
         try {
@@ -138,7 +150,8 @@ public class TicketProcessService {
             log.info("成功删除流程部署: deploymentId={}", deploymentId);
             
             // 更新实体状态
-            ticketProcess.get().setDeployed(false);
+            // ticketProcess.get().setDeployed(false);
+            ticketProcess.get().setStatus(TicketProcessStatusEnum.DRAFT.name());
             ticketProcess.get().setDeploymentId(null);
             ticketProcessRepository.save(ticketProcess.get());
             

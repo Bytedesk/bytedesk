@@ -235,7 +235,8 @@ public class TicketProcessRestService
             Optional<TicketProcessEntity> processEntity = findByUid(processUid);
             if (processEntity.isPresent()) {
                 processEntity.get().setDeploymentId(deployment.getId());
-                processEntity.get().setDeployed(true);
+                // processEntity.get().setDeployed(true);
+                processEntity.get().setStatus(TicketProcessStatusEnum.DEPLOYED.name());
                 save(processEntity.get());
             }
 
@@ -293,7 +294,8 @@ public class TicketProcessRestService
             Optional<TicketProcessEntity> processEntity = findByUid(processUid);
             if (processEntity.isPresent()) {
                 processEntity.get().setDeploymentId(deployment.getId());
-                processEntity.get().setDeployed(true);
+                // processEntity.get().setDeployed(true);
+                processEntity.get().setStatus(TicketProcessStatusEnum.DEPLOYED.name());
                 save(processEntity.get());
             }
 
