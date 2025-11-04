@@ -37,6 +37,7 @@ public class TicketProcessService {
 
     // 查询流程
     public List<TicketProcessDefinitionResponse> query(TicketProcessRequest request) {
+        
         String orgUid = request.getOrgUid();
         if (orgUid == null) {
             throw new RuntimeException("租户ID不能为空");
