@@ -114,6 +114,35 @@ public class PageRouteController {
 	}
 
 	/**
+	 * apidocs 文档
+	 * 支持多语言路径：/apidocs, /apidocs/zh-CN, /apidocs/zh-TW
+	 * http://127.0.0.1:9003/apidocs
+	 */
+	@GetMapping({
+			"/apidocs",
+			"/apidocs/",
+			"/apidocs/{lang:zh-CN|zh-TW}",
+			"/apidocs/{lang:zh-CN|zh-TW}/",
+			"/apidocs/{path:[^\\.]*}",
+			"/apidocs/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/apidocs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}",
+			"/apidocs/{lang:zh-CN|zh-TW}/{path:[^\\.]*}/{path2:[^\\.]*}"
+	})
+	public String apidocs(
+			@PathVariable(required = false) String lang,
+			@PathVariable(required = false) String path,
+			@PathVariable(required = false) String path2) {
+
+		// 如果指定了语言，则使用对应语言的入口页面
+		if (lang != null) {
+			return "forward:/apidocs/" + lang + "/index.html";
+		}
+
+		// 默认使用英文入口页面
+		return "forward:/apidocs/index.html";
+	}
+
+	/**
 	 * admin
 	 * 管理后台
 	 * http://127.0.0.1:9003/admin
