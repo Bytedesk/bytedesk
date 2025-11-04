@@ -45,7 +45,6 @@ public class MqttEventListener {
         // 用户clientId格式: uid/client/deviceUid
         // final String uid = clientId.split("/")[0];
         // log.info("topic onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
-        //
         topicCacheService.pushClientId(clientId);
     }
 
@@ -55,7 +54,6 @@ public class MqttEventListener {
         // 用户clientId格式: uid/client/deviceUid
         // final String uid = clientId.split("/")[0];
         // log.info("topic onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
-        //
         // 暂不删除
         // topicCacheService.removeClientId(clientId);
     }
@@ -63,14 +61,12 @@ public class MqttEventListener {
     @EventListener
     public void onMqttSubscribeEvent(MqttSubscribeEvent event) {
         // log.info("topic onMqttSubscribeEvent {}", event);
-        //
         topicRestService.subscribe(event.getTopic(), event.getClientId());
     }
 
     @EventListener
     public void onMqttUnsubscribeEvent(MqttUnsubscribeEvent event) {
         // log.info("topic onMqttUnsubscribeEvent {}", event);
-        //
         // topicService.unsubscribe(event.getTopic(), event.getClientId());
     }
 
