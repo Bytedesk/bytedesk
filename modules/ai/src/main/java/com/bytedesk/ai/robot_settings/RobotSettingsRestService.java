@@ -3,6 +3,7 @@ package com.bytedesk.ai.robot_settings;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,7 +23,9 @@ import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class RobotSettingsRestService
@@ -366,27 +369,19 @@ public class RobotSettingsRestService
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
             if (published != null) {
+                log.info("welcomeTip {}, draftWelcomeTip {}", entity.getServiceSettings().getWelcomeTip(), 
+                entity.getDraftServiceSettings().getWelcomeTip());
+                // 
                 copyPropertiesExcludingIds(entity.getDraftServiceSettings(), published);
             } else {
                 ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
                 copyPropertiesExcludingIds(entity.getDraftServiceSettings(), newPublished);
+                log.info("new welcomeTip {}", newPublished.getWelcomeTip());
                 newPublished.setUid(uidUtils.getUid());
                 entity.setServiceSettings(newPublished);
             }
         }
-        
-        // if (entity.getDraftLlm() != null) {
-        //     RobotLlmEntity published = entity.getLlm();
-        //     if (published != null) {
-        //         copyPropertiesExcludingIds(entity.getDraftLlm(), published);
-        //     } else {
-        //         RobotLlmEntity newPublished = new RobotLlmEntity();
-        //         copyPropertiesExcludingIds(entity.getDraftLlm(), newPublished);
-        //         newPublished.setUid(uidUtils.getUid());
-        //         entity.setLlm(newPublished);
-        //     }
-        // }
-        
+
         if (entity.getDraftRateDownSettings() != null) {
             RatedownSettingsEntity published = entity.getRateDownSettings();
             if (published != null) {
@@ -435,7 +430,7 @@ public class RobotSettingsRestService
         if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
             serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source, (ServiceSettingsEntity) target);
         } else {
-            org.springframework.beans.BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
+            BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
         }
     }
 
