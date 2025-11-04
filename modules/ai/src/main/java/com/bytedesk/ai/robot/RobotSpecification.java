@@ -81,11 +81,13 @@ public class RobotSpecification extends BaseSpecification<RobotEntity, RobotRequ
                     }
                 }
             }
+            
             // searchText
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
                 String searchText = request.getSearchText();
                 
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
 

@@ -40,6 +40,8 @@ public class TicketProcessResponse extends BaseResponse {
 
     // private String type;
 
+    private String status;
+
     private String schema;
 
     // 是否已部署流程
