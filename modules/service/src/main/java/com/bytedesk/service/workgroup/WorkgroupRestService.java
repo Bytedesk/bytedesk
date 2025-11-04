@@ -34,6 +34,8 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,17 +47,15 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     private final WorkgroupRepository workgroupRepository;
 
-    private final AgentRestService agentService;
+    private final AgentRestService agentRestService;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
-    // private final ServiceSettingsService serviceSettingsService;
-
     private final AuthService authService;
     
-    private final com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService workgroupSettingsRestService;
+    private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
@@ -74,21 +74,21 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         workgroup.setOrgUid(request.getOrgUid());
         //
-    // 绑定工作组配置：优先使用请求中的 settingsUid，否则使用组织默认配置
-    if (StringUtils.hasText(request.getSettingsUid())) {
-        workgroupSettingsRestService.findByUid(request.getSettingsUid())
-            .ifPresentOrElse(workgroup::setSettings,
-                () -> workgroup.setSettings(
-                    workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid())));
-    } else {
-        workgroup.setSettings(workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid()));
-    }
+        // 绑定工作组配置：优先使用请求中的 settingsUid，否则使用组织默认配置
+        if (StringUtils.hasText(request.getSettingsUid())) {
+            workgroupSettingsRestService.findByUid(request.getSettingsUid())
+                .ifPresentOrElse(workgroup::setSettings,
+                    () -> workgroup.setSettings(
+                        workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid())));
+        } else {
+            workgroup.setSettings(workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid()));
+        }
         //
         if (request.getAgentUids() != null) {
             Iterator<String> agentIterator = request.getAgentUids().iterator();
             while (agentIterator.hasNext()) {
                 String agentUid = agentIterator.next();
-                Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
+                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
                 if (agentOptional.isPresent()) {
                     AgentEntity agentEntity = agentOptional.get();
                     workgroup.getAgents().add(agentEntity);
@@ -99,7 +99,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         // messageLeaveAgent 兜底：优先使用请求指定，其次使用第一个客服，最后保持为空
         if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
-            Optional<AgentEntity> agentOptional = agentService.findByUid(request.getMessageLeaveAgentUid());
+            Optional<AgentEntity> agentOptional = agentRestService.findByUid(request.getMessageLeaveAgentUid());
             agentOptional.ifPresent(workgroup::setMessageLeaveAgent);
         } else if (workgroup.getAgents() != null && !workgroup.getAgents().isEmpty()) {
             workgroup.setMessageLeaveAgent(workgroup.getAgents().get(0));
@@ -153,7 +153,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             Iterator<String> iterator = request.getAgentUids().iterator();
             while (iterator.hasNext()) {
                 String agentUid = iterator.next();
-                Optional<AgentEntity> agentOptional = agentService.findByUid(agentUid);
+                Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
                 if (agentOptional.isPresent()) {
                     AgentEntity agentEntity = agentOptional.get();
                     workgroup.getAgents().add(agentEntity);
@@ -170,7 +170,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
         // robust 设置留言处理坐席：
         if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
-            agentService.findByUid(request.getMessageLeaveAgentUid()).ifPresent(workgroup::setMessageLeaveAgent);
+            agentRestService.findByUid(request.getMessageLeaveAgentUid()).ifPresent(workgroup::setMessageLeaveAgent);
         } else if (agentsChanged) {
             // 当客服列表被修改但未显式指定留言坐席时：若列表非空取第一个，否则置空，避免越界
             if (workgroup.getAgents() != null && !workgroup.getAgents().isEmpty()) {

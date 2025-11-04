@@ -44,6 +44,7 @@ import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
+import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.core.member.MemberEntity;
@@ -73,7 +74,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final ThreadRestService threadRestService;
     
-    private final com.bytedesk.service.agent_settings.AgentSettingsRestService agentSettingsRestService;
+    private final AgentSettingsRestService agentSettingsRestService;
 
     @Override
     protected Specification<AgentEntity> createSpecification(AgentRequest request) {

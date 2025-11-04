@@ -65,9 +65,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     private final RobotRepository robotRepository;
 
-    // private final FaqRestService faqRestService; // No longer needed after
-    // settings migration
-
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
