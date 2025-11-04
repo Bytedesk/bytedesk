@@ -32,7 +32,6 @@ public class TicketProcessResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String key;
@@ -48,12 +47,4 @@ public class TicketProcessResponse extends BaseResponse {
 
     // 部署id
     private String deploymentId;
-
-    private String userUid;
-
-    private String orgUid;
-
-    // private ZonedDateTime createdAt;
-
-    // private ZonedDateTime updatedAt;
 }
