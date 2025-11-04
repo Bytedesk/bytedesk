@@ -36,14 +36,14 @@ public class TicketProcessService {
     private final TicketProcessRepository ticketProcessRepository;
 
     // 查询流程
-    public List<ProcessDefinition> query(TicketProcessRequest request) {
+    public List<TicketProcessDefinitionResponse> query(TicketProcessRequest request) {
         String orgUid = request.getOrgUid();
         if (orgUid == null) {
             throw new RuntimeException("租户ID不能为空");
         }
         
         // 先查询已部署的流程定义实体
-        List<TicketProcessEntity> deployedProcesses = ticketProcessRepository.findByOrgUidAndDeployedTrue(orgUid);
+        List<TicketProcessEntity> deployedProcesses = ticketProcessRepository.findByOrgUidAndStatus(orgUid, TicketProcessStatusEnum.DEPLOYED.name());
         
         // 收集所有部署ID
         Set<String> deploymentIds = deployedProcesses.stream()
@@ -73,7 +73,19 @@ public class TicketProcessService {
                 processDefinition.getDeploymentId());
         }
 
-        return processList;
+        List<TicketProcessDefinitionResponse> ticketProcessResponses = processList.stream()
+            .map(def -> TicketProcessDefinitionResponse.builder()
+                .id(def.getId())
+                .key(def.getKey())
+                .name(def.getName())
+                .description(def.getDescription())
+                .version(def.getVersion())
+                .deploymentId(def.getDeploymentId())
+                .tenantId(def.getTenantId())
+                .build())
+            .collect(Collectors.toList());
+
+        return ticketProcessResponses;
     }
 
     // 部署流程
@@ -124,7 +136,7 @@ public class TicketProcessService {
     }
 
     // 删除流程
-    public List<ProcessDefinition> undeploy(TicketProcessRequest request) {
+    public List<TicketProcessDefinitionResponse> undeploy(TicketProcessRequest request) {
 
         Optional<TicketProcessEntity> ticketProcess = ticketProcessRepository.findByUid(request.getUid());
         if (!ticketProcess.isPresent()) {
@@ -165,10 +177,23 @@ public class TicketProcessService {
         List<ProcessDefinition> remainingProcesses = repositoryService.createProcessDefinitionQuery()
                 .deploymentId(deploymentId)
                 .list();
+
+        // 转换为 DTO 列表返回
+        List<TicketProcessDefinitionResponse> ticketProcessResponses = remainingProcesses.stream()
+            .map(def -> TicketProcessDefinitionResponse.builder()
+                .id(def.getId())
+                .key(def.getKey())
+                .name(def.getName())
+                .description(def.getDescription())
+                .version(def.getVersion())
+                .deploymentId(def.getDeploymentId())
+                .tenantId(def.getTenantId())
+                .build())
+            .collect(Collectors.toList());
         
         log.info("删除后流程版本数量: {}", remainingProcesses.size());
 
-        return processes;  // 返回删除前的流程定义列表
+        return ticketProcessResponses;  // 返回删除前的流程定义列表
     }
     
     

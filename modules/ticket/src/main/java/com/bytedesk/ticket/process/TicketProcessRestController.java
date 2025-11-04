@@ -14,9 +14,6 @@
 package com.bytedesk.ticket.process;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,22 +81,10 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     // 查询流程定义列表
     @GetMapping("/query/deployments")
     public ResponseEntity<?> queryProcesses(TicketProcessRequest request) {
-        
-        List<ProcessDefinition> definitions = processService.query(request);
-        
-        List<TicketProcessDefinitionResponse> ticketProcessResponses = definitions.stream()
-            .map(def -> TicketProcessDefinitionResponse.builder()
-                .id(def.getId())
-                .key(def.getKey())
-                .name(def.getName())
-                .description(def.getDescription())
-                .version(def.getVersion())
-                .deploymentId(def.getDeploymentId())
-                .tenantId(def.getTenantId())
-                .build())
-            .collect(Collectors.toList());
 
-        return ResponseEntity.ok(JsonResult.success(ticketProcessResponses));
+        List<TicketProcessDefinitionResponse> definitions = processService.query(request);
+
+        return ResponseEntity.ok(JsonResult.success(definitions));
     }
 
     // 部署流程
@@ -114,22 +99,10 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
     // 取消部署流程
     @PostMapping("/undeploy")
     public ResponseEntity<?> undeployProcess(@RequestBody TicketProcessRequest request) {
-        List<ProcessDefinition> definitions = processService.undeploy(request);
-        
-        // 转换为 DTO 列表返回
-        List<TicketProcessDefinitionResponse> ticketProcessResponses = definitions.stream()
-            .map(def -> TicketProcessDefinitionResponse.builder()
-                .id(def.getId())
-                .key(def.getKey())
-                .name(def.getName())
-                .description(def.getDescription())
-                .version(def.getVersion())
-                .deploymentId(def.getDeploymentId())
-                .tenantId(def.getTenantId())
-                .build())
-            .collect(Collectors.toList());
 
-        return ResponseEntity.ok(JsonResult.success(ticketProcessResponses));
+        List<TicketProcessDefinitionResponse> definitions = processService.undeploy(request);
+
+        return ResponseEntity.ok(JsonResult.success(definitions));
     }
 
     @Override
