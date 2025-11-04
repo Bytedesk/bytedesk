@@ -41,9 +41,21 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
             }
+            // description
+            if (StringUtils.hasText(request.getDescription())) {
+                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
             // topic
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
+            }
+            // status
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+            // priority
+            if (StringUtils.hasText(request.getPriority())) {
+                predicates.add(criteriaBuilder.equal(root.get("priority"), request.getPriority()));
             }
             // threadUid
             if (StringUtils.hasText(request.getThreadUid())) {
