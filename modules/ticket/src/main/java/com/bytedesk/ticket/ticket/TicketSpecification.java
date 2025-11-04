@@ -73,7 +73,7 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                     log.warn("Invalid createdAtEnd format: {}", request.getCreatedAtEnd());
                 }
             }
-
+            // 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
