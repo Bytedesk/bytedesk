@@ -118,12 +118,11 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     }
 
     // @PreAuthorize("hasAuthority('AGENT_READ')")
-    // @ActionAnnotation(title = "客服", action = "syncCurrentThreadCount", description = "sync agent current thread count")
     @Operation(summary = "同步当前会话数", description = "同步客服当前会话数量")
     @ApiResponse(responseCode = "200", description = "同步成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
-    @ActionAnnotation(title = "客服", action = "syncCurrentThreadCount", description = "sync agent current thread count")
+    // @ActionAnnotation(title = "客服", action = "同步当前会话数", description = "sync agent current thread count")
     @PostMapping("/sync/current/thread/count")
     public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
 

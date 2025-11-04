@@ -99,11 +99,6 @@ public class TicketRestService
     @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
-        // UserEntity owner = authService.getUser();
-        // if (owner == null) {
-        //     throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        // }
-        // String userUid = owner.getUid();
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());

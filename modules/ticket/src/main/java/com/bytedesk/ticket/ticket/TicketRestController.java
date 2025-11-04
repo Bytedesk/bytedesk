@@ -116,16 +116,6 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         
         return ResponseEntity.ok(JsonResult.success());
     }
-    
-    // @PostMapping("/{id}/comments")
-    // public TicketCommentEntity addComment(@PathVariable Long id, @RequestBody TicketCommentRequest comment) {
-    //     return ticketRestService.addComment(id, comment);
-    // }
-    
-    // @PostMapping("/{id}/attachments")
-    // public TicketAttachmentEntity uploadAttachment(@PathVariable Long id, @RequestParam MultipartFile file) {
-    //     return ticketRestService.uploadAttachment(id, file);
-    // }
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
