@@ -18,7 +18,6 @@ import java.util.Set;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentResponse;
-import com.bytedesk.ticket.process.TicketProcessResponse;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 
 import lombok.Data;
@@ -71,8 +70,10 @@ public class TicketResponse extends BaseResponse {
     private Set<TicketAttachmentResponse> attachments;
     // 流程实例ID
     private String processInstanceId;
+    // 流程定义实体UID
+    private String processEntityUid;
     // 流程定义实体
-    private TicketProcessResponse processEntity;
+    // private TicketProcessResponse processEntity;
 
     // 是否评价
     private Boolean rated;

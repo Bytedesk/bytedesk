@@ -21,8 +21,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.ticket.process.TicketProcessResponse;
-import com.bytedesk.ticket.process.TicketProcessRestService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketResponse;
 
@@ -59,28 +57,28 @@ public class TicketConvertUtils {
         }
         // 
         // 加载关联的流程实体
-        if (StringUtils.hasText(entity.getProcessEntityUid())) {
-            try {
-                TicketProcessRestService processRestService = ApplicationContextHolder.getBean(TicketProcessRestService.class);
-                processRestService.findByUid(entity.getProcessEntityUid()).ifPresent(processEntity -> {
-                    TicketProcessResponse processResponse = TicketProcessResponse.builder()
-                        .name(processEntity.getName())
-                        .key(processEntity.getKey())
-                        .description(processEntity.getDescription())
-                        .status(processEntity.getStatus())
-                        .schema(processEntity.getSchema())
-                        .deploymentId(processEntity.getDeploymentId())
-                        .build();
-                    processResponse.setUid(processEntity.getUid());
-                    processResponse.setCreatedAt(processEntity.getCreatedAt());
-                    processResponse.setUpdatedAt(processEntity.getUpdatedAt());
-                    ticketResponse.setProcessEntity(processResponse);
-                });
-            } catch (Exception e) {
-                // 如果获取流程失败,不影响工单查询
-                log.warn("Failed to load process entity for ticket {}: {}", entity.getUid(), e.getMessage());
-            }
-        }
+        // if (StringUtils.hasText(entity.getProcessEntityUid())) {
+        //     try {
+        //         TicketProcessRestService processRestService = ApplicationContextHolder.getBean(TicketProcessRestService.class);
+        //         processRestService.findByUid(entity.getProcessEntityUid()).ifPresent(processEntity -> {
+        //             TicketProcessResponse processResponse = TicketProcessResponse.builder()
+        //                 .name(processEntity.getName())
+        //                 .key(processEntity.getKey())
+        //                 .description(processEntity.getDescription())
+        //                 .status(processEntity.getStatus())
+        //                 .schema(processEntity.getSchema())
+        //                 .deploymentId(processEntity.getDeploymentId())
+        //                 .build();
+        //             processResponse.setUid(processEntity.getUid());
+        //             processResponse.setCreatedAt(processEntity.getCreatedAt());
+        //             processResponse.setUpdatedAt(processEntity.getUpdatedAt());
+        //             ticketResponse.setProcessEntity(processResponse);
+        //         });
+        //     } catch (Exception e) {
+        //         // 如果获取流程失败,不影响工单查询
+        //         log.warn("Failed to load process entity for ticket {}: {}", entity.getUid(), e.getMessage());
+        //     }
+        // }
         // 
         return ticketResponse;
         
