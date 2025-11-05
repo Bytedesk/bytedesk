@@ -214,6 +214,7 @@ public class BytedeskProperties {
         private String logo;
         private String description;
         private Boolean showRightCornerChat = true;
+        private String rightCornerChatPlacement = "bottom-right"; // 位置：bottom-right / bottom-left
         private Boolean showDemo = true; // 是否显示演示
         private String privacyPolicyUrl;
         private String termsOfServiceUrl;
