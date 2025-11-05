@@ -33,6 +33,18 @@ public class TicketProcessSpecification extends BaseSpecification<TicketProcessE
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+            // name
+            if (StringUtils.hasText(request.getName())) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            }
+            // key
+            if (StringUtils.hasText(request.getKey())) {
+                predicates.add(criteriaBuilder.equal(root.get("key"), request.getKey()));
+            }
+            // description
+            if (StringUtils.hasText(request.getDescription())) {
+                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
@@ -41,7 +53,6 @@ public class TicketProcessSpecification extends BaseSpecification<TicketProcessE
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
-
             // userUid
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));

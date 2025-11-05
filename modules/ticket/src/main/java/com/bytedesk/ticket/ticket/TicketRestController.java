@@ -188,7 +188,6 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     /**
      * 挂起工单
      */
-    
     @PostMapping("/hold")
     public ResponseEntity<?> holdTicket(@RequestBody TicketRequest request) {
 
