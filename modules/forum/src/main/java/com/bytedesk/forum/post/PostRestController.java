@@ -16,7 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/posts")
-public class PostController {
+public class PostRestController {
 
     @Autowired
     private PostService postService;

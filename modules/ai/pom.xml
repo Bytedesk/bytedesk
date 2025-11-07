@@ -206,7 +206,6 @@
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
-
 		<!-- https://github.com/alibaba/spring-ai-alibaba -->
 		<!--
 		https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
@@ -233,7 +232,6 @@
 			<artifactId>qlexpress4</artifactId>
 			<version>4.0.4</version>
 		</dependency>
-
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
 		<dependency>
@@ -241,7 +239,6 @@
 			<artifactId>ollama4j</artifactId>
 			<version>${ollama4j.version}</version>
 		</dependency>
-
 		<!-- 抓取网页时使用 -->
 		<!-- https://jsoup.org/download -->
 		<dependency>
