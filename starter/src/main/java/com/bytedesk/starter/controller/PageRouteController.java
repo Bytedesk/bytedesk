@@ -286,6 +286,19 @@ public class PageRouteController {
 		return "forward:/reactdemo/index.html";
 	}
 
+	@GetMapping({
+			"/forum",
+			"/forum/",
+			"/forum/{path:[^\\.]*}",
+			"/forum/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/forum/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/forum/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+	})
+	public String forum(@PathVariable(required = false) String path,
+			@PathVariable(required = false) String path2) {
+		return "forward:/forum/index.html";
+	}
+
 	/**
 	 * http://127.0.0.1:9003/download
 	 * http://127.0.0.1:9003/privacy
