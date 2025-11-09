@@ -122,26 +122,15 @@ Listed course START -->
 			</div>
 
 			<!-- Item -->
-			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
+			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/home.svg" alt="项目管理图标">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="stretched-link" target="_blank">项目管理</a></h5>
-					<span class="mb-0">看板、日报、任务管理</span>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="stretched-link" target="_blank">任务管理</a></h5>
+					<span class="mb-0">任务、日历、待办事项</span>
 				</div>
-			</div>  -->
-
-			<!-- Item -->
-			<#--  <div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
-					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/coding.svg" alt="插件模块图标">
-					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="stretched_link" target="_blank">插件模块</a></h5>
-					<span class="mb-0">扩展能力，支持第三方插件开发和集成，自定义业务流程、API对接，插件商店，一键安装</span>
-				</div>
-			</div>  -->
+			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
@@ -158,10 +147,10 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/online.svg" alt="<@t key='alt.suite.video'>视频客服图标</@t>">
+						<img src="assets/images/element/online.svg" alt="<@t key='alt.suite.video'>视频会议图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="stretched_link" target="_blank"><@t key="section.suite.item.video.title">视频客服</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.video.desc">WebRTC视频通话，屏幕共享，远程协助，视频录制，AI视频分析，支持移动端和PC端</@t></span>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="stretched_link" target="_blank"><@t key="section.suite.item.video.title">视频会议</@t></a></h5>
+					<span class="mb-0"><@t key="section.suite.item.video.desc">视频会议、视频客服，屏幕共享，远程协助，视频录制，AI视频分析，支持移动端和PC端</@t></span>
 				</div>
 			</div>
 
@@ -169,9 +158,9 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="assets/images/element/profit.svg" alt="<@t key='alt.suite.scrm'>客户管理Scrm图标</@t>">
+						<img src="assets/images/element/profit.svg" alt="<@t key='alt.suite.scrm'>客户管理图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/scrm.html" class="stretched_link" target="_blank"><@t key="section.suite.item.scrm.title">客户管理Scrm</@t></a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/scrm.html" class="stretched_link" target="_blank"><@t key="section.suite.item.scrm.title">客户管理</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.scrm.desc">AI智能客户画像，客户生命周期管理，营销自动化，销售漏斗分析，多渠道客户数据统一管理</@t></span>
 				</div>
 			</div>

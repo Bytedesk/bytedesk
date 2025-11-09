@@ -25,7 +25,7 @@ Hero Section START -->
 		<!-- Title -->
 		<div class="row mb-5">
 			<div class="col-lg-10 mx-auto text-center">
-				<h1 class="display-5 fw-bold mb-4">微语AI客户管理Scrm</h1>
+				<h1 class="display-5 fw-bold mb-4">微语AI客户管理</h1>
 				<p class="lead mb-4">革命性的AI驱动客户关系管理系统，整合多渠道客户数据，智能分析客户行为，提升销售转化率和客户满意度</p>
 				<div class="d-flex flex-wrap justify-content-center gap-3">
 					<a href="#features" class="btn btn-primary btn-lg">立即体验</a>
@@ -284,7 +284,7 @@ Benefits START -->
 	<div class="container">
 		<div class="row mb-5">
 			<div class="col-lg-8 mx-auto text-center">
-				<h2 class="fw-bold">为什么选择微语AI客户管理Scrm？</h2>
+				<h2 class="fw-bold">为什么选择微语AI客户管理？</h2>
 				<p class="mb-0">基于行业最佳实践，为您提供无与伦比的客户管理体验</p>
 			</div>
 		</div>
@@ -458,7 +458,7 @@ CTA Section START -->
 			<div class="col-md-5 position-relative z-index-9">
 				<!-- Title -->
 				<h2 class="fw-bold mb-4">开启智能客户管理新时代</h2>
-				<p class="mb-4">立即体验微语AI客户管理Scrm，让人工智能成为您的销售助手。提升转化率，增强客户黏性。</p>
+				<p class="mb-4">立即体验微语AI客户管理，让人工智能成为您的销售助手。提升转化率，增强客户黏性。</p>
 				
 				<!-- CTA buttons -->
 				<div class="d-flex flex-column flex-sm-row gap-3">

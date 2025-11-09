@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="微语AI">
-<meta name="description" content="微语AI客户管理Scrm - 革命性的AI驱动客户关系管理系统，整合多渠道客户数据，智能分析客户行为，提升销售转化率和客户满意度。支持AI客户画像、销售漏斗分析、营销自动化等核心功能。">
+<meta name="description" content="微语AI客户管理 - 革命性的AI驱动客户关系管理系统，整合多渠道客户数据，智能分析客户行为，提升销售转化率和客户满意度。支持AI客户画像、销售漏斗分析、营销自动化等核心功能。">
 <meta name="keywords" content="微语,AI,客户管理,Scrm,CRM,客户关系管理,销售漏斗,营销自动化,客户画像,销售管理,客户分析">
 
 <!-- Dark mode -->
@@ -84,15 +84,15 @@
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.weiyuai.cn/scrm">
-<meta property="og:title" content="微语AI客户管理Scrm - 智能客户关系管理系统">
+<meta property="og:title" content="微语AI客户管理 - 智能客户关系管理系统">
 <meta property="og:description" content="革命性的AI驱动客户关系管理系统，整合多渠道客户数据，智能分析客户行为，提升销售转化率和客户满意度">
 <meta property="og:image" content="https://www.weiyuai.cn/assets/images/logo.png">
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image">
 <meta property="twitter:url" content="https://www.weiyuai.cn/scrm">
-<meta property="twitter:title" content="微语AI客户管理Scrm - 智能客户关系管理系统">
+<meta property="twitter:title" content="微语AI客户管理 - 智能客户关系管理系统">
 <meta property="twitter:description" content="革命性的AI驱动客户关系管理系统，整合多渠道客户数据，智能分析客户行为，提升销售转化率和客户满意度">
 <meta property="twitter:image" content="https://www.weiyuai.cn/assets/images/logo.png">
 
-<title>微语AI客户管理Scrm - 智能客户关系管理系统 | 微语AI</title>
+<title>微语AI客户管理 - 智能客户关系管理系统 | 微语AI</title>

@@ -105,10 +105,10 @@
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.callcenter">呼叫中心</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.videocall">视频客服</@t></a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.videocall">视频会议</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/scrm.html" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.scrm">客户管理Scrm</@t></a>
+						<a href="https://www.weiyuai.cn/scrm.html" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.scrm">客户管理</@t></a>
 					</div>
 
 					<#--  第四行  -->
