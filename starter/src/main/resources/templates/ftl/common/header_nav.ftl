@@ -4,10 +4,11 @@
 	<nav class="navbar navbar-expand-lg">
 		<div class="container">
 			<!-- Logo START -->
-			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/" title="微语 - 重复工作自动化">
+			<#include "./macro/i18n.ftl" />
+			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/" title="${(i18n['brand.title'])! '微语 - 重复工作自动化'}">
 				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="微语logo">  -->
 				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="微语logo">  -->
-				<h1 class="h5">微语 - 重复工作自动化</h1>
+				<h1 class="h5">${(i18n['brand.title'])! '微语 - 重复工作自动化'}</h1>
 				<#--  重复工作自动化/开源AI应用创新平台/开源即时通讯平台  -->
 			</a>
 			<!-- Logo END -->
@@ -29,7 +30,7 @@
 
 					<!-- Nav item 1 Demos -->
 					<li class="nav-item dropdown">
-						<a class="nav-link active" href="https://www.weiyuai.cn" id="homeMenu" aria-current="page">首页</a>
+						<a class="nav-link active" href="https://www.weiyuai.cn" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
 					</li>
 					<!-- Nav item 1 Demos -->
 					<#--  <li class="nav-item dropdown">
@@ -42,19 +43,19 @@
 						</ul>
 					</li>  -->
 					<!-- Nav item 2 Course -->
-					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank">文档</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank">价格</a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank"><@t key="nav.docs">文档</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
 					
 					<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
-					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/voc" target="_blank">客户之声</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/forum" target="_blank">客户社区</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./helpcenter/df_org_uid_df_kb_hc_uid" target="_blank">帮助中心</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./architecture.html" target="_blank">架构</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank">下载</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./about.html" target="_blank">关于</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./contact.html" target="_blank">联系</a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/voc" target="_blank"><@t key="nav.voice">客户之声</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/forum" target="_blank"><@t key="nav.forum">客户社区</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="./helpcenter/df_org_uid_df_kb_hc_uid" target="_blank"><@t key="nav.help">帮助中心</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="./architecture.html" target="_blank"><@t key="nav.architecture">架构</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank"><@t key="nav.download">下载</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="./about.html" target="_blank"><@t key="nav.about">关于</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="./contact.html" target="_blank"><@t key="nav.contact">联系</@t></a></li>
 					<!-- Nav item 3 link-->
-					<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank">Github</a></li>
+					<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>
 				</ul>
 			</div>
 			<!-- Main navbar END -->

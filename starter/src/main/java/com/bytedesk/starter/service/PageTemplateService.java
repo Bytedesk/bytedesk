@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.io.FileInputStream;
 
 /**
  * only used for development
@@ -74,6 +76,66 @@ public class PageTemplateService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Generate multilingual static page versions.
+     * @param tempName template base name
+     */
+    public void toHtmlMulti(String tempName) {
+        String[] langs = {"zh-CN", "zh-TW", "en"};
+        for (String lang : langs) {
+            try {
+                String classpath = this.getClass().getResource("/").getPath();
+                configuration.setDirectoryForTemplateLoading(new File(classpath + templatePath));
+                Template template = configuration.getTemplate(tempName + ".ftl");
+                Map<String, Object> map = new HashMap<>();
+                map.put("lang", lang);
+                // Load properties
+                Map<String, String> i18nMap = loadI18n(classpath, lang);
+                // merge meta translations if present
+                Map<String, String> metaMap = loadI18n(classpath, lang, true);
+                i18nMap.putAll(metaMap);
+                map.put("i18n", i18nMap);
+                String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
+                InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
+                String langDir = htmlSavePath + lang + "/";
+                checkAndCreateFolder(classpath, langDir);
+                String savePath = classpath + langDir + tempName + ".html";
+                log.info("savePath {}", savePath);
+                FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath));
+                IOUtils.copy(inputStream, fileOutputStream);
+                inputStream.close();
+                fileOutputStream.close();
+            } catch (Exception e) {
+                log.error("Generate multilingual page failed for tempName {} lang {}", tempName, lang, e);
+            }
+        }
+    }
+
+    private Map<String, String> loadI18n(String classpath, String lang) {
+        return loadI18n(classpath, lang, false);
+    }
+
+    private Map<String, String> loadI18n(String classpath, String lang, boolean meta) {
+        Map<String, String> map = new HashMap<>();
+        String filePrefix = meta ? "messages_meta_" : "messages_";
+        String filePath = classpath + templatePath + "i18n/" + filePrefix + lang + ".properties";
+        File file = new File(filePath);
+        if (!file.exists()) {
+            log.warn("i18n file not found: {}", filePath);
+            return map;
+        }
+        try (FileInputStream fis = new FileInputStream(file)) {
+            Properties props = new Properties();
+            props.load(fis);
+            for (String name : props.stringPropertyNames()) {
+                map.put(name, props.getProperty(name));
+            }
+        } catch (Exception e) {
+            log.error("Load i18n file error: {}", filePath, e);
+        }
+        return map;
     }
 
     // private void toHtmlPlan(String tempName) {

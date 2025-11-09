@@ -1,3 +1,4 @@
+<#include "./macro/i18n.ftl" />
 <footer>
 	<div class="container">
 		<!-- Row START -->
@@ -11,8 +12,8 @@
 					<#--  <img class="dark-mode-item h-40px" src="assets/images/logo-light.svg" alt="logo">  -->
 				</a>
 
-				<p class="my-4"><h3>微语 - 重复工作自动化</h3></p>
-				<p ><h5>开源办公软件</h5></p>
+				<p class="my-4"><h3>${(i18n['brand.title'])! '微语 - 重复工作自动化'}</h3></p>
+				<p ><h5>${(i18n['brand.subtitle'])! '开源办公软件'}</h5></p>
 				<#--  开源即时通讯平台、重复工作自动化、开源AI应用创新平台  -->
 				<!-- Newsletter -->
 				<#--  <form class="row row-cols-lg-auto g-2">
@@ -26,7 +27,7 @@
 				
 				<!-- 联系方式 -->
 				<div class="mt-3">
-					<h5>联系我们</h5>
+					<h5><@t key="footer.contactus">联系我们</@t></h5>
 					<p><a href="mailto:270580156@qq.com" target="_blank">270580156@qq.com</a></p>
 					<p>添加微信请备注：微语</p>
 					<a href="/assets/images/qrcode/wechat.png" target="_blank">
@@ -38,7 +39,7 @@
 
 			<!-- Widget 2 START -->
 			<div class="col-md-6 col-lg-2">
-				<h5 class="mb-3">快速链接</h5>
+				<h5 class="mb-3"><@t key="footer.quicklinks">快速链接</@t></h5>
 				<ul class="nav flex-column">
 					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank">文档</a></li>
 					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/download.html" target="_blank">下载</a></li>
@@ -66,7 +67,7 @@
 			
 			<!-- Widget 3 START - 微语开源套件 -->
 			<div class="col-md-12 col-lg-6">
-				<h5 class="mb-3">微语开源套件</h5>
+				<h5 class="mb-3"><@t key="footer.suite">微语开源套件</@t></h5>
 				<div class="row g-3">
 					<!-- 第一行 -->
 					<div class="col-6 col-lg-3">
@@ -128,12 +129,12 @@
 			<div class="col-12">
 				<div class="d-md-flex justify-content-between align-items-center pt-2 pb-4 text-center">
 					<!-- copyright text -->
-					<div class="text-primary-hover"> Copyrights <a href="https://www.bytedesk.com/" target="_blank" class="text-reset">©2013~2025 北京微语天下科技有限公司</a>.</div>
+					<div class="text-primary-hover"> ${(i18n['footercopyright'])! 'Copyrights ©2013~2025 北京微语天下科技有限公司'}</div>
 					<!-- copyright links-->
 					<div class="nav justify-content-center mt-3 mt-md-0">
 						<ul class="list-inline mb-0">
-							<li class="list-inline-item"><a class="nav-link" href="https://www.weiyuai.cn/protocal.html" target="_blank">用户协议</a></li>
-							<li class="list-inline-item"><a class="nav-link" href="https://www.weiyuai.cn/privacy.html" target="_blank">隐私条款</a></li>
+							<li class="list-inline-item"><a class="nav-link" href="https://www.weiyuai.cn/protocal.html" target="_blank"><@t key="footer.agreement">用户协议</@t></a></li>
+							<li class="list-inline-item"><a class="nav-link" href="https://www.weiyuai.cn/privacy.html" target="_blank"><@t key="footer.privacy">隐私条款</@t></a></li>
 							<li class="list-inline-item"><a class="nav-link" href="https://beian.miit.gov.cn/" target="_blank">京ICP备17041763号-20</a></li>
 							<li class="list-inline-item"><a class="nav-link" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44030502008688" target="_blank">粤公网安备 44030502008688号</a></li>
 						</ul>

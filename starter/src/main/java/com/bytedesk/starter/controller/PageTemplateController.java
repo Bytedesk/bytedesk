@@ -45,7 +45,7 @@ public class PageTemplateController {
      */
     @GetMapping("/static")
     public JsonResult<?> staticize() {
-
+        // single default zh-CN legacy generation
         pageTemplateService.toHtml("index");
         pageTemplateService.toHtml("download");
         pageTemplateService.toHtml("office");
@@ -54,8 +54,16 @@ public class PageTemplateController {
         pageTemplateService.toHtml("privacy");
         pageTemplateService.toHtml("terms");
         pageTemplateService.toHtml("scrm");
-
-        return JsonResult.success("generate html success", 200, true);
+        // multilingual generation
+        pageTemplateService.toHtmlMulti("index");
+        pageTemplateService.toHtmlMulti("download");
+        pageTemplateService.toHtmlMulti("office");
+        pageTemplateService.toHtmlMulti("about");
+        pageTemplateService.toHtmlMulti("contact");
+        pageTemplateService.toHtmlMulti("privacy");
+        pageTemplateService.toHtmlMulti("terms");
+        pageTemplateService.toHtmlMulti("scrm");
+        return JsonResult.success("generate html success (multi-language)", 200, true);
     }
 
 }

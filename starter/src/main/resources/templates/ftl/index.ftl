@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${lang! 'zh-CN'}">
 <head>
 	<#--  Header  -->
 	<#include "./common/header_meta.ftl" />
@@ -25,8 +25,9 @@ Listed course START -->
 		<!-- Title -->
 		<div class="row mb-4">
 			<div class="col-lg-8 mx-auto text-center">
-				<h2>微语开源套件：N合一</h2>
-				<p class="mb-0">开源、免费，私有部署，所有数据存储在您自己的服务器上</p>
+				<#include "./common/macro/i18n.ftl" />
+				<h2><@t key="section.suite.title">微语开源套件：N合一</@t></h2>
+				<p class="mb-0"><@t key="section.suite.desc">开源、免费，私有部署，所有数据存储在您自己的服务器上</@t></p>
 			</div>
 		</div>
 
@@ -199,14 +200,14 @@ Download START -->
 		<div class="row g-4 align-items-center">
 			<div class="col-md-5 position-relative z-index-9">
 				<!-- Title -->
-				<h2>支持定制</h2>
-				<p>如果您有定制需求或其他合作事宜，请与我们联系.</p>
-				<p>添加微信请备注：微语</p>
+				<h2><@t key="section.custom.title">支持定制</@t></h2>
+				<p><@t key="section.custom.desc">如果您有定制需求或其他合作事宜，请与我们联系.</@t></p>
+				<p><@t key="section.custom.wechat">添加微信请备注：微语</@t></p>
 				<!-- Download button -->
 				<div class="row">
 					<!-- Google play store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
-						<a href="mailto:270580156@qq.com">270580156@qq.com</a>
+						<a href="mailto:${(i18n['section.contact.email'])!'270580156@qq.com'}">${(i18n['section.contact.email'])!'270580156@qq.com'}</a>
 					</div>
 					<!-- App store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
