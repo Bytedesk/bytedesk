@@ -1,5 +1,6 @@
 <!-- =======================
 Action box START -->
+<#include "./macro/i18n.ftl" />
 <section>
 	<div class="container">
 		<div class="row">
@@ -35,16 +36,16 @@ Action box START -->
 						</div>
 						<!-- Title -->
 						<div class="col-lg-6 text-center">
-							<span class="h6 fw-light">开源、开放</span>
-							<h3 class="mb-0 mt-2">开始免费使用吧</h3>
+							<span class="h6 fw-light"><@t key="action.open">开源、开放</@t></span>
+							<h3 class="mb-0 mt-2"><@t key="action.title">开始免费使用吧</@t></h3>
 							<!-- Button -->
 							<p style="margin-top: 1rem;">
-								<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>
+								<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》<@t key="action.register">免费注册</@t></a>
 							</p>
 						</div>
 						<!-- Content and input -->
 						<div class="col-lg-3 text-center text-lg-end z-index-9">
-							<a href="https://www.weiyuai.cn/download.html" class="btn btn-warning mb-0" target="_blank">去下载</a>
+							<a href="https://www.weiyuai.cn/download.html" class="btn btn-warning mb-0" target="_blank"><@t key="action.download">去下载</@t></a>
 						</div>
 					</div>
 				</div>

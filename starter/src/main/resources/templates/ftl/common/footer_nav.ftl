@@ -28,8 +28,8 @@
 				<!-- 联系方式 -->
 				<div class="mt-3">
 					<h5><@t key="footer.contactus">联系我们</@t></h5>
-					<p><a href="mailto:270580156@qq.com" target="_blank">270580156@qq.com</a></p>
-					<p>添加微信请备注：微语</p>
+					<p><a href="mailto:${(i18n['section.contact.email'])!'270580156@qq.com'}" target="_blank">${(i18n['section.contact.email'])!'270580156@qq.com'}</a></p>
+					<p><@t key="section.custom.wechat">添加微信请备注：微语</@t></p>
 					<a href="/assets/images/qrcode/wechat.png" target="_blank">
 						<img src="/assets/images/qrcode/wechat.png" style="height: 80px;" alt="微语微信联系方式二维码"/>
 					</a>
@@ -51,13 +51,13 @@
 				<!-- 微信公众号 -->
 				<div class="row mt-4">
 					<div class="col-6">
-						<h6 class="mb-2">服务号</h6>
+						<h6 class="mb-2"><@t key="footer.serviceAccount">服务号</@t></h6>
 						<a href="/assets/images/qrcode/weiyu/qrcode_1280.jpg" target="_blank">
 							<img src="/assets/images/qrcode/weiyu/qrcode_1280.jpg" style="height: 80px;" alt="微语服务号"/>
 						</a>
 					</div>
 					<div class="col-6">
-						<h6 class="mb-2">订阅号</h6>
+						<h6 class="mb-2"><@t key="footer.subscribeAccount">订阅号</@t></h6>
 						<a href="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" target="_blank">
 							<img src="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" style="height: 80px;" alt="微语订阅号"/>
 						</a>
@@ -71,27 +71,27 @@
 				<div class="row g-3">
 					<!-- 第一行 -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/team" class="text-reset d-inline-block mb-1" target="_blank">企业IM</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/team" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.team">企业IM</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/service" class="text-reset d-inline-block mb-1" target="_blank">在线客服</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/service" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.service">在线客服</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ai" class="text-reset d-inline-block mb-1" target="_blank">AI Agent</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ai" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.ai">AI Agent</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kbase" class="text-reset d-inline-block mb-1" target="_blank">企业知识库</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kbase" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.kbase">企业知识库</@t></a>
 					</div>
 
 					<!-- 第二行 -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="text-reset d-inline-block mb-1" target="_blank">客户之声</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.voc">客户之声</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="text-reset d-inline-block mb-1" target="_blank">工单系统</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.ticket">工单系统</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="text-reset d-inline-block mb-1" target="_blank">工作流</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.workflow">工作流</@t></a>
 					</div>
 					<#--  <div class="col-6 col-lg-3">
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="text-reset d-inline-block mb-1" target="_blank">项目管理</a>
@@ -102,21 +102,21 @@
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="text-reset d-inline-block mb-1" target="_blank">插件模块</a>
 					</div>  -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="text-reset d-inline-block mb-1" target="_blank">呼叫中心</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.callcenter">呼叫中心</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank">视频客服</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.videocall">视频客服</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/scrm.html" class="text-reset d-inline-block mb-1" target="_blank">客户管理Scrm</a>
+						<a href="https://www.weiyuai.cn/scrm.html" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.scrm">客户管理Scrm</@t></a>
 					</div>
 
 					<#--  第四行  -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="text-reset d-inline-block mb-1" target="_blank">开放平台</a>
+						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.open">开放平台</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/office.html" class="text-reset d-inline-block mb-1" target="_blank">AI文档</a>
+						<a href="https://www.weiyuai.cn/office.html" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.office">AI文档</@t></a>
 					</div>
 				</div>
 			</div>

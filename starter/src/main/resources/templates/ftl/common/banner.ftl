@@ -1,3 +1,4 @@
+<#include "./macro/i18n.ftl" />
 <!-- =======================
 Main Banner START -->
 <section class="position-relative">
@@ -13,10 +14,10 @@ Main Banner START -->
 		<div class="row align-items-center">
 			<div class="col-md-5">
 				<!-- Title -->
-				<h1 class="mb-3">基于AI全新打造</h1>
-				<h4 class="mb-3">开源企业协同解决方案</h4>
+				<h1 class="mb-3"><@t key="banner.title">基于AI全新打造</@t></h1>
+				<h4 class="mb-3"><@t key="banner.subtitle">开源企业协同解决方案</@t></h4>
 				<!-- Button -->
-				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>
+				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》<@t key="banner.register">免费注册</@t></a>
 			</div>
 			<div class="col-md-7">
 				<!-- Image -->

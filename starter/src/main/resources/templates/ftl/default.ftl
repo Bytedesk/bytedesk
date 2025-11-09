@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${lang! 'zh-CN'}">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系统入口</title>
+    <#include "./common/macro/i18n.ftl" />
+    <title><@t key="default.title">系统入口</@t></title>
     <#--  <title>${(customName?exists && customName != '')?then(customName?html, '系统入口')}</title>  -->
     <#if customLogo?exists && customLogo != ''>
     <link rel="icon" href="${customLogo}" type="image/x-icon">
@@ -125,26 +126,26 @@
         <#--  <#if customLogo?exists && customLogo != ''>
         <img src="${customLogo}" alt="${(customName?exists && customName != '')?then(customName?html, '系统入口')}" class="logo">
         </#if>  -->
-        <#--  <h1>${(customName?exists && customName != '')?then(customName?html, '系统入口')}</h1>  -->
-        <h1>系统入口</h1>
-        <#--  <p class="description">${(customDescription?exists && customDescription != '')?then(customDescription?html, '请选择您要进入的系统入口')}</p>  -->
-        <p class="description">请选择您要进入的系统入口</p>
+    <#--  <h1>${(customName?exists && customName != '')?then(customName?html, '系统入口')}</h1>  -->
+    <h1><@t key="default.title">系统入口</@t></h1>
+    <#--  <p class="description">${(customDescription?exists && customDescription != '')?then(customDescription?html, '请选择您要进入的系统入口')}</p>  -->
+    <p class="description"><@t key="default.select">请选择您要进入的系统入口</@t></p>
         
         <div class="button-container">
             <a href="/admin" target="_blank" class="button">
                 <i class="fas fa-cogs"></i>
-                <div class="button-title">管理后台</div>
-                <div class="button-description">系统配置与管理</div>
+                <div class="button-title"><@t key="default.admin.title">管理后台</@t></div>
+                <div class="button-description"><@t key="default.admin.desc">系统配置与管理</@t></div>
             </a>
             <a href="/agent/chat" target="_blank" class="button">
                 <i class="fas fa-headset"></i>
-                <div class="button-title">客服工作台</div>
-                <div class="button-description">客户服务与沟通</div>
+                <div class="button-title"><@t key="default.agent.title">客服工作台</@t></div>
+                <div class="button-description"><@t key="default.agent.desc">客户服务与沟通</@t></div>
             </a>
         </div>
         
         <footer>
-            <p>© 2025 版权所有</p>
+            <p>© 2025 <@t key="default.copyright">版权所有</@t></p>
         </footer>
     </div>
 </body>
