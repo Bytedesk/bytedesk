@@ -94,7 +94,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/profit.svg" alt="<@t key='alt.suite.voc'>客户之声图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="stretched-link" target="_blank">客户之声</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="stretched-link" target="_blank"><@t key="section.suite.item.voc.title">客户之声</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.voc.desc">AI回复助手，社交媒体评论抓取、第三方平台评论同步、意见反馈、服务投诉、调查问卷</@t></span>
 				</div>
 			</div>
@@ -105,7 +105,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/medical.svg" alt="<@t key='alt.suite.ticket'>工单系统图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="stretched-link" target="_blank">工单系统</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="stretched-link" target="_blank"><@t key="section.suite.item.ticket.title">工单系统</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.ticket.desc">AI工单助手，自动创建工单，自动分配工单，自动关闭工单</@t></span>
 				</div>
 			</div>
@@ -116,7 +116,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/artist.svg" alt="<@t key='alt.suite.workflow'>工作流图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="stretched-link" target="_blank">工作流</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="stretched-link" target="_blank"><@t key="section.suite.item.workflow.title">工作流</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.workflow.desc">AI智能体，自动执行数据操作，自定义工作流、流程编排，Function Calling/Mcp</@t></span>
 				</div>
 			</div>
@@ -149,7 +149,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/data-science.svg" alt="<@t key='alt.suite.call'>呼叫中心图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="stretched_link" target="_blank">呼叫中心</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="stretched_link" target="_blank"><@t key="section.suite.item.call.title">呼叫中心</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.call.desc">AI智能外呼，自动语音识别，智能语音合成，多线路接入，通话录音，质检分析，支持FreeSWITCH</@t></span>
 				</div>
 			</div>
@@ -160,7 +160,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/online.svg" alt="<@t key='alt.suite.video'>视频客服图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="stretched_link" target="_blank">视频客服</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="stretched_link" target="_blank"><@t key="section.suite.item.video.title">视频客服</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.video.desc">WebRTC视频通话，屏幕共享，远程协助，视频录制，AI视频分析，支持移动端和PC端</@t></span>
 				</div>
 			</div>
@@ -171,7 +171,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/profit.svg" alt="<@t key='alt.suite.scrm'>客户管理Scrm图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/scrm.html" class="stretched_link" target="_blank">客户管理Scrm</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/scrm.html" class="stretched_link" target="_blank"><@t key="section.suite.item.scrm.title">客户管理Scrm</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.scrm.desc">AI智能客户画像，客户生命周期管理，营销自动化，销售漏斗分析，多渠道客户数据统一管理</@t></span>
 				</div>
 			</div>
@@ -182,7 +182,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/engineering.svg" alt="<@t key='alt.suite.open'>开放平台图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="stretched_link" target="_blank">开放平台</a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="stretched_link" target="_blank"><@t key="section.suite.item.open.title">开放平台</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.open.desc">API接口开放，第三方集成，开发者工具，SDK支持，插件生态，开放API文档</@t></span>
 				</div>
 			</div>
