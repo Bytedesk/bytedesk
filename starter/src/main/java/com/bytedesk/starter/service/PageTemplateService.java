@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * only used for development
@@ -126,9 +128,9 @@ public class PageTemplateService {
             log.warn("i18n file not found: {}", filePath);
             return map;
         }
-        try (FileInputStream fis = new FileInputStream(file)) {
+        try (FileInputStream fis = new FileInputStream(file); InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
             Properties props = new Properties();
-            props.load(fis);
+            props.load(reader);
             for (String name : props.stringPropertyNames()) {
                 map.put(name, props.getProperty(name));
             }
@@ -139,7 +141,6 @@ public class PageTemplateService {
     }
 
     // private void toHtmlPlan(String tempName) {
-
     //     try {
     //         // 设置模板路径
     //         String classpath = this.getClass().getResource("/").getPath();
@@ -165,7 +166,6 @@ public class PageTemplateService {
     //         // 关闭流
     //         inputStream.close();
     //         fileOutputStream.close();
-
     //     } catch (Exception e) {
     //         e.printStackTrace();
     //     }
