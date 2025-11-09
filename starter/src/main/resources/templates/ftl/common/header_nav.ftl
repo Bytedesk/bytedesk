@@ -47,13 +47,9 @@
 					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
 					
 					<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
-					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/voc" target="_blank"><@t key="nav.voice">客户之声</@t></a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="https://demo.weiyuai.cn/forum" target="_blank"><@t key="nav.forum">客户社区</@t></a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./helpcenter/df_org_uid_df_kb_hc_uid" target="_blank"><@t key="nav.help">帮助中心</@t></a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./architecture.html" target="_blank"><@t key="nav.architecture">架构</@t></a></li>
+					<#-- pruned: voice, forum, help, architecture -->
 					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank"><@t key="nav.download">下载</@t></a></li>
 					<li class="nav-item dropdown"><a class="nav-link" href="./about.html" target="_blank"><@t key="nav.about">关于</@t></a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./contact.html" target="_blank"><@t key="nav.contact">联系</@t></a></li>
 					<!-- Nav item 3 link-->
 					<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>
 

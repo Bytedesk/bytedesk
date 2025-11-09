@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${(lang)!'zh-CN'}">
 <head>
 	<#--  Header  -->
 	<#include "./common/meta_about.ftl" />
 	<#include "./common/header_js.ftl" />
 	<#include "./common/header_css.ftl" />
+	<#-- i18n macro -->
+	<#include "./common/macro/i18n.ftl" />
 	
 </head>
 
@@ -23,13 +25,10 @@ Download START -->
 <section class="overflow-hidden">
 	<div class="container">
 		<div class="row g-4 align-items-center">
-			<div class="col-md-5 position-relative z-index-9">
+            <div class="col-md-5 position-relative z-index-9">
 				<!-- Title -->
-				<h2>关于我们</h2>
-				<p>公司成立于2013年6月，目前团队规模数十人(其中80%是技术人员)，并在不断成长扩充中，成员多来自中科院、北邮、北航等名校，曾就职于腾讯、阿里等名企.
-					公司成立至今已经积累了 神州数码、神州专车、中国移动咪咕动漫等大客户，同时也有屈臣氏、大集汇商城、海猫全球购、比呀比海淘、 不乱买海淘、聚来宝商城、漫骆驼动漫商城、
-					8天在线云超市、itibar商城、欧咖跨境电商、趣旅网等..
-				</p>
+				<h2><@t key="page.about.title">关于我们</@t></h2>
+				<p><@t key="page.about.desc">公司成立于2013年6月，目前团队规模数十人(其中80%是技术人员)，并在不断成长扩充中，成员多来自中科院、北邮、北航等名校，曾就职于腾讯、阿里等名企。公司成立至今已经积累了多行业客户案例与实践经验。</@t></p>
 				<!-- Download button -->
 				<div class="row">
 					<!-- Google play store button -->
@@ -53,7 +52,7 @@ Download START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/07.svg" class="position-relative" alt="微语公司介绍插图">
+				<img src="assets/images/element/07.svg" class="position-relative" alt="<@t key='alt.about.illustration'>公司介绍插图</@t>">
 			</div>
 		</div>
 	</div>
