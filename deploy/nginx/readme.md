@@ -72,6 +72,7 @@ service nginx restart
 ```
 
 - 将其中的 admin，agent，chat 三个文件夹复制到 /var/www/html/weiyuai/ 文件夹下。
+- sudo chmod -R a+rX /var/www/html/weiyuai
 - 其中：admin 为管理后台，agent 为客户端，chat 为访客端
 - 三者默认访问的服务器地址为: http://127.0.0.1:9003, 发布到线上时需要修改才能够正常使用，具体修改方法如下：
 - 找到 admin/config.json 、 agent/config.json 和 chat/config.json 三个文件
