@@ -2,21 +2,21 @@
 <html lang="zh-CN">
 <head>
 	<#--  Header  -->
-	<#include "./common/meta_office.ftl" />
-	<#include "./common/header_js.ftl" />
-	<#include "./common/header_css.ftl" />
+	<#include "../common/meta_office.ftl" />
+	<#include "../common/header_js.ftl" />
+	<#include "../common/header_css.ftl" />
 	
 </head>
 
 <body>
 
 <#--  导航  -->
-<#include "./common/header_nav.ftl" />
+<#include "../common/header_nav.ftl" />
 
 <!-- **************** MAIN CONTENT START **************** -->
 <main>
 
-<#include "./common/banner.ftl" />
+<#include "../common/banner.ftl" />
 
 <!-- =======================
 Hero Section START -->
@@ -536,22 +536,22 @@ CTA Section START -->
 	</div>
 </section>
 
-<#include "./common/action_box.ftl" />
+<#include "../common/action_box.ftl" />
 
 </main>
 <!-- **************** MAIN CONTENT END **************** -->
 
 <!-- ======================= Footer START -->
-<#include "./common/footer_nav.ftl" />
+<#include "../common/footer_nav.ftl" />
 <!-- ======================= Footer END -->
 
-<#include "./common/footer_js.ftl" />
+<#include "../common/footer_js.ftl" />
 
 <#-- livechat code 客服代码  -->
-<#include "./common/bytedesk.ftl" />
+<#include "../common/bytedesk.ftl" />
 
 <#-- trace code 统计代码  -->
-<#include "./common/track.ftl" />
+<#include "../common/track.ftl" />
 
 </body>
 </html>

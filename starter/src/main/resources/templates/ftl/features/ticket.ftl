@@ -2,25 +2,25 @@
 <html lang="${lang! 'zh-CN'}">
 <head>
 	<#--  Header  -->
-	<#include "./common/header_meta.ftl" />
-	<#include "./common/header_js.ftl" />
-	<#include "./common/header_css.ftl" />
+	<#include "../common/header_meta.ftl" />
+	<#include "../common/header_js.ftl" />
+	<#include "../common/header_css.ftl" />
 	<#-- i18n macro -->
-	<#include "./common/macro/i18n.ftl" />
+	<#include "../common/macro/i18n.ftl" />
 	
 </head>
 
 <body>
 
 <#--  导航  -->
-<#include "./common/header_nav.ftl" />
+<#include "../common/header_nav.ftl" />
 
 <!-- **************** MAIN CONTENT START **************** -->
 <main>
 
 <!-- =======================
 Page Banner START -->
-<section class="bg-light py-5">
+<section class="bg-light pt-5 pb-5">
 	<div class="container">
 		<div class="row g-4 g-md-5 position-relative">
 			<!-- Main content START -->
@@ -230,22 +230,22 @@ Use Cases START -->
 <!-- =======================
 Use Cases END -->
 
-<#include "./common/action_box.ftl" />
+<#include "../common/action_box.ftl" />
 
 </main>
 <!-- **************** MAIN CONTENT END **************** -->
 
 <!-- ======================= Footer START -->
-<#include "./common/footer_nav.ftl" />
+<#include "../common/footer_nav.ftl" />
 <!-- ======================= Footer END -->
 
-<#include "./common/footer_js.ftl" />
+<#include "../common/footer_js.ftl" />
 
 <#-- livechat code 客服代码  -->
-<#include "./common/bytedesk.ftl" />
+<#include "../common/bytedesk.ftl" />
 
 <#-- trace code 统计代码  -->
-<#include "./common/track.ftl" />
+<#include "../common/track.ftl" />
 
 </body>
 </html>

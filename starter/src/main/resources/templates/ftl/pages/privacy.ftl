@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 <head>
-    <#include "./common/header_meta.ftl" />
+    <#include "../common/header_meta.ftl" />
 
 </head>
 
@@ -54,7 +54,7 @@
         type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1279686124'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/stat.php%3Fid%3D1279686124%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
 
     <#--  网站统计代码  -->
-    <#include "./common/track.ftl"/>
+    <#include "../common/track.ftl"/>
 
 </body>
 

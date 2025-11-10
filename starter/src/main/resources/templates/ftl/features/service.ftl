@@ -26,14 +26,14 @@ Page Banner START -->
 			<!-- Main content START -->
 			<div class="col-lg-8">
 				<!-- Title -->
-				<h1><@t key="page.voc.title">客户之声 (VoC)</@t></h1>
-				<p class="lead"><@t key="page.voc.subtitle">聆听客户声音，驱动产品优化与服务提升</@t></p>
+				<h1><@t key="page.service.title">在线客服 - 智能客户服务平台</@t></h1>
+				<p class="lead"><@t key="page.service.subtitle">多渠道对接、AI智能辅助，提供7x24小时优质客户服务</@t></p>
 			</div>
 			<!-- Main content END -->
 
 			<!-- Image -->
 			<div class="col-lg-4 text-center">
-				<img src="assets/images/element/profit.svg" class="h-200px" alt="<@t key='alt.voc.icon'>客户之声图标</@t>">
+				<img src="assets/images/element/data-science.svg" class="h-200px" alt="<@t key='alt.service.icon'>在线客服图标</@t>">
 			</div>
 		</div>
 	</div>
@@ -48,8 +48,8 @@ Features START -->
 		<!-- Title -->
 		<div class="row mb-4">
 			<div class="col-12 text-center">
-				<h2><@t key="page.voc.features.title">核心功能</@t></h2>
-				<p class="mb-0"><@t key="page.voc.features.desc">全渠道收集客户反馈，AI智能分析</@t></p>
+				<h2><@t key="page.service.features.title">核心功能</@t></h2>
+				<p class="mb-0"><@t key="page.service.features.desc">全方位智能客服解决方案</@t></p>
 			</div>
 		</div>
 
@@ -59,10 +59,10 @@ Features START -->
 			<div class="col-md-6 col-lg-4">
 				<div class="card card-body h-100">
 					<div class="icon-lg bg-primary bg-opacity-10 text-primary rounded-circle mb-3">
-						<i class="bi bi-chat-square-text fs-5"></i>
+						<i class="bi bi-chat-dots fs-5"></i>
 					</div>
-					<h5><@t key="page.voc.feature.social.title">社交媒体监听</@t></h5>
-					<p class="mb-0"><@t key="page.voc.feature.social.desc">自动抓取微博、小红书、抖音等社交平台评论，实时掌握用户声音</@t></p>
+					<h5><@t key="page.service.feature.multichannel.title">多渠道接入</@t></h5>
+					<p class="mb-0"><@t key="page.service.feature.multichannel.desc">支持网页、微信、小程序、APP等多种渠道，统一管理客户咨询</@t></p>
 				</div>
 			</div>
 
@@ -72,8 +72,8 @@ Features START -->
 					<div class="icon-lg bg-success bg-opacity-10 text-success rounded-circle mb-3">
 						<i class="bi bi-robot fs-5"></i>
 					</div>
-					<h5><@t key="page.voc.feature.aireply.title">AI回复助手</@t></h5>
-					<p class="mb-0"><@t key="page.voc.feature.aireply.desc">AI智能生成回复内容，帮助客服快速响应用户评论和反馈</@t></p>
+					<h5><@t key="page.service.feature.ai.title">AI智能助手</@t></h5>
+					<p class="mb-0"><@t key="page.service.feature.ai.desc">AI自动回复、意图识别、情绪分析，提升服务效率和质量</@t></p>
 				</div>
 			</div>
 
@@ -81,10 +81,10 @@ Features START -->
 			<div class="col-md-6 col-lg-4">
 				<div class="card card-body h-100">
 					<div class="icon-lg bg-warning bg-opacity-10 text-warning rounded-circle mb-3">
-						<i class="bi bi-star fs-5"></i>
+						<i class="bi bi-people fs-5"></i>
 					</div>
-					<h5><@t key="page.voc.feature.review.title">第三方评论同步</@t></h5>
-					<p class="mb-0"><@t key="page.voc.feature.review.desc">同步应用商店、电商平台等第三方评价，统一管理用户反馈</@t></p>
+					<h5><@t key="page.service.feature.agent.title">智能分配</@t></h5>
+					<p class="mb-0"><@t key="page.service.feature.agent.desc">智能路由分配客服，支持技能组、VIP优先级等多种分配策略</@t></p>
 				</div>
 			</div>
 
@@ -92,10 +92,10 @@ Features START -->
 			<div class="col-md-6 col-lg-4">
 				<div class="card card-body h-100">
 					<div class="icon-lg bg-info bg-opacity-10 text-info rounded-circle mb-3">
-						<i class="bi bi-envelope fs-5"></i>
+						<i class="bi bi-graph-up fs-5"></i>
 					</div>
-					<h5><@t key="page.voc.feature.feedback.title">意见反馈</@t></h5>
-					<p class="mb-0"><@t key="page.voc.feature.feedback.desc">在线反馈表单，收集用户建议和问题，跟踪处理进度</@t></p>
+					<h5><@t key="page.service.feature.analytics.title">数据分析</@t></h5>
+					<p class="mb-0"><@t key="page.service.feature.analytics.desc">实时监控服务数据，客户满意度分析，客服绩效评估</@t></p>
 				</div>
 			</div>
 
@@ -103,10 +103,10 @@ Features START -->
 			<div class="col-md-6 col-lg-4">
 				<div class="card card-body h-100">
 					<div class="icon-lg bg-danger bg-opacity-10 text-danger rounded-circle mb-3">
-						<i class="bi bi-exclamation-triangle fs-5"></i>
+						<i class="bi bi-shield-check fs-5"></i>
 					</div>
-					<h5><@t key="page.voc.feature.complaint.title">服务投诉</@t></h5>
-					<p class="mb-0"><@t key="page.voc.feature.complaint.desc">投诉受理与处理流程，确保问题得到妥善解决，提升客户满意度</@t></p>
+					<h5><@t key="page.service.feature.quality.title">智能质检</@t></h5>
+					<p class="mb-0"><@t key="page.service.feature.quality.desc">AI自动质检会话记录，识别服务风险，提升服务规范性</@t></p>
 				</div>
 			</div>
 
@@ -114,10 +114,10 @@ Features START -->
 			<div class="col-md-6 col-lg-4">
 				<div class="card card-body h-100">
 					<div class="icon-lg bg-purple bg-opacity-10 text-purple rounded-circle mb-3">
-						<i class="bi bi-clipboard-check fs-5"></i>
+						<i class="bi bi-database fs-5"></i>
 					</div>
-					<h5><@t key="page.voc.feature.survey.title">调查问卷</@t></h5>
-					<p class="mb-0"><@t key="page.voc.feature.survey.desc">创建和发布满意度调查、需求调研，数据可视化分析</@t></p>
+					<h5><@t key="page.service.feature.crm.title">客户管理</@t></h5>
+					<p class="mb-0"><@t key="page.service.feature.crm.desc">完整客户画像，会话历史记录，私域流量沉淀</@t></p>
 				</div>
 			</div>
 		</div>
@@ -127,60 +127,64 @@ Features START -->
 Features END -->
 
 <!-- =======================
-Analysis START -->
+Advantages START -->
 <section class="bg-light">
 	<div class="container">
 		<div class="row mb-4">
 			<div class="col-12 text-center">
-				<h2><@t key="page.voc.analysis.title">智能分析</@t></h2>
+				<h2><@t key="page.service.advantages.title">产品优势</@t></h2>
 			</div>
 		</div>
 
 		<div class="row g-4">
+			<!-- Advantage 1 -->
 			<div class="col-md-6 col-lg-3">
 				<div class="text-center">
 					<div class="icon-xl bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-3">
-						<i class="bi bi-bar-chart fs-4"></i>
+						<i class="bi bi-lightning-charge fs-3"></i>
 					</div>
-					<h5><@t key="page.voc.analysis.sentiment.title">情感分析</@t></h5>
-					<p class="small"><@t key="page.voc.analysis.sentiment.desc">自动识别用户情绪倾向</@t></p>
+					<h5><@t key="page.service.advantage.fast.title">快速响应</@t></h5>
+					<p><@t key="page.service.advantage.fast.desc">AI秒级回复，人工坐席快速接入</@t></p>
 				</div>
 			</div>
 
+			<!-- Advantage 2 -->
 			<div class="col-md-6 col-lg-3">
 				<div class="text-center">
 					<div class="icon-xl bg-success bg-opacity-10 text-success rounded-circle mx-auto mb-3">
-						<i class="bi bi-tags fs-4"></i>
+						<i class="bi bi-coin fs-3"></i>
 					</div>
-					<h5><@t key="page.voc.analysis.tag.title">智能标签</@t></h5>
-					<p class="small"><@t key="page.voc.analysis.tag.desc">自动分类反馈类型</@t></p>
+					<h5><@t key="page.service.advantage.cost.title">降本增效</@t></h5>
+					<p><@t key="page.service.advantage.cost.desc">AI处理80%常见问题，降低人力成本</@t></p>
 				</div>
 			</div>
 
+			<!-- Advantage 3 -->
 			<div class="col-md-6 col-lg-3">
 				<div class="text-center">
 					<div class="icon-xl bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-3">
-						<i class="bi bi-graph-up fs-4"></i>
+						<i class="bi bi-clock-history fs-3"></i>
 					</div>
-					<h5><@t key="page.voc.analysis.trend.title">趋势分析</@t></h5>
-					<p class="small"><@t key="page.voc.analysis.trend.desc">发现问题变化趋势</@t></p>
+					<h5><@t key="page.service.advantage.24x7.title">全天候服务</@t></h5>
+					<p><@t key="page.service.advantage.24x7.desc">7x24小时在线，不错过任何咨询</@t></p>
 				</div>
 			</div>
 
+			<!-- Advantage 4 -->
 			<div class="col-md-6 col-lg-3">
 				<div class="text-center">
 					<div class="icon-xl bg-info bg-opacity-10 text-info rounded-circle mx-auto mb-3">
-						<i class="bi bi-lightbulb fs-4"></i>
+						<i class="bi bi-emoji-smile fs-3"></i>
 					</div>
-					<h5><@t key="page.voc.analysis.insight.title">洞察建议</@t></h5>
-					<p class="small"><@t key="page.voc.analysis.insight.desc">AI生成改进建议</@t></p>
+					<h5><@t key="page.service.advantage.satisfaction.title">提升满意度</@t></h5>
+					<p><@t key="page.service.advantage.satisfaction.desc">专业服务，快速解决问题</@t></p>
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
 <!-- =======================
-Analysis END -->
+Advantages END -->
 
 <!-- =======================
 Use Cases START -->
@@ -188,7 +192,7 @@ Use Cases START -->
 	<div class="container">
 		<div class="row mb-4">
 			<div class="col-12 text-center">
-				<h2><@t key="page.voc.usecases.title">应用场景</@t></h2>
+				<h2><@t key="page.service.usecases.title">应用场景</@t></h2>
 			</div>
 		</div>
 
@@ -197,8 +201,8 @@ Use Cases START -->
 			<div class="col-md-6">
 				<div class="card border h-100">
 					<div class="card-body">
-						<h5 class="card-title"><@t key="page.voc.usecase.product.title">产品优化</@t></h5>
-						<p class="card-text"><@t key="page.voc.usecase.product.desc">收集用户对产品功能的反馈，发现痛点和需求，指导产品迭代方向</@t></p>
+						<h5 class="card-title"><@t key="page.service.usecase.ecommerce.title">电商行业</@t></h5>
+						<p class="card-text"><@t key="page.service.usecase.ecommerce.desc">售前咨询、订单查询、售后服务，全流程客户服务支持</@t></p>
 					</div>
 				</div>
 			</div>
@@ -207,8 +211,8 @@ Use Cases START -->
 			<div class="col-md-6">
 				<div class="card border h-100">
 					<div class="card-body">
-						<h5 class="card-title"><@t key="page.voc.usecase.service.title">服务改进</@t></h5>
-						<p class="card-text"><@t key="page.voc.usecase.service.desc">监控服务质量投诉，及时发现并解决服务问题，提升客户满意度</@t></p>
+						<h5 class="card-title"><@t key="page.service.usecase.finance.title">金融行业</@t></h5>
+						<p class="card-text"><@t key="page.service.usecase.finance.desc">业务咨询、产品介绍、投诉处理，合规安全的服务体验</@t></p>
 					</div>
 				</div>
 			</div>
@@ -217,8 +221,8 @@ Use Cases START -->
 			<div class="col-md-6">
 				<div class="card border h-100">
 					<div class="card-body">
-						<h5 class="card-title"><@t key="page.voc.usecase.reputation.title">品牌监测</@t></h5>
-						<p class="card-text"><@t key="page.voc.usecase.reputation.desc">实时监测社交媒体舆情，快速响应负面评论，保护品牌形象</@t></p>
+						<h5 class="card-title"><@t key="page.service.usecase.education.title">教育培训</@t></h5>
+						<p class="card-text"><@t key="page.service.usecase.education.desc">课程咨询、报名服务、学员答疑，提升招生转化率</@t></p>
 					</div>
 				</div>
 			</div>
@@ -227,8 +231,8 @@ Use Cases START -->
 			<div class="col-md-6">
 				<div class="card border h-100">
 					<div class="card-body">
-						<h5 class="card-title"><@t key="page.voc.usecase.market.title">市场调研</@t></h5>
-						<p class="card-text"><@t key="page.voc.usecase.market.desc">通过问卷调查了解市场需求，为新产品开发提供决策依据</@t></p>
+						<h5 class="card-title"><@t key="page.service.usecase.saas.title">SaaS企业</@t></h5>
+						<p class="card-text"><@t key="page.service.usecase.saas.desc">产品试用、技术支持、续费服务，提升客户留存率</@t></p>
 					</div>
 				</div>
 			</div>

@@ -54,7 +54,7 @@ Listed course START -->
 						<img src="assets/images/element/data-science.svg" alt="<@t key='alt.suite.service'>在线客服图标</@t>">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/service" class="stretched-link" target="_blank"><@t key="section.suite.item.service.title">在线客服</@t></a></h5>
+					<h5 class="mb-1"><a href="/service.html" class="stretched-link"><@t key="section.suite.item.service.title">在线客服</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.service.desc">多渠道对接、多账号聚合，私域管理，AI意图识别，AI智能质检、支持人工坐席兜底，数十项在线客服通用功能。
 						来自<a href="http://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
 					</@t></span>
@@ -160,7 +160,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/profit.svg" alt="<@t key='alt.suite.scrm'>客户管理图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/scrm.html" class="stretched_link" target="_blank"><@t key="section.suite.item.scrm.title">客户管理</@t></a></h5>
+					<h5 class="mb-1"><a href="/scrm.html" class="stretched-link"><@t key="section.suite.item.scrm.title">客户管理</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.scrm.desc">AI智能客户画像，客户生命周期管理，营销自动化，销售漏斗分析，多渠道客户数据统一管理</@t></span>
 				</div>
 			</div>
@@ -171,7 +171,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="assets/images/element/engineering.svg" alt="<@t key='alt.suite.open'>开放平台图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="stretched_link" target="_blank"><@t key="section.suite.item.open.title">开放平台</@t></a></h5>
+					<h5 class="mb-1"><a href="/open.html" class="stretched-link"><@t key="section.suite.item.open.title">开放平台</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.open.desc">API接口开放，第三方集成，开发者工具，SDK支持，插件生态，开放API文档</@t></span>
 				</div>
 			</div>
