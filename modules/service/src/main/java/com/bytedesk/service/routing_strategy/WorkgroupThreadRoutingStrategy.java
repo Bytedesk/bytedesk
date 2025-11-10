@@ -274,7 +274,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         if (workgroup.getAvailableAgents().isEmpty()) {
             return null; // 继续使用现有会话
         }
-        
         return null; // 有可用客服时重新路由
     }
     /**

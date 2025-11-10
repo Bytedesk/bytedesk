@@ -129,21 +129,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setDescription(request.getDescription());
         // workgroup.setRoutingMode(request.getRoutingMode());
         workgroup.setStatus(request.getStatus());
-        // TODO: Settings should be managed through WorkgroupSettingsEntity
-        // MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatWorkgroupMessageLeaveSettings(request);
-        // workgroup.setMessageLeaveSettings(messageLeaveSettings);
-        // //
-        // RobotSettings robotSettings = serviceSettingsService.formatWorkgroupRobotSettings(request);
-        // workgroup.setRobotSettings(robotSettings);
-        // //
-        // ServiceSettings serviceSettings = serviceSettingsService.formatWorkgroupServiceSettings(request);
-        // workgroup.setServiceSettings(serviceSettings);
-        // //
-        // QueueSettings queueSettings = serviceSettingsService.formatWorkgroupQueueSettings(request);
-        // workgroup.setQueueSettings(queueSettings);
-        //
-        // InviteSettings inviteSettings = serviceSettingsService.formatWorkgroupInviteSettings(request);
-        // workgroup.setInviteSettings(inviteSettings);
         //
         // 如果前端未传 agentUids，则不改动现有客服列表；只有在明确传入时才覆盖
         boolean agentsChanged = false;
