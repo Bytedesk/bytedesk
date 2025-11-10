@@ -21,7 +21,6 @@ import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
-import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicCacheService;
 import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicRestService;
@@ -122,11 +121,11 @@ public class ThreadEventListener {
         }
     }
 
-    @EventListener
-    public void onThreadCloseEvent(ThreadCloseEvent event) {
-        ThreadEntity thread = event.getThread();
-        log.info("ThreadEventListener onThreadCloseEvent: {}", thread.getUid());
-    }
+    // @EventListener
+    // public void onThreadCloseEvent(ThreadCloseEvent event) {
+    //     ThreadEntity thread = event.getThread();
+    //     log.info("ThreadEventListener onThreadCloseEvent: {}", thread.getUid());
+    // }
 
     @EventListener
     public void onThreadRemoveTopicEvent(ThreadRemoveTopicEvent event) {
