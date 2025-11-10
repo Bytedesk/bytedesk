@@ -5,11 +5,11 @@
 		<div class="container">
 			<!-- Logo START -->
 			<#include "./macro/i18n.ftl" />
-			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/" title="${(i18n['brand.title'])! '微语 - 重复工作自动化'}">
+			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/" title="${(i18n['brand.title'])! '微语 - 开源智能客服系统'}">
 				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="微语logo">  -->
 				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="微语logo">  -->
-				<h1 class="h5">${(i18n['brand.title'])! '微语 - 重复工作自动化'}</h1>
-				<#--  重复工作自动化/开源AI应用创新平台/开源即时通讯平台  -->
+				<h1 class="h5">${(i18n['brand.title'])! '微语 - 开源智能客服系统'}</h1>
+				<#--  开源智能客服系统/开源AI应用创新平台/开源即时通讯平台  -->
 			</a>
 			<!-- Logo END -->
 

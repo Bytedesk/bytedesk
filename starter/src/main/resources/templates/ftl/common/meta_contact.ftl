@@ -1,4 +1,4 @@
-<title>联系我们 - 微语 - 重复工作自动化解决方案</title>
+<title>联系我们 - 微语 - 开源智能客服系统解决方案</title>
 <!-- Meta Tags -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,7 +8,7 @@
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.weiyuai.cn/contact.html">
-<meta property="og:title" content="联系我们 - 微语 - 重复工作自动化解决方案">
+<meta property="og:title" content="联系我们 - 微语 - 开源智能客服系统解决方案">
 <meta property="og:description" content="微语联系方式，提供企业IM、在线客服、AI助手、知识库等开源办公软件解决方案，支持定制开发">
 <meta property="og:image" content="https://www.weiyuai.cn/assets/images/qrcode/weiyu/qrcode_1280.jpg">
 <!-- Twitter -->

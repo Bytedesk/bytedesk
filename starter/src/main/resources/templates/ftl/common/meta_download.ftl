@@ -34,6 +34,6 @@
     "priceCurrency": "CNY"
   },
   "downloadUrl": "https://www.weiyuai.cn/download.html",
-  "description": "企业IM、在线客服系统、AI助手等重复工作自动化解决方案"
+  "description": "企业IM、在线客服系统、AI助手等开源智能客服系统解决方案"
 }
 </script>
