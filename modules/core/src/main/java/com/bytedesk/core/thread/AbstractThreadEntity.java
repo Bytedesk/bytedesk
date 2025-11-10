@@ -112,10 +112,10 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Column(name = "is_fold")
     private Boolean fold = false;
 
-    // 自动关闭
+    // 关闭来源类型，替代原autoClose布尔；保持向后兼容：如果是旧数据autoClose=true则在业务层转换为AUTO
     @Builder.Default
-    @Column(name = "is_auto_close")
-    private Boolean autoClose = false;
+    @Column(name = "thread_close_type")
+    private String closeType = "NONE"; // {@link ThreadCloseTypeEnum}
 
     // 备注
     @Column(name = "thread_note")

@@ -233,9 +233,11 @@ public class ConvertUtils {
         // threadResponse.setWeChatMpChannel(thread.isWeChatMp());
         // threadResponse.setWeChatMiniChannel(thread.isWeChatMini());
         
-        // 手动设置业务逻辑字段
-        threadResponse.setRobotToAgent(thread.isRobotToAgent());
-        threadResponse.setValid(thread.isValid());
+    // 手动设置业务逻辑字段
+    threadResponse.setRobotToAgent(thread.isRobotToAgent());
+    threadResponse.setValid(thread.isValid());
+    // 关闭来源类型
+    threadResponse.setCloseType(thread.getCloseType());
         
         // 手动设置消息统计字段
         threadResponse.setAllMessageCount(thread.getAllMessageCount());

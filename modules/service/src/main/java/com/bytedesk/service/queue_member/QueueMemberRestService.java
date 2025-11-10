@@ -43,6 +43,20 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     
+    /**
+     * 访客主动退出排队：标记离开时间并软删除队列成员记录
+     */
+    public void visitorExitQueue(String threadUid) {
+        Optional<QueueMemberEntity> optional = findByThreadUid(threadUid);
+        if (!optional.isPresent()) {
+            return;
+        }
+        QueueMemberEntity entity = optional.get();
+        entity.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
+        entity.setDeleted(true);
+        save(entity);
+    }
+    
     @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {

@@ -67,7 +67,9 @@ public class VisitorThreadEventListener {
         ThreadEntity thread = event.getThread();
         log.info("visitor onThreadCloseEvent: {}", thread.getUid());
         
-        boolean autoClose = thread.getAutoClose();
+    // 使用closeType替代autoClose
+    String closeType = thread.getCloseType();
+    boolean autoClose = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
         
         // 更新队列成员状态
         updateQueueMemberOnClose(thread, autoClose);
@@ -78,7 +80,7 @@ public class VisitorThreadEventListener {
         }
         
         // 获取关闭提示语
-        String content = getCloseTip(thread, autoClose);
+    String content = getCloseTip(thread, closeType);
         
         // 发送消息
         MessageProtobuf messageProtobuf = autoClose
@@ -153,56 +155,57 @@ public class VisitorThreadEventListener {
     /**
      * 获取关闭提示语
      */
-    private String getCloseTip(ThreadEntity thread, boolean autoClose) {
+    private String getCloseTip(ThreadEntity thread, String closeType) {
         String topic = thread.getTopic();
-        
+        boolean autoClose = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
         if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-            return getWorkgroupCloseTip(topic, autoClose);
+            return getWorkgroupCloseTip(topic, autoClose, closeType);
         } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
-            return getAgentCloseTip(topic, autoClose);
+            return getAgentCloseTip(topic, autoClose, closeType);
         } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
             return getRobotCloseTip(topic);
         }
-        
-        return "会话已结束";
+        return resolveGenericCloseTip(closeType);
     }
 
     /**
      * 获取工作组关闭提示语
      */
-    private String getWorkgroupCloseTip(String topic, boolean autoClose) {
+    private String getWorkgroupCloseTip(String topic, boolean autoClose, String closeType) {
         String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
         
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
             if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
-                return autoClose 
-                    ? workgroup.getSettings().getServiceSettings().getAutoCloseTip()
-                    : workgroup.getSettings().getServiceSettings().getAgentCloseTip();
+                if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                    return workgroup.getSettings().getServiceSettings().getAgentCloseTip();
+                }
+                return autoClose ? workgroup.getSettings().getServiceSettings().getAutoCloseTip()
+                        : workgroup.getSettings().getServiceSettings().getAgentCloseTip();
             }
         }
-        
-        return autoClose ? I18Consts.I18N_AUTO_CLOSE_TIP : I18Consts.I18N_AGENT_CLOSE_TIP;
+        return resolveGenericCloseTip(closeType);
     }
 
     /**
      * 获取客服关闭提示语
      */
-    private String getAgentCloseTip(String topic, boolean autoClose) {
+    private String getAgentCloseTip(String topic, boolean autoClose, String closeType) {
         String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
         
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
-                return autoClose 
-                    ? agent.getSettings().getServiceSettings().getAutoCloseTip()
-                    : agent.getSettings().getServiceSettings().getAgentCloseTip();
+                if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                    return agent.getSettings().getServiceSettings().getAgentCloseTip();
+                }
+                return autoClose ? agent.getSettings().getServiceSettings().getAutoCloseTip()
+                        : agent.getSettings().getServiceSettings().getAgentCloseTip();
             }
         }
-        
-        return autoClose ? I18Consts.I18N_AUTO_CLOSE_TIP : I18Consts.I18N_AGENT_CLOSE_TIP;
+        return resolveGenericCloseTip(closeType);
     }
 
     /**
@@ -220,6 +223,19 @@ public class VisitorThreadEventListener {
         }
         
         return I18Consts.I18N_AUTO_CLOSE_TIP;
+    }
+
+    private String resolveGenericCloseTip(String closeType) {
+        if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+            return I18Consts.I18N_AUTO_CLOSE_TIP;
+        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
+            return I18Consts.I18N_AGENT_CLOSE_TIP;
+        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+            return I18Consts.I18N_AGENT_CLOSE_TIP; // 访客关闭复用客服关闭提示
+        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.SYSTEM.name().equalsIgnoreCase(closeType)) {
+            return I18Consts.I18N_AGENT_CLOSE_TIP;
+        }
+        return "会话已结束";
     }
 
     /**

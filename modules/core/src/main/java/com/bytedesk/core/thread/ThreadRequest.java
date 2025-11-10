@@ -78,8 +78,9 @@ public class ThreadRequest extends BaseRequest {
     @Builder.Default
     private Boolean fold = false;
 
+    // 替换autoClose：关闭来源类型
     @Builder.Default
-    private Boolean autoClose = false;
+    private String closeType = "NONE"; // {@link ThreadCloseTypeEnum}
 
     // 备注
     private String note;

@@ -27,6 +27,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
+import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.core.message.content.QueueContent;
@@ -141,6 +142,28 @@ public class QueueMemberEventListener {
             return parts[0] + "/" + parts[1] + "/" + parts[2];
         }
         return null;
+    }
+
+    /**
+     * 会话关闭时(包含访客主动关闭/系统自动关闭/客服关闭)，刷新同队列其余排队成员位置
+     */
+    @EventListener
+    public void onThreadCloseEvent(ThreadCloseEvent event) {
+        ThreadEntity thread = event.getThread();
+        if (thread == null || thread.getTopic() == null) {
+            return;
+        }
+        String topicPrefix = extractTopicPrefix(thread.getTopic());
+        if (topicPrefix == null) {
+            return;
+        }
+        List<ThreadEntity> queuingThreads = threadRestService.findByTopicStartsWithAndStatus(
+                topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
+        int totalQueuingCount = queuingThreads.size();
+        for (int i = 0; i < queuingThreads.size(); i++) {
+            ThreadEntity queuingThread = queuingThreads.get(i);
+            sendQueueUpdateMessage(queuingThread, i + 1, totalQueuingCount);
+        }
     }
 
     @EventListener

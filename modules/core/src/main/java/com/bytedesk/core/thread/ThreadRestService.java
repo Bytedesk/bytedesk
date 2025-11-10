@@ -607,7 +607,7 @@ public class ThreadRestService
                 .uid(thread.getUid())
                 .topic(thread.getTopic())
                 .userUid(user != null ? user.getUid() : null)
-                .autoClose(true)
+                .closeType(com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name())
                 .status(ThreadProcessStatusEnum.CLOSED.name())
                 .build();
         return closeByUid(threadRequest);
@@ -628,12 +628,23 @@ public class ThreadRestService
         if (ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())) {
             throw new RuntimeException("thread " + thread.getUid() + " is already closed");
         }
-        thread.setAutoClose(request.getAutoClose());
+        // 设置关闭来源
+        if (StringUtils.hasText(request.getCloseType())) {
+            thread.setCloseType(request.getCloseType());
+        }
         thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
         // 发布关闭消息, 通知用户
-        String content = request.getAutoClose()
-                ? I18Consts.I18N_AUTO_CLOSED
-                : I18Consts.I18N_AGENT_CLOSED;
+        String content;
+        String closeType = thread.getCloseType();
+        if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+            content = I18Consts.I18N_AUTO_CLOSED;
+        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
+            content = I18Consts.I18N_AGENT_CLOSED;
+        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+            content = I18Consts.I18N_AGENT_CLOSE_TIP; // 复用通用提示
+        } else {
+            content = I18Consts.I18N_AGENT_CLOSED;
+        }
         thread.setContent(content);
         //
         ThreadEntity updateThread = save(thread);
@@ -641,7 +652,7 @@ public class ThreadRestService
             throw new RuntimeException("thread save failed");
         }
         if (Boolean.TRUE.equals(request.getUnsubscribe()) 
-            || Boolean.TRUE.equals(request.getAutoClose())) {
+            || com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
             TopicRequest topicRequest = TopicRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
@@ -666,12 +677,22 @@ public class ThreadRestService
         for (ThreadEntity thread : threads) {
             // 找到第一个未关闭的，执行关闭并返回
             if (!thread.isClosed()) {
-                thread.setAutoClose(request.getAutoClose());
+                if (StringUtils.hasText(request.getCloseType())) {
+                    thread.setCloseType(request.getCloseType());
+                }
                 thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
                 // 发布关闭消息, 通知用户
-                String content = request.getAutoClose()
-                        ? I18Consts.I18N_AUTO_CLOSED
-                        : I18Consts.I18N_AGENT_CLOSED;
+                String closeType = thread.getCloseType();
+                String content;
+                if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+                    content = I18Consts.I18N_AUTO_CLOSED;
+                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
+                    content = I18Consts.I18N_AGENT_CLOSED;
+                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                    content = I18Consts.I18N_AGENT_CLOSE_TIP;
+                } else {
+                    content = I18Consts.I18N_AGENT_CLOSED;
+                }
                 thread.setContent(content);
                 //
                 ThreadEntity updateThread = save(thread);
@@ -819,8 +840,9 @@ public class ThreadRestService
                 latestEntity.setMute(entity.getMute() != null ? entity.getMute() : latestEntity.getMute());
                 latestEntity.setHide(entity.getHide() != null ? entity.getHide() : latestEntity.getHide());
                 latestEntity.setFold(entity.getFold() != null ? entity.getFold() : latestEntity.getFold());
-                latestEntity.setAutoClose(
-                        entity.getAutoClose() != null ? entity.getAutoClose() : latestEntity.getAutoClose());
+                if (entity.getCloseType() != null) {
+                    latestEntity.setCloseType(entity.getCloseType());
+                }
 
                 // Preserve metadata
                 if (entity.getNote() != null) {

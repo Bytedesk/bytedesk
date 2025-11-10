@@ -78,7 +78,8 @@ public class ThreadResponse extends BaseResponse {
 
     private Boolean fold;
 
-    private Boolean autoClose;
+    // 关闭来源类型
+    private String closeType;
 
     private String note;
 
