@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.socket.connection;
 
-
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.Data;
@@ -31,17 +30,17 @@ public class ConnectionResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-        private String clientId;
-        private String deviceUid;
+    private String clientId;
+    private String deviceUid;
     private String protocol;
     // channel 字段在 BaseResponse 中未定义，这里单独暴露以便前端获取来源渠道
     private String channel;
-        private String ip;
-        private String userAgent;
-        private String status;
-        private Long connectedAt;
-        private Long lastHeartbeatAt;
-        private Long disconnectedAt;
-        private Integer ttlSeconds;
+    private String ip;
+    private String userAgent;
+    private String status;
+    private Long connectedAt;
+    private Long lastHeartbeatAt;
+    private Long disconnectedAt;
+    private Integer ttlSeconds;
 
 }

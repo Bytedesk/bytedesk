@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${lang! 'zh-CN'}">
 <head>
 	<#--  Header  -->
-	<#include "../common/meta_office.ftl" />
+	<#include "../common/header_meta.ftl" />
 	<#include "../common/header_js.ftl" />
 	<#include "../common/header_css.ftl" />
+	<#-- i18n macro -->
+	<#include "../common/macro/i18n.ftl" />
 	
 </head>
 
@@ -16,7 +18,28 @@
 <!-- **************** MAIN CONTENT START **************** -->
 <main>
 
-<#include "../common/banner.ftl" />
+<!-- =======================
+Page Banner START -->
+<section class="bg-primary bg-opacity-10" style="padding-top: 6rem; padding-bottom: 3rem;">
+	<div class="container">
+		<div class="row g-4 g-md-5 position-relative">
+			<!-- Main content START -->
+			<div class="col-lg-8">
+				<!-- Title -->
+				<h1>微语AI文档</h1>
+				<p class="lead">革命性的AI驱动文档编辑体验，支持Word、Excel、PPT等多种格式，让您的文档创作更加智能高效</p>
+			</div>
+			<!-- Main content END -->
+
+			<!-- Image -->
+			<div class="col-lg-4 text-center">
+				<img src="/assets/images/element/09.svg" class="h-200px" alt="AI文档图标">
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+Page Banner END -->
 
 <!-- =======================
 Hero Section START -->

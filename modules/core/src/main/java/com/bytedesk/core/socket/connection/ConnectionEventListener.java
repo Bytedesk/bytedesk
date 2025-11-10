@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,14 @@ public class ConnectionEventListener {
         // 根据 ConnectionEntity 汇总判断是否仍在线（多端）
         // boolean online = connectionRestService.isUserOnline(uid);
         // agentRestService.updateConnect(uid, online);
+    }
+
+    /**
+     * 每分钟调度：清理过期连接，移除超出 TTL 的会话，保持在线状态准确。
+     */
+    @EventListener
+    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+        connectionRestService.expireStaleSessions();
     }
 }
 

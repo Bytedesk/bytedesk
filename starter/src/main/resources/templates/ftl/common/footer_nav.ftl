@@ -1,8 +1,8 @@
 <#include "./macro/i18n.ftl" />
-<footer>
+<footer class="bg-light pt-5">
 	<div class="container">
 		<!-- Row START -->
-		<div class="row g-4 justify-content-between pt-5">
+		<div class="row g-4 justify-content-between">
 
 			<!-- Widget 1 START -->
 			<div class="col-md-6 col-lg-4">

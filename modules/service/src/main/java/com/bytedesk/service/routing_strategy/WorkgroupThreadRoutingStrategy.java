@@ -115,8 +115,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 1. 验证和获取工作组信息
         log.debug("步骤1: 开始获取工作组信息 - workgroupUid: {}", visitorRequest.getSid());
         WorkgroupEntity workgroup = getWorkgroupEntity(visitorRequest.getSid());
-    log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数(legacy): {}, 在线客服数(presence): {}",
-        workgroup.getUid(), workgroup.getConnectedAgentCount(), presenceFacadeService.countOnlineAgents(workgroup));
+        log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数(presence): {}",
+                workgroup.getUid(), presenceFacadeService.countOnlineAgents(workgroup));
 
         // 2. 生成会话主题并检查现有会话
         log.debug("步骤2: 开始处理线程创建或获取");
@@ -159,8 +159,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         WorkgroupEntity workgroup = workgroupOptional.get();
-        log.info("工作组实体获取完成 - workgroupUid: {}, 在线客服数量: {}, 耗时: {}ms",
-                workgroup.getUid(), workgroup.getConnectedAgentCount(), System.currentTimeMillis() - startTime);
+        log.info("工作组实体获取完成 - workgroupUid: {}, 在线客服数量(presence): {}, 耗时: {}ms",
+                workgroup.getUid(), presenceFacadeService.countOnlineAgents(workgroup),
+                System.currentTimeMillis() - startTime);
         return workgroup;
     }
 
@@ -299,8 +300,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 决定路由方向：机器人 or 人工
         boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup);
-    log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态(presence): {}",
-        shouldUseRobot, visitorRequest.getForceAgent(), presenceFacadeService.isWorkgroupOnline(workgroup));
+        log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态(presence): {}",
+                shouldUseRobot, visitorRequest.getForceAgent(), presenceFacadeService.isWorkgroupOnline(workgroup));
 
         if (shouldUseRobot) {
             log.info("路由到机器人处理");
@@ -324,7 +325,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         // 检查机器人配置和服务时间
-    boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
+        boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
         boolean isInServiceTime = workgroup.getSettings() != null
                 && workgroup.getSettings().getMessageLeaveSettings() != null
                         ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
@@ -527,8 +528,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 发布事件
         publishWorkgroupThreadEvents(savedThread);
 
-    // 发送欢迎消息（结构化 WelcomeContent）
-    WelcomeContent wc = WelcomeContentUtils.buildAgentWelcomeContent(agentEntity);
+        // 发送欢迎消息（结构化 WelcomeContent）
+        WelcomeContent wc = WelcomeContentUtils.buildAgentWelcomeContent(agentEntity);
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(wc, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
@@ -657,7 +658,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 
         // 创建欢迎消息（结构化 WelcomeContent）
-        WelcomeContent wc = buildRobotWelcomeContent(robotEntity);
+        WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity);
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, savedThread);
         messageRestService.save(message);
 
@@ -715,7 +716,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private MessageProtobuf getRobotContinueMessage(RobotEntity robotEntity, ThreadEntity thread) {
         validateThread(thread, "get robot continue message");
 
-        WelcomeContent wc = buildRobotWelcomeContent(robotEntity);
+        WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity);
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
@@ -749,10 +750,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 根据机器人设置构建结构化 WelcomeContent
      */
     // 已迁移到 WelcomeContentUtils
-    @Deprecated
-    private WelcomeContent buildRobotWelcomeContent(RobotEntity robotEntity) {
-        return WelcomeContentUtils.buildRobotWelcomeContent(robotEntity);
-    }
 
     /**
      * 获取工作组离线消息

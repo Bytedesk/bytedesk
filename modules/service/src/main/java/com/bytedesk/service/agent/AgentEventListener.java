@@ -24,14 +24,10 @@ import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
-import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
-import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.kbase.kbase.KbaseRequest;
@@ -53,7 +49,7 @@ public class AgentEventListener {
     private final AgentRestService agentRestService;
     private final KbaseRestService kbaseRestService;
     private final IMessageSendService messageSendService;
-    private final ConnectionRestService connectionRestService;
+    // private final ConnectionRestService connectionRestService;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
     @Order(6)
@@ -91,45 +87,45 @@ public class AgentEventListener {
         kbaseRestService.create(kbaseQuickReply);
     }
 
-    @EventListener
-    public void onMqttConnectedEvent(MqttConnectedEvent event) {
-        String clientId = event.getClientId();
-        // 用户clientId格式: uid/client/deviceUid
-        final String uid = clientId.split("/")[0];
-        // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
-        // 标记连接（使用 ConnectionEntity 支持多端在线）
-        // 仍保持原有行为，确保现有业务在线状态及时更新
-        agentRestService.updateConnect(uid, true);
-    }
+    // @EventListener
+    // public void onMqttConnectedEvent(MqttConnectedEvent event) {
+    //     // String clientId = event.getClientId();
+    //     // 用户clientId格式: uid/client/deviceUid
+    //     // final String uid = clientId.split("/")[0];
+    //     // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
+    //     // 标记连接（使用 ConnectionEntity 支持多端在线）
+    //     // 仍保持原有行为，确保现有业务在线状态及时更新
+    //     // agentRestService.updateConnect(uid, true);
+    // }
 
-    @EventListener
-    public void onMqttDisconnectedEvent(MqttDisconnectedEvent event) {
-        String clientId = event.getClientId();
-        // 用户clientId格式: uid/client/deviceUid
-        final String uid = clientId.split("/")[0];
-        // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
-        // 先标记该 client 断开
-        connectionRestService.markDisconnected(clientId);
-        // 根据 ConnectionEntity 汇总判断是否仍在线（多端）
-        boolean online = connectionRestService.isUserOnline(uid);
-        agentRestService.updateConnect(uid, online);
-    }
+    // @EventListener
+    // public void onMqttDisconnectedEvent(MqttDisconnectedEvent event) {
+    //     // String clientId = event.getClientId();
+    //     // 用户clientId格式: uid/client/deviceUid
+    //     // final String uid = clientId.split("/")[0];
+    //     // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
+    //     // 先标记该 client 断开
+    //     // connectionRestService.markDisconnected(clientId);
+    //     // 根据 ConnectionEntity 汇总判断是否仍在线（多端）
+    //     // boolean online = connectionRestService.isUserOnline(uid);
+    //     // agentRestService.updateConnect(uid, online);
+    // }
 
-    // 更新agent在线状态
-    @EventListener
-    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        // log.info("agent QuartzOneMinEvent");
-        // 先清理过期会话
-        connectionRestService.expireStaleSessions();
-        // 再同步已标记为在线的坐席，如果 TTL 过期则下线
-        agentRestService.findAllConnected().forEach(agent -> {
-            boolean online = connectionRestService.isUserOnline(agent.getUserUid());
-            if (!online) {
-                log.info("agent updateConnect uid {} offline(by presence)", agent.getUserUid());
-                agentRestService.updateConnect(agent.getUserUid(), false);
-            }
-        });
-    }
+    // // 更新agent在线状态
+    // @EventListener
+    // public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+    //     // log.info("agent QuartzOneMinEvent");
+    //     // 先清理过期会话
+    //     // connectionRestService.expireStaleSessions();
+    //     // 再同步已标记为在线的坐席，如果 TTL 过期则下线
+    //     // agentRestService.findAllConnected().forEach(agent -> {
+    //     //     boolean online = connectionRestService.isUserOnline(agent.getUserUid());
+    //     //     if (!online) {
+    //     //         log.info("agent updateConnect uid {} offline(by presence)", agent.getUserUid());
+    //     //         // agentRestService.updateConnect(agent.getUserUid(), false);
+    //     //     }
+    //     // });
+    // }
 
     // 客服接待数量发生变化，增加接待数量，发送欢迎语
     @EventListener

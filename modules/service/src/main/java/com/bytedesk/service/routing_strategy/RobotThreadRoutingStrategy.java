@@ -262,18 +262,11 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         validateThread(thread, "get robot continue message");
 
         String tip = getRobotWelcomeMessage(robotEntity);
-        WelcomeContent wc = buildRobotWelcomeContent(robotEntity, tip);
+    WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    /**
-     * 根据机器人设置构建结构化 WelcomeContent
-     */
-    // 已迁移到 WelcomeContentUtils
-    @Deprecated
-    private WelcomeContent buildRobotWelcomeContent(RobotEntity robotEntity, String tip) {
-        return WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
-    }
+    // buildRobotWelcomeContent 已迁移至 WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip)
 }

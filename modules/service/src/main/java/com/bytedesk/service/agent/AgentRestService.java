@@ -15,7 +15,6 @@ package com.bytedesk.service.agent;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -34,7 +32,6 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserService;
-import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -69,8 +66,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     private final AuthService authService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
-
-    private final MqttConnectionService mqttConnectionService;
 
     private final ThreadRestService threadRestService;
     
@@ -142,10 +137,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             agent.setSettings(agentSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
         //
-        Set<String> userIds = mqttConnectionService.getConnectedUserUids();
-        if (userIds.contains(agent.getUserUid())) {
-            agent.setConnected(true);
-        }
+        // Set<String> userIds = mqttConnectionService.getConnectedUserUids();
+        // if (userIds.contains(agent.getUserUid())) {
+        //     agent.setConnected(true);
+        // }
         // 保存Agent并检查返回值
         AgentEntity savedAgent = save(agent);
         if (savedAgent == null) {
@@ -331,9 +326,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
      * @param userUid   用户ID
      * @param connected 是否在线
      */
-    @Async
-    @Transactional
-    public void updateConnect(String userUid, boolean connected) { /* no-op: presence driven */ }
+    // @Async
+    // @Transactional
+    // public void updateConnect(String userUid, boolean connected) { /* no-op: presence driven */ }
 
     @Cacheable(value = "agent", key = "#entity.uid", unless = "#result == null")
     @Override

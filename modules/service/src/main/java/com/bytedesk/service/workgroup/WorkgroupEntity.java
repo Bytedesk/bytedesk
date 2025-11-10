@@ -144,20 +144,6 @@ public class WorkgroupEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
-    /**
-     * 获取可用客服
-     * @return 可用客服列表
-     */
-    @JsonIgnore
-    @Deprecated
-    public List<AgentEntity> getAvailableAgents() {
-        // Legacy method retained; presence-based filtering moved to PresenceFacadeService
-        if (this.agents == null) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(); // Always empty; use PresenceFacadeService.getAvailableAgents(workgroup)
-    }
-
     @JsonIgnore
     public AgentEntity getMessageLeaveAgent() {
         if (this.messageLeaveAgent == null) {
@@ -170,13 +156,6 @@ public class WorkgroupEntity extends BaseEntity {
                 .orElse(null);
         }
         return this.messageLeaveAgent;
-    }
-
-    @JsonIgnore
-    @Deprecated
-    public Boolean isConnected() {
-        // Deprecated: use PresenceFacadeService.isWorkgroupOnline(workgroup)
-        return false;
     }
 
     @JsonIgnore
@@ -198,15 +177,6 @@ public class WorkgroupEntity extends BaseEntity {
             return this.settings.getRoutingMode();
         }
         return WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
-    }
-
-    // 监控客服组登录坐席、开启自动领取坐席数、空闲坐席数、领取会话数、已处理会话数、流失会话数、留言数。
-    // agent connected count
-    @JsonIgnore
-    @Deprecated
-    public long getConnectedAgentCount() {
-        // Deprecated: use PresenceFacadeService.countOnlineAgents(workgroup)
-        return 0L;
     }
 
     // agent available count

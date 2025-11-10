@@ -20,7 +20,7 @@
 
 <!-- =======================
 Page Banner START -->
-<section class="bg-light" style="padding-top: 6rem; padding-bottom: 3rem;">
+<section class="bg-primary bg-opacity-10" style="padding-top: 6rem; padding-bottom: 3rem;">
 	<div class="container">
 		<div class="row g-4 g-md-5 position-relative">
 			<!-- Main content START -->
@@ -43,7 +43,7 @@ Page Banner END -->
 
 <!-- =======================
 Core Features START -->
-<section>
+<section class="bg-body">
 	<div class="container">
 		<!-- Title -->
 		<div class="row mb-4">
