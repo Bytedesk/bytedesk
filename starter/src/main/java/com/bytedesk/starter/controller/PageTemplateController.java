@@ -47,22 +47,46 @@ public class PageTemplateController {
     public JsonResult<?> staticize() {
         // single default zh-CN legacy generation
         pageTemplateService.toHtml("index");
-        pageTemplateService.toHtml("download");
-        pageTemplateService.toHtml("office");
-        pageTemplateService.toHtml("about");
-        pageTemplateService.toHtml("contact");
-        pageTemplateService.toHtml("privacy");
-        pageTemplateService.toHtml("terms");
-        pageTemplateService.toHtml("scrm");
+        // pages
+        pageTemplateService.toHtml("pages/download");
+        pageTemplateService.toHtml("pages/about");
+        pageTemplateService.toHtml("pages/contact");
+        pageTemplateService.toHtml("pages/privacy");
+        pageTemplateService.toHtml("pages/terms");
+        // features
+        pageTemplateService.toHtml("features/office");
+        pageTemplateService.toHtml("features/scrm");
+        pageTemplateService.toHtml("features/team");
+        pageTemplateService.toHtml("features/ai");
+        pageTemplateService.toHtml("features/kbase");
+        pageTemplateService.toHtml("features/voc");
+        pageTemplateService.toHtml("features/ticket");
+        pageTemplateService.toHtml("features/workflow");
+        pageTemplateService.toHtml("features/kanban");
+        pageTemplateService.toHtml("features/callcenter");
+        pageTemplateService.toHtml("features/video");
+        
         // multilingual generation
         pageTemplateService.toHtmlMulti("index");
-        pageTemplateService.toHtmlMulti("download");
-        pageTemplateService.toHtmlMulti("office");
-        pageTemplateService.toHtmlMulti("about");
-        pageTemplateService.toHtmlMulti("contact");
-        pageTemplateService.toHtmlMulti("privacy");
-        pageTemplateService.toHtmlMulti("terms");
-        pageTemplateService.toHtmlMulti("scrm");
+        // pages
+        pageTemplateService.toHtmlMulti("pages/download");
+        pageTemplateService.toHtmlMulti("pages/about");
+        pageTemplateService.toHtmlMulti("pages/contact");
+        pageTemplateService.toHtmlMulti("pages/privacy");
+        pageTemplateService.toHtmlMulti("pages/terms");
+        // features
+        pageTemplateService.toHtmlMulti("features/office");
+        pageTemplateService.toHtmlMulti("features/scrm");
+        pageTemplateService.toHtmlMulti("features/team");
+        pageTemplateService.toHtmlMulti("features/ai");
+        pageTemplateService.toHtmlMulti("features/kbase");
+        pageTemplateService.toHtmlMulti("features/voc");
+        pageTemplateService.toHtmlMulti("features/ticket");
+        pageTemplateService.toHtmlMulti("features/workflow");
+        pageTemplateService.toHtmlMulti("features/kanban");
+        pageTemplateService.toHtmlMulti("features/callcenter");
+        pageTemplateService.toHtmlMulti("features/video");
+        
         return JsonResult.success("generate html success (multi-language)", 200, true);
     }
 

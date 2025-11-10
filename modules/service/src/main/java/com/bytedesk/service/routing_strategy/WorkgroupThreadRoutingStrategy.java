@@ -544,30 +544,30 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
 
-    // 生成排队消息文本
-    int queuingCount = queueMemberEntity.getWorkgroupQueue().getQueuingCount();
-    String queueContentText = generateWorkgroupQueueMessage(queueMemberEntity);
+        // 生成排队消息文本
+        int queuingCount = queueMemberEntity.getWorkgroupQueue().getQueuingCount();
+        String queueContentText = generateWorkgroupQueueMessage(queueMemberEntity);
 
-    // 构建结构化 QueueContent
-    QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
-        .content(queueContentText)
-        .position(queueMemberEntity.getQueueNumber())
-        .queueSize(queuingCount)
-        .serverTimestamp(System.currentTimeMillis());
+        // 构建结构化 QueueContent
+        QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
+                .content(queueContentText)
+                .position(queueMemberEntity.getQueueNumber())
+                .queueSize(queuingCount)
+                .serverTimestamp(System.currentTimeMillis());
 
-    // 计算预估等待时间（分钟 -> 秒）与描述
-    if (queuingCount > 0) {
-        int estimatedMinutes = queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
-        builder.waitSeconds(estimatedMinutes * 60)
-            .estimatedWaitTime("约" + estimatedMinutes + "分钟");
-    } else {
-        builder.waitSeconds(0).estimatedWaitTime("即将开始");
-    }
-    QueueContent queueContent = builder.build();
+        // 计算预估等待时间（分钟 -> 秒）与描述
+        if (queuingCount > 0) {
+            int estimatedMinutes = queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
+            builder.waitSeconds(estimatedMinutes * 60)
+                    .estimatedWaitTime("约" + estimatedMinutes + "分钟");
+        } else {
+            builder.waitSeconds(0).estimatedWaitTime("即将开始");
+        }
+        QueueContent queueContent = builder.build();
 
-    // 设置线程状态（使用结构化JSON）
-    thread.setUserUid(agentEntity.getUid());
-    thread.setQueuing().setContent(queueContent.toJson());
+        // 设置线程状态（使用结构化JSON）
+        thread.setUserUid(agentEntity.getUid());
+        thread.setQueuing().setContent(queueContent.toJson());
 
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
@@ -696,7 +696,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 qc = JSON.parseObject(c, QueueContent.class);
             }
         } catch (Exception e) {
-            log.debug("Parse queue content failed, fallback to text - threadUid: {}, error: {}", thread.getUid(), e.getMessage());
+            log.debug("Parse queue content failed, fallback to text - threadUid: {}, error: {}", thread.getUid(),
+                    e.getMessage());
         }
         if (qc == null) {
             qc = QueueContent.builder()

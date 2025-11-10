@@ -65,8 +65,16 @@ public class PageTemplateService {
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             // log.info("content:{}", content);
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
-            // 输出文件
-            String savePath = classpath + htmlSavePath + tempName + ".html";
+            // 输出文件 - 支持子目录
+            String savePath;
+            if (tempName.contains("/")) {
+                // 如果包含子目录，需要先创建目录
+                String dirPath = tempName.substring(0, tempName.lastIndexOf("/"));
+                checkAndCreateFolder(classpath + htmlSavePath, dirPath);
+                savePath = classpath + htmlSavePath + tempName + ".html";
+            } else {
+                savePath = classpath + htmlSavePath + tempName + ".html";
+            }
             // /Users/ningjinpeng/Desktop/git/private/weiyu/server/starter/target/classes/templates/
             log.info("savePath {}", savePath);
             FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath));
@@ -103,7 +111,15 @@ public class PageTemplateService {
                 InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
                 String langDir = htmlSavePath + lang + "/";
                 checkAndCreateFolder(classpath, langDir);
-                String savePath = classpath + langDir + tempName + ".html";
+                // 支持子目录
+                String savePath;
+                if (tempName.contains("/")) {
+                    String dirPath = tempName.substring(0, tempName.lastIndexOf("/"));
+                    checkAndCreateFolder(classpath + langDir, dirPath);
+                    savePath = classpath + langDir + tempName + ".html";
+                } else {
+                    savePath = classpath + langDir + tempName + ".html";
+                }
                 log.info("savePath {}", savePath);
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath));
                 IOUtils.copy(inputStream, fileOutputStream);

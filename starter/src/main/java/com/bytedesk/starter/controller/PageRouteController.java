@@ -303,8 +303,10 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/download
 	 * http://127.0.0.1:9003/privacy
 	 * http://127.0.0.1:9003/terms
+	 * http://127.0.0.1:9003/about
+	 * http://127.0.0.1:9003/contact
 	 */
-	@GetMapping({ "/{page:download|contact|about|privacy|terms|office|scrm}", "/{page:download|contact|about|privacy|terms|office|scrm}.html" })
+	@GetMapping({ "/{page:download|contact|about|privacy|terms}", "/{page:download|contact|about|privacy|terms}.html" })
 	public String handlePageRoutes(@PathVariable String page, Model model) {
 		if (!showDemo) {
 			// 添加自定义配置到模型
@@ -315,7 +317,33 @@ public class PageRouteController {
 			}
 			return "default";
 		}
-		return page;
+		return "pages/" + page;
+	}
+
+	/**
+	 * http://127.0.0.1:9003/office
+	 * http://127.0.0.1:9003/scrm
+	 * http://127.0.0.1:9003/team
+	 * http://127.0.0.1:9003/ai
+	 * http://127.0.0.1:9003/kbase
+	 * http://127.0.0.1:9003/voc
+	 * http://127.0.0.1:9003/ticket
+	 * http://127.0.0.1:9003/workflow
+	 * http://127.0.0.1:9003/callcenter
+	 * http://127.0.0.1:9003/video
+	 */
+	@GetMapping({ "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video}", "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video}.html" })
+	public String handleFeatureRoutes(@PathVariable String feature, Model model) {
+		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
+			return "default";
+		}
+		return "features/" + feature;
 	}
 
 }
