@@ -502,7 +502,7 @@ CTA Section START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/08.svg" class="position-relative" alt="AI文档">
+				<img src="/assets/images/element/08.svg" class="position-relative" alt="AI文档">
 			</div>
 
 			<div class="col-md-5 position-relative z-index-9">

@@ -33,7 +33,7 @@ Page Banner START -->
 
 			<!-- Image -->
 			<div class="col-lg-4 text-center">
-				<img src="assets/images/element/data-science.svg" class="h-200px" alt="<@t key='alt.callcenter.icon'>呼叫中心图标</@t>">
+				<img src="/assets/images/element/data-science.svg" class="h-200px" alt="<@t key='alt.callcenter.icon'>呼叫中心图标</@t>">
 			</div>
 		</div>
 	</div>
@@ -164,7 +164,7 @@ Technology START -->
 			</div>
 
 			<div class="col-lg-6 text-center">
-				<img src="assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.callcenter.tech'>呼叫中心技术插图</@t>">
+				<img src="/assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.callcenter.tech'>呼叫中心技术插图</@t>">
 			</div>
 		</div>
 	</div>

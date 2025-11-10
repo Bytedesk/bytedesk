@@ -33,7 +33,7 @@ Page Banner START -->
 
 			<!-- Image -->
 			<div class="col-lg-4 text-center">
-				<img src="assets/images/element/coding.svg" class="h-200px" alt="<@t key='alt.team.icon'>企业IM图标</@t>">
+				<img src="/assets/images/element/coding.svg" class="h-200px" alt="<@t key='alt.team.icon'>企业IM图标</@t>">
 			</div>
 		</div>
 	</div>
@@ -165,7 +165,7 @@ Advantages START -->
 
 			<!-- Right image -->
 			<div class="col-lg-6 text-center">
-				<img src="assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.team.advantage'>企业IM优势插图</@t>">
+				<img src="/assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.team.advantage'>企业IM优势插图</@t>">
 			</div>
 		</div>
 	</div>

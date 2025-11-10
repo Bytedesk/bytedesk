@@ -452,7 +452,7 @@ CTA Section START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/09.svg" class="position-relative" alt="AI客户管理">
+				<img src="/assets/images/element/09.svg" class="position-relative" alt="AI客户管理">
 			</div>
 
 			<div class="col-md-5 position-relative z-index-9">

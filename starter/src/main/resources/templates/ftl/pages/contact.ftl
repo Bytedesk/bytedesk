@@ -38,7 +38,7 @@ Download START -->
 					</div>
 					<!-- App store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
-						<#--  <a href="#"><img src="assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
+						<#--  <a href="#"><img src="/assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
 						<a href="/assets/images/qrcode/wechat.png" target="_blank">
 							<img src="/assets/images/qrcode/wechat.png" alt="微语微信联系方式二维码"/>
 						</a>
@@ -55,7 +55,7 @@ Download START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/07.svg" class="position-relative" alt="<@t key='alt.contact.illustration'>联系方式插图</@t>">
+				<img src="/assets/images/element/07.svg" class="position-relative" alt="<@t key='alt.contact.illustration'>联系方式插图</@t>">
 			</div>
 		</div>
 	</div>

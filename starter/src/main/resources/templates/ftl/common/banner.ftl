@@ -21,7 +21,7 @@ Main Banner START -->
 			</div>
 			<div class="col-md-7">
 				<!-- Image -->
-				<img src="assets/images/element/05.svg" alt="">
+				<img src="/assets/images/element/05.svg" alt="">
 			</div>
 		</div>
 	</div>

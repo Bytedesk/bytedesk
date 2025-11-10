@@ -21,7 +21,7 @@ Action box START -->
 						</svg>
 					</figure>
 					<!-- SVG image -->
-					<img src="assets/images/element/09.svg" class="position-absolute bottom-0 end-0 z-index-1 d-none d-lg-block me-n3" alt="">
+					<img src="/assets/images/element/09.svg" class="position-absolute bottom-0 end-0 z-index-1 d-none d-lg-block me-n3" alt="">
 					<!-- SVG decoration -->
 					<figure class="position-absolute top-0 end-0 mt-5 me-n5 d-none d-sm-block">
 						<svg 	width="285px" height="272px">
@@ -32,7 +32,7 @@ Action box START -->
 					<div class="row g-4 justify-content-center align-items-center position-relative">
 						<div class="col-lg-3 text-center text-lg-start ps-0">
 							<!-- Image -->
-							<img src="assets/images/element/08.svg" alt="">
+							<img src="/assets/images/element/08.svg" alt="">
 						</div>
 						<!-- Title -->
 						<div class="col-lg-6 text-center">

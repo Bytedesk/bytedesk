@@ -33,7 +33,7 @@ Page Banner START -->
 
 			<!-- Image -->
 			<div class="col-lg-4 text-center">
-				<img src="assets/images/element/online.svg" class="h-200px" alt="<@t key='alt.video.icon'>视频会议图标</@t>">
+				<img src="/assets/images/element/online.svg" class="h-200px" alt="<@t key='alt.video.icon'>视频会议图标</@t>">
 			</div>
 		</div>
 	</div>
@@ -219,7 +219,7 @@ Advantages START -->
 			</div>
 
 			<div class="col-lg-6 text-center">
-				<img src="assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.video.advantage'>视频会议优势插图</@t>">
+				<img src="/assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.video.advantage'>视频会议优势插图</@t>">
 			</div>
 		</div>
 	</div>

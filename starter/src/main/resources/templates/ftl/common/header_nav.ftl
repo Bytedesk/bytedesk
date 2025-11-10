@@ -6,8 +6,8 @@
 			<!-- Logo START -->
 			<#include "./macro/i18n.ftl" />
 			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/" title="${(i18n['brand.title'])! '微语 - 开源智能客服系统'}">
-				<#--  <img class="light-mode-item navbar-brand-item" src="assets/images/logo.svg" alt="微语logo">  -->
-				<#--  <img class="dark-mode-item navbar-brand-item" src="assets/images/logo-light.svg" alt="微语logo">  -->
+				<#--  <img class="light-mode-item navbar-brand-item" src="/assets/images/logo.svg" alt="微语logo">  -->
+				<#--  <img class="dark-mode-item navbar-brand-item" src="/assets/images/logo-light.svg" alt="微语logo">  -->
 				<h1 class="h5">${(i18n['brand.title'])! '微语 - 开源智能客服系统'}</h1>
 				<#--  开源智能客服系统/开源AI应用创新平台/开源即时通讯平台  -->
 			</a>
@@ -48,8 +48,8 @@
 					
 					<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
 					<#-- pruned: voice, forum, help, architecture -->
-					<li class="nav-item dropdown"><a class="nav-link" href="./download.html" target="_blank"><@t key="nav.download">下载</@t></a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="./about.html" target="_blank"><@t key="nav.about">关于</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="/pages/download.html"><@t key="nav.download">下载</@t></a></li>
+					<li class="nav-item dropdown"><a class="nav-link" href="/pages/about.html"><@t key="nav.about">关于</@t></a></li>
 					<!-- Nav item 3 link-->
 					<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>
 

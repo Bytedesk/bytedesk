@@ -300,41 +300,18 @@ public class PageRouteController {
 	}
 
 	/**
-	 * http://127.0.0.1:9003/download
-	 * http://127.0.0.1:9003/privacy
-	 * http://127.0.0.1:9003/terms
-	 * http://127.0.0.1:9003/about
-	 * http://127.0.0.1:9003/contact
-	 */
-	@GetMapping({ "/{page:download|contact|about|privacy|terms}", "/{page:download|contact|about|privacy|terms}.html" })
-	public String handlePageRoutes(@PathVariable String page, Model model) {
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
-			return "default";
-		}
-		return "pages/" + page;
-	}
-
-	/**
+	 * Features pages - support both with and without /features/ prefix
+	 * http://127.0.0.1:9003/team.html (backward compatible)
+	 * http://127.0.0.1:9003/features/team.html (for static HTML)
 	 * http://127.0.0.1:9003/office
-	 * http://127.0.0.1:9003/scrm
-	 * http://127.0.0.1:9003/team
-	 * http://127.0.0.1:9003/ai
-	 * http://127.0.0.1:9003/kbase
-	 * http://127.0.0.1:9003/voc
-	 * http://127.0.0.1:9003/ticket
-	 * http://127.0.0.1:9003/workflow
-	 * http://127.0.0.1:9003/callcenter
-	 * http://127.0.0.1:9003/video
-	 * http://127.0.0.1:9003/service
-	 * http://127.0.0.1:9003/open
+	 * http://127.0.0.1:9003/features/office
 	 */
-	@GetMapping({ "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}", "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html" })
+	@GetMapping({ 
+		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}", 
+		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}",
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html"
+	})
 	public String handleFeatureRoutes(@PathVariable String feature, Model model) {
 		if (!showDemo) {
 			// 添加自定义配置到模型
@@ -346,6 +323,30 @@ public class PageRouteController {
 			return "default";
 		}
 		return "features/" + feature;
+	}
+
+	/**
+	 * Pages - support both with and without /pages/ prefix
+	 * http://127.0.0.1:9003/download.html (backward compatible)
+	 * http://127.0.0.1:9003/pages/download.html (for static HTML)
+	 */
+	@GetMapping({ 
+		"/{page:download|contact|about|privacy|terms}", 
+		"/{page:download|contact|about|privacy|terms}.html",
+		"/pages/{page:download|contact|about|privacy|terms}",
+		"/pages/{page:download|contact|about|privacy|terms}.html"
+	})
+	public String handlePageRoutes(@PathVariable String page, Model model) {
+		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
+			return "default";
+		}
+		return "pages/" + page;
 	}
 
 }

@@ -33,7 +33,7 @@ Page Banner START -->
 
 			<!-- Image -->
 			<div class="col-lg-4 text-center">
-				<img src="assets/images/element/engineering.svg" class="h-200px" alt="<@t key='alt.kbase.icon'>知识库图标</@t>">
+				<img src="/assets/images/element/engineering.svg" class="h-200px" alt="<@t key='alt.kbase.icon'>知识库图标</@t>">
 			</div>
 		</div>
 	</div>
@@ -207,7 +207,7 @@ Benefits START -->
 			</div>
 
 			<div class="col-lg-6 text-center">
-				<img src="assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.kbase.benefit'>知识库价值插图</@t>">
+				<img src="/assets/images/element/07.svg" class="img-fluid" alt="<@t key='alt.kbase.benefit'>知识库价值插图</@t>">
 			</div>
 		</div>
 	</div>

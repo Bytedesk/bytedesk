@@ -8,8 +8,8 @@
 			<div class="col-md-6 col-lg-4">
 				<!-- logo -->
 				<a class="me-0" href="index.html" target="_blank">
-					<#--  <img class="light-mode-item h-40px" src="assets/images/logo.svg" alt="logo">  -->
-					<#--  <img class="dark-mode-item h-40px" src="assets/images/logo-light.svg" alt="logo">  -->
+					<#--  <img class="light-mode-item h-40px" src="/assets/images/logo.svg" alt="logo">  -->
+					<#--  <img class="dark-mode-item h-40px" src="/assets/images/logo-light.svg" alt="logo">  -->
 				</a>
 
 				<p class="my-4"><h3>${(i18n['brand.title'])! '微语 - 开源智能客服系统'}</h3></p>
@@ -42,9 +42,9 @@
 				<h5 class="mb-3"><@t key="footer.quicklinks">快速链接</@t></h5>
 				<ul class="nav flex-column">
 					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank"><@t key="nav.docs">文档</@t></a></li>
-					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/download.html" target="_blank"><@t key="nav.download">下载</@t></a></li>
-					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/about.html" target="_blank"><@t key="nav.about">关于</@t></a></li>
-					<li class="nav-item"><a class="nav-link" href="https://www.weiyuai.cn/contact.html" target="_blank"><@t key="nav.contact">联系</@t></a></li>
+					<li class="nav-item"><a class="nav-link" href="/pages/download.html"><@t key="nav.download">下载</@t></a></li>
+					<li class="nav-item"><a class="nav-link" href="/pages/about.html"><@t key="nav.about">关于</@t></a></li>
+					<li class="nav-item"><a class="nav-link" href="/pages/contact.html"><@t key="nav.contact">联系</@t></a></li>
 					<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>
 				</ul>
 				
@@ -71,30 +71,30 @@
 				<div class="row g-3">
 					<!-- 第一行 -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/team" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.team">企业IM</@t></a>
+						<a href="/features/team.html" class="text-reset d-inline-block mb-1"><@t key="suite.team">企业IM</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/service" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.service">在线客服</@t></a>
+						<a href="/features/service.html" class="text-reset d-inline-block mb-1"><@t key="suite.service">在线客服</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ai" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.ai">AI Agent</@t></a>
+						<a href="/features/ai.html" class="text-reset d-inline-block mb-1"><@t key="suite.ai">AI Agent</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kbase" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.kbase">企业知识库</@t></a>
+						<a href="/features/kbase.html" class="text-reset d-inline-block mb-1"><@t key="suite.kbase">企业知识库</@t></a>
 					</div>
 
 					<!-- 第二行 -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/voc" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.voc">客户之声</@t></a>
+						<a href="/features/voc.html" class="text-reset d-inline-block mb-1"><@t key="suite.voc">客户之声</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/ticket" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.ticket">工单系统</@t></a>
+						<a href="/features/ticket.html" class="text-reset d-inline-block mb-1"><@t key="suite.ticket">工单系统</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/workflow" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.workflow">工作流</@t></a>
+						<a href="/features/workflow.html" class="text-reset d-inline-block mb-1"><@t key="suite.workflow">工作流</@t></a>
 					</div>
 					<#--  <div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/kanban" class="text-reset d-inline-block mb-1" target="_blank">项目管理</a>
+						<a href="/features/kanban.html" class="text-reset d-inline-block mb-1">项目管理</a>
 					</div>  -->
 
 					<!-- 第三行 -->
@@ -102,21 +102,21 @@
 						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/category/plugins" class="text-reset d-inline-block mb-1" target="_blank">插件模块</a>
 					</div>  -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/freeswitch" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.callcenter">呼叫中心</@t></a>
+						<a href="/features/callcenter.html" class="text-reset d-inline-block mb-1"><@t key="suite.callcenter">呼叫中心</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/plugins/webrtc" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.videocall">视频会议</@t></a>
+						<a href="/features/video.html" class="text-reset d-inline-block mb-1"><@t key="suite.videocall">视频会议</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/scrm.html" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.scrm">客户管理</@t></a>
+						<a href="/features/scrm.html" class="text-reset d-inline-block mb-1"><@t key="suite.scrm">客户管理</@t></a>
 					</div>
 
 					<#--  第四行  -->
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/docs/zh-CN/docs/modules/open" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.open">开放平台</@t></a>
+						<a href="/features/open.html" class="text-reset d-inline-block mb-1"><@t key="suite.open">开放平台</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="https://www.weiyuai.cn/office.html" class="text-reset d-inline-block mb-1" target="_blank"><@t key="suite.office">AI文档</@t></a>
+						<a href="/features/office.html" class="text-reset d-inline-block mb-1"><@t key="suite.office">AI文档</@t></a>
 					</div>
 				</div>
 			</div>
@@ -133,8 +133,8 @@
 					<!-- copyright links-->
 					<div class="nav justify-content-center mt-3 mt-md-0">
 						<ul class="list-inline mb-0">
-							<li class="list-inline-item"><a class="nav-link" href="https://www.weiyuai.cn/protocal.html" target="_blank"><@t key="footer.agreement">用户协议</@t></a></li>
-							<li class="list-inline-item"><a class="nav-link" href="https://www.weiyuai.cn/privacy.html" target="_blank"><@t key="footer.privacy">隐私条款</@t></a></li>
+							<li class="list-inline-item"><a class="nav-link" href="/pages/terms.html"><@t key="footer.agreement">用户协议</@t></a></li>
+							<li class="list-inline-item"><a class="nav-link" href="/pages/privacy.html"><@t key="footer.privacy">隐私条款</@t></a></li>
 							<li class="list-inline-item"><a class="nav-link" href="https://beian.miit.gov.cn/" target="_blank">京ICP备17041763号-20</a></li>
 							<li class="list-inline-item"><a class="nav-link" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44030502008688" target="_blank">粤公网安备 44030502008688号</a></li>
 						</ul>

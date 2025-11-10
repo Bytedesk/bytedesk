@@ -33,7 +33,7 @@ Page Banner START -->
 
 			<!-- Image -->
 			<div class="col-lg-4 text-center">
-				<img src="assets/images/element/home.svg" class="h-200px" alt="<@t key='alt.kanban.icon'>任务管理图标</@t>">
+				<img src="/assets/images/element/home.svg" class="h-200px" alt="<@t key='alt.kanban.icon'>任务管理图标</@t>">
 			</div>
 		</div>
 	</div>

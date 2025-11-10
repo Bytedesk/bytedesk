@@ -34,11 +34,11 @@ Download START -->
 					<!-- Google play store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
 						<#--  <a href="mailto:270580156@qq.com">contact us</a>  -->
-						<#--  <a href="#"><img src="assets/images/element/google-play.svg" class="btn-transition" alt="google-play"></a>  -->
+						<#--  <a href="#"><img src="/assets/images/element/google-play.svg" class="btn-transition" alt="google-play"></a>  -->
 					</div>
 					<!-- App store button -->
 					<div class="col-6 col-sm-4 col-md-6 col-lg-4">
-						<#--  <a href="#"><img src="assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
+						<#--  <a href="#"><img src="/assets/images/element/app-store.svg" class="btn-transition" alt="app-store"></a>  -->
 					</div>
 				</div>
 			</div>
@@ -52,7 +52,7 @@ Download START -->
 				</figure>
 
 				<!-- Image -->
-				<img src="assets/images/element/07.svg" class="position-relative" alt="<@t key='alt.about.illustration'>公司介绍插图</@t>">
+				<img src="/assets/images/element/07.svg" class="position-relative" alt="<@t key='alt.about.illustration'>公司介绍插图</@t>">
 			</div>
 		</div>
 	</div>

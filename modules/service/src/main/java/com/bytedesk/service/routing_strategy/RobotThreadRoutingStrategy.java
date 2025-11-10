@@ -180,7 +180,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 2. 配置线程状态
         String tip = getRobotWelcomeMessage(robotEntity);
-    WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
+        WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
         thread.setRoboting().setContent(wc != null ? wc.toJson() : null);
 
         // 3. 设置机器人信息
