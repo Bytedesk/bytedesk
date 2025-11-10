@@ -331,8 +331,10 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/workflow
 	 * http://127.0.0.1:9003/callcenter
 	 * http://127.0.0.1:9003/video
+	 * http://127.0.0.1:9003/service
+	 * http://127.0.0.1:9003/open
 	 */
-	@GetMapping({ "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video}", "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video}.html" })
+	@GetMapping({ "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}", "/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html" })
 	public String handleFeatureRoutes(@PathVariable String feature, Model model) {
 		if (!showDemo) {
 			// 添加自定义配置到模型

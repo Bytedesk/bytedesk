@@ -43,9 +43,8 @@ import com.bytedesk.core.utils.BdDateUtils;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.QueueContent;
-import com.bytedesk.kbase.llm_faq.FaqEntity;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -285,7 +284,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             log.debug("获取最新线程状态并更新为聊天状态");
             ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
             String tip = getAgentWelcomeMessage(agent);
-            WelcomeContent wc = buildAgentWelcomeContent(agent, tip);
+                WelcomeContent wc = WelcomeContentUtils.buildAgentWelcomeContent(agent, tip);
             String jsonWelcome = wc != null ? wc.toJson() : null;
             thread.setChatting().setContent(jsonWelcome);
         log.debug("线程状态更新完成 - 状态: {}, 欢迎消息长度: {}", 
@@ -497,30 +496,6 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.info("客服欢迎消息获取完成 - agentUid: {}, 最终消息长度: {}", 
                 agent.getUid(), welcomeMessage != null ? welcomeMessage.length() : 0);
         return welcomeMessage;
-    }
-
-    /**
-     * 构建结构化 WelcomeContent
-     */
-    private WelcomeContent buildAgentWelcomeContent(AgentEntity agent, String tip) {
-        var settings = agent.getSettings() != null ? agent.getSettings().getServiceSettings() : null;
-        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
-        if (settings != null) {
-            builder.kbUid(settings.getWelcomeKbUid());
-            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
-                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
-                for (FaqEntity f : settings.getWelcomeFaqs()) {
-                    qas.add(WelcomeContent.QA.builder()
-                            .uid(f.getUid())
-                            .question(f.getQuestion())
-                            .answer(f.getAnswer())
-                            .type(f.getType())
-                            .build());
-                }
-                builder.faqs(qas);
-            }
-        }
-        return builder.build();
     }
 
     /**

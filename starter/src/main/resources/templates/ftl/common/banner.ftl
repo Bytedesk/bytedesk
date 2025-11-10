@@ -10,7 +10,7 @@ Main Banner START -->
 		</svg>
 	</figure>
 
-	<div class="container position-relative mt-0 mt-sm-5 pt-5">
+	<div class="container position-relative" style="margin-top: 0; padding-top: 6rem;">
 		<div class="row align-items-center">
 			<div class="col-md-5">
 				<!-- Title -->

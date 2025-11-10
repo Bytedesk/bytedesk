@@ -27,6 +27,7 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -48,8 +49,6 @@ import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.kbase.llm_faq.FaqEntity;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -526,8 +525,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 发布事件
         publishWorkgroupThreadEvents(savedThread);
 
-        // 发送欢迎消息（结构化 WelcomeContent）
-        WelcomeContent wc = buildAgentWelcomeContent(agentEntity);
+    // 发送欢迎消息（结构化 WelcomeContent）
+    WelcomeContent wc = WelcomeContentUtils.buildAgentWelcomeContent(agentEntity);
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(wc, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
@@ -745,55 +744,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     }
 
     /**
-     * 根据客服设置构建结构化 WelcomeContent
-     */
-    private WelcomeContent buildAgentWelcomeContent(AgentEntity agentEntity) {
-        String tip = getAgentWelcomeMessage(agentEntity);
-        var settings = agentEntity.getSettings() != null ? agentEntity.getSettings().getServiceSettings() : null;
-        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
-        if (settings != null) {
-            // kb
-            builder.kbUid(settings.getWelcomeKbUid());
-            // faqs
-            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
-                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
-                for (FaqEntity f : settings.getWelcomeFaqs()) {
-                    qas.add(WelcomeContent.QA.builder()
-                            .uid(f.getUid())
-                            .question(f.getQuestion())
-                            .answer(f.getAnswer())
-                            .type(f.getType())
-                            .build());
-                }
-                builder.faqs(qas);
-            }
-        }
-        return builder.build();
-    }
-
-    /**
      * 根据机器人设置构建结构化 WelcomeContent
      */
+    // 已迁移到 WelcomeContentUtils
+    @Deprecated
     private WelcomeContent buildRobotWelcomeContent(RobotEntity robotEntity) {
-        String tip = getRobotWelcomeMessage(robotEntity);
-        var settings = robotEntity.getSettings() != null ? robotEntity.getSettings().getServiceSettings() : null;
-        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
-        if (settings != null) {
-            builder.kbUid(settings.getWelcomeKbUid());
-            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
-                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
-                for (FaqEntity f : settings.getWelcomeFaqs()) {
-                    qas.add(WelcomeContent.QA.builder()
-                            .uid(f.getUid())
-                            .question(f.getQuestion())
-                            .answer(f.getAnswer())
-                            .type(f.getType())
-                            .build());
-                }
-                builder.faqs(qas);
-            }
-        }
-        return builder.build();
+        return WelcomeContentUtils.buildRobotWelcomeContent(robotEntity);
     }
 
     /**

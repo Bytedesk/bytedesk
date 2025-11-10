@@ -24,6 +24,7 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
@@ -35,7 +36,6 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
-import com.bytedesk.kbase.llm_faq.FaqEntity;
 import jakarta.annotation.Nonnull;
 
 import com.bytedesk.core.thread.ThreadEntity;
@@ -180,7 +180,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 2. 配置线程状态
         String tip = getRobotWelcomeMessage(robotEntity);
-        WelcomeContent wc = buildRobotWelcomeContent(robotEntity, tip);
+    WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
         thread.setRoboting().setContent(wc != null ? wc.toJson() : null);
 
         // 3. 设置机器人信息
@@ -271,24 +271,9 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 根据机器人设置构建结构化 WelcomeContent
      */
+    // 已迁移到 WelcomeContentUtils
+    @Deprecated
     private WelcomeContent buildRobotWelcomeContent(RobotEntity robotEntity, String tip) {
-        var settings = robotEntity.getSettings() != null ? robotEntity.getSettings().getServiceSettings() : null;
-        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
-        if (settings != null) {
-            builder.kbUid(settings.getWelcomeKbUid());
-            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
-                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
-                for (FaqEntity f : settings.getWelcomeFaqs()) {
-                    qas.add(WelcomeContent.QA.builder()
-                            .uid(f.getUid())
-                            .question(f.getQuestion())
-                            .answer(f.getAnswer())
-                            .type(f.getType())
-                            .build());
-                }
-                builder.faqs(qas);
-            }
-        }
-        return builder.build();
+        return WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
     }
 }

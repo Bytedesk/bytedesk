@@ -20,7 +20,7 @@
 
 <!-- =======================
 Page Banner START -->
-<section class="bg-light pt-5 pb-5">
+<section class="bg-light" style="padding-top: 15rem; padding-bottom: 3rem;">
 	<div class="container">
 		<div class="row g-4 g-md-5 position-relative">
 			<!-- Main content START -->
