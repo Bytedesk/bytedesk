@@ -40,7 +40,6 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     Optional<AgentEntity> findByUserUidAndOrgUidAndDeletedFalse(String userUid, String orgUid);
 
-    List<AgentEntity> findByConnectedAndDeletedFalse(boolean connected);
 
     List<AgentEntity> findByDeletedFalse();
 
@@ -48,10 +47,6 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     Boolean existsByUserUidAndOrgUidAndDeletedFalse(String userUid, String orgUid);
 
-    @Transactional
-    @Modifying
-	@Query(value = "update bytedesk_service_agent set is_connected = :connected where user_uid = :userUid", nativeQuery = true)
-    void updateConnectedByUserUid(@Param("connected") Boolean connected, @Param("userUid") String userUid);
     
     @Transactional
     @Modifying
@@ -96,8 +91,6 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
     // @Query("SELECT a.uid FROM AgentEntity a WHERE a.skills LIKE %:skill% AND a.enabled = true")
     // List<String> findBySkillsAndEnabled(@Param("skill") String skill);
     
-    @Query("SELECT a.uid FROM AgentEntity a WHERE a.connected = :connected AND a.enabled = true")
-    List<String> findByConnectedAndEnabled(@Param("connected") boolean connected);
     
     @Query("SELECT a.status FROM AgentEntity a WHERE a.uid = :agentUid")
     String getAgentStatus(@Param("agentUid") String agentUid);

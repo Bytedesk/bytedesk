@@ -14,26 +14,45 @@
 package com.bytedesk.core.socket.connection;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
+import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class ConnectionEventListener {
 
-    // Legacy initialization removed; retained class for potential future org-scoped connection metrics.
+    private final ConnectionRestService connectionRestService;
 
-    @Order(3)
     @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        // No-op after legacy connection initialization removal
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        log.info("organization created (connection listener noop): {}", organization.getName());
+    public void onMqttConnectedEvent(MqttConnectedEvent event) {
+        String clientId = event.getClientId();
+        // 用户clientId格式: uid/client/deviceUid
+        final String uid = clientId.split("/")[0];
+        // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
+        // 标记连接（使用 ConnectionEntity 支持多端在线）
+        // 无法从事件中获取更多上下文，使用协议 MQTT，其它信息置空/默认
+        connectionRestService.markConnected(uid, null, clientId,
+                clientId.contains("/") && clientId.split("/").length > 2 ? clientId.split("/")[2] : null,
+                "MQTT", null, null, null, 90);
+    }
+
+    @EventListener
+    public void onMqttDisconnectedEvent(MqttDisconnectedEvent event) {
+        String clientId = event.getClientId();
+        // 用户clientId格式: uid/client/deviceUid
+        // final String uid = clientId.split("/")[0];
+        // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
+        // 先标记该 client 断开
+        connectionRestService.markDisconnected(clientId);
+        // 根据 ConnectionEntity 汇总判断是否仍在线（多端）
+        // boolean online = connectionRestService.isUserOnline(uid);
+        // agentRestService.updateConnect(uid, online);
     }
 }
 

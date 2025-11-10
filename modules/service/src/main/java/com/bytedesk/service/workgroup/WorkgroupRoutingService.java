@@ -14,6 +14,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueRestService;
+import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
@@ -36,6 +37,7 @@ public class WorkgroupRoutingService {
     private final QueueRestService queueRestService;
 
     private final ThreadRestService threadRestService;
+    private final PresenceFacadeService presenceFacadeService;
 
     // 获取当天日期
     private String getCurrentDay() {
@@ -46,7 +48,7 @@ public class WorkgroupRoutingService {
      * 根据工作组路由模式选择客服
      */
     public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread) {
-        List<AgentEntity> availableAgents = workgroup.getAvailableAgents();
+    List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
         // 
         switch (workgroup.getRoutingMode()) {
             case "ROUND_ROBIN":
@@ -237,7 +239,7 @@ public class WorkgroupRoutingService {
     private AgentEntity selectByRecent(WorkgroupEntity workgroup, ThreadEntity thread) {
         // 获取访客ID
         String visitorUid = thread.getUserProtobuf().getUid();
-        if (visitorUid == null || workgroup.getAvailableAgents().isEmpty()) {
+        if (visitorUid == null || presenceFacadeService.getAvailableAgents(workgroup).isEmpty()) {
             return null;
         }
         
@@ -252,14 +254,14 @@ public class WorkgroupRoutingService {
                     UserProtobuf agentProtobuf = UserProtobuf.fromJson(recentThread.getAgent());
                     if (agentProtobuf != null && agentProtobuf.getUid() != null) {
                         // 检查该客服是否在当前可用客服列表中
-                        Optional<AgentEntity> recentAgent = workgroup.getAvailableAgents().stream()
+                        Optional<AgentEntity> recentAgent = presenceFacadeService.getAvailableAgents(workgroup).stream()
                             .filter(agent -> agent.getUid().equals(agentProtobuf.getUid()))
                             .findFirst();
                         
                         if (recentAgent.isPresent()) {
                             // 检查客服是否在线且可以接受新会话
                             AgentEntity agent = recentAgent.get();
-                            if (agent.isConnectedAndAvailable()) {
+                            if (presenceFacadeService.isAgentOnlineAndAvailable(agent)) {
                                 String today = getCurrentDay();
                                 String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
                                 Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
@@ -282,6 +284,6 @@ public class WorkgroupRoutingService {
         
         // 如果没有找到合适的最近客服，或者最近客服不在线，则使用轮询算法
         log.info("未找到合适的最近客服，使用轮询算法");
-        return selectByRoundRobin(workgroup.getUid(), workgroup.getAvailableAgents());
+    return selectByRoundRobin(workgroup.getUid(), presenceFacadeService.getAvailableAgents(workgroup));
     }
 }

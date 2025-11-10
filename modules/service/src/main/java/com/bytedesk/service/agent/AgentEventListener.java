@@ -98,10 +98,6 @@ public class AgentEventListener {
         final String uid = clientId.split("/")[0];
         // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         // 标记连接（使用 ConnectionEntity 支持多端在线）
-        // 无法从事件中获取更多上下文，使用协议 MQTT，其它信息置空/默认
-        connectionRestService.markConnected(uid, null, clientId,
-                clientId.contains("/") && clientId.split("/").length > 2 ? clientId.split("/")[2] : null,
-                "MQTT", null, null, null, 90);
         // 仍保持原有行为，确保现有业务在线状态及时更新
         agentRestService.updateConnect(uid, true);
     }

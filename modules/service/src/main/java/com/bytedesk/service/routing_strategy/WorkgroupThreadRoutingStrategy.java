@@ -49,6 +49,7 @@ import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.service.presence.PresenceFacadeService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,6 +88,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final WorkgroupRoutingService workgroupRoutingService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final QueueMemberMessageService queueMemberMessageService;
+    private final PresenceFacadeService presenceFacadeService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -113,8 +115,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 1. 验证和获取工作组信息
         log.debug("步骤1: 开始获取工作组信息 - workgroupUid: {}", visitorRequest.getSid());
         WorkgroupEntity workgroup = getWorkgroupEntity(visitorRequest.getSid());
-        log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数: {}",
-                workgroup.getUid(), workgroup.getConnectedAgentCount());
+    log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数(legacy): {}, 在线客服数(presence): {}",
+        workgroup.getUid(), workgroup.getConnectedAgentCount(), presenceFacadeService.countOnlineAgents(workgroup));
 
         // 2. 生成会话主题并检查现有会话
         log.debug("步骤2: 开始处理线程创建或获取");
@@ -281,7 +283,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         log.info("Found existing offline thread");
 
         // 如果没有可用客服，继续使用现有离线会话
-        if (workgroup.getAvailableAgents().isEmpty()) {
+        if (presenceFacadeService.getAvailableAgents(workgroup).isEmpty()) {
             return null; // 继续使用现有会话
         }
         return null; // 有可用客服时重新路由
@@ -297,8 +299,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 决定路由方向：机器人 or 人工
         boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup);
-        log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态: {}",
-                shouldUseRobot, visitorRequest.getForceAgent(), workgroup.isConnected());
+    log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态(presence): {}",
+        shouldUseRobot, visitorRequest.getForceAgent(), presenceFacadeService.isWorkgroupOnline(workgroup));
 
         if (shouldUseRobot) {
             log.info("路由到机器人处理");
@@ -322,7 +324,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         // 检查机器人配置和服务时间
-        boolean isOffline = !workgroup.isConnected();
+    boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
         boolean isInServiceTime = workgroup.getSettings() != null
                 && workgroup.getSettings().getMessageLeaveSettings() != null
                         ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
@@ -481,7 +483,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private MessageProtobuf routeByAgentStatus(AgentEntity agentEntity, ThreadEntity thread,
             QueueMemberEntity queueMemberEntity, WorkgroupEntity workgroup, VisitorRequest visitorRequest) {
 
-        if (agentEntity.isConnectedAndAvailable()) {
+        if (presenceFacadeService.isAgentOnlineAndAvailable(agentEntity)) {
             // 客服在线且可接待
             if (queueMemberEntity.getWorkgroupQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
                 return handleAvailableWorkgroup(thread, agentEntity, queueMemberEntity);

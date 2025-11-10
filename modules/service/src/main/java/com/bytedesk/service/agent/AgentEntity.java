@@ -118,18 +118,16 @@ public class AgentEntity extends BaseEntity {
         return this.status.equals(AgentStatusEnum.AWAY.name());
     }
 
-    // 是否可以接待
-    @Builder.Default
-    @Column(name = "is_connected")
-    private Boolean connected = false; // Deprecated: 将逐步由 ConnectionEntity 统计替代
-
-    // 兼容旧代码：仍保留布尔连通判断
+    // 已废弃：connected 字段迁移至 ConnectionEntity，多端会话判断在线
+    // 保留兼容方法以避免旧代码立即崩溃，但始终返回 false 或基于 presence 外部计算
+    @Deprecated
     public Boolean isConnectedAndAvailable() {
-        return this.getConnected() && this.isAvailable();
+        return false; // 使用 PresenceFacadeService 替代
     }
 
-    public Boolean isConnected() {
-        return this.connected != null && this.connected;
+    @Deprecated
+    public Boolean getConnected() {
+        return false; // 使用 PresenceFacadeService 替代
     }
 
     public UserProtobuf toUserProtobuf() {

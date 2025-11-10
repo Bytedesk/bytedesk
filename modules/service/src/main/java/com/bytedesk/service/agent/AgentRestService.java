@@ -261,23 +261,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
-    // 在定时任务中执行
-    public void updateConnect() {
-        List<AgentEntity> agents = findAllConnected();
-        Set<String> userIds = mqttConnectionService.getConnectedUserUids();
-        // 遍历agents，判断是否在线，如果不在，则更新为离线状态
-        for (AgentEntity agent : agents) {
-            String userUid = agent.getUserUid();
-            if (!userIds.contains(userUid)) {
-                log.info("agent updateConnect uid {} offline", userUid);
-                updateConnect(userUid, false);
-            }
-        }
-        // 遍历userIds，更新为在线状态
-        for (String userUid : userIds) {
-            updateConnect(userUid, true);
-        }
-    }
+    // 兼容方法：已由 ConnectionEntity 管理在线状态，无需同步数据库布尔值
+    public void updateConnect() { }
 
     public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
         UserEntity user = authService.getUser();
@@ -348,11 +333,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
      */
     @Async
     @Transactional
-    public void updateConnect(String userUid, boolean connected) {
-        // 参数uid是userUid，非agent uid，所以无法直接更新
-        agentRepository.updateConnectedByUserUid(connected, userUid);
-        // TODO: redis cache agent online status
-    }
+    public void updateConnect(String userUid, boolean connected) { /* no-op: presence driven */ }
 
     @Cacheable(value = "agent", key = "#entity.uid", unless = "#result == null")
     @Override
@@ -478,12 +459,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return agentRepository.existsByUid(uid);
     }
 
-    public List<AgentEntity> findAllConnected() {
-        return findByConnected(true);
-    }
-
-    public List<AgentEntity> findByConnected(boolean connected) {
-        return agentRepository.findByConnectedAndDeletedFalse(connected);
-    }
+    public List<AgentEntity> findAllConnected() { return java.util.Collections.emptyList(); }
 
 }

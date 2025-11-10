@@ -33,7 +33,9 @@ public class ConnectionResponse extends BaseResponse {
 
         private String clientId;
         private String deviceUid;
-        private String protocol;
+    private String protocol;
+    // channel 字段在 BaseResponse 中未定义，这里单独暴露以便前端获取来源渠道
+    private String channel;
         private String ip;
         private String userAgent;
         private String status;

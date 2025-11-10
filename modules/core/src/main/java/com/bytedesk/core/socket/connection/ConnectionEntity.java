@@ -45,60 +45,44 @@ public class ConnectionEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // ================= Session identity =================
-    // 说明：userUid、orgUid 字段已在 BaseEntity 中定义，避免在此处重复定义以造成 setter 冲突
-
     /** 客户端唯一标识（如 MQTT clientId、WS sessionId 等） */
-    @Column(name = "client_id")
     private String clientId;
 
     /** 设备 UID（可选，来自 clientId 或 SDK） */
-    @Column(name = "device_uid")
     private String deviceUid;
 
     // ================= Session meta =================
     // 说明：平台 platform 已在 BaseEntity 中以 platform_type 列存在，避免重复定义
 
     /** 协议：MQTT / WS / SSE / OTHER */
-    @Column(name = "protocol")
     private String protocol;
 
     /** 渠道：如 WEB_VISITOR / WEB / APP 等（与系统 channel 对齐） */
-    @Column(name = "channel")
     private String channel;
 
     /** 客户端 IP */
-    @Column(name = "ip")
     private String ip;
 
     /** User-Agent（可选，长度较长） */
-    @Column(name = "user_agent", length = 512)
+    @Column(length = 512)
     private String userAgent;
 
     // ================= Session lifecycle =================
     /** 连接状态：CONNECTED / DISCONNECTED */
     @Builder.Default
-    @Column(name = "status")
     private String status = ConnectionStatusEnum.DISCONNECTED.name();
 
     /** 首次连接毫秒时间戳 */
-    @Column(name = "connected_at")
     private Long connectedAt;
 
     /** 最近心跳/活跃毫秒时间戳 */
-    @Column(name = "last_heartbeat_at")
     private Long lastHeartbeatAt;
 
     /** 断开连接毫秒时间戳 */
-    @Column(name = "disconnected_at")
     private Long disconnectedAt;
 
     /** 心跳存活 TTL（秒），用于判定是否在线（lastHeartbeatAt 未过期） */
     @Builder.Default
-    @Column(name = "ttl_seconds")
     private Integer ttlSeconds = 90;
-
-    // ================= Legacy fields removed =================
-    // name / description / type 均移除
 
 }

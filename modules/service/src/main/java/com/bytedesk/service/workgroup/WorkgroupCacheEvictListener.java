@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 
 import lombok.AllArgsConstructor;
@@ -36,6 +37,7 @@ public class WorkgroupCacheEvictListener {
 
     private final WorkgroupRepository workgroupRepository;
     private final CacheManager cacheManager;
+    private final PresenceFacadeService presenceFacadeService;
 
     /**
      * 处理客服状态更新事件，清除关联的工作组缓存
@@ -46,8 +48,9 @@ public class WorkgroupCacheEvictListener {
     public void handleAgentUpdateStatusEvent(AgentUpdateStatusEvent event) {
         AgentEntity agent = event.getAgent();
         String agentUid = agent.getUid();
-        log.info("监测到客服状态变更，准备清除关联工作组缓存: {}, connected: {}, status: {}", 
-                agentUid, agent.getConnected(), agent.getStatus());
+    boolean presenceOnline = presenceFacadeService.isAgentOnline(agent);
+    log.info("监测到客服状态变更，准备清除关联工作组缓存: {}, status: {}, presenceOnline: {}", 
+        agentUid, agent.getStatus(), presenceOnline);
 
         // 查找包含该客服的所有工作组
         List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentUid);

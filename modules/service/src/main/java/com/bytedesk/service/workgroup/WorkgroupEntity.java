@@ -16,7 +16,6 @@ package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -150,11 +149,13 @@ public class WorkgroupEntity extends BaseEntity {
      * @return 可用客服列表
      */
     @JsonIgnore
+    @Deprecated
     public List<AgentEntity> getAvailableAgents() {
+        // Legacy method retained; presence-based filtering moved to PresenceFacadeService
         if (this.agents == null) {
             return new ArrayList<>();
         }
-        return this.agents.stream().filter(agent -> agent.isConnectedAndAvailable()).collect(Collectors.toList());
+        return new ArrayList<>(); // Always empty; use PresenceFacadeService.getAvailableAgents(workgroup)
     }
 
     @JsonIgnore
@@ -172,11 +173,10 @@ public class WorkgroupEntity extends BaseEntity {
     }
 
     @JsonIgnore
+    @Deprecated
     public Boolean isConnected() {
-        if (this.agents == null || this.agents.isEmpty()) {
-            return false;
-        }
-        return this.agents.stream().anyMatch(agent -> agent.getConnected());
+        // Deprecated: use PresenceFacadeService.isWorkgroupOnline(workgroup)
+        return false;
     }
 
     @JsonIgnore
@@ -203,11 +203,10 @@ public class WorkgroupEntity extends BaseEntity {
     // 监控客服组登录坐席、开启自动领取坐席数、空闲坐席数、领取会话数、已处理会话数、流失会话数、留言数。
     // agent connected count
     @JsonIgnore
+    @Deprecated
     public long getConnectedAgentCount() {
-        if (this.agents == null || this.agents.isEmpty()) {
-            return 0;
-        }
-        return this.agents.stream().filter(agent -> agent.getConnected()).count();
+        // Deprecated: use PresenceFacadeService.countOnlineAgents(workgroup)
+        return 0L;
     }
 
     // agent available count

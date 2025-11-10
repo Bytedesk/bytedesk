@@ -137,8 +137,8 @@ public class ServiceConvertUtils {
             boolean online = presence.isUserOnline(agent.getUserUid());
             resp.setConnected(online);
         } catch (Exception ignore) {
-            // ApplicationContext not ready or bean missing; fallback to entity field
-            resp.setConnected(agent.getConnected());
+            // ApplicationContext not ready or bean missing; set false as safe default
+            resp.setConnected(false);
         }
         return resp;
     }
