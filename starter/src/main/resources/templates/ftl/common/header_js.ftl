@@ -10,8 +10,10 @@
     }
 
     const setTheme = function (theme) {
-        if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.setAttribute('data-bs-theme', 'dark')
+        if (theme === 'auto') {
+            // For auto mode, check system preference
+            const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+            document.documentElement.setAttribute('data-bs-theme', preferredTheme)
         } else {
             document.documentElement.setAttribute('data-bs-theme', theme)
         }
@@ -24,19 +26,21 @@
         if(el != 'undefined' && el != null) {
             const showActiveTheme = theme => {
             const activeThemeIcon = document.querySelector('.theme-icon-active use')
-            const btnToActive = document.querySelector(`[data-bs-theme-value="${theme!'light'}"]`)
-            const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+            const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+            if (btnToActive) {
+                const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
 
-            document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-                element.classList.remove('active')
-            })
+                document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+                    element.classList.remove('active')
+                })
 
-            btnToActive.classList.add('active')
-            activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+                btnToActive.classList.add('active')
+                activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+            }
         }
 
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            if (storedTheme !== 'light' || storedTheme !== 'dark') {
+            if (storedTheme !== 'light' && storedTheme !== 'dark') {
                 setTheme(getPreferredTheme())
             }
         })

@@ -21,6 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * Controller for "/".
  *
@@ -153,12 +161,17 @@ public class PageRouteController {
 			return "default";
 		}
 		
-		// If language is specified, add it to model
-		if (lang != null) {
-			model.addAttribute("lang", lang);
-		} else {
-			model.addAttribute("lang", "zh-CN");
+		// Set default language if not specified
+		if (lang == null) {
+			lang = "zh-CN";
 		}
+		
+		// Add lang to model
+		model.addAttribute("lang", lang);
+		
+		// Load i18n properties for the specified language
+		Map<String, String> i18nMap = loadI18nProperties(lang);
+		model.addAttribute("i18n", i18nMap);
 		
 		return "index";
 	}
@@ -425,6 +438,34 @@ public class PageRouteController {
 			return "default";
 		}
 		return "pages/" + page;
+	}
+
+	/**
+	 * Helper method to load i18n properties for a given language
+	 */
+	private Map<String, String> loadI18nProperties(String lang) {
+		Map<String, String> i18nMap = new HashMap<>();
+		try {
+			String classpath = this.getClass().getResource("/").getPath();
+			String filePath = classpath + "templates/ftl/i18n/messages_" + lang + ".properties";
+			File file = new File(filePath);
+			
+			if (file.exists()) {
+				try (FileInputStream fis = new FileInputStream(file);
+					 InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
+					Properties props = new Properties();
+					props.load(reader);
+					for (String name : props.stringPropertyNames()) {
+						i18nMap.put(name, props.getProperty(name));
+					}
+				}
+			} else {
+				log.warn("i18n file not found: {}", filePath);
+			}
+		} catch (Exception e) {
+			log.error("Failed to load i18n properties for language: {}", lang, e);
+		}
+		return i18nMap;
 	}
 
 }
