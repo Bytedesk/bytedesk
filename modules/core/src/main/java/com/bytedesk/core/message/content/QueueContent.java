@@ -41,5 +41,10 @@ public class QueueContent extends BaseContent {
      * 人性化预计等待时间描述，如 "约5分钟"；与 waitSeconds 同步，仅展示用。
      */
     private String estimatedWaitTime;
+
+    /**
+     * 服务端时间戳（毫秒）。用于前端进行动态剩余时间估算的基准。
+     */
+    private Long serverTimestamp;
     
 }

@@ -29,6 +29,8 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
+import com.bytedesk.core.message.content.QueueContent;
+import com.bytedesk.service.routing_strategy.ThreadRoutingConstants;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 
@@ -65,16 +67,16 @@ public class QueueMemberEventListener {
             log.info("搜索topic前缀: {}, 状态: QUEUING", topicPrefix);
             // 查询状态为QUEUING的会话，按创建时间升序排序
             List<ThreadEntity> queuingThreads = threadRestService.findByTopicStartsWithAndStatus(
-                topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
+                    topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
             log.info("找到{}个排队中的会话", queuingThreads.size());
-            
+
             // 遍历排队中的会话并发送更新的排队人数消息
             int totalQueuingCount = queuingThreads.size();
             for (int i = 0; i < queuingThreads.size(); i++) {
                 ThreadEntity queuingThread = queuingThreads.get(i);
-                log.info("排队中的会话: {}, topic: {}, 当前排队位置: {}/{}", 
-                    queuingThread.getUid(), queuingThread.getTopic(), i + 1, totalQueuingCount);
-                
+                log.info("排队中的会话: {}, topic: {}, 当前排队位置: {}/{}",
+                        queuingThread.getUid(), queuingThread.getTopic(), i + 1, totalQueuingCount);
+
                 // 发送最新排队人数消息
                 sendQueueUpdateMessage(queuingThread, i + 1, totalQueuingCount);
             }
@@ -86,24 +88,40 @@ public class QueueMemberEventListener {
      */
     private void sendQueueUpdateMessage(ThreadEntity thread, int currentPosition, int totalCount) {
         try {
-            String content = "";
+            // 构建用于展示的提示文本
+            String displayText;
             if (currentPosition == 1) {
-                content = "请稍后，下一个就是您";
+                displayText = "请稍后，下一个就是您";
             } else {
-                content = "当前排队人数：" + totalCount + "，您的位置：" + currentPosition + 
-                         "，大约等待时间：" + (currentPosition - 1) * 2 + " 分钟";
+                int waitMinutes = (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON;
+                displayText = "当前排队人数：" + totalCount + "，您的位置：" + currentPosition +
+                        "，大约等待时间：" + waitMinutes + " 分钟";
             }
-            
-            // 更新线程内容
-            thread.setContent(content);
+
+            // 计算等待时间（秒）与人性化描述
+            int waitSeconds = currentPosition == 1 ? 0
+                    : (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON * 60;
+            String estimatedWaitTime = currentPosition == 1 ? "即将开始" : ("约" + (waitSeconds / 60) + "分钟");
+
+            QueueContent queueContent = QueueContent.builder()
+                    .content(displayText)
+                    .position(currentPosition)
+                    .queueSize(totalCount)
+                    .waitSeconds(waitSeconds)
+                    .estimatedWaitTime(estimatedWaitTime)
+                    .serverTimestamp(System.currentTimeMillis())
+                    .build();
+
+            // 将结构化内容写入线程（保持与其它策略一致）
+            thread.setContent(queueContent.toJson());
             threadRestService.save(thread);
-            
-            // 发送排队消息
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(thread);
+
+            // 发送结构化排队消息
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, thread);
             messageSendService.sendProtobufMessage(messageProtobuf);
-            
-            log.debug("已发送排队更新消息: threadUid={}, position={}/{}, content={}", 
-                thread.getUid(), currentPosition, totalCount, content);
+
+            log.debug("已发送排队更新消息(结构化): threadUid={}, position={}/{}, waitSeconds={}, content={}",
+                    thread.getUid(), currentPosition, totalCount, waitSeconds, displayText);
         } catch (Exception e) {
             log.error("发送排队更新消息时出错: threadUid={}, error={}", thread.getUid(), e.getMessage(), e);
         }
@@ -117,7 +135,7 @@ public class QueueMemberEventListener {
         if (topic == null || topic.isEmpty()) {
             return null;
         }
-        
+
         String[] parts = topic.split("/");
         if (parts.length >= 3) {
             return parts[0] + "/" + parts[1] + "/" + parts[2];
@@ -131,19 +149,20 @@ public class QueueMemberEventListener {
         if (message == null) {
             return;
         }
-        // log.debug("QueueMemberEventListener 接收到新消息事件: messageUid={}, threadUid={}, content={}",
-        //         message.getUid(), message.getThread().getUid(), message.getContent()); 
-        
+        // log.debug("QueueMemberEventListener 接收到新消息事件: messageUid={}, threadUid={},
+        // content={}",
+        // message.getUid(), message.getThread().getUid(), message.getContent());
+
         // 获取消息对应的会话线程
         ThreadEntity thread = null;
         try {
             thread = threadRestService.findByUid(message.getThread().getUid()).orElse(null);
             if (thread == null) {
-                log.warn("消息对应的会话不存在: messageUid={}, threadUid={}", 
+                log.warn("消息对应的会话不存在: messageUid={}, threadUid={}",
                         message.getUid(), message.getThread().getUid());
                 return;
             }
-            
+
             if (message.isFromVisitor()) {
                 // 更新访客消息统计
                 updateVisitorMessageStats(message, thread);
@@ -166,7 +185,7 @@ public class QueueMemberEventListener {
      * 更新访客消息统计
      * 
      * @param message 消息对象
-     * @param thread 会话对象
+     * @param thread  会话对象
      */
     private void updateVisitorMessageStats(MessageEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
@@ -175,7 +194,7 @@ public class QueueMemberEventListener {
         if (!message.isFromVisitor()) {
             return;
         }
-        
+
         try {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
@@ -183,35 +202,35 @@ public class QueueMemberEventListener {
                 log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
                 return;
             }
-            
+
             QueueMemberEntity queueMember = queueMemberOpt.get();
             ZonedDateTime now = BdDateUtils.now();
-            
+
             // 更新首次消息时间（如果尚未设置）
             if (queueMember.getVisitorFirstMessageAt() == null) {
                 queueMember.setVisitorFirstMessageAt(now);
             }
-            
+
             // 更新最后一次访客消息时间
             queueMember.setVisitorLastMessageAt(now);
-            
+
             // 更新访客消息计数
             queueMember.setVisitorMessageCount(queueMember.getVisitorMessageCount() + 1);
-            
+
             // 保存更新 - 支持重试机制
             queueMemberRestService.save(queueMember);
-            log.debug("已更新队列成员访客消息统计: threadUid={}, visitorMsgCount={}", 
+            log.debug("已更新队列成员访客消息统计: threadUid={}, visitorMsgCount={}",
                     thread.getUid(), queueMember.getVisitorMessageCount());
         } catch (Exception e) {
             log.error("更新访客消息统计时出错: {}", e.getMessage(), e);
         }
     }
-    
+
     /**
      * 更新客服消息统计
      * 
      * @param message 消息对象
-     * @param thread 会话对象
+     * @param thread  会话对象
      */
     private void updateAgentMessageStats(MessageEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
@@ -220,7 +239,7 @@ public class QueueMemberEventListener {
         if (!message.isFromAgent()) {
             return;
         }
-        
+
         try {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
@@ -228,18 +247,18 @@ public class QueueMemberEventListener {
                 log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
                 return;
             }
-            
+
             QueueMemberEntity queueMember = queueMemberOpt.get();
             ZonedDateTime now = BdDateUtils.now();
-            
+
             // 更新客服消息计数
             queueMember.setAgentMessageCount(queueMember.getAgentMessageCount() + 1);
-            
+
             // 如果是首次响应，记录首次响应时间
             if (!queueMember.getAgentFirstResponse() && queueMember.getVisitorLastMessageAt() != null) {
                 queueMember.setAgentFirstResponse(true);
                 queueMember.setAgentFirstResponseAt(now);
-                
+
                 // 计算首次响应时间（秒）
                 long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
                 queueMember.setAgentMaxResponseLength((int) responseTimeInSeconds);
@@ -247,12 +266,12 @@ public class QueueMemberEventListener {
             } else if (queueMember.getVisitorLastMessageAt() != null) {
                 // 非首次响应，更新平均和最大响应时间
                 long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
-                
+
                 // 更新最大响应时间
                 if (responseTimeInSeconds > queueMember.getAgentMaxResponseLength()) {
                     queueMember.setAgentMaxResponseLength((int) responseTimeInSeconds);
                 }
-                
+
                 // 更新平均响应时间 - 使用累计平均计算方法
                 // (currentAvg * (messageCount-1) + newValue) / messageCount
                 int messageCount = queueMember.getAgentMessageCount();
@@ -261,25 +280,25 @@ public class QueueMemberEventListener {
                     queueMember.setAgentAvgResponseLength((currentTotal + (int) responseTimeInSeconds) / messageCount);
                 }
             }
-            
+
             // 更新最后响应时间
             queueMember.setAgentLastResponseAt(now);
-            
+
             // 保存更新
             queueMemberRestService.save(queueMember);
-            log.debug("已更新队列成员客服消息统计: threadUid={}, agentMsgCount={}, avgResponseTime={}s, maxResponseTime={}s", 
-                    thread.getUid(), queueMember.getAgentMessageCount(), 
+            log.debug("已更新队列成员客服消息统计: threadUid={}, agentMsgCount={}, avgResponseTime={}s, maxResponseTime={}s",
+                    thread.getUid(), queueMember.getAgentMessageCount(),
                     queueMember.getAgentAvgResponseLength(), queueMember.getAgentMaxResponseLength());
         } catch (Exception e) {
             log.error("更新客服消息统计时出错: {}", e.getMessage(), e);
         }
     }
-    
+
     /**
      * 更新机器人消息统计
      *
      * @param message 消息对象
-     * @param thread 会话对象
+     * @param thread  会话对象
      */
     private void updateRobotMessageStats(MessageEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
@@ -288,7 +307,7 @@ public class QueueMemberEventListener {
         if (!message.isFromRobot()) {
             return;
         }
-        
+
         try {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
@@ -296,31 +315,31 @@ public class QueueMemberEventListener {
                 log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
                 return;
             }
-            
+
             QueueMemberEntity queueMember = queueMemberOpt.get();
             ZonedDateTime now = BdDateUtils.now();
-            
+
             // 更新首次机器人消息时间（如果尚未设置）
             if (queueMember.getRobotFirstResponseAt() == null) {
                 queueMember.setRobotFirstResponseAt(now);
             }
-            
+
             // 更新最后一次机器人消息时间
             queueMember.setRobotLastResponseAt(now);
-            
+
             // 更新机器人消息计数
             queueMember.setRobotMessageCount(queueMember.getRobotMessageCount() + 1);
-            
+
             // 如果是访客提问后的机器人回复，计算响应时间
             if (queueMember.getVisitorLastMessageAt() != null) {
                 long responseTimeInSeconds = Duration.between(queueMember.getVisitorLastMessageAt(), now).getSeconds();
-                
+
                 // 更新最大响应时间
-                if (queueMember.getRobotMaxResponseLength() == 0 || 
-                    responseTimeInSeconds > queueMember.getRobotMaxResponseLength()) {
+                if (queueMember.getRobotMaxResponseLength() == 0 ||
+                        responseTimeInSeconds > queueMember.getRobotMaxResponseLength()) {
                     queueMember.setRobotMaxResponseLength((int) responseTimeInSeconds);
                 }
-                
+
                 // 更新平均响应时间
                 int messageCount = queueMember.getRobotMessageCount();
                 if (messageCount > 1) {
@@ -330,11 +349,11 @@ public class QueueMemberEventListener {
                     queueMember.setRobotAvgResponseLength((int) responseTimeInSeconds);
                 }
             }
-            
+
             // 保存更新
             queueMemberRestService.save(queueMember);
-            log.debug("已更新队列成员机器人消息统计: threadUid={}, robotMsgCount={}, avgResponseTime={}s, maxResponseTime={}s", 
-                    thread.getUid(), queueMember.getRobotMessageCount(), 
+            log.debug("已更新队列成员机器人消息统计: threadUid={}, robotMsgCount={}, avgResponseTime={}s, maxResponseTime={}s",
+                    thread.getUid(), queueMember.getRobotMessageCount(),
                     queueMember.getRobotAvgResponseLength(), queueMember.getRobotMaxResponseLength());
         } catch (Exception e) {
             log.error("更新机器人消息统计时出错: {}", e.getMessage(), e);
@@ -345,7 +364,7 @@ public class QueueMemberEventListener {
      * 更新系统消息统计
      *
      * @param message 消息对象
-     * @param thread 会话对象
+     * @param thread  会话对象
      */
     private void updateSystemMessageStats(MessageEntity message, ThreadEntity thread) {
         if (thread == null || message == null) {
@@ -354,7 +373,7 @@ public class QueueMemberEventListener {
         if (!message.isFromSystem()) {
             return;
         }
-        
+
         try {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
@@ -362,31 +381,28 @@ public class QueueMemberEventListener {
                 log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
                 return;
             }
-            
+
             QueueMemberEntity queueMember = queueMemberOpt.get();
             ZonedDateTime now = BdDateUtils.now();
-            
+
             // 更新系统消息计数
             queueMember.setSystemMessageCount(queueMember.getSystemMessageCount() + 1);
-            
+
             // 记录首次系统消息时间（如果尚未设置）
             if (queueMember.getSystemFirstResponseAt() == null) {
                 queueMember.setSystemFirstResponseAt(now);
             }
-            
+
             // 更新最后一次系统消息时间
             queueMember.setSystemLastResponseAt(now);
-            
+
             // 保存更新
             queueMemberRestService.save(queueMember);
-            log.debug("已更新队列成员系统消息统计: threadUid={}, systemMsgCount={}", 
+            log.debug("已更新队列成员系统消息统计: threadUid={}, systemMsgCount={}",
                     thread.getUid(), queueMember.getSystemMessageCount());
         } catch (Exception e) {
             log.error("更新系统消息统计时出错: {}", e.getMessage(), e);
         }
     }
 
-
-
-    
 }

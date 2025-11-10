@@ -43,6 +43,7 @@ import com.bytedesk.core.utils.BdDateUtils;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 
 import lombok.AllArgsConstructor;
@@ -345,10 +346,24 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
         
         log.debug("生成排队消息内容");
-        String queueContent = generateAgentQueueMessage(queueMemberEntity);
-        thread.setQueuing().setContent(queueContent);
+        int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
+        String queueContentText = generateAgentQueueMessage(queueMemberEntity);
+        QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
+                .content(queueContentText)
+                .position(queueMemberEntity.getQueueNumber())
+                .queueSize(queuingCount)
+                .serverTimestamp(System.currentTimeMillis());
+        if (queuingCount > 0) {
+            int estimatedMinutes = queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
+            builder.waitSeconds(estimatedMinutes * 60)
+                   .estimatedWaitTime("约" + estimatedMinutes + "分钟");
+        } else {
+            builder.waitSeconds(0).estimatedWaitTime("即将开始");
+        }
+        QueueContent qc = builder.build();
+        thread.setQueuing().setContent(qc.toJson());
         log.debug("线程状态设置为排队 - threadUid: {}, 排队消息长度: {}", 
-                thread.getUid(), queueContent != null ? queueContent.length() : 0);
+        thread.getUid(), queueContentText != null ? queueContentText.length() : 0);
         
         // 保存线程
         log.debug("保存排队状态的线程");
@@ -362,7 +377,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 发送排队消息
         log.debug("开始发送排队消息");
         long msgStartTime = System.currentTimeMillis();
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(savedThread);
+    MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(qc, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         log.info("排队消息发送完成 - threadUid: {}, 消息发送耗时: {}ms, 总处理耗时: {}ms", 
                 savedThread.getUid(), System.currentTimeMillis() - msgStartTime, System.currentTimeMillis() - startTime);
@@ -620,9 +635,23 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             log.warn("线程中未找到客服信息 - threadUid: {}", thread.getUid());
             throw new IllegalStateException("Thread agent protobuf is null");
         }
-        
-        log.info("客服排队消息生成完成 - threadUid: {}, agentUid: {}, agentNickname: {}", 
+        // 线程content可能已是结构化QueueContent JSON；尝试解析，否则构造最小QueueContent
+        QueueContent qc = null;
+        try {
+            if (thread.getContent() != null && thread.getContent().trim().startsWith("{")) {
+                qc = com.alibaba.fastjson2.JSON.parseObject(thread.getContent(), QueueContent.class);
+            }
+        } catch (Exception e) {
+            log.debug("解析线程排队内容失败，使用降级模式 - threadUid: {}, error: {}", thread.getUid(), e.getMessage());
+        }
+        if (qc == null) {
+            qc = QueueContent.builder()
+                .content("正在排队，请稍候...")
+                .serverTimestamp(System.currentTimeMillis())
+                .build();
+        }
+        log.info("客服排队消息生成完成(结构化) - threadUid: {}, agentUid: {}, agentNickname: {}", 
                 thread.getUid(), user.getUid(), user.getNickname());
-        return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
+        return ThreadMessageUtil.getThreadQueuingMessage(qc, user, thread);
     }
 }

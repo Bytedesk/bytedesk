@@ -552,7 +552,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
         .content(queueContentText)
         .position(queueMemberEntity.getQueueNumber())
-        .queueSize(queuingCount);
+        .queueSize(queuingCount)
+        .serverTimestamp(System.currentTimeMillis());
 
     // 计算预估等待时间（分钟 -> 秒）与描述
     if (queuingCount > 0) {
@@ -687,7 +688,23 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("Getting workgroup queuing message for user: {}", user.getNickname());
 
-        return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
+        // 线程content通常为结构化QueueContent JSON；解析失败则降级为仅文本
+        QueueContent qc = null;
+        try {
+            String c = thread.getContent();
+            if (c != null && c.trim().startsWith("{")) {
+                qc = JSON.parseObject(c, QueueContent.class);
+            }
+        } catch (Exception e) {
+            log.debug("Parse queue content failed, fallback to text - threadUid: {}, error: {}", thread.getUid(), e.getMessage());
+        }
+        if (qc == null) {
+            qc = QueueContent.builder()
+                    .content(thread.getContent())
+                    .serverTimestamp(System.currentTimeMillis())
+                    .build();
+        }
+        return ThreadMessageUtil.getThreadQueuingMessage(qc, user, thread);
     }
 
     /**
