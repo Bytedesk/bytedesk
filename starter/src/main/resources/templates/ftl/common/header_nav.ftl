@@ -1,11 +1,16 @@
 <!-- Header START -->
-<header class="navbar-light navbar-sticky navbar-transparent">
+<header class="navbar-light navbar-sticky bg-white shadow-sm fixed-top">
 	<!-- Logo Nav START -->
 	<nav class="navbar navbar-expand-lg">
 		<div class="container">
 			<!-- Logo START -->
 			<#include "./macro/i18n.ftl" />
-			<a class="navbar-brand me-0" href="https://www.weiyuai.cn/" title="${(i18n['brand.title'])! '微语 - 开源智能客服系统'}">
+			<#-- Language prefix for links -->
+			<#assign langPrefix = "">
+			<#if lang?? && lang != "zh-CN">
+				<#assign langPrefix = "/" + lang>
+			</#if>
+			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 开源智能客服系统'}">
 				<#--  <img class="light-mode-item navbar-brand-item" src="/assets/images/logo.svg" alt="微语logo">  -->
 				<#--  <img class="dark-mode-item navbar-brand-item" src="/assets/images/logo-light.svg" alt="微语logo">  -->
 				<h1 class="h5">${(i18n['brand.title'])! '微语 - 开源智能客服系统'}</h1>
@@ -28,32 +33,30 @@
 				<!-- Nav Search END -->
 				<ul class="navbar-nav navbar-nav-scroll ms-auto">
 
-					<!-- Nav item 1 Demos -->
-					<li class="nav-item dropdown">
-						<a class="nav-link active" href="https://www.weiyuai.cn" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
-					</li>
-					<!-- Nav item 1 Demos -->
-					<#--  <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="demoMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">方案</a>
-						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoMenu">
-							<li> <a class="dropdown-item" href="./plan/im-social.html" target="_blank">社交IM</a></li>
-							<li> <a class="dropdown-item" href="./plan/im-social.html" target="_blank">企业IM</a></li>
-							<li> <a class="dropdown-item" href="./plan/cs.html" target="_blank">在线客服</a></li>
-							<li> <a class="dropdown-item" href="./plan/ai.html" target="_blank">AI助手</a></li>
-						</ul>
-					</li>  -->
-					<!-- Nav item 2 Course -->
-					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank"><@t key="nav.docs">文档</@t></a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
-					
-					<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
-					<#-- pruned: voice, forum, help, architecture -->
-					<li class="nav-item dropdown"><a class="nav-link" href="/pages/download.html"><@t key="nav.download">下载</@t></a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="/pages/about.html"><@t key="nav.about">关于</@t></a></li>
-					<!-- Nav item 3 link-->
-					<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>
-
-					<!-- Language Switch Dropdown -->
+				<!-- Nav item 1 Demos -->
+				<li class="nav-item dropdown">
+					<a class="nav-link active" href="${langPrefix}/index.html" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
+				</li>
+				<!-- Nav item 1 Demos -->
+				<#--  <li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="demoMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">方案</a>
+					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoMenu">
+						<li> <a class="dropdown-item" href="./plan/im-social.html" target="_blank">社交IM</a></li>
+						<li> <a class="dropdown-item" href="./plan/im-social.html" target="_blank">企业IM</a></li>
+						<li> <a class="dropdown-item" href="./plan/cs.html" target="_blank">在线客服</a></li>
+						<li> <a class="dropdown-item" href="./plan/ai.html" target="_blank">AI助手</a></li>
+					</ul>
+				</li>  -->
+				<!-- Nav item 2 Course -->
+				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank"><@t key="nav.docs">文档</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
+				
+				<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
+				<#-- pruned: voice, forum, help, architecture -->
+				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/download.html"><@t key="nav.download">下载</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/about.html"><@t key="nav.about">关于</@t></a></li>
+				<!-- Nav item 3 link-->
+				<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>					<!-- Language Switch Dropdown -->
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${(i18n['lang.current'])! (lang! 'zh-CN')}</a>
 						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langMenu">

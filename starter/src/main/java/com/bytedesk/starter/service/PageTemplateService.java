@@ -40,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 public class PageTemplateService {
 
     private static final String htmlSavePath = "/templates/";
+    private static final String staticSavePath = "/static/";
     private static final String templatePath = "/templates/ftl/";
     //
     // private static final String htmlSavePlanPath = "/templates/plan/";
@@ -108,23 +109,29 @@ public class PageTemplateService {
                 i18nMap.putAll(metaMap);
                 map.put("i18n", i18nMap);
                 String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
-                InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
-                String langDir = htmlSavePath + lang + "/";
-                checkAndCreateFolder(classpath, langDir);
-                // 支持子目录
-                String savePath;
-                if (tempName.contains("/")) {
-                    String dirPath = tempName.substring(0, tempName.lastIndexOf("/"));
-                    checkAndCreateFolder(classpath + langDir, dirPath);
-                    savePath = classpath + langDir + tempName + ".html";
-                } else {
-                    savePath = classpath + langDir + tempName + ".html";
+                
+                // Save to both templates/ and static/ directories
+                String[] savePaths = {htmlSavePath, staticSavePath};
+                
+                for (String basePath : savePaths) {
+                    String langDir = basePath + lang + "/";
+                    checkAndCreateFolder(classpath, langDir);
+                    // 支持子目录
+                    String savePath;
+                    if (tempName.contains("/")) {
+                        String dirPath = tempName.substring(0, tempName.lastIndexOf("/"));
+                        checkAndCreateFolder(classpath + langDir, dirPath);
+                        savePath = classpath + langDir + tempName + ".html";
+                    } else {
+                        savePath = classpath + langDir + tempName + ".html";
+                    }
+                    log.info("savePath {}", savePath);
+                    
+                    try (InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
+                         FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath))) {
+                        IOUtils.copy(inputStream, fileOutputStream);
+                    }
                 }
-                log.info("savePath {}", savePath);
-                FileOutputStream fileOutputStream = new FileOutputStream(new File(savePath));
-                IOUtils.copy(inputStream, fileOutputStream);
-                inputStream.close();
-                fileOutputStream.close();
             } catch (Exception e) {
                 log.error("Generate multilingual page failed for tempName {} lang {}", tempName, lang, e);
             }

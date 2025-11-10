@@ -49,6 +49,9 @@ public class PageRouteController {
 	 * 微语首页
 	 * http://127.0.0.1:9003
 	 * http://127.0.0.1:9003/home
+	 * 多语言支持:
+	 * http://127.0.0.1:9003/zh-TW/index.html
+	 * http://127.0.0.1:9003/en/index.html
 	 */
 	@GetMapping({ "/", "/home" })
 	public String home(Model model) {
@@ -64,6 +67,66 @@ public class PageRouteController {
 		model.addAttribute("title", "微语");
 		model.addAttribute("chatUrl", "/chat/home");
 		return "home";
+	}
+
+	/**
+	 * Multi-language static HTML support
+	 * http://127.0.0.1:9003/zh-TW/index.html
+	 * http://127.0.0.1:9003/en/index.html
+	 * http://127.0.0.1:9003/zh-TW/features/team.html
+	 * http://127.0.0.1:9003/en/pages/about.html
+	 */
+	@GetMapping({
+		"/{lang:zh-CN|zh-TW|en}/index.html",
+		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
+		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms}.html"
+	})
+	public String multiLanguageStaticPages(
+			@PathVariable String lang,
+			@PathVariable(required = false) String feature,
+			@PathVariable(required = false) String page,
+			Model model) {
+		
+		// Add lang to model for template processing
+		model.addAttribute("lang", lang);
+		
+		// Forward to the actual static HTML file in templates/{lang}/ directory
+		if (feature != null) {
+			return "forward:/templates/" + lang + "/features/" + feature + ".html";
+		} else if (page != null) {
+			return "forward:/templates/" + lang + "/pages/" + page + ".html";
+		} else {
+			return "forward:/templates/" + lang + "/index.html";
+		}
+	}
+
+	/**
+	 * Root static HTML pages for zh-CN (default language)
+	 * http://127.0.0.1:9003/index.html
+	 * http://127.0.0.1:9003/features/team.html
+	 * http://127.0.0.1:9003/pages/about.html
+	 */
+	@GetMapping({
+		"/index.html",
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
+		"/pages/{page:download|contact|about|privacy|terms}.html"
+	})
+	public String rootStaticPages(
+			@PathVariable(required = false) String feature,
+			@PathVariable(required = false) String page,
+			Model model) {
+		
+		// Default language is zh-CN
+		model.addAttribute("lang", "zh-CN");
+		
+		// Forward to the actual static HTML file in templates/ directory
+		if (feature != null) {
+			return "forward:/templates/features/" + feature + ".html";
+		} else if (page != null) {
+			return "forward:/templates/pages/" + page + ".html";
+		} else {
+			return "forward:/templates/index.html";
+		}
 	}
 
 	/**
@@ -301,18 +364,17 @@ public class PageRouteController {
 
 	/**
 	 * Features pages - support both with and without /features/ prefix
-	 * http://127.0.0.1:9003/team.html (backward compatible)
-	 * http://127.0.0.1:9003/features/team.html (for static HTML)
+	 * For dynamic FTL template rendering (non-.html requests)
 	 * http://127.0.0.1:9003/office
 	 * http://127.0.0.1:9003/features/office
 	 */
 	@GetMapping({ 
 		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}", 
-		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}",
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html"
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}"
 	})
-	public String handleFeatureRoutes(@PathVariable String feature, Model model) {
+	public String handleFeatureRoutes(
+			@PathVariable(required = false) String feature, 
+			Model model) {
 		if (!showDemo) {
 			// 添加自定义配置到模型
 			if (customEnabled) {
@@ -322,19 +384,19 @@ public class PageRouteController {
 			}
 			return "default";
 		}
+		
 		return "features/" + feature;
 	}
 
 	/**
 	 * Pages - support both with and without /pages/ prefix
-	 * http://127.0.0.1:9003/download.html (backward compatible)
-	 * http://127.0.0.1:9003/pages/download.html (for static HTML)
+	 * For dynamic FTL template rendering (non-.html requests)
+	 * http://127.0.0.1:9003/download
+	 * http://127.0.0.1:9003/pages/download
 	 */
 	@GetMapping({ 
 		"/{page:download|contact|about|privacy|terms}", 
-		"/{page:download|contact|about|privacy|terms}.html",
-		"/pages/{page:download|contact|about|privacy|terms}",
-		"/pages/{page:download|contact|about|privacy|terms}.html"
+		"/pages/{page:download|contact|about|privacy|terms}"
 	})
 	public String handlePageRoutes(@PathVariable String page, Model model) {
 		if (!showDemo) {

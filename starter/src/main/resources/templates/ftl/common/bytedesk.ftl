@@ -20,7 +20,7 @@ chatUrl: 'https://www.weiyuai.cn/chat?org=df_org_uid&t=1&sid=df_wg_uid&',
     placement: 'bottom-right',
     autoPopup: false,
     inviteConfig: {
-      show: true,
+      show: false,
       text: '${inviteText?trim}',
       delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
       loop: true, // 是否启用循环
