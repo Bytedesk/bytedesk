@@ -78,6 +78,17 @@ public class ThreadRestService
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final TopicRestService topicRestService;
+    
+    public Map<String, Long> reportClosedByCloseType(java.time.ZonedDateTime start, java.time.ZonedDateTime end) {
+        List<Object[]> rows = threadRepository.countClosedGroupedByCloseType(start, end);
+        Map<String, Long> result = new HashMap<>();
+        for (Object[] row : rows) {
+            String key = (String) row[0];
+            Long count = (Long) row[1];
+            result.put(key != null ? key : "NONE", count != null ? count : 0L);
+        }
+        return result;
+    }
 
     @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {

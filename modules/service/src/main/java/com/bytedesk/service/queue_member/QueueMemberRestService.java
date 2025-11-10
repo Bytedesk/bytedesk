@@ -42,6 +42,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final QueueMemberRepository queueMemberRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
+    private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
     
     /**
      * 访客主动退出排队：标记离开时间并软删除队列成员记录
@@ -55,6 +56,25 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         entity.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
         entity.setDeleted(true);
         save(entity);
+    }
+
+    /**
+     * 扫描超时(未发送首条消息)的排队成员并标记删除
+     */
+    public int cleanupIdleQueueMembers() {
+        java.time.ZonedDateTime threshold = com.bytedesk.core.utils.BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
+        java.util.List<QueueMemberEntity> idleList = queueMemberRepository.findIdleBefore(threshold);
+        int removed = 0;
+        for (QueueMemberEntity qm : idleList) {
+            // 只处理仍处于排队状态的线程
+            if (qm.getThread() != null && qm.getThread().isQueuing()) {
+                qm.setDeleted(true);
+                qm.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
+                save(qm);
+                removed++;
+            }
+        }
+        return removed;
     }
     
     @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")

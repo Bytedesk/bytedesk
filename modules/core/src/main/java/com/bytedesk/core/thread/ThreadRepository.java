@@ -88,6 +88,12 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         List<ThreadEntity> findByTopicStartsWithAndStatusAndDeletedFalse(@Param("topicPrefix") String topicPrefix, @Param("status") String status);
 
         /**
+         * 统计在时间范围内按关闭来源分组的数量
+         */
+        @Query("SELECT t.closeType, COUNT(t) FROM ThreadEntity t WHERE t.status = 'CLOSED' AND t.deleted = false AND t.updatedAt BETWEEN :start AND :end GROUP BY t.closeType")
+        List<Object[]> countClosedGroupedByCloseType(@Param("start") java.time.ZonedDateTime start, @Param("end") java.time.ZonedDateTime end);
+
+        /**
          * 根据访客ID查找最近的客服会话记录
          * 查找访客与客服的最近一次会话，按更新时间倒序排列
          */

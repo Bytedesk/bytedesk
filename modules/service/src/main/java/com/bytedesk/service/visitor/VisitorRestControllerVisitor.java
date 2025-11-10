@@ -48,6 +48,7 @@ import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
+import java.time.ZonedDateTime;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -200,6 +201,18 @@ public class VisitorRestControllerVisitor {
             return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
         }
         return ResponseEntity.ok(JsonResult.success("close success", response));
+    }
+
+    /**
+     * 关闭来源分布报表(按 updatedAt 时间范围统计)
+     */
+    @GetMapping("/thread/report/close-type")
+    public ResponseEntity<?> reportCloseType(@RequestParam(value = "start", required = false) Long startEpoch,
+                                             @RequestParam(value = "end", required = false) Long endEpoch) {
+        ZonedDateTime end = endEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(endEpoch), java.time.ZoneId.systemDefault()) : ZonedDateTime.now();
+        ZonedDateTime start = startEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(startEpoch), java.time.ZoneId.systemDefault()) : end.minusDays(1);
+        Map<String, Long> data = threadRestService.reportClosedByCloseType(start, end);
+        return ResponseEntity.ok(JsonResult.success("report success", data));
     }
 
     // 清空当前用户所有未读消息

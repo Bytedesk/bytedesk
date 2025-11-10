@@ -49,4 +49,10 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.orgUid = :orgUid AND qm.robotQueue IS NOT NULL AND qm.createdAt >= :startDate AND qm.createdAt <= :endDate")
     Long countByRobotUidAndDateBetween(@Param("orgUid") String orgUid, @Param("robotUid") String robotUid, @Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate);
 
+    /**
+     * 查找在指定时间之前仍未发送任何访客消息(visitorMessageCount=0)的排队成员
+     */
+    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.visitorMessageCount = 0 AND qm.deleted = false AND qm.visitorEnqueueAt < :threshold")
+    List<QueueMemberEntity> findIdleBefore(@Param("threshold") ZonedDateTime threshold);
+
 }
