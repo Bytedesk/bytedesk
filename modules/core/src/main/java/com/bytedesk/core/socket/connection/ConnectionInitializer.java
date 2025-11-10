@@ -16,22 +16,20 @@ package com.bytedesk.core.socket.connection;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
-
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class ConnectionInitializer implements SmartInitializingSingleton {
 
-    private final ConnectionRestService connectionRestService;
+    // private final ConnectionRestService connectionRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
         // create default
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        connectionRestService.initConnections(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // connectionRestService.initConnections(orgUid);
     }
 
     private void initPermissions() {

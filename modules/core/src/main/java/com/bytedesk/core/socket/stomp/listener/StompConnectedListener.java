@@ -19,8 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
+
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 
 // import com.bytedesk.core.event.BytedeskEventPublisher;
 
@@ -36,7 +39,8 @@ import org.springframework.web.socket.messaging.SessionConnectedEvent;
 @AllArgsConstructor
 public class StompConnectedListener implements ApplicationListener<SessionConnectedEvent> {
 
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final ConnectionRestService connectionRestService;
+    
     @Override
     public void onApplicationEvent(@NonNull SessionConnectedEvent event) {
         // log.debug("stomp sessionConnectedEvent {}", event.toString());
@@ -47,16 +51,24 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
         // String uid = SimpMessageHeaderAccessor.getFirstNativeHeader("login", headers);
         // log.info("stomp sessionConnectedEvent uid:  {}", uid);
         // 
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        if (headerAccessor != null) {
-            // log.info("headerAccessor {}", headerAccessor.getMessageHeaders());
-            // String login = headerAccessor.getLogin();
-            // FIXME: nativeHeaders={login=[1513088171901063], 但是 stomp connection with uid:  null，未正确获取到 login 值
-            // log.info("stomp connection with uid:  {}", login);
-            // 处理 login 值，例如存储到数据库或日志记录
-        } else {
-            log.info("stomp connection with unknown uid");
+        StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
+        if (headerAccessor == null) {
+            log.info("stomp connection without headerAccessor");
+            return;
         }
-        // bytedeskEventPublisher.publishStompConnectedEvent(null);
+        String uid = headerAccessor.getLogin();
+        // 尝试从原始 native headers 解析 login
+        if (uid == null && headerAccessor.getNativeHeader("login") != null && !headerAccessor.getNativeHeader("login").isEmpty()) {
+            uid = headerAccessor.getNativeHeader("login").get(0);
+        }
+        if (uid == null) {
+            log.info("stomp connection missing login header");
+            return;
+        }
+        String sessionId = headerAccessor.getSessionId();
+        String clientId = uid + "/stomp/" + sessionId;
+        // 标记连接，仅记录会话；坐席在线布尔状态由上层定时任务/事件统一刷新
+        connectionRestService.markConnected(uid, null, clientId, null, "STOMP", "WEB", null, null, 90);
+        log.debug("stomp connected uid {} session {}", uid, sessionId);
     }
 }

@@ -35,13 +35,13 @@ public class ConnectionSpecification extends BaseSpecification<ConnectionEntity,
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // name
-            if (StringUtils.hasText(request.getName())) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
-            }
+            // if (StringUtils.hasText(request.getName())) {
+            //     predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            // }
             // description
-            if (StringUtils.hasText(request.getDescription())) {
-                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
-            }
+            // if (StringUtils.hasText(request.getDescription())) {
+            //     predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            // }
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));

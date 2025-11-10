@@ -16,7 +16,6 @@ package com.bytedesk.core.socket.connection;
 
 import com.bytedesk.core.base.BaseResponse;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,17 +26,20 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
 @NoArgsConstructor
 public class ConnectionResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
-    private String name;
-
-    private String description;
-
-    private String type;
+        private String clientId;
+        private String deviceUid;
+        private String protocol;
+        private String ip;
+        private String userAgent;
+        private String status;
+        private Long connectedAt;
+        private Long lastHeartbeatAt;
+        private Long disconnectedAt;
+        private Integer ttlSeconds;
 
 }

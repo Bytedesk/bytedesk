@@ -76,9 +76,6 @@ public class AgentEntity extends BaseEntity {
     @Column(name = "agent_status")
     private String status = AgentStatusEnum.OFFLINE.name();
 
-    @Builder.Default
-    @Column(name = "is_connected")
-    private Boolean connected = false;
 
     /**
      * Configuration settings reference
@@ -122,6 +119,11 @@ public class AgentEntity extends BaseEntity {
     }
 
     // 是否可以接待
+    @Builder.Default
+    @Column(name = "is_connected")
+    private Boolean connected = false; // Deprecated: 将逐步由 ConnectionEntity 统计替代
+
+    // 兼容旧代码：仍保留布尔连通判断
     public Boolean isConnectedAndAvailable() {
         return this.getConnected() && this.isAvailable();
     }

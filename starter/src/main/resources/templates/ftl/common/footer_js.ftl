@@ -9,3 +9,7 @@
 
 <!-- Template Functions -->
 <script src="/assets/kbase/social/js/functions.js"></script>
+
+<!-- Language Switching Script -->
+<#include "../common/lang_switch.ftl" />
+

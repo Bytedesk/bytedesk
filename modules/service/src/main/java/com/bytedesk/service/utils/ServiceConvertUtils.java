@@ -33,6 +33,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
 import com.bytedesk.service.queue.QueueEntity;
@@ -130,7 +131,16 @@ public class ServiceConvertUtils {
     
     //
     public static AgentResponse convertToAgentResponse(AgentEntity agent) {
-        return getModelMapper().map(agent, AgentResponse.class);
+        AgentResponse resp = getModelMapper().map(agent, AgentResponse.class);
+        try {
+            ConnectionRestService presence = ApplicationContextHolder.getBean(ConnectionRestService.class);
+            boolean online = presence.isUserOnline(agent.getUserUid());
+            resp.setConnected(online);
+        } catch (Exception ignore) {
+            // ApplicationContext not ready or bean missing; fallback to entity field
+            resp.setConnected(agent.getConnected());
+        }
+        return resp;
     }
 
     public static UserProtobuf convertToUserProtobuf(AgentEntity agent) {

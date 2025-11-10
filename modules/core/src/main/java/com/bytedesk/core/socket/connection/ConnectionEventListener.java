@@ -20,25 +20,20 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
 public class ConnectionEventListener {
 
-    private final ConnectionRestService connectionRestService;
+    // Legacy initialization removed; retained class for potential future org-scoped connection metrics.
 
     @Order(3)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
+        // No-op after legacy connection initialization removal
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        connectionRestService.initConnections(orgUid);
+        log.info("organization created (connection listener noop): {}", organization.getName());
     }
-
- 
 }
 

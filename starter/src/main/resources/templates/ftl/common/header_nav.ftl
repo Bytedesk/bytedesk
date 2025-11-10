@@ -57,9 +57,9 @@
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${(i18n['lang.current'])! (lang! 'zh-CN')}</a>
 						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langMenu">
-							<li><a class="dropdown-item" href="?lang=zh-CN">中文简体</a></li>
-							<li><a class="dropdown-item" href="?lang=zh-TW">繁體中文</a></li>
-							<li><a class="dropdown-item" href="?lang=en">English</a></li>
+							<li><a class="dropdown-item" href="#" data-lang="zh-CN">中文简体</a></li>
+							<li><a class="dropdown-item" href="#" data-lang="zh-TW">繁體中文</a></li>
+							<li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
 						</ul>
 					</li>
 				</ul>

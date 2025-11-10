@@ -24,7 +24,11 @@ public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Lo
 
     Boolean existsByUid(String uid);
 
-    Optional<ConnectionEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+    Optional<ConnectionEntity> findByClientId(String clientId);
+
+    java.util.List<ConnectionEntity> findByUserUidAndDeletedFalse(String userUid);
+
+    long countByUserUidAndStatusAndDeletedFalse(String userUid, String status);
 
     // Boolean existsByPlatform(String platform);
 }

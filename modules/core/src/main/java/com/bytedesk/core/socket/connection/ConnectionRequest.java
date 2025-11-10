@@ -14,7 +14,6 @@
 package com.bytedesk.core.socket.connection;
 
 import com.bytedesk.core.base.BaseRequest;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,17 +24,15 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
 @NoArgsConstructor
 public class ConnectionRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
-    private String name;
-
-    private String description;
-
-    // @Builder.Default
-    // private String type = ConnectionTypeEnum.CUSTOMER.name();
+    private String clientId;
+    private String deviceUid;
+    private String protocol;
+    private String ip;
+    private String userAgent;
+    private Integer ttlSeconds;
 }

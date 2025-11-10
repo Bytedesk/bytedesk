@@ -14,7 +14,6 @@
 package com.bytedesk.core.socket.connection;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
@@ -47,13 +46,7 @@ public class ConnectionEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     // ================= Session identity =================
-    /** 关联用户 UID（客服或访客均可） */
-    @Column(name = "user_uid")
-    private String userUid;
-
-    /** 组织 UID（可选，用于范围统计） */
-    @Column(name = "org_uid")
-    private String orgUid;
+    // 说明：userUid、orgUid 字段已在 BaseEntity 中定义，避免在此处重复定义以造成 setter 冲突
 
     /** 客户端唯一标识（如 MQTT clientId、WS sessionId 等） */
     @Column(name = "client_id")
@@ -64,9 +57,7 @@ public class ConnectionEntity extends BaseEntity {
     private String deviceUid;
 
     // ================= Session meta =================
-    /** 平台：WEB / IOS / ANDROID / DESKTOP / OTHER */
-    @Column(name = "platform")
-    private String platform;
+    // 说明：平台 platform 已在 BaseEntity 中以 platform_type 列存在，避免重复定义
 
     /** 协议：MQTT / WS / SSE / OTHER */
     @Column(name = "protocol")
@@ -107,16 +98,7 @@ public class ConnectionEntity extends BaseEntity {
     @Column(name = "ttl_seconds")
     private Integer ttlSeconds = 90;
 
-    // ================= Legacy fields (kept for compatibility) =================
-    /** 名称与描述历史字段（保留兼容） */
-    private String name;
-
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
-
-    /** 历史类型字段（保留兼容，不再用于在线态判定） */
-    @Builder.Default
-    @Column(name = "connection_type")
-    private String type = ConnectionTypeEnum.CUSTOMER.name();
+    // ================= Legacy fields removed =================
+    // name / description / type 均移除
 
 }

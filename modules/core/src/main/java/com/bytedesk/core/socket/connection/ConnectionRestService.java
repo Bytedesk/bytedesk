@@ -14,6 +14,7 @@
 package com.bytedesk.core.socket.connection;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,12 +26,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.Utils;
+
+import static com.bytedesk.core.socket.connection.ConnectionStatusEnum.CONNECTED;
+import static com.bytedesk.core.socket.connection.ConnectionStatusEnum.DISCONNECTED;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,99 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     private final AuthService authService;
 
+    /* ================= Presence APIs (multi-client) ================= */
+
+    /**
+     * Mark (or create) a connection as connected.
+     * clientId format recommendation: userUid/client/deviceUid
+     */
+    @Transactional
+    public void markConnected(String userUid, String orgUid, String clientId, String deviceUid, String protocol, String channel, String ip, String userAgent, Integer ttlSeconds) {
+        long now = System.currentTimeMillis();
+        Optional<ConnectionEntity> optional = connectionRepository.findByClientId(clientId);
+        ConnectionEntity entity = optional.orElseGet(() -> ConnectionEntity.builder()
+                .uid(uidUtils.getUid())
+                .userUid(userUid)
+                .orgUid(orgUid)
+                .clientId(clientId)
+                .deviceUid(deviceUid)
+                .protocol(protocol)
+                .channel(channel)
+                .ip(ip)
+                .userAgent(userAgent)
+                .build());
+        entity.setStatus(CONNECTED.name())
+              .setConnectedAt(entity.getConnectedAt() == null ? now : entity.getConnectedAt())
+              .setLastHeartbeatAt(now)
+              .setDisconnectedAt(null);
+        if (ttlSeconds != null && ttlSeconds > 0) {
+            entity.setTtlSeconds(ttlSeconds);
+        }
+        save(entity);
+    }
+
+    /** Update heartbeat for a client connection */
+    @Transactional
+    public void heartbeat(String clientId) {
+        Optional<ConnectionEntity> optional = connectionRepository.findByClientId(clientId);
+        optional.ifPresent(entity -> {
+            entity.setLastHeartbeatAt(System.currentTimeMillis());
+            save(entity);
+        });
+    }
+
+    /** Mark a client connection as disconnected */
+    @Transactional
+    public void markDisconnected(String clientId) {
+        Optional<ConnectionEntity> optional = connectionRepository.findByClientId(clientId);
+        optional.ifPresent(entity -> {
+            if (!DISCONNECTED.name().equals(entity.getStatus())) {
+                entity.setStatus(DISCONNECTED.name())
+                      .setDisconnectedAt(System.currentTimeMillis());
+                save(entity);
+            }
+        });
+    }
+
+    /** Cleanup expired (stale) connections by TTL */
+    @Transactional
+    public int expireStaleSessions() {
+        long now = System.currentTimeMillis();
+        List<ConnectionEntity> all = connectionRepository.findAll();
+        int changed = 0;
+        for (ConnectionEntity c : all) {
+            if (c.isDeleted()) continue;
+            if (CONNECTED.name().equals(c.getStatus())) {
+                Long last = c.getLastHeartbeatAt();
+                if (last != null && c.getTtlSeconds() != null && last + c.getTtlSeconds() * 1000L < now) {
+                    c.setStatus(DISCONNECTED.name())
+                     .setDisconnectedAt(now);
+                    save(c);
+                    changed++;
+                }
+            }
+        }
+        return changed;
+    }
+
+    /** Determine online (has >=1 active non-expired connection) */
+    @Transactional(readOnly = true)
+    public boolean isUserOnline(String userUid) {
+        List<ConnectionEntity> list = connectionRepository.findByUserUidAndDeletedFalse(userUid);
+        if (list.isEmpty()) return false;
+        long now = System.currentTimeMillis();
+        for (ConnectionEntity c : list) {
+            if (!CONNECTED.name().equals(c.getStatus())) continue;
+            Long last = c.getLastHeartbeatAt();
+            if (last == null) continue;
+            if (c.getTtlSeconds() == null) continue;
+            if (last + c.getTtlSeconds() * 1000L >= now) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected Specification<ConnectionEntity> createSpecification(ConnectionRequest request) {
         return ConnectionSpecification.search(request, authService);
@@ -64,11 +158,6 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         return connectionRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "connection", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<ConnectionEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return connectionRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
-    }
-
     public Boolean existsByUid(String uid) {
         return connectionRepository.existsByUid(uid);
     }
@@ -79,13 +168,6 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
-        }
-        // 检查name+orgUid+type是否已经存在
-        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<ConnectionEntity> connection = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-            if (connection.isPresent()) {
-                return convertToResponse(connection.get());
-            }
         }
         // 
         UserEntity user = authService.getUser();
@@ -135,10 +217,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             Optional<ConnectionEntity> latest = connectionRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 ConnectionEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                latestEntity.setName(entity.getName());
-                // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
+                // 保留最新实体，回写必要字段
                 return connectionRepository.save(latestEntity);
             }
         } catch (Exception ex) {
@@ -175,21 +254,6 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     @Override
     public ConnectionExcel convertToExcel(ConnectionEntity entity) {
         return modelMapper.map(entity, ConnectionExcel.class);
-    }
-    
-    public void initConnections(String orgUid) {
-        // log.info("initThreadConnection");
-        for (String connection : ConnectionInitData.getAllConnections()) {
-            ConnectionRequest connectionRequest = ConnectionRequest.builder()
-                    .uid(Utils.formatUid(orgUid, connection))
-                    .name(connection)
-                    .type(ConnectionTypeEnum.THREAD.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            create(connectionRequest);
-        }
     }
 
     

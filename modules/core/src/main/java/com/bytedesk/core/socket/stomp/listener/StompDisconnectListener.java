@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 // import com.bytedesk.core.event.BytedeskEventPublisher;
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 
 /**
  * published when a STOMP session ends.
@@ -37,18 +38,27 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @AllArgsConstructor
 public class StompDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
 
+    private final ConnectionRestService connectionRestService;
+
     @Override
     public void onApplicationEvent(@NonNull SessionDisconnectEvent event) {
         // log.debug("stomp sessionDisconnectEvent {}", event.toString());
         StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
-        if (headerAccessor != null) {
-            String login = headerAccessor.getLogin();
-            log.info("stomp disconnection with uid:  {}", login);
-            // 处理 login 值，例如存储到数据库或日志记录
-        } else {
-            // log.info("stomp disconnection without uid");
+        if (headerAccessor == null) {
+            return;
         }
-        // TODO: 访客离线，通知客服端
+        String uid = headerAccessor.getLogin();
+        if (uid == null && headerAccessor.getNativeHeader("login") != null && !headerAccessor.getNativeHeader("login").isEmpty()) {
+            uid = headerAccessor.getNativeHeader("login").get(0);
+        }
+        if (uid == null) {
+            return; // 无法识别用户
+        }
+        String sessionId = headerAccessor.getSessionId();
+        String clientId = uid + "/stomp/" + sessionId;
+        // 标记该 STOMP 会话断开；坐席在线状态由定时任务统一刷新
+        connectionRestService.markDisconnected(clientId);
+        log.debug("stomp disconnected uid {} session {}", uid, sessionId);
         
     }
 
