@@ -42,6 +42,8 @@ import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -281,10 +283,12 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             // 获取并更新线程状态
             log.debug("获取最新线程状态并更新为聊天状态");
             ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-            String welcomeContent = getAgentWelcomeMessage(agent);
-            thread.setChatting().setContent(welcomeContent);
-            log.debug("线程状态更新完成 - 状态: {}, 欢迎消息长度: {}", 
-                    thread.getStatus(), welcomeContent != null ? welcomeContent.length() : 0);
+            String tip = getAgentWelcomeMessage(agent);
+            WelcomeContent wc = buildAgentWelcomeContent(agent, tip);
+            String jsonWelcome = wc != null ? wc.toJson() : null;
+            thread.setChatting().setContent(jsonWelcome);
+        log.debug("线程状态更新完成 - 状态: {}, 欢迎消息长度: {}", 
+            thread.getStatus(), jsonWelcome != null ? jsonWelcome.length() : 0);
             
             // 保存线程
             long saveStartTime = System.currentTimeMillis();
@@ -305,7 +309,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             // 发送欢迎消息
             log.debug("开始发送欢迎消息");
             long msgStartTime = System.currentTimeMillis();
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(wc, savedThread);
             messageSendService.sendProtobufMessage(messageProtobuf);
             log.info("可用客服处理完成 - threadUid: {}, agentUid: {}, 消息发送耗时: {}ms, 总处理耗时: {}ms", 
                     savedThread.getUid(), agent.getUid(), System.currentTimeMillis() - msgStartTime, 
@@ -478,6 +482,30 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.info("客服欢迎消息获取完成 - agentUid: {}, 最终消息长度: {}", 
                 agent.getUid(), welcomeMessage != null ? welcomeMessage.length() : 0);
         return welcomeMessage;
+    }
+
+    /**
+     * 构建结构化 WelcomeContent
+     */
+    private WelcomeContent buildAgentWelcomeContent(AgentEntity agent, String tip) {
+        var settings = agent.getSettings() != null ? agent.getSettings().getServiceSettings() : null;
+        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
+        if (settings != null) {
+            builder.kbUid(settings.getWelcomeKbUid());
+            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
+                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
+                for (FaqEntity f : settings.getWelcomeFaqs()) {
+                    qas.add(WelcomeContent.QA.builder()
+                            .uid(f.getUid())
+                            .question(f.getQuestion())
+                            .answer(f.getAnswer())
+                            .type(f.getType())
+                            .build());
+                }
+                builder.faqs(qas);
+            }
+        }
+        return builder.build();
     }
 
     /**

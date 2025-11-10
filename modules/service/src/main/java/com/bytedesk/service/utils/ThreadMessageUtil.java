@@ -22,6 +22,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -35,33 +36,16 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ThreadMessageUtil {
 
-    public static MessageProtobuf getThreadUnifiedWelcomeMessage(ThreadEntity thread) {
+    /**
+     * 结构化 WelcomeContent 的机器人欢迎消息
+     */
+    public static MessageEntity getThreadRobotWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
+        String json = content != null ? content.toJson() : null;
+
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(thread.getContent())
-                .type(MessageTypeEnum.WELCOME.name())
-                .status(MessageStatusEnum.READ.name())
-                .channel(ChannelEnum.SYSTEM.name())
-                .user(thread.getAgent())
-                .orgUid(thread.getOrgUid())
-                .createdAt(BdDateUtils.now())
-                .updatedAt(BdDateUtils.now())
-                .thread(thread)
-                .extra(extra.toJson())
-                .build();
-        
-        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
-    }
-
-    public static MessageEntity getThreadRobotWelcomeMessage(String content, ThreadEntity thread) {
-
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        // 
-        MessageEntity message = MessageEntity.builder()
-                .uid(UidUtils.getInstance().getUid())
-                .content(content)
+                .content(json)
                 .thread(thread)
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
@@ -72,39 +56,19 @@ public class ThreadMessageUtil {
                 .createdAt(BdDateUtils.now())
                 .updatedAt(BdDateUtils.now())
                 .build();
-        //
         return message;
     }
 
-    public static MessageEntity getThreadWorkflowWelcomeMessage(String content, ThreadEntity thread) {
-
+    /**
+     * 结构化 WelcomeContent 的人工欢迎消息
+     */
+    public static MessageProtobuf getThreadWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        // 
+        String json = content != null ? content.toJson() : null;
+
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(content)
-                .thread(thread)
-                .type(MessageTypeEnum.WELCOME.name())
-                .status(MessageStatusEnum.READ.name())
-                .channel(ChannelEnum.SYSTEM.name())
-                .user(thread.getRobot())
-                .orgUid(thread.getOrgUid())
-                .extra(extra.toJson())
-                .createdAt(BdDateUtils.now())
-                .updatedAt(BdDateUtils.now())
-                .build();
-        //
-        return message;
-    }
-
-    // 将此方法设为静态，以便在没有实例化类的情况下调用
-    public static MessageProtobuf getThreadWelcomeMessage(String content, ThreadEntity thread) {
-        //
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
-        MessageEntity message = MessageEntity.builder()
-                .uid(UidUtils.getInstance().getUid())
-                .content(content)
+                .content(json)
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
@@ -115,14 +79,14 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
-        
+
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadQueueMessage(ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
+
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
@@ -136,13 +100,13 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
-        
+
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadQueuingMessage(UserProtobuf user, ThreadEntity thread) {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
+
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
@@ -156,13 +120,13 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
-        
+
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     public static MessageProtobuf getThreadContinueMessage(UserProtobuf user, ThreadEntity thread) {
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
+
         MessageEntity message = MessageEntity.builder()
                 .uid(thread.getUid()) // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
                 .content(I18Consts.I18N_REENTER_TIP)
@@ -176,7 +140,7 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
-        
+
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
@@ -184,7 +148,7 @@ public class ThreadMessageUtil {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
+
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
@@ -198,7 +162,7 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
-        
+
         return message;
     }
 
@@ -206,7 +170,7 @@ public class ThreadMessageUtil {
         // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-        
+
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(content)
@@ -220,7 +184,7 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
-        
+
         return message;
     }
 
@@ -231,34 +195,31 @@ public class ThreadMessageUtil {
         }
 
         // 检查用户是否在灰度范围内
-        // if (grayReleaseService.isUserInGrayRelease(userUid, 
-        //         GrayReleaseFeature.PROACTIVE_TRIGGER.getCode())) {
-        //     // 启用功能
-        //     // ...
+        // if (grayReleaseService.isUserInGrayRelease(userUid,
+        // GrayReleaseFeature.PROACTIVE_TRIGGER.getCode())) {
+        // // 启用功能
+        // // ...
         // }
 
         // 检查用户是否可以使用主动触发功能
-        // if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid, "proactive_trigger")) {
-        //     return;
+        // if (!settings.getGrayReleaseConfig().isUserInGrayRelease(userUid,
+        // "proactive_trigger")) {
+        // return;
         // }
 
         ServiceTrigger trigger = JSON.parseObject(
-            settings.getTriggerConditions(), 
-            ServiceTrigger.class
-        );
+                settings.getTriggerConditions(),
+                ServiceTrigger.class);
 
         // 检查无响应触发
         trigger.getConditions().stream()
-            .filter(c -> c.getType().equals(ServiceTrigger.TriggerCondition.TYPE_NO_RESPONSE))
-            .filter(c -> (System.currentTimeMillis() - lastActiveTime) / 1000 > c.getTimeout())
-            .findFirst()
-            .ifPresent(condition -> {
-                // TODO: 发送主动推送消息
-                // sendProactiveMessage(userId, condition.getMessage());
-            });
+                .filter(c -> c.getType().equals(ServiceTrigger.TriggerCondition.TYPE_NO_RESPONSE))
+                .filter(c -> (System.currentTimeMillis() - lastActiveTime) / 1000 > c.getTimeout())
+                .findFirst()
+                .ifPresent(condition -> {
+                    // TODO: 发送主动推送消息
+                    // sendProactiveMessage(userId, condition.getMessage());
+                });
     }
-
-    
-
 
 }

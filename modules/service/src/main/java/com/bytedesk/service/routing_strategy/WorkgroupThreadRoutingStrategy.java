@@ -26,6 +26,7 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
@@ -46,6 +47,7 @@ import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,13 +55,15 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 工作组线程路由策略
  * 
- * <p>功能特点：
+ * <p>
+ * 功能特点：
  * - 支持机器人优先接待，可转人工
  * - 智能路由决策：根据工作组配置、服务时间、客服在线状态等因素决定路由方向
  * - 支持排队管理和离线留言
  * - 支持强制转人工和机器人转人工
  * 
- * <p>路由决策流程：
+ * <p>
+ * 路由决策流程：
  * 1. 检查现有会话状态
  * 2. 根据配置决定机器人或人工接待
  * 3. 处理排队和离线场景
@@ -103,36 +107,36 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     public MessageProtobuf createWorkgroupThread(VisitorRequest visitorRequest) {
         long startTime = System.currentTimeMillis();
-        log.info("开始创建工作组线程 - visitorUid: {}, workgroupUid: {}, forceAgent: {}", 
+        log.info("开始创建工作组线程 - visitorUid: {}, workgroupUid: {}, forceAgent: {}",
                 visitorRequest.getUid(), visitorRequest.getSid(), visitorRequest.getForceAgent());
-        
+
         // 1. 验证和获取工作组信息
         log.debug("步骤1: 开始获取工作组信息 - workgroupUid: {}", visitorRequest.getSid());
         WorkgroupEntity workgroup = getWorkgroupEntity(visitorRequest.getSid());
-        log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数: {}", 
+        log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数: {}",
                 workgroup.getUid(), workgroup.getConnectedAgentCount());
-        
+
         // 2. 生成会话主题并检查现有会话
         log.debug("步骤2: 开始处理线程创建或获取");
         String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroup.getUid(), visitorRequest.getUid());
         log.debug("生成工作组线程主题: {}", topic);
         ThreadEntity thread = getOrCreateWorkgroupThread(visitorRequest, workgroup, topic);
-        log.info("步骤2完成: 线程处理完成 - threadUid: {}, 状态: {}, 是否新建: {}", 
+        log.info("步骤2完成: 线程处理完成 - threadUid: {}, 状态: {}, 是否新建: {}",
                 thread.getUid(), thread.getStatus(), thread.isNew());
-        
+
         // 3. 处理现有活跃会话
         log.debug("步骤3: 检查是否为现有活跃会话");
         MessageProtobuf existingThreadResult = handleExistingWorkgroupThread(visitorRequest, thread, workgroup);
         if (existingThreadResult != null) {
-            log.info("检测到现有活跃会话，直接返回 - threadUid: {}, 总耗时: {}ms", 
+            log.info("检测到现有活跃会话，直接返回 - threadUid: {}, 总耗时: {}ms",
                     thread.getUid(), System.currentTimeMillis() - startTime);
             return existingThreadResult;
         }
-        
+
         // 4. 新会话路由决策
         log.debug("步骤4: 开始新会话路由决策");
         MessageProtobuf result = routeNewWorkgroupThread(visitorRequest, thread, workgroup);
-        log.info("创建工作组线程完成 - threadUid: {}, 总耗时: {}ms", 
+        log.info("创建工作组线程完成 - threadUid: {}, 总耗时: {}ms",
                 thread.getUid(), System.currentTimeMillis() - startTime);
         return result;
     }
@@ -143,17 +147,17 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private WorkgroupEntity getWorkgroupEntity(String workgroupUid) {
         long startTime = System.currentTimeMillis();
         log.debug("开始获取工作组实体 - workgroupUid: {}", workgroupUid);
-        
+
         validateUid(workgroupUid, "Workgroup");
-        
+
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
         if (!workgroupOptional.isPresent()) {
             log.error("工作组不存在 - workgroupUid: {}", workgroupUid);
             throw new IllegalArgumentException("Workgroup uid " + workgroupUid + " not found");
         }
-        
+
         WorkgroupEntity workgroup = workgroupOptional.get();
-        log.info("工作组实体获取完成 - workgroupUid: {}, 在线客服数量: {}, 耗时: {}ms", 
+        log.info("工作组实体获取完成 - workgroupUid: {}, 在线客服数量: {}, 耗时: {}ms",
                 workgroup.getUid(), workgroup.getConnectedAgentCount(), System.currentTimeMillis() - startTime);
         return workgroup;
     }
@@ -161,7 +165,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 获取或创建工作组会话
      */
-    private ThreadEntity getOrCreateWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
+    private ThreadEntity getOrCreateWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup,
+            String topic) {
         // 当强制新建会话时，直接创建新会话，跳过复用逻辑
         if (Boolean.TRUE.equals(visitorRequest.getForceNewThread())) {
             log.debug("forceNewThread=true, creating new workgroup thread for topic: {}", topic);
@@ -170,13 +175,13 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         long dbStartTime = System.currentTimeMillis();
         log.debug("开始查询现有工作组线程 - topic: {}", topic);
-        
+
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         log.debug("工作组线程查询完成 - 耗时: {}ms", System.currentTimeMillis() - dbStartTime);
-        
+
         if (threadOptional.isPresent()) {
             ThreadEntity existingThread = threadOptional.get();
-            log.info("发现现有工作组线程 - threadUid: {}, 状态: {}, 创建时间: {}", 
+            log.info("发现现有工作组线程 - threadUid: {}, 状态: {}, 创建时间: {}",
                     existingThread.getUid(), existingThread.getStatus(), existingThread.getCreatedAt());
             return existingThread;
         }
@@ -185,7 +190,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         log.debug("未找到现有工作组线程，开始创建新线程");
         long createStartTime = System.currentTimeMillis();
         ThreadEntity newThread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
-        log.info("新工作组线程创建完成 - threadUid: {}, 创建耗时: {}ms", 
+        log.info("新工作组线程创建完成 - threadUid: {}, 创建耗时: {}ms",
                 newThread.getUid(), System.currentTimeMillis() - createStartTime);
         return newThread;
     }
@@ -195,34 +200,35 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 
      * @return 如果是现有活跃会话则返回相应消息，否则返回null继续新会话流程
      */
-    private MessageProtobuf handleExistingWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    private MessageProtobuf handleExistingWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         log.debug("开始处理现有工作组会话 - threadUid: {}, 状态: {}", thread.getUid(), thread.getStatus());
-        
+
         if (thread.isNew()) {
             log.debug("线程处于新建状态，继续路由流程");
             return null; // 继续新会话流程
         }
-        
+
         if (thread.isRoboting()) {
             log.info("发现现有机器人会话，进入机器人处理流程");
             return handleExistingRobotThread(visitorRequest, thread, workgroup);
         }
-        
+
         if (thread.isChatting()) {
             log.info("发现现有聊天会话，进入聊天处理流程");
             return handleExistingChatThread(visitorRequest, thread, workgroup);
         }
-        
+
         if (thread.isQueuing()) {
             log.info("发现现有排队会话，返回排队消息");
             return getWorkgroupQueuingMessage(visitorRequest, thread);
         }
-        
+
         if (thread.isOffline()) {
             log.info("发现现有离线会话，进入离线处理流程");
             return handleExistingOfflineThread(visitorRequest, thread, workgroup);
         }
-        
+
         log.debug("线程状态不匹配任何已知处理流程，继续新会话流程 - 状态: {}", thread.getStatus());
         return null; // 其他状态继续新会话流程
     }
@@ -230,20 +236,22 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 处理现有机器人会话
      */
-    private MessageProtobuf handleExistingRobotThread(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    private MessageProtobuf handleExistingRobotThread(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         log.info("Found existing robot thread");
-        
+
         if (!visitorRequest.getForceAgent()) {
             // 重新初始化机器人会话
-            RobotEntity robotEntity = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null 
-                ? workgroup.getSettings().getRobotSettings().getRobot() 
-                : null;
+            RobotEntity robotEntity = workgroup.getSettings() != null
+                    && workgroup.getSettings().getRobotSettings() != null
+                            ? workgroup.getSettings().getRobotSettings().getRobot()
+                            : null;
             if (robotEntity != null) {
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                 String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
                 thread.setRobot(robotString);
                 ThreadEntity savedThread = saveThread(thread);
-                
+
                 log.info("Continuing existing robot thread: {}", thread.getTopic());
                 return getRobotContinueMessage(robotEntity, savedThread);
             }
@@ -255,9 +263,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 处理现有聊天会话
      */
-    private MessageProtobuf handleExistingChatThread(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    private MessageProtobuf handleExistingChatThread(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         log.info("Found existing chat thread");
-        
+
         // 重新初始化会话
         thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
         log.info("Continuing existing chat thread: {}", thread.getTopic());
@@ -267,27 +276,30 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 处理现有离线会话
      */
-    private MessageProtobuf handleExistingOfflineThread(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    private MessageProtobuf handleExistingOfflineThread(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         log.info("Found existing offline thread");
-        
+
         // 如果没有可用客服，继续使用现有离线会话
         if (workgroup.getAvailableAgents().isEmpty()) {
             return null; // 继续使用现有会话
         }
         return null; // 有可用客服时重新路由
     }
+
     /**
      * 路由新工作组会话
      */
-    private MessageProtobuf routeNewWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
-        log.debug("开始新工作组会话路由决策 - threadUid: {}, workgroupUid: {}", 
+    private MessageProtobuf routeNewWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
+        log.debug("开始新工作组会话路由决策 - threadUid: {}, workgroupUid: {}",
                 thread.getUid(), workgroup.getUid());
-        
+
         // 决定路由方向：机器人 or 人工
         boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup);
-        log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态: {}", 
+        log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态: {}",
                 shouldUseRobot, visitorRequest.getForceAgent(), workgroup.isConnected());
-        
+
         if (shouldUseRobot) {
             log.info("路由到机器人处理");
             return routeToRobot(visitorRequest, thread, workgroup);
@@ -302,33 +314,34 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     private boolean shouldRouteToRobot(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
         log.debug("开始机器人路由决策判断");
-        
+
         // 强制转人工
         if (visitorRequest.getForceAgent()) {
             log.info("用户强制要求转人工，不使用机器人");
             return false;
         }
-        
+
         // 检查机器人配置和服务时间
         boolean isOffline = !workgroup.isConnected();
-        boolean isInServiceTime = workgroup.getSettings() != null && workgroup.getSettings().getMessageLeaveSettings() != null
-            ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
-            : true;
-        
-        log.debug("路由决策参数 - 工作组离线状态: {}, 在服务时间内: {}", 
+        boolean isInServiceTime = workgroup.getSettings() != null
+                && workgroup.getSettings().getMessageLeaveSettings() != null
+                        ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
+                        : true;
+
+        log.debug("路由决策参数 - 工作组离线状态: {}, 在服务时间内: {}",
                 isOffline, isInServiceTime);
-        
+
         boolean transferToRobot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
-            ? workgroup.getSettings().getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime)
-            : false;
+                ? workgroup.getSettings().getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime)
+                : false;
         log.debug("机器人设置决策结果: {}", transferToRobot);
-        
+
         if (transferToRobot) {
             RobotEntity robot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
-                ? workgroup.getSettings().getRobotSettings().getRobot()
-                : null;
+                    ? workgroup.getSettings().getRobotSettings().getRobot()
+                    : null;
             if (robot != null) {
-                log.info("满足机器人路由条件，将路由到机器人 - robotUid: {}, offline: {}, in service time: {}", 
+                log.info("满足机器人路由条件，将路由到机器人 - robotUid: {}, offline: {}, in service time: {}",
                         robot.getUid(), isOffline, isInServiceTime);
                 return true;
             } else {
@@ -337,83 +350,87 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         } else {
             log.debug("不满足机器人路由条件，将路由到人工客服");
         }
-        
+
         return false;
     }
 
     /**
      * 路由到机器人
      */
-    private MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    private MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         RobotEntity robot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
-            ? workgroup.getSettings().getRobotSettings().getRobot()
-            : null;
+                ? workgroup.getSettings().getRobotSettings().getRobot()
+                : null;
         if (robot == null) {
             throw new IllegalStateException("Workgroup robot not found");
         }
-        
+
         // 重新初始化会话
         thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
-        
+
         return routeToRobot(visitorRequest, thread, robot, workgroup);
     }
 
     /**
      * 路由到人工客服
      */
-    private MessageProtobuf routeToAgent(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
-        log.debug("开始路由到人工客服 - threadUid: {}, workgroupUid: {}", 
+    private MessageProtobuf routeToAgent(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
+        log.debug("开始路由到人工客服 - threadUid: {}, workgroupUid: {}",
                 thread.getUid(), workgroup.getUid());
-        
+
         // 检查是否在工作时间内
-        boolean isInServiceTime = workgroup.getSettings() != null && workgroup.getSettings().getMessageLeaveSettings() != null
-            ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
-            : true;
+        boolean isInServiceTime = workgroup.getSettings() != null
+                && workgroup.getSettings().getMessageLeaveSettings() != null
+                        ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
+                        : true;
         log.debug("服务时间检查 - 是否在服务时间内: {}", isInServiceTime);
-        
+
         if (!isInServiceTime) {
             log.info("不在服务时间内，路由到离线留言");
             // 选择离线留言接待客服
             AgentEntity messageLeaveAgent = workgroup.getMessageLeaveAgent();
             if (messageLeaveAgent == null) {
-                log.error("离线留言接待客服不存在，请配置工作组留言接待客服 - workgroupUid: {}", 
+                log.error("离线留言接待客服不存在，请配置工作组留言接待客服 - workgroupUid: {}",
                         workgroup.getUid());
                 throw new IllegalStateException("Workgroup message leave agent not found");
             }
-            
+
             log.debug("使用离线留言接待客服 - agentUid: {}", messageLeaveAgent.getUid());
-            
+
             // 加入队列（用于统计和管理）
             long enqueueStartTime = System.currentTimeMillis();
             UserProtobuf agent = messageLeaveAgent.toUserProtobuf();
-            QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+            QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup,
+                    visitorRequest);
             log.debug("离线留言队列加入完成 - 耗时: {}ms", System.currentTimeMillis() - enqueueStartTime);
-            
+
             // 直接返回离线留言消息
             return getOfflineMessage(visitorRequest, thread, messageLeaveAgent, workgroup, queueMemberEntity);
         }
-        
+
         // 选择客服
         log.debug("在服务时间内，开始选择客服");
         long selectStartTime = System.currentTimeMillis();
         AgentEntity agentEntity = selectAgent(workgroup, thread);
-        log.info("客服选择完成 - agentUid: {}, 选择耗时: {}ms", 
+        log.info("客服选择完成 - agentUid: {}, 选择耗时: {}ms",
                 agentEntity.getUid(), System.currentTimeMillis() - selectStartTime);
-        
+
         // 加入队列
         log.debug("开始将线程加入工作组队列");
         long enqueueStartTime = System.currentTimeMillis();
         UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
-        log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", 
+        log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms",
                 queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
-        
+
         // 处理强制转人工
         if (visitorRequest.getForceAgent()) {
             log.debug("处理强制转人工标记");
             handleForceAgentTransfer(visitorRequest, thread, queueMemberEntity);
         }
-        
+
         // 根据客服状态进行路由
         log.debug("开始根据客服状态进行最终路由");
         return routeByAgentStatus(agentEntity, thread, queueMemberEntity, workgroup, visitorRequest);
@@ -424,7 +441,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     private AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread) {
         AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread);
-        
+
         if (agentEntity == null) {
             // 离线留言接待客服
             agentEntity = workgroup.getMessageLeaveAgent();
@@ -433,23 +450,24 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 throw new IllegalStateException("Workgroup message leave agent not found");
             }
         }
-        
+
         return agentEntity;
     }
 
     /**
      * 处理强制转人工
      */
-    private void handleForceAgentTransfer(VisitorRequest visitorRequest, ThreadEntity thread, QueueMemberEntity queueMemberEntity) {
+    private void handleForceAgentTransfer(VisitorRequest visitorRequest, ThreadEntity thread,
+            QueueMemberEntity queueMemberEntity) {
         if (visitorRequest.getForceAgent()) {
             log.info("Processing force agent transfer");
-            
+
             // 发布转人工事件
             bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-            
+
             // 更新队列状态
             queueMemberEntity.transferRobotToAgent();
-            
+
             // 异步处理转人工操作
             Map<String, Object> updates = new HashMap<>();
             updates.put("robotToAgent", true);
@@ -460,9 +478,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 根据客服状态进行路由
      */
-    private MessageProtobuf routeByAgentStatus(AgentEntity agentEntity, ThreadEntity thread, 
+    private MessageProtobuf routeByAgentStatus(AgentEntity agentEntity, ThreadEntity thread,
             QueueMemberEntity queueMemberEntity, WorkgroupEntity workgroup, VisitorRequest visitorRequest) {
-        
+
         if (agentEntity.isConnectedAndAvailable()) {
             // 客服在线且可接待
             if (queueMemberEntity.getWorkgroupQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
@@ -479,109 +497,112 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 处理可用工作组客服
      */
-    private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf handleAvailableWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity,
+            QueueMemberEntity queueMemberEntity) {
         log.info("Handling available workgroup agent: {}", agentEntity.getNickname());
-        
+
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        
+
         // 设置欢迎内容和线程状态
         String welcomeContent = getAgentWelcomeMessage(agentEntity);
         thread.setUserUid(agentEntity.getUid());
         thread.setChatting().setContent(welcomeContent);
-        
+
         // 设置线程所有者
         setThreadOwner(thread, agentEntity);
-        
+
         // 设置客服信息
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
-        
+
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
-        
+
         // 更新队列状态为自动接受
         updateQueueMemberForAgentAccept(queueMemberEntity);
-        
+
         // 发布事件
         publishWorkgroupThreadEvents(savedThread);
-        
-        // 发送欢迎消息
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
+
+        // 发送欢迎消息（结构化 WelcomeContent）
+        WelcomeContent wc = buildAgentWelcomeContent(agentEntity);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(wc, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        
+
         return messageProtobuf;
     }
 
     /**
      * 处理排队工作组客服
      */
-    private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity,
+            QueueMemberEntity queueMemberEntity) {
         log.info("Handling queued workgroup agent: {}", agentEntity.getNickname());
-        
+
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        
+
         // 生成排队消息
         String queueContent = generateWorkgroupQueueMessage(queueMemberEntity);
-        
+
         // 设置线程状态
         thread.setUserUid(agentEntity.getUid());
         thread.setQueuing().setContent(queueContent);
-        
+
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
-        
+
         // 发送排队消息
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        
+
         return messageProtobuf;
     }
 
     /**
      * 获取离线消息
      */
-    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, 
+    public MessageProtobuf getOfflineMessage(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
             AgentEntity agentEntity, WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
         log.info("Handling offline message for agent: {}", agentEntity.getNickname());
-        
+
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        
+
         // 设置离线内容
         String offlineContent = getWorkgroupOfflineMessage(workgroup);
         thread.setOffline().setContent(offlineContent);
-        
+
         // 设置客服信息
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
         thread.setAgent(agentProtobuf.toJson());
-        
+
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
-        
+
         // 更新队列状态为离线
         queueMemberEntity.setAgentOffline(true);
         queueMemberRestService.save(queueMemberEntity);
-        
+
         // 创建离线消息
         MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(offlineContent, savedThread);
         messageRestService.save(message);
-        
+
         // 发送离线消息
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
-        
+
         // 发布离线事件
         bytedeskEventPublisher.publishEvent(new ThreadAgentOfflineEvent(this, savedThread));
-        
+
         return messageProtobuf;
     }
 
     /**
      * 路由到机器人
      */
-    public MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, 
+    public MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
             RobotEntity robotEntity, WorkgroupEntity workgroup) {
         validateThread(threadFromRequest, "route to robot");
         if (robotEntity == null) {
@@ -590,34 +611,36 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-        
+
         // 加入队列
         UserProtobuf robotProtobuf = robotEntity.toUserProtobuf();
-        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, robotProtobuf, workgroup, visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, robotProtobuf, workgroup,
+                visitorRequest);
         log.info("Robot enqueued to queue: {}", queueMemberEntity.getUid());
-        
+
         // 设置机器人接待状态
         String welcomeContent = getRobotWelcomeMessage(robotEntity);
         thread.setUserUid(robotEntity.getUid());
         thread.setRoboting().setContent(welcomeContent);
-        
+
         // 设置机器人信息
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         thread.setRobot(robotString);
-        
+
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
-        
+
         // 更新队列状态
         updateQueueMemberForRobotAccept(queueMemberEntity);
-        
+
         // 发布事件
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-        
-        // 创建欢迎消息
-        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(welcomeContent, savedThread);
+
+        // 创建欢迎消息（结构化 WelcomeContent）
+        WelcomeContent wc = buildRobotWelcomeContent(robotEntity);
+        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, savedThread);
         messageRestService.save(message);
-        
+
         return ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
     }
 
@@ -627,15 +650,15 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private MessageProtobuf getWorkgroupContinueMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("Getting workgroup continue message for user: {}", user.getNickname());
-        
+
         // 继续会话
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadContinueMessage(user, thread);
-        
+
         // 微信公众号等渠道不能重复推送"继续会话"消息
         if (!visitorRequest.isWeChat()) {
             messageSendService.sendProtobufMessage(messageProtobuf);
         }
-        
+
         return messageProtobuf;
     }
 
@@ -645,7 +668,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private MessageProtobuf getWorkgroupQueuingMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
         UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
         log.info("Getting workgroup queuing message for user: {}", user.getNickname());
-        
+
         return ThreadMessageUtil.getThreadQueuingMessage(user, thread);
     }
 
@@ -654,10 +677,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     private MessageProtobuf getRobotContinueMessage(RobotEntity robotEntity, ThreadEntity thread) {
         validateThread(thread, "get robot continue message");
-        
-        String content = getRobotWelcomeMessage(robotEntity);
-        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
-        
+
+        WelcomeContent wc = buildRobotWelcomeContent(robotEntity);
+        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
+
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
@@ -667,9 +690,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取客服欢迎消息
      */
     private String getAgentWelcomeMessage(AgentEntity agentEntity) {
-        String customMessage = agentEntity.getSettings() != null && agentEntity.getSettings().getServiceSettings() != null
-            ? agentEntity.getSettings().getServiceSettings().getWelcomeTip()
-            : null;
+        String customMessage = agentEntity.getSettings() != null
+                && agentEntity.getSettings().getServiceSettings() != null
+                        ? agentEntity.getSettings().getServiceSettings().getWelcomeTip()
+                        : null;
         return getValidWelcomeMessage(customMessage);
     }
 
@@ -677,19 +701,73 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取机器人欢迎消息
      */
     private String getRobotWelcomeMessage(RobotEntity robotEntity) {
-        String customMessage = robotEntity.getSettings() != null && robotEntity.getSettings().getServiceSettings() != null
-            ? robotEntity.getSettings().getServiceSettings().getWelcomeTip()
-            : null;
+        String customMessage = robotEntity.getSettings() != null
+                && robotEntity.getSettings().getServiceSettings() != null
+                        ? robotEntity.getSettings().getServiceSettings().getWelcomeTip()
+                        : null;
         return getValidWelcomeMessage(customMessage);
+    }
+
+    /**
+     * 根据客服设置构建结构化 WelcomeContent
+     */
+    private WelcomeContent buildAgentWelcomeContent(AgentEntity agentEntity) {
+        String tip = getAgentWelcomeMessage(agentEntity);
+        var settings = agentEntity.getSettings() != null ? agentEntity.getSettings().getServiceSettings() : null;
+        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
+        if (settings != null) {
+            // kb
+            builder.kbUid(settings.getWelcomeKbUid());
+            // faqs
+            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
+                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
+                for (FaqEntity f : settings.getWelcomeFaqs()) {
+                    qas.add(WelcomeContent.QA.builder()
+                            .uid(f.getUid())
+                            .question(f.getQuestion())
+                            .answer(f.getAnswer())
+                            .type(f.getType())
+                            .build());
+                }
+                builder.faqs(qas);
+            }
+        }
+        return builder.build();
+    }
+
+    /**
+     * 根据机器人设置构建结构化 WelcomeContent
+     */
+    private WelcomeContent buildRobotWelcomeContent(RobotEntity robotEntity) {
+        String tip = getRobotWelcomeMessage(robotEntity);
+        var settings = robotEntity.getSettings() != null ? robotEntity.getSettings().getServiceSettings() : null;
+        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
+        if (settings != null) {
+            builder.kbUid(settings.getWelcomeKbUid());
+            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
+                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
+                for (FaqEntity f : settings.getWelcomeFaqs()) {
+                    qas.add(WelcomeContent.QA.builder()
+                            .uid(f.getUid())
+                            .question(f.getQuestion())
+                            .answer(f.getAnswer())
+                            .type(f.getType())
+                            .build());
+                }
+                builder.faqs(qas);
+            }
+        }
+        return builder.build();
     }
 
     /**
      * 获取工作组离线消息
      */
     private String getWorkgroupOfflineMessage(WorkgroupEntity workgroup) {
-        String customMessage = workgroup.getSettings() != null && workgroup.getSettings().getMessageLeaveSettings() != null
-            ? workgroup.getSettings().getMessageLeaveSettings().getMessageLeaveTip()
-            : null;
+        String customMessage = workgroup.getSettings() != null
+                && workgroup.getSettings().getMessageLeaveSettings() != null
+                        ? workgroup.getSettings().getMessageLeaveSettings().getMessageLeaveTip()
+                        : null;
         if (customMessage == null || customMessage.isEmpty()) {
             customMessage = "请稍后，客服会尽快回复您";
         }
@@ -723,12 +801,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private void updateQueueMemberForAgentAccept(QueueMemberEntity queueMemberEntity) {
         try {
             queueMemberEntity.agentAutoAcceptThread();
-            
+
             // 使用MQ异步处理自动接受会话操作
             Map<String, Object> updates = new HashMap<>();
             updates.put("agentAutoAcceptThread", true);
             queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
-            
+
             log.debug("Updated queue member status for agent auto-accept: {}", queueMemberEntity.getUid());
         } catch (Exception e) {
             log.error("Failed to update queue member for agent auto-accept: {}", e.getMessage(), e);
@@ -759,7 +837,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
             log.debug("Published workgroup thread events for thread: {}", savedThread.getUid());
         } catch (Exception e) {
-            log.warn("Failed to publish thread events for workgroup thread {}: {}", savedThread.getUid(), e.getMessage());
+            log.warn("Failed to publish thread events for workgroup thread {}: {}", savedThread.getUid(),
+                    e.getMessage());
         }
     }
 }

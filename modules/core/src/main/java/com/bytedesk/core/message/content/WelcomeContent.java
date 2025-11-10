@@ -14,6 +14,12 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * 欢迎消息内容类
+ *
+ * 使用说明:
+ * 1. 服务端在路由策略(Agent/Robot/Workgroup)中构建 WelcomeContent 并序列化为 JSON 写入 MessageEntity.content
+ * 2. 前端收到 type=WELCOME 的消息后优先尝试 JSON.parse(content) 解析为该结构；若解析失败则按旧版纯文本展示
+ * 3. faqs 字段为精简 FAQ 数据，不依赖复杂对象，避免前端反序列化失败；kbUid 指向关联知识库
+ * 4. 兼容：旧历史消息只有 content(纯字符串)，前端自动回退
  */
 @Getter
 @Setter

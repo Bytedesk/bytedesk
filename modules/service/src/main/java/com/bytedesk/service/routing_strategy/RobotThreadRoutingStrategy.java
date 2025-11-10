@@ -23,6 +23,7 @@ import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
@@ -34,6 +35,7 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
 import jakarta.annotation.Nonnull;
 
 import com.bytedesk.core.thread.ThreadEntity;
@@ -174,8 +176,9 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.info("Robot enqueued to queue: {}", queueMemberEntity.getUid());
 
         // 2. 配置线程状态
-        String welcomeContent = getRobotWelcomeMessage(robotEntity);
-        thread.setRoboting().setContent(welcomeContent);
+    String tip = getRobotWelcomeMessage(robotEntity);
+    WelcomeContent wc = buildRobotWelcomeContent(robotEntity, tip);
+    thread.setRoboting().setContent(wc != null ? wc.toJson() : null);
         
         // 3. 设置机器人信息
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
@@ -191,7 +194,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         publishRobotThreadEvent(savedThread);
         
         // 7. 创建并保存欢迎消息
-        return createAndSaveWelcomeMessage(welcomeContent, savedThread);
+        return createAndSaveWelcomeMessage(wc, savedThread);
     }
 
     /**
@@ -233,9 +236,9 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 创建并保存欢迎消息
      */
-    private MessageProtobuf createAndSaveWelcomeMessage(String content, ThreadEntity thread) {
+    private MessageProtobuf createAndSaveWelcomeMessage(WelcomeContent wc, ThreadEntity thread) {
         try {
-            MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
+            MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
             messageRestService.save(message);
             
             MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
@@ -254,9 +257,34 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private MessageProtobuf getRobotContinueMessage(RobotEntity robotEntity, @Nonnull ThreadEntity thread) {
         validateThread(thread, "get robot continue message");
         
-        String content = getRobotWelcomeMessage(robotEntity);
-        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(content, thread);
+        String tip = getRobotWelcomeMessage(robotEntity);
+        WelcomeContent wc = buildRobotWelcomeContent(robotEntity, tip);
+        MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
         
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+    }
+
+    /**
+     * 根据机器人设置构建结构化 WelcomeContent
+     */
+    private WelcomeContent buildRobotWelcomeContent(RobotEntity robotEntity, String tip) {
+        var settings = robotEntity.getSettings() != null ? robotEntity.getSettings().getServiceSettings() : null;
+        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
+        if (settings != null) {
+            builder.kbUid(settings.getWelcomeKbUid());
+            if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
+                java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
+                for (FaqEntity f : settings.getWelcomeFaqs()) {
+                    qas.add(WelcomeContent.QA.builder()
+                            .uid(f.getUid())
+                            .question(f.getQuestion())
+                            .answer(f.getAnswer())
+                            .type(f.getType())
+                            .build());
+                }
+                builder.faqs(qas);
+            }
+        }
+        return builder.build();
     }
 }

@@ -38,6 +38,8 @@ import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
 import com.bytedesk.service.utils.ThreadMessageUtil;
+import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.kbase.llm_faq.FaqEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -124,10 +126,27 @@ public class AgentEventListener {
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             // 发送欢迎语
-            String content = agent.getSettings() != null && agent.getSettings().getServiceSettings() != null
+            String tip = agent.getSettings() != null && agent.getSettings().getServiceSettings() != null
                 ? agent.getSettings().getServiceSettings().getWelcomeTip()
                 : null;
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(content, thread);
+            WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
+            if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
+                var settings = agent.getSettings().getServiceSettings();
+                builder.kbUid(settings.getWelcomeKbUid());
+                if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
+                    java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
+                    for (FaqEntity f : settings.getWelcomeFaqs()) {
+                        qas.add(WelcomeContent.QA.builder()
+                                .uid(f.getUid())
+                                .question(f.getQuestion())
+                                .answer(f.getAnswer())
+                                .type(f.getType())
+                                .build());
+                    }
+                    builder.faqs(qas);
+                }
+            }
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(builder.build(), thread);
             messageSendService.sendProtobufMessage(messageProtobuf);
         } else {
             log.error("agent not found");
