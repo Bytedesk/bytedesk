@@ -17,7 +17,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const currentPath = window.location.pathname;
         
-        // Remove current language prefix (if any)
+        // Special handling for /web path
+        if (currentPath === '/web' || currentPath.startsWith('/web/')) {
+            // For /web routes, language goes after /web
+            if (lang === 'zh-CN') {
+                window.location.href = '/web';
+            } else {
+                window.location.href = '/web/' + lang;
+            }
+            return;
+        }
+        
+        // For static HTML pages, remove current language prefix (if any)
         const cleanPath = currentPath.replace(/^\/(zh-CN|zh-TW|en)\//, '/');
         
         // Build new path with target language

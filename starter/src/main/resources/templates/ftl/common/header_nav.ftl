@@ -1,5 +1,5 @@
 <!-- Header START -->
-<header class="navbar-light navbar-sticky bg-white shadow-sm fixed-top">
+<header class="navbar-light navbar-sticky bg-body shadow-sm fixed-top" data-bs-theme-value="light">
 	<!-- Logo Nav START -->
 	<nav class="navbar navbar-expand-lg">
 		<div class="container">

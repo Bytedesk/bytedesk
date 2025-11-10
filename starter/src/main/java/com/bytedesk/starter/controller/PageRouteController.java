@@ -130,11 +130,19 @@ public class PageRouteController {
 	}
 
 	/**
-	 * 
-	 * http://127.0.0.1:9003/web
+	 * Multi-language /web support
+	 * http://127.0.0.1:9003/web (默认简体中文)
+	 * http://127.0.0.1:9003/web/zh-CN
+	 * http://127.0.0.1:9003/web/zh-TW
+	 * http://127.0.0.1:9003/web/en
 	 */
-	@GetMapping("/web")
-	public String web(Model model) {
+	@GetMapping({
+		"/web",
+		"/web/{lang:zh-CN|zh-TW|en}"
+	})
+	public String web(
+			@PathVariable(required = false) String lang,
+			Model model) {
 		if (!showDemo) {
 			// 添加自定义配置到模型
 			if (customEnabled) {
@@ -144,6 +152,14 @@ public class PageRouteController {
 			}
 			return "default";
 		}
+		
+		// If language is specified, add it to model
+		if (lang != null) {
+			model.addAttribute("lang", lang);
+		} else {
+			model.addAttribute("lang", "zh-CN");
+		}
+		
 		return "index";
 	}
 
