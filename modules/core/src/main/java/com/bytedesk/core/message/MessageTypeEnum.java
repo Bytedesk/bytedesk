@@ -15,11 +15,11 @@ package com.bytedesk.core.message;
 
 // \(".*?"\)
 public enum MessageTypeEnum {
-    WELCOME,
-    CONTINUE,
-    SYSTEM,
-    QUEUE,
-    NOTICE,
+    WELCOME, // 欢迎消息
+    CONTINUE, // 继续会话
+    SYSTEM, // 系统消息
+    QUEUE, // 排队消息
+    NOTICE, // 通知消息
     TEXT, // 文本消息
     IMAGE, // 图片消息
     FILE, // 文件消息
@@ -27,11 +27,11 @@ public enum MessageTypeEnum {
     AUDIO, // 音频消息
     VOICE, // 语音消息
     VIDEO, // 视频消息
-    MUSIC,
-    LOCATION,
-    LINK,
-    GOODS, // 商品
-    CARD,
+    MUSIC, // 音乐消息
+    LOCATION, // 位置消息
+    LINK, // 链接消息
+    GOODS, // 商品消息
+    CARD, // 名片消息
     EVENT, // 事件：离线、上线等
     EXTRA, // 附加信息
     GUESS, // 猜你想问

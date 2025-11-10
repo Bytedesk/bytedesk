@@ -22,6 +22,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -90,6 +91,32 @@ public class ThreadMessageUtil {
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(thread.getContent())
+                .type(MessageTypeEnum.QUEUE.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+    }
+
+    /**
+     * 结构化 QueueContent 的排队消息
+     */
+    public static MessageProtobuf getThreadQueueMessage(QueueContent content, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+
+        String json = content != null ? content.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
                 .type(MessageTypeEnum.QUEUE.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())

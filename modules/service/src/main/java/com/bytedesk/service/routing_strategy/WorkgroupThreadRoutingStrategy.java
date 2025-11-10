@@ -27,6 +27,7 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
@@ -543,18 +544,35 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
 
-        // 生成排队消息
-        String queueContent = generateWorkgroupQueueMessage(queueMemberEntity);
+    // 生成排队消息文本
+    int queuingCount = queueMemberEntity.getWorkgroupQueue().getQueuingCount();
+    String queueContentText = generateWorkgroupQueueMessage(queueMemberEntity);
 
-        // 设置线程状态
-        thread.setUserUid(agentEntity.getUid());
-        thread.setQueuing().setContent(queueContent);
+    // 构建结构化 QueueContent
+    QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
+        .content(queueContentText)
+        .position(queueMemberEntity.getQueueNumber())
+        .queueSize(queuingCount);
+
+    // 计算预估等待时间（分钟 -> 秒）与描述
+    if (queuingCount > 0) {
+        int estimatedMinutes = queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
+        builder.waitSeconds(estimatedMinutes * 60)
+            .estimatedWaitTime("约" + estimatedMinutes + "分钟");
+    } else {
+        builder.waitSeconds(0).estimatedWaitTime("即将开始");
+    }
+    QueueContent queueContent = builder.build();
+
+    // 设置线程状态（使用结构化JSON）
+    thread.setUserUid(agentEntity.getUid());
+    thread.setQueuing().setContent(queueContent.toJson());
 
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
 
-        // 发送排队消息
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(savedThread);
+        // 发送结构化排队消息
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;

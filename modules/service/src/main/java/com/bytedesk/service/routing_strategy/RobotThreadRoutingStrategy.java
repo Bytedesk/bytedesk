@@ -46,12 +46,14 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 机器人线程路由策略
  * 
- * <p>功能特点：
+ * <p>
+ * 功能特点：
  * - 纯机器人接待，不支持转人工
  * - 自动创建和管理机器人会话
  * - 支持会话复用和重新初始化
  * 
- * <p>处理流程：
+ * <p>
+ * 处理流程：
  * 1. 验证机器人配置
  * 2. 检查现有会话
  * 3. 创建或复用会话
@@ -93,16 +95,16 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     public MessageProtobuf createRobotThread(VisitorRequest request) {
         // 1. 验证和获取机器人配置
         RobotEntity robotEntity = getRobotEntity(request.getSid());
-        
+
         // 2. 生成会话主题并检查现有会话
         String topic = TopicUtils.formatOrgRobotThreadTopic(robotEntity.getUid(), request.getUid());
         ThreadEntity thread = getOrCreateRobotThread(request, robotEntity, topic);
-        
+
         // 3. 处理现有活跃会话
         if (isExistingRobotThread(thread)) {
             return handleExistingRobotThread(robotEntity, thread);
         }
-        
+
         // 4. 处理新会话或重新激活的会话
         return processNewRobotThread(request, thread, robotEntity);
     }
@@ -112,7 +114,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      */
     private RobotEntity getRobotEntity(String robotUid) {
         validateUid(robotUid, "Robot");
-        
+
         return robotRestService.findByUid(robotUid)
                 .orElseThrow(() -> {
                     log.error("Robot uid {} not found", robotUid);
@@ -131,10 +133,10 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         }
 
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-        
+
         if (threadOptional.isPresent()) {
             ThreadEntity existingThread = threadOptional.get();
-            
+
             // 检查现有会话状态
             if (existingThread.isNew()) {
                 log.debug("Found new robot thread: {}", topic);
@@ -169,30 +171,31 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理新的机器人会话
      */
-    private MessageProtobuf processNewRobotThread(VisitorRequest request, ThreadEntity thread, RobotEntity robotEntity) {
+    private MessageProtobuf processNewRobotThread(VisitorRequest request, ThreadEntity thread,
+            RobotEntity robotEntity) {
         // 1. 加入队列
         UserProtobuf robotProtobuf = robotEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robotProtobuf, request);
         log.info("Robot enqueued to queue: {}", queueMemberEntity.getUid());
 
         // 2. 配置线程状态
-    String tip = getRobotWelcomeMessage(robotEntity);
-    WelcomeContent wc = buildRobotWelcomeContent(robotEntity, tip);
-    thread.setRoboting().setContent(wc != null ? wc.toJson() : null);
-        
+        String tip = getRobotWelcomeMessage(robotEntity);
+        WelcomeContent wc = buildRobotWelcomeContent(robotEntity, tip);
+        thread.setRoboting().setContent(wc != null ? wc.toJson() : null);
+
         // 3. 设置机器人信息
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         thread.setRobot(robotString);
-        
+
         // 4. 保存线程
         ThreadEntity savedThread = saveThread(thread);
-        
+
         // 5. 更新队列状态
         updateQueueMemberForRobot(queueMemberEntity);
-        
+
         // 6. 发布事件
         publishRobotThreadEvent(savedThread);
-        
+
         // 7. 创建并保存欢迎消息
         return createAndSaveWelcomeMessage(wc, savedThread);
     }
@@ -201,9 +204,10 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 获取机器人欢迎消息
      */
     private String getRobotWelcomeMessage(RobotEntity robotEntity) {
-        String customMessage = robotEntity.getSettings() != null && robotEntity.getSettings().getServiceSettings() != null
-            ? robotEntity.getSettings().getServiceSettings().getWelcomeTip()
-            : null;
+        String customMessage = robotEntity.getSettings() != null
+                && robotEntity.getSettings().getServiceSettings() != null
+                        ? robotEntity.getSettings().getServiceSettings().getWelcomeTip()
+                        : null;
         return getValidWelcomeMessage(customMessage);
     }
 
@@ -240,10 +244,10 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         try {
             MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
             messageRestService.save(message);
-            
+
             MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
             log.debug("Created robot welcome message for thread: {}", thread.getUid());
-            
+
             return messageProtobuf;
         } catch (Exception e) {
             log.error("Failed to create welcome message for robot thread {}: {}", thread.getUid(), e.getMessage(), e);
@@ -256,11 +260,11 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      */
     private MessageProtobuf getRobotContinueMessage(RobotEntity robotEntity, @Nonnull ThreadEntity thread) {
         validateThread(thread, "get robot continue message");
-        
+
         String tip = getRobotWelcomeMessage(robotEntity);
         WelcomeContent wc = buildRobotWelcomeContent(robotEntity, tip);
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
-        
+
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
