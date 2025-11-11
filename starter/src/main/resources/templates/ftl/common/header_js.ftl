@@ -26,7 +26,7 @@
         if(el != 'undefined' && el != null) {
             const showActiveTheme = theme => {
             const activeThemeIcon = document.querySelector('.theme-icon-active use')
-            const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+            const btnToActive = document.querySelector('[data-bs-theme-value="' + theme + '"]')
             if (btnToActive) {
                 const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
 

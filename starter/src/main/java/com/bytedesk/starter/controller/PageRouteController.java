@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -95,16 +95,39 @@ public class PageRouteController {
 			@PathVariable(required = false) String page,
 			Model model) {
 		
+		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
+			return "default";
+		}
+		
 		// Add lang to model for template processing
 		model.addAttribute("lang", lang);
 		
-		// Forward to the actual static HTML file in templates/{lang}/ directory
+		// Load i18n properties for the specified language
+		try {
+			Map<String, String> i18nMap = loadI18nProperties(lang);
+			if (i18nMap != null && !i18nMap.isEmpty()) {
+				model.addAttribute("i18n", i18nMap);
+			} else {
+				model.addAttribute("i18n", new HashMap<String, String>());
+			}
+		} catch (Exception e) {
+			log.error("Error loading i18n for language: {}", lang, e);
+			model.addAttribute("i18n", new HashMap<String, String>());
+		}
+		
+		// Return FreeMarker template path
 		if (feature != null) {
-			return "forward:/templates/" + lang + "/features/" + feature + ".html";
+			return "features/" + feature;
 		} else if (page != null) {
-			return "forward:/templates/" + lang + "/pages/" + page + ".html";
+			return "pages/" + page;
 		} else {
-			return "forward:/templates/" + lang + "/index.html";
+			return "index";
 		}
 	}
 
@@ -124,16 +147,39 @@ public class PageRouteController {
 			@PathVariable(required = false) String page,
 			Model model) {
 		
+		if (!showDemo) {
+			// 添加自定义配置到模型
+			if (customEnabled) {
+				model.addAttribute("customName", customName);
+				model.addAttribute("customLogo", customLogo);
+				model.addAttribute("customDescription", customDescription);
+			}
+			return "default";
+		}
+		
 		// Default language is zh-CN
 		model.addAttribute("lang", "zh-CN");
 		
-		// Forward to the actual static HTML file in templates/ directory
+		// Load i18n properties for zh-CN
+		try {
+			Map<String, String> i18nMap = loadI18nProperties("zh-CN");
+			if (i18nMap != null && !i18nMap.isEmpty()) {
+				model.addAttribute("i18n", i18nMap);
+			} else {
+				model.addAttribute("i18n", new HashMap<String, String>());
+			}
+		} catch (Exception e) {
+			log.error("Error loading i18n for zh-CN", e);
+			model.addAttribute("i18n", new HashMap<String, String>());
+		}
+		
+		// Return FreeMarker template path
 		if (feature != null) {
-			return "forward:/templates/features/" + feature + ".html";
+			return "features/" + feature;
 		} else if (page != null) {
-			return "forward:/templates/pages/" + page + ".html";
+			return "pages/" + page;
 		} else {
-			return "forward:/templates/index.html";
+			return "index";
 		}
 	}
 
@@ -151,29 +197,47 @@ public class PageRouteController {
 	public String web(
 			@PathVariable(required = false) String lang,
 			Model model) {
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
+		try {
+			if (!showDemo) {
+				// 添加自定义配置到模型
+				if (customEnabled) {
+					model.addAttribute("customName", customName);
+					model.addAttribute("customLogo", customLogo);
+					model.addAttribute("customDescription", customDescription);
+				}
+				return "default";
 			}
-			return "default";
+			
+			// Set default language if not specified
+			if (lang == null || lang.isEmpty()) {
+				lang = "zh-CN";
+			}
+			
+			log.info("Loading /web for language: {}", lang);
+			
+			// Add lang to model
+			model.addAttribute("lang", lang);
+			
+			// Load i18n properties for the specified language
+			try {
+				Map<String, String> i18nMap = loadI18nProperties(lang);
+				if (i18nMap != null && !i18nMap.isEmpty()) {
+					model.addAttribute("i18n", i18nMap);
+					log.info("Successfully loaded {} i18n entries for language: {}", i18nMap.size(), lang);
+				} else {
+					log.warn("No i18n entries loaded for language: {}, using empty map", lang);
+					model.addAttribute("i18n", new HashMap<String, String>());
+				}
+			} catch (Exception e) {
+				log.error("Error loading i18n for language: {}, using empty map", lang, e);
+				model.addAttribute("i18n", new HashMap<String, String>());
+			}
+			
+			return "index";
+		} catch (Exception e) {
+			log.error("Error in web() method for lang: {}", lang, e);
+			throw e;
 		}
-		
-		// Set default language if not specified
-		if (lang == null) {
-			lang = "zh-CN";
-		}
-		
-		// Add lang to model
-		model.addAttribute("lang", lang);
-		
-		// Load i18n properties for the specified language
-		Map<String, String> i18nMap = loadI18nProperties(lang);
-		model.addAttribute("i18n", i18nMap);
-		
-		return "index";
 	}
 
 	/**
@@ -446,21 +510,21 @@ public class PageRouteController {
 	private Map<String, String> loadI18nProperties(String lang) {
 		Map<String, String> i18nMap = new HashMap<>();
 		try {
-			String classpath = this.getClass().getResource("/").getPath();
-			String filePath = classpath + "templates/ftl/i18n/messages_" + lang + ".properties";
-			File file = new File(filePath);
+			String resourcePath = "templates/ftl/i18n/messages_" + lang + ".properties";
+			ClassPathResource resource = new ClassPathResource(resourcePath);
 			
-			if (file.exists()) {
-				try (FileInputStream fis = new FileInputStream(file);
-					 InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
+			if (resource.exists()) {
+				try (InputStream is = resource.getInputStream();
+					 InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
 					Properties props = new Properties();
 					props.load(reader);
 					for (String name : props.stringPropertyNames()) {
 						i18nMap.put(name, props.getProperty(name));
 					}
+					log.info("Loaded {} i18n properties for language: {}", i18nMap.size(), lang);
 				}
 			} else {
-				log.warn("i18n file not found: {}", filePath);
+				log.warn("i18n file not found: {}", resourcePath);
 			}
 		} catch (Exception e) {
 			log.error("Failed to load i18n properties for language: {}", lang, e);

@@ -17,7 +17,7 @@
 					<#--  <img class="dark-mode-item h-40px" src="/assets/images/logo-light.svg" alt="logo">  -->
 				</a>
 
-				<p class="my-4"><h3 class="text-white">${(i18n['brand.title'])! '微语 - 开源智能客服系统'}</h3></p>
+				<p class="my-4"><h3 class="text-white">${(i18n['brand.title'])! '微语 - 重复工作自动化'}</h3></p>
 				<p><h5 class="text-white-50">${(i18n['brand.subtitle'])! '开源办公软件'}</h5></p>
 				<#--  开源即时通讯平台、开源智能客服系统、开源AI应用创新平台  -->
 				<!-- Newsletter -->

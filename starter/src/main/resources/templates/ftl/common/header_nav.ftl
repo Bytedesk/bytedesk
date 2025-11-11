@@ -10,10 +10,10 @@
 			<#if lang?? && lang != "zh-CN">
 				<#assign langPrefix = "/" + lang>
 			</#if>
-			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 开源智能客服系统'}">
+			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 一切以客户服务为中心'}">
 				<#--  <img class="light-mode-item navbar-brand-item" src="/assets/images/logo.svg" alt="微语logo">  -->
 				<#--  <img class="dark-mode-item navbar-brand-item" src="/assets/images/logo-light.svg" alt="微语logo">  -->
-				<h1 class="h5">${(i18n['brand.title'])! '微语 - 开源智能客服系统'}</h1>
+				<h1 class="h5">${(i18n['brand.title'])! '微语 - 一切以客户服务为中心'}</h1>
 				<#--  开源智能客服系统/开源AI应用创新平台/开源即时通讯平台  -->
 			</a>
 			<!-- Logo END -->
