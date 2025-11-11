@@ -125,10 +125,10 @@ Listed course START -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="/assets/images/element/home.svg" alt="项目管理图标">
+						<img src="/assets/images/element/home.svg" alt="<@t key='alt.suite.kanban'>任务管理图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="/features/kanban.html" class="stretched-link">任务管理</a></h5>
-					<span class="mb-0">任务、日历、待办事项</span>
+					<h5 class="mb-1"><a href="/features/kanban.html" class="stretched-link"><@t key="section.suite.item.kanban.title">任务管理</@t></a></h5>
+					<span class="mb-0"><@t key="section.suite.item.kanban.desc">任务、日历、待办事项</@t></span>
 				</div>
 			</div>
 
