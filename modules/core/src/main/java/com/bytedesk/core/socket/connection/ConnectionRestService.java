@@ -49,6 +49,8 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     private final AuthService authService;
 
+    private final PresenceTtlResolver presenceTtlResolver;
+
     /* ================= Presence APIs (multi-client) ================= */
 
     /**
@@ -70,13 +72,13 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                 .ip(ip)
                 .userAgent(userAgent)
                 .build());
+        // Resolve TTL with policy (default 90s, range 60–180s, per-protocol override)
+        int resolvedTtl = presenceTtlResolver.resolve(protocol, ttlSeconds);
         entity.setStatus(CONNECTED.name())
               .setConnectedAt(entity.getConnectedAt() == null ? now : entity.getConnectedAt())
               .setLastHeartbeatAt(now)
-              .setDisconnectedAt(null);
-        if (ttlSeconds != null && ttlSeconds > 0) {
-            entity.setTtlSeconds(ttlSeconds);
-        }
+              .setDisconnectedAt(null)
+              .setTtlSeconds(resolvedTtl);
         save(entity);
     }
 
@@ -106,10 +108,13 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     /** Cleanup expired (stale) connections by TTL */
     @Transactional
     public int expireStaleSessions() {
-        long now = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        long now = start;
         List<ConnectionEntity> all = connectionRepository.findAll();
+        int scanned = 0;
         int changed = 0;
         for (ConnectionEntity c : all) {
+            scanned++;
             if (c.isDeleted()) continue;
             if (CONNECTED.name().equals(c.getStatus())) {
                 Long last = c.getLastHeartbeatAt();
@@ -121,6 +126,8 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                 }
             }
         }
+        long cost = System.currentTimeMillis() - start;
+        log.info("expireStaleSessions scanned={}, expired={}, costMs={}", scanned, changed, cost);
         return changed;
     }
 
@@ -140,6 +147,31 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             }
         }
         return false;
+    }
+
+    @Transactional(readOnly = true)
+    public int countActiveConnections(String userUid) {
+        List<ConnectionEntity> list = connectionRepository.findByUserUidAndDeletedFalse(userUid);
+        if (list.isEmpty()) return 0;
+        long now = System.currentTimeMillis();
+        int count = 0;
+        for (ConnectionEntity c : list) {
+            if (!CONNECTED.name().equals(c.getStatus())) continue;
+            Long last = c.getLastHeartbeatAt();
+            if (last == null) continue;
+            Integer ttl = c.getTtlSeconds();
+            if (ttl == null) continue;
+            if (last + ttl * 1000L >= now) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Transactional(readOnly = true)
+    public PresenceResponse getPresence(String userUid) {
+        int active = countActiveConnections(userUid);
+        return PresenceResponse.builder().online(active > 0).activeCount(active).build();
     }
 
     @Override

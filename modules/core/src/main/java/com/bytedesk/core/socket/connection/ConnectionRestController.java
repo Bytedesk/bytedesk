@@ -16,6 +16,7 @@ package com.bytedesk.core.socket.connection;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
 
     private final ConnectionRestService connectionRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query connection by org")
+    @ActionAnnotation(title = "Connection", action = "组织查询", description = "query connection by org")
     @Operation(summary = "Query Connections by Organization", description = "Retrieve connections for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(ConnectionRequest request) {
@@ -49,7 +50,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connections));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query connection by user")
+    @ActionAnnotation(title = "Connection", action = "用户查询", description = "query connection by user")
     @Operation(summary = "Query Connections by User", description = "Retrieve connections for the current user")
     @Override
     public ResponseEntity<?> queryByUser(ConnectionRequest request) {
@@ -59,7 +60,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connections));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query connection by uid")
+    @ActionAnnotation(title = "Connection", action = "查询详情", description = "query connection by uid")
     @Operation(summary = "Query Connection by UID", description = "Retrieve a specific connection by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(ConnectionRequest request) {
@@ -69,7 +70,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connection));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create connection")
+    @ActionAnnotation(title = "Connection", action = "新建", description = "create connection")
     @Operation(summary = "Create Connection", description = "Create a new connection")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +81,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connection));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update connection")
+    @ActionAnnotation(title = "Connection", action = "更新", description = "update connection")
     @Operation(summary = "Update Connection", description = "Update an existing connection")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +92,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connection));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete connection")
+    @ActionAnnotation(title = "Connection", action = "删除", description = "delete connection")
     @Operation(summary = "Delete Connection", description = "Delete a connection")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +103,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export connection")
+    @ActionAnnotation(title = "Connection", action = "导出", description = "export connection")
     @Operation(summary = "Export Connections", description = "Export connections to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,9 +114,17 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
             response,
             connectionRestService,
             ConnectionExcel.class,
-            "标签",
+            "Connection",
             "connection"
         );
+    }
+
+    @ActionAnnotation(title = "在线", action = "查询", description = "presence by user")
+    @Operation(summary = "Get Presence", description = "Get user's online presence and active connection count")
+    @GetMapping("/presence/{userUid}")
+    public ResponseEntity<?> getPresence(@PathVariable("userUid") String userUid) {
+        PresenceResponse presence = connectionRestService.getPresence(userUid);
+        return ResponseEntity.ok(JsonResult.success(presence));
     }
 
     
