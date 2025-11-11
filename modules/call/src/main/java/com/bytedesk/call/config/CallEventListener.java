@@ -21,8 +21,7 @@ public class CallEventListener implements com.bytedesk.call.esl.client.inbound.I
     @Override
     public void onEslEvent(Context ctx, EslEvent eslEvent) {
         String eventName = eslEvent.getEventName();
-
-        log.info("收到Call事件: {}", eventName);
+        // log.info("收到Call事件: {}", eventName); // HEARTBEAT/RE_SCHEDULE
 
         switch (eventName) {
             case "CHANNEL_CREATE":
