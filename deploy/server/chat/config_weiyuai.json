@@ -2,5 +2,6 @@
     "enabled": true,
     "apiUrl": "https://api.weiyuai.cn",
     "websocketUrl": "wss://api.weiyuai.cn/stomp",
+    "stompUrl": "wss://api.weiyuai.cn/stomp",
     "htmlUrl": "https://www.weiyuai.cn"
 }
