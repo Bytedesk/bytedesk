@@ -58,11 +58,34 @@
 				<!-- Nav item 3 link-->
 				<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>					<!-- Language Switch Dropdown -->
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${(i18n['lang.current'])! (lang! 'zh-CN')}</a>
+						<#-- Language switch label shows target language; highlight current in the list -->
+						<#-- Normalize current language -->
+						<#assign currentLang = 'zh-cn'>
+						<#if lang??>
+							<#assign _lc = lang?lower_case>
+							<#if _lc?index_of('zh-tw') == 0>
+								<#assign currentLang = 'zh-tw'>
+							<#elseif _lc?index_of('en') == 0>
+								<#assign currentLang = 'en'>
+							<#else>
+								<#assign currentLang = 'zh-cn'>
+							</#if>
+						</#if>
+
+						<#-- Toggle label: if current is English -> show 中文简体; otherwise show English -->
+						<#assign langSwitchLabel = (currentLang == 'en')?string('中文简体', 'English')>
+
+						<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${langSwitchLabel}</a>
 						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langMenu">
-							<li><a class="dropdown-item" href="#" data-lang="zh-CN">中文简体</a></li>
-							<li><a class="dropdown-item" href="#" data-lang="zh-TW">繁體中文</a></li>
-							<li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+							<li>
+								<a class="dropdown-item ${(currentLang == 'zh-cn')?string('active','')}" href="#" data-lang="zh-CN" aria-current="${(currentLang == 'zh-cn')?string('true','false')}"><@t key='lang.name.zh-CN'>中文简体</@t><#if currentLang == 'zh-cn'> ✓</#if></a>
+							</li>
+							<li>
+								<a class="dropdown-item ${(currentLang == 'zh-tw')?string('active','')}" href="#" data-lang="zh-TW" aria-current="${(currentLang == 'zh-tw')?string('true','false')}"><@t key='lang.name.zh-TW'>繁體中文</@t><#if currentLang == 'zh-tw'> ✓</#if></a>
+							</li>
+							<li>
+								<a class="dropdown-item ${(currentLang == 'en')?string('active','')}" href="#" data-lang="en" aria-current="${(currentLang == 'en')?string('true','false')}"><@t key='lang.name.en'>English</@t><#if currentLang == 'en'> ✓</#if></a>
+							</li>
 						</ul>
 					</li>
 				</ul>
