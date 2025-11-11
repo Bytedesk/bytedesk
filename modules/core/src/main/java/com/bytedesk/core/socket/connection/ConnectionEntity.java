@@ -17,6 +17,7 @@ import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({ConnectionEntityListener.class})
-@Table(name = "bytedesk_core_connection")
+@Table(name = "bytedesk_core_connection", indexes = {
+    @Index(name = "idx_core_conn_client_id", columnList = "clientId")
+})
 public class ConnectionEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -55,7 +58,8 @@ public class ConnectionEntity extends BaseEntity {
     // 说明：平台 platform 已在 BaseEntity 中以 platform_type 列存在，避免重复定义
 
     /** 协议：MQTT / WS / SSE / OTHER */
-    private String protocol;
+    @Builder.Default
+    private String protocol = ConnectionProtocalEnum.MQTT.name();
 
     /** 渠道：如 WEB_VISITOR / WEB / APP 等（与系统 channel 对齐） */
     private String channel;

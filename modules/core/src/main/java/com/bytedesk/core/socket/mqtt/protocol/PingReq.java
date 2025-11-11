@@ -21,9 +21,9 @@ import com.bytedesk.core.socket.connection.ConnectionRestService;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @AllArgsConstructor
 public class PingReq {
 
@@ -34,11 +34,11 @@ public class PingReq {
     public void processPingReq(Channel channel, MqttMessage message) {
         //
         String clientId = MqttChannelUtils.getClientId(channel);
-        // log.info("PINGREQ - clientId: {}", clientId);
-        mqttConnectionService.addConnected(clientId);
+        log.info("PINGREQ - clientId: {}", clientId);
         // 同步刷新数据库心跳，保障 Presence TTL 不会过期
         try {
             if (clientId != null) {
+                mqttConnectionService.addConnected(clientId);
                 connectionRestService.heartbeat(clientId);
             }
         } catch (Exception ignore) {

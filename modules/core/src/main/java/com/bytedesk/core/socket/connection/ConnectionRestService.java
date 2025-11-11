@@ -86,24 +86,25 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     /** Update heartbeat for a client connection */
     @Transactional
     public void heartbeat(String clientId) {
-        Optional<ConnectionEntity> optional = connectionRepository.findByClientId(clientId);
-        if (optional.isPresent()) {
-            ConnectionEntity entity = optional.get();
-            entity.setLastHeartbeatAt(System.currentTimeMillis());
-            save(entity);
-        } else {
-            // 兜底：若不存在记录（可能未触发连接事件），尝试按 clientId 格式 uid/client/deviceUid 创建
-            if (clientId != null && clientId.contains("/")) {
+        if (clientId == null || clientId.isEmpty()) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        final long MIN_INTERVAL_MS = 5000L; // 基础节流策略：5 秒内重复心跳不落库
+        long threshold = now - MIN_INTERVAL_MS;
+        // 直接使用轻量条件更新，避免读取+save 整实体开销
+        int updated = connectionRepository.updateHeartbeatIfOlder(clientId, now, threshold);
+        if (updated == 0) {
+            // 未更新，可能记录不存在或刚刚已写入；尝试兜底创建（只在不存在时）
+            if (!connectionRepository.existsByClientId(clientId) && clientId.contains("/")) {
                 try {
                     String[] parts = clientId.split("/");
                     String userUid = parts.length > 0 ? parts[0] : null;
                     String deviceUid = parts.length > 2 ? parts[2] : null;
                     if (userUid != null) {
-                        // 使用 MQTT 协议默认 TTL，其他上下文信息留空
-                        markConnected(userUid, null, clientId, deviceUid, "MQTT", null, null, null, null);
+                        markConnected(userUid, null, clientId, deviceUid, ConnectionProtocalEnum.MQTT.name(), null, null, null, null);
                     }
                 } catch (Exception ignore) {
-                    // 保守处理，避免异常中断心跳
                 }
             }
         }

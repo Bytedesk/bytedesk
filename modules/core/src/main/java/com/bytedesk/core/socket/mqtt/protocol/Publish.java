@@ -17,6 +17,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.utils.MessageConvertUtils;
@@ -29,6 +30,7 @@ import lombok.AllArgsConstructor;
 public class Publish {
 
     private final IMessageSendService messageSendService;
+    private final ConnectionRestService connectionRestService;
 
     //
     public void processPublish(Channel channel, MqttPublishMessage mqttPublishMessage) {
@@ -36,6 +38,15 @@ public class Publish {
         // TODO: 发送：消息发送成功回执
         // String clientId = (String)
         // channel.attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).get();
+        // 心跳增强：每次客户端有实际数据发布，刷新该连接的心跳，避免仅依赖PINGREQ
+        String clientId = MqttChannelUtils.getClientId(channel);
+        if (clientId != null) {
+            try {
+                connectionRestService.heartbeat(clientId);
+            } catch (Exception ignored) {
+                // 保守处理，不影响主消息流
+            }
+        }
         byte[] messageBytes = new byte[mqttPublishMessage.payload().readableBytes()];
         this.sendMqMessage(mqttPublishMessage, messageBytes);
         //

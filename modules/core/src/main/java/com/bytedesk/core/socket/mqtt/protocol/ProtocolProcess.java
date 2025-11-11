@@ -27,7 +27,7 @@ public class ProtocolProcess {
     private MqttMessageIdService mqttMessageIdService;
 
     @Autowired
-    private MqttEventPublisher mqService;
+    private MqttEventPublisher mqttEventPublisher;
 
     @Autowired
     private IMessageSendService messageSendService;
@@ -60,35 +60,35 @@ public class ProtocolProcess {
 
     public Connect connect() {
         if (connect == null) {
-            connect = new Connect(mqttAuthService, mqttSessionStoreService, mqService);
+            connect = new Connect(mqttAuthService, mqttSessionStoreService, mqttEventPublisher);
         }
         return connect;
     }
 
     public Subscribe subscribe() {
         if (subscribe == null) {
-            subscribe = new Subscribe(mqService);
+            subscribe = new Subscribe(mqttEventPublisher, connectionRestService);
         }
         return subscribe;
     }
 
     public UnSubscribe unSubscribe() {
         if (unSubscribe == null) {
-            unSubscribe = new UnSubscribe(mqService);
+            unSubscribe = new UnSubscribe(mqttEventPublisher);
         }
         return unSubscribe;
     }
 
     public Publish publish() {
         if (publish == null) {
-            publish = new Publish(messageSendService);
+            publish = new Publish(messageSendService, connectionRestService);
         }
         return publish;
     }
 
     public DisConnect disConnect() {
         if (disConnect == null) {
-            disConnect = new DisConnect(mqttSessionStoreService, mqService);
+            disConnect = new DisConnect(mqttSessionStoreService, mqttEventPublisher);
         }
         return disConnect;
     }

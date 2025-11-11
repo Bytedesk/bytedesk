@@ -40,7 +40,7 @@ public class ConnectionEventListener {
         // 无法从事件中获取更多上下文，使用协议 MQTT，其它信息置空/默认
         connectionRestService.markConnected(uid, null, clientId,
                 clientId.contains("/") && clientId.split("/").length > 2 ? clientId.split("/")[2] : null,
-                "MQTT", null, null, null, 90);
+                ConnectionProtocalEnum.MQTT.name(), null, null, null, 90);
     }
 
     @EventListener

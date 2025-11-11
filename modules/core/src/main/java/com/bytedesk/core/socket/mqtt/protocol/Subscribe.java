@@ -19,6 +19,7 @@ import io.netty.handler.codec.mqtt.*;
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.mqtt.MqttUtils;
 import com.bytedesk.core.socket.mqtt.event.MqttEventPublisher;
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import java.util.List;
 public class Subscribe {
 
     private final MqttEventPublisher mqService;
+    private final ConnectionRestService connectionRestService;
 
     public void processSubscribe(Channel channel, MqttSubscribeMessage mqttSubscribeMessage) {
         // log.debug("processSubscribe {}", mqttSubscribeMessage.toString());
@@ -44,6 +46,13 @@ public class Subscribe {
             //
             String clientId = MqttChannelUtils.getClientId(channel);
             log.info("subscribe clientId {}", clientId);
+            // 心跳增强：订阅动作也视为活跃，刷新心跳
+            if (clientId != null) {
+                try {
+                    connectionRestService.heartbeat(clientId);
+                } catch (Exception ignored) {
+                }
+            }
             // 用户clientId格式: uid/client
             // final String uid = clientId.split("/")[0];
             //

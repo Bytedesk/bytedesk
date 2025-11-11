@@ -121,7 +121,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         );
     }
 
-    @ActionAnnotation(title = "在线", action = "查询", description = "presence by user")
+    // @ActionAnnotation(title = "在线", action = "查询", description = "presence by user")
     @Operation(summary = "Get Presence", description = "Get user's online presence and active connection count")
     @GetMapping("/presence/{userUid}")
     public ResponseEntity<?> getPresence(@PathVariable("userUid") String userUid) {
@@ -129,7 +129,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(presence));
     }
 
-    @ActionAnnotation(title = "在线", action = "查询", description = "active connections by user")
+    // @ActionAnnotation(title = "在线", action = "查询", description = "active connections by user")
     @Operation(summary = "List Active Connections", description = "List user's active (non-expired) connections")
     @GetMapping("/presence/{userUid}/list")
     public ResponseEntity<?> listActiveConnections(@PathVariable("userUid") String userUid) {

@@ -28,7 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UnSubscribe {
 
-    private final MqttEventPublisher mqService;
+    private final MqttEventPublisher mqttEventPublisher;
 
     public void processUnSubscribe(Channel channel, MqttUnsubscribeMessage mqttUnsubscribeMessage) {
         // log.debug("processUnSubscribe {}", mqttUnsubscribeMessage.toString());
@@ -42,7 +42,7 @@ public class UnSubscribe {
             //
             // mqttSubscribeStoreService.remove(topicFilter, clientId);
             // topicService.unsubscribe(topicFilter, clientId);
-            mqService.publishMqttUnsubscribeEvent(topicFilter, clientId);
+            mqttEventPublisher.publishMqttUnsubscribeEvent(topicFilter, clientId);
             // 移除缓存
             // redisUserService.removeTopic(uid, topicFilter);
             log.debug("UNSUBSCRIBE - clientId: {}, topicFilter: {}", clientId, topicFilter);
