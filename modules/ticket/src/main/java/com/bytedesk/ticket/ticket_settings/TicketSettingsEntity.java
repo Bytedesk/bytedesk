@@ -117,4 +117,16 @@ public class TicketSettingsEntity extends BaseEntity {
     @Column(name = "settings_type")
     private String type = TicketSettingsTypeEnum.CUSTOMER.name();
 
+    /** 最近修改人 UID */
+    @Column(name = "last_modified_user_uid")
+    private String lastModifiedUserUid;
+
+    /** 是否已初始化（用于首次按工作组加载后保存标记） */
+    @Builder.Default
+    private Boolean initialized = Boolean.FALSE;
+
+    /** 迁移阶段保留原整体 JSON 字段，后续可删除 */
+    @Column(name = "settings_json", columnDefinition = "TEXT")
+    private String settingsJson;
+
 }

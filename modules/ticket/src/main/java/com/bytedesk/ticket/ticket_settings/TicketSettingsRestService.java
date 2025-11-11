@@ -191,6 +191,114 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
     }
 
+    /**
+     * 发布草稿配置到正式配置，参考 WorkgroupSettings 的 publish 逻辑。
+     * 目前 TicketSettings 已改为拆分多个子配置（basic/statusFlow/priority/assignment/notification/customField）发布 + 草稿。
+     * 若正式为空而草稿存在，则克隆草稿；若正式存在则仅复制业务字段（忽略 id/uid/version/时间）。
+     */
+    @Transactional
+    public TicketSettingsResponse publish(String uid) {
+        Optional<TicketSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("TicketSettings not found: " + uid);
+        }
+        TicketSettingsEntity entity = optional.get();
+
+        // ===== 基础设置 =====
+        if (entity.getDraftBasicSettings() != null) {
+            if (entity.getBasicSettings() == null) {
+                entity.setBasicSettings(cloneSettings(entity.getDraftBasicSettings()));
+            } else {
+                copyBusinessFields(entity.getDraftBasicSettings(), entity.getBasicSettings());
+            }
+        }
+        // ===== 流转设置 =====
+        if (entity.getDraftStatusFlowSettings() != null) {
+            if (entity.getStatusFlowSettings() == null) {
+                entity.setStatusFlowSettings(cloneSettings(entity.getDraftStatusFlowSettings()));
+            } else {
+                copyBusinessFields(entity.getDraftStatusFlowSettings(), entity.getStatusFlowSettings());
+            }
+        }
+        // ===== 优先级设置 =====
+        if (entity.getDraftPrioritySettings() != null) {
+            if (entity.getPrioritySettings() == null) {
+                entity.setPrioritySettings(cloneSettings(entity.getDraftPrioritySettings()));
+            } else {
+                copyBusinessFields(entity.getDraftPrioritySettings(), entity.getPrioritySettings());
+            }
+        }
+        // ===== 分配设置 =====
+        if (entity.getDraftAssignmentSettings() != null) {
+            if (entity.getAssignmentSettings() == null) {
+                entity.setAssignmentSettings(cloneSettings(entity.getDraftAssignmentSettings()));
+            } else {
+                copyBusinessFields(entity.getDraftAssignmentSettings(), entity.getAssignmentSettings());
+            }
+        }
+        // ===== 通知设置 =====
+        if (entity.getDraftNotificationSettings() != null) {
+            if (entity.getNotificationSettings() == null) {
+                entity.setNotificationSettings(cloneSettings(entity.getDraftNotificationSettings()));
+            } else {
+                copyBusinessFields(entity.getDraftNotificationSettings(), entity.getNotificationSettings());
+            }
+        }
+        // ===== 自定义字段设置 =====
+        if (entity.getDraftCustomFieldSettings() != null) {
+            if (entity.getCustomFieldSettings() == null) {
+                entity.setCustomFieldSettings(cloneSettings(entity.getDraftCustomFieldSettings()));
+            } else {
+                copyBusinessFields(entity.getDraftCustomFieldSettings(), entity.getCustomFieldSettings());
+            }
+        }
+
+        // 发布后标记（沿用 initialized 代表已持久化，后续可扩展 hasUnpublishedChanges 字段）
+        entity.setInitialized(Boolean.TRUE);
+        TicketSettingsEntity saved = save(entity);
+        return convertToResponse(saved);
+    }
+
+    /**
+     * 克隆草稿配置为新的发布配置，分配新的 uid，清空 id/version。
+     */
+    @SuppressWarnings("unchecked")
+    private <T> T cloneSettings(T source) {
+        if (source == null) {
+            return null;
+        }
+        T target = (T) modelMapper.map(source, source.getClass());
+        try {
+            // 通过反射设置基础标识字段（BaseEntity: setUid, setId, setVersion）
+            source.getClass().getMethod("setUid", String.class).invoke(target, uidUtils.getUid());
+            // id 设为 null
+            try { source.getClass().getMethod("setId", Long.class).invoke(target, (Long) null); } catch (NoSuchMethodException ignore) {}
+            try { source.getClass().getMethod("setVersion", Long.class).invoke(target, 0L); } catch (NoSuchMethodException ignore) {}
+        } catch (Exception e) {
+            log.warn("cloneSettings reflection failed: {}", e.getMessage());
+        }
+        return target;
+    }
+
+    /**
+     * 复制业务字段：使用 modelMapper 覆盖（保留目标 uid/id/version）。
+     */
+    private void copyBusinessFields(Object draft, Object published) {
+        if (draft == null || published == null) {
+            return;
+        }
+        String uid = null;
+        Long id = null;
+        Long version = null;
+        try { uid = (String) published.getClass().getMethod("getUid").invoke(published); } catch (Exception ignore) {}
+        try { id = (Long) published.getClass().getMethod("getId").invoke(published); } catch (Exception ignore) {}
+        try { version = (Long) published.getClass().getMethod("getVersion").invoke(published); } catch (Exception ignore) {}
+        modelMapper.map(draft, published);
+        try { if (uid != null) published.getClass().getMethod("setUid", String.class).invoke(published, uid); } catch (Exception ignore) {}
+        try { if (id != null) published.getClass().getMethod("setId", Long.class).invoke(published, id); } catch (Exception ignore) {}
+        try { if (version != null) published.getClass().getMethod("setVersion", Long.class).invoke(published, version); } catch (Exception ignore) {}
+    }
+
     @Override
     protected TicketSettingsEntity doSave(TicketSettingsEntity entity) {
         return ticketSettingsRepository.save(entity);

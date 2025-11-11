@@ -141,6 +141,17 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(request);
         return ResponseEntity.ok(JsonResult.success(resp));
     }
+
+    @ActionAnnotation(title = "Ticket Settings", action = "发布", description = "发布当前工作组的工单草稿配置")
+    @Operation(summary = "Publish TicketSettings", description = "Publish draft settings to active for given TicketSettings uid")
+    @PostMapping("/publish")
+    public ResponseEntity<?> publish(@RequestBody TicketSettingsRequest request) {
+        if (request == null || request.getUid() == null) {
+            return ResponseEntity.badRequest().body(JsonResult.error("uid is required"));
+        }
+        TicketSettingsResponse resp = ticketSettingsRestService.publish(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
     
     
 }
