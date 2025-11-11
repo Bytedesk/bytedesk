@@ -42,4 +42,17 @@ public class TicketSettingsRequest extends BaseRequest {
     private String color;
 
     private Integer order;
+
+    /**
+     * 目标工作组UID，用于按工作组维度加载/保存配置
+     */
+    private String workgroupUid;
+
+    /**
+     * 整体配置JSON（basic/statusFlow/priorities/assignment/notifications/customFields）
+     */
+    private String settingsJson;
+
+    /** 是否已初始化（仅返回视图用，更新时可忽略） */
+    private Boolean initialized;
 }

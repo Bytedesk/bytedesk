@@ -55,6 +55,33 @@ public class TicketSettingsEntity extends BaseEntity {
     /**
      * Description of the ticketSettings
      */
+
+    /**
+     * 关联工作组UID。一个工作组对应一套工单配置；与 orgUid 组合唯一。
+     */
+    @Column(name = "workgroup_uid")
+    private String workgroupUid;
+
+    /**
+     * 扩展配置，JSON字符串，存储整体 TicketSettings 结构（basic/statusFlow/priorities/assignment/notifications/customFields）。
+     * 采用单列 JSON 方式以减少多表拆分复杂度，后续可按需迁移。
+     */
+    @Builder.Default
+    @Column(name = "settings_json", length = 4096)
+    private String settingsJson = com.bytedesk.core.constant.BytedeskConsts.EMPTY_JSON_STRING;
+
+    /**
+     * 是否已初始化(首次访问时可能为默认模板)。
+     */
+    @Builder.Default
+    @Column(name = "initialized")
+    private Boolean initialized = Boolean.FALSE;
+
+    /**
+     * 最后修改用户UID，审计用途。
+     */
+    @Column(name = "last_modified_user_uid")
+    private String lastModifiedUserUid;
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 

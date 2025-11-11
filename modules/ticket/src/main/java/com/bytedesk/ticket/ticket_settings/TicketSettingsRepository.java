@@ -26,5 +26,7 @@ public interface TicketSettingsRepository extends JpaRepository<TicketSettingsEn
 
     Optional<TicketSettingsEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
+    Optional<TicketSettingsEntity> findByOrgUidAndWorkgroupUidAndDeletedFalse(String orgUid, String workgroupUid);
+
     // Boolean existsByPlatform(String platform);
 }

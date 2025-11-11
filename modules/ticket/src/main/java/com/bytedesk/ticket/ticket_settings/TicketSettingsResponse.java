@@ -44,4 +44,12 @@ public class TicketSettingsResponse extends BaseResponse {
 
     private Integer order;
 
+    private String workgroupUid;
+
+    private String settingsJson;
+
+    private Boolean initialized;
+
+    private String lastModifiedUserUid;
+
 }

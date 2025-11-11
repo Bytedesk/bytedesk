@@ -90,6 +90,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         // 
         TicketSettingsEntity entity = modelMapper.map(request, TicketSettingsEntity.class);
+        entity.setLastModifiedUserUid(request.getUserUid());
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
@@ -108,6 +109,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         if (optional.isPresent()) {
             TicketSettingsEntity entity = optional.get();
             modelMapper.map(request, entity);
+            entity.setLastModifiedUserUid(request.getUserUid());
             //
             TicketSettingsEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -117,6 +119,75 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         else {
             throw new RuntimeException("TicketSettings not found");
+        }
+    }
+
+    /**
+     * 根据 org + workgroup 获取设置，不存在时返回默认结构（不落库），供前端初始化。
+     */
+    public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid) {
+        Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get()).setInitialized(true);
+        }
+        // 构造默认 JSON 模板
+        String defaultJson = "{" +
+            "\"basic\":{\"numberPrefix\":\"TK\",\"numberLength\":8,\"defaultPriority\":\"medium\",\"validityDays\":30,\"autoCloseHours\":72,\"enableAutoClose\":true}," +
+            "\"statusFlow\":{\"statuses\":[" +
+                "{\\\"key\\\":\\\"new\\\",\\\"name\\\":\\\"新建\\\",\\\"color\\\":\\\"#1890ff\\\",\\\"description\\\":\\\"新创建的工单\\\",\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"assigned\\\",\\\"name\\\":\\\"已分配\\\",\\\"color\\\":\\\"#52c41a\\\",\\\"description\\\":\\\"已分配给处理人员\\\",\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"processing\\\",\\\"name\\\":\\\"处理中\\\",\\\"color\\\":\\\"#faad14\\\",\\\"description\\\":\\\"正在处理中\\\",\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"pending\\\",\\\"name\\\":\\\"待客户\\\",\\\"color\\\":\\\"#fa8c16\\\",\\\"description\\\":\\\"等待客户反馈\\\",\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"resolved\\\",\\\"name\\\":\\\"已解决\\\",\\\"color\\\":\\\"#52c41a\\\",\\\"description\\\":\\\"问题已解决\\\",\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"closed\\\",\\\"name\\\":\\\"已关闭\\\",\\\"color\\\":\\\"#8c8c8c\\\",\\\"description\\\":\\\"工单已关闭\\\",\\\"isActive\\\":true}]," +
+            "\"transitions\":[" +
+                "{\\\"from\\\":\\\"new\\\",\\\"to\\\":\\\"assigned\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
+                "{\\\"from\\\":\\\"assigned\\\",\\\"to\\\":\\\"processing\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
+                "{\\\"from\\\":\\\"processing\\\",\\\"to\\\":\\\"pending\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
+                "{\\\"from\\\":\\\"processing\\\",\\\"to\\\":\\\"resolved\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
+                "{\\\"from\\\":\\\"pending\\\",\\\"to\\\"processing\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
+                "{\\\"from\\\":\\\"resolved\\\",\\\"to\\\":\\\"closed\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\",\\\"customer\\\"]}]," +
+            "}," +
+            "\"priorities\":[" +
+                "{\\\"key\\\":\\\"low\\\",\\\"name\\\":\\\"低\\\",\\\"color\\\":\\\"#52c41a\\\",\\\"slaHours\\\":72,\\\"order\\\":1,\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"medium\\\",\\\"name\\\":\\\"中\\\",\\\"color\\\":\\\"#faad14\\\",\\\"slaHours\\\":48,\\\"order\\\":2,\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"high\\\",\\\"name\\\":\\\"高\\\",\\\"color\\\":\\\"#fa8c16\\\",\\\"slaHours\\\":24,\\\"order\\\":3,\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"urgent\\\",\\\"name\\\":\\\"紧急\\\",\\\"color\\\":\\\"#f5222d\\\",\\\"slaHours\\\":8,\\\"order\\\":4,\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"critical\\\",\\\"name\\\":\\\"严重\\\",\\\"color\\\":\\\"#722ed1\\\",\\\"slaHours\\\":4,\\\"order\\\":5,\\\"isActive\\\":true}]," +
+            "\"assignment\":{\"autoAssign\":true,\"assignmentType\":\"round_robin\",\"workingHours\":{\"enabled\":true,\"startTime\":\"09:00\",\"endTime\":\"18:00\",\"workingDays\":[1,2,3,4,5]},\"maxConcurrentTickets\":10}," +
+            "\"notifications\":{\"email\":{\"enabled\":true,\"events\":[\"created\",\"assigned\",\"resolved\",\"closed\"],\"templates\":{}},\"internal\":{\"enabled\":true,\"events\":[\"created\",\"assigned\",\"resolved\",\"closed\"]},\"webhook\":{\"enabled\":false,\"url\":\"\",\"events\":[]}}," +
+            "\"customFields\":[" +
+                "{\\\"key\\\":\\\"department\\\",\\\"name\\\":\\\"部门\\\",\\\"type\\\":\\\"select\\\",\\\"required\\\":true,\\\"options\\\":[\\\"技术部\\\",\\\"销售部\\\",\\\"客服部\\\",\\\"市场部\\\"],\\\"order\\\":1,\\\"isActive\\\":true}," +
+                "{\\\"key\\\":\\\"contact_phone\\\",\\\"name\\\":\\\"联系电话\\\",\\\"type\\\":\\\"text\\\",\\\"required\\\":false,\\\"order\\\":2,\\\"isActive\\\":true}]" +
+            "}";
+        return TicketSettingsResponse.builder()
+            .orgUid(orgUid)
+            .workgroupUid(workgroupUid)
+            .settingsJson(defaultJson)
+            .initialized(false)
+            .build();
+    }
+
+    /**
+     * 保存/更新指定工作组的设置（按 orgUid+workgroupUid 幂等）。
+     */
+    @Transactional
+    public TicketSettingsResponse saveByWorkgroup(TicketSettingsRequest request) {
+        Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(), request.getWorkgroupUid());
+        if (optional.isPresent()) {
+            TicketSettingsEntity entity = optional.get();
+            entity.setSettingsJson(request.getSettingsJson());
+            entity.setLastModifiedUserUid(request.getUserUid());
+            entity.setInitialized(Boolean.TRUE);
+            return convertToResponse(save(entity));
+        } else {
+            TicketSettingsEntity entity = modelMapper.map(request, TicketSettingsEntity.class);
+            if (!StringUtils.hasText(entity.getUid())) {
+                entity.setUid(uidUtils.getUid());
+            }
+            entity.setInitialized(Boolean.TRUE);
+            entity.setLastModifiedUserUid(request.getUserUid());
+            return convertToResponse(save(entity));
         }
     }
 

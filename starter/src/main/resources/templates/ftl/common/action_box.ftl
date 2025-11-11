@@ -42,6 +42,13 @@ Action box START -->
 							<p style="margin-top: 1rem;">
 								<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》<@t key="action.register">免费注册</@t></a>
 							</p>
+							<!-- WeChat QR 提示添加好友咨询 -->
+							<div class="mt-3">
+								<p class="mb-2 small text-body-emphasis"><@t key="action.wechat.tip">添加微信，备注：微语</@t></p>
+								<a href="/assets/images/qrcode/wechat.png" target="_blank" class="d-inline-block">
+									<img src="/assets/images/qrcode/wechat.png" alt="<@t key='action.wechat.alt'>微信二维码，扫码添加好友咨询</@t>" style="width:120px;height:auto;" loading="lazy"/>
+								</a>
+							</div>
 						</div>
 						<!-- Content and input -->
 						<div class="col-lg-3 text-center text-lg-end z-index-9">

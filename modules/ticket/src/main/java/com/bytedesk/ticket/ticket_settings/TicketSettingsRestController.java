@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -118,6 +120,27 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         );
     }
 
+    @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询", description = "通过 orgUid+workgroupUid 获取工单设置，若不存在返回默认模板")
+    @Operation(summary = "Get TicketSettings by workgroup", description = "Get settings by orgUid and workgroupUid; returns defaults if missing")
+    @GetMapping("/by-workgroup")
+    public ResponseEntity<?> getByWorkgroup(TicketSettingsRequest request) {
+        if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
+            return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
+        }
+        TicketSettingsResponse resp = ticketSettingsRestService.getOrDefaultByWorkgroup(request.getOrgUid(), request.getWorkgroupUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
+    @ActionAnnotation(title = "Ticket Settings", action = "按工作组保存", description = "保存或更新指定工作组的工单设置")
+    @Operation(summary = "Save TicketSettings by workgroup", description = "Upsert settings by orgUid+workgroupUid")
+    @PostMapping("/by-workgroup")
+    public ResponseEntity<?> saveByWorkgroup(@RequestBody TicketSettingsRequest request) {
+        if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
+            return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
+        }
+        TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(request);
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
     
     
 }

@@ -50,6 +50,10 @@ public class TicketSettingsSpecification extends BaseSpecification<TicketSetting
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
+            // workgroupUid
+            if (StringUtils.hasText(request.getWorkgroupUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("workgroupUid"), request.getWorkgroupUid()));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
