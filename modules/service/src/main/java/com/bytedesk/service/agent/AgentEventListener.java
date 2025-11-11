@@ -31,8 +31,12 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.kbase.kbase.KbaseRequest;
+import com.bytedesk.kbase.kbase.KbaseResponse;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
+import com.bytedesk.kbase.quick_reply.QuickReplyRequest;
+import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.core.message.content.WelcomeContent;
@@ -49,6 +53,7 @@ public class AgentEventListener {
     private final AgentRestService agentRestService;
     private final KbaseRestService kbaseRestService;
     private final IMessageSendService messageSendService;
+    private final QuickReplyRestService quickReplyRestService;
     // private final ConnectionRestService connectionRestService;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
@@ -84,7 +89,23 @@ public class AgentEventListener {
                 .agentUid(agent.getUid())
                 .orgUid(agent.getOrgUid())
                 .build();
-        kbaseRestService.create(kbaseQuickReply);
+        KbaseResponse kb = kbaseRestService.create(kbaseQuickReply);
+
+        // 初始化一条个人快捷回复（仅坐席本人可见）
+        try {
+            QuickReplyRequest qr = QuickReplyRequest.builder()
+                .title("我的第一条快捷回复")
+                .content("这是你的个人快捷回复。你可以在右侧面板编辑、设置快捷键并快速插入到会话中。")
+                .kbUid(kb.getUid())
+                .agentUid(agent.getUid())
+                .orgUid(agent.getOrgUid())
+                .level(LevelEnum.AGENT.name())
+                .type(MessageTypeEnum.TEXT.name())
+                .build();
+            quickReplyRestService.create(qr);
+        } catch (Exception ex) {
+            log.warn("Failed to create default personal quick reply for agent {}: {}", agent.getUid(), ex.getMessage());
+        }
     }
 
     // @EventListener

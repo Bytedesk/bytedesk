@@ -40,6 +40,10 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import lombok.AllArgsConstructor;
+import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.kbase.KbaseTypeEnum;
+import com.bytedesk.kbase.kbase.KbaseRequest;
+import com.bytedesk.kbase.kbase.KbaseResponse;
 
 @Service
 @AllArgsConstructor
@@ -52,6 +56,8 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
     private final UidUtils uidUtils;
 
     private final CategoryRestService categoryRestService;
+
+    private final KbaseRestService kbaseRestService;
 
     @Override
     protected Specification<QuickReplyEntity> createSpecification(QuickReplyRequest request) {
@@ -83,6 +89,37 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
             entity.setUid(uidUtils.getUid());
         }
         entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+
+        // 如果提供了 agentUid，则强制归属到该坐席的个人快捷回复知识库，并标记为 AGENT 级别
+        if (StringUtils.hasText(request.getAgentUid())) {
+            String agentUid = request.getAgentUid();
+            // 寻找坐席个人的 QUICKREPLY 知识库
+            var list = kbaseRestService.findByLevelAndTypeAndAgentUid(LevelEnum.AGENT, KbaseTypeEnum.QUICKREPLY, agentUid);
+            String kbUid;
+            if (list != null && !list.isEmpty()) {
+                kbUid = list.get(0).getUid();
+            } else {
+                // 若不存在则创建一个最小化的个人快捷回复知识库
+                KbaseRequest kbReq = KbaseRequest.builder()
+                        .name("AgentQuickReplyKb")
+                        .descriptionHtml("Agent Quick Reply Kb")
+                        .language(com.bytedesk.core.enums.LanguageEnum.ZH_CN.name())
+                        .level(LevelEnum.AGENT.name())
+                        .type(KbaseTypeEnum.QUICKREPLY.name())
+                        .agentUid(agentUid)
+                        .orgUid(request.getOrgUid())
+                        .build();
+                KbaseResponse kb = kbaseRestService.create(kbReq);
+                kbUid = kb.getUid();
+            }
+            entity.setKbUid(kbUid);
+            entity.setAgentUid(agentUid);
+            entity.setLevel(LevelEnum.AGENT.name());
+            // 保持 orgUid，用于查询范围判定
+            if (!StringUtils.hasText(entity.getOrgUid())) {
+                entity.setOrgUid(request.getOrgUid());
+            }
+        }
 
         return convertToResponse(save(entity));
     }
