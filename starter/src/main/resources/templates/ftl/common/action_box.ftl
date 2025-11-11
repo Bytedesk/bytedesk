@@ -44,7 +44,7 @@ Action box START -->
 							</p>
 							<!-- WeChat QR 提示添加好友咨询 -->
 							<div class="mt-3">
-								<p class="mb-2 small text-body-emphasis"><@t key="action.wechat.tip">添加微信，备注：微语</@t></p>
+								<p class="mb-2 small text-body-emphasis"><@t key="action.wechat.tip">微信咨询，备注：微语</@t></p>
 								<a href="/assets/images/qrcode/wechat.png" target="_blank" class="d-inline-block">
 									<img src="/assets/images/qrcode/wechat.png" alt="<@t key='action.wechat.alt'>微信二维码，扫码添加好友咨询</@t>" style="width:120px;height:auto;" loading="lazy"/>
 								</a>

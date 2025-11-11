@@ -29,7 +29,7 @@ Download START -->
 				<!-- Title -->
 				<h2><@t key="page.contact.title">联系我们</@t></h2>
 				<p><@t key="page.contact.desc1">如果您有定制需求或其他合作事宜，请与我们联系.</@t></p>
-				<p><@t key="page.contact.desc2">添加微信请备注：微语</@t></p>
+				<p><@t key="page.contact.desc2">微信咨询请备注：微语</@t></p>
 				<!-- Download button -->
 				<div class="row">
 					<!-- Google play store button -->

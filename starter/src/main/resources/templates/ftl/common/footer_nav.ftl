@@ -34,7 +34,7 @@
 				<div class="mt-3">
 					<h5 class="text-white"><@t key="footer.contactus">联系我们</@t></h5>
 					<p><a href="mailto:${(i18n['section.contact.email'])!'270580156@qq.com'}" class="text-white-50" target="_blank">${(i18n['section.contact.email'])!'270580156@qq.com'}</a></p>
-					<p class="text-white-50"><@t key="section.custom.wechat">添加微信请备注：微语</@t></p>
+					<p class="text-white-50"><@t key="section.custom.wechat">微信咨询请备注：微语</@t></p>
 					<a href="/assets/images/qrcode/wechat.png" target="_blank">
 						<img src="/assets/images/qrcode/wechat.png" style="height: 80px;" alt="微语微信联系方式二维码"/>
 					</a>

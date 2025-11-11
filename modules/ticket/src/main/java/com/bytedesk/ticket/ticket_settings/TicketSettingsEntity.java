@@ -15,8 +15,16 @@ package com.bytedesk.ticket.ticket_settings;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketCustomFieldSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketNotificationSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -62,26 +70,43 @@ public class TicketSettingsEntity extends BaseEntity {
     @Column(name = "workgroup_uid")
     private String workgroupUid;
 
-    /**
-     * 扩展配置，JSON字符串，存储整体 TicketSettings 结构（basic/statusFlow/priorities/assignment/notifications/customFields）。
-     * 采用单列 JSON 方式以减少多表拆分复杂度，后续可按需迁移。
-     */
-    @Builder.Default
-    @Column(name = "settings_json", length = 4096)
-    private String settingsJson = com.bytedesk.core.constant.BytedeskConsts.EMPTY_JSON_STRING;
+    // ====== 发布版本 ======
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketBasicSettingsEntity basicSettings;
 
-    /**
-     * 是否已初始化(首次访问时可能为默认模板)。
-     */
-    @Builder.Default
-    @Column(name = "initialized")
-    private Boolean initialized = Boolean.FALSE;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketStatusFlowSettingsEntity statusFlowSettings;
 
-    /**
-     * 最后修改用户UID，审计用途。
-     */
-    @Column(name = "last_modified_user_uid")
-    private String lastModifiedUserUid;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketPrioritySettingsEntity prioritySettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketAssignmentSettingsEntity assignmentSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketNotificationSettingsEntity notificationSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketCustomFieldSettingsEntity customFieldSettings;
+
+    // ====== 草稿版本 ======
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketBasicSettingsEntity draftBasicSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketStatusFlowSettingsEntity draftStatusFlowSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketPrioritySettingsEntity draftPrioritySettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketAssignmentSettingsEntity draftAssignmentSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketNotificationSettingsEntity draftNotificationSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    private TicketCustomFieldSettingsEntity draftCustomFieldSettings;
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
