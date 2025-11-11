@@ -10,22 +10,12 @@
 			<#if lang?? && lang != "zh-CN">
 				<#assign langPrefix = "/" + lang>
 			</#if>
+
+			<!-- Logo START -->
 			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 一切以客户服务为中心'}">
-				<#--  <img class="light-mode-item navbar-brand-item" src="/assets/images/logo.svg" alt="微语logo">  -->
-				<#--  <img class="dark-mode-item navbar-brand-item" src="/assets/images/logo-light.svg" alt="微语logo">  -->
 				<h1 class="h5">${(i18n['brand.title'])! '微语 - 一切以客户服务为中心'}</h1>
-				<#--  开源智能客服系统/开源AI应用创新平台/开源即时通讯平台  -->
 			</a>
 			<!-- Logo END -->
-
-			<!-- Responsive navbar toggler -->
-			<button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-animation">
-					<span></span>
-					<span></span>
-					<span></span>
-				</span>
-			</button>
 
 			<!-- Main navbar START -->
 			<div class="navbar-collapse collapse" id="navbarCollapse">
@@ -33,20 +23,10 @@
 				<!-- Nav Search END -->
 				<ul class="navbar-nav navbar-nav-scroll ms-auto">
 
-				<!-- Nav item 1 Demos -->
-				<li class="nav-item dropdown">
+				<!-- Nav item: Home -->
+				<li class="nav-item">
 					<a class="nav-link active" href="${langPrefix}/index.html" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
 				</li>
-				<!-- Nav item 1 Demos -->
-				<#--  <li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="demoMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">方案</a>
-					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="demoMenu">
-						<li> <a class="dropdown-item" href="./plan/im-social.html" target="_blank">社交IM</a></li>
-						<li> <a class="dropdown-item" href="./plan/im-social.html" target="_blank">企业IM</a></li>
-						<li> <a class="dropdown-item" href="./plan/cs.html" target="_blank">在线客服</a></li>
-						<li> <a class="dropdown-item" href="./plan/ai.html" target="_blank">AI助手</a></li>
-					</ul>
-				</li>  -->
 				<!-- Nav item 2 Course -->
 				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank"><@t key="nav.docs">文档</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
@@ -72,19 +52,19 @@
 							</#if>
 						</#if>
 
-						<#-- Toggle label: if current is English -> show 中文简体; otherwise show English -->
-						<#assign langSwitchLabel = (currentLang == 'en')?string('中文简体', 'English')>
+						<#-- Toggle label: if current is English -> show 简体中文; otherwise show English -->
+						<#assign langSwitchLabel = (currentLang == 'en')?string('简体中文', 'English')>
 
-						<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${langSwitchLabel}</a>
+						<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-current-lang="${currentLang}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${langSwitchLabel}</a>
 						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langMenu">
 							<li>
-								<a class="dropdown-item ${(currentLang == 'zh-cn')?string('active','')}" href="#" data-lang="zh-CN" aria-current="${(currentLang == 'zh-cn')?string('true','false')}"><@t key='lang.name.zh-CN'>中文简体</@t><#if currentLang == 'zh-cn'> ✓</#if></a>
+								<a class="dropdown-item ${(currentLang == 'zh-cn')?string('active','')}" href="#" data-lang="zh-CN" aria-current="${(currentLang == 'zh-cn')?string('true','false')}">简体中文<#if currentLang == 'zh-cn'> ✓</#if></a>
 							</li>
 							<li>
-								<a class="dropdown-item ${(currentLang == 'zh-tw')?string('active','')}" href="#" data-lang="zh-TW" aria-current="${(currentLang == 'zh-tw')?string('true','false')}"><@t key='lang.name.zh-TW'>繁體中文</@t><#if currentLang == 'zh-tw'> ✓</#if></a>
+								<a class="dropdown-item ${(currentLang == 'zh-tw')?string('active','')}" href="#" data-lang="zh-TW" aria-current="${(currentLang == 'zh-tw')?string('true','false')}">繁體中文<#if currentLang == 'zh-tw'> ✓</#if></a>
 							</li>
 							<li>
-								<a class="dropdown-item ${(currentLang == 'en')?string('active','')}" href="#" data-lang="en" aria-current="${(currentLang == 'en')?string('true','false')}"><@t key='lang.name.en'>English</@t><#if currentLang == 'en'> ✓</#if></a>
+								<a class="dropdown-item ${(currentLang == 'en')?string('active','')}" href="#" data-lang="en" aria-current="${(currentLang == 'en')?string('true','false')}">English<#if currentLang == 'en'> ✓</#if></a>
 							</li>
 						</ul>
 					</li>

@@ -124,11 +124,18 @@
             const langMenuButton = document.getElementById('langMenu');
             if (langMenuButton) {
                 const langNames = {
-                    'zh-CN': '中文简体',
+                    'zh-CN': '简体中文',
                     'zh-TW': '繁體中文',
                     'en': 'English'
                 };
-                langMenuButton.textContent = langNames[currentLang] || langNames['zh-CN'];
+                // Prefer server-side current lang if provided in attribute
+                let detectedLang = langMenuButton.getAttribute('data-current-lang') || currentLang;
+                // Normalize
+                if (detectedLang === 'zh-cn') detectedLang = 'zh-CN';
+                if (detectedLang === 'zh-tw') detectedLang = 'zh-TW';
+                // Show target language label: if current is English -> show Simplified Chinese; else show English
+                const finalDisplayLang = (detectedLang === 'en') ? 'zh-CN' : 'en';
+                langMenuButton.textContent = langNames[finalDisplayLang] || langNames['en'];
             }
         });
     })();
