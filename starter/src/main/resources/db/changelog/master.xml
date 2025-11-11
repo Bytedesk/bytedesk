@@ -13,4 +13,6 @@
     <!-- <include file="db/changelog/migration/251010_create_service_statistic_views.xml" /> -->
     <!-- <include file="db/changelog/migration/251010_create_quality_statistic_views.xml" /> -->
 
+    <include file="db/changelog/migration/251111_alter_thread_content_to_text.xml" />
+
 </databaseChangeLog>

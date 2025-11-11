@@ -63,6 +63,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     private String topic;
 
     @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content = BytedeskConsts.EMPTY_STRING;
 
     /**
