@@ -26,6 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -51,6 +52,16 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     private final AuthService authService;
 
     private final PresenceTtlResolver presenceTtlResolver;
+    private final ConnectionMetrics connectionMetrics;
+
+    private final StringRedisTemplate stringRedisTemplate;
+
+    // Redis 缓存心跳Key
+    private static final String REDIS_HEARTBEAT_HASH_KEY = "core:conn:hb";
+    // Redis 最近一次数据库写入时间Key
+    private static final String REDIS_LAST_DB_WRITE_HASH_KEY = "core:conn:hb:lastdb";
+    // 最小数据库写入间隔（毫秒）
+    private static final long MIN_INTERVAL_MS = 5000L;
 
     /* ================= Presence APIs (multi-client) ================= */
 
@@ -89,12 +100,17 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         if (clientId == null || clientId.isEmpty()) {
             return;
         }
+        connectionMetrics.incHeartbeatCall();
         long now = System.currentTimeMillis();
-        final long MIN_INTERVAL_MS = 5000L; // 基础节流策略：5 秒内重复心跳不落库
         long threshold = now - MIN_INTERVAL_MS;
+        // 先写入Redis缓存（仅记录最新心跳时间，减少数据库频繁写）
+        tryWriteHeartbeatToCache(clientId, now);
         // 直接使用轻量条件更新，避免读取+save 整实体开销
         int updated = connectionRepository.updateHeartbeatIfOlder(clientId, now, threshold);
-        if (updated == 0) {
+        if (updated > 0) {
+            cacheLastDbWrite(clientId, now);
+            connectionMetrics.incDbWrite();
+        } else {
             // 未更新，可能记录不存在或刚刚已写入；尝试兜底创建（只在不存在时）
             if (!connectionRepository.existsByClientId(clientId) && clientId.contains("/")) {
                 try {
@@ -103,11 +119,55 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                     String deviceUid = parts.length > 2 ? parts[2] : null;
                     if (userUid != null) {
                         markConnected(userUid, null, clientId, deviceUid, ConnectionProtocalEnum.MQTT.name(), null, null, null, null);
+                        cacheLastDbWrite(clientId, now);
+                        connectionMetrics.incCreated();
                     }
                 } catch (Exception ignore) {
                 }
+            } else {
+                // 间隔不足，跳过数据库写
+                connectionMetrics.incSkipped();
             }
         }
+    }
+
+    private void tryWriteHeartbeatToCache(String clientId, long ts) {
+        try {
+            if (stringRedisTemplate != null) {
+                stringRedisTemplate.opsForHash().put(REDIS_HEARTBEAT_HASH_KEY, clientId, String.valueOf(ts));
+            }
+        } catch (Exception ignore) {}
+    }
+
+    private void cacheLastDbWrite(String clientId, long ts) {
+        try {
+            if (stringRedisTemplate != null) {
+                stringRedisTemplate.opsForHash().put(REDIS_LAST_DB_WRITE_HASH_KEY, clientId, String.valueOf(ts));
+            }
+        } catch (Exception ignore) {}
+    }
+
+    /**
+     * 批量刷新心跳缓存到数据库，返回成功更新条数。
+     * 该方法供定时任务调用。
+     */
+    @Transactional
+    public int flushHeartbeatCacheBatch(java.util.Map<String, Long> heartbeats) {
+        if (heartbeats == null || heartbeats.isEmpty()) return 0;
+        int updatedCount = 0;
+        long now = System.currentTimeMillis();
+        long threshold = now - MIN_INTERVAL_MS;
+        for (java.util.Map.Entry<String, Long> e : heartbeats.entrySet()) {
+            String clientId = e.getKey();
+            Long hbTs = e.getValue();
+            if (clientId == null || hbTs == null) continue;
+            int u = connectionRepository.updateHeartbeatIfOlder(clientId, hbTs, threshold);
+            if (u > 0) {
+                updatedCount += u;
+                cacheLastDbWrite(clientId, hbTs);
+            }
+        }
+        return updatedCount;
     }
 
     /** Mark a client connection as disconnected */
