@@ -16,6 +16,7 @@ package com.bytedesk.core.socket.mqtt.protocol;
 
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
@@ -27,6 +28,7 @@ import lombok.AllArgsConstructor;
 public class PingReq {
 
     private final MqttConnectionService mqttConnectionService;
+    private final ConnectionRestService connectionRestService;
 
     // client send ping every 30 seconds
     public void processPingReq(Channel channel, MqttMessage message) {
@@ -34,6 +36,14 @@ public class PingReq {
         String clientId = MqttChannelUtils.getClientId(channel);
         // log.info("PINGREQ - clientId: {}", clientId);
         mqttConnectionService.addConnected(clientId);
+        // 同步刷新数据库心跳，保障 Presence TTL 不会过期
+        try {
+            if (clientId != null) {
+                connectionRestService.heartbeat(clientId);
+            }
+        } catch (Exception ignore) {
+            // 避免心跳异常影响协议响应
+        }
 
         // send ping response PINGRESP
         MqttMessage pingRespMessage = MqttMessageFactory.newMessage(

@@ -15,6 +15,7 @@ package com.bytedesk.core.socket.connection;
 
 import java.util.Optional;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -86,10 +87,26 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     @Transactional
     public void heartbeat(String clientId) {
         Optional<ConnectionEntity> optional = connectionRepository.findByClientId(clientId);
-        optional.ifPresent(entity -> {
+        if (optional.isPresent()) {
+            ConnectionEntity entity = optional.get();
             entity.setLastHeartbeatAt(System.currentTimeMillis());
             save(entity);
-        });
+        } else {
+            // 兜底：若不存在记录（可能未触发连接事件），尝试按 clientId 格式 uid/client/deviceUid 创建
+            if (clientId != null && clientId.contains("/")) {
+                try {
+                    String[] parts = clientId.split("/");
+                    String userUid = parts.length > 0 ? parts[0] : null;
+                    String deviceUid = parts.length > 2 ? parts[2] : null;
+                    if (userUid != null) {
+                        // 使用 MQTT 协议默认 TTL，其他上下文信息留空
+                        markConnected(userUid, null, clientId, deviceUid, "MQTT", null, null, null, null);
+                    }
+                } catch (Exception ignore) {
+                    // 保守处理，避免异常中断心跳
+                }
+            }
+        }
     }
 
     /** Mark a client connection as disconnected */
@@ -172,6 +189,23 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     public PresenceResponse getPresence(String userUid) {
         int active = countActiveConnections(userUid);
         return PresenceResponse.builder().online(active > 0).activeCount(active).build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ConnectionResponse> listActiveConnections(String userUid) {
+        List<ConnectionEntity> list = connectionRepository.findByUserUidAndDeletedFalse(userUid);
+        long now = System.currentTimeMillis();
+        List<ConnectionResponse> result = new ArrayList<>();
+        for (ConnectionEntity c : list) {
+            if (!CONNECTED.name().equals(c.getStatus())) continue;
+            Long last = c.getLastHeartbeatAt();
+            Integer ttl = c.getTtlSeconds();
+            if (last == null || ttl == null) continue;
+            if (last + ttl * 1000L >= now) {
+                result.add(convertToResponse(c));
+            }
+        }
+        return result;
     }
 
     @Override

@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.socket.connection;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
@@ -125,6 +127,14 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     public ResponseEntity<?> getPresence(@PathVariable("userUid") String userUid) {
         PresenceResponse presence = connectionRestService.getPresence(userUid);
         return ResponseEntity.ok(JsonResult.success(presence));
+    }
+
+    @ActionAnnotation(title = "在线", action = "查询", description = "active connections by user")
+    @Operation(summary = "List Active Connections", description = "List user's active (non-expired) connections")
+    @GetMapping("/presence/{userUid}/list")
+    public ResponseEntity<?> listActiveConnections(@PathVariable("userUid") String userUid) {
+        List<ConnectionResponse> list = connectionRestService.listActiveConnections(userUid);
+        return ResponseEntity.ok(JsonResult.success(list));
     }
 
     

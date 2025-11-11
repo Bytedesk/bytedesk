@@ -35,7 +35,7 @@ public class ConnectionEventListener {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String uid = clientId.split("/")[0];
-        // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
+        log.info("user onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
         // 标记连接（使用 ConnectionEntity 支持多端在线）
         // 无法从事件中获取更多上下文，使用协议 MQTT，其它信息置空/默认
         connectionRestService.markConnected(uid, null, clientId,
@@ -47,13 +47,10 @@ public class ConnectionEventListener {
     public void onMqttDisconnectedEvent(MqttDisconnectedEvent event) {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
-        // final String uid = clientId.split("/")[0];
-        // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
+        final String uid = clientId.split("/")[0];
+        log.info("user onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
         // 先标记该 client 断开
         connectionRestService.markDisconnected(clientId);
-        // 根据 ConnectionEntity 汇总判断是否仍在线（多端）
-        // boolean online = connectionRestService.isUserOnline(uid);
-        // agentRestService.updateConnect(uid, online);
     }
 
     /**

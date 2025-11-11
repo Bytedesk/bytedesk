@@ -6,6 +6,7 @@ import com.bytedesk.core.socket.mqtt.service.MqttAuthService;
 import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
 import com.bytedesk.core.socket.mqtt.service.MqttMessageIdService;
 import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 
 import lombok.Data;
 
@@ -33,6 +34,9 @@ public class ProtocolProcess {
 
     @Autowired
     private MqttConnectionService mqttConnectionService;
+
+    @Autowired
+    private ConnectionRestService connectionRestService;
 
     private Connect connect;
 
@@ -91,7 +95,7 @@ public class ProtocolProcess {
 
     public PingReq pingReq() {
         if (pingReq == null) {
-            pingReq = new PingReq(mqttConnectionService);
+            pingReq = new PingReq(mqttConnectionService, connectionRestService);
         }
         return pingReq;
     }
