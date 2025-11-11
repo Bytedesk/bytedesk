@@ -135,8 +135,16 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
             entity.setContent(request.getContent());
             entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
             entity.setShortCut(request.getShortCut());
-
-            return convertToResponse(save(entity));
+            // 
+            if (StringUtils.hasText(request.getCategoryUid())) {
+                entity.setCategoryUid(request.getCategoryUid());
+            }
+            // 
+            QuickReplyEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to update QuickReply");
+            }
+            return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("quick_reply not found");
         }
