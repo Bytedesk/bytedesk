@@ -118,8 +118,8 @@
 			<!-- Signin button -->
 			<div class="navbar-nav ms-3 d-none d-sm-block">
 				<#include "./macro/i18n.ftl" />
-				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/admin/')"><@t key="nav.admin">管理后台</@t></button>
-				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/agent/')"><@t key="nav.agent">客服后台</@t></button>
+				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/admin/?lang=${currentLang}')"><@t key="nav.admin">管理后台</@t></button>
+				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/agent/?lang=${currentLang}')"><@t key="nav.agent">客服后台</@t></button>
 			</div>
 
 		</div>
