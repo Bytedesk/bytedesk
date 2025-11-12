@@ -42,11 +42,11 @@ public class TicketAssignmentSettingsEntity extends BaseEntity {
     @Builder.Default
     private String workingHoursEnd = "18:00";
 
-        /** 工作日集合（持久化 JSON） */
-        @Builder.Default
-        @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.WorkingDaysConverter.class)
-        @Column(length = 128)
-        private java.util.List<Integer> workingDays = java.util.Arrays.asList(1,2,3,4,5);
+    /** 工作日集合（持久化 JSON） */
+    @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.WorkingDaysConverter.class)
+    @Column(length = 128)
+    private java.util.List<Integer> workingDays = java.util.Arrays.asList(1, 2, 3, 4, 5);
 
     @Builder.Default
     private Integer maxConcurrentTickets = 10;
