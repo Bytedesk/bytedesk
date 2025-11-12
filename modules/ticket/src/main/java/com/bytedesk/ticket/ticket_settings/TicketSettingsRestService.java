@@ -61,8 +61,8 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
     }
 
     @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<TicketSettingsEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return ticketSettingsRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+    public Optional<TicketSettingsEntity> findByNameAndOrgUid(String name, String orgUid) {
+        return ticketSettingsRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
     public Boolean existsByUid(String uid) {
@@ -77,8 +77,8 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
-        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<TicketSettingsEntity> ticketSettings = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid())) {
+            Optional<TicketSettingsEntity> ticketSettings = findByNameAndOrgUid(request.getName(), request.getOrgUid());
             if (ticketSettings.isPresent()) {
                 return convertToResponse(ticketSettings.get());
             }
@@ -138,7 +138,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             .build();
         // 默认草稿：Basic
         resp.setDraftBasicSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest.builder()
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
                 .numberPrefix("TK").numberLength(8)
                 .defaultPriority("medium")
                 .validityDays(30)
@@ -148,40 +148,40 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         );
         // 默认草稿：StatusFlow / Priority / Assignment / Notification / CustomFields
         resp.setDraftStatusFlowSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest.builder()
-                .content("{}")
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
+                .content(com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData.builder().build())
                 .build()
         );
         resp.setDraftPrioritySettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest.builder()
-                .content("[]")
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
+                .content(com.bytedesk.ticket.ticket_settings.sub.model.PrioritySettingsData.builder().build())
                 .build()
         );
         resp.setDraftAssignmentSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest.builder()
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
                 .autoAssign(true)
                 .assignmentType("round_robin")
                 .workingHoursEnabled(true)
                 .workingHoursStart("09:00")
                 .workingHoursEnd("18:00")
-                .workingDays("[1,2,3,4,5]")
+                .workingDays(java.util.List.of(1,2,3,4,5))
                 .maxConcurrentTickets(10)
                 .build()
         );
         resp.setDraftNotificationSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest.builder()
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
                 .emailEnabled(true)
-                .emailEvents("[\"created\",\"assigned\",\"resolved\",\"closed\"]")
-                .emailTemplates("{}")
+                .emailEvents(java.util.List.of("created","assigned","resolved","closed"))
+                .emailTemplates(java.util.List.of())
                 .internalEnabled(true)
-                .internalEvents("[\"created\",\"assigned\",\"resolved\",\"closed\"]")
+                .internalEvents(java.util.List.of("created","assigned","resolved","closed"))
                 .webhookEnabled(false)
-                .webhookEvents("[]")
+                .webhookEvents(java.util.List.of())
                 .build()
         );
         resp.setDraftCustomFieldSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest.builder()
-                .content("[]")
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
+                .content(com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData.builder().build())
                 .build()
         );
         return resp;
@@ -455,7 +455,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         // 发布版本映射
         if (entity.getBasicSettings() != null) {
             resp.setBasicSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
                     .numberPrefix(entity.getBasicSettings().getNumberPrefix())
                     .numberLength(entity.getBasicSettings().getNumberLength())
                     .defaultPriority(entity.getBasicSettings().getDefaultPriority())
@@ -467,21 +467,21 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         if (entity.getStatusFlowSettings() != null) {
             resp.setStatusFlowSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
                     .content(entity.getStatusFlowSettings().getContent())
                     .build()
             );
         }
         if (entity.getPrioritySettings() != null) {
             resp.setPrioritySettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
                     .content(entity.getPrioritySettings().getContent())
                     .build()
             );
         }
         if (entity.getAssignmentSettings() != null) {
             resp.setAssignmentSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
                     .autoAssign(entity.getAssignmentSettings().getAutoAssign())
                     .assignmentType(entity.getAssignmentSettings().getAssignmentType())
                     .workingHoursEnabled(entity.getAssignmentSettings().getWorkingHoursEnabled())
@@ -494,7 +494,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         if (entity.getNotificationSettings() != null) {
             resp.setNotificationSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
                     .emailEnabled(entity.getNotificationSettings().getEmailEnabled())
                     .emailEvents(entity.getNotificationSettings().getEmailEvents())
                     .emailTemplates(entity.getNotificationSettings().getEmailTemplates())
@@ -508,7 +508,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         if (entity.getCustomFieldSettings() != null) {
             resp.setCustomFieldSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
                     .content(entity.getCustomFieldSettings().getContent())
                     .build()
             );
@@ -516,7 +516,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         // 草稿版本映射
         if (entity.getDraftBasicSettings() != null) {
             resp.setDraftBasicSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
                     .numberPrefix(entity.getDraftBasicSettings().getNumberPrefix())
                     .numberLength(entity.getDraftBasicSettings().getNumberLength())
                     .defaultPriority(entity.getDraftBasicSettings().getDefaultPriority())
@@ -528,21 +528,21 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         if (entity.getDraftStatusFlowSettings() != null) {
             resp.setDraftStatusFlowSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
                     .content(entity.getDraftStatusFlowSettings().getContent())
                     .build()
             );
         }
         if (entity.getDraftPrioritySettings() != null) {
             resp.setDraftPrioritySettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
                     .content(entity.getDraftPrioritySettings().getContent())
                     .build()
             );
         }
         if (entity.getDraftAssignmentSettings() != null) {
             resp.setDraftAssignmentSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
                     .autoAssign(entity.getDraftAssignmentSettings().getAutoAssign())
                     .assignmentType(entity.getDraftAssignmentSettings().getAssignmentType())
                     .workingHoursEnabled(entity.getDraftAssignmentSettings().getWorkingHoursEnabled())
@@ -555,7 +555,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         if (entity.getDraftNotificationSettings() != null) {
             resp.setDraftNotificationSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
                     .emailEnabled(entity.getDraftNotificationSettings().getEmailEnabled())
                     .emailEvents(entity.getDraftNotificationSettings().getEmailEvents())
                     .emailTemplates(entity.getDraftNotificationSettings().getEmailTemplates())
@@ -569,7 +569,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         if (entity.getDraftCustomFieldSettings() != null) {
             resp.setDraftCustomFieldSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest.builder()
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
                     .content(entity.getDraftCustomFieldSettings().getContent())
                     .build()
             );

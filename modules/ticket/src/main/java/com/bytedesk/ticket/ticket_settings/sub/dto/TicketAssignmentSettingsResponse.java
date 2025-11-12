@@ -1,6 +1,7 @@
 package com.bytedesk.ticket.ticket_settings.sub.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 工单指派设置响应 DTO。
+ * 工单指派设置响应 DTO（结构化 workingDays）。
  */
 @Data
 @Builder
@@ -23,6 +24,6 @@ public class TicketAssignmentSettingsResponse implements Serializable {
     private Boolean workingHoursEnabled;
     private String workingHoursStart;
     private String workingHoursEnd;
-    private String workingDays; // JSON array as string
+    private List<Integer> workingDays; // 1-7
     private Integer maxConcurrentTickets;
 }
