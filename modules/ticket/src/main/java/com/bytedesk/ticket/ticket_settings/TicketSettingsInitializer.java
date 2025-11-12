@@ -1,44 +1,59 @@
 /*
- * @Author: jackning 270580156@qq.com
- * @Date: 2024-11-06 21:43:58
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-19 18:03:37
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ * Initialize default TicketSettings for default organization and bind to default workgroup
  */
 package com.bytedesk.ticket.ticket_settings;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
+import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository;
+import com.bytedesk.core.uid.UidUtils;
 
-@Component
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component("ticketSettingsInitializer")
+@DependsOn("workgroupInitializer")
 @AllArgsConstructor
 public class TicketSettingsInitializer implements SmartInitializingSingleton {
 
-    // private final TicketSettingsRestService ticketSettingsRestService;
+    private final TicketSettingsRestService ticketSettingsRestService;
+    private final TicketSettingsBindingRepository bindingRepository;
+    private final UidUtils uidUtils;
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
-        // create default
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // ticketSettingsRestService.initTicketSettings(orgUid);
+        try {
+            initDefaults();
+        } catch (Exception e) {
+            log.error("TicketSettingsInitializer failed: {}", e.getMessage(), e);
+        }
     }
 
-    private void initPermissions() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = TicketSettingsPermissions.ARTICLE_PREFIX + permission.name();
-        //     authorityService.createForPlatform(permissionValue);
-        // }
+    private void initDefaults() {
+        final String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        final String defaultWorkgroupUid = BytedeskConsts.DEFAULT_WORKGROUP_UID;
+
+        // 1) 获取或创建组织默认 TicketSettings
+        TicketSettingsEntity def = ticketSettingsRestService.getOrCreateDefault(orgUid);
+        log.info("Default TicketSettings ready for org {}: {}", orgUid, def.getUid());
+
+        // 2) 绑定默认工作组（若尚未绑定）
+        bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, defaultWorkgroupUid)
+                .orElseGet(() -> {
+                    TicketSettingsBindingEntity binding = TicketSettingsBindingEntity.builder()
+                            .uid(uidUtils.getUid())
+                            .orgUid(orgUid)
+                            .workgroupUid(defaultWorkgroupUid)
+                            .ticketSettingsUid(def.getUid())
+                            .build();
+                    log.info("Bind default workgroup {} to default TicketSettings {}", defaultWorkgroupUid,
+                            def.getUid());
+                    return bindingRepository.save(binding);
+                });
     }
-
-    
-
 }
