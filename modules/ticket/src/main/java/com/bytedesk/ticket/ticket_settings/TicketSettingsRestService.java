@@ -389,31 +389,36 @@ public class TicketSettingsRestService extends
         settings.setDraftNotificationSettings(dNtf);
         settings.setDraftCustomFieldSettings(dCst);
 
-        // 发布克隆草稿（分配新的 UID）
-        TicketBasicSettingsEntity pBasic = new TicketBasicSettingsEntity();
-        pBasic.setUid(uidUtils.getUid());
-        modelMapper.map(dBasic, pBasic);
-        settings.setBasicSettings(pBasic);
-        TicketStatusFlowSettingsEntity pFlow = new TicketStatusFlowSettingsEntity();
-        pFlow.setUid(uidUtils.getUid());
-        modelMapper.map(dFlow, pFlow);
-        settings.setStatusFlowSettings(pFlow);
-        TicketPrioritySettingsEntity pPri = new TicketPrioritySettingsEntity();
-        pPri.setUid(uidUtils.getUid());
-        modelMapper.map(dPri, pPri);
-        settings.setPrioritySettings(pPri);
-        TicketAssignmentSettingsEntity pAsn = new TicketAssignmentSettingsEntity();
-        pAsn.setUid(uidUtils.getUid());
-        modelMapper.map(dAsn, pAsn);
-        settings.setAssignmentSettings(pAsn);
-        TicketNotificationSettingsEntity pNtf = new TicketNotificationSettingsEntity();
-        pNtf.setUid(uidUtils.getUid());
-        modelMapper.map(dNtf, pNtf);
-        settings.setNotificationSettings(pNtf);
-        TicketCustomFieldSettingsEntity pCst = new TicketCustomFieldSettingsEntity();
-        pCst.setUid(uidUtils.getUid());
-        modelMapper.map(dCst, pCst);
-        settings.setCustomFieldSettings(pCst);
+    // 发布克隆草稿（分配新的 UID，且保留发布实体的 uid/id/version 不被覆盖）
+    TicketBasicSettingsEntity pBasic = new TicketBasicSettingsEntity();
+    pBasic.setUid(uidUtils.getUid());
+    copyBusinessFields(dBasic, pBasic);
+    settings.setBasicSettings(pBasic);
+
+    TicketStatusFlowSettingsEntity pFlow = new TicketStatusFlowSettingsEntity();
+    pFlow.setUid(uidUtils.getUid());
+    copyBusinessFields(dFlow, pFlow);
+    settings.setStatusFlowSettings(pFlow);
+
+    TicketPrioritySettingsEntity pPri = new TicketPrioritySettingsEntity();
+    pPri.setUid(uidUtils.getUid());
+    copyBusinessFields(dPri, pPri);
+    settings.setPrioritySettings(pPri);
+
+    TicketAssignmentSettingsEntity pAsn = new TicketAssignmentSettingsEntity();
+    pAsn.setUid(uidUtils.getUid());
+    copyBusinessFields(dAsn, pAsn);
+    settings.setAssignmentSettings(pAsn);
+
+    TicketNotificationSettingsEntity pNtf = new TicketNotificationSettingsEntity();
+    pNtf.setUid(uidUtils.getUid());
+    copyBusinessFields(dNtf, pNtf);
+    settings.setNotificationSettings(pNtf);
+
+    TicketCustomFieldSettingsEntity pCst = new TicketCustomFieldSettingsEntity();
+    pCst.setUid(uidUtils.getUid());
+    copyBusinessFields(dCst, pCst);
+    settings.setCustomFieldSettings(pCst);
 
         TicketSettingsEntity saved = save(settings);
         if (saved == null) {
