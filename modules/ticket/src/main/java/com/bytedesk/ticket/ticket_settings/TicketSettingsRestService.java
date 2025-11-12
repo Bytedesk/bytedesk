@@ -29,6 +29,8 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
+import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository;
 import com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketCustomFieldSettingsEntity;
@@ -45,7 +47,8 @@ public class TicketSettingsRestService extends
         BaseRestServiceWithExport<TicketSettingsEntity, TicketSettingsRequest, TicketSettingsResponse, TicketSettingsExcel> {
 
     private final TicketSettingsRepository ticketSettingsRepository;
-    private final com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository bindingRepository;
+    
+    private final TicketSettingsBindingRepository bindingRepository;
 
     private final ModelMapper modelMapper;
 
@@ -330,7 +333,7 @@ public class TicketSettingsRestService extends
      */
     public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid) {
         // 1) 已绑定则直接返回
-        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository
+        Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
                 .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         if (bindingOpt.isPresent()) {
             Optional<TicketSettingsEntity> settingsOpt = findByUid(bindingOpt.get().getTicketSettingsUid());
@@ -341,7 +344,7 @@ public class TicketSettingsRestService extends
         // 2) 获取或创建默认，并建立绑定
         TicketSettingsEntity def = getOrCreateDefault(orgUid);
         if (bindingOpt.isEmpty()) {
-            com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity binding = com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity
+            TicketSettingsBindingEntity binding = TicketSettingsBindingEntity
                     .builder()
                     .uid(uidUtils.getUid())
                     .orgUid(orgUid)
@@ -360,6 +363,7 @@ public class TicketSettingsRestService extends
         if (existing.isPresent())
             return existing.get();
 
+        // 按 WorkgroupSettingsRestService 模式创建：发布 + 草稿各自独立初始化并分配唯一 UID
         TicketSettingsEntity settings = TicketSettingsEntity.builder()
                 .uid(uidUtils.getUid())
                 .orgUid(orgUid)
@@ -369,56 +373,57 @@ public class TicketSettingsRestService extends
                 .enabled(true)
                 .build();
 
-        // 草稿
-        TicketBasicSettingsEntity dBasic = TicketBasicSettingsEntity.fromRequest(null, modelMapper);
-        dBasic.setUid(uidUtils.getUid());
-        TicketStatusFlowSettingsEntity dFlow = TicketStatusFlowSettingsEntity.fromRequest(null);
-        dFlow.setUid(uidUtils.getUid());
-        TicketPrioritySettingsEntity dPri = TicketPrioritySettingsEntity.fromRequest(null);
-        dPri.setUid(uidUtils.getUid());
-        TicketAssignmentSettingsEntity dAsn = TicketAssignmentSettingsEntity.fromRequest(null);
-        dAsn.setUid(uidUtils.getUid());
-        TicketNotificationSettingsEntity dNtf = TicketNotificationSettingsEntity.fromRequest(null);
-        dNtf.setUid(uidUtils.getUid());
-        TicketCustomFieldSettingsEntity dCst = TicketCustomFieldSettingsEntity.fromRequest(null);
-        dCst.setUid(uidUtils.getUid());
-        settings.setDraftBasicSettings(dBasic);
-        settings.setDraftStatusFlowSettings(dFlow);
-        settings.setDraftPrioritySettings(dPri);
-        settings.setDraftAssignmentSettings(dAsn);
-        settings.setDraftNotificationSettings(dNtf);
-        settings.setDraftCustomFieldSettings(dCst);
+        // 依照 WorkgroupSettingsRestService 排列方式：每种子配置“发布 + 草稿”成对紧邻，便于阅读与维护
+        // Basic (published + draft)
+        TicketBasicSettingsEntity basic = TicketBasicSettingsEntity.fromRequest(null, modelMapper);
+        basic.setUid(uidUtils.getUid());
+        settings.setBasicSettings(basic);
+        TicketBasicSettingsEntity draftBasic = TicketBasicSettingsEntity.fromRequest(null, modelMapper);
+        draftBasic.setUid(uidUtils.getUid());
+        settings.setDraftBasicSettings(draftBasic);
 
-    // 发布克隆草稿（分配新的 UID，且保留发布实体的 uid/id/version 不被覆盖）
-    TicketBasicSettingsEntity pBasic = new TicketBasicSettingsEntity();
-    pBasic.setUid(uidUtils.getUid());
-    copyBusinessFields(dBasic, pBasic);
-    settings.setBasicSettings(pBasic);
+        // StatusFlow (published + draft)
+        TicketStatusFlowSettingsEntity flow = TicketStatusFlowSettingsEntity.fromRequest(null);
+        flow.setUid(uidUtils.getUid());
+        settings.setStatusFlowSettings(flow);
+        TicketStatusFlowSettingsEntity draftFlow = TicketStatusFlowSettingsEntity.fromRequest(null);
+        draftFlow.setUid(uidUtils.getUid());
+        settings.setDraftStatusFlowSettings(draftFlow);
 
-    TicketStatusFlowSettingsEntity pFlow = new TicketStatusFlowSettingsEntity();
-    pFlow.setUid(uidUtils.getUid());
-    copyBusinessFields(dFlow, pFlow);
-    settings.setStatusFlowSettings(pFlow);
+        // Priority (published + draft)
+        TicketPrioritySettingsEntity priority = TicketPrioritySettingsEntity.fromRequest(null);
+        priority.setUid(uidUtils.getUid());
+        settings.setPrioritySettings(priority);
+        TicketPrioritySettingsEntity draftPriority = TicketPrioritySettingsEntity.fromRequest(null);
+        draftPriority.setUid(uidUtils.getUid());
+        settings.setDraftPrioritySettings(draftPriority);
 
-    TicketPrioritySettingsEntity pPri = new TicketPrioritySettingsEntity();
-    pPri.setUid(uidUtils.getUid());
-    copyBusinessFields(dPri, pPri);
-    settings.setPrioritySettings(pPri);
+        // Assignment (published + draft)
+        TicketAssignmentSettingsEntity assignment = TicketAssignmentSettingsEntity.fromRequest(null);
+        assignment.setUid(uidUtils.getUid());
+        settings.setAssignmentSettings(assignment);
+        TicketAssignmentSettingsEntity draftAssignment = TicketAssignmentSettingsEntity.fromRequest(null);
+        draftAssignment.setUid(uidUtils.getUid());
+        settings.setDraftAssignmentSettings(draftAssignment);
 
-    TicketAssignmentSettingsEntity pAsn = new TicketAssignmentSettingsEntity();
-    pAsn.setUid(uidUtils.getUid());
-    copyBusinessFields(dAsn, pAsn);
-    settings.setAssignmentSettings(pAsn);
+        // Notification (published + draft)
+        TicketNotificationSettingsEntity notification = TicketNotificationSettingsEntity.fromRequest(null);
+        notification.setUid(uidUtils.getUid());
+        settings.setNotificationSettings(notification);
+        TicketNotificationSettingsEntity draftNotification = TicketNotificationSettingsEntity.fromRequest(null);
+        draftNotification.setUid(uidUtils.getUid());
+        settings.setDraftNotificationSettings(draftNotification);
 
-    TicketNotificationSettingsEntity pNtf = new TicketNotificationSettingsEntity();
-    pNtf.setUid(uidUtils.getUid());
-    copyBusinessFields(dNtf, pNtf);
-    settings.setNotificationSettings(pNtf);
+        // CustomField (published + draft)
+        TicketCustomFieldSettingsEntity customField = TicketCustomFieldSettingsEntity.fromRequest(null);
+        customField.setUid(uidUtils.getUid());
+        settings.setCustomFieldSettings(customField);
+        TicketCustomFieldSettingsEntity draftCustomField = TicketCustomFieldSettingsEntity.fromRequest(null);
+        draftCustomField.setUid(uidUtils.getUid());
+        settings.setDraftCustomFieldSettings(draftCustomField);
 
-    TicketCustomFieldSettingsEntity pCst = new TicketCustomFieldSettingsEntity();
-    pCst.setUid(uidUtils.getUid());
-    copyBusinessFields(dCst, pCst);
-    settings.setCustomFieldSettings(pCst);
+        // 确保同 org 仅有一个默认（虽然已锁定查询，此调用保持一致性）
+        ensureSingleDefault(orgUid, settings);
 
         TicketSettingsEntity saved = save(settings);
         if (saved == null) {
@@ -439,10 +444,10 @@ public class TicketSettingsRestService extends
         for (String wgUid : workgroupUids) {
             if (!StringUtils.hasText(wgUid))
                 continue;
-            Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> opt = bindingRepository
+            Optional<TicketSettingsBindingEntity> opt = bindingRepository
                     .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, wgUid);
-            com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity binding = opt
-                    .orElseGet(() -> com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity.builder()
+            TicketSettingsBindingEntity binding = opt
+                    .orElseGet(() -> TicketSettingsBindingEntity.builder()
                             .orgUid(orgUid)
                             .workgroupUid(wgUid)
                             .uid(uidUtils.getUid())
@@ -453,7 +458,7 @@ public class TicketSettingsRestService extends
         }
     }
 
-    public java.util.List<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> listBindings(
+    public java.util.List<TicketSettingsBindingEntity> listBindings(
             String ticketSettingsUid) {
         return bindingRepository.findByTicketSettingsUidAndDeletedFalse(ticketSettingsUid);
     }
@@ -465,7 +470,7 @@ public class TicketSettingsRestService extends
     public TicketSettingsResponse saveByWorkgroup(String orgUid, String workgroupUid,
             com.bytedesk.ticket.ticket_settings.dto.TicketSettingsByWorkgroupUpdateRequest request) {
         // 先获取已绑定的 settings；没有则创建/获取默认并绑定
-        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository
+        Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
                 .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         TicketSettingsEntity entity = null;
         if (bindingOpt.isPresent()) {
@@ -477,7 +482,7 @@ public class TicketSettingsRestService extends
         if (entity == null) {
             entity = getOrCreateDefault(orgUid); // 默认 settings 已包含发布+草稿
             // 建立绑定
-            com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity binding = com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity
+            TicketSettingsBindingEntity binding = TicketSettingsBindingEntity
                     .builder()
                     .uid(uidUtils.getUid())
                     .orgUid(orgUid)
@@ -601,7 +606,7 @@ public class TicketSettingsRestService extends
     // public TicketSettingsResponse saveByWorkgroup(TicketSettingsRequest request)
     // {
     // // 1) 先根据绑定表查出是否已有对应 settings
-    // Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity>
+    // Optional<TicketSettingsBindingEntity>
     // bindingOpt = bindingRepository
     // .findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(),
     // request.getWorkgroupUid());
@@ -725,10 +730,10 @@ public class TicketSettingsRestService extends
     // TicketSettingsEntity saved = save(entity);
 
     // // 确保绑定关系存在且指向最新的 settings
-    // com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity
+    // TicketSettingsBindingEntity
     // binding = bindingOpt
     // .orElseGet(() ->
-    // com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity.builder()
+    // TicketSettingsBindingEntity.builder()
     // .uid(uidUtils.getUid())
     // .orgUid(request.getOrgUid())
     // .workgroupUid(request.getWorkgroupUid())
@@ -815,7 +820,7 @@ public class TicketSettingsRestService extends
      */
     @Transactional
     public TicketSettingsResponse publishByWorkgroup(String orgUid, String workgroupUid) {
-        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository
+        Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
                 .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         if (bindingOpt.isPresent()) {
             return publish(bindingOpt.get().getTicketSettingsUid());
