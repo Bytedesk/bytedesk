@@ -299,28 +299,18 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
      * 根据 org + workgroup 获取设置，不存在时返回默认结构（不落库），供前端初始化。
      */
     public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid) {
-        // 1. 使用绑定表查找
+        // 使用绑定表查找
         Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         if (bindingOpt.isPresent()) {
             String settingsUid = bindingOpt.get().getTicketSettingsUid();
             Optional<TicketSettingsEntity> settingsOpt = findByUid(settingsUid);
             if (settingsOpt.isPresent()) {
-                TicketSettingsResponse resp = convertToResponse(settingsOpt.get());
-                resp.setWorkgroupUid(workgroupUid); // 前端需要知道当前工作组上下文
-                return resp;
+                return convertToResponse(settingsOpt.get());
             }
         }
-        // 2. 兼容旧逻辑：直接在 TicketSettingsEntity 上查（单 workgroupUid）
-        Optional<TicketSettingsEntity> legacyOpt = ticketSettingsRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
-        if (legacyOpt.isPresent()) {
-            TicketSettingsResponse resp = convertToResponse(legacyOpt.get());
-            resp.setWorkgroupUid(workgroupUid);
-            return resp;
-        }
-        // 3. 返回默认草稿结构（不落库）
+        // 返回默认草稿结构（不落库）
         TicketSettingsResponse resp = TicketSettingsResponse.builder()
             .orgUid(orgUid)
-            .workgroupUid(workgroupUid)
             .build();
         resp.setDraftBasicSettings(
             com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
@@ -403,14 +393,25 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
      */
     @Transactional
     public TicketSettingsResponse saveByWorkgroup(TicketSettingsRequest request) {
-        Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(), request.getWorkgroupUid());
-        TicketSettingsEntity entity = optional.orElseGet(() -> {
-            TicketSettingsEntity e = modelMapper.map(request, TicketSettingsEntity.class);
-            if (!StringUtils.hasText(e.getUid())) {
-                e.setUid(uidUtils.getUid());
+        // 1) 先根据绑定表查出是否已有对应 settings
+        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt =
+            bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(), request.getWorkgroupUid());
+
+        TicketSettingsEntity entity = null;
+        if (bindingOpt.isPresent()) {
+            // 已绑定：加载对应 settings
+            Optional<TicketSettingsEntity> optional = findByUid(bindingOpt.get().getTicketSettingsUid());
+            if (optional.isPresent()) {
+                entity = optional.get();
             }
-            return e;
-        });
+        }
+        if (entity == null) {
+            // 未绑定：创建新 settings，并建立绑定
+            entity = modelMapper.map(request, TicketSettingsEntity.class);
+            if (!StringUtils.hasText(entity.getUid())) {
+                entity.setUid(uidUtils.getUid());
+            }
+        }
 
         // 更新草稿子配置：仅当请求包含对应部分时才更新
         if (request.getDraftBasicSettings() != null) {
@@ -494,6 +495,17 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
 
     // 不再使用 initialized/lastModifiedUserUid 字段
         TicketSettingsEntity saved = save(entity);
+
+        // 确保绑定关系存在且指向最新的 settings
+        com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity binding = bindingOpt
+            .orElseGet(() -> com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(request.getOrgUid())
+                .workgroupUid(request.getWorkgroupUid())
+                .ticketSettingsUid(saved.getUid())
+                .build());
+        binding.setTicketSettingsUid(saved.getUid());
+        bindingRepository.save(binding);
         return convertToResponse(saved);
     }
 
@@ -569,17 +581,11 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
      */
     @Transactional
     public TicketSettingsResponse publishByWorkgroup(String orgUid, String workgroupUid) {
-        // 先查绑定
         Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         if (bindingOpt.isPresent()) {
             return publish(bindingOpt.get().getTicketSettingsUid());
         }
-        // 兼容旧逻辑
-        Optional<TicketSettingsEntity> legacy = ticketSettingsRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
-        if (legacy.isPresent()) {
-            return publish(legacy.get().getUid());
-        }
-        throw new RuntimeException("TicketSettings not found by binding or legacy workgroup field");
+        throw new RuntimeException("TicketSettings not found by binding");
     }
 
     /**

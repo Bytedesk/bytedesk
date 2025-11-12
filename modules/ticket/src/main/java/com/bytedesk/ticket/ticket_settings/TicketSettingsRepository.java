@@ -26,7 +26,7 @@ public interface TicketSettingsRepository extends JpaRepository<TicketSettingsEn
 
     Optional<TicketSettingsEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
 
-    Optional<TicketSettingsEntity> findByOrgUidAndWorkgroupUidAndDeletedFalse(String orgUid, String workgroupUid);
+    // 2025-11: workgroupUid 已移除，按工作组查询请先通过 BindingRepository 解析 settingsUid
 
     // Boolean existsByPlatform(String platform);
 }

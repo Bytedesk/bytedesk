@@ -43,7 +43,7 @@ public class TicketSettingsResponse extends BaseResponse {
 
     private String description;
 
-    private String workgroupUid;
+    // 2025-11: 不再在响应中携带 workgroupUid（上下文由请求方持有）
 
     // ===== 发布版本（前端展示用） =====
     private TicketBasicSettingsResponse basicSettings;

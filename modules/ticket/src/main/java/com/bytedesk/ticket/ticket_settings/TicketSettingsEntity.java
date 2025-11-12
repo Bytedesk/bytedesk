@@ -67,11 +67,6 @@ public class TicketSettingsEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
-    /**
-     * 关联工作组UID。一个工作组对应一套工单配置；与 orgUid 组合唯一。
-     */
-    private String workgroupUid;
-
     // ====== 发布版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity basicSettings;
