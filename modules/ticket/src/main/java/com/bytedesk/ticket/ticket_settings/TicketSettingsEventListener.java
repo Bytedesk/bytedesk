@@ -13,7 +13,12 @@
  */
 package com.bytedesk.ticket.ticket_settings;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
+import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +28,39 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TicketSettingsEventListener {
 
+	private final TicketSettingsRestService ticketSettingsRestService;
+	private final com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository bindingRepository;
+	private final com.bytedesk.core.uid.UidUtils uidUtils;
 
- 
+	@EventListener
+	@Transactional
+	public void handleWorkgroupCreate(WorkgroupCreateEvent event) {
+		if (event == null || event.getWorkgroup() == null) {
+			return;
+		}
+		String orgUid = event.getWorkgroup().getOrgUid();
+		String workgroupUid = event.getWorkgroup().getUid();
+		if (orgUid == null || workgroupUid == null) {
+			return;
+		}
+		try {
+			// 获取或创建默认 TicketSettings
+			TicketSettingsEntity defaultSettings = ticketSettingsRestService.getOrCreateDefault(orgUid);
+			// 若该工作组尚未绑定则绑定
+			bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid)
+				.orElseGet(() -> {
+					TicketSettingsBindingEntity binding = TicketSettingsBindingEntity.builder()
+						.uid(uidUtils.getUid())
+						.orgUid(orgUid)
+						.workgroupUid(workgroupUid)
+						.ticketSettingsUid(defaultSettings.getUid())
+						.build();
+					return bindingRepository.save(binding);
+				});
+			log.info("Workgroup {} auto bound to default TicketSettings {}", workgroupUid, defaultSettings.getUid());
+		} catch (Exception e) {
+			log.error("Auto-bind default TicketSettings failed for workgroup {}: {}", workgroupUid, e.getMessage(), e);
+		}
+	}
 }
 

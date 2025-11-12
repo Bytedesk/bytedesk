@@ -1,10 +1,13 @@
 package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,4 +35,20 @@ public class TicketCustomFieldSettingsEntity extends BaseEntity {
     @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.CustomFieldSettingsConverter.class)
     @Column(length = 4096)
     private com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData content = com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData.builder().build();
+
+    public static TicketCustomFieldSettingsEntity fromRequest(TicketCustomFieldSettingsRequest req) {
+        TicketCustomFieldSettingsEntity entity = new TicketCustomFieldSettingsEntity();
+        if (req == null || req.getContent() == null || req.getContent().isEmpty()) {
+            entity.setContent(CustomFieldSettingsData.builder().build());
+            return entity;
+        }
+        try {
+            ObjectMapper om = new ObjectMapper();
+            CustomFieldSettingsData data = om.readValue(req.getContent(), CustomFieldSettingsData.class);
+            entity.setContent(data == null ? CustomFieldSettingsData.builder().build() : data);
+        } catch (Exception e) {
+            entity.setContent(CustomFieldSettingsData.builder().build());
+        }
+        return entity;
+    }
 }

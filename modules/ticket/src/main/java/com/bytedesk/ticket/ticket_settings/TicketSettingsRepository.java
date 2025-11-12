@@ -14,6 +14,12 @@
 package com.bytedesk.ticket.ticket_settings;
 
 import java.util.Optional;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -25,6 +31,15 @@ public interface TicketSettingsRepository extends JpaRepository<TicketSettingsEn
     Boolean existsByUid(String uid);
 
     Optional<TicketSettingsEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
+
+    List<TicketSettingsEntity> findByOrgUidAndIsDefaultTrue(String orgUid);
+
+    /**
+     * 悲观锁读取 org 默认 TicketSettings，保证并发下只创建一个默认。
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select t from TicketSettingsEntity t where t.orgUid = :orgUid and t.isDefault = true and t.deleted = false")
+    Optional<TicketSettingsEntity> findDefaultForUpdate(@Param("orgUid") String orgUid);
 
     // 2025-11: workgroupUid 已移除，按工作组查询请先通过 BindingRepository 解析 settingsUid
 
