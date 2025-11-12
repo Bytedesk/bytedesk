@@ -75,7 +75,6 @@ public class TicketSettingsEntity extends BaseEntity {
      * Only one settings per organization should have isDefault=true
      */
     @lombok.Builder.Default
-    @Column(name = "is_default")
     private Boolean isDefault = false;
 
      /**
