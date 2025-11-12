@@ -35,11 +35,11 @@ public class TicketSettingsEventListener {
 	@EventListener
 	@Transactional
 	public void handleWorkgroupCreate(WorkgroupCreateEvent event) {
-		if (event == null || event.getWorkgroup() == null) {
+		if (event == null) {
 			return;
 		}
-		String orgUid = event.getWorkgroup().getOrgUid();
-		String workgroupUid = event.getWorkgroup().getUid();
+		String orgUid = event.getOrgUid();
+		String workgroupUid = event.getWorkgroupUid();
 		if (orgUid == null || workgroupUid == null) {
 			return;
 		}

@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.event.AgentUpdateEvent;
-import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
 
 @Slf4j
@@ -41,13 +40,12 @@ public class TicketIdentityListener {
     }
 
     /**
-     * 监听工作组变更事件
+     * 监听工作组变更事件（最小载荷）
      */
     @EventListener
     public void onWorkgroupUpdated(WorkgroupUpdateEvent event) {
-        WorkgroupEntity workgroup = event.getWorkgroup();
-        // 同步工作组到Flowable
-        identityService.syncWorkgroup(workgroup);
+        // 使用最小载荷字段进行同步，避免实体序列化问题
+        identityService.syncWorkgroupByBasic(event.getWorkgroupUid(), event.getNickname());
     }
 
     /**

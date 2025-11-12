@@ -13,24 +13,26 @@
  */
 package com.bytedesk.service.workgroup.event;
 
-import com.bytedesk.service.workgroup.WorkgroupEntity;
+import org.springframework.context.ApplicationEvent;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.springframework.context.ApplicationEvent;
-
+/**
+ * 工作组创建事件：仅携带最小必要信息，避免实体序列化/懒加载问题。
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class WorkgroupCreateEvent extends ApplicationEvent {
 
-    private final static long serialVersionUID = 1L;
-    
-    private WorkgroupEntity workgroup;
-    
-    public WorkgroupCreateEvent(WorkgroupEntity workgroup) {
-        super(workgroup);
-        this.workgroup = workgroup;
+    private static final long serialVersionUID = 1L;
+
+    private final String orgUid;
+    private final String workgroupUid;
+
+    public WorkgroupCreateEvent(String orgUid, String workgroupUid) {
+        super(workgroupUid); // 以 workgroupUid 作为事件源
+        this.orgUid = orgUid;
+        this.workgroupUid = workgroupUid;
     }
-    
 }

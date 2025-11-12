@@ -15,21 +15,26 @@ package com.bytedesk.service.workgroup.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.bytedesk.service.workgroup.WorkgroupEntity;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * 工作组更新事件：最小载荷，避免实体序列化带来的懒加载问题。
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class WorkgroupUpdateEvent extends ApplicationEvent {
 
-    private final static long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-    private WorkgroupEntity workgroup;
+    private final String orgUid;
+    private final String workgroupUid;
+    private final String nickname; // 可选业务字段（名称变更等）
 
-    public WorkgroupUpdateEvent(WorkgroupEntity workgroup) {
-        super(workgroup);
-        this.workgroup = workgroup;
+    public WorkgroupUpdateEvent(String orgUid, String workgroupUid, String nickname) {
+        super(workgroupUid);
+        this.orgUid = orgUid;
+        this.workgroupUid = workgroupUid;
+        this.nickname = nickname;
     }
 }

@@ -96,6 +96,25 @@ public class TicketIdentityService {
     }
 
     /**
+     * 使用最小信息同步工作组（避免在事件中传输实体）
+     */
+    public void syncWorkgroupByBasic(String workgroupUid, String nickname) {
+        Group flowableGroup = identityService.createGroupQuery()
+            .groupId(workgroupUid)
+            .singleResult();
+
+        if (flowableGroup == null) {
+            flowableGroup = identityService.newGroup(workgroupUid);
+        }
+
+        flowableGroup.setName(nickname);
+        flowableGroup.setType("assignment");
+        identityService.saveGroup(flowableGroup);
+
+        log.info("Synced group (basic): {}", workgroupUid);
+    }
+
+    /**
      * 同步用户和工作组的关系
      */
     public void syncMembership(String userId, String groupId) {

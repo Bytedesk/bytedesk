@@ -14,7 +14,6 @@
 package com.bytedesk.service.workgroup;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -31,20 +30,18 @@ public class WorkgroupEntityListener {
 
     @PostPersist
     public void onPostPersist(WorkgroupEntity workgroup) {
-        log.info("onPostPersist: {}", workgroup);
-        WorkgroupEntity cloneWorkgroup = SerializationUtils.clone(workgroup);
-        // 
+        log.info("onPostPersist: {}", workgroup.getUid());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new WorkgroupCreateEvent(cloneWorkgroup));
+        // 仅传递必要标识，避免序列化问题
+        bytedeskEventPublisher.publishEvent(new WorkgroupCreateEvent(workgroup.getOrgUid(), workgroup.getUid()));
     }
 
     @PostUpdate
     public void onPostUpdate(WorkgroupEntity workgroup) {
-        log.info("onPostUpdate: {}", workgroup);
-        WorkgroupEntity cloneWorkgroup = SerializationUtils.clone(workgroup);
-        // 
+        log.info("onPostUpdate: {}", workgroup.getUid());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new WorkgroupUpdateEvent(cloneWorkgroup));
+        // 仅传递必要标识，避免序列化问题
+        bytedeskEventPublisher.publishEvent(new WorkgroupUpdateEvent(workgroup.getOrgUid(), workgroup.getUid(), workgroup.getNickname()));
     }
 
 }
