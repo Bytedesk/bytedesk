@@ -2,6 +2,7 @@ package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -28,23 +29,31 @@ public class TicketNotificationSettingsEntity extends BaseEntity {
 
     @Builder.Default
     private Boolean emailEnabled = Boolean.TRUE;
+    /** 邮件事件集合 */
     @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.StringListConverter.class)
     @Column(length = 512)
-    private String emailEvents = "[\"created\",\"assigned\",\"resolved\",\"closed\"]"; // JSON Array
+    private java.util.List<String> emailEvents = new java.util.ArrayList<>();
+    /** 邮件模板集合 */
     @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.EmailTemplateListConverter.class)
     @Column(length = 1024)
-    private String emailTemplates = "{}"; // JSON Map
+    private java.util.List<com.bytedesk.ticket.ticket_settings.sub.model.EmailTemplateDef> emailTemplates = new java.util.ArrayList<>();
 
     @Builder.Default
     private Boolean internalEnabled = Boolean.TRUE;
+    /** 内部事件集合 */
     @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.StringListConverter.class)
     @Column(length = 512)
-    private String internalEvents = "[\"created\",\"assigned\",\"resolved\",\"closed\"]";
+    private java.util.List<String> internalEvents = new java.util.ArrayList<>();
 
     @Builder.Default
     private Boolean webhookEnabled = Boolean.FALSE;
     private String webhookUrl; // 可为空
+    /** webhook事件集合 */
     @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.StringListConverter.class)
     @Column(length = 512)
-    private String webhookEvents = "[]";
+    private java.util.List<String> webhookEvents = new java.util.ArrayList<>();
 }
