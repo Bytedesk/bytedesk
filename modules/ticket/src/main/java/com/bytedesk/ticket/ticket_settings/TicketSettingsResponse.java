@@ -15,6 +15,7 @@ package com.bytedesk.ticket.ticket_settings;
 
 
 import com.bytedesk.core.base.BaseResponse;
+import java.time.ZonedDateTime;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse;
@@ -42,6 +43,26 @@ public class TicketSettingsResponse extends BaseResponse {
     private String name;
 
     private String description;
+
+    /**
+     * 是否为组织默认配置
+     */
+    private Boolean isDefault;
+
+    /**
+     * 是否启用
+     */
+    private Boolean enabled;
+
+    /**
+     * 草稿是否存在未发布变更（由服务端维护）
+     */
+    private Boolean hasUnpublishedChanges;
+
+    /**
+     * 最近发布时间（由服务端在发布时更新）
+     */
+    private ZonedDateTime publishedAt;
 
     // 2025-11: 不再在响应中携带 workgroupUid（上下文由请求方持有）
 

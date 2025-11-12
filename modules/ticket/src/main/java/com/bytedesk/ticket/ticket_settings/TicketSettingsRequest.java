@@ -44,7 +44,18 @@ public class TicketSettingsRequest extends BaseRequest {
     /**
      * 目标工作组UID，用于按工作组维度加载/保存配置
      */
-    private String workgroupUid;
+    // @Deprecated
+    // private String workgroupUid;
+
+    /**
+     * 是否设为组织默认配置（同一 org 仅允许一个默认，服务端在事务内保证唯一）
+     */
+    private Boolean isDefault;
+
+    /**
+     * 是否启用（默认为 true）
+     */
+    private Boolean enabled;
 
     // 草稿子配置（仅在更新草稿时传入；创建时也可传，后台将初始化发布+草稿）
     private TicketBasicSettingsRequest draftBasicSettings;
@@ -57,6 +68,7 @@ public class TicketSettingsRequest extends BaseRequest {
     /**
      * 批量绑定使用：多个工作组 UID 列表
      */
-    private java.util.List<String> workgroupUids;
+    // @Deprecated
+    // private java.util.List<String> workgroupUids;
 
 }

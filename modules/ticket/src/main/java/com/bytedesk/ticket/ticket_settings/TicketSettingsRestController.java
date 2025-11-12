@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
@@ -120,27 +121,26 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         );
     }
 
-    // @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询", description = "通过 orgUid+workgroupUid 获取工单设置，若不存在返回默认模板")
-    // @Operation(summary = "Get TicketSettings by workgroup", description = "Get settings by orgUid and workgroupUid; returns defaults if missing")
-    // @GetMapping("/by-workgroup")
-    // public ResponseEntity<?> getByWorkgroup(TicketSettingsRequest request) {
-    //     if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
-    //         return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
-    //     }
-    //     TicketSettingsResponse resp = ticketSettingsRestService.getOrDefaultByWorkgroup(request.getOrgUid(), request.getWorkgroupUid());
-    //     return ResponseEntity.ok(JsonResult.success(resp));
-    // }
+    @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询", description = "通过 orgUid+workgroupUid 获取工单设置，若不存在返回默认模板")
+    @Operation(summary = "Get TicketSettings by workgroup", description = "Get settings by orgUid and workgroupUid; returns defaults if missing")
+    @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}")
+    public ResponseEntity<?> getByWorkgroup(
+            @PathVariable("orgUid") String orgUid,
+            @PathVariable("workgroupUid") String workgroupUid) {
+        TicketSettingsResponse resp = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
 
-    // @ActionAnnotation(title = "Ticket Settings", action = "按工作组保存", description = "保存或更新指定工作组的工单设置")
-    // @Operation(summary = "Save TicketSettings by workgroup", description = "Upsert settings by orgUid+workgroupUid")
-    // @PostMapping("/by-workgroup")
-    // public ResponseEntity<?> saveByWorkgroup(@RequestBody TicketSettingsRequest request) {
-    //     if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
-    //         return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
-    //     }
-    //     TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(request);
-    //     return ResponseEntity.ok(JsonResult.success(resp));
-    // }
+    @ActionAnnotation(title = "Ticket Settings", action = "按工作组保存", description = "保存或更新指定工作组的工单设置(草稿)")
+    @Operation(summary = "Save TicketSettings by workgroup", description = "Upsert ticket settings draft by orgUid+workgroupUid")
+    @PostMapping("/orgs/{orgUid}/workgroups/{workgroupUid}")
+    public ResponseEntity<?> saveByWorkgroup(
+            @PathVariable("orgUid") String orgUid,
+            @PathVariable("workgroupUid") String workgroupUid,
+            @RequestBody com.bytedesk.ticket.ticket_settings.dto.TicketSettingsByWorkgroupUpdateRequest request) {
+        TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(orgUid, workgroupUid, request);
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
 
     @ActionAnnotation(title = "Ticket Settings", action = "发布", description = "发布当前工作组的工单草稿配置")
     @Operation(summary = "Publish TicketSettings", description = "Publish draft settings to active for given TicketSettings uid")
@@ -155,24 +155,26 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
 
     @ActionAnnotation(title = "Ticket Settings", action = "按工作组发布", description = "通过 orgUid+workgroupUid 发布草稿配置")
     @Operation(summary = "Publish TicketSettings by workgroup", description = "Publish draft settings for given orgUid+workgroupUid")
-    @PostMapping("/by-workgroup/publish")
-    public ResponseEntity<?> publishByWorkgroup(@RequestBody TicketSettingsRequest request) {
-        if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
-            return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
-        }
-        TicketSettingsResponse resp = ticketSettingsRestService.publishByWorkgroup(request.getOrgUid(), request.getWorkgroupUid());
+    @PostMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/publish")
+    public ResponseEntity<?> publishByWorkgroup(
+            @PathVariable("orgUid") String orgUid,
+            @PathVariable("workgroupUid") String workgroupUid) {
+        TicketSettingsResponse resp = ticketSettingsRestService.publishByWorkgroup(orgUid, workgroupUid);
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
     // ===== 新增：批量绑定工作组到指定 TicketSettings =====
     @ActionAnnotation(title = "Ticket Settings", action = "批量绑定工作组", description = "将多个工作组绑定到同一套工单设置")
     @Operation(summary = "Bind workgroups to TicketSettings", description = "Bind multiple workgroups to one ticket settings instance")
-    @PostMapping("/bindings/batch")
-    public ResponseEntity<?> bindWorkgroups(@RequestBody TicketSettingsRequest request) {
-        if (request == null || request.getOrgUid() == null || request.getUid() == null || request.getWorkgroupUids() == null) {
-            return ResponseEntity.badRequest().body(JsonResult.error("orgUid, uid and workgroupUids are required"));
+    @PostMapping("/{uid}/orgs/{orgUid}/bindings")
+    public ResponseEntity<?> bindWorkgroups(
+            @PathVariable("uid") String uid,
+            @PathVariable("orgUid") String orgUid,
+            @RequestBody com.bytedesk.ticket.ticket_settings.dto.TicketSettingsBatchBindRequest request) {
+        if (request == null || request.getWorkgroupUids() == null) {
+            return ResponseEntity.badRequest().body(JsonResult.error("workgroupUids are required"));
         }
-        ticketSettingsRestService.bindWorkgroups(request.getUid(), request.getOrgUid(), request.getWorkgroupUids());
+        ticketSettingsRestService.bindWorkgroups(uid, orgUid, request.getWorkgroupUids());
         return ResponseEntity.ok(JsonResult.success());
     }
 
