@@ -66,22 +66,22 @@ public class VisitorThreadEventListener {
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
         log.info("visitor onThreadCloseEvent: {}", thread.getUid());
-        
-    // 使用closeType替代autoClose
-    String closeType = thread.getCloseType();
-    boolean autoClose = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
-        
+
+        // 使用closeType替代autoClose
+        String closeType = thread.getCloseType();
+        boolean autoClose = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
+
         // 更新队列成员状态
         updateQueueMemberOnClose(thread, autoClose);
-        
+
         // 如果是自动关闭且客服离线，不发送消息
         if (autoClose && isAgentOffline(thread)) {
             return;
         }
-        
+
         // 获取关闭提示语
-    String content = getCloseTip(thread, closeType);
-        
+        String content = getCloseTip(thread, closeType);
+
         // 发送消息
         MessageProtobuf messageProtobuf = autoClose
                 ? MessageUtils.createAutoCloseMessage(thread, content)
@@ -93,10 +93,10 @@ public class VisitorThreadEventListener {
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
         // log.info("visitor_thread quartz one min event: " + event);
         List<ThreadEntity> threads = threadRestService.findServiceThreadStateStarted();
-        
+
         // 自动关闭线程
         visitorThreadService.autoRemindAgentOrCloseThread(threads);
-        
+
         // 处理主动触发逻辑
         threads.forEach(this::processProactiveTrigger);
     }
@@ -108,23 +108,22 @@ public class VisitorThreadEventListener {
         // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
         long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
         long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
-        
+
         // 移除Math.abs()，确保时间顺序正确
         long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
-        
+
         // 如果updatedAt在未来，说明时间有问题，跳过处理
         if (diffInMilliseconds < 0) {
             log.warn("Thread {} updatedAt is in the future, skipping proactive trigger check", thread.getUid());
             return;
         }
-        
+
         // Convert to seconds
         long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
-        
+
         // 处理主动触发
         handleProactiveTrigger(thread, diffInSeconds);
     }
-    
 
     /**
      * 更新队列成员状态
@@ -174,7 +173,7 @@ public class VisitorThreadEventListener {
     private String getWorkgroupCloseTip(String topic, boolean autoClose, String closeType) {
         String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
-        
+
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
             if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
@@ -194,7 +193,7 @@ public class VisitorThreadEventListener {
     private String getAgentCloseTip(String topic, boolean autoClose, String closeType) {
         String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-        
+
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
@@ -214,14 +213,14 @@ public class VisitorThreadEventListener {
     private String getRobotCloseTip(String topic) {
         String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
         Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
-        
+
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
             if (robot.getSettings() != null && robot.getSettings().getServiceSettings() != null) {
                 return robot.getSettings().getServiceSettings().getAutoCloseTip();
             }
         }
-        
+
         return I18Consts.I18N_AUTO_CLOSE_TIP;
     }
 
@@ -243,7 +242,7 @@ public class VisitorThreadEventListener {
      */
     private void handleProactiveTrigger(ThreadEntity thread, long diffInSeconds) {
         String topic = thread.getTopic();
-        
+
         if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             handleWorkgroupProactiveTrigger(thread, topic, diffInSeconds);
         } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
@@ -259,14 +258,14 @@ public class VisitorThreadEventListener {
     private void handleWorkgroupProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
         String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
-        
+
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
             if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
                 if (workgroup.getSettings().getServiceSettings().getEnableProactiveTrigger()
                         && diffInSeconds > workgroup.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message", 
-                        thread.getUid());
+                    log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message",
+                            thread.getUid());
                     MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
                             workgroup.getSettings().getServiceSettings().getProactiveMessage());
                     messageSendService.sendProtobufMessage(messageProtobuf);
@@ -281,14 +280,14 @@ public class VisitorThreadEventListener {
     private void handleAgentProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
         String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-        
+
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
                 if (agent.getSettings().getServiceSettings().getEnableProactiveTrigger()
                         && diffInSeconds > agent.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message", 
-                        thread.getUid());
+                    log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message",
+                            thread.getUid());
                     MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
                             agent.getSettings().getServiceSettings().getProactiveMessage());
                     messageSendService.sendProtobufMessage(messageProtobuf);
@@ -303,14 +302,14 @@ public class VisitorThreadEventListener {
     private void handleRobotProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
         String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
         Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
-        
+
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
             if (robot.getSettings() != null && robot.getSettings().getServiceSettings() != null) {
                 if (robot.getSettings().getServiceSettings().getEnableProactiveTrigger()
                         && diffInSeconds > robot.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message", 
-                        thread.getUid());
+                    log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message",
+                            thread.getUid());
                     MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
                             robot.getSettings().getServiceSettings().getProactiveMessage());
                     messageSendService.sendProtobufMessage(messageProtobuf);
