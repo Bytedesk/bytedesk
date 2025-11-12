@@ -15,6 +15,12 @@ package com.bytedesk.ticket.ticket_settings;
 
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,23 +39,26 @@ public class TicketSettingsResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
 
-    private String type;
-
-    private String color;
-
-    private Integer order;
-
     private String workgroupUid;
 
-    private String settingsJson;
+    // ===== 发布版本（前端展示用） =====
+    private TicketBasicSettingsResponse basicSettings;
+    private TicketStatusFlowSettingsResponse statusFlowSettings;
+    private TicketPrioritySettingsResponse prioritySettings;
+    private TicketAssignmentSettingsResponse assignmentSettings;
+    private TicketNotificationSettingsResponse notificationSettings;
+    private TicketCustomFieldSettingsResponse customFieldSettings;
 
-    private Boolean initialized;
-
-    private String lastModifiedUserUid;
+    // ===== 草稿版本（编辑态用，使用同一响应结构便于统一渲染） =====
+    private TicketBasicSettingsResponse draftBasicSettings;
+    private TicketStatusFlowSettingsResponse draftStatusFlowSettings;
+    private TicketPrioritySettingsResponse draftPrioritySettings;
+    private TicketAssignmentSettingsResponse draftAssignmentSettings;
+    private TicketNotificationSettingsResponse draftNotificationSettings;
+    private TicketCustomFieldSettingsResponse draftCustomFieldSettings;
 
 }

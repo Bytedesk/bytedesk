@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:26:04
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-20 14:24:05
+ * @LastEditTime: 2025-11-12 12:10:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,15 +14,21 @@
 package com.bytedesk.ticket.ticket_settings;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 
 @Data
-@SuperBuilder
+@Builder
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
@@ -31,28 +37,21 @@ public class TicketSettingsRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
-
-    // @Builder.Default
-    // private String type = TicketSettingsTypeEnum.CUSTOMER.name();
-
-    private String color;
-
-    private Integer order;
 
     /**
      * 目标工作组UID，用于按工作组维度加载/保存配置
      */
     private String workgroupUid;
 
-    /**
-     * 整体配置JSON（basic/statusFlow/priorities/assignment/notifications/customFields）
-     */
-    private String settingsJson;
+    // 草稿子配置（仅在更新草稿时传入；创建时也可传，后台将初始化发布+草稿）
+    private TicketBasicSettingsRequest draftBasicSettings;
+    private TicketStatusFlowSettingsRequest draftStatusFlowSettings;
+    private TicketPrioritySettingsRequest draftPrioritySettings;
+    private TicketAssignmentSettingsRequest draftAssignmentSettings;
+    private TicketNotificationSettingsRequest draftNotificationSettings;
+    private TicketCustomFieldSettingsRequest draftCustomFieldSettings;
 
-    /** 是否已初始化（仅返回视图用，更新时可忽略） */
-    private Boolean initialized;
 }

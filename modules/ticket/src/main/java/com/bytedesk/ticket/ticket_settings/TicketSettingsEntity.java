@@ -63,6 +63,8 @@ public class TicketSettingsEntity extends BaseEntity {
     /**
      * Description of the ticketSettings
      */
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
      * 关联工作组UID。一个工作组对应一套工单配置；与 orgUid 组合唯一。
@@ -107,26 +109,6 @@ public class TicketSettingsEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
     private TicketCustomFieldSettingsEntity draftCustomFieldSettings;
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
-
-    /**
-     * Type of ticketSettings (CUSTOMER, TICKET, ARTICLE, etc.)
-     */
-    @Builder.Default
-    @Column(name = "settings_type")
-    private String type = TicketSettingsTypeEnum.CUSTOMER.name();
-
-    /** 最近修改人 UID */
-    @Column(name = "last_modified_user_uid")
-    private String lastModifiedUserUid;
-
-    /** 是否已初始化（用于首次按工作组加载后保存标记） */
-    @Builder.Default
-    private Boolean initialized = Boolean.FALSE;
-
-    /** 迁移阶段保留原整体 JSON 字段，后续可删除 */
-    @Column(name = "settings_json", columnDefinition = "TEXT")
-    private String settingsJson;
+    
 
 }

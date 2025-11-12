@@ -2,6 +2,7 @@ package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -28,10 +29,9 @@ public class TicketStatusFlowSettingsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * JSON: { statuses:[], transitions:[] }
-     */
+    /** 结构化状态流转定义（持久化为 JSON） */
     @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.StatusFlowSettingsConverter.class)
     @Column(length = 4096)
-    private String content = com.bytedesk.core.constant.BytedeskConsts.EMPTY_JSON_STRING;
+    private com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData content = com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData.builder().build();
 }

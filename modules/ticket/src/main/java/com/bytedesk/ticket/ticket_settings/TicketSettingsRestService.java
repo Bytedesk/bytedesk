@@ -90,7 +90,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         // 
         TicketSettingsEntity entity = modelMapper.map(request, TicketSettingsEntity.class);
-        entity.setLastModifiedUserUid(request.getUserUid());
+    // 移除 lastModifiedUserUid 字段，不再记录最近修改人
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
@@ -109,7 +109,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         if (optional.isPresent()) {
             TicketSettingsEntity entity = optional.get();
             modelMapper.map(request, entity);
-            entity.setLastModifiedUserUid(request.getUserUid());
+            // 移除 lastModifiedUserUid 字段，不再记录最近修改人
             //
             TicketSettingsEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -128,44 +128,63 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
     public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid) {
         Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         if (optional.isPresent()) {
-            return convertToResponse(optional.get()).setInitialized(true);
+            return convertToResponse(optional.get());
         }
-        // 构造默认 JSON 模板
-        String defaultJson = "{" +
-            "\"basic\":{\"numberPrefix\":\"TK\",\"numberLength\":8,\"defaultPriority\":\"medium\",\"validityDays\":30,\"autoCloseHours\":72,\"enableAutoClose\":true}," +
-            "\"statusFlow\":{\"statuses\":[" +
-                "{\\\"key\\\":\\\"new\\\",\\\"name\\\":\\\"新建\\\",\\\"color\\\":\\\"#1890ff\\\",\\\"description\\\":\\\"新创建的工单\\\",\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"assigned\\\",\\\"name\\\":\\\"已分配\\\",\\\"color\\\":\\\"#52c41a\\\",\\\"description\\\":\\\"已分配给处理人员\\\",\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"processing\\\",\\\"name\\\":\\\"处理中\\\",\\\"color\\\":\\\"#faad14\\\",\\\"description\\\":\\\"正在处理中\\\",\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"pending\\\",\\\"name\\\":\\\"待客户\\\",\\\"color\\\":\\\"#fa8c16\\\",\\\"description\\\":\\\"等待客户反馈\\\",\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"resolved\\\",\\\"name\\\":\\\"已解决\\\",\\\"color\\\":\\\"#52c41a\\\",\\\"description\\\":\\\"问题已解决\\\",\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"closed\\\",\\\"name\\\":\\\"已关闭\\\",\\\"color\\\":\\\"#8c8c8c\\\",\\\"description\\\":\\\"工单已关闭\\\",\\\"isActive\\\":true}]," +
-            "\"transitions\":[" +
-                "{\\\"from\\\":\\\"new\\\",\\\"to\\\":\\\"assigned\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
-                "{\\\"from\\\":\\\"assigned\\\",\\\"to\\\":\\\"processing\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
-                "{\\\"from\\\":\\\"processing\\\",\\\"to\\\":\\\"pending\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
-                "{\\\"from\\\":\\\"processing\\\",\\\"to\\\":\\\"resolved\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
-                "{\\\"from\\\":\\\"pending\\\",\\\"to\\\"processing\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\"]}," +
-                "{\\\"from\\\":\\\"resolved\\\",\\\"to\\\":\\\"closed\\\",\\\"roles\\\":[\\\"admin\\\",\\\"agent\\\",\\\"customer\\\"]}]," +
-            "}," +
-            "\"priorities\":[" +
-                "{\\\"key\\\":\\\"low\\\",\\\"name\\\":\\\"低\\\",\\\"color\\\":\\\"#52c41a\\\",\\\"slaHours\\\":72,\\\"order\\\":1,\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"medium\\\",\\\"name\\\":\\\"中\\\",\\\"color\\\":\\\"#faad14\\\",\\\"slaHours\\\":48,\\\"order\\\":2,\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"high\\\",\\\"name\\\":\\\"高\\\",\\\"color\\\":\\\"#fa8c16\\\",\\\"slaHours\\\":24,\\\"order\\\":3,\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"urgent\\\",\\\"name\\\":\\\"紧急\\\",\\\"color\\\":\\\"#f5222d\\\",\\\"slaHours\\\":8,\\\"order\\\":4,\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"critical\\\",\\\"name\\\":\\\"严重\\\",\\\"color\\\":\\\"#722ed1\\\",\\\"slaHours\\\":4,\\\"order\\\":5,\\\"isActive\\\":true}]," +
-            "\"assignment\":{\"autoAssign\":true,\"assignmentType\":\"round_robin\",\"workingHours\":{\"enabled\":true,\"startTime\":\"09:00\",\"endTime\":\"18:00\",\"workingDays\":[1,2,3,4,5]},\"maxConcurrentTickets\":10}," +
-            "\"notifications\":{\"email\":{\"enabled\":true,\"events\":[\"created\",\"assigned\",\"resolved\",\"closed\"],\"templates\":{}},\"internal\":{\"enabled\":true,\"events\":[\"created\",\"assigned\",\"resolved\",\"closed\"]},\"webhook\":{\"enabled\":false,\"url\":\"\",\"events\":[]}}," +
-            "\"customFields\":[" +
-                "{\\\"key\\\":\\\"department\\\",\\\"name\\\":\\\"部门\\\",\\\"type\\\":\\\"select\\\",\\\"required\\\":true,\\\"options\\\":[\\\"技术部\\\",\\\"销售部\\\",\\\"客服部\\\",\\\"市场部\\\"],\\\"order\\\":1,\\\"isActive\\\":true}," +
-                "{\\\"key\\\":\\\"contact_phone\\\",\\\"name\\\":\\\"联系电话\\\",\\\"type\\\":\\\"text\\\",\\\"required\\\":false,\\\"order\\\":2,\\\"isActive\\\":true}]" +
-            "}";
-        return TicketSettingsResponse.builder()
+        // 返回结构化默认（不落库）
+        TicketSettingsResponse resp = TicketSettingsResponse.builder()
             .orgUid(orgUid)
             .workgroupUid(workgroupUid)
-            .settingsJson(defaultJson)
-            .initialized(false)
+            // 初始化标记已移除
             .build();
+        // 默认草稿：Basic
+        resp.setDraftBasicSettings(
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest.builder()
+                .numberPrefix("TK").numberLength(8)
+                .defaultPriority("medium")
+                .validityDays(30)
+                .autoCloseHours(72)
+                .enableAutoClose(true)
+                .build()
+        );
+        // 默认草稿：StatusFlow / Priority / Assignment / Notification / CustomFields
+        resp.setDraftStatusFlowSettings(
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest.builder()
+                .content("{}")
+                .build()
+        );
+        resp.setDraftPrioritySettings(
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest.builder()
+                .content("[]")
+                .build()
+        );
+        resp.setDraftAssignmentSettings(
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest.builder()
+                .autoAssign(true)
+                .assignmentType("round_robin")
+                .workingHoursEnabled(true)
+                .workingHoursStart("09:00")
+                .workingHoursEnd("18:00")
+                .workingDays("[1,2,3,4,5]")
+                .maxConcurrentTickets(10)
+                .build()
+        );
+        resp.setDraftNotificationSettings(
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest.builder()
+                .emailEnabled(true)
+                .emailEvents("[\"created\",\"assigned\",\"resolved\",\"closed\"]")
+                .emailTemplates("{}")
+                .internalEnabled(true)
+                .internalEvents("[\"created\",\"assigned\",\"resolved\",\"closed\"]")
+                .webhookEnabled(false)
+                .webhookEvents("[]")
+                .build()
+        );
+        resp.setDraftCustomFieldSettings(
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest.builder()
+                .content("[]")
+                .build()
+        );
+        return resp;
     }
 
     /**
@@ -174,21 +193,97 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
     @Transactional
     public TicketSettingsResponse saveByWorkgroup(TicketSettingsRequest request) {
         Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(), request.getWorkgroupUid());
-        if (optional.isPresent()) {
-            TicketSettingsEntity entity = optional.get();
-            entity.setSettingsJson(request.getSettingsJson());
-            entity.setLastModifiedUserUid(request.getUserUid());
-            entity.setInitialized(Boolean.TRUE);
-            return convertToResponse(save(entity));
-        } else {
-            TicketSettingsEntity entity = modelMapper.map(request, TicketSettingsEntity.class);
-            if (!StringUtils.hasText(entity.getUid())) {
-                entity.setUid(uidUtils.getUid());
+        TicketSettingsEntity entity = optional.orElseGet(() -> {
+            TicketSettingsEntity e = modelMapper.map(request, TicketSettingsEntity.class);
+            if (!StringUtils.hasText(e.getUid())) {
+                e.setUid(uidUtils.getUid());
             }
-            entity.setInitialized(Boolean.TRUE);
-            entity.setLastModifiedUserUid(request.getUserUid());
-            return convertToResponse(save(entity));
+            return e;
+        });
+
+        // 更新草稿子配置：仅当请求包含对应部分时才更新
+        if (request.getDraftBasicSettings() != null) {
+            if (entity.getDraftBasicSettings() == null) {
+                com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity draft = new com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getDraftBasicSettings(), draft);
+                entity.setDraftBasicSettings(draft);
+            } else {
+                String originalUid = entity.getDraftBasicSettings().getUid();
+                modelMapper.map(request.getDraftBasicSettings(), entity.getDraftBasicSettings());
+                entity.getDraftBasicSettings().setUid(originalUid);
+            }
+            // 不再维护 hasUnpublishedChanges 标记
         }
+        if (request.getDraftStatusFlowSettings() != null) {
+            if (entity.getDraftStatusFlowSettings() == null) {
+                com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity draft = new com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getDraftStatusFlowSettings(), draft);
+                entity.setDraftStatusFlowSettings(draft);
+            } else {
+                String originalUid = entity.getDraftStatusFlowSettings().getUid();
+                modelMapper.map(request.getDraftStatusFlowSettings(), entity.getDraftStatusFlowSettings());
+                entity.getDraftStatusFlowSettings().setUid(originalUid);
+            }
+            // 不再维护 hasUnpublishedChanges 标记
+        }
+        if (request.getDraftPrioritySettings() != null) {
+            if (entity.getDraftPrioritySettings() == null) {
+                com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity draft = new com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getDraftPrioritySettings(), draft);
+                entity.setDraftPrioritySettings(draft);
+            } else {
+                String originalUid = entity.getDraftPrioritySettings().getUid();
+                modelMapper.map(request.getDraftPrioritySettings(), entity.getDraftPrioritySettings());
+                entity.getDraftPrioritySettings().setUid(originalUid);
+            }
+            // 不再维护 hasUnpublishedChanges 标记
+        }
+        if (request.getDraftAssignmentSettings() != null) {
+            if (entity.getDraftAssignmentSettings() == null) {
+                com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity draft = new com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getDraftAssignmentSettings(), draft);
+                entity.setDraftAssignmentSettings(draft);
+            } else {
+                String originalUid = entity.getDraftAssignmentSettings().getUid();
+                modelMapper.map(request.getDraftAssignmentSettings(), entity.getDraftAssignmentSettings());
+                entity.getDraftAssignmentSettings().setUid(originalUid);
+            }
+            // 不再维护 hasUnpublishedChanges 标记
+        }
+        if (request.getDraftNotificationSettings() != null) {
+            if (entity.getDraftNotificationSettings() == null) {
+                com.bytedesk.ticket.ticket_settings.sub.TicketNotificationSettingsEntity draft = new com.bytedesk.ticket.ticket_settings.sub.TicketNotificationSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getDraftNotificationSettings(), draft);
+                entity.setDraftNotificationSettings(draft);
+            } else {
+                String originalUid = entity.getDraftNotificationSettings().getUid();
+                modelMapper.map(request.getDraftNotificationSettings(), entity.getDraftNotificationSettings());
+                entity.getDraftNotificationSettings().setUid(originalUid);
+            }
+            // 不再维护 hasUnpublishedChanges 标记
+        }
+        if (request.getDraftCustomFieldSettings() != null) {
+            if (entity.getDraftCustomFieldSettings() == null) {
+                com.bytedesk.ticket.ticket_settings.sub.TicketCustomFieldSettingsEntity draft = new com.bytedesk.ticket.ticket_settings.sub.TicketCustomFieldSettingsEntity();
+                draft.setUid(uidUtils.getUid());
+                modelMapper.map(request.getDraftCustomFieldSettings(), draft);
+                entity.setDraftCustomFieldSettings(draft);
+            } else {
+                String originalUid = entity.getDraftCustomFieldSettings().getUid();
+                modelMapper.map(request.getDraftCustomFieldSettings(), entity.getDraftCustomFieldSettings());
+                entity.getDraftCustomFieldSettings().setUid(originalUid);
+            }
+            // 不再维护 hasUnpublishedChanges 标记
+        }
+
+    // 不再使用 initialized/lastModifiedUserUid 字段
+        TicketSettingsEntity saved = save(entity);
+        return convertToResponse(saved);
     }
 
     /**
@@ -253,10 +348,22 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             }
         }
 
-        // 发布后标记（沿用 initialized 代表已持久化，后续可扩展 hasUnpublishedChanges 字段）
-        entity.setInitialized(Boolean.TRUE);
+    // 发布后不再使用 initialized/hasUnpublishedChanges/publishedAt 字段
         TicketSettingsEntity saved = save(entity);
         return convertToResponse(saved);
+    }
+
+    /**
+     * 按 orgUid + workgroupUid 发布对应 TicketSettings（便于前端直接在工作组维度触发）。
+     */
+    @Transactional
+    public TicketSettingsResponse publishByWorkgroup(String orgUid, String workgroupUid) {
+        Optional<TicketSettingsEntity> optional = ticketSettingsRepository
+                .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("TicketSettings not found by orgUid+workgroupUid");
+        }
+        return publish(optional.get().getUid());
     }
 
     /**
@@ -344,7 +451,130 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
 
     @Override
     public TicketSettingsResponse convertToResponse(TicketSettingsEntity entity) {
-        return modelMapper.map(entity, TicketSettingsResponse.class);
+        TicketSettingsResponse resp = modelMapper.map(entity, TicketSettingsResponse.class);
+        // 发布版本映射
+        if (entity.getBasicSettings() != null) {
+            resp.setBasicSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest.builder()
+                    .numberPrefix(entity.getBasicSettings().getNumberPrefix())
+                    .numberLength(entity.getBasicSettings().getNumberLength())
+                    .defaultPriority(entity.getBasicSettings().getDefaultPriority())
+                    .validityDays(entity.getBasicSettings().getValidityDays())
+                    .autoCloseHours(entity.getBasicSettings().getAutoCloseHours())
+                    .enableAutoClose(entity.getBasicSettings().getEnableAutoClose())
+                    .build()
+            );
+        }
+        if (entity.getStatusFlowSettings() != null) {
+            resp.setStatusFlowSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest.builder()
+                    .content(entity.getStatusFlowSettings().getContent())
+                    .build()
+            );
+        }
+        if (entity.getPrioritySettings() != null) {
+            resp.setPrioritySettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest.builder()
+                    .content(entity.getPrioritySettings().getContent())
+                    .build()
+            );
+        }
+        if (entity.getAssignmentSettings() != null) {
+            resp.setAssignmentSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest.builder()
+                    .autoAssign(entity.getAssignmentSettings().getAutoAssign())
+                    .assignmentType(entity.getAssignmentSettings().getAssignmentType())
+                    .workingHoursEnabled(entity.getAssignmentSettings().getWorkingHoursEnabled())
+                    .workingHoursStart(entity.getAssignmentSettings().getWorkingHoursStart())
+                    .workingHoursEnd(entity.getAssignmentSettings().getWorkingHoursEnd())
+                    .workingDays(entity.getAssignmentSettings().getWorkingDays())
+                    .maxConcurrentTickets(entity.getAssignmentSettings().getMaxConcurrentTickets())
+                    .build()
+            );
+        }
+        if (entity.getNotificationSettings() != null) {
+            resp.setNotificationSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest.builder()
+                    .emailEnabled(entity.getNotificationSettings().getEmailEnabled())
+                    .emailEvents(entity.getNotificationSettings().getEmailEvents())
+                    .emailTemplates(entity.getNotificationSettings().getEmailTemplates())
+                    .internalEnabled(entity.getNotificationSettings().getInternalEnabled())
+                    .internalEvents(entity.getNotificationSettings().getInternalEvents())
+                    .webhookEnabled(entity.getNotificationSettings().getWebhookEnabled())
+                    .webhookUrl(entity.getNotificationSettings().getWebhookUrl())
+                    .webhookEvents(entity.getNotificationSettings().getWebhookEvents())
+                    .build()
+            );
+        }
+        if (entity.getCustomFieldSettings() != null) {
+            resp.setCustomFieldSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest.builder()
+                    .content(entity.getCustomFieldSettings().getContent())
+                    .build()
+            );
+        }
+        // 草稿版本映射
+        if (entity.getDraftBasicSettings() != null) {
+            resp.setDraftBasicSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest.builder()
+                    .numberPrefix(entity.getDraftBasicSettings().getNumberPrefix())
+                    .numberLength(entity.getDraftBasicSettings().getNumberLength())
+                    .defaultPriority(entity.getDraftBasicSettings().getDefaultPriority())
+                    .validityDays(entity.getDraftBasicSettings().getValidityDays())
+                    .autoCloseHours(entity.getDraftBasicSettings().getAutoCloseHours())
+                    .enableAutoClose(entity.getDraftBasicSettings().getEnableAutoClose())
+                    .build()
+            );
+        }
+        if (entity.getDraftStatusFlowSettings() != null) {
+            resp.setDraftStatusFlowSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest.builder()
+                    .content(entity.getDraftStatusFlowSettings().getContent())
+                    .build()
+            );
+        }
+        if (entity.getDraftPrioritySettings() != null) {
+            resp.setDraftPrioritySettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest.builder()
+                    .content(entity.getDraftPrioritySettings().getContent())
+                    .build()
+            );
+        }
+        if (entity.getDraftAssignmentSettings() != null) {
+            resp.setDraftAssignmentSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest.builder()
+                    .autoAssign(entity.getDraftAssignmentSettings().getAutoAssign())
+                    .assignmentType(entity.getDraftAssignmentSettings().getAssignmentType())
+                    .workingHoursEnabled(entity.getDraftAssignmentSettings().getWorkingHoursEnabled())
+                    .workingHoursStart(entity.getDraftAssignmentSettings().getWorkingHoursStart())
+                    .workingHoursEnd(entity.getDraftAssignmentSettings().getWorkingHoursEnd())
+                    .workingDays(entity.getDraftAssignmentSettings().getWorkingDays())
+                    .maxConcurrentTickets(entity.getDraftAssignmentSettings().getMaxConcurrentTickets())
+                    .build()
+            );
+        }
+        if (entity.getDraftNotificationSettings() != null) {
+            resp.setDraftNotificationSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest.builder()
+                    .emailEnabled(entity.getDraftNotificationSettings().getEmailEnabled())
+                    .emailEvents(entity.getDraftNotificationSettings().getEmailEvents())
+                    .emailTemplates(entity.getDraftNotificationSettings().getEmailTemplates())
+                    .internalEnabled(entity.getDraftNotificationSettings().getInternalEnabled())
+                    .internalEvents(entity.getDraftNotificationSettings().getInternalEvents())
+                    .webhookEnabled(entity.getDraftNotificationSettings().getWebhookEnabled())
+                    .webhookUrl(entity.getDraftNotificationSettings().getWebhookUrl())
+                    .webhookEvents(entity.getDraftNotificationSettings().getWebhookEvents())
+                    .build()
+            );
+        }
+        if (entity.getDraftCustomFieldSettings() != null) {
+            resp.setDraftCustomFieldSettings(
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest.builder()
+                    .content(entity.getDraftCustomFieldSettings().getContent())
+                    .build()
+            );
+        }
+        return resp;
     }
 
     @Override

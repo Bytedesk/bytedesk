@@ -2,6 +2,7 @@ package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,10 +28,9 @@ public class TicketPrioritySettingsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * JSON: priorities:[]
-     */
+    /** 优先级集合结构化表示（持久化为 JSON） */
     @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.PrioritySettingsConverter.class)
     @Column(length = 2048)
-    private String content = com.bytedesk.core.constant.BytedeskConsts.EMPTY_JSON_STRING;
+    private com.bytedesk.ticket.ticket_settings.sub.model.PrioritySettingsData content = com.bytedesk.ticket.ticket_settings.sub.model.PrioritySettingsData.builder().build();
 }

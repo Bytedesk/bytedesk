@@ -2,6 +2,7 @@ package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,8 +27,9 @@ import lombok.experimental.SuperBuilder;
 public class TicketCustomFieldSettingsEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
-    /** JSON 数组: [{ key,name,type,required,options?,defaultValue?,order,isActive }] */
+    /** 结构化自定义字段定义集合（持久化 JSON） */
     @Builder.Default
+    @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.CustomFieldSettingsConverter.class)
     @Column(length = 4096)
-    private String content = com.bytedesk.core.constant.BytedeskConsts.EMPTY_JSON_STRING;
+    private com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData content = com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData.builder().build();
 }
