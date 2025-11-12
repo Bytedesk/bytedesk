@@ -16,22 +16,20 @@ package com.bytedesk.ticket.ticket_settings;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
-
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class TicketSettingsInitializer implements SmartInitializingSingleton {
 
-    private final TicketSettingsRestService ticketSettingsRestService;
+    // private final TicketSettingsRestService ticketSettingsRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
         // create default
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        ticketSettingsRestService.initTicketSettings(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // ticketSettingsRestService.initTicketSettings(orgUid);
     }
 
     private void initPermissions() {

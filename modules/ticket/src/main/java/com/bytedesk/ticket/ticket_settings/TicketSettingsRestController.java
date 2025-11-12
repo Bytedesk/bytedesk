@@ -120,27 +120,27 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         );
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询", description = "通过 orgUid+workgroupUid 获取工单设置，若不存在返回默认模板")
-    @Operation(summary = "Get TicketSettings by workgroup", description = "Get settings by orgUid and workgroupUid; returns defaults if missing")
-    @GetMapping("/by-workgroup")
-    public ResponseEntity<?> getByWorkgroup(TicketSettingsRequest request) {
-        if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
-            return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
-        }
-        TicketSettingsResponse resp = ticketSettingsRestService.getOrDefaultByWorkgroup(request.getOrgUid(), request.getWorkgroupUid());
-        return ResponseEntity.ok(JsonResult.success(resp));
-    }
+    // @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询", description = "通过 orgUid+workgroupUid 获取工单设置，若不存在返回默认模板")
+    // @Operation(summary = "Get TicketSettings by workgroup", description = "Get settings by orgUid and workgroupUid; returns defaults if missing")
+    // @GetMapping("/by-workgroup")
+    // public ResponseEntity<?> getByWorkgroup(TicketSettingsRequest request) {
+    //     if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
+    //         return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
+    //     }
+    //     TicketSettingsResponse resp = ticketSettingsRestService.getOrDefaultByWorkgroup(request.getOrgUid(), request.getWorkgroupUid());
+    //     return ResponseEntity.ok(JsonResult.success(resp));
+    // }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "按工作组保存", description = "保存或更新指定工作组的工单设置")
-    @Operation(summary = "Save TicketSettings by workgroup", description = "Upsert settings by orgUid+workgroupUid")
-    @PostMapping("/by-workgroup")
-    public ResponseEntity<?> saveByWorkgroup(@RequestBody TicketSettingsRequest request) {
-        if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
-            return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
-        }
-        TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(request);
-        return ResponseEntity.ok(JsonResult.success(resp));
-    }
+    // @ActionAnnotation(title = "Ticket Settings", action = "按工作组保存", description = "保存或更新指定工作组的工单设置")
+    // @Operation(summary = "Save TicketSettings by workgroup", description = "Upsert settings by orgUid+workgroupUid")
+    // @PostMapping("/by-workgroup")
+    // public ResponseEntity<?> saveByWorkgroup(@RequestBody TicketSettingsRequest request) {
+    //     if (request == null || request.getOrgUid() == null || request.getWorkgroupUid() == null) {
+    //         return ResponseEntity.badRequest().body(JsonResult.error("orgUid and workgroupUid are required"));
+    //     }
+    //     TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(request);
+    //     return ResponseEntity.ok(JsonResult.success(resp));
+    // }
 
     @ActionAnnotation(title = "Ticket Settings", action = "发布", description = "发布当前工作组的工单草稿配置")
     @Operation(summary = "Publish TicketSettings", description = "Publish draft settings to active for given TicketSettings uid")

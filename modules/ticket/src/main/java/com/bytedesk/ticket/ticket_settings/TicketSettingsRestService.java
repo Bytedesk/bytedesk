@@ -40,7 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketSettingsEntity, TicketSettingsRequest, TicketSettingsResponse, TicketSettingsExcel> {
+public class TicketSettingsRestService extends
+        BaseRestServiceWithExport<TicketSettingsEntity, TicketSettingsRequest, TicketSettingsResponse, TicketSettingsExcel> {
 
     private final TicketSettingsRepository ticketSettingsRepository;
     private final com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository bindingRepository;
@@ -61,13 +62,13 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         return ticketSettingsRepository.findAll(spec, pageable);
     }
 
-    @Cacheable(value = "ticketSettings", key = "#uid", unless="#result==null")
+    @Cacheable(value = "ticketSettings", key = "#uid", unless = "#result==null")
     @Override
     public Optional<TicketSettingsEntity> findByUid(String uid) {
         return ticketSettingsRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
+    @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' + #type", unless = "#result==null")
     public Optional<TicketSettingsEntity> findByNameAndOrgUid(String name, String orgUid) {
         return ticketSettingsRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
@@ -90,7 +91,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
                 return convertToResponse(ticketSettings.get());
             }
         }
-        // 
+        //
         UserEntity user = authService.getUser();
         if (user != null) {
             request.setUserUid(user.getUid());
@@ -289,8 +290,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
                 throw new RuntimeException("Update ticketSettings failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("TicketSettings not found");
         }
     }
@@ -300,7 +300,8 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
      */
     public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid) {
         // 使用绑定表查找
-        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
+        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository
+                .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         if (bindingOpt.isPresent()) {
             String settingsUid = bindingOpt.get().getTicketSettingsUid();
             Optional<TicketSettingsEntity> settingsOpt = findByUid(settingsUid);
@@ -310,54 +311,49 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         }
         // 返回默认草稿结构（不落库）
         TicketSettingsResponse resp = TicketSettingsResponse.builder()
-            .orgUid(orgUid)
-            .build();
+                .orgUid(orgUid)
+                .build();
         resp.setDraftBasicSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
-                .numberPrefix("TK").numberLength(8)
-                .defaultPriority("medium")
-                .validityDays(30)
-                .autoCloseHours(72)
-                .enableAutoClose(true)
-                .build()
-        );
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
+                        .numberPrefix("TK").numberLength(8)
+                        .defaultPriority("medium")
+                        .validityDays(30)
+                        .autoCloseHours(72)
+                        .enableAutoClose(true)
+                        .build());
         resp.setDraftStatusFlowSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
-                .content(com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData.builder().build())
-                .build()
-        );
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
+                        .content(com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData.builder().build())
+                        .build());
         resp.setDraftPrioritySettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
-                .content(com.bytedesk.ticket.ticket_settings.sub.model.PrioritySettingsData.builder().build())
-                .build()
-        );
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
+                        .content(com.bytedesk.ticket.ticket_settings.sub.model.PrioritySettingsData.builder().build())
+                        .build());
         resp.setDraftAssignmentSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
-                .autoAssign(true)
-                .assignmentType("round_robin")
-                .workingHoursEnabled(true)
-                .workingHoursStart("09:00")
-                .workingHoursEnd("18:00")
-                .workingDays(java.util.List.of(1,2,3,4,5))
-                .maxConcurrentTickets(10)
-                .build()
-        );
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
+                        .autoAssign(true)
+                        .assignmentType("round_robin")
+                        .workingHoursEnabled(true)
+                        .workingHoursStart("09:00")
+                        .workingHoursEnd("18:00")
+                        .workingDays(java.util.List.of(1, 2, 3, 4, 5))
+                        .maxConcurrentTickets(10)
+                        .build());
         resp.setDraftNotificationSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
-                .emailEnabled(true)
-                .emailEvents(java.util.List.of("created","assigned","resolved","closed"))
-                .emailTemplates(java.util.List.of())
-                .internalEnabled(true)
-                .internalEvents(java.util.List.of("created","assigned","resolved","closed"))
-                .webhookEnabled(false)
-                .webhookEvents(java.util.List.of())
-                .build()
-        );
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
+                        .emailEnabled(true)
+                        .emailEvents(java.util.List.of("created", "assigned", "resolved", "closed"))
+                        .emailTemplates(java.util.List.of())
+                        .internalEnabled(true)
+                        .internalEvents(java.util.List.of("created", "assigned", "resolved", "closed"))
+                        .webhookEnabled(false)
+                        .webhookEvents(java.util.List.of())
+                        .build());
         resp.setDraftCustomFieldSettings(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
-                .content(com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData.builder().build())
-                .build()
-        );
+                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
+                        .content(
+                                com.bytedesk.ticket.ticket_settings.sub.model.CustomFieldSettingsData.builder().build())
+                        .build());
         return resp;
     }
 
@@ -371,20 +367,24 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             throw new IllegalArgumentException("参数非法");
         }
         for (String wgUid : workgroupUids) {
-            if (!StringUtils.hasText(wgUid)) continue;
-            Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> opt = bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, wgUid);
-            com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity binding = opt.orElseGet(() -> com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity.builder()
-                .orgUid(orgUid)
-                .workgroupUid(wgUid)
-                .uid(uidUtils.getUid())
-                .ticketSettingsUid(ticketSettingsUid)
-                .build());
+            if (!StringUtils.hasText(wgUid))
+                continue;
+            Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> opt = bindingRepository
+                    .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, wgUid);
+            com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity binding = opt
+                    .orElseGet(() -> com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity.builder()
+                            .orgUid(orgUid)
+                            .workgroupUid(wgUid)
+                            .uid(uidUtils.getUid())
+                            .ticketSettingsUid(ticketSettingsUid)
+                            .build());
             binding.setTicketSettingsUid(ticketSettingsUid); // 覆盖更新
             bindingRepository.save(binding);
         }
     }
 
-    public java.util.List<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> listBindings(String ticketSettingsUid) {
+    public java.util.List<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> listBindings(
+            String ticketSettingsUid) {
         return bindingRepository.findByTicketSettingsUidAndDeletedFalse(ticketSettingsUid);
     }
 
@@ -394,8 +394,8 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
     @Transactional
     public TicketSettingsResponse saveByWorkgroup(TicketSettingsRequest request) {
         // 1) 先根据绑定表查出是否已有对应 settings
-        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt =
-            bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(), request.getWorkgroupUid());
+        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository
+                .findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(), request.getWorkgroupUid());
 
         TicketSettingsEntity entity = null;
         if (bindingOpt.isPresent()) {
@@ -493,17 +493,17 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             // 不再维护 hasUnpublishedChanges 标记
         }
 
-    // 不再使用 initialized/lastModifiedUserUid 字段
+        // 不再使用 initialized/lastModifiedUserUid 字段
         TicketSettingsEntity saved = save(entity);
 
         // 确保绑定关系存在且指向最新的 settings
         com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity binding = bindingOpt
-            .orElseGet(() -> com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity.builder()
-                .uid(uidUtils.getUid())
-                .orgUid(request.getOrgUid())
-                .workgroupUid(request.getWorkgroupUid())
-                .ticketSettingsUid(saved.getUid())
-                .build());
+                .orElseGet(() -> com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity.builder()
+                        .uid(uidUtils.getUid())
+                        .orgUid(request.getOrgUid())
+                        .workgroupUid(request.getWorkgroupUid())
+                        .ticketSettingsUid(saved.getUid())
+                        .build());
         binding.setTicketSettingsUid(saved.getUid());
         bindingRepository.save(binding);
         return convertToResponse(saved);
@@ -511,7 +511,9 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
 
     /**
      * 发布草稿配置到正式配置，参考 WorkgroupSettings 的 publish 逻辑。
-     * 目前 TicketSettings 已改为拆分多个子配置（basic/statusFlow/priority/assignment/notification/customField）发布 + 草稿。
+     * 目前 TicketSettings
+     * 已改为拆分多个子配置（basic/statusFlow/priority/assignment/notification/customField）发布 +
+     * 草稿。
      * 若正式为空而草稿存在，则克隆草稿；若正式存在则仅复制业务字段（忽略 id/uid/version/时间）。
      */
     @Transactional
@@ -571,7 +573,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             }
         }
 
-    // 发布后不再使用 initialized/hasUnpublishedChanges/publishedAt 字段
+        // 发布后不再使用 initialized/hasUnpublishedChanges/publishedAt 字段
         TicketSettingsEntity saved = save(entity);
         return convertToResponse(saved);
     }
@@ -581,7 +583,8 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
      */
     @Transactional
     public TicketSettingsResponse publishByWorkgroup(String orgUid, String workgroupUid) {
-        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
+        Optional<com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity> bindingOpt = bindingRepository
+                .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
         if (bindingOpt.isPresent()) {
             return publish(bindingOpt.get().getTicketSettingsUid());
         }
@@ -601,8 +604,14 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             // 通过反射设置基础标识字段（BaseEntity: setUid, setId, setVersion）
             source.getClass().getMethod("setUid", String.class).invoke(target, uidUtils.getUid());
             // id 设为 null
-            try { source.getClass().getMethod("setId", Long.class).invoke(target, (Long) null); } catch (NoSuchMethodException ignore) {}
-            try { source.getClass().getMethod("setVersion", Long.class).invoke(target, 0L); } catch (NoSuchMethodException ignore) {}
+            try {
+                source.getClass().getMethod("setId", Long.class).invoke(target, (Long) null);
+            } catch (NoSuchMethodException ignore) {
+            }
+            try {
+                source.getClass().getMethod("setVersion", Long.class).invoke(target, 0L);
+            } catch (NoSuchMethodException ignore) {
+            }
         } catch (Exception e) {
             log.warn("cloneSettings reflection failed: {}", e.getMessage());
         }
@@ -619,13 +628,34 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         String uid = null;
         Long id = null;
         Long version = null;
-        try { uid = (String) published.getClass().getMethod("getUid").invoke(published); } catch (Exception ignore) {}
-        try { id = (Long) published.getClass().getMethod("getId").invoke(published); } catch (Exception ignore) {}
-        try { version = (Long) published.getClass().getMethod("getVersion").invoke(published); } catch (Exception ignore) {}
+        try {
+            uid = (String) published.getClass().getMethod("getUid").invoke(published);
+        } catch (Exception ignore) {
+        }
+        try {
+            id = (Long) published.getClass().getMethod("getId").invoke(published);
+        } catch (Exception ignore) {
+        }
+        try {
+            version = (Long) published.getClass().getMethod("getVersion").invoke(published);
+        } catch (Exception ignore) {
+        }
         modelMapper.map(draft, published);
-        try { if (uid != null) published.getClass().getMethod("setUid", String.class).invoke(published, uid); } catch (Exception ignore) {}
-        try { if (id != null) published.getClass().getMethod("setId", Long.class).invoke(published, id); } catch (Exception ignore) {}
-        try { if (version != null) published.getClass().getMethod("setVersion", Long.class).invoke(published, version); } catch (Exception ignore) {}
+        try {
+            if (uid != null)
+                published.getClass().getMethod("setUid", String.class).invoke(published, uid);
+        } catch (Exception ignore) {
+        }
+        try {
+            if (id != null)
+                published.getClass().getMethod("setId", Long.class).invoke(published, id);
+        } catch (Exception ignore) {
+        }
+        try {
+            if (version != null)
+                published.getClass().getMethod("setVersion", Long.class).invoke(published, version);
+        } catch (Exception ignore) {
+        }
     }
 
     @Override
@@ -634,7 +664,8 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
     }
 
     @Override
-    public TicketSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TicketSettingsEntity entity) {
+    public TicketSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            TicketSettingsEntity entity) {
         try {
             Optional<TicketSettingsEntity> latest = ticketSettingsRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -660,8 +691,7 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
             optional.get().setDeleted(true);
             save(optional.get());
             // ticketSettingsRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("TicketSettings not found");
         }
     }
@@ -677,124 +707,112 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         // 发布版本映射
         if (entity.getBasicSettings() != null) {
             resp.setBasicSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
-                    .numberPrefix(entity.getBasicSettings().getNumberPrefix())
-                    .numberLength(entity.getBasicSettings().getNumberLength())
-                    .defaultPriority(entity.getBasicSettings().getDefaultPriority())
-                    .validityDays(entity.getBasicSettings().getValidityDays())
-                    .autoCloseHours(entity.getBasicSettings().getAutoCloseHours())
-                    .enableAutoClose(entity.getBasicSettings().getEnableAutoClose())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
+                            .numberPrefix(entity.getBasicSettings().getNumberPrefix())
+                            .numberLength(entity.getBasicSettings().getNumberLength())
+                            .defaultPriority(entity.getBasicSettings().getDefaultPriority())
+                            .validityDays(entity.getBasicSettings().getValidityDays())
+                            .autoCloseHours(entity.getBasicSettings().getAutoCloseHours())
+                            .enableAutoClose(entity.getBasicSettings().getEnableAutoClose())
+                            .build());
         }
         if (entity.getStatusFlowSettings() != null) {
             resp.setStatusFlowSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
-                    .content(entity.getStatusFlowSettings().getContent())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
+                            .content(entity.getStatusFlowSettings().getContent())
+                            .build());
         }
         if (entity.getPrioritySettings() != null) {
             resp.setPrioritySettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
-                    .content(entity.getPrioritySettings().getContent())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
+                            .content(entity.getPrioritySettings().getContent())
+                            .build());
         }
         if (entity.getAssignmentSettings() != null) {
             resp.setAssignmentSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
-                    .autoAssign(entity.getAssignmentSettings().getAutoAssign())
-                    .assignmentType(entity.getAssignmentSettings().getAssignmentType())
-                    .workingHoursEnabled(entity.getAssignmentSettings().getWorkingHoursEnabled())
-                    .workingHoursStart(entity.getAssignmentSettings().getWorkingHoursStart())
-                    .workingHoursEnd(entity.getAssignmentSettings().getWorkingHoursEnd())
-                    .workingDays(entity.getAssignmentSettings().getWorkingDays())
-                    .maxConcurrentTickets(entity.getAssignmentSettings().getMaxConcurrentTickets())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
+                            .autoAssign(entity.getAssignmentSettings().getAutoAssign())
+                            .assignmentType(entity.getAssignmentSettings().getAssignmentType())
+                            .workingHoursEnabled(entity.getAssignmentSettings().getWorkingHoursEnabled())
+                            .workingHoursStart(entity.getAssignmentSettings().getWorkingHoursStart())
+                            .workingHoursEnd(entity.getAssignmentSettings().getWorkingHoursEnd())
+                            .workingDays(entity.getAssignmentSettings().getWorkingDays())
+                            .maxConcurrentTickets(entity.getAssignmentSettings().getMaxConcurrentTickets())
+                            .build());
         }
         if (entity.getNotificationSettings() != null) {
             resp.setNotificationSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
-                    .emailEnabled(entity.getNotificationSettings().getEmailEnabled())
-                    .emailEvents(entity.getNotificationSettings().getEmailEvents())
-                    .emailTemplates(entity.getNotificationSettings().getEmailTemplates())
-                    .internalEnabled(entity.getNotificationSettings().getInternalEnabled())
-                    .internalEvents(entity.getNotificationSettings().getInternalEvents())
-                    .webhookEnabled(entity.getNotificationSettings().getWebhookEnabled())
-                    .webhookUrl(entity.getNotificationSettings().getWebhookUrl())
-                    .webhookEvents(entity.getNotificationSettings().getWebhookEvents())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
+                            .emailEnabled(entity.getNotificationSettings().getEmailEnabled())
+                            .emailEvents(entity.getNotificationSettings().getEmailEvents())
+                            .emailTemplates(entity.getNotificationSettings().getEmailTemplates())
+                            .internalEnabled(entity.getNotificationSettings().getInternalEnabled())
+                            .internalEvents(entity.getNotificationSettings().getInternalEvents())
+                            .webhookEnabled(entity.getNotificationSettings().getWebhookEnabled())
+                            .webhookUrl(entity.getNotificationSettings().getWebhookUrl())
+                            .webhookEvents(entity.getNotificationSettings().getWebhookEvents())
+                            .build());
         }
         if (entity.getCustomFieldSettings() != null) {
             resp.setCustomFieldSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
-                    .content(entity.getCustomFieldSettings().getContent())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
+                            .content(entity.getCustomFieldSettings().getContent())
+                            .build());
         }
         // 草稿版本映射
         if (entity.getDraftBasicSettings() != null) {
             resp.setDraftBasicSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
-                    .numberPrefix(entity.getDraftBasicSettings().getNumberPrefix())
-                    .numberLength(entity.getDraftBasicSettings().getNumberLength())
-                    .defaultPriority(entity.getDraftBasicSettings().getDefaultPriority())
-                    .validityDays(entity.getDraftBasicSettings().getValidityDays())
-                    .autoCloseHours(entity.getDraftBasicSettings().getAutoCloseHours())
-                    .enableAutoClose(entity.getDraftBasicSettings().getEnableAutoClose())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse.builder()
+                            .numberPrefix(entity.getDraftBasicSettings().getNumberPrefix())
+                            .numberLength(entity.getDraftBasicSettings().getNumberLength())
+                            .defaultPriority(entity.getDraftBasicSettings().getDefaultPriority())
+                            .validityDays(entity.getDraftBasicSettings().getValidityDays())
+                            .autoCloseHours(entity.getDraftBasicSettings().getAutoCloseHours())
+                            .enableAutoClose(entity.getDraftBasicSettings().getEnableAutoClose())
+                            .build());
         }
         if (entity.getDraftStatusFlowSettings() != null) {
             resp.setDraftStatusFlowSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
-                    .content(entity.getDraftStatusFlowSettings().getContent())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
+                            .content(entity.getDraftStatusFlowSettings().getContent())
+                            .build());
         }
         if (entity.getDraftPrioritySettings() != null) {
             resp.setDraftPrioritySettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
-                    .content(entity.getDraftPrioritySettings().getContent())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
+                            .content(entity.getDraftPrioritySettings().getContent())
+                            .build());
         }
         if (entity.getDraftAssignmentSettings() != null) {
             resp.setDraftAssignmentSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
-                    .autoAssign(entity.getDraftAssignmentSettings().getAutoAssign())
-                    .assignmentType(entity.getDraftAssignmentSettings().getAssignmentType())
-                    .workingHoursEnabled(entity.getDraftAssignmentSettings().getWorkingHoursEnabled())
-                    .workingHoursStart(entity.getDraftAssignmentSettings().getWorkingHoursStart())
-                    .workingHoursEnd(entity.getDraftAssignmentSettings().getWorkingHoursEnd())
-                    .workingDays(entity.getDraftAssignmentSettings().getWorkingDays())
-                    .maxConcurrentTickets(entity.getDraftAssignmentSettings().getMaxConcurrentTickets())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
+                            .autoAssign(entity.getDraftAssignmentSettings().getAutoAssign())
+                            .assignmentType(entity.getDraftAssignmentSettings().getAssignmentType())
+                            .workingHoursEnabled(entity.getDraftAssignmentSettings().getWorkingHoursEnabled())
+                            .workingHoursStart(entity.getDraftAssignmentSettings().getWorkingHoursStart())
+                            .workingHoursEnd(entity.getDraftAssignmentSettings().getWorkingHoursEnd())
+                            .workingDays(entity.getDraftAssignmentSettings().getWorkingDays())
+                            .maxConcurrentTickets(entity.getDraftAssignmentSettings().getMaxConcurrentTickets())
+                            .build());
         }
         if (entity.getDraftNotificationSettings() != null) {
             resp.setDraftNotificationSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
-                    .emailEnabled(entity.getDraftNotificationSettings().getEmailEnabled())
-                    .emailEvents(entity.getDraftNotificationSettings().getEmailEvents())
-                    .emailTemplates(entity.getDraftNotificationSettings().getEmailTemplates())
-                    .internalEnabled(entity.getDraftNotificationSettings().getInternalEnabled())
-                    .internalEvents(entity.getDraftNotificationSettings().getInternalEvents())
-                    .webhookEnabled(entity.getDraftNotificationSettings().getWebhookEnabled())
-                    .webhookUrl(entity.getDraftNotificationSettings().getWebhookUrl())
-                    .webhookEvents(entity.getDraftNotificationSettings().getWebhookEvents())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
+                            .emailEnabled(entity.getDraftNotificationSettings().getEmailEnabled())
+                            .emailEvents(entity.getDraftNotificationSettings().getEmailEvents())
+                            .emailTemplates(entity.getDraftNotificationSettings().getEmailTemplates())
+                            .internalEnabled(entity.getDraftNotificationSettings().getInternalEnabled())
+                            .internalEvents(entity.getDraftNotificationSettings().getInternalEvents())
+                            .webhookEnabled(entity.getDraftNotificationSettings().getWebhookEnabled())
+                            .webhookUrl(entity.getDraftNotificationSettings().getWebhookUrl())
+                            .webhookEvents(entity.getDraftNotificationSettings().getWebhookEvents())
+                            .build());
         }
         if (entity.getDraftCustomFieldSettings() != null) {
             resp.setDraftCustomFieldSettings(
-                com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
-                    .content(entity.getDraftCustomFieldSettings().getContent())
-                    .build()
-            );
+                    com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
+                            .content(entity.getDraftCustomFieldSettings().getContent())
+                            .build());
         }
         return resp;
     }
@@ -803,23 +821,5 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
     public TicketSettingsExcel convertToExcel(TicketSettingsEntity entity) {
         return modelMapper.map(entity, TicketSettingsExcel.class);
     }
-    
-    public void initTicketSettings(String orgUid) {
-        // log.info("initThreadTicketSettings");
-        // for (String ticketSettings : TicketSettingsInitData.getAllTicketSettingss()) {
-        //     TicketSettingsRequest ticketSettingsRequest = TicketSettingsRequest.builder()
-        //             .uid(Utils.formatUid(orgUid, ticketSettings))
-        //             .name(ticketSettings)
-        //             .order(0)
-        //             .type(TicketSettingsTypeEnum.THREAD.name())
-        //             .level(LevelEnum.ORGANIZATION.name())
-        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-        //             .orgUid(orgUid)
-        //             .build();
-        //     create(ticketSettingsRequest);
-        // }
-    }
 
-    
-    
 }

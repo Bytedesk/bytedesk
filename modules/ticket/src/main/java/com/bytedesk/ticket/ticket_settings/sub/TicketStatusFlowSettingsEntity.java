@@ -1,10 +1,13 @@
 package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,4 +37,20 @@ public class TicketStatusFlowSettingsEntity extends BaseEntity {
     @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.StatusFlowSettingsConverter.class)
     @Column(length = 4096)
     private com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData content = com.bytedesk.ticket.ticket_settings.sub.model.StatusFlowSettingsData.builder().build();
+
+    public static TicketStatusFlowSettingsEntity fromRequest(TicketStatusFlowSettingsRequest req) {
+        TicketStatusFlowSettingsEntity entity = new TicketStatusFlowSettingsEntity();
+        if (req == null || req.getContent() == null || req.getContent().isEmpty()) {
+            entity.setContent(StatusFlowSettingsData.builder().build());
+            return entity;
+        }
+        try {
+            ObjectMapper om = new ObjectMapper();
+            StatusFlowSettingsData data = om.readValue(req.getContent(), StatusFlowSettingsData.class);
+            entity.setContent(data == null ? StatusFlowSettingsData.builder().build() : data);
+        } catch (Exception e) {
+            entity.setContent(StatusFlowSettingsData.builder().build());
+        }
+        return entity;
+    }
 }

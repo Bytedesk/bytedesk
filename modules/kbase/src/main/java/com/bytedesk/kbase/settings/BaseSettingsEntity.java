@@ -78,31 +78,7 @@ public abstract class BaseSettingsEntity extends BaseEntity {
     @Column(name = "is_default")
     private Boolean isDefault = false;
 
-    /**
-     * Service settings (published)
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
-    private ServiceSettingsEntity serviceSettings;
-
-    /**
-     * Invitation settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
-    private InviteSettingsEntity inviteSettings;
-
-    /**
-     * Intention recognition settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
-    private IntentionSettingsEntity intentionSettings;
-
-    /**
+     /**
      * Whether the settings is enabled
      */
     @lombok.Builder.Default
@@ -110,12 +86,32 @@ public abstract class BaseSettingsEntity extends BaseEntity {
     private Boolean enabled = true;
 
     /**
+     * Service settings (published)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private ServiceSettingsEntity serviceSettings;
+
+    /**
+     * Invitation settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private InviteSettingsEntity inviteSettings;
+
+    /**
+     * Intention recognition settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private IntentionSettingsEntity intentionSettings;
+
+    /**
      * Draft service settings (used in admin editing/testing, not affecting online
      * runtime until published)
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private ServiceSettingsEntity draftServiceSettings;
 
     /**
@@ -123,7 +119,6 @@ public abstract class BaseSettingsEntity extends BaseEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private InviteSettingsEntity draftInviteSettings;
 
     /**
@@ -131,7 +126,6 @@ public abstract class BaseSettingsEntity extends BaseEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private IntentionSettingsEntity draftIntentionSettings;
 
     /**

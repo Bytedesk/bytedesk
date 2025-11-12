@@ -1,10 +1,12 @@
 package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -50,4 +52,25 @@ public class TicketAssignmentSettingsEntity extends BaseEntity {
 
     @Builder.Default
     private Integer maxConcurrentTickets = 10;
+
+    public static TicketAssignmentSettingsEntity fromRequest(TicketAssignmentSettingsRequest req) {
+        TicketAssignmentSettingsEntity entity = new TicketAssignmentSettingsEntity();
+        if (req == null) {
+            return entity;
+        }
+        if (req.getAutoAssign() != null) entity.setAutoAssign(req.getAutoAssign());
+        if (req.getAssignmentType() != null && !req.getAssignmentType().isEmpty()) entity.setAssignmentType(req.getAssignmentType());
+        if (req.getWorkingHoursEnabled() != null) entity.setWorkingHoursEnabled(req.getWorkingHoursEnabled());
+        if (req.getWorkingHoursStart() != null && !req.getWorkingHoursStart().isEmpty()) entity.setWorkingHoursStart(req.getWorkingHoursStart());
+        if (req.getWorkingHoursEnd() != null && !req.getWorkingHoursEnd().isEmpty()) entity.setWorkingHoursEnd(req.getWorkingHoursEnd());
+        if (req.getMaxConcurrentTickets() != null) entity.setMaxConcurrentTickets(req.getMaxConcurrentTickets());
+        if (req.getWorkingDays() != null && !req.getWorkingDays().isEmpty()) {
+            try {
+                ObjectMapper om = new ObjectMapper();
+                java.util.List<Integer> days = java.util.Arrays.asList(om.readValue(req.getWorkingDays(), Integer[].class));
+                entity.setWorkingDays(days);
+            } catch (Exception ignore) {}
+        }
+        return entity;
+    }
 }

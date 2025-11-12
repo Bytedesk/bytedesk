@@ -1,10 +1,13 @@
 package com.bytedesk.ticket.ticket_settings.sub;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.model.EmailTemplateDef;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -56,4 +59,29 @@ public class TicketNotificationSettingsEntity extends BaseEntity {
     @Convert(converter = com.bytedesk.ticket.ticket_settings.sub.converter.StringListConverter.class)
     @Column(length = 512)
     private java.util.List<String> webhookEvents = new java.util.ArrayList<>();
+
+    public static TicketNotificationSettingsEntity fromRequest(TicketNotificationSettingsRequest req) {
+        TicketNotificationSettingsEntity entity = new TicketNotificationSettingsEntity();
+        if (req == null) {
+            return entity;
+        }
+        ObjectMapper om = new ObjectMapper();
+        if (req.getEmailEnabled() != null) entity.setEmailEnabled(req.getEmailEnabled());
+        if (req.getEmailEvents() != null && !req.getEmailEvents().isEmpty()) {
+            try { entity.setEmailEvents(java.util.Arrays.asList(om.readValue(req.getEmailEvents(), String[].class))); } catch (Exception ignore) {}
+        }
+        if (req.getEmailTemplates() != null && !req.getEmailTemplates().isEmpty()) {
+            try { entity.setEmailTemplates(java.util.Arrays.asList(om.readValue(req.getEmailTemplates(), EmailTemplateDef[].class))); } catch (Exception ignore) {}
+        }
+        if (req.getInternalEnabled() != null) entity.setInternalEnabled(req.getInternalEnabled());
+        if (req.getInternalEvents() != null && !req.getInternalEvents().isEmpty()) {
+            try { entity.setInternalEvents(java.util.Arrays.asList(om.readValue(req.getInternalEvents(), String[].class))); } catch (Exception ignore) {}
+        }
+        if (req.getWebhookEnabled() != null) entity.setWebhookEnabled(req.getWebhookEnabled());
+        if (req.getWebhookUrl() != null && !req.getWebhookUrl().isEmpty()) entity.setWebhookUrl(req.getWebhookUrl());
+        if (req.getWebhookEvents() != null && !req.getWebhookEvents().isEmpty()) {
+            try { entity.setWebhookEvents(java.util.Arrays.asList(om.readValue(req.getWebhookEvents(), String[].class))); } catch (Exception ignore) {}
+        }
+        return entity;
+    }
 }

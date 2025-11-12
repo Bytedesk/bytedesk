@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ticket.ticket_settings;
 
+import java.time.ZonedDateTime;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity;
@@ -23,6 +25,7 @@ import com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -67,6 +70,21 @@ public class TicketSettingsEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
+    /**
+     * Whether this is a default settings template for new entities
+     * Only one settings per organization should have isDefault=true
+     */
+    @lombok.Builder.Default
+    @Column(name = "is_default")
+    private Boolean isDefault = false;
+
+     /**
+     * Whether the settings is enabled
+     */
+    @lombok.Builder.Default
+    @Column(name = "is_enabled")
+    private Boolean enabled = true;
+
     // ====== 发布版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity basicSettings;
@@ -105,5 +123,15 @@ public class TicketSettingsEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketCustomFieldSettingsEntity draftCustomFieldSettings;
     
+    /**
+     * Whether there are unpublished changes in draft
+     */
+    @lombok.Builder.Default
+    private Boolean hasUnpublishedChanges = false;
+
+    /**
+     * Last published time
+     */
+    private ZonedDateTime publishedAt;
 
 }

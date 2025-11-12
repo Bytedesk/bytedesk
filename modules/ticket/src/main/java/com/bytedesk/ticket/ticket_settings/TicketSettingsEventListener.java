@@ -13,12 +13,7 @@
  */
 package com.bytedesk.ticket.ticket_settings;
 
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,16 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TicketSettingsEventListener {
 
-    private final TicketSettingsRestService ticketSettingsRestService;
-
-    @Order(3)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        ticketSettingsRestService.initTicketSettings(orgUid);
-    }
 
  
 }

@@ -14,16 +14,37 @@
 package com.bytedesk.service.workgroup;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
+
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
+import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
 
 import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostUpdate;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class WorkgroupEntityListener {
 
-    
     @PostPersist
     public void onPostPersist(WorkgroupEntity workgroup) {
-        System.out.println("WorkgroupListener: onPostPersist");
+        log.info("onPostPersist: {}", workgroup);
+        WorkgroupEntity cloneWorkgroup = SerializationUtils.clone(workgroup);
+        // 
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishEvent(new WorkgroupCreateEvent(cloneWorkgroup));
+    }
+
+    @PostUpdate
+    public void onPostUpdate(WorkgroupEntity workgroup) {
+        log.info("onPostUpdate: {}", workgroup);
+        WorkgroupEntity cloneWorkgroup = SerializationUtils.clone(workgroup);
+        // 
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishEvent(new WorkgroupUpdateEvent(cloneWorkgroup));
     }
 
 }
