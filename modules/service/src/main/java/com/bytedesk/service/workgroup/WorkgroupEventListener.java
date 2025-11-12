@@ -73,9 +73,6 @@ public class WorkgroupEventListener {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
-        // TODO: Settings should be managed through WorkgroupSettingsEntity
-        // workgroupRequest.getMessageLeaveSettings().setWorktimeUids(worktimeUids);
-
         workgroupService.create(workgroupRequest);
     }
 

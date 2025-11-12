@@ -163,6 +163,29 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         TicketSettingsResponse resp = ticketSettingsRestService.publishByWorkgroup(request.getOrgUid(), request.getWorkgroupUid());
         return ResponseEntity.ok(JsonResult.success(resp));
     }
+
+    // ===== 新增：批量绑定工作组到指定 TicketSettings =====
+    @ActionAnnotation(title = "Ticket Settings", action = "批量绑定工作组", description = "将多个工作组绑定到同一套工单设置")
+    @Operation(summary = "Bind workgroups to TicketSettings", description = "Bind multiple workgroups to one ticket settings instance")
+    @PostMapping("/bindings/batch")
+    public ResponseEntity<?> bindWorkgroups(@RequestBody TicketSettingsRequest request) {
+        if (request == null || request.getOrgUid() == null || request.getUid() == null || request.getWorkgroupUids() == null) {
+            return ResponseEntity.badRequest().body(JsonResult.error("orgUid, uid and workgroupUids are required"));
+        }
+        ticketSettingsRestService.bindWorkgroups(request.getUid(), request.getOrgUid(), request.getWorkgroupUids());
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
+    // ===== 新增：查询某 TicketSettings 已绑定的工作组列表 =====
+    @ActionAnnotation(title = "Ticket Settings", action = "查询绑定工作组", description = "列出使用该工单设置的所有工作组")
+    @Operation(summary = "List bound workgroups", description = "List workgroups bound to the given ticket settings")
+    @GetMapping("/bindings")
+    public ResponseEntity<?> listBindings(TicketSettingsRequest request) {
+        if (request == null || request.getUid() == null) {
+            return ResponseEntity.badRequest().body(JsonResult.error("uid is required"));
+        }
+        return ResponseEntity.ok(JsonResult.success(ticketSettingsRestService.listBindings(request.getUid())));
+    }
     
     
 }

@@ -51,7 +51,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         initPermissions();
     }
 
-    // 迁移到 unifiedInitializer 执行
     public void init() {
 
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
@@ -65,6 +64,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
+        workgroupService.create(workgroupRequest);
          // add workgroup before
         WorkgroupRequest workgroupBeforeRequest = WorkgroupRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_PRESALES)
@@ -73,27 +73,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
-        // 写入 faq uid 到 welcomeFaqUids
-        // TODO: Settings should be managed through WorkgroupSettingsEntity
-        // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
-        // workgroupRequest.getServiceSettings().setWelcomeKbUid(kbUid);
-        // workgroupBeforeRequest.getServiceSettings().setWelcomeKbUid(kbUid);
-        // // 将 faq_001 ~ faq_005 写入到 welcomeFaqUids
-        // for (int i = 1; i <= 5; i++) {
-        //     String faqUid = Utils.formatUid(orgUid, "faq_00" + i);
-        //     workgroupRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
-        //     workgroupBeforeRequest.getServiceSettings().getWelcomeFaqUids().add(faqUid);
-        // }
-        // workgroupRequest.getServiceSettings().setFaqKbUid(kbUid);
-        // workgroupRequest.getRobotSettings().setDefaultRobot(true);
-        // workgroupRequest.getRobotSettings().setOfflineRobot(true);
-        // workgroupRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
-        workgroupService.create(workgroupRequest);
-        // 
-        // workgroupBeforeRequest.getServiceSettings().setFaqKbUid(kbUid);
-        // workgroupBeforeRequest.getRobotSettings().setDefaultRobot(true);
-        // workgroupBeforeRequest.getRobotSettings().setOfflineRobot(true);
-        // workgroupBeforeRequest.getRobotSettings().setRobotUid(BytedeskConsts.DEFAULT_ROBOT_UID);
         workgroupService.create(workgroupBeforeRequest);
         // add workgroup after
         WorkgroupRequest workgroupAfterRequest = WorkgroupRequest.builder()
@@ -105,7 +84,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .build();
         workgroupService.create(workgroupAfterRequest);
     }
-    
 
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {

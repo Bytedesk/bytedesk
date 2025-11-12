@@ -54,4 +54,9 @@ public class TicketSettingsRequest extends BaseRequest {
     private TicketNotificationSettingsRequest draftNotificationSettings;
     private TicketCustomFieldSettingsRequest draftCustomFieldSettings;
 
+    /**
+     * 批量绑定使用：多个工作组 UID 列表
+     */
+    private java.util.List<String> workgroupUids;
+
 }
