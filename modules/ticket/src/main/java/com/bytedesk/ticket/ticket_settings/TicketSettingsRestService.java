@@ -28,6 +28,12 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketCustomFieldSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketNotificationSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -88,13 +94,99 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         if (user != null) {
             request.setUserUid(user.getUid());
         }
-        // 
+        // 基础实体
         TicketSettingsEntity entity = modelMapper.map(request, TicketSettingsEntity.class);
-    // 移除 lastModifiedUserUid 字段，不再记录最近修改人
+        // 赋 UID
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
-        // 
+
+        // 初始化并绑定发布 + 草稿子配置，参考 WorkgroupSettings 的 create 逻辑
+        // Basic
+        TicketBasicSettingsEntity basic = new TicketBasicSettingsEntity();
+        basic.setUid(uidUtils.getUid());
+        TicketBasicSettingsEntity draftBasic = new TicketBasicSettingsEntity();
+        draftBasic.setUid(uidUtils.getUid());
+        if (request.getDraftBasicSettings() != null) {
+            modelMapper.map(request.getDraftBasicSettings(), draftBasic);
+        }
+        // 初始创建时，发布版本以草稿为基准；保留发布 UID
+        String basicUid = basic.getUid();
+        modelMapper.map(draftBasic, basic);
+        basic.setUid(basicUid);
+        entity.setBasicSettings(basic);
+        entity.setDraftBasicSettings(draftBasic);
+
+        // StatusFlow
+        TicketStatusFlowSettingsEntity statusFlow = new TicketStatusFlowSettingsEntity();
+        statusFlow.setUid(uidUtils.getUid());
+        TicketStatusFlowSettingsEntity draftStatusFlow = new TicketStatusFlowSettingsEntity();
+        draftStatusFlow.setUid(uidUtils.getUid());
+        if (request.getDraftStatusFlowSettings() != null) {
+            modelMapper.map(request.getDraftStatusFlowSettings(), draftStatusFlow);
+        }
+        String statusFlowUid = statusFlow.getUid();
+        modelMapper.map(draftStatusFlow, statusFlow);
+        statusFlow.setUid(statusFlowUid);
+        entity.setStatusFlowSettings(statusFlow);
+        entity.setDraftStatusFlowSettings(draftStatusFlow);
+
+        // Priority
+        TicketPrioritySettingsEntity priority = new TicketPrioritySettingsEntity();
+        priority.setUid(uidUtils.getUid());
+        TicketPrioritySettingsEntity draftPriority = new TicketPrioritySettingsEntity();
+        draftPriority.setUid(uidUtils.getUid());
+        if (request.getDraftPrioritySettings() != null) {
+            modelMapper.map(request.getDraftPrioritySettings(), draftPriority);
+        }
+        String priorityUid = priority.getUid();
+        modelMapper.map(draftPriority, priority);
+        priority.setUid(priorityUid);
+        entity.setPrioritySettings(priority);
+        entity.setDraftPrioritySettings(draftPriority);
+
+        // Assignment
+        TicketAssignmentSettingsEntity assignment = new TicketAssignmentSettingsEntity();
+        assignment.setUid(uidUtils.getUid());
+        TicketAssignmentSettingsEntity draftAssignment = new TicketAssignmentSettingsEntity();
+        draftAssignment.setUid(uidUtils.getUid());
+        if (request.getDraftAssignmentSettings() != null) {
+            modelMapper.map(request.getDraftAssignmentSettings(), draftAssignment);
+        }
+        String assignmentUid = assignment.getUid();
+        modelMapper.map(draftAssignment, assignment);
+        assignment.setUid(assignmentUid);
+        entity.setAssignmentSettings(assignment);
+        entity.setDraftAssignmentSettings(draftAssignment);
+
+        // Notification
+        TicketNotificationSettingsEntity notifySettings = new TicketNotificationSettingsEntity();
+        notifySettings.setUid(uidUtils.getUid());
+        TicketNotificationSettingsEntity draftNotify = new TicketNotificationSettingsEntity();
+        draftNotify.setUid(uidUtils.getUid());
+        if (request.getDraftNotificationSettings() != null) {
+            modelMapper.map(request.getDraftNotificationSettings(), draftNotify);
+        }
+        String notifyUid = notifySettings.getUid();
+        modelMapper.map(draftNotify, notifySettings);
+        notifySettings.setUid(notifyUid);
+        entity.setNotificationSettings(notifySettings);
+        entity.setDraftNotificationSettings(draftNotify);
+
+        // CustomField
+        TicketCustomFieldSettingsEntity customField = new TicketCustomFieldSettingsEntity();
+        customField.setUid(uidUtils.getUid());
+        TicketCustomFieldSettingsEntity draftCustomField = new TicketCustomFieldSettingsEntity();
+        draftCustomField.setUid(uidUtils.getUid());
+        if (request.getDraftCustomFieldSettings() != null) {
+            modelMapper.map(request.getDraftCustomFieldSettings(), draftCustomField);
+        }
+        String customFieldUid = customField.getUid();
+        modelMapper.map(draftCustomField, customField);
+        customField.setUid(customFieldUid);
+        entity.setCustomFieldSettings(customField);
+        entity.setDraftCustomFieldSettings(draftCustomField);
+
         TicketSettingsEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create ticketSettings failed");
@@ -108,9 +200,89 @@ public class TicketSettingsRestService extends BaseRestServiceWithExport<TicketS
         Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             TicketSettingsEntity entity = optional.get();
+            // 更新基础字段（不直接覆盖子配置）
             modelMapper.map(request, entity);
-            // 移除 lastModifiedUserUid 字段，不再记录最近修改人
-            //
+
+            // 仅更新草稿子配置：与 WorkgroupSettingsRestService.update 一致
+            if (request.getDraftBasicSettings() != null) {
+                TicketBasicSettingsEntity draft = entity.getDraftBasicSettings();
+                if (draft == null) {
+                    draft = new TicketBasicSettingsEntity();
+                    draft.setUid(uidUtils.getUid());
+                    modelMapper.map(request.getDraftBasicSettings(), draft);
+                    entity.setDraftBasicSettings(draft);
+                } else {
+                    String originalUid = draft.getUid();
+                    modelMapper.map(request.getDraftBasicSettings(), draft);
+                    draft.setUid(originalUid);
+                }
+            }
+            if (request.getDraftStatusFlowSettings() != null) {
+                TicketStatusFlowSettingsEntity draft = entity.getDraftStatusFlowSettings();
+                if (draft == null) {
+                    draft = new TicketStatusFlowSettingsEntity();
+                    draft.setUid(uidUtils.getUid());
+                    modelMapper.map(request.getDraftStatusFlowSettings(), draft);
+                    entity.setDraftStatusFlowSettings(draft);
+                } else {
+                    String originalUid = draft.getUid();
+                    modelMapper.map(request.getDraftStatusFlowSettings(), draft);
+                    draft.setUid(originalUid);
+                }
+            }
+            if (request.getDraftPrioritySettings() != null) {
+                TicketPrioritySettingsEntity draft = entity.getDraftPrioritySettings();
+                if (draft == null) {
+                    draft = new TicketPrioritySettingsEntity();
+                    draft.setUid(uidUtils.getUid());
+                    modelMapper.map(request.getDraftPrioritySettings(), draft);
+                    entity.setDraftPrioritySettings(draft);
+                } else {
+                    String originalUid = draft.getUid();
+                    modelMapper.map(request.getDraftPrioritySettings(), draft);
+                    draft.setUid(originalUid);
+                }
+            }
+            if (request.getDraftAssignmentSettings() != null) {
+                TicketAssignmentSettingsEntity draft = entity.getDraftAssignmentSettings();
+                if (draft == null) {
+                    draft = new TicketAssignmentSettingsEntity();
+                    draft.setUid(uidUtils.getUid());
+                    modelMapper.map(request.getDraftAssignmentSettings(), draft);
+                    entity.setDraftAssignmentSettings(draft);
+                } else {
+                    String originalUid = draft.getUid();
+                    modelMapper.map(request.getDraftAssignmentSettings(), draft);
+                    draft.setUid(originalUid);
+                }
+            }
+            if (request.getDraftNotificationSettings() != null) {
+                TicketNotificationSettingsEntity draft = entity.getDraftNotificationSettings();
+                if (draft == null) {
+                    draft = new TicketNotificationSettingsEntity();
+                    draft.setUid(uidUtils.getUid());
+                    modelMapper.map(request.getDraftNotificationSettings(), draft);
+                    entity.setDraftNotificationSettings(draft);
+                } else {
+                    String originalUid = draft.getUid();
+                    modelMapper.map(request.getDraftNotificationSettings(), draft);
+                    draft.setUid(originalUid);
+                }
+            }
+            if (request.getDraftCustomFieldSettings() != null) {
+                TicketCustomFieldSettingsEntity draft = entity.getDraftCustomFieldSettings();
+                if (draft == null) {
+                    draft = new TicketCustomFieldSettingsEntity();
+                    draft.setUid(uidUtils.getUid());
+                    modelMapper.map(request.getDraftCustomFieldSettings(), draft);
+                    entity.setDraftCustomFieldSettings(draft);
+                } else {
+                    String originalUid = draft.getUid();
+                    modelMapper.map(request.getDraftCustomFieldSettings(), draft);
+                    draft.setUid(originalUid);
+                }
+            }
+
             TicketSettingsEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update ticketSettings failed");

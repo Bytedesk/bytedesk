@@ -23,7 +23,6 @@ import com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -71,7 +70,6 @@ public class TicketSettingsEntity extends BaseEntity {
     /**
      * 关联工作组UID。一个工作组对应一套工单配置；与 orgUid 组合唯一。
      */
-    @Column(name = "workgroup_uid")
     private String workgroupUid;
 
     // ====== 发布版本 ======
