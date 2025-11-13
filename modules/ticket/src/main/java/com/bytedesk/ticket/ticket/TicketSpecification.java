@@ -38,9 +38,9 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             // 使用基类方法处理超级管理员权限和组织过滤
             // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             
-            if (StringUtils.hasText(request.getTitle())) {
-                predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
-            }
+            // if (StringUtils.hasText(request.getTitle())) {
+            //     predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
+            // }
             // description
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));

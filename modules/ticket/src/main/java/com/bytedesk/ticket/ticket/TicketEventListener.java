@@ -84,7 +84,7 @@ public class TicketEventListener {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
                 .tenantId(ticket.getOrgUid())
-                .name(ticket.getTitle())
+                // .name(ticket.getTitle())
                 .businessKey(ticket.getUid())
                 .variables(variables)
                 .start();

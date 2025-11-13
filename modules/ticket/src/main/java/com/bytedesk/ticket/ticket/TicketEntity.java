@@ -59,8 +59,8 @@ public class TicketEntity extends BaseEntity {
     /**
      * Title of the support ticket (required field)
      */
-    @Column(nullable = false)
-    private String title;           // 工单标题(必填)
+    // @Column(nullable = false)
+    // private String title;           // 工单标题(必填)
     
     /**
      * Detailed description of the ticket issue (optional)
