@@ -82,7 +82,7 @@ Listed course START -->
 						<img src="/assets/images/element/engineering.svg" alt="<@t key='alt.suite.kbase'>企业知识库图标</@t>">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="/features/kbase.html" class="stretched-link"><@t key="section.suite.item.kbase.title">企业知识库/帮助中心</@t></a></h5>
+					<h5 class="mb-1"><a href="/features/kbase.html" class="stretched-link"><@t key="section.suite.item.kbase.title">企业知识库</@t></a></h5>
 					<span class="mb-0"><@t key="section.suite.item.kbase.desc">内部客服中心，AI写作助手，AI知识库问答，自动撰写内容，内部知识库管理、文档管理、对外知识库、帮助文档、内容公告</@t></span>
 				</div>
 			</div>
