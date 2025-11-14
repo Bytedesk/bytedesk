@@ -80,8 +80,6 @@ public class TicketSettingsEntity extends BaseEntity {
     private Boolean enabled = true;
 
     // 
-
-
     // ====== 发布版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity basicSettings;
