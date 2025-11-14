@@ -67,6 +67,12 @@ public class TicketEntity extends BaseEntity {
      */
     private String description;     // 工单描述(选填)
 
+    // 联系手机号
+    private String phone;           // 联系手机号
+    
+    // 联系邮箱
+    private String email;           // 联系邮箱
+
     /**
      * Current status of the ticket (NEW, IN_PROGRESS, RESOLVED, CLOSED)
      */

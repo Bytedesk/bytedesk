@@ -16,6 +16,7 @@ package com.bytedesk.ticket.ticket_settings;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsRequest;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest;
@@ -58,5 +59,9 @@ public class TicketSettingsRequest extends BaseRequest {
     private TicketAssignmentSettingsRequest assignmentSettings;
     private TicketNotificationSettingsRequest notificationSettings;
     private TicketCustomFieldSettingsRequest customFieldSettings;
+
+    private TicketCategorySettingsRequest categorySettings;
+
+    private TicketCategorySettingsRequest draftCategorySettings;
 
 }

@@ -13,7 +13,10 @@
  */
 package com.bytedesk.ticket.ticket_settings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.time.ZonedDateTime;
 
 import org.modelmapper.ModelMapper;
@@ -32,6 +35,12 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository;
 import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.TicketCategorySettingsEntity;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsRequest;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategoryItemResponse;
+import com.bytedesk.ticket.ticket_settings.sub.model.CategoryItemData;
+import com.bytedesk.ticket.ticket_settings.sub.model.CategorySettingsData;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -111,6 +120,16 @@ public class TicketSettingsRestService extends
         TicketBasicSettingsEntity draftBasic = TicketBasicSettingsEntity.fromRequest(request.getBasicSettings(), modelMapper);
         draftBasic.setUid(uidUtils.getUid());
         entity.setDraftBasicSettings(draftBasic);
+
+        TicketCategorySettingsEntity category = TicketCategorySettingsEntity
+            .fromRequest(request.getCategorySettings(), uidUtils::getUid);
+        category.setUid(uidUtils.getUid());
+        entity.setCategorySettings(category);
+
+        TicketCategorySettingsEntity draftCategory = TicketCategorySettingsEntity
+            .fromRequest(resolveDraftCategoryRequest(request), uidUtils::getUid);
+        draftCategory.setUid(uidUtils.getUid());
+        entity.setDraftCategorySettings(draftCategory);
 
         // // StatusFlow
         // TicketStatusFlowSettingsEntity statusFlow = new TicketStatusFlowSettingsEntity();
@@ -199,6 +218,31 @@ public class TicketSettingsRestService extends
             // 更新基础字段（不直接覆盖子配置）
             modelMapper.map(request, entity);
             boolean draftUpdated = false;
+
+            if (request.getCategorySettings() != null) {
+                TicketCategorySettingsEntity category = entity.getCategorySettings();
+                if (category == null) {
+                    category = TicketCategorySettingsEntity
+                            .fromRequest(request.getCategorySettings(), uidUtils::getUid);
+                    category.setUid(uidUtils.getUid());
+                    entity.setCategorySettings(category);
+                } else {
+                    category.replaceFromRequest(request.getCategorySettings(), uidUtils::getUid);
+                }
+            }
+
+            if (request.getDraftCategorySettings() != null) {
+                TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
+                if (draftCategory == null) {
+                    draftCategory = TicketCategorySettingsEntity
+                            .fromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                    draftCategory.setUid(uidUtils.getUid());
+                    entity.setDraftCategorySettings(draftCategory);
+                } else {
+                    draftCategory.replaceFromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                }
+                draftUpdated = true;
+            }
 
             // // 仅更新草稿子配置：与 WorkgroupSettingsRestService.update 一致
             // if (request.getDraftBasicSettings() != null) {
@@ -364,6 +408,14 @@ public class TicketSettingsRestService extends
                 .enabled(true)
                 .build();
 
+        TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
+        category.setUid(uidUtils.getUid());
+        settings.setCategorySettings(category);
+
+        TicketCategorySettingsEntity draftCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
+        draftCategory.setUid(uidUtils.getUid());
+        settings.setDraftCategorySettings(draftCategory);
+
         // // 依照 WorkgroupSettingsRestService 排列方式：每种子配置“发布 + 草稿”成对紧邻，便于阅读与维护
         // // Basic (published + draft)
         // TicketBasicSettingsEntity basic = TicketBasicSettingsEntity.fromRequest(null, modelMapper);
@@ -490,6 +542,18 @@ public class TicketSettingsRestService extends
             entity.setDescription(request.getDescription());
         }
         boolean draftUpdated = false;
+        if (request.getDraftCategorySettings() != null) {
+            TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
+            if (draftCategory == null) {
+                draftCategory = TicketCategorySettingsEntity
+                        .fromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                draftCategory.setUid(uidUtils.getUid());
+                entity.setDraftCategorySettings(draftCategory);
+            } else {
+                draftCategory.replaceFromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+            }
+            draftUpdated = true;
+        }
         // if (request.getDraftBasicSettings() != null) {
         //     TicketBasicSettingsEntity draft = entity.getDraftBasicSettings();
         //     if (draft == null) {
@@ -799,6 +863,22 @@ public class TicketSettingsRestService extends
         //     }
         // }
 
+        if (entity.getDraftCategorySettings() != null) {
+            TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
+            TicketCategorySettingsEntity publishedCategory = entity.getCategorySettings();
+            if (publishedCategory == null) {
+                publishedCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
+                publishedCategory.setUid(uidUtils.getUid());
+                entity.setCategorySettings(publishedCategory);
+            }
+            if (draftCategory.getContent() != null) {
+                draftCategory.getContent().normalize();
+                publishedCategory.setContent(copyCategorySettings(draftCategory.getContent()));
+            } else {
+                publishedCategory.setContent(CategorySettingsData.builder().build());
+            }
+        }
+
         // 发布时间与草稿标记维护
         entity.setPublishedAt(ZonedDateTime.now());
         entity.setHasUnpublishedChanges(false);
@@ -929,6 +1009,66 @@ public class TicketSettingsRestService extends
         deleteByUid(request.getUid());
     }
 
+    private TicketCategorySettingsRequest resolveDraftCategoryRequest(TicketSettingsRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return request.getDraftCategorySettings() != null
+                ? request.getDraftCategorySettings()
+                : request.getCategorySettings();
+    }
+
+    private CategorySettingsData copyCategorySettings(CategorySettingsData source) {
+        if (source == null) {
+            CategorySettingsData copy = CategorySettingsData.builder().build();
+            copy.normalize();
+            return copy;
+        }
+        List<CategoryItemData> copiedItems = source.getItems() == null
+                ? new ArrayList<>()
+                : source.getItems().stream()
+                        .map(item -> CategoryItemData.builder()
+                                .uid(item.getUid())
+                                .name(item.getName())
+                                .description(item.getDescription())
+                                .enabled(item.getEnabled())
+                                .defaultCategory(item.getDefaultCategory())
+                                .orderIndex(item.getOrderIndex())
+                                .build())
+                        .collect(Collectors.toList());
+        CategorySettingsData copy = CategorySettingsData.builder()
+                .items(copiedItems)
+                .build();
+        copy.normalize();
+        return copy;
+    }
+
+    private TicketCategorySettingsResponse mapCategorySettings(TicketCategorySettingsEntity entity) {
+        if (entity == null || entity.getContent() == null) {
+            return null;
+        }
+        CategorySettingsData content = entity.getContent();
+        List<TicketCategoryItemResponse> items = content.getItems() == null
+                ? new ArrayList<>()
+                : content.getItems().stream()
+                        .map(item -> TicketCategoryItemResponse.builder()
+                                .uid(item.getUid())
+                                .name(item.getName())
+                                .description(item.getDescription())
+                                .enabled(item.getEnabled())
+                                .defaultCategory(item.getDefaultCategory())
+                                .orderIndex(item.getOrderIndex())
+                                .build())
+                        .collect(Collectors.toList());
+        return TicketCategorySettingsResponse.builder()
+                .items(items)
+                .defaultCategoryUid(content.resolveDefaultUid())
+                .enabledCount(content.countEnabled())
+                .disabledCount(content.countDisabled())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
+
     @Override
     public TicketSettingsResponse convertToResponse(TicketSettingsEntity entity) {
         TicketSettingsResponse resp = modelMapper.map(entity, TicketSettingsResponse.class);
@@ -1042,6 +1182,8 @@ public class TicketSettingsRestService extends
         //                     .content(entity.getDraftCustomFieldSettings().getContent())
         //                     .build());
         // }
+        resp.setCategorySettings(mapCategorySettings(entity.getCategorySettings()));
+        resp.setDraftCategorySettings(mapCategorySettings(entity.getDraftCategorySettings()));
         return resp;
     }
 

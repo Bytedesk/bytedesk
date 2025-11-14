@@ -18,6 +18,7 @@ import com.bytedesk.core.base.BaseResponse;
 import java.time.ZonedDateTime;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse;
@@ -73,6 +74,7 @@ public class TicketSettingsResponse extends BaseResponse {
     private TicketAssignmentSettingsResponse assignmentSettings;
     private TicketNotificationSettingsResponse notificationSettings;
     private TicketCustomFieldSettingsResponse customFieldSettings;
+    private TicketCategorySettingsResponse categorySettings;
 
     // ===== 草稿版本（编辑态用，使用同一响应结构便于统一渲染） =====
     private TicketBasicSettingsResponse draftBasicSettings;
@@ -81,5 +83,6 @@ public class TicketSettingsResponse extends BaseResponse {
     private TicketAssignmentSettingsResponse draftAssignmentSettings;
     private TicketNotificationSettingsResponse draftNotificationSettings;
     private TicketCustomFieldSettingsResponse draftCustomFieldSettings;
+    private TicketCategorySettingsResponse draftCategorySettings;
 
 }
