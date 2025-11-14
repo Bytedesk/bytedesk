@@ -4,7 +4,6 @@ import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.modelmapper.ModelMapper;
-import org.springframework.util.StringUtils;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,22 +50,11 @@ public class TicketBasicSettingsEntity extends BaseEntity {
      * 静态工厂：根据请求DTO与可选ModelMapper构建实体。
      * 为空时返回默认配置；非空字段才覆盖默认值。
      */
-    public static TicketBasicSettingsEntity fromRequest(TicketBasicSettingsRequest req, ModelMapper mapper) {
-        TicketBasicSettingsEntity entity = new TicketBasicSettingsEntity();
-        if (req == null) {
-            return entity; // 返回默认
+    public static TicketBasicSettingsEntity fromRequest(TicketBasicSettingsRequest request, ModelMapper mapper) {
+        if (request == null || mapper == null) {
+            return TicketBasicSettingsEntity.builder().build(); // 返回默认
         }
         // 若提供 mapper，直接 map 后再补默认值（避免为 null 覆盖默认）
-        if (mapper != null) {
-            mapper.map(req, entity);
-        } else {
-            if (StringUtils.hasText(req.getNumberPrefix())) entity.setNumberPrefix(req.getNumberPrefix());
-            if (req.getNumberLength() != null) entity.setNumberLength(req.getNumberLength());
-            if (StringUtils.hasText(req.getDefaultPriority())) entity.setDefaultPriority(req.getDefaultPriority());
-            if (req.getValidityDays() != null) entity.setValidityDays(req.getValidityDays());
-            if (req.getAutoCloseHours() != null) entity.setAutoCloseHours(req.getAutoCloseHours());
-            if (req.getEnableAutoClose() != null) entity.setEnableAutoClose(req.getEnableAutoClose());
-        }
-        return entity;
+        return mapper.map(request, TicketBasicSettingsEntity.class);
     }
 }

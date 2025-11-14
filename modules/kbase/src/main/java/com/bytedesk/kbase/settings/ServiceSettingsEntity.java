@@ -324,7 +324,7 @@ public class ServiceSettingsEntity extends BaseEntity {
      */
     public static ServiceSettingsEntity fromRequest(ServiceSettingsRequest request, ModelMapper modelMapper) {
         // 如果 request 为 null，返回默认值
-        if (request == null) {
+        if (request == null || modelMapper == null) {
             return ServiceSettingsEntity.builder().build();
         }
         

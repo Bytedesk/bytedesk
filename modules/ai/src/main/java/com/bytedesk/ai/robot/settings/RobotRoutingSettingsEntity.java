@@ -78,7 +78,7 @@ public class RobotRoutingSettingsEntity extends BaseEntity {
      * @return 非空的 RobotRoutingSettingsEntity 实例
      */
     public static RobotRoutingSettingsEntity fromRequest(RobotRoutingSettingsRequest request) {
-        if (request == null) {
+        if (request == null ) {
             return RobotRoutingSettingsEntity.builder().build();
         }
         return RobotRoutingSettingsEntity.builder()

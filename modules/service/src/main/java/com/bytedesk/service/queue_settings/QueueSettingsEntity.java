@@ -68,7 +68,7 @@ public class QueueSettingsEntity extends BaseEntity {
      * @return QueueSettings 实体，永远不为 null
      */
     public static QueueSettingsEntity fromRequest(QueueSettingsRequest request, ModelMapper modelMapper) {
-        if (request == null) {
+        if (request == null || modelMapper == null) {
             return QueueSettingsEntity.builder().build();
         }
         

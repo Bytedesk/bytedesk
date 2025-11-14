@@ -115,7 +115,7 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
      * @return MessageLeaveSettings 实体，永远不为 null
      */
     public static MessageLeaveSettingsEntity fromRequest(MessageLeaveSettingsRequest request, ModelMapper modelMapper) {
-        if (request == null) {
+        if (request == null || modelMapper == null) {
             return MessageLeaveSettingsEntity.builder().build();
         }
         

@@ -276,7 +276,7 @@ public class InviteSettingsEntity extends BaseEntity {
      * @return InviteSettings 实体，永远不为 null
      */
     public static InviteSettingsEntity fromRequest(InviteSettingsRequest request, ModelMapper modelMapper) {
-        if (request == null) {
+        if (request == null || modelMapper == null) {
             return InviteSettingsEntity.builder().build();
         }
         return modelMapper.map(request, InviteSettingsEntity.class);

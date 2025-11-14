@@ -172,7 +172,7 @@ public class IntentionSettingsEntity extends BaseEntity {
      * @return IntentionSettings 实体，永远不为 null
      */
     public static IntentionSettingsEntity fromRequest(IntentionSettingsRequest request, ModelMapper modelMapper) {
-        if (request == null) {
+        if (request == null || modelMapper == null) {
             return IntentionSettingsEntity.builder().build();
         }
         return modelMapper.map(request, IntentionSettingsEntity.class);

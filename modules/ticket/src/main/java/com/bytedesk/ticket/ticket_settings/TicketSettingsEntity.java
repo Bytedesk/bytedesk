@@ -17,12 +17,7 @@ import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
-import com.bytedesk.ticket.ticket_settings.sub.TicketCustomFieldSettingsEntity;
-import com.bytedesk.ticket.ticket_settings.sub.TicketNotificationSettingsEntity;
-import com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity;
-import com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -84,43 +79,50 @@ public class TicketSettingsEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
+    // 
+
+
+
+
+
+
     // ====== 发布版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity basicSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketStatusFlowSettingsEntity statusFlowSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketStatusFlowSettingsEntity statusFlowSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketPrioritySettingsEntity prioritySettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketPrioritySettingsEntity prioritySettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketAssignmentSettingsEntity assignmentSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketAssignmentSettingsEntity assignmentSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketNotificationSettingsEntity notificationSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketNotificationSettingsEntity notificationSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketCustomFieldSettingsEntity customFieldSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketCustomFieldSettingsEntity customFieldSettings;
 
     // ====== 草稿版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity draftBasicSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketStatusFlowSettingsEntity draftStatusFlowSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketStatusFlowSettingsEntity draftStatusFlowSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketPrioritySettingsEntity draftPrioritySettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketPrioritySettingsEntity draftPrioritySettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketAssignmentSettingsEntity draftAssignmentSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketAssignmentSettingsEntity draftAssignmentSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketNotificationSettingsEntity draftNotificationSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketNotificationSettingsEntity draftNotificationSettings;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketCustomFieldSettingsEntity draftCustomFieldSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketCustomFieldSettingsEntity draftCustomFieldSettings;
     
     /**
      * Whether there are unpublished changes in draft
