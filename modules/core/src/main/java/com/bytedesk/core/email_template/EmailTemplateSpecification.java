@@ -14,7 +14,34 @@
 package com.bytedesk.core.email_template;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.rbac.auth.AuthService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
+
+import jakarta.persistence.criteria.Predicate;
 
 public class EmailTemplateSpecification extends BaseSpecification<EmailTemplateEntity, EmailTemplateRequest> {
-    
+	public static Specification<EmailTemplateEntity> search(EmailTemplateRequest request, AuthService authService) {
+		return (root, query, cb) -> {
+			List<Predicate> predicates = new ArrayList<>();
+			predicates.addAll(getBasicPredicates(root, cb, request, authService));
+			// name
+			if (StringUtils.hasText(request.getName())) {
+				predicates.add(cb.like(root.get("name"), "%" + request.getName() + "%"));
+			}
+			// searchText across name/content
+			if (StringUtils.hasText(request.getSearchText())) {
+				String kw = request.getSearchText();
+				List<Predicate> orPreds = new ArrayList<>();
+				orPreds.add(cb.like(root.get("name"), "%" + kw + "%"));
+				orPreds.add(cb.like(root.get("content"), "%" + kw + "%"));
+				predicates.add(cb.or(orPreds.toArray(new Predicate[0])));
+			}
+			return cb.and(predicates.toArray(new Predicate[0]));
+		};
+	}
 }

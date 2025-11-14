@@ -32,10 +32,7 @@ public class EmailTemplateRequest extends BaseRequest {
     
     private static final long serialVersionUID = 1L;
 
-    
     private String name;
 
     // private String subject;
-
-    // private String content;
 }
