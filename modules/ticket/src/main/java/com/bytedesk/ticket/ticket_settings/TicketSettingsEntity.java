@@ -82,8 +82,6 @@ public class TicketSettingsEntity extends BaseEntity {
     // 
 
 
-
-
     // ====== 发布版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity basicSettings;

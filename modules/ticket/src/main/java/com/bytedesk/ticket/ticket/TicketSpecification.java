@@ -61,6 +61,19 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getThreadUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("threadUid"), request.getThreadUid()));
             }
+            // categoryUid
+            if (StringUtils.hasText(request.getCategoryUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
+            }
+            // workgroupUid
+            if (StringUtils.hasText(request.getWorkgroupUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("workgroupUid"), request.getWorkgroupUid()));
+            }
+            // departmentUid
+            if (StringUtils.hasText(request.getDepartmentUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("departmentUid"), request.getDepartmentUid()));
+            }
+            //
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
