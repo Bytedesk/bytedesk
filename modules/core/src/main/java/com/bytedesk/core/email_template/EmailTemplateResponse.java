@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.email_template;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,10 +33,33 @@ public class EmailTemplateResponse extends BaseResponse {
  
     private static final long serialVersionUID = 1L;
 
- 
     private String name;
 
-    // private String subject;
+    private String subject;
+
+    private String preheader;
 
     private String content;
+
+    private String plainText;
+
+    private String contentType;
+
+    private String templateType;
+
+    private String status;
+
+    private String language;
+
+    private String description;
+
+    private List<String> tagList;
+
+    private Boolean enabled;
+
+    private Boolean defaultTemplate;
+
+    private Integer templateVersion;
+
+    private Long useCount;
 }

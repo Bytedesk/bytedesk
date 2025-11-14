@@ -13,8 +13,15 @@
  */
 package com.bytedesk.core.email_template;
 
-import com.bytedesk.core.base.BaseEntity;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -23,13 +30,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
+import lombok.Builder.Default;
 
 /**
  * 邮件模板
  */
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
@@ -39,10 +48,53 @@ public class EmailTemplateEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     
+    @Column(length = 128)
     private String name;
 
-    // private String subject;
+    @Column(length = 256)
+    private String subject;
 
+    @Column(length = 256)
+    private String preheader;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String plainText;
+
+    @Default
+    private String contentType = EmailTemplateContentTypeEnum.HTML.name();
+
+    @Default
+    private String templateType = EmailTemplateTypeEnum.TICKET_REPLY.name();
+    
+    @Default
+    private String status = EmailTemplateStatusEnum.DRAFT.name();
+
+    @Column(length = 16)
+    private String language;
+
+    @Column(length = 512)
+    private String description;
+
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    @Builder.Default
+    private List<String> tagList = new ArrayList<>();
+
+    @Default
+    private Boolean enabled = Boolean.TRUE;
+
+    @Default
+    private Boolean defaultTemplate = Boolean.FALSE;
+
+    @Default
+    private Integer templateVersion = 1;
+
+    @Default
+    private Long useCount = 0L;
+
+    
 
 }

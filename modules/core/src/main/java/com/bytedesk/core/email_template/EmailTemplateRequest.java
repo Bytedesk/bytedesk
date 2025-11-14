@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.email_template;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseRequest;
 
 import lombok.AllArgsConstructor;
@@ -34,5 +36,28 @@ public class EmailTemplateRequest extends BaseRequest {
 
     private String name;
 
-    // private String subject;
+    private String subject;
+
+    private String preheader;
+
+    // BaseRequest 已包含 content 字段，这里不重复声明
+    private String plainText;
+
+    private String contentType;
+
+    private String templateType;
+
+    private String status;
+
+    private String language;
+
+    private String description;
+
+    private List<String> tagList;
+
+    private Boolean enabled;
+
+    private Boolean defaultTemplate;
+
+    private Integer templateVersion;
 }
