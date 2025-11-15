@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.tag;
+package com.bytedesk.core.task;
 
 
 import com.bytedesk.core.base.BaseResponse;
@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagResponse extends BaseResponse {
+public class TaskResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,9 +38,5 @@ public class TagResponse extends BaseResponse {
     private String description;
 
     private String type;
-
-    private String color;
-
-    private Integer order;
 
 }

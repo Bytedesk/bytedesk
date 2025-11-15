@@ -61,7 +61,6 @@ public class TicketSettingsRequest extends BaseRequest {
     private TicketCustomFieldSettingsRequest customFieldSettings;
 
     private TicketCategorySettingsRequest categorySettings;
-
     private TicketCategorySettingsRequest draftCategorySettings;
 
 }

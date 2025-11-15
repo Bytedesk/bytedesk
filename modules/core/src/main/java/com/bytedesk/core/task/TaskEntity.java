@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.tag;
+package com.bytedesk.core.task;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -28,11 +28,16 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Tag entity for content categorization and organization
- * Provides tagging functionality for various system entities
+ * 待办任务：
+ * 一个工单内可以关联多个任务，
+ * 每个人都可以创建待办任务
+ * 可以单纯创建待办，也可以关联工单创建待办任务
  * 
- * Database Table: bytedesk_core_tag
- * Purpose: Stores tag definitions, colors, and organization settings
+ * Task entity for content categorization and organization
+ * Provides taskging functionality for various system entities
+ * 
+ * Database Table: bytedesk_core_task
+ * Purpose: Stores task definitions, colors, and organization settings
  */
 @Entity
 @Data
@@ -41,41 +46,28 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({TagEntityListener.class})
-@Table(name = "bytedesk_core_tag")
-public class TagEntity extends BaseEntity {
+// @EntityListeners({TaskEntityListener.class})
+@Table(name = "bytedesk_core_task")
+public class TaskEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Name of the tag
+     * Name of the task
      */
     private String name;
 
     /**
-     * Description of the tag
+     * Description of the task
      */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of tag (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Type of task (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "tag_type")
-    private String type = TagTypeEnum.CUSTOMER.name();
+    @Column(name = "task_type")
+    private String type = TaskTypeEnum.CUSTOMER.name();
 
-    /**
-     * Color theme for the tag display
-     */
-    @Builder.Default
-    @Column(name = "tag_color")
-    private String color = "red";
-
-    /**
-     * Display order of the tag
-     */
-    @Builder.Default
-    @Column(name = "tag_order")
-    private Integer order = 0;
 }

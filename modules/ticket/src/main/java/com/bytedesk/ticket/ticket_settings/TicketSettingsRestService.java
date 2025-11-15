@@ -34,7 +34,6 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository;
-import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketCategorySettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsRequest;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse;
@@ -114,12 +113,12 @@ public class TicketSettingsRestService extends
 
         // 初始化并绑定发布 + 草稿子配置，参考 WorkgroupSettings 的 create 逻辑
         // Basic
-        TicketBasicSettingsEntity basic = TicketBasicSettingsEntity.fromRequest(request.getBasicSettings(), modelMapper);
-        basic.setUid(uidUtils.getUid());
-        entity.setBasicSettings(basic);
-        TicketBasicSettingsEntity draftBasic = TicketBasicSettingsEntity.fromRequest(request.getBasicSettings(), modelMapper);
-        draftBasic.setUid(uidUtils.getUid());
-        entity.setDraftBasicSettings(draftBasic);
+        // TicketBasicSettingsEntity basic = TicketBasicSettingsEntity.fromRequest(request.getBasicSettings(), modelMapper);
+        // basic.setUid(uidUtils.getUid());
+        // entity.setBasicSettings(basic);
+        // TicketBasicSettingsEntity draftBasic = TicketBasicSettingsEntity.fromRequest(request.getBasicSettings(), modelMapper);
+        // draftBasic.setUid(uidUtils.getUid());
+        // entity.setDraftBasicSettings(draftBasic);
 
         TicketCategorySettingsEntity category = TicketCategorySettingsEntity
             .fromRequest(request.getCategorySettings(), uidUtils::getUid);

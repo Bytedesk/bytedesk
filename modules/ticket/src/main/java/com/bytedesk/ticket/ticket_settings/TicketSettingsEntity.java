@@ -17,7 +17,6 @@ import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketCategorySettingsEntity;
 
 import jakarta.persistence.CascadeType;
@@ -82,8 +81,8 @@ public class TicketSettingsEntity extends BaseEntity {
 
     // 
     // ====== 发布版本 ======
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketBasicSettingsEntity basicSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketBasicSettingsEntity basicSettings;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketCategorySettingsEntity categorySettings;
@@ -104,8 +103,8 @@ public class TicketSettingsEntity extends BaseEntity {
     // private TicketCustomFieldSettingsEntity customFieldSettings;
 
     // ====== 草稿版本 ======
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketBasicSettingsEntity draftBasicSettings;
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    // private TicketBasicSettingsEntity draftBasicSettings;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketCategorySettingsEntity draftCategorySettings;
