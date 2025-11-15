@@ -732,73 +732,7 @@ public class TicketSettingsRestService extends
         throw new RuntimeException("TicketSettings not found by binding");
     }
 
-    /**
-     * 克隆草稿配置为新的发布配置，分配新的 uid，清空 id/version。
-     */
-    // @SuppressWarnings("unchecked")
-    // private <T> T cloneSettings(T source) {
-    //     if (source == null) {
-    //         return null;
-    //     }
-    //     T target = (T) modelMapper.map(source, source.getClass());
-    //     try {
-    //         // 通过反射设置基础标识字段（BaseEntity: setUid, setId, setVersion）
-    //         source.getClass().getMethod("setUid", String.class).invoke(target, uidUtils.getUid());
-    //         // id 设为 null
-    //         try {
-    //             source.getClass().getMethod("setId", Long.class).invoke(target, (Long) null);
-    //         } catch (NoSuchMethodException ignore) {
-    //         }
-    //         try {
-    //             source.getClass().getMethod("setVersion", Long.class).invoke(target, 0L);
-    //         } catch (NoSuchMethodException ignore) {
-    //         }
-    //     } catch (Exception e) {
-    //         log.warn("cloneSettings reflection failed: {}", e.getMessage());
-    //     }
-    //     return target;
-    // }
-
-    /**
-     * 复制业务字段：使用 modelMapper 覆盖（保留目标 uid/id/version）。
-     */
-    // private void copyBusinessFields(Object draft, Object published) {
-    //     if (draft == null || published == null) {
-    //         return;
-    //     }
-    //     String uid = null;
-    //     Long id = null;
-    //     Long version = null;
-    //     try {
-    //         uid = (String) published.getClass().getMethod("getUid").invoke(published);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         id = (Long) published.getClass().getMethod("getId").invoke(published);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         version = (Long) published.getClass().getMethod("getVersion").invoke(published);
-    //     } catch (Exception ignore) {
-    //     }
-    //     modelMapper.map(draft, published);
-    //     try {
-    //         if (uid != null)
-    //             published.getClass().getMethod("setUid", String.class).invoke(published, uid);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         if (id != null)
-    //             published.getClass().getMethod("setId", Long.class).invoke(published, id);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         if (version != null)
-    //             published.getClass().getMethod("setVersion", Long.class).invoke(published, version);
-    //     } catch (Exception ignore) {
-    //     }
-    // }
-
+    
     @Override
     protected TicketSettingsEntity doSave(TicketSettingsEntity entity) {
         return ticketSettingsRepository.save(entity);
@@ -988,20 +922,39 @@ public class TicketSettingsRestService extends
     @Override
     public TicketSettingsResponse convertToResponse(TicketSettingsEntity entity) {
         TicketSettingsResponse resp = modelMapper.map(entity, TicketSettingsResponse.class);
-        // 发布版本映射
+        // 基础设置 
         resp.setBasicSettings(mapBasicSettings(entity.getBasicSettings()));
+        resp.setDraftBasicSettings(mapBasicSettings(entity.getDraftBasicSettings()));
+        // 分类设置
+        resp.setCategorySettings(mapCategorySettings(entity.getCategorySettings()));
+        resp.setDraftCategorySettings(mapCategorySettings(entity.getDraftCategorySettings()));
+        // 
         // if (entity.getStatusFlowSettings() != null) {
         //     resp.setStatusFlowSettings(
         //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
         //                     .content(entity.getStatusFlowSettings().getContent())
         //                     .build());
         // }
+        // if (entity.getDraftStatusFlowSettings() != null) {
+        //     resp.setDraftStatusFlowSettings(
+        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
+        //                     .content(entity.getDraftStatusFlowSettings().getContent())
+        //                     .build());
+        // }
+
         // if (entity.getPrioritySettings() != null) {
         //     resp.setPrioritySettings(
         //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
         //                     .content(entity.getPrioritySettings().getContent())
         //                     .build());
         // }
+        // if (entity.getDraftPrioritySettings() != null) {
+        //     resp.setDraftPrioritySettings(
+        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
+        //                     .content(entity.getDraftPrioritySettings().getContent())
+        //                     .build());
+        // }
+
         // if (entity.getAssignmentSettings() != null) {
         //     resp.setAssignmentSettings(
         //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
@@ -1014,6 +967,19 @@ public class TicketSettingsRestService extends
         //                     .maxConcurrentTickets(entity.getAssignmentSettings().getMaxConcurrentTickets())
         //                     .build());
         // }
+        // if (entity.getDraftAssignmentSettings() != null) {
+        //     resp.setDraftAssignmentSettings(
+        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
+        //                     .autoAssign(entity.getDraftAssignmentSettings().getAutoAssign())
+        //                     .assignmentType(entity.getDraftAssignmentSettings().getAssignmentType())
+        //                     .workingHoursEnabled(entity.getDraftAssignmentSettings().getWorkingHoursEnabled())
+        //                     .workingHoursStart(entity.getDraftAssignmentSettings().getWorkingHoursStart())
+        //                     .workingHoursEnd(entity.getDraftAssignmentSettings().getWorkingHoursEnd())
+        //                     .workingDays(entity.getDraftAssignmentSettings().getWorkingDays())
+        //                     .maxConcurrentTickets(entity.getDraftAssignmentSettings().getMaxConcurrentTickets())
+        //                     .build());
+        // }
+
         // if (entity.getNotificationSettings() != null) {
         //     resp.setNotificationSettings(
         //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse.builder()
@@ -1025,38 +991,6 @@ public class TicketSettingsRestService extends
         //                     .webhookEnabled(entity.getNotificationSettings().getWebhookEnabled())
         //                     .webhookUrl(entity.getNotificationSettings().getWebhookUrl())
         //                     .webhookEvents(entity.getNotificationSettings().getWebhookEvents())
-        //                     .build());
-        // }
-        // if (entity.getCustomFieldSettings() != null) {
-        //     resp.setCustomFieldSettings(
-        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
-        //                     .content(entity.getCustomFieldSettings().getContent())
-        //                     .build());
-        // }
-        // // 草稿版本映射
-        resp.setDraftBasicSettings(mapBasicSettings(entity.getDraftBasicSettings()));
-        // if (entity.getDraftStatusFlowSettings() != null) {
-        //     resp.setDraftStatusFlowSettings(
-        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse.builder()
-        //                     .content(entity.getDraftStatusFlowSettings().getContent())
-        //                     .build());
-        // }
-        // if (entity.getDraftPrioritySettings() != null) {
-        //     resp.setDraftPrioritySettings(
-        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse.builder()
-        //                     .content(entity.getDraftPrioritySettings().getContent())
-        //                     .build());
-        // }
-        // if (entity.getDraftAssignmentSettings() != null) {
-        //     resp.setDraftAssignmentSettings(
-        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse.builder()
-        //                     .autoAssign(entity.getDraftAssignmentSettings().getAutoAssign())
-        //                     .assignmentType(entity.getDraftAssignmentSettings().getAssignmentType())
-        //                     .workingHoursEnabled(entity.getDraftAssignmentSettings().getWorkingHoursEnabled())
-        //                     .workingHoursStart(entity.getDraftAssignmentSettings().getWorkingHoursStart())
-        //                     .workingHoursEnd(entity.getDraftAssignmentSettings().getWorkingHoursEnd())
-        //                     .workingDays(entity.getDraftAssignmentSettings().getWorkingDays())
-        //                     .maxConcurrentTickets(entity.getDraftAssignmentSettings().getMaxConcurrentTickets())
         //                     .build());
         // }
         // if (entity.getDraftNotificationSettings() != null) {
@@ -1072,14 +1006,22 @@ public class TicketSettingsRestService extends
         //                     .webhookEvents(entity.getDraftNotificationSettings().getWebhookEvents())
         //                     .build());
         // }
+
+        // if (entity.getCustomFieldSettings() != null) {
+        //     resp.setCustomFieldSettings(
+        //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
+        //                     .content(entity.getCustomFieldSettings().getContent())
+        //                     .build());
+        // }
+        
         // if (entity.getDraftCustomFieldSettings() != null) {
         //     resp.setDraftCustomFieldSettings(
         //             com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse.builder()
         //                     .content(entity.getDraftCustomFieldSettings().getContent())
         //                     .build());
         // }
-        resp.setCategorySettings(mapCategorySettings(entity.getCategorySettings()));
-        resp.setDraftCategorySettings(mapCategorySettings(entity.getDraftCategorySettings()));
+
+        
         return resp;
     }
 
@@ -1105,5 +1047,73 @@ public class TicketSettingsRestService extends
         }
         target.setIsDefault(true);
     }
+
+    /**
+     * 克隆草稿配置为新的发布配置，分配新的 uid，清空 id/version。
+     */
+    // @SuppressWarnings("unchecked")
+    // private <T> T cloneSettings(T source) {
+    //     if (source == null) {
+    //         return null;
+    //     }
+    //     T target = (T) modelMapper.map(source, source.getClass());
+    //     try {
+    //         // 通过反射设置基础标识字段（BaseEntity: setUid, setId, setVersion）
+    //         source.getClass().getMethod("setUid", String.class).invoke(target, uidUtils.getUid());
+    //         // id 设为 null
+    //         try {
+    //             source.getClass().getMethod("setId", Long.class).invoke(target, (Long) null);
+    //         } catch (NoSuchMethodException ignore) {
+    //         }
+    //         try {
+    //             source.getClass().getMethod("setVersion", Long.class).invoke(target, 0L);
+    //         } catch (NoSuchMethodException ignore) {
+    //         }
+    //     } catch (Exception e) {
+    //         log.warn("cloneSettings reflection failed: {}", e.getMessage());
+    //     }
+    //     return target;
+    // }
+
+    /**
+     * 复制业务字段：使用 modelMapper 覆盖（保留目标 uid/id/version）。
+     */
+    // private void copyBusinessFields(Object draft, Object published) {
+    //     if (draft == null || published == null) {
+    //         return;
+    //     }
+    //     String uid = null;
+    //     Long id = null;
+    //     Long version = null;
+    //     try {
+    //         uid = (String) published.getClass().getMethod("getUid").invoke(published);
+    //     } catch (Exception ignore) {
+    //     }
+    //     try {
+    //         id = (Long) published.getClass().getMethod("getId").invoke(published);
+    //     } catch (Exception ignore) {
+    //     }
+    //     try {
+    //         version = (Long) published.getClass().getMethod("getVersion").invoke(published);
+    //     } catch (Exception ignore) {
+    //     }
+    //     modelMapper.map(draft, published);
+    //     try {
+    //         if (uid != null)
+    //             published.getClass().getMethod("setUid", String.class).invoke(published, uid);
+    //     } catch (Exception ignore) {
+    //     }
+    //     try {
+    //         if (id != null)
+    //             published.getClass().getMethod("setId", Long.class).invoke(published, id);
+    //     } catch (Exception ignore) {
+    //     }
+    //     try {
+    //         if (version != null)
+    //             published.getClass().getMethod("setVersion", Long.class).invoke(published, version);
+    //     } catch (Exception ignore) {
+    //     }
+    // }
+
 
 }
