@@ -16,7 +16,7 @@ package com.bytedesk.kanban.todo_list;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.kanban.task.TaskResponse;
+import com.bytedesk.core.task.TaskResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

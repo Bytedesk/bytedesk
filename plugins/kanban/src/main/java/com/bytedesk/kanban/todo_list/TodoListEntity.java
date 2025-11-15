@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.kanban.task.TaskEntity;
+import com.bytedesk.core.task.TaskEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
