@@ -31,6 +31,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -49,6 +51,12 @@ import lombok.AllArgsConstructor;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true, exclude = { "attachments" })
 @EntityListeners({TicketEntityListener.class})
+@Table(
+    name = "bytedesk_ticket",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_ticket_org_number", columnNames = {"org_uid", "ticket_number"})
+    }
+)
 @Entity(name = "bytedesk_ticket")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -91,7 +99,7 @@ public class TicketEntity extends BaseEntity {
     /**
      * Human friendly ticket number generated from ticket settings
      */
-    // @Column(name = "ticket_number", length = 64, unique = true)
+    @Column(name = "ticket_number", length = 64)
     private String ticketNumber;
 
     /**

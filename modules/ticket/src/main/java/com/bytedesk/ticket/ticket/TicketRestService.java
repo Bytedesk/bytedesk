@@ -378,16 +378,17 @@ public class TicketRestService
     }
 
     private String generateTicketNumber(String orgUid, String workgroupUid) {
-        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(orgUid, workgroupUid);
+        String scopedOrgUid = StringUtils.hasText(orgUid) ? orgUid : BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(scopedOrgUid, workgroupUid);
         String prefix = resolvePrefix(basicSettings);
         int numericLength = resolveNumericLength(prefix, basicSettings);
         for (int i = 0; i < 5; i++) {
             String candidate = prefix + buildNumericPart(numericLength);
-            if (!ticketRepository.existsByTicketNumber(candidate)) {
+            if (!ticketNumberExists(scopedOrgUid, candidate)) {
                 return candidate;
             }
         }
-        return prefix + uidUtils.getUid();
+        return generateFallbackTicketNumber(scopedOrgUid, prefix);
     }
 
     private TicketBasicSettingsResponse fetchBasicSettings(String orgUid, String workgroupUid) {
@@ -467,5 +468,19 @@ public class TicketRestService
             return ticket.getDepartmentUid();
         }
         return BytedeskConsts.DEFAULT_WORKGROUP_UID;
+    }
+
+    private boolean ticketNumberExists(String orgUid, String candidate) {
+        return ticketRepository.existsByOrgUidAndTicketNumber(orgUid, candidate);
+    }
+
+    private String generateFallbackTicketNumber(String orgUid, String prefix) {
+        for (int i = 0; i < 3; i++) {
+            String candidate = prefix + uidUtils.getUid();
+            if (!ticketNumberExists(orgUid, candidate)) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("Unable to allocate unique ticket number for org " + orgUid);
     }
 }

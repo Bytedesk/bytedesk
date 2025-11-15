@@ -28,6 +28,10 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
 
     boolean existsByTicketNumber(String ticketNumber);
 
+    Optional<TicketEntity> findByOrgUidAndTicketNumber(String orgUid, String ticketNumber);
+
+    boolean existsByOrgUidAndTicketNumber(String orgUid, String ticketNumber);
+
     Optional<TicketEntity> findByProcessInstanceId(String processInstanceId);
 
     List<TicketEntity> findByWorkgroupUidContainingAndCreatedAtBetween(
