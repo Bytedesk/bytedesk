@@ -42,9 +42,7 @@ public class TicketCategorySettingsEntity extends BaseEntity {
     @Column(length = 4096)
     private CategorySettingsData content = CategorySettingsData.builder().build();
 
-    public static TicketCategorySettingsEntity fromRequest(
-            TicketCategorySettingsRequest request,
-            Supplier<String> uidSupplier) {
+    public static TicketCategorySettingsEntity fromRequest(TicketCategorySettingsRequest request, Supplier<String> uidSupplier) {
         TicketCategorySettingsEntity entity = new TicketCategorySettingsEntity();
         entity.setContent(buildContent(request, uidSupplier));
         return entity;

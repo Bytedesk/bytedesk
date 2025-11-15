@@ -218,31 +218,6 @@ public class TicketSettingsRestService extends
             modelMapper.map(request, entity);
             boolean draftUpdated = false;
 
-            if (request.getCategorySettings() != null) {
-                TicketCategorySettingsEntity category = entity.getCategorySettings();
-                if (category == null) {
-                    category = TicketCategorySettingsEntity
-                            .fromRequest(request.getCategorySettings(), uidUtils::getUid);
-                    category.setUid(uidUtils.getUid());
-                    entity.setCategorySettings(category);
-                } else {
-                    category.replaceFromRequest(request.getCategorySettings(), uidUtils::getUid);
-                }
-            }
-
-            if (request.getDraftCategorySettings() != null) {
-                TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
-                if (draftCategory == null) {
-                    draftCategory = TicketCategorySettingsEntity
-                            .fromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
-                    draftCategory.setUid(uidUtils.getUid());
-                    entity.setDraftCategorySettings(draftCategory);
-                } else {
-                    draftCategory.replaceFromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
-                }
-                draftUpdated = true;
-            }
-
             // // 仅更新草稿子配置：与 WorkgroupSettingsRestService.update 一致
             // if (request.getDraftBasicSettings() != null) {
             //     TicketBasicSettingsEntity draft = entity.getDraftBasicSettings();
@@ -259,6 +234,20 @@ public class TicketSettingsRestService extends
             //     }
             //     draftUpdated = true;
             // }
+
+            if (request.getDraftCategorySettings() != null) {
+                TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
+                if (draftCategory == null) {
+                    draftCategory = TicketCategorySettingsEntity
+                            .fromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                    draftCategory.setUid(uidUtils.getUid());
+                    entity.setDraftCategorySettings(draftCategory);
+                } else {
+                    draftCategory.replaceFromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                }
+                draftUpdated = true;
+            }
+
             // if (request.getDraftStatusFlowSettings() != null) {
             //     TicketStatusFlowSettingsEntity draft = entity.getDraftStatusFlowSettings();
             //     if (draft == null) {
@@ -274,6 +263,7 @@ public class TicketSettingsRestService extends
             //     }
             //     draftUpdated = true;
             // }
+
             // if (request.getDraftPrioritySettings() != null) {
             //     TicketPrioritySettingsEntity draft = entity.getDraftPrioritySettings();
             //     if (draft == null) {
@@ -654,151 +644,6 @@ public class TicketSettingsRestService extends
     }
 
     /**
-     * 保存/更新指定工作组的设置（按 orgUid+workgroupUid 幂等）。
-     */
-    // @Transactional
-    // public TicketSettingsResponse saveByWorkgroup(TicketSettingsRequest request)
-    // {
-    // // 1) 先根据绑定表查出是否已有对应 settings
-    // Optional<TicketSettingsBindingEntity>
-    // bindingOpt = bindingRepository
-    // .findByOrgUidAndWorkgroupUidAndDeletedFalse(request.getOrgUid(),
-    // request.getWorkgroupUid());
-
-    // TicketSettingsEntity entity = null;
-    // if (bindingOpt.isPresent()) {
-    // // 已绑定：加载对应 settings
-    // Optional<TicketSettingsEntity> optional =
-    // findByUid(bindingOpt.get().getTicketSettingsUid());
-    // if (optional.isPresent()) {
-    // entity = optional.get();
-    // }
-    // }
-    // if (entity == null) {
-    // // 未绑定：创建新 settings，并建立绑定
-    // entity = modelMapper.map(request, TicketSettingsEntity.class);
-    // if (!StringUtils.hasText(entity.getUid())) {
-    // entity.setUid(uidUtils.getUid());
-    // }
-    // }
-
-    // // 更新草稿子配置：仅当请求包含对应部分时才更新
-    // if (request.getDraftBasicSettings() != null) {
-    // if (entity.getDraftBasicSettings() == null) {
-    // com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity draft =
-    // TicketBasicSettingsEntity.fromRequest(request.getDraftBasicSettings(),
-    // modelMapper);
-    // draft.setUid(uidUtils.getUid());
-    // entity.setDraftBasicSettings(draft);
-    // } else {
-    // String originalUid = entity.getDraftBasicSettings().getUid();
-    // TicketBasicSettingsEntity tmp =
-    // TicketBasicSettingsEntity.fromRequest(request.getDraftBasicSettings(),
-    // modelMapper);
-    // modelMapper.map(tmp, entity.getDraftBasicSettings());
-    // entity.getDraftBasicSettings().setUid(originalUid);
-    // }
-    // // 不再维护 hasUnpublishedChanges 标记
-    // }
-    // if (request.getDraftStatusFlowSettings() != null) {
-    // if (entity.getDraftStatusFlowSettings() == null) {
-    // com.bytedesk.ticket.ticket_settings.sub.TicketStatusFlowSettingsEntity draft
-    // =
-    // TicketStatusFlowSettingsEntity.fromRequest(request.getDraftStatusFlowSettings());
-    // draft.setUid(uidUtils.getUid());
-    // entity.setDraftStatusFlowSettings(draft);
-    // } else {
-    // String originalUid = entity.getDraftStatusFlowSettings().getUid();
-    // TicketStatusFlowSettingsEntity tmp =
-    // TicketStatusFlowSettingsEntity.fromRequest(request.getDraftStatusFlowSettings());
-    // modelMapper.map(tmp, entity.getDraftStatusFlowSettings());
-    // entity.getDraftStatusFlowSettings().setUid(originalUid);
-    // }
-    // // 不再维护 hasUnpublishedChanges 标记
-    // }
-    // if (request.getDraftPrioritySettings() != null) {
-    // if (entity.getDraftPrioritySettings() == null) {
-    // com.bytedesk.ticket.ticket_settings.sub.TicketPrioritySettingsEntity draft =
-    // TicketPrioritySettingsEntity.fromRequest(request.getDraftPrioritySettings());
-    // draft.setUid(uidUtils.getUid());
-    // entity.setDraftPrioritySettings(draft);
-    // } else {
-    // String originalUid = entity.getDraftPrioritySettings().getUid();
-    // TicketPrioritySettingsEntity tmp =
-    // TicketPrioritySettingsEntity.fromRequest(request.getDraftPrioritySettings());
-    // modelMapper.map(tmp, entity.getDraftPrioritySettings());
-    // entity.getDraftPrioritySettings().setUid(originalUid);
-    // }
-    // // 不再维护 hasUnpublishedChanges 标记
-    // }
-    // if (request.getDraftAssignmentSettings() != null) {
-    // if (entity.getDraftAssignmentSettings() == null) {
-    // com.bytedesk.ticket.ticket_settings.sub.TicketAssignmentSettingsEntity draft
-    // =
-    // TicketAssignmentSettingsEntity.fromRequest(request.getDraftAssignmentSettings());
-    // draft.setUid(uidUtils.getUid());
-    // entity.setDraftAssignmentSettings(draft);
-    // } else {
-    // String originalUid = entity.getDraftAssignmentSettings().getUid();
-    // TicketAssignmentSettingsEntity tmp =
-    // TicketAssignmentSettingsEntity.fromRequest(request.getDraftAssignmentSettings());
-    // modelMapper.map(tmp, entity.getDraftAssignmentSettings());
-    // entity.getDraftAssignmentSettings().setUid(originalUid);
-    // }
-    // // 不再维护 hasUnpublishedChanges 标记
-    // }
-    // if (request.getDraftNotificationSettings() != null) {
-    // if (entity.getDraftNotificationSettings() == null) {
-    // com.bytedesk.ticket.ticket_settings.sub.TicketNotificationSettingsEntity
-    // draft =
-    // TicketNotificationSettingsEntity.fromRequest(request.getDraftNotificationSettings());
-    // draft.setUid(uidUtils.getUid());
-    // entity.setDraftNotificationSettings(draft);
-    // } else {
-    // String originalUid = entity.getDraftNotificationSettings().getUid();
-    // TicketNotificationSettingsEntity tmp =
-    // TicketNotificationSettingsEntity.fromRequest(request.getDraftNotificationSettings());
-    // modelMapper.map(tmp, entity.getDraftNotificationSettings());
-    // entity.getDraftNotificationSettings().setUid(originalUid);
-    // }
-    // // 不再维护 hasUnpublishedChanges 标记
-    // }
-    // if (request.getDraftCustomFieldSettings() != null) {
-    // if (entity.getDraftCustomFieldSettings() == null) {
-    // com.bytedesk.ticket.ticket_settings.sub.TicketCustomFieldSettingsEntity draft
-    // =
-    // TicketCustomFieldSettingsEntity.fromRequest(request.getDraftCustomFieldSettings());
-    // draft.setUid(uidUtils.getUid());
-    // entity.setDraftCustomFieldSettings(draft);
-    // } else {
-    // String originalUid = entity.getDraftCustomFieldSettings().getUid();
-    // TicketCustomFieldSettingsEntity tmp =
-    // TicketCustomFieldSettingsEntity.fromRequest(request.getDraftCustomFieldSettings());
-    // modelMapper.map(tmp, entity.getDraftCustomFieldSettings());
-    // entity.getDraftCustomFieldSettings().setUid(originalUid);
-    // }
-    // // 不再维护 hasUnpublishedChanges 标记
-    // }
-
-    // // 不再使用 initialized/lastModifiedUserUid 字段
-    // TicketSettingsEntity saved = save(entity);
-
-    // // 确保绑定关系存在且指向最新的 settings
-    // TicketSettingsBindingEntity
-    // binding = bindingOpt
-    // .orElseGet(() ->
-    // TicketSettingsBindingEntity.builder()
-    // .uid(uidUtils.getUid())
-    // .orgUid(request.getOrgUid())
-    // .workgroupUid(request.getWorkgroupUid())
-    // .ticketSettingsUid(saved.getUid())
-    // .build());
-    // binding.setTicketSettingsUid(saved.getUid());
-    // bindingRepository.save(binding);
-    // return convertToResponse(saved);
-    // }
-
-    /**
      * 发布草稿配置到正式配置，参考 WorkgroupSettings 的 publish 逻辑。
      * 目前 TicketSettings
      * 已改为拆分多个子配置（basic/statusFlow/priority/assignment/notification/customField）发布 +
@@ -821,6 +666,23 @@ public class TicketSettingsRestService extends
         //         copyBusinessFields(entity.getDraftBasicSettings(), entity.getBasicSettings());
         //     }
         // }
+
+        if (entity.getDraftCategorySettings() != null) {
+            TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
+            TicketCategorySettingsEntity publishedCategory = entity.getCategorySettings();
+            if (publishedCategory == null) {
+                publishedCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
+                publishedCategory.setUid(uidUtils.getUid());
+                entity.setCategorySettings(publishedCategory);
+            }
+            if (draftCategory.getContent() != null) {
+                draftCategory.getContent().normalize();
+                publishedCategory.setContent(copyCategorySettings(draftCategory.getContent()));
+            } else {
+                publishedCategory.setContent(CategorySettingsData.builder().build());
+            }
+        }
+
         // // ===== 流转设置 =====
         // if (entity.getDraftStatusFlowSettings() != null) {
         //     if (entity.getStatusFlowSettings() == null) {
@@ -862,22 +724,7 @@ public class TicketSettingsRestService extends
         //     }
         // }
 
-        if (entity.getDraftCategorySettings() != null) {
-            TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
-            TicketCategorySettingsEntity publishedCategory = entity.getCategorySettings();
-            if (publishedCategory == null) {
-                publishedCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
-                publishedCategory.setUid(uidUtils.getUid());
-                entity.setCategorySettings(publishedCategory);
-            }
-            if (draftCategory.getContent() != null) {
-                draftCategory.getContent().normalize();
-                publishedCategory.setContent(copyCategorySettings(draftCategory.getContent()));
-            } else {
-                publishedCategory.setContent(CategorySettingsData.builder().build());
-            }
-        }
-
+        
         // 发布时间与草稿标记维护
         entity.setPublishedAt(ZonedDateTime.now());
         entity.setHasUnpublishedChanges(false);
