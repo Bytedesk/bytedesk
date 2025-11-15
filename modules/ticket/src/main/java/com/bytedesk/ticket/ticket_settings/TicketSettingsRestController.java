@@ -75,7 +75,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @ActionAnnotation(title = "Ticket Settings", action = "新建", description = "create ticketSettings")
     @Operation(summary = "Create TicketSettings", description = "Create a new ticketSettings")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    // @PreAuthorize("hasAuthority('TICKET_SETTINGS_CREATE')")
     public ResponseEntity<?> create(TicketSettingsRequest request) {
         
         TicketSettingsResponse ticketSettings = ticketSettingsRestService.create(request);
@@ -86,7 +86,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @ActionAnnotation(title = "Ticket Settings", action = "更新", description = "update ticketSettings")
     @Operation(summary = "Update TicketSettings", description = "Update an existing ticketSettings")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    // @PreAuthorize("hasAuthority('TICKET_SETTINGS_UPDATE')")
     public ResponseEntity<?> update(TicketSettingsRequest request) {
         
         TicketSettingsResponse ticketSettings = ticketSettingsRestService.update(request);
@@ -97,7 +97,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @ActionAnnotation(title = "Ticket Settings", action = "删除", description = "delete ticketSettings")
     @Operation(summary = "Delete TicketSettings", description = "Delete a ticketSettings")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    // @PreAuthorize("hasAuthority('TICKET_SETTINGS_DELETE')")
     public ResponseEntity<?> delete(TicketSettingsRequest request) {
         if (request == null || request.getUid() == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("uid is required"));
@@ -113,7 +113,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @ActionAnnotation(title = "Ticket Settings", action = "导出", description = "export ticketSettings")
     @Operation(summary = "Export ticketSettings", description = "Export ticketSettings to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    // @PreAuthorize("hasAuthority('TICKET_SETTINGS_EXPORT')")
     @GetMapping("/export")
     public Object export(TicketSettingsRequest request, HttpServletResponse response) {
         return exportTemplate(
