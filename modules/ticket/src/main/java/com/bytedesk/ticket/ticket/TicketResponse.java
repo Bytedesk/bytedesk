@@ -37,6 +37,10 @@ public class TicketResponse extends BaseResponse {
     // 
     // private String title;
     private String description;
+
+    private String contactName;
+    private String phone;
+    private String email;
     // 
     private String status;
     private String priority;

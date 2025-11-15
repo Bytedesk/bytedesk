@@ -67,6 +67,9 @@ public class TicketEntity extends BaseEntity {
      */
     private String description;     // 工单描述(选填)
 
+    // 联系称呼
+    private String contactName;     // 联系称呼
+    
     // 联系手机号
     private String phone;           // 联系手机号
     

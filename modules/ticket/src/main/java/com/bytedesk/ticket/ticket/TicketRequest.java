@@ -37,6 +37,13 @@ public class TicketRequest extends BaseRequest {
 
     // private String title;
     private String description;
+
+    // 联系称呼
+    private String contactName;
+    // 联系手机号
+    private String phone;
+    // 联系邮箱
+    private String email;
     // private String searchText;
     // 
     private String status;
