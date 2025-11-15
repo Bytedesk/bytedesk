@@ -52,16 +52,13 @@ public class TicketSettingsRequest extends BaseRequest {
      */
     private Boolean enabled;
 
-    // 草稿子配置（仅在更新草稿时传入；创建时也可传，后台将初始化发布+草稿）
+    // 子配置请求（仅提供非 draft 版本，服务端自动维护草稿）
     private TicketBasicSettingsRequest basicSettings;
-    private TicketBasicSettingsRequest draftBasicSettings;
     private TicketStatusFlowSettingsRequest statusFlowSettings;
     private TicketPrioritySettingsRequest prioritySettings;
     private TicketAssignmentSettingsRequest assignmentSettings;
     private TicketNotificationSettingsRequest notificationSettings;
     private TicketCustomFieldSettingsRequest customFieldSettings;
-
     private TicketCategorySettingsRequest categorySettings;
-    private TicketCategorySettingsRequest draftCategorySettings;
 
 }

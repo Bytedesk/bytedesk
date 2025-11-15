@@ -231,15 +231,15 @@ public class TicketSettingsRestService extends
                 draftUpdated = true;
             }
 
-            if (request.getDraftCategorySettings() != null) {
+            if (request.getCategorySettings() != null) {
                 TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
                 if (draftCategory == null) {
                     draftCategory = TicketCategorySettingsEntity
-                            .fromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                            .fromRequest(request.getCategorySettings(), uidUtils::getUid);
                     draftCategory.setUid(uidUtils.getUid());
                     entity.setDraftCategorySettings(draftCategory);
                 } else {
-                    draftCategory.replaceFromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                    draftCategory.replaceFromRequest(request.getCategorySettings(), uidUtils::getUid);
                 }
                 draftUpdated = true;
             }
@@ -487,12 +487,12 @@ public class TicketSettingsRestService extends
         return bindingRepository.findByTicketSettingsUidAndDeletedFalse(ticketSettingsUid);
     }
 
-    /**
-     * 按 orgUid+workgroupUid 保存草稿（专用新 DTO）。若尚未绑定则自动创建默认 settings 绑定后再更新草稿。
-     */
-    @Transactional
-    public TicketSettingsResponse saveByWorkgroup(String orgUid, String workgroupUid,
-            com.bytedesk.ticket.ticket_settings.dto.TicketSettingsByWorkgroupUpdateRequest request) {
+        /**
+         * 按 orgUid+workgroupUid 保存草稿。若尚未绑定则自动创建默认 settings 绑定后再更新草稿。
+         */
+        @Transactional
+        public TicketSettingsResponse saveByWorkgroup(String orgUid, String workgroupUid,
+            TicketSettingsRequest request) {
         // 先获取已绑定的 settings；没有则创建/获取默认并绑定
         Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
                 .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
@@ -523,25 +523,27 @@ public class TicketSettingsRestService extends
             entity.setDescription(request.getDescription());
         }
         boolean draftUpdated = false;
-        if (request.getDraftCategorySettings() != null) {
+        TicketCategorySettingsRequest draftCategoryRequest = resolveDraftCategoryRequest(request);
+        if (draftCategoryRequest != null) {
             TicketCategorySettingsEntity draftCategory = entity.getDraftCategorySettings();
             if (draftCategory == null) {
                 draftCategory = TicketCategorySettingsEntity
-                        .fromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                        .fromRequest(draftCategoryRequest, uidUtils::getUid);
                 draftCategory.setUid(uidUtils.getUid());
                 entity.setDraftCategorySettings(draftCategory);
             } else {
-                draftCategory.replaceFromRequest(request.getDraftCategorySettings(), uidUtils::getUid);
+                draftCategory.replaceFromRequest(draftCategoryRequest, uidUtils::getUid);
             }
             draftUpdated = true;
         }
-        if (request.getDraftBasicSettings() != null) {
+        TicketBasicSettingsRequest draftBasicRequest = resolveDraftBasicRequest(request);
+        if (draftBasicRequest != null) {
             TicketBasicSettingsEntity draft = entity.getDraftBasicSettings();
             if (draft == null) {
-                draft = createBasicSettingsEntity(request.getDraftBasicSettings(), entity.getOrgUid());
+                draft = createBasicSettingsEntity(draftBasicRequest, entity.getOrgUid());
                 entity.setDraftBasicSettings(draft);
             } else {
-                applyBasicSettingsRequest(draft, request.getDraftBasicSettings());
+                applyBasicSettingsRequest(draft, draftBasicRequest);
             }
             draftUpdated = true;
         }
@@ -795,18 +797,14 @@ public class TicketSettingsRestService extends
         if (request == null) {
             return null;
         }
-        return request.getDraftCategorySettings() != null
-                ? request.getDraftCategorySettings()
-                : request.getCategorySettings();
+        return request.getCategorySettings();
     }
 
     private TicketBasicSettingsRequest resolveDraftBasicRequest(TicketSettingsRequest request) {
         if (request == null) {
             return null;
         }
-        return request.getDraftBasicSettings() != null
-                ? request.getDraftBasicSettings()
-                : request.getBasicSettings();
+        return request.getBasicSettings();
     }
 
     private TicketBasicSettingsEntity createBasicSettingsEntity(TicketBasicSettingsRequest request, String orgUid) {

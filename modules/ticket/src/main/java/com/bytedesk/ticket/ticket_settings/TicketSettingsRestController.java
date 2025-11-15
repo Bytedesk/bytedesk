@@ -139,10 +139,10 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @ActionAnnotation(title = "Ticket Settings", action = "按工作组保存", description = "保存或更新指定工作组的工单设置(草稿)")
     @Operation(summary = "Save TicketSettings by workgroup", description = "Upsert ticket settings draft by orgUid+workgroupUid")
     @PostMapping("/orgs/{orgUid}/workgroups/{workgroupUid}")
-    public ResponseEntity<?> saveByWorkgroup(
+        public ResponseEntity<?> saveByWorkgroup(
             @PathVariable("orgUid") String orgUid,
             @PathVariable("workgroupUid") String workgroupUid,
-            @RequestBody com.bytedesk.ticket.ticket_settings.dto.TicketSettingsByWorkgroupUpdateRequest request) {
+            @RequestBody TicketSettingsRequest request) {
         TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(orgUid, workgroupUid, request);
         return ResponseEntity.ok(JsonResult.success(resp));
     }
