@@ -49,6 +49,10 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
+            // ticket number
+            if (StringUtils.hasText(request.getTicketNumber())) {
+                predicates.add(criteriaBuilder.equal(root.get("ticketNumber"), request.getTicketNumber()));
+            }
             // status
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));

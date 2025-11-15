@@ -53,6 +53,9 @@ import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
+import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
+import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
 import com.bytedesk.core.topic.TopicUtils;
 
 import lombok.AllArgsConstructor;
@@ -81,6 +84,8 @@ public class TicketRestService
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final CategoryRestService categoryRestService;
+
+    private final TicketSettingsRestService ticketSettingsRestService;
 
     @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
@@ -117,6 +122,8 @@ public class TicketRestService
             ticket.setStatus(TicketStatusEnum.NEW.name());
         }
         ticket.setReporter(request.getReporterJson());
+
+        ensureTicketNumber(ticket, request);
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
         // 保存附件
@@ -361,4 +368,104 @@ public class TicketRestService
         return ticketRepository.findAll(specification, pageable);
     }
 
+    private void ensureTicketNumber(TicketEntity ticket, TicketRequest request) {
+        if (ticket == null || StringUtils.hasText(ticket.getTicketNumber())) {
+            return;
+        }
+        String orgUid = resolveOrgUid(ticket, request);
+        String workgroupUid = resolveWorkgroupUid(ticket, request);
+        ticket.setTicketNumber(generateTicketNumber(orgUid, workgroupUid));
+    }
+
+    private String generateTicketNumber(String orgUid, String workgroupUid) {
+        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(orgUid, workgroupUid);
+        String prefix = resolvePrefix(basicSettings);
+        int numericLength = resolveNumericLength(prefix, basicSettings);
+        for (int i = 0; i < 5; i++) {
+            String candidate = prefix + buildNumericPart(numericLength);
+            if (!ticketRepository.existsByTicketNumber(candidate)) {
+                return candidate;
+            }
+        }
+        return prefix + uidUtils.getUid();
+    }
+
+    private TicketBasicSettingsResponse fetchBasicSettings(String orgUid, String workgroupUid) {
+        if (!StringUtils.hasText(orgUid) || !StringUtils.hasText(workgroupUid)) {
+            return null;
+        }
+        try {
+            TicketSettingsResponse settings = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+            if (settings == null) {
+                return null;
+            }
+            return settings.getBasicSettings() != null
+                    ? settings.getBasicSettings()
+                    : settings.getDraftBasicSettings();
+        } catch (Exception ex) {
+            log.warn("Failed to load ticket settings for org {} workgroup {}: {}", orgUid, workgroupUid, ex.getMessage());
+            return null;
+        }
+    }
+
+    private String resolvePrefix(TicketBasicSettingsResponse basicSettings) {
+        if (basicSettings != null && StringUtils.hasText(basicSettings.getNumberPrefix())) {
+            return basicSettings.getNumberPrefix().trim().toUpperCase();
+        }
+        return "TK";
+    }
+
+    private int resolveNumericLength(String prefix, TicketBasicSettingsResponse basicSettings) {
+        int prefixLength = StringUtils.hasText(prefix) ? prefix.length() : 0;
+        Integer configuredLength = basicSettings != null ? basicSettings.getNumberLength() : null;
+        int totalLength = (configuredLength != null && configuredLength > prefixLength)
+                ? configuredLength
+                : prefixLength + 8;
+        int numericLength = totalLength - prefixLength;
+        numericLength = Math.max(numericLength, 4);
+        return Math.min(numericLength, 32);
+    }
+
+    private String buildNumericPart(int length) {
+        String raw = uidUtils.getUid();
+        if (length <= 0) {
+            return raw;
+        }
+        if (raw.length() > length) {
+            return raw.substring(raw.length() - length);
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = raw.length(); i < length; i++) {
+            builder.append('0');
+        }
+        builder.append(raw);
+        return builder.toString();
+    }
+
+    private String resolveOrgUid(TicketEntity ticket, TicketRequest request) {
+        if (ticket != null && StringUtils.hasText(ticket.getOrgUid())) {
+            return ticket.getOrgUid();
+        }
+        if (request != null && StringUtils.hasText(request.getOrgUid())) {
+            return request.getOrgUid();
+        }
+        UserEntity user = authService.getUser();
+        if (user != null && StringUtils.hasText(user.getOrgUid())) {
+            return user.getOrgUid();
+        }
+        return BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+    }
+
+    private String resolveWorkgroupUid(TicketEntity ticket, TicketRequest request) {
+        if (ticket != null && StringUtils.hasText(ticket.getWorkgroupUid())) {
+            return ticket.getWorkgroupUid();
+        }
+        if (request != null && StringUtils.hasText(request.getWorkgroupUid())) {
+            return request.getWorkgroupUid();
+        }
+        if (ticket != null && StringUtils.hasText(ticket.getDepartmentUid())) {
+            return ticket.getDepartmentUid();
+        }
+        return BytedeskConsts.DEFAULT_WORKGROUP_UID;
+    }
 }

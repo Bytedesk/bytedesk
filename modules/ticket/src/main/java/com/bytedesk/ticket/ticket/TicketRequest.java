@@ -44,6 +44,8 @@ public class TicketRequest extends BaseRequest {
     private String phone;
     // 联系邮箱
     private String email;
+
+    private String ticketNumber;
     // private String searchText;
     // 
     private String status;

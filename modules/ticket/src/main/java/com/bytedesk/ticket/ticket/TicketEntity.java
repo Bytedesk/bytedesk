@@ -89,6 +89,12 @@ public class TicketEntity extends BaseEntity {
     private String priority = TicketPriorityEnum.LOW.name();        // 优先级(低/中/高/紧急)
 
     /**
+     * Human friendly ticket number generated from ticket settings
+     */
+    // @Column(name = "ticket_number", length = 64, unique = true)
+    private String ticketNumber;
+
+    /**
      * Type of ticket (AGENT, GROUP)
      */
     @Builder.Default
