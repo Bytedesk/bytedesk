@@ -11,6 +11,26 @@
 				<#assign langPrefix = "/" + lang>
 			</#if>
 
+			<#-- Normalize current language for shared usage -->
+			<#assign currentLang = 'zh-cn'>
+			<#if lang??>
+				<#assign _lc = lang?lower_case>
+				<#if _lc?index_of('zh-tw') == 0>
+					<#assign currentLang = 'zh-tw'>
+				<#elseif _lc?index_of('en') == 0>
+					<#assign currentLang = 'en'>
+				</#if>
+			</#if>
+
+			<#-- External doc/pricing URLs should follow current language -->
+			<#assign docBaseUrl = 'https://www.weiyuai.cn/docs/'>
+			<#if currentLang == 'zh-cn'>
+				<#assign docBaseUrl = 'https://www.weiyuai.cn/docs/zh-CN/'>
+			<#elseif currentLang == 'zh-tw'>
+				<#assign docBaseUrl = 'https://www.weiyuai.cn/docs/zh-TW/'>
+			</#if>
+			<#assign pricingUrl = docBaseUrl + 'docs/payment'>
+
 			<!-- Logo START -->
 			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 一切以客户服务为中心'}">
 				<h1 class="h5">${(i18n['brand.title'])! '微语 - 一切以客户服务为中心'}</h1>
@@ -28,29 +48,17 @@
 					<a class="nav-link active" href="${langPrefix}/index.html" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
 				</li>
 				<!-- Nav item 2 Course -->
-				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank"><@t key="nav.docs">文档</@t></a></li>
-				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/docs/zh-CN/docs/payment" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${docBaseUrl}" target="_blank"><@t key="nav.docs">文档</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${pricingUrl}" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
 				
 				<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
 				<#-- pruned: voice, forum, help, architecture -->
 				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/download.html"><@t key="nav.download">下载</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/about.html"><@t key="nav.about">关于</@t></a></li>
 				<!-- Nav item 3 link-->
-				<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>					<!-- Language Switch Dropdown -->
+				<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>				<!-- Language Switch Dropdown -->
 					<li class="nav-item dropdown">
 						<#-- Language switch label shows target language; highlight current in the list -->
-						<#-- Normalize current language -->
-						<#assign currentLang = 'zh-cn'>
-						<#if lang??>
-							<#assign _lc = lang?lower_case>
-							<#if _lc?index_of('zh-tw') == 0>
-								<#assign currentLang = 'zh-tw'>
-							<#elseif _lc?index_of('en') == 0>
-								<#assign currentLang = 'en'>
-							<#else>
-								<#assign currentLang = 'zh-cn'>
-							</#if>
-						</#if>
 
 						<#-- Toggle label: if current is English -> show 简体中文; otherwise show English -->
 						<#assign langSwitchLabel = (currentLang == 'en')?string('简体中文', 'English')>
