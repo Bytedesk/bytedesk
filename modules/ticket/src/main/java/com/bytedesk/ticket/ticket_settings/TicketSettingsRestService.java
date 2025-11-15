@@ -840,6 +840,21 @@ public class TicketSettingsRestService extends
     @Transactional
     @Override
     public void deleteByUid(String uid) {
+        List<TicketSettingsBindingEntity> activeBindings = bindingRepository
+            .findByTicketSettingsUidAndDeletedFalse(uid);
+        if (!activeBindings.isEmpty()) {
+            String boundWorkgroups = activeBindings.stream()
+                .map(TicketSettingsBindingEntity::getWorkgroupUid)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .collect(Collectors.joining(","));
+            throw new IllegalStateException(
+                boundWorkgroups.isEmpty()
+                    ? "Ticket settings is bound to workgroups, please unbind before deleting."
+                    : String.format(
+                        "Ticket settings is bound to workgroups (%s), please unbind before deleting.",
+                        boundWorkgroups));
+        }
         Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);

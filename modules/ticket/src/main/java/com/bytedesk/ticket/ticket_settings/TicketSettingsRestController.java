@@ -99,9 +99,14 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
     public ResponseEntity<?> delete(TicketSettingsRequest request) {
-        
-        ticketSettingsRestService.delete(request);
-
+        if (request == null || request.getUid() == null) {
+            return ResponseEntity.badRequest().body(JsonResult.error("uid is required"));
+        }
+        try {
+            ticketSettingsRestService.delete(request);
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.badRequest().body(JsonResult.error(ex.getMessage()));
+        }
         return ResponseEntity.ok(JsonResult.success());
     }
 

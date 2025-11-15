@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.core.task;
+package com.bytedesk.core.task_list;
 
 import com.bytedesk.core.base.BaseRequest;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaskRequest extends BaseRequest {
+public class TaskListRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,6 +36,6 @@ public class TaskRequest extends BaseRequest {
     private String description;
 
     // @Builder.Default
-    // private String type = TaskTypeEnum.CUSTOMER.name();
+    // private String type = TaskListTypeEnum.CUSTOMER.name();
 
 }
