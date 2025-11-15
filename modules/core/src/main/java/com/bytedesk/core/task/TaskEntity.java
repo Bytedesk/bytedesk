@@ -29,9 +29,8 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * 待办任务：
- * 一个工单内可以关联多个任务，
- * 每个人都可以创建待办任务
- * 可以单纯创建待办，也可以关联工单创建待办任务
+ * 一个工单内可以关联多个任务，每个人都可以创建待办任务
+ * 可以单纯创建待办，也可以关联工单等创建待办任务
  * 
  * Task entity for content categorization and organization
  * Provides taskging functionality for various system entities
