@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.AllArgsConstructor;
@@ -37,7 +36,6 @@ import com.bytedesk.core.utils.BdDateUtils;
 public class FaqRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
-
 
     private String question;
 
@@ -64,8 +62,8 @@ public class FaqRequest extends BaseRequest {
     @Builder.Default
     private List<String> relatedFaqUids = new ArrayList<>();
 
-    @Builder.Default
-    private String type = MessageTypeEnum.TEXT.name();
+    // @Builder.Default
+    // private String type = MessageTypeEnum.TEXT.name();
 
     @Builder.Default
     private String elasticStatus = FaqStatusEnum.NEW.name();

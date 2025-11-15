@@ -22,8 +22,6 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.llm.LlmDefaults;
 
 import jakarta.persistence.Column;
@@ -45,12 +43,11 @@ public class KbaseRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
 
-    private String type;
+    // private String type;
 
     // private String subType;
 
@@ -131,13 +128,11 @@ public class KbaseRequest extends BaseRequest {
     // private LanguageEnum language = LanguageEnum.ZH_CN;
     private String language = LanguageEnum.ZH_CN.name();
 
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
+    // @Builder.Default
+    // private String level = LevelEnum.ORGANIZATION.name();
 
-    @Builder.Default
-    // @Enumerated(EnumType.STRING)
-    // private PlatformEnum platform = PlatformEnum.BYTEDESK;
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    // private String platform = PlatformEnum.BYTEDESK.name();
 
     // private KbaseTypeEnum type = KbaseTypeEnum.HELPCENTER;
     // private String categoryUid;

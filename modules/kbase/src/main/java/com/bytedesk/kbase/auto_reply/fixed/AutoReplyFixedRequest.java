@@ -24,18 +24,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
 public class AutoReplyFixedRequest extends BaseRequest {
     
     private static final long serialVersionUID = 1L;
-
     
-    private String content;
+    // private String content;
 
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
@@ -56,5 +56,5 @@ public class AutoReplyFixedRequest extends BaseRequest {
     private String kbUid; // 对应知识库
 
     // user uid
-    private String userUid;
+    // private String userUid;
 }

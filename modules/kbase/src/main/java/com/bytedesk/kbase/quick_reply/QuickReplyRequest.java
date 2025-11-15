@@ -37,7 +37,7 @@ public class QuickReplyRequest extends BaseRequest {
 
     private String title;
 
-    private String content;
+    // private String content;
 
     private String shortCut;
 
