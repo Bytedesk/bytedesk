@@ -225,13 +225,6 @@
             <artifactId>spring-ai-alibaba-starter-graph-observation</artifactId>
             <version>${spring-ai-alibaba.version}</version>
         </dependency> -->
-		<!-- 规则引擎 -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba/qlexpress4 -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>qlexpress4</artifactId>
-			<version>4.0.4</version>
-		</dependency>
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
 		<dependency>

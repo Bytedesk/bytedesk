@@ -142,16 +142,6 @@
 			<version>${flowable.version}</version>
 		</dependency> -->
 
-
-		<!-- ///////////////////////////////////////////////////////////////////////////// -->
-
-		<!-- https://mvnrepository.com/artifact/org.drools/drools-core -->
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-core</artifactId>
-			<version>10.0.0</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>

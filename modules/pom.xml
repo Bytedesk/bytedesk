@@ -310,6 +310,33 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- https://mvnrepository.com/artifact/org.drools/drools-core -->
+		<!-- <dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-core</artifactId>
+			<version>${drools.version}</version>
+		</dependency> -->
+        <!-- https://mvnrepository.com/artifact/org.drools/drools-rules-spring-boot-starter -->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-rules-spring-boot-starter</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.drools/drools-decisions-spring-boot-starter -->
+        <!-- <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-decisions-spring-boot-starter</artifactId>
+            <version>${drools.version}</version>
+        </dependency> -->
+        <!-- https://mvnrepository.com/artifact/org.drools/drools-addons-springboot-events-rules -->
+        <!-- <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-addons-springboot-events-rules</artifactId>
+            <version>${drools.version}</version>
+        </dependency> -->
+
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <!-- <dependency>
             <groupId>org.apache.commons</groupId>
