@@ -1,22 +1,19 @@
 package com.bytedesk.ticket.ticket_settings.sub.dto;
 
-import java.io.Serializable;
+import com.bytedesk.core.base.BaseRequest;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 优先级设置草稿请求 DTO：content 为 JSON priorities 数组。
  */
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class TicketPrioritySettingsRequest implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class TicketPrioritySettingsRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
-    private String content; // JSON blob
 }

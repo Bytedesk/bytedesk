@@ -13,27 +13,30 @@
  */
 package com.bytedesk.ai.robot.settings;
 
-import java.io.Serializable;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.core.base.BaseResponse;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Response DTO for robot routing settings
  */
 @Data
-@Builder
+@SuperBuilder
 @Embeddable
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RobotRoutingSettingsResponse implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class RobotRoutingSettingsResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 

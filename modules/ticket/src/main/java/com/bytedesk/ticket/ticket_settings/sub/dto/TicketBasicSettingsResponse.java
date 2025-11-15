@@ -1,22 +1,24 @@
 package com.bytedesk.ticket.ticket_settings.sub.dto;
 
-import java.io.Serializable;
+import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 基础设置发布/草稿响应 DTO（与请求字段一致，预留后续只读属性扩展）。
  */
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TicketBasicSettingsResponse implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class TicketBasicSettingsResponse extends BaseResponse {
     private static final long serialVersionUID = 1L;
     private String numberPrefix;
     private Integer numberLength;

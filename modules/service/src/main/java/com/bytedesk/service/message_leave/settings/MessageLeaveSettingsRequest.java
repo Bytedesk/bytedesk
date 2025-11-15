@@ -13,26 +13,29 @@
  */
 package com.bytedesk.service.message_leave.settings;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.message_leave.MessageLeaveNotifyTypeEnum;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageLeaveSettingsRequest  implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class MessageLeaveSettingsRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
     

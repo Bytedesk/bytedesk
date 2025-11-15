@@ -1,26 +1,26 @@
 package com.bytedesk.ticket.ticket_settings.sub.dto;
 
-import java.io.Serializable;
+import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 单个工单分类项的响应 DTO。
  */
 @Data
-@Builder
+@SuperBuilder
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class TicketCategoryItemResponse implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class TicketCategoryItemResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
-
-    private String uid;
 
     private String name;
 

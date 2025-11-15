@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +41,7 @@ import lombok.EqualsAndHashCode;
 @Getter
 @Setter
 @SuperBuilder
+@Accessors(chain = true)
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor

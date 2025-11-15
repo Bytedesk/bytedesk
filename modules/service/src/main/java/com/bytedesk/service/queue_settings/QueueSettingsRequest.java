@@ -13,8 +13,7 @@
  */
 package com.bytedesk.service.queue_settings;
 
-import java.io.Serializable;
-
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.persistence.Embeddable;
@@ -22,16 +21,19 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @Embeddable
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class QueueSettingsRequest implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class QueueSettingsRequest extends BaseRequest {
     
     private static final long serialVersionUID = 1L;
 
