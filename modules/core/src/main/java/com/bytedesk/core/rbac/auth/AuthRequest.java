@@ -15,9 +15,6 @@
 package com.bytedesk.core.rbac.auth;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.enums.PlatformEnum;
-
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -42,8 +39,8 @@ public class AuthRequest extends BaseRequest {
     private String code;
 
     // 
-    @NotBlank
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @NotBlank
+    // private String platform = PlatformEnum.BYTEDESK.name();
 
     // 登录验证码
     private String captchaUid;
@@ -54,12 +51,12 @@ public class AuthRequest extends BaseRequest {
     // 直接在url中传递accessToken，免登录
     private String accessToken;
     // 客户端类型 WEB, ANDROID, IOS 等
-    private String channel;
+    // private String channel;
     
     // 设备信息
     private String device;
     // 修改邮箱、手机号需要记录用户uid和组织uid
-    private String userUid;
+    // private String userUid;
 
     // 
     public String getReceiver() {

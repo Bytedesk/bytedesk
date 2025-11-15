@@ -30,25 +30,23 @@ public class MessageRequest extends BaseRequest {
     
     private static final long serialVersionUID = 1L;
 
-    
     private String topic;
 
     private String threadUid;
 
     private String threadType;
     
-    private String userUid;
+    // private String userUid;
 
     private String nickname;
 
     // 客服端可以更加消息类型过滤消息
-    private String type;
+    // private String type;
 
     // used for client query
     private String componentType;
 
     private String searchDate;
-
 
     /**
      * 判断是否为客服类型会话

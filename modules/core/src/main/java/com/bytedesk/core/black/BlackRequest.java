@@ -31,12 +31,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlackRequest extends BaseRequest {
+    
     private static final long serialVersionUID = 1L;
 
-
     // 黑名单类型
-    @Builder.Default
-    private String type = BlackTypeEnum.VISITOR.name();
+    // @Builder.Default
+    // private String type = BlackTypeEnum.VISITOR.name();
 
     // AI: 考虑到黑名单功能主要用于用户访问控制,需要频繁查询和过滤,我建议使用单独字段存储的方式:
     // 黑名单用户uid
@@ -56,7 +56,7 @@ public class BlackRequest extends BaseRequest {
     private Boolean blockIp = false;
 
     // 执行拉黑的用户uid
-    private String userUid;
+    // private String userUid;
 
     // 执行拉黑的用户昵称
     private String userNickname;

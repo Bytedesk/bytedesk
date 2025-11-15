@@ -14,8 +14,6 @@
 package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.thread.enums.ThreadTypeEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,15 +27,15 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueueRequest extends BaseRequest {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     // 队列名称
     private String nickname;
 
     // 队列类型
-    @Builder.Default
-    private String type = ThreadTypeEnum.WORKGROUP.name();  
+    // @Builder.Default
+    // private String type = ThreadTypeEnum.WORKGROUP.name();  
 
     // 区别于thread topic，此处的topic是队列的主题，用于访客监听排队人数变化
     private String topic;

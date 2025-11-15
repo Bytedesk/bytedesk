@@ -40,7 +40,7 @@ public class LlmProviderRequest extends BaseRequest {
     @Builder.Default
     private String description = BytedeskConsts.EMPTY_STRING;
 
-    private String type;
+    // private String type;
 
     //
     private String baseUrl;

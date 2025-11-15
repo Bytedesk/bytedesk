@@ -21,16 +21,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuartzRequest extends BaseRequest {
+
     private static final long serialVersionUID = 1L;
 
-    
     /** 任务名称 */
     @NotBlank(message = "jobName is required")
     private String jobName;
@@ -77,6 +78,6 @@ public class QuartzRequest extends BaseRequest {
     private String misfirePolicy = QuartzConsts.MISFIRE_DEFAULT;
 
     /** belong to org */
-    @NotBlank(message = "orgUid is required")
-    private String orgUid;
+    // @NotBlank(message = "orgUid is required")
+    // private String orgUid;
 }

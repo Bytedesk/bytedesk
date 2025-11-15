@@ -42,7 +42,7 @@ public class TicketRequest extends BaseRequest {
     private String status;
     private String priority;
     // 
-    private String type;
+    // private String type;
     // 
     private String topic;
     private String threadUid;

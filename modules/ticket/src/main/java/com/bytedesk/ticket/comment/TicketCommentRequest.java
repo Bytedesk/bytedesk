@@ -23,6 +23,6 @@ import lombok.EqualsAndHashCode;
 public class TicketCommentRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
 
-    private String content;
+    // private String content;
     private String author;
 } 

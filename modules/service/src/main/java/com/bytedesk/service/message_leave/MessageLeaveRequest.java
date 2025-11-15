@@ -32,8 +32,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageLeaveRequest extends BaseRequest {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     // 客户称呼
     private String nickname;
@@ -42,10 +42,10 @@ public class MessageLeaveRequest extends BaseRequest {
     private String contact;
 
     // 留言内容
-    private String content;
+    // private String content;
 
     // 留言类型
-    private String type;
+    // private String type;
 
     // 支持图片
     @Builder.Default
@@ -87,7 +87,7 @@ public class MessageLeaveRequest extends BaseRequest {
     // private ThreadEntity thread;
 
     // 客户来源渠道（如：网站、APP、小程序等）
-    private String channel;
+    // private String channel;
     
     // 设备信息（浏览器、APP版本等）
     private String deviceInfo;

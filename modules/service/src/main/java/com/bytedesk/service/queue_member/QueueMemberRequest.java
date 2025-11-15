@@ -38,7 +38,6 @@ public class QueueMemberRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String queueUid;  // 关联队列
 
     private String queueNickname;  // 队列昵称
@@ -161,7 +160,8 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private String resolvedStatus = ThreadSummaryStatusEnum.PENDING.name();
 
-    private String channel;  // 客户来源渠道
+    // baserequest已经有channel字段
+    // private String channel;  // 客户来源渠道
 
     // 排队用户信息
     @Builder.Default

@@ -33,7 +33,6 @@ public class TokenRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
@@ -54,7 +53,7 @@ public class TokenRequest extends BaseRequest {
 
     private String revokeReason;
 
-    private String channel;
+    // private String channel;
 
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;

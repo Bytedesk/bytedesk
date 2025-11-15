@@ -16,12 +16,10 @@ package com.bytedesk.core.rbac.user;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.user.UserEntity.Sex;
 
 // import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,7 +36,7 @@ public class UserRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-    private String uid;
+    // private String uid;
 
 	private String num;
 
@@ -77,9 +75,9 @@ public class UserRequest extends BaseRequest {
 	private Boolean mobileVerified;
 
 	// 需要前端传递字符串的情况下，使用string类型
-	@NotBlank(message = "platform required")
-	@Builder.Default
-	private String platform = PlatformEnum.BYTEDESK.name();
+	// @NotBlank(message = "platform required")
+	// @Builder.Default
+	// private String platform = PlatformEnum.BYTEDESK.name();
 
 	// 注册来源（例如：USERNAME、EMAIL、MOBILE、GITHUB、WECHAT、GOOGLE、DINGTALK、FEISHU、FACEBOOK、DOUYIN、LDAP、OIDC、OPENID、CAS、ADMIN、IMPORT、UNKNOWN）
 	@Builder.Default
