@@ -120,7 +120,6 @@ public class TicketRestService
         // 默认是工作组工单，暂不启用一对一
         // ticket.setType(TicketTypeEnum.DEPARTMENT.name());
         // ticket.setOwner(owner); // 创建人
-        //
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());
         //
