@@ -176,11 +176,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             return visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
         }
 
-        long dbStartTime = System.currentTimeMillis();
         log.debug("开始查询现有工作组线程 - topic: {}", topic);
-
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-        log.debug("工作组线程查询完成 - 耗时: {}ms", System.currentTimeMillis() - dbStartTime);
 
         if (threadOptional.isPresent()) {
             ThreadEntity existingThread = threadOptional.get();
@@ -191,10 +188,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 创建新会话
         log.debug("未找到现有工作组线程，开始创建新线程");
-        long createStartTime = System.currentTimeMillis();
         ThreadEntity newThread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
-        log.info("新工作组线程创建完成 - threadUid: {}, 创建耗时: {}ms",
-                newThread.getUid(), System.currentTimeMillis() - createStartTime);
         return newThread;
     }
 
