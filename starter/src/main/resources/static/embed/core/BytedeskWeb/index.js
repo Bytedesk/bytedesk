@@ -16,6 +16,7 @@ class ee {
     p(this, "windowState", "normal");
     p(this, "loopCount", 0);
     p(this, "loopTimer", null);
+    p(this, "isDestroyed", !1);
     // 添加请求状态管理
     p(this, "initVisitorPromise", null);
     p(this, "getUnreadMessageCountPromise", null);
@@ -128,55 +129,70 @@ class ee {
   }
   async init() {
     var e, i;
-    if (await this._initVisitor(), await this._browseVisitor(), this.createBubble(), this.createInviteDialog(), this.setupMessageListener(), this.setupResizeListener(), (e = this.config.feedbackConfig) != null && e.enabled && (this.config.isDebug && t.debug("BytedeskWeb: 开始初始化文档反馈功能，document.readyState:", document.readyState), this.initFeedbackFeature(), document.readyState !== "complete")) {
-      this.config.isDebug && t.debug("BytedeskWeb: DOM未完全加载，设置备用初始化");
-      const o = () => {
-        this.config.isDebug && t.debug("BytedeskWeb: window load事件触发，重新初始化反馈功能"), this.initFeedbackFeature(), window.removeEventListener("load", o);
-      };
-      window.addEventListener("load", o);
-      const s = () => {
-        this.config.isDebug && t.debug("BytedeskWeb: DOMContentLoaded事件触发，重新初始化反馈功能"), setTimeout(() => this.initFeedbackFeature(), 100), document.removeEventListener("DOMContentLoaded", s);
-      };
-      document.readyState === "loading" && document.addEventListener("DOMContentLoaded", s);
+    if (this.isDestroyed) {
+      t.warn("BytedeskWeb 已销毁，跳过初始化");
+      return;
     }
-    this._getUnreadMessageCount(), this.config.autoPopup && setTimeout(() => {
-      this.showChat();
-    }, this.config.autoPopupDelay || 1e3), (i = this.config.inviteConfig) != null && i.show && setTimeout(() => {
-      this.showInviteDialog();
-    }, this.config.inviteConfig.delay || 3e3);
+    if (await this._initVisitor(), !this.isDestroyed && (await this._browseVisitor(), !this.isDestroyed && (this.createBubble(), !this.isDestroyed && (this.createInviteDialog(), !this.isDestroyed && (this.setupMessageListener(), this.setupResizeListener(), !this.isDestroyed))))) {
+      if ((e = this.config.feedbackConfig) != null && e.enabled && (this.config.isDebug && t.debug("BytedeskWeb: 开始初始化文档反馈功能，document.readyState:", document.readyState), this.initFeedbackFeature(), document.readyState !== "complete")) {
+        this.config.isDebug && t.debug("BytedeskWeb: DOM未完全加载，设置备用初始化");
+        const o = () => {
+          this.config.isDebug && t.debug("BytedeskWeb: window load事件触发，重新初始化反馈功能"), this.initFeedbackFeature(), window.removeEventListener("load", o);
+        };
+        window.addEventListener("load", o);
+        const s = () => {
+          this.config.isDebug && t.debug("BytedeskWeb: DOMContentLoaded事件触发，重新初始化反馈功能"), setTimeout(() => this.initFeedbackFeature(), 100), document.removeEventListener("DOMContentLoaded", s);
+        };
+        document.readyState === "loading" && document.addEventListener("DOMContentLoaded", s);
+      }
+      if (this._getUnreadMessageCount(), !this.isDestroyed) {
+        if (this.config.autoPopup) {
+          if (this.isDestroyed) return;
+          setTimeout(() => {
+            this.showChat();
+          }, this.config.autoPopupDelay || 1e3);
+        }
+        if (!this.isDestroyed && (i = this.config.inviteConfig) != null && i.show) {
+          if (this.isDestroyed) return;
+          setTimeout(() => {
+            this.showInviteDialog();
+          }, this.config.inviteConfig.delay || 3e3);
+        }
+      }
+    }
   }
   async _initVisitor() {
-    var n, a, d, l;
+    var n, a, d, r;
     if (this.initVisitorPromise)
       return t.debug("访客初始化请求正在进行中，返回现有Promise"), this.initVisitorPromise;
     const e = localStorage.getItem(W), i = localStorage.getItem(U);
     t.debug("localUid: ", e), t.debug("localVisitorUid: ", i);
     const s = ((n = this.config.chatConfig) == null ? void 0 : n.visitorUid) && i ? ((a = this.config.chatConfig) == null ? void 0 : a.visitorUid) === i : !0;
-    return e && i && s ? (t.debug("访客信息相同，直接返回本地访客信息"), (l = (d = this.config).onVisitorInfo) == null || l.call(d, e || "", i || ""), {
+    return e && i && s ? (t.debug("访客信息相同，直接返回本地访客信息"), (r = (d = this.config).onVisitorInfo) == null || r.call(d, e || "", i || ""), {
       uid: e,
       visitorUid: i
     }) : (t.debug("开始创建访客初始化Promise"), this.initVisitorPromise = import("../../apis/visitor/index.js").then(
-      async ({ initVisitor: g }) => {
-        var c, r, h, b, u, w, m, x, k, v, E, S, M, I, f, D, B, T, y, F, O, $, _;
+      async ({ initVisitor: h }) => {
+        var c, l, g, b, u, w, m, x, k, v, B, S, M, I, f, D, E, T, y, F, O, $, _;
         try {
           const R = {
             uid: String(((c = this.config.chatConfig) == null ? void 0 : c.uid) || e || ""),
             visitorUid: String(
-              ((r = this.config.chatConfig) == null ? void 0 : r.visitorUid) || i || ""
+              ((l = this.config.chatConfig) == null ? void 0 : l.visitorUid) || i || ""
             ),
-            orgUid: String(((h = this.config.chatConfig) == null ? void 0 : h.org) || ""),
+            orgUid: String(((g = this.config.chatConfig) == null ? void 0 : g.org) || ""),
             nickname: String(((b = this.config.chatConfig) == null ? void 0 : b.name) || ""),
             avatar: String(((u = this.config.chatConfig) == null ? void 0 : u.avatar) || ""),
             mobile: String(((w = this.config.chatConfig) == null ? void 0 : w.mobile) || ""),
             email: String(((m = this.config.chatConfig) == null ? void 0 : m.email) || ""),
             note: String(((x = this.config.chatConfig) == null ? void 0 : x.note) || ""),
             extra: typeof ((k = this.config.chatConfig) == null ? void 0 : k.extra) == "string" ? this.config.chatConfig.extra : JSON.stringify(((v = this.config.chatConfig) == null ? void 0 : v.extra) || {}),
-            vipLevel: String(((E = this.config.chatConfig) == null ? void 0 : E.vipLevel) || ""),
+            vipLevel: String(((B = this.config.chatConfig) == null ? void 0 : B.vipLevel) || ""),
             debug: ((S = this.config.chatConfig) == null ? void 0 : S.debug) || !1,
             settingsUid: ((M = this.config.chatConfig) == null ? void 0 : M.settingsUid) || "",
             loadHistory: ((I = this.config.chatConfig) == null ? void 0 : I.loadHistory) || !1
-          }, C = await g(R);
-          return t.debug("访客初始化API响应:", C.data, R), ((f = C.data) == null ? void 0 : f.code) === 200 ? ((B = (D = C.data) == null ? void 0 : D.data) != null && B.uid && (localStorage.setItem(W, C.data.data.uid), t.debug("已保存uid到localStorage:", C.data.data.uid)), (y = (T = C.data) == null ? void 0 : T.data) != null && y.visitorUid && (localStorage.setItem(
+          }, C = await h(R);
+          return t.debug("访客初始化API响应:", C.data, R), ((f = C.data) == null ? void 0 : f.code) === 200 ? ((E = (D = C.data) == null ? void 0 : D.data) != null && E.uid && (localStorage.setItem(W, C.data.data.uid), t.debug("已保存uid到localStorage:", C.data.data.uid)), (y = (T = C.data) == null ? void 0 : T.data) != null && y.visitorUid && (localStorage.setItem(
             U,
             C.data.data.visitorUid
           ), t.debug(
@@ -209,14 +225,14 @@ class ee {
         } else
           localStorage.removeItem(z);
       }
-      const a = window.location.href, d = document.title, l = document.referrer, g = navigator.userAgent, c = this.getBrowserInfo(g), r = this.getOSInfo(g), h = this.getDeviceInfo(g), b = `${screen.width}x${screen.height}`, u = new URLSearchParams(window.location.search), w = u.get("utm_source") || void 0, m = u.get("utm_medium") || void 0, x = u.get("utm_campaign") || void 0, k = localStorage.getItem(W), v = {
+      const a = window.location.href, d = document.title, r = document.referrer, h = navigator.userAgent, c = this.getBrowserInfo(h), l = this.getOSInfo(h), g = this.getDeviceInfo(h), b = `${screen.width}x${screen.height}`, u = new URLSearchParams(window.location.search), w = u.get("utm_source") || void 0, m = u.get("utm_medium") || void 0, x = u.get("utm_campaign") || void 0, k = localStorage.getItem(W), v = {
         url: a,
         title: d,
-        referrer: l,
-        userAgent: g,
-        operatingSystem: r,
+        referrer: r,
+        userAgent: h,
+        operatingSystem: l,
         browser: c,
-        deviceType: h,
+        deviceType: g,
         screenResolution: b,
         utmSource: w,
         utmMedium: m,
@@ -232,7 +248,7 @@ class ee {
         t.warn("访客uid为空，跳过browse操作");
         return;
       }
-      const { browse: E } = await import("../../apis/visitor/index.js"), S = await E(v);
+      const { browse: B } = await import("../../apis/visitor/index.js"), S = await B(v);
       ((o = S.data) == null ? void 0 : o.code) === 200 ? localStorage.removeItem(z) : (t.error("浏览记录发送失败:", (s = S.data) == null ? void 0 : s.message), localStorage.setItem(z, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
     } catch (n) {
       t.error("发送浏览记录时出错:", n), localStorage.setItem(z, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
@@ -255,15 +271,15 @@ class ee {
       async ({ getUnreadMessageCount: e }) => {
         var i, o, s, n, a;
         try {
-          const d = String(((i = this.config.chatConfig) == null ? void 0 : i.visitorUid) || ""), l = localStorage.getItem(W), g = localStorage.getItem(U), c = {
-            uid: l || "",
-            visitorUid: d || g || "",
+          const d = String(((i = this.config.chatConfig) == null ? void 0 : i.visitorUid) || ""), r = localStorage.getItem(W), h = localStorage.getItem(U), c = {
+            uid: r || "",
+            visitorUid: d || h || "",
             orgUid: ((o = this.config.chatConfig) == null ? void 0 : o.org) || ""
           };
           if (c.uid === "")
             return 0;
-          const r = await e(c);
-          return ((s = r.data) == null ? void 0 : s.code) === 200 ? ((n = r == null ? void 0 : r.data) != null && n.data && ((a = r == null ? void 0 : r.data) == null ? void 0 : a.data) > 0 ? this.showUnreadBadge(r.data.data) : this.clearUnreadBadge(), r.data.data || 0) : 0;
+          const l = await e(c);
+          return ((s = l.data) == null ? void 0 : s.code) === 200 ? ((n = l == null ? void 0 : l.data) != null && n.data && ((a = l == null ? void 0 : l.data) == null ? void 0 : a.data) > 0 ? this.showUnreadBadge(l.data.data) : this.clearUnreadBadge(), l.data.data || 0) : 0;
         } catch (d) {
           return t.error("获取未读消息数出错:", d), 0;
         } finally {
@@ -347,8 +363,8 @@ class ee {
             uid: n || "",
             visitorUid: s || a || "",
             orgUid: ((o = this.config.chatConfig) == null ? void 0 : o.org) || ""
-          }, l = await e(d);
-          return t.debug("清空未读消息数:", l.data, d), l.data.code === 200 ? (t.info("清空未读消息数成功:", l.data), this.clearUnreadBadge(), l.data.data || 0) : (t.error("清空未读消息数失败:", l.data.message), 0);
+          }, r = await e(d);
+          return t.debug("清空未读消息数:", r.data, d), r.data.code === 200 ? (t.info("清空未读消息数成功:", r.data), this.clearUnreadBadge(), r.data.data || 0) : (t.error("清空未读消息数失败:", r.data.message), 0);
         } catch (s) {
           return t.error("清空未读消息数出错:", s), 0;
         } finally {
@@ -358,7 +374,7 @@ class ee {
     ), this.clearUnreadMessagesPromise);
   }
   createBubble() {
-    var r, h, b, u, w, m, x, k, v, E, S, M, I;
+    var l, g, b, u, w, m, x, k, v, B, S, M, I;
     if (this.bubble && document.body.contains(this.bubble)) {
       t.debug("createBubble: 气泡已存在，不重复创建");
       return;
@@ -376,9 +392,9 @@ class ee {
       z-index: 9999;
     `;
     let i = null;
-    if ((r = this.config.bubbleConfig) != null && r.show) {
+    if ((l = this.config.bubbleConfig) != null && l.show) {
       i = document.createElement("div"), i.style.cssText = `
-        background: ${((h = this.config.theme) == null ? void 0 : h.mode) === "dark" ? "#1f2937" : "white"};
+        background: ${((g = this.config.theme) == null ? void 0 : g.mode) === "dark" ? "#1f2937" : "white"};
         color: ${((b = this.config.theme) == null ? void 0 : b.mode) === "dark" ? "#e5e7eb" : "#1f2937"};
         padding: 12px 16px;
         border-radius: 8px;
@@ -402,10 +418,10 @@ class ee {
       );
       const D = document.createElement("span");
       D.textContent = ((u = this.config.bubbleConfig) == null ? void 0 : u.icon) || "", D.style.fontSize = "20px", f.appendChild(D);
-      const B = document.createElement("div"), T = document.createElement("div");
-      T.textContent = ((w = this.config.bubbleConfig) == null ? void 0 : w.title) || "", T.style.fontWeight = "bold", T.style.color = ((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#e5e7eb" : "#1f2937", T.style.marginBottom = "4px", T.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", B.appendChild(T);
+      const E = document.createElement("div"), T = document.createElement("div");
+      T.textContent = ((w = this.config.bubbleConfig) == null ? void 0 : w.title) || "", T.style.fontWeight = "bold", T.style.color = ((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#e5e7eb" : "#1f2937", T.style.marginBottom = "4px", T.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", E.appendChild(T);
       const y = document.createElement("div");
-      y.textContent = ((x = this.config.bubbleConfig) == null ? void 0 : x.subtitle) || "", y.style.fontSize = "0.9em", y.style.color = ((k = this.config.theme) == null ? void 0 : k.mode) === "dark" ? "#9ca3af" : "#4b5563", y.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", B.appendChild(y), f.appendChild(B), i.appendChild(f);
+      y.textContent = ((x = this.config.bubbleConfig) == null ? void 0 : x.subtitle) || "", y.style.fontSize = "0.9em", y.style.color = ((k = this.config.theme) == null ? void 0 : k.mode) === "dark" ? "#9ca3af" : "#4b5563", y.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", E.appendChild(y), f.appendChild(E), i.appendChild(f);
       const F = document.createElement("div");
       F.style.cssText = `
         position: absolute;
@@ -424,15 +440,15 @@ class ee {
         ${this.config.placement === "bottom-left" ? "left: 18px" : "right: 18px"};
         width: 24px;
         height: 12px;
-        background: ${((E = this.config.theme) == null ? void 0 : E.mode) === "dark" ? "#1f2937" : "white"};
+        background: ${((B = this.config.theme) == null ? void 0 : B.mode) === "dark" ? "#1f2937" : "white"};
       `, i.appendChild(F), i.appendChild(O), e.appendChild(i), setTimeout(() => {
         i && (i.style.opacity = "1", i.style.transform = "translateY(0)");
       }, 500);
     }
     this.bubble = document.createElement("button");
-    const o = this.config.buttonConfig || {}, s = o.width || 60, n = o.height || 60, a = Math.min(s, n) / 2, d = ((S = this.config.theme) == null ? void 0 : S.mode) === "dark", l = d ? "#3B82F6" : "#0066FF", g = ((M = this.config.theme) == null ? void 0 : M.backgroundColor) || l;
+    const o = this.config.buttonConfig || {}, s = o.width || 60, n = o.height || 60, a = Math.min(s, n) / 2, d = ((S = this.config.theme) == null ? void 0 : S.mode) === "dark", r = d ? "#3B82F6" : "#0066FF", h = ((M = this.config.theme) == null ? void 0 : M.backgroundColor) || r;
     this.bubble.style.cssText = `
-      background-color: ${g};
+      background-color: ${h};
       width: ${s}px;
       height: ${n}px;
       border-radius: ${a}px;
@@ -478,13 +494,13 @@ class ee {
     }), this.bubble.addEventListener("mouseleave", () => {
       this.bubble.style.transform = "scale(1)";
     }), e.appendChild(this.bubble), this.config.draggable) {
-      let f = 0, D = 0, B = 0, T = 0;
+      let f = 0, D = 0, E = 0, T = 0;
       this.bubble.addEventListener("mousedown", (y) => {
-        y.button === 0 && (this.isDragging = !0, f = y.clientX, D = y.clientY, B = e.offsetLeft, T = e.offsetTop, e.style.transition = "none");
+        y.button === 0 && (this.isDragging = !0, f = y.clientX, D = y.clientY, E = e.offsetLeft, T = e.offsetTop, e.style.transition = "none");
       }), document.addEventListener("mousemove", (y) => {
         if (!this.isDragging) return;
         y.preventDefault();
-        const F = y.clientX - f, O = y.clientY - D, $ = B + F, _ = T + O, R = window.innerHeight - e.offsetHeight;
+        const F = y.clientX - f, O = y.clientY - D, $ = E + F, _ = T + O, R = window.innerHeight - e.offsetHeight;
         $ <= window.innerWidth / 2 ? (e.style.left = `${Math.max(0, $)}px`, e.style.right = "auto", e.style.alignItems = "flex-start", this.config.placement = "bottom-left") : (e.style.right = `${Math.max(
           0,
           window.innerWidth - $ - e.offsetWidth
@@ -511,7 +527,7 @@ class ee {
     });
   }
   createChatWindow() {
-    var d, l, g, c, r, h;
+    var d, r, h, c, l, g;
     if (this.window && document.body.contains(this.window)) {
       t.debug("createChatWindow: 聊天窗口已存在，不重复创建");
       return;
@@ -521,7 +537,7 @@ class ee {
       ((d = this.config.window) == null ? void 0 : d.width) || i * 0.9,
       i * 0.9
     ), n = Math.min(
-      ((l = this.config.window) == null ? void 0 : l.height) || o * 0.9,
+      ((r = this.config.window) == null ? void 0 : r.height) || o * 0.9,
       o * 0.9
     );
     e ? this.window.style.cssText = `
@@ -535,7 +551,7 @@ class ee {
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
-        transition: all ${(g = this.config.animation) == null ? void 0 : g.duration}ms ${(c = this.config.animation) == null ? void 0 : c.type};
+        transition: all ${(h = this.config.animation) == null ? void 0 : h.duration}ms ${(c = this.config.animation) == null ? void 0 : c.type};
       ` : this.window.style.cssText = `
         position: fixed;
         ${this.config.placement === "bottom-right" ? "right" : "left"}: ${this.config.marginSide}px;
@@ -547,7 +563,7 @@ class ee {
         display: none;
         overflow: hidden;
         z-index: 10000;
-        transition: all ${(r = this.config.animation) == null ? void 0 : r.duration}ms ${(h = this.config.animation) == null ? void 0 : h.type};
+        transition: all ${(l = this.config.animation) == null ? void 0 : l.duration}ms ${(g = this.config.animation) == null ? void 0 : g.type};
       `;
     const a = document.createElement("iframe");
     a.style.cssText = `
@@ -569,15 +585,15 @@ class ee {
       else if (a === "goodsInfo" || a === "orderInfo")
         try {
           typeof d == "string" ? i.append(a, d) : i.append(a, JSON.stringify(d));
-        } catch (l) {
-          t.error(`Error processing ${a}:`, l);
+        } catch (r) {
+          t.error(`Error processing ${a}:`, r);
         }
       else if (a === "extra")
         try {
-          let l = typeof d == "string" ? JSON.parse(d) : d;
-          l.goodsInfo && delete l.goodsInfo, l.orderInfo && delete l.orderInfo, Object.keys(l).length > 0 && i.append(a, JSON.stringify(l));
-        } catch (l) {
-          t.error("Error processing extra parameter:", l);
+          let r = typeof d == "string" ? JSON.parse(d) : d;
+          r.goodsInfo && delete r.goodsInfo, r.orderInfo && delete r.orderInfo, Object.keys(r).length > 0 && i.append(a, JSON.stringify(r));
+        } catch (r) {
+          t.error("Error processing extra parameter:", r);
         }
       else a !== "debug" && a !== "loadHistory" && i.append(a, String(d));
     }), Object.entries(this.config.browseConfig || {}).forEach(([a, d]) => {
@@ -696,19 +712,19 @@ class ee {
           borderBottomRightRadius: "0"
         });
       else {
-        let l = this.windowState === "maximized" ? s : Math.min(
+        let r = this.windowState === "maximized" ? s : Math.min(
           ((a = this.config.window) == null ? void 0 : a.width) || s * 0.9,
           s * 0.9
-        ), g = this.windowState === "maximized" ? n : Math.min(
+        ), h = this.windowState === "maximized" ? n : Math.min(
           ((d = this.config.window) == null ? void 0 : d.height) || n * 0.9,
           n * 0.9
         );
-        const c = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, r = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
+        const c = this.config.placement === "bottom-right" ? this.config.marginSide : void 0, l = this.config.placement === "bottom-left" ? this.config.marginSide : void 0;
         Object.assign(this.window.style, {
-          width: `${l}px`,
-          height: `${g}px`,
+          width: `${r}px`,
+          height: `${h}px`,
           right: c ? `${c}px` : "auto",
-          left: r ? `${r}px` : "auto",
+          left: l ? `${l}px` : "auto",
           bottom: `${this.config.marginBottom}px`,
           borderRadius: this.windowState === "maximized" ? "0" : "12px"
         });
@@ -721,11 +737,12 @@ class ee {
   }
   destroy() {
     var i;
+    this.isDestroyed = !0;
     const e = (i = this.bubble) == null ? void 0 : i.parentElement;
     e && document.body.contains(e) && (document.body.removeChild(e), this.bubble = null), this.window && document.body.contains(this.window) && (document.body.removeChild(this.window), this.window = null), window.removeEventListener("resize", this.setupResizeListener.bind(this)), this.loopTimer && (window.clearTimeout(this.loopTimer), this.loopTimer = null), this.inviteDialog && document.body.contains(this.inviteDialog) && (document.body.removeChild(this.inviteDialog), this.inviteDialog = null), this.contextMenu && document.body.contains(this.contextMenu) && (document.body.removeChild(this.contextMenu), this.contextMenu = null), this.hideTimeout && (clearTimeout(this.hideTimeout), this.hideTimeout = null), this.selectionDebounceTimer && (clearTimeout(this.selectionDebounceTimer), this.selectionDebounceTimer = null), this.destroyFeedbackFeature();
   }
   createInviteDialog() {
-    var d, l, g, c, r, h;
+    var d, r, h, c, l, g;
     if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
       t.debug("createInviteDialog: 邀请框已存在，不重复创建");
       return;
@@ -745,7 +762,7 @@ class ee {
       display: none;
       max-width: 300px;
       text-align: center;
-    `, (l = this.config.inviteConfig) != null && l.icon) {
+    `, (r = this.config.inviteConfig) != null && r.icon) {
       const b = document.createElement("div");
       b.style.cssText = `
         font-size: 32px;
@@ -757,7 +774,7 @@ class ee {
     i.style.cssText = `
       margin-bottom: 16px;
       color: ${e ? "#e5e7eb" : "#333"};
-    `, i.textContent = ((g = this.config.inviteConfig) == null ? void 0 : g.text) || "需要帮助吗？点击开始对话", this.inviteDialog.appendChild(i);
+    `, i.textContent = ((h = this.config.inviteConfig) == null ? void 0 : h.text) || "需要帮助吗？点击开始对话", this.inviteDialog.appendChild(i);
     const o = document.createElement("div");
     o.style.cssText = `
       display: flex;
@@ -766,7 +783,7 @@ class ee {
     `;
     const s = document.createElement("button");
     s.textContent = ((c = this.config.inviteConfig) == null ? void 0 : c.acceptText) || "开始对话";
-    const n = ((r = this.config.theme) == null ? void 0 : r.backgroundColor) || (e ? "#3B82F6" : "#0066FF");
+    const n = ((l = this.config.theme) == null ? void 0 : l.backgroundColor) || (e ? "#3B82F6" : "#0066FF");
     s.style.cssText = `
       padding: 8px 16px;
       background: ${n};
@@ -779,7 +796,7 @@ class ee {
       this.hideInviteDialog(), this.showChat(), (u = (b = this.config.inviteConfig) == null ? void 0 : b.onAccept) == null || u.call(b);
     };
     const a = document.createElement("button");
-    a.textContent = ((h = this.config.inviteConfig) == null ? void 0 : h.rejectText) || "稍后再说", a.style.cssText = `
+    a.textContent = ((g = this.config.inviteConfig) == null ? void 0 : g.rejectText) || "稍后再说", a.style.cssText = `
       padding: 8px 16px;
       background: ${e ? "#374151" : "#f5f5f5"};
       color: ${e ? "#d1d5db" : "#666"};
@@ -1094,8 +1111,8 @@ class ee {
         for (; x < Math.min(k.length, s.endOffset); ) {
           const v = document.createRange();
           v.setStart(s.startContainer, s.startOffset), v.setEnd(s.startContainer, x + 1);
-          const E = v.getBoundingClientRect(), S = m.getBoundingClientRect();
-          if (Math.abs(E.top - S.top) > 5)
+          const B = v.getBoundingClientRect(), S = m.getBoundingClientRect();
+          if (Math.abs(B.top - S.top) > 5)
             break;
           x++;
         }
@@ -1113,18 +1130,18 @@ class ee {
       width: n.width,
       height: n.height
     });
-    const a = 120, d = 40, l = 15, g = 5;
-    let c = n.left + g, r = n.top - d - l;
-    const h = window.innerWidth, b = window.innerHeight, u = window.scrollX, w = window.scrollY;
-    c < 10 && (c = 10), c + a > h - 10 && (c = h - a - 10), r < w + 10 && (r = n.bottom + l, this.config.isDebug && t.debug("BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方")), c += u, r += w, this.config.isDebug && t.debug("BytedeskWeb: 最终提示框位置:", {
+    const a = 120, d = 40, r = 15, h = 5;
+    let c = n.left + h, l = n.top - d - r;
+    const g = window.innerWidth, b = window.innerHeight, u = window.scrollX, w = window.scrollY;
+    c < 10 && (c = 10), c + a > g - 10 && (c = g - a - 10), l < w + 10 && (l = n.bottom + r, this.config.isDebug && t.debug("BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方")), c += u, l += w, this.config.isDebug && t.debug("BytedeskWeb: 最终提示框位置:", {
       x: c,
-      y: r,
+      y: l,
       说明: "显示在选中文字第一行左上角上方，增加间距避免遮挡",
-      verticalOffset: l,
-      horizontalOffset: g,
+      verticalOffset: r,
+      horizontalOffset: h,
       选中区域: n,
-      视口信息: { viewportWidth: h, viewportHeight: b, scrollX: u, scrollY: w }
-    }), this.feedbackTooltip.style.position = "absolute", this.feedbackTooltip.style.left = c + "px", this.feedbackTooltip.style.top = r + "px", this.feedbackTooltip.style.display = "block", this.feedbackTooltip.style.visibility = "visible", this.feedbackTooltip.style.opacity = "0", this.feedbackTooltip.style.zIndex = "999999", this.config.isDebug && t.debug("BytedeskWeb: 提示框位置已设置，样式:", {
+      视口信息: { viewportWidth: g, viewportHeight: b, scrollX: u, scrollY: w }
+    }), this.feedbackTooltip.style.position = "absolute", this.feedbackTooltip.style.left = c + "px", this.feedbackTooltip.style.top = l + "px", this.feedbackTooltip.style.display = "block", this.feedbackTooltip.style.visibility = "visible", this.feedbackTooltip.style.opacity = "0", this.feedbackTooltip.style.zIndex = "999999", this.config.isDebug && t.debug("BytedeskWeb: 提示框位置已设置，样式:", {
       position: this.feedbackTooltip.style.position,
       left: this.feedbackTooltip.style.left,
       top: this.feedbackTooltip.style.top,
@@ -1153,7 +1170,7 @@ class ee {
    * 创建反馈对话框
    */
   createFeedbackDialog() {
-    var i, o, s, n, a, d, l, g;
+    var i, o, s, n, a, d, r, h;
     if (this.config.isDebug && t.debug("BytedeskWeb: createFeedbackDialog被调用"), this.feedbackDialog && document.body.contains(this.feedbackDialog)) {
       this.config.isDebug && t.debug("BytedeskWeb: 反馈对话框已存在且在DOM中，跳过创建");
       return;
@@ -1308,7 +1325,7 @@ class ee {
           cursor: pointer;
           font-size: 14px;
           font-family: inherit;
-        ">${((l = this.config.feedbackConfig) == null ? void 0 : l.cancelText) || "取消"}</button>
+        ">${((r = this.config.feedbackConfig) == null ? void 0 : r.cancelText) || "取消"}</button>
         <button type="button" data-action="submit" style="
           background: #2e88ff;
           color: white;
@@ -1318,7 +1335,7 @@ class ee {
           cursor: pointer;
           font-size: 14px;
           font-family: inherit;
-        ">${((g = this.config.feedbackConfig) == null ? void 0 : g.submitText) || "提交反馈"}</button>
+        ">${((h = this.config.feedbackConfig) == null ? void 0 : h.submitText) || "提交反馈"}</button>
       </div>
 
       <div style="margin-top: 12px; text-align: center; font-size: 12px; color: #999;">
@@ -1338,11 +1355,11 @@ class ee {
           break;
       }
     }), this.feedbackDialog.appendChild(e), this.feedbackDialog.addEventListener("click", (c) => {
-      var r, h;
-      c.target === this.feedbackDialog && (this.hideFeedbackDialog(), (h = (r = this.config.feedbackConfig) == null ? void 0 : r.onCancel) == null || h.call(r));
+      var l, g;
+      c.target === this.feedbackDialog && (this.hideFeedbackDialog(), (g = (l = this.config.feedbackConfig) == null ? void 0 : l.onCancel) == null || g.call(l));
     }), document.addEventListener("keydown", (c) => {
-      var r, h, b;
-      c.key === "Escape" && ((r = this.feedbackDialog) == null ? void 0 : r.style.display) === "flex" && (this.hideFeedbackDialog(), (b = (h = this.config.feedbackConfig) == null ? void 0 : h.onCancel) == null || b.call(h));
+      var l, g, b;
+      c.key === "Escape" && ((l = this.feedbackDialog) == null ? void 0 : l.style.display) === "flex" && (this.hideFeedbackDialog(), (b = (g = this.config.feedbackConfig) == null ? void 0 : g.onCancel) == null || b.call(g));
     }), document.body.appendChild(this.feedbackDialog);
   }
   /**
@@ -1413,9 +1430,9 @@ class ee {
             return;
           }
           try {
-            const d = `screenshot_${Date.now()}.jpg`, l = new File([n], d, { type: "image/jpeg" });
+            const d = `screenshot_${Date.now()}.jpg`, r = new File([n], d, { type: "image/jpeg" });
             this.config.isDebug && t.debug("BytedeskWeb: 截图生成成功，文件大小:", Math.round(n.size / 1024), "KB");
-            const { uploadScreenshot: g } = await import("../../apis/upload/index.js"), c = await g(l, {
+            const { uploadScreenshot: h } = await import("../../apis/upload/index.js"), c = await h(r, {
               orgUid: ((a = this.config.chatConfig) == null ? void 0 : a.org) || "",
               isDebug: this.config.isDebug
             });
@@ -1458,7 +1475,7 @@ class ee {
           allowTaint: !0,
           backgroundColor: "#ffffff",
           scale: 1,
-          ignoreElements: (g) => g.hasAttribute("data-bytedesk-feedback") || g.closest("[data-bytedesk-feedback]") !== null
+          ignoreElements: (h) => h.hasAttribute("data-bytedesk-feedback") || h.closest("[data-bytedesk-feedback]") !== null
         }), a = document.createElement("img");
         a.src = n.toDataURL("image/jpeg", 0.8), a.style.cssText = `
         max-width: 100%;
@@ -1467,8 +1484,8 @@ class ee {
         border: 1px solid #ddd;
         cursor: pointer;
       `, a.onclick = () => {
-          const g = document.createElement("img");
-          g.src = a.src, g.style.cssText = `
+          const h = document.createElement("img");
+          h.src = a.src, h.style.cssText = `
           max-width: 90vw;
           max-height: 90vh;
           border-radius: 8px;
@@ -1488,8 +1505,8 @@ class ee {
           z-index: 1000001;
           cursor: pointer;
         `;
-          const r = document.createElement("div");
-          r.style.cssText = `
+          const l = document.createElement("div");
+          l.style.cssText = `
           position: absolute;
           top: 20px;
           right: 20px;
@@ -1499,7 +1516,7 @@ class ee {
           padding: 8px 12px;
           border-radius: 4px;
           user-select: none;
-        `, r.textContent = "点击任意位置关闭", c.appendChild(r), c.appendChild(g), c.onclick = () => document.body.removeChild(c), document.body.appendChild(c);
+        `, l.textContent = "点击任意位置关闭", c.appendChild(l), c.appendChild(h), c.onclick = () => document.body.removeChild(c), document.body.appendChild(c);
         };
         const d = document.createElement("div");
         d.style.cssText = `
@@ -1508,12 +1525,12 @@ class ee {
         align-items: center;
         gap: 8px;
       `, d.appendChild(a);
-        const l = document.createElement("div");
-        l.style.cssText = `
+        const r = document.createElement("div");
+        r.style.cssText = `
         font-size: 12px;
         color: #666;
         text-align: center;
-      `, l.innerHTML = "点击图片可放大查看<br/>提交时将自动上传此截图", d.appendChild(l), e.innerHTML = "", e.appendChild(d), this.feedbackDialog.screenshotCanvas = n, this.config.isDebug && t.debug("BytedeskWeb: 截图预览生成成功");
+      `, r.innerHTML = "点击图片可放大查看<br/>提交时将自动上传此截图", d.appendChild(r), e.innerHTML = "", e.appendChild(d), this.feedbackDialog.screenshotCanvas = n, this.config.isDebug && t.debug("BytedeskWeb: 截图预览生成成功");
       } catch (o) {
         t.error("生成截图预览失败:", o), e.innerHTML = `
         <div style="color: #ff6b6b; text-align: center; flex-direction: column; gap: 8px; display: flex; align-items: center;">
@@ -1543,37 +1560,37 @@ class ee {
         o && o.rangeCount > 0 && (i = o.getRangeAt(0).getBoundingClientRect());
       }
       if (i && i.width > 0 && i.height > 0) {
-        const o = window.pageXOffset || document.documentElement.scrollLeft, s = window.pageYOffset || document.documentElement.scrollTop, n = i.left + o, a = i.top + s, d = Math.min(800, window.innerWidth), l = Math.min(600, window.innerHeight);
-        let g = n - d / 2, c = a - l / 2;
-        const r = document.documentElement.scrollWidth, h = document.documentElement.scrollHeight;
-        g = Math.max(0, Math.min(g, r - d)), c = Math.max(0, Math.min(c, h - l)), e = {
-          height: l,
+        const o = window.pageXOffset || document.documentElement.scrollLeft, s = window.pageYOffset || document.documentElement.scrollTop, n = i.left + o, a = i.top + s, d = Math.min(800, window.innerWidth), r = Math.min(600, window.innerHeight);
+        let h = n - d / 2, c = a - r / 2;
+        const l = document.documentElement.scrollWidth, g = document.documentElement.scrollHeight;
+        h = Math.max(0, Math.min(h, l - d)), c = Math.max(0, Math.min(c, g - r)), e = {
+          height: r,
           width: d,
-          x: g,
+          x: h,
           y: c,
           scrollX: 0,
           scrollY: 0
         }, this.config.isDebug && t.debug("BytedeskWeb: 选中文本截图区域:", {
           selectedRect: i,
           absolutePosition: { left: n, top: a },
-          captureArea: { x: g, y: c, width: d, height: l },
-          pageSize: { width: r, height: h }
+          captureArea: { x: h, y: c, width: d, height: r },
+          pageSize: { width: l, height: g }
         });
       } else if (this.lastMouseEvent) {
-        const o = window.pageXOffset || document.documentElement.scrollLeft, s = window.pageYOffset || document.documentElement.scrollTop, n = this.lastMouseEvent.clientX + o, a = this.lastMouseEvent.clientY + s, d = Math.min(800, window.innerWidth), l = Math.min(600, window.innerHeight);
-        let g = n - d / 2, c = a - l / 2;
-        const r = document.documentElement.scrollWidth, h = document.documentElement.scrollHeight;
-        g = Math.max(0, Math.min(g, r - d)), c = Math.max(0, Math.min(c, h - l)), e = {
-          height: l,
+        const o = window.pageXOffset || document.documentElement.scrollLeft, s = window.pageYOffset || document.documentElement.scrollTop, n = this.lastMouseEvent.clientX + o, a = this.lastMouseEvent.clientY + s, d = Math.min(800, window.innerWidth), r = Math.min(600, window.innerHeight);
+        let h = n - d / 2, c = a - r / 2;
+        const l = document.documentElement.scrollWidth, g = document.documentElement.scrollHeight;
+        h = Math.max(0, Math.min(h, l - d)), c = Math.max(0, Math.min(c, g - r)), e = {
+          height: r,
           width: d,
-          x: g,
+          x: h,
           y: c,
           scrollX: 0,
           scrollY: 0
         }, this.config.isDebug && t.debug("BytedeskWeb: 鼠标位置截图区域:", {
           mousePosition: { x: this.lastMouseEvent.clientX, y: this.lastMouseEvent.clientY },
           absolutePosition: { x: n, y: a },
-          captureArea: { x: g, y: c, width: d, height: l }
+          captureArea: { x: h, y: c, width: d, height: r }
         });
       }
     } catch (i) {
@@ -1612,23 +1629,23 @@ class ee {
    * 提交反馈
    */
   async submitFeedback() {
-    var d, l, g, c, r, h, b;
+    var d, r, h, c, l, g, b;
     const e = (d = this.feedbackDialog) == null ? void 0 : d.querySelector("#bytedesk-feedback-text"), i = (e == null ? void 0 : e.value.trim()) || "";
     if (!i) {
       alert("请填写反馈内容"), e == null || e.focus();
       return;
     }
-    const o = [], s = (l = this.feedbackDialog) == null ? void 0 : l.querySelectorAll('input[name="feedback-type"]:checked');
+    const o = [], s = (r = this.feedbackDialog) == null ? void 0 : r.querySelectorAll('input[name="feedback-type"]:checked');
     if (s && s.forEach((u) => {
       o.push(u.value);
-    }), (g = this.config.feedbackConfig) != null && g.requiredTypes && o.length === 0) {
+    }), (h = this.config.feedbackConfig) != null && h.requiredTypes && o.length === 0) {
       alert("请至少选择一个问题类型");
       return;
     }
     const n = (c = this.feedbackDialog) == null ? void 0 : c.querySelector(".bytedesk-feedback-submit"), a = (n == null ? void 0 : n.textContent) || "提交反馈";
     n && (n.disabled = !0, n.textContent = "提交中...", n.style.opacity = "0.6");
     try {
-      const u = (r = this.feedbackDialog) == null ? void 0 : r.querySelector("#bytedesk-submit-screenshot"), w = (u == null ? void 0 : u.checked) !== !1;
+      const u = (l = this.feedbackDialog) == null ? void 0 : l.querySelector("#bytedesk-submit-screenshot"), w = (u == null ? void 0 : u.checked) !== !1;
       let m = [];
       if (w) {
         this.config.isDebug && t.debug("BytedeskWeb: 开始生成和上传截图"), n && (n.textContent = "正在生成截图...");
@@ -1644,7 +1661,7 @@ class ee {
         title: document.title,
         userAgent: navigator.userAgent,
         visitorUid: localStorage.getItem("bytedesk_uid") || "",
-        orgUid: ((h = this.config.chatConfig) == null ? void 0 : h.org) || "",
+        orgUid: ((g = this.config.chatConfig) == null ? void 0 : g.org) || "",
         ...o.length > 0 && { categoryNames: o.join(",") }
       };
       (b = this.config.feedbackConfig) != null && b.onSubmit ? this.config.feedbackConfig.onSubmit(x) : await this.submitFeedbackToServer(x), this.showFeedbackSuccess(), setTimeout(() => {

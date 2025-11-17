@@ -71,6 +71,7 @@ declare class BytedeskWeb {
     private windowState;
     private loopCount;
     private loopTimer;
+    private isDestroyed;
     private initVisitorPromise;
     private getUnreadMessageCountPromise;
     private clearUnreadMessagesPromise;
