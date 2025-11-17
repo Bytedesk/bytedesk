@@ -123,6 +123,7 @@ public class TicketRestService
         }
         ticket.setReporter(request.getReporterJson());
 
+        enforceRequireLoginRule(ticket, request);
         ensureTicketNumber(ticket, request);
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
@@ -482,5 +483,18 @@ public class TicketRestService
             }
         }
         throw new IllegalStateException("Unable to allocate unique ticket number for org " + orgUid);
+    }
+
+    private void enforceRequireLoginRule(TicketEntity ticket, TicketRequest request) {
+        String orgUid = resolveOrgUid(ticket, request);
+        String workgroupUid = resolveWorkgroupUid(ticket, request);
+        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(orgUid, workgroupUid);
+        if (basicSettings == null || !Boolean.TRUE.equals(basicSettings.getRequireLogin())) {
+            return;
+        }
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
     }
 }

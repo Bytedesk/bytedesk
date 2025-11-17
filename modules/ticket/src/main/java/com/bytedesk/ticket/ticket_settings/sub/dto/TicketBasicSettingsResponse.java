@@ -26,4 +26,5 @@ public class TicketBasicSettingsResponse extends BaseResponse {
     private Integer validityDays;
     private Integer autoCloseHours;
     private Boolean enableAutoClose;
+    private Boolean requireLogin;
 }

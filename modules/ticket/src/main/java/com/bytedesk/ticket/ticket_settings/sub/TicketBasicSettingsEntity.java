@@ -46,9 +46,9 @@ public class TicketBasicSettingsEntity extends BaseEntity {
     @Builder.Default
     private Boolean enableAutoClose = Boolean.TRUE;
 
-    // 是否需要登录才能创建工单
+    // 是否需要登录才能创建工单/查询工单
     @Builder.Default
-    private Boolean requireLoginToCreate = Boolean.FALSE;
+    private Boolean requireLogin = Boolean.FALSE;
 
     /**
      * 静态工厂：根据请求DTO与可选ModelMapper构建实体。

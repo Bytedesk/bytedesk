@@ -26,4 +26,5 @@ public class TicketBasicSettingsRequest extends BaseRequest {
     private Integer validityDays;
     private Integer autoCloseHours;
     private Boolean enableAutoClose;
+    private Boolean requireLogin;
 }

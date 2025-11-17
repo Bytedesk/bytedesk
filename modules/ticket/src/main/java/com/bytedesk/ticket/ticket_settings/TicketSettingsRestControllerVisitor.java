@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse;
 import com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse;
+import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategoryItemResponse;
 import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse;
 
@@ -40,6 +41,24 @@ public class TicketSettingsRestControllerVisitor {
         TicketSettingsResponse settings = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
         TicketCategoryVisitorResponse response = toVisitorResponse(settings != null ? settings.getCategorySettings() : null);
         return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/basic")
+    public ResponseEntity<?> getBasicSettingsByWorkgroup(
+            @PathVariable("orgUid") String orgUid,
+            @PathVariable("workgroupUid") String workgroupUid) {
+        TicketBasicSettingsResponse response = resolveBasicSettings(orgUid, workgroupUid);
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    private TicketBasicSettingsResponse resolveBasicSettings(String orgUid, String workgroupUid) {
+        TicketSettingsResponse settings = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+        if (settings == null) {
+            return null;
+        }
+        return settings.getBasicSettings() != null
+                ? settings.getBasicSettings()
+                : settings.getDraftBasicSettings();
     }
 
     private TicketCategoryVisitorResponse toVisitorResponse(TicketCategorySettingsResponse categorySettings) {

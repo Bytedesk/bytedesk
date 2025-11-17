@@ -836,6 +836,9 @@ public class TicketSettingsRestService extends
         if (request.getEnableAutoClose() != null) {
             target.setEnableAutoClose(request.getEnableAutoClose());
         }
+        if (request.getRequireLogin() != null) {
+            target.setRequireLogin(request.getRequireLogin());
+        }
     }
 
     private void copyBasicSettings(TicketBasicSettingsEntity source, TicketBasicSettingsEntity target) {
@@ -848,7 +851,7 @@ public class TicketSettingsRestService extends
         target.setValidityDays(source.getValidityDays());
         target.setAutoCloseHours(source.getAutoCloseHours());
         target.setEnableAutoClose(source.getEnableAutoClose());
-        target.setRequireLoginToCreate(source.getRequireLoginToCreate());
+        target.setRequireLogin(source.getRequireLogin());
     }
 
     private TicketBasicSettingsResponse mapBasicSettings(TicketBasicSettingsEntity entity) {
@@ -863,6 +866,7 @@ public class TicketSettingsRestService extends
                 .validityDays(entity.getValidityDays())
                 .autoCloseHours(entity.getAutoCloseHours())
                 .enableAutoClose(entity.getEnableAutoClose())
+                .requireLogin(entity.getRequireLogin())
                 .build();
     }
 
