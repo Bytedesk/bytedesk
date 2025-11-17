@@ -160,10 +160,14 @@ public class TicketRestService
         // 未绑定客服会话的情况下，创建工单客服会话
         if (!StringUtils.hasText(ticket.getThreadUid())) {
             // 如果创建工单的时候没有绑定会话，则创建会话
-            ThreadEntity thread = createTicketThread(ticket);
-            if (thread != null) {
-                ticket.setTopic(thread.getTopic());
-                ticket.setThreadUid(thread.getUid());
+            if (!skipLoginEnforce) {
+                ThreadEntity thread = createTicketThread(ticket);
+                if (thread != null) {
+                    ticket.setTopic(thread.getTopic());
+                    ticket.setThreadUid(thread.getUid());
+                }
+            } else {
+                log.debug("Skip creating ticket thread for anonymous visitor ticket: {}", ticket.getUid());
             }
         }
 

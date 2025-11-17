@@ -126,12 +126,12 @@ public class TicketEntity extends BaseEntity {
     /**
      * Associated workgroup UID for ticket assignment
      */
-    private String workgroupUid; // 工作组
+    private String workgroupUid; // 客服工作组
 
     /**
      * Associated department UID for ticket routing
      */
-    private String departmentUid; // 部门
+    private String departmentUid; // 内部部门
 
     /**
      * Ticket assignee information stored as JSON string
