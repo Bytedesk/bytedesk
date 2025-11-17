@@ -23,9 +23,9 @@ import lombok.Data;
 @Data
 public class TicketExcel {
 
-    // @ExcelProperty(value = "标题")
-    // @ColumnWidth(20)
-    // private String title;
+    @ExcelProperty(value = "摘要")
+    @ColumnWidth(20)
+    private String summary;
 
     @ExcelProperty(value = "工单编号")
     @ColumnWidth(20)

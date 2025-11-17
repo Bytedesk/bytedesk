@@ -35,7 +35,7 @@ public class TicketResponse extends BaseResponse {
     private static final long serialVersionUID = 1L;
 
     // 
-    // private String title;
+    private String summary;
     private String description;
 
     private String contactName;

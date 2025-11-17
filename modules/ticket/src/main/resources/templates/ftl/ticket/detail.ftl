@@ -5,7 +5,7 @@
         <!-- 工单详情 -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="mb-0">${ticket.title}</h5>
+                <h5 class="mb-0">${ticket.summary}</h5>
             </div>
             <div class="card-body">
                 <div class="ticket-content mb-4">

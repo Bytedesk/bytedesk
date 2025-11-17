@@ -35,7 +35,7 @@ public class TicketRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-    // private String title;
+    private String summary;
     private String description;
 
     // 联系称呼

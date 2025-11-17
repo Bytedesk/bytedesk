@@ -174,7 +174,7 @@ public class TicketRestService
         TicketEntity ticket = ticketOptional.get();
 
         // 更新基本信息
-        // ticket.setTitle(request.getTitle());
+        ticket.setSummary(request.getSummary());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
         ticket.setStatus(request.getStatus());
@@ -301,7 +301,7 @@ public class TicketRestService
             if (latest.isPresent()) {
                 TicketEntity latestEntity = latest.get();
                 // 合并需要保留的数据
-                // latestEntity.setTitle(entity.getTitle());
+                latestEntity.setSummary(entity.getSummary());
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setPriority(entity.getPriority());
                 latestEntity.setStatus(entity.getStatus());

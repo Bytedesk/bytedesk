@@ -65,10 +65,9 @@ public class TicketEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
     
     /**
-     * Title of the support ticket (required field)
+     * Summary of the support ticket (previously title)
      */
-    // @Column(nullable = false)
-    // private String title;           // 工单标题(必填)
+    private String summary;           // 工单摘要
     
     /**
      * Detailed description of the ticket issue (optional)
