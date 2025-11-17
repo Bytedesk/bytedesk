@@ -104,6 +104,15 @@ public class TicketRestService
     @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
+        return createInternal(request, false);
+    }
+
+    @Transactional
+    public TicketResponse createVisitor(TicketRequest request) {
+        return createInternal(request, true);
+    }
+
+    private TicketResponse createInternal(TicketRequest request, boolean skipLoginEnforce) {
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
@@ -123,7 +132,9 @@ public class TicketRestService
         }
         ticket.setReporter(request.getReporterJson());
 
-        enforceRequireLoginRule(ticket, request);
+        if (!skipLoginEnforce) {
+            enforceRequireLoginRule(ticket, request);
+        }
         ensureTicketNumber(ticket, request);
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
