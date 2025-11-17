@@ -39,6 +39,7 @@ import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
@@ -95,6 +96,12 @@ public class TicketRestService
 
     // query by user
     public Page<TicketResponse> queryByUser(TicketRequest request) {
+        if (!StringUtils.hasText(request.getUserUid())) {
+            String reporterUid = resolveReporterUid(request);
+            if (StringUtils.hasText(reporterUid)) {
+                request.setUserUid(reporterUid);
+            }
+        }
         Pageable pageable = request.getPageable();
         Specification<TicketEntity> spec = createSpecification(request);
         Page<TicketEntity> page = executePageQuery(spec, pageable);
@@ -116,6 +123,12 @@ public class TicketRestService
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setUid(uidUtils.getUid());
+        if (!StringUtils.hasText(ticket.getUserUid())) {
+            String reporterUid = resolveReporterUid(request);
+            if (StringUtils.hasText(reporterUid)) {
+                ticket.setUserUid(reporterUid);
+            }
+        }
         // ticket.setUserUid(userUid); // 创建人
         // 默认是工作组工单，暂不启用一对一
         // ticket.setType(TicketTypeEnum.DEPARTMENT.name());
@@ -510,5 +523,19 @@ public class TicketRestService
         if (user == null) {
             throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
         }
+    }
+
+    private String resolveReporterUid(TicketRequest request) {
+        if (request == null) {
+            return null;
+        }
+        if (StringUtils.hasText(request.getReporterUid())) {
+            return request.getReporterUid();
+        }
+        UserProtobuf reporter = request.getReporter();
+        if (reporter != null && StringUtils.hasText(reporter.getUid())) {
+            return reporter.getUid();
+        }
+        return null;
     }
 }
