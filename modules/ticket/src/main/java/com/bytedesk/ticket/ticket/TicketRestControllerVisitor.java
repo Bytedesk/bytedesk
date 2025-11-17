@@ -52,5 +52,13 @@ public class TicketRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PostMapping("/delete")
+    public ResponseEntity<?> deleteByVisitor(@RequestBody TicketRequest request) {
+
+        ticketRestService.deleteByVisitor(request);
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
     
 }

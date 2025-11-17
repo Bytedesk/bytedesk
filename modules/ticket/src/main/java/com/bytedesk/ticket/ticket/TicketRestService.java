@@ -357,6 +357,33 @@ public class TicketRestService
         ticket.setDeleted(true);
         save(ticket);
     }
+    
+    public void deleteByVisitor(TicketRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("ticket uid required");
+        }
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (ticketOptional.isEmpty()) {
+            throw new NotFoundException("ticket not found");
+        }
+        TicketEntity ticket = ticketOptional.get();
+        String reporterUid = resolveReporterUid(request);
+        if (!StringUtils.hasText(reporterUid)) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        String ticketReporterUid = ticket.getUserUid();
+        if (!StringUtils.hasText(ticketReporterUid) && StringUtils.hasText(ticket.getReporterString())) {
+            UserProtobuf reporter = ticket.getReporter();
+            if (reporter != null && StringUtils.hasText(reporter.getUid())) {
+                ticketReporterUid = reporter.getUid();
+            }
+        }
+        if (!StringUtils.hasText(ticketReporterUid) || !ticketReporterUid.equals(reporterUid)) {
+            throw new NotFoundException("ticket not found");
+        }
+        ticket.setDeleted(true);
+        save(ticket);
+    }
 
     @Override
     public TicketResponse convertToResponse(TicketEntity entity) {
