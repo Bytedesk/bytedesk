@@ -58,27 +58,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
-    @Transactional(readOnly = true)
-    public List<String> findWorkgroupUidsByUserUid(String userUid) {
-        if (!StringUtils.hasText(userUid)) {
-            return new ArrayList<>();
-        }
-
-        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(userUid);
-        if (!agentOptional.isPresent()) {
-            return new ArrayList<>();
-        }
-
-        List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentOptional.get().getUid());
-        List<String> workgroupUids = new ArrayList<>();
-        for (WorkgroupEntity workgroup : workgroups) {
-            if (workgroup != null && !workgroup.isDeleted() && StringUtils.hasText(workgroup.getUid())) {
-                workgroupUids.add(workgroup.getUid());
-            }
-        }
-        return workgroupUids;
-    }
-
+    
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
         // 判断uid是否已经存储，如果已经存在，则不创建新的workgroup
@@ -339,6 +319,27 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     @Override
     protected Page<WorkgroupEntity> executePageQuery(Specification<WorkgroupEntity> spec, Pageable pageable) {
         return workgroupRepository.findAll(spec, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> findWorkgroupUidsByUserUid(String userUid) {
+        if (!StringUtils.hasText(userUid)) {
+            return new ArrayList<>();
+        }
+
+        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(userUid);
+        if (!agentOptional.isPresent()) {
+            return new ArrayList<>();
+        }
+
+        List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentOptional.get().getUid());
+        List<String> workgroupUids = new ArrayList<>();
+        for (WorkgroupEntity workgroup : workgroups) {
+            if (workgroup != null && !workgroup.isDeleted() && StringUtils.hasText(workgroup.getUid())) {
+                workgroupUids.add(workgroup.getUid());
+            }
+        }
+        return workgroupUids;
     }
 
 

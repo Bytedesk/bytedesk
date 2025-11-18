@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
+import com.bytedesk.service.workgroup.event.WorkgroupDeleteEvent;
 import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
 
 import jakarta.persistence.PostPersist;
@@ -41,7 +42,11 @@ public class WorkgroupEntityListener {
         log.info("onPostUpdate: {}", workgroup.getUid());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         // 仅传递必要标识，避免序列化问题
-        bytedeskEventPublisher.publishEvent(new WorkgroupUpdateEvent(workgroup.getOrgUid(), workgroup.getUid(), workgroup.getNickname()));
+        if (workgroup.isDeleted()) {
+            bytedeskEventPublisher.publishEvent(new WorkgroupDeleteEvent(workgroup.getOrgUid(), workgroup.getUid()));
+        } else {
+            bytedeskEventPublisher.publishEvent(new WorkgroupUpdateEvent(workgroup.getOrgUid(), workgroup.getUid(), workgroup.getNickname()));
+        }
     }
 
 }
