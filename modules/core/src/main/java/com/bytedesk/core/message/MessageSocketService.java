@@ -132,7 +132,6 @@ public class MessageSocketService {
             // log.debug("doSendMessage hasSession: topic {} clientId {}", topic, clientId);
             // 订阅者收到MQTT消息的QoS级别, 最终取决于发布消息的QoS和主题订阅的QoS
             int messageId = mqttMessageIdService.getNextMessageId();
-            //
             MqttPublishMessage publishMessage = (MqttPublishMessage) MqttMessageFactory.newMessage(
                     new MqttFixedHeader(MqttMessageType.PUBLISH, dup, mqttQoS, retain, 0),
                     new MqttPublishVariableHeader(topic, messageId),
