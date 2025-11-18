@@ -37,6 +37,7 @@ import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
@@ -49,7 +50,7 @@ import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.service.presence.PresenceFacadeService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

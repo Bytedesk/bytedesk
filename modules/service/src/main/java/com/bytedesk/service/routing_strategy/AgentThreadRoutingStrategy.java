@@ -31,6 +31,7 @@ import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -39,7 +40,6 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
-import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import com.bytedesk.core.thread.ThreadEntity;

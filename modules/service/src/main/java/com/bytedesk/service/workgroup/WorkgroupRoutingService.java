@@ -12,9 +12,9 @@ import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueRestService;
-import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 

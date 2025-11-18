@@ -19,8 +19,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
+import com.bytedesk.service.presence.PresenceFacadeService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
