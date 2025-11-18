@@ -13,61 +13,61 @@
  */
 package com.bytedesk.core.socket.mqtt;
 
-import java.util.List;
-import java.util.Set;
+// import java.util.List;
+// import java.util.Set;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
-import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
-import com.bytedesk.core.uid.utils.NetUtils;
-import com.bytedesk.core.utils.JsonResult;
-import com.alibaba.fastjson2.JSONObject;
+// import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
+// import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
+// import com.bytedesk.core.uid.utils.NetUtils;
+// import com.bytedesk.core.utils.JsonResult;
+// import com.alibaba.fastjson2.JSONObject;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+// import io.swagger.v3.oas.annotations.Operation;
+// import io.swagger.v3.oas.annotations.tags.Tag;
+// import lombok.AllArgsConstructor;
 
-@RestController
-@AllArgsConstructor
-@RequestMapping("/mqtt/api/v1")
-@Tag(name = "MQTT Management", description = "MQTT connection and session management APIs")
-public class MqttRestController {
+// @RestController
+// @AllArgsConstructor
+// @RequestMapping("/mqtt/api/v1")
+// @Tag(name = "MQTT Management", description = "MQTT connection and session management APIs")
+// public class MqttRestController {
 
-    private final MqttSessionService mqttSessionService;
+//     private final MqttSessionService mqttSessionService;
 
-    private final MqttConnectionService mqttConnectionService;
+//     private final MqttConnectionService mqttConnectionService;
 
-    /**
-     * get clientIds that has session in the local mqtt server
-     * http://127.0.0.1:9003/mqtt/api/v1/session/clients
-     * @return
-     */
-    @Operation(summary = "Get Session Clients", description = "Retrieve all client IDs that have sessions in the local MQTT server")
-    @GetMapping("/session/clients")
-    public ResponseEntity<?> getSessionClients() {
-        //
-        String host = NetUtils.getLocalAddress();
-        List<String> clientIds = mqttSessionService.getAllClientIds();
-        //
-        JSONObject json = new JSONObject();
-        json.put("host", host);
-        json.put("clientIds", clientIds);
+//     /**
+//      * get clientIds that has session in the local mqtt server
+//      * http://127.0.0.1:9003/mqtt/api/v1/session/clients
+//      * @return
+//      */
+//     @Operation(summary = "Get Session Clients", description = "Retrieve all client IDs that have sessions in the local MQTT server")
+//     @GetMapping("/session/clients")
+//     public ResponseEntity<?> getSessionClients() {
+//         //
+//         String host = NetUtils.getLocalAddress();
+//         List<String> clientIds = mqttSessionService.getAllClientIds();
+//         //
+//         JSONObject json = new JSONObject();
+//         json.put("host", host);
+//         json.put("clientIds", clientIds);
 
-        return ResponseEntity.ok(JsonResult.success(json));
-    }
+//         return ResponseEntity.ok(JsonResult.success(json));
+//     }
 
-    // http://127.0.0.1:9003/mqtt/api/v1/connected/clients
-    @Operation(summary = "Get Connected Clients", description = "Retrieve all currently connected MQTT client IDs")
-    @GetMapping("/connected/clients")
-    public ResponseEntity<?> isConnectedClients() {
+//     // http://127.0.0.1:9003/mqtt/api/v1/connected/clients
+//     @Operation(summary = "Get Connected Clients", description = "Retrieve all currently connected MQTT client IDs")
+//     @GetMapping("/connected/clients")
+//     public ResponseEntity<?> isConnectedClients() {
 
-        Set<String> clientIds = mqttConnectionService.getConnectedClientIds();
+//         Set<String> clientIds = mqttConnectionService.getConnectedClientIds();
 
-        return ResponseEntity.ok(JsonResult.success(clientIds));
-    }
+//         return ResponseEntity.ok(JsonResult.success(clientIds));
+//     }
 
-}
+// }

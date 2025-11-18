@@ -137,8 +137,6 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    // 移除旧版 getThreadQueuingMessage(UserProtobuf, ThreadEntity)；统一使用结构化版本
-
     /**
      * 结构化 QueueContent 的排队消息（可指定消息用户，例如 agent/robot/system）。
      */

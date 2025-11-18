@@ -28,7 +28,6 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.worktime.WorktimeRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +37,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkgroupEventListener {
 
-    private final AgentRestService agentService;
+    private final AgentRestService agentRestService;
     
     private final WorkgroupRestService workgroupService;
 
-    private final WorktimeRestService worktimeService;
+    // private final WorktimeRestService worktimeService;
 
     private final UidUtils uidUtils;
 
@@ -56,14 +55,14 @@ public class WorkgroupEventListener {
         log.info("workgroup - organization created: {}", organization.getName());
 
         List<String> agentUids = new ArrayList<>();
-        Optional<AgentEntity> agentOptional = agentService.findByMobileAndOrgUid(user.getMobile(), organization.getUid());
+        Optional<AgentEntity> agentOptional = agentRestService.findByMobileAndOrgUid(user.getMobile(), organization.getUid());
         agentOptional.ifPresent(agent -> {
             agentUids.add(agent.getUid());
         });
         // 
-        List<String> worktimeUids = new ArrayList<>();
-        String worktimeUid = worktimeService.createDefault();
-        worktimeUids.add(worktimeUid);
+        // List<String> worktimeUids = new ArrayList<>();
+        // String worktimeUid = worktimeService.createDefault();
+        // worktimeUids.add(worktimeUid);
         
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
