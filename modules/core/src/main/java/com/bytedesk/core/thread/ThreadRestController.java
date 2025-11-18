@@ -276,27 +276,11 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     }
 
     /**
-     * 更新会话未读数量
+     * 查询用户所有客服会话
      * 
-     * @param request 更新请求
-     * @return 更新后的会话
-     */
-    // @Operation(summary = "更新会话未读数量", description = "更新会话的未读消息数量")
-    // @PostMapping("/update/unread/count")
-    // public ResponseEntity<?> updateUnreadCount(@RequestBody ThreadRequest request) {
-
-    //     ThreadResponse threadResponse = threadRestService.updateUnreadCount(request);
-
-    //     return ResponseEntity.ok(JsonResult.success(threadResponse));
-    // }
-
-    /**
-     * 根据用户UID查询所有会话
-     * 
-     * @param request 包含userUid的请求
      * @return 用户所有会话列表
      */
-    @Operation(summary = "根据用户UID查询所有会话", description = "通过userUid查询用户相关的所有会话")
+    @Operation(summary = "查询用户所有客服会话", description = "查询用户所有客服会话")
     @GetMapping("/query/by/user/topics")
     public ResponseEntity<?> queryByUserTopics(ThreadRequest request) {
         

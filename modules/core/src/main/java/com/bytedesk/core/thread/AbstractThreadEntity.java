@@ -22,6 +22,7 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -116,7 +117,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     // 关闭来源类型，替代原autoClose布尔；保持向后兼容：如果是旧数据autoClose=true则在业务层转换为AUTO
     @Builder.Default
     @Column(name = "thread_close_type")
-    private String closeType = "NONE"; // {@link ThreadCloseTypeEnum}
+    private String closeType = ThreadCloseTypeEnum.NONE.name(); // {@link ThreadCloseTypeEnum}
 
     // 备注
     @Column(name = "thread_note")

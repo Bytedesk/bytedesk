@@ -167,6 +167,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             if (StringUtils.hasText(request.getUid())) {
                 predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
             }
+            
             //
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
