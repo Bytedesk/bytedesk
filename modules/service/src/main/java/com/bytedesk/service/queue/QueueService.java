@@ -50,10 +50,10 @@ public class QueueService {
         return enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
     }
 
-    @Transactional
-    public QueueMemberEntity enqueueWorkflow(ThreadEntity threadEntity, UserProtobuf workflow, VisitorRequest visitorRequest) {
-        return enqueueToQueue(threadEntity, workflow, null, QueueTypeEnum.WORKFLOW);
-    }
+    // @Transactional
+    // public QueueMemberEntity enqueueWorkflow(ThreadEntity threadEntity, UserProtobuf workflow, VisitorRequest visitorRequest) {
+    //     return enqueueToQueue(threadEntity, workflow, null, QueueTypeEnum.WORKFLOW);
+    // }
 
     /**
      * 统一的入队方法
