@@ -85,33 +85,6 @@ public class ThreadMessageUtil {
     }
 
     /**
-     * 已废弃：请改用结构化重载 getThreadQueueMessage(QueueContent, ThreadEntity)
-     * 或使用 getThreadQueuingMessage(QueueContent, UserProtobuf, ThreadEntity) 指定消息用户。
-     * 保留此方法仅为兼容旧代码路径，其 content 将直接使用 thread.getContent() 原样发送。
-     */
-    @Deprecated
-    public static MessageProtobuf getThreadQueueMessage(ThreadEntity thread) {
-        UserProtobuf system = UserProtobuf.getSystemUser();
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-
-        MessageEntity message = MessageEntity.builder()
-                .uid(UidUtils.getInstance().getUid())
-                .content(thread.getContent())
-                .type(MessageTypeEnum.QUEUE.name())
-                .status(MessageStatusEnum.READ.name())
-                .channel(ChannelEnum.SYSTEM.name())
-                .user(system.toJson())
-                .orgUid(thread.getOrgUid())
-                .createdAt(BdDateUtils.now())
-                .updatedAt(BdDateUtils.now())
-                .thread(thread)
-                .extra(extra.toJson())
-                .build();
-
-        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
-    }
-
-    /**
      * 结构化 QueueContent 的排队消息
      */
     public static MessageProtobuf getThreadQueueMessage(QueueContent content, ThreadEntity thread) {
