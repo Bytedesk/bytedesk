@@ -256,9 +256,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
-    // 兼容方法：已由 ConnectionEntity 管理在线状态，无需同步数据库布尔值
-    public void updateConnect() { }
-
     public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
