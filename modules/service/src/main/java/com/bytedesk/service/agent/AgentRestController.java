@@ -110,7 +110,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         schema = @Schema(implementation = ThreadResponse.class)))
     @ActionAnnotation(title = "会话", action = "accept", description = "accept thread")
     @PostMapping("/accept")
-    public ResponseEntity<?> acceptByAgent (@RequestBody ThreadRequest request) {
+    public ResponseEntity<?> acceptByAgent(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = agentRestService.acceptByAgent(request);
 
