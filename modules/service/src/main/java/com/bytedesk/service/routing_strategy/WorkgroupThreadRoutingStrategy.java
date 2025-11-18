@@ -736,12 +736,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                         : null;
         return getValidWelcomeMessage(customMessage);
     }
-
-    /**
-     * 根据机器人设置构建结构化 WelcomeContent
-     */
-    // 已迁移到 WelcomeContentUtils
-
+    
     /**
      * 获取工作组离线消息
      */
