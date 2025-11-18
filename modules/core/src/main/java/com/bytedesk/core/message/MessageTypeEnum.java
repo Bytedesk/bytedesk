@@ -100,8 +100,8 @@ public enum MessageTypeEnum {
     // 
     ARTICLE, // 文章
     // 
+    RATE_INVITE, // 邀请评价
     RATE, // 访客主动评价
-    RATE_INVITE, // 客服邀请评价
     RATE_SUBMIT, // 访客提交评价
     RATE_CANCEL, // 访客取消评价
     // 
