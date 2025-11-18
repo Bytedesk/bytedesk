@@ -179,7 +179,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         log.debug("开始查询现有工作组线程 - topic: {}", topic);
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-
         if (threadOptional.isPresent()) {
             ThreadEntity existingThread = threadOptional.get();
             log.info("发现现有工作组线程 - threadUid: {}, 状态: {}, 创建时间: {}",

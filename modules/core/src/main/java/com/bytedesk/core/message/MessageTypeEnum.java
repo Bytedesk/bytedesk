@@ -18,7 +18,6 @@ public enum MessageTypeEnum {
     WELCOME, // 欢迎消息
     CONTINUE, // 继续会话
     SYSTEM, // 系统消息
-    QUEUE, // 排队消息
     NOTICE, // 通知消息
     TEXT, // 文本消息
     IMAGE, // 图片消息
@@ -38,6 +37,13 @@ public enum MessageTypeEnum {
     HOT, // 热门话题
     SHORTCUT, // 快捷路径
     ORDER, // 订单
+    // 
+    QUEUE, // 排队消息: 用户进入排队队列
+    QUEUE_NOTICE, // 排队通知消息: 用户进入排队队列，通知客服人员
+    QUEUE_UPDATE, // 排队更新消息: 用户排队位置或预计等待时间更新
+    QUEUE_ACCEPT, // 排队接受消息：用户排队成功，准备接入客服
+    QUEUE_TIMEOUT, // 排队超时消息：用户排队超时未接入客服
+    QUEUE_CANCEL, // 排队取消消息：用户取消排队或被移出排队队列
     // 
     POLL, // 投票
     POLL_SUBMIT, // 投票提交
