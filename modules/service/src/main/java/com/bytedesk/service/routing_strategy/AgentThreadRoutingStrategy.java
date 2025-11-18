@@ -548,7 +548,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 更新队列成员接受状态
      */
     private void updateQueueMemberForAcceptance(QueueMemberEntity queueMemberEntity) {
-        long startTime = System.currentTimeMillis();
+        // long startTime = System.currentTimeMillis();
         log.debug("开始更新队列成员接受状态 - queueMemberUid: {}, threadUid: {}",
                 queueMemberEntity.getUid(), queueMemberEntity.getThread().getUid());
 
@@ -559,16 +559,15 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("设置队列成员接受状态 - queueMemberUid: {}, 接受时间: {}, 接受类型: {}",
                 queueMemberEntity.getUid(), acceptTime, QueueMemberAcceptTypeEnum.AUTO.name());
 
-        QueueMemberEntity savedEntity = queueMemberRestService.save(queueMemberEntity);
-        log.info("队列成员接受状态更新完成 - queueMemberUid: {}, 更新耗时: {}ms",
-                savedEntity.getUid(), System.currentTimeMillis() - startTime);
+        queueMemberRestService.save(queueMemberEntity);
+        // log.info("队列成员接受状态更新完成 - queueMemberUid: {}, 更新耗时: {}ms",
+        //         savedEntity.getUid(), System.currentTimeMillis() - startTime);
     }
 
     /**
      * 发布线程相关事件
      */
     private void publishThreadEvents(ThreadEntity savedThread) {
-        long startTime = System.currentTimeMillis();
         log.debug("开始发布线程相关事件 - threadUid: {}, 状态: {}", savedThread.getUid(), savedThread.getStatus());
 
         try {
@@ -580,9 +579,6 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             // 发布线程处理创建事件
             log.debug("发布ThreadProcessCreateEvent事件 - threadUid: {}", savedThread.getUid());
             bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-
-            log.info("线程相关事件发布完成 - threadUid: {}, 发布耗时: {}ms",
-                    savedThread.getUid(), System.currentTimeMillis() - startTime);
         } catch (Exception e) {
             log.error("发布线程事件失败 - threadUid: {}, 错误信息: {}", savedThread.getUid(), e.getMessage(), e);
             throw e;
