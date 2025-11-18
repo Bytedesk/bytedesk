@@ -189,8 +189,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 创建新会话
         log.debug("未找到现有工作组线程，开始创建新线程");
-        ThreadEntity newThread = visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
-        return newThread;
+        return visitorThreadService.createWorkgroupThread(visitorRequest, workgroup, topic);
     }
 
     /**
