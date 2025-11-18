@@ -395,11 +395,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             // 
             log.debug("使用离线留言接待客服 - agentUid: {}", messageLeaveAgent.getUid());
             // 加入队列（用于统计和管理）
-            long enqueueStartTime = System.currentTimeMillis();
             UserProtobuf agent = messageLeaveAgent.toUserProtobuf();
             QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup,
                     visitorRequest);
-            log.debug("离线留言队列加入完成 - 耗时: {}ms", System.currentTimeMillis() - enqueueStartTime);
 
             // 直接返回离线留言消息
             return getOfflineMessage(visitorRequest, thread, messageLeaveAgent, workgroup, queueMemberEntity);
@@ -736,7 +734,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                         : null;
         return getValidWelcomeMessage(customMessage);
     }
-    
+
     /**
      * 获取工作组离线消息
      */
