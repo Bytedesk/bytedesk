@@ -14,19 +14,24 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
+import com.bytedesk.core.topic.TopicEntity;
 import com.bytedesk.core.topic.TopicCacheService;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
@@ -48,6 +53,8 @@ public class WorkgroupEventListener {
     private final WorkgroupRestService workgroupRestService;
 
     private final TopicCacheService topicCacheService;
+
+    private final TopicRestService topicRestService;
 
     private final UidUtils uidUtils;
 
@@ -83,28 +90,26 @@ public class WorkgroupEventListener {
 
     @EventListener
     public void onWorkgroupCreateEvent(WorkgroupCreateEvent event) {
-        WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
-        String workgroupUid = workgroup.getUid();
+        String workgroupUid = event.getWorkgroupUid();
         String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
-        log.info("workgroup - workgroup created: {}, topic: {}", workgroup.getNickname(), topic);
+        log.info("workgroup - workgroup created: {}, topic: {}", event.getWorkgroupUid(), topic);
+        syncAgentSubscriptions(workgroupUid, topic, false);
     }
 
     @EventListener
     public void onWorkgroupUpdateEvent(WorkgroupUpdateEvent event) {
-        WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
-        String workgroupUid = workgroup.getUid();
+        String workgroupUid = event.getWorkgroupUid();
         String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
-        log.info("workgroup - workgroup updated: {}, topic: {}", workgroup.getNickname(), topic);
-        // topicCacheService.updateTopic(topic);
+        log.info("workgroup - workgroup updated: {}, topic: {}", event.getNickname(), topic);
+        syncAgentSubscriptions(workgroupUid, topic, true);
     }
 
     @EventListener
     public void onWorkgroupDeleteEvent(WorkgroupDeleteEvent event) {
-        WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
-        String workgroupUid = workgroup.getUid();
+        String workgroupUid = event.getWorkgroupUid();
         String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
-        log.info("workgroup - workgroup deleted: {}, topic: {}", workgroup.getNickname(), topic);
-        // topicCacheService.removeTopic(topic);
+        log.info("workgroup - workgroup deleted: {}, topic: {}", workgroupUid, topic);
+        removeAllSubscriptions(topic);
     }
 
     @EventListener
@@ -118,5 +123,65 @@ public class WorkgroupEventListener {
             String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
             topicCacheService.pushTopic(topic, userUid);
         }
+    }
+
+    private void syncAgentSubscriptions(String workgroupUid, String topic, boolean pruneStale) {
+        Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
+        if (!workgroupOptional.isPresent()) {
+            log.warn("workgroup - workgroup not found for uid: {}", workgroupUid);
+            return;
+        }
+
+        WorkgroupEntity workgroup = workgroupOptional.get();
+        Set<String> agentUserUids = extractAgentUserUids(workgroup);
+        if (agentUserUids.isEmpty()) {
+            log.debug("workgroup - no agents bound to workgroup {} while syncing topics", workgroupUid);
+        }
+
+        agentUserUids.forEach(userUid -> topicCacheService.pushTopic(topic, userUid));
+
+        if (pruneStale) {
+            removeStaleSubscriptions(topic, agentUserUids);
+        }
+    }
+
+    private Set<String> extractAgentUserUids(WorkgroupEntity workgroup) {
+        Set<String> agentUserUids = new HashSet<>();
+        if (workgroup.getAgents() == null) {
+            return agentUserUids;
+        }
+        workgroup.getAgents().forEach(agent -> {
+            if (agent != null && StringUtils.hasText(agent.getUserUid())) {
+                agentUserUids.add(agent.getUserUid());
+            }
+        });
+        return agentUserUids;
+    }
+
+    private void removeStaleSubscriptions(String topic, Set<String> validUserUids) {
+        Set<TopicEntity> topicEntities = topicRestService.findByTopic(topic);
+        if (topicEntities == null || topicEntities.isEmpty()) {
+            return;
+        }
+        topicEntities.forEach(topicEntity -> {
+            if (topicEntity == null || !StringUtils.hasText(topicEntity.getUserUid())) {
+                return;
+            }
+            if (!validUserUids.contains(topicEntity.getUserUid())) {
+                topicRestService.remove(topic, topicEntity.getUserUid());
+            }
+        });
+    }
+
+    private void removeAllSubscriptions(String topic) {
+        Set<TopicEntity> topicEntities = topicRestService.findByTopic(topic);
+        if (topicEntities == null || topicEntities.isEmpty()) {
+            return;
+        }
+        topicEntities.forEach(topicEntity -> {
+            if (topicEntity != null && StringUtils.hasText(topicEntity.getUserUid())) {
+                topicRestService.remove(topic, topicEntity.getUserUid());
+            }
+        });
     }
 }

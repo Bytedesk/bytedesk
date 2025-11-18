@@ -616,6 +616,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     public MessageProtobuf routeToRobot(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
             RobotEntity robotEntity, WorkgroupEntity workgroup) {
+        
         validateThread(threadFromRequest, "route to robot");
         if (robotEntity == null) {
             throw new IllegalArgumentException("RobotEntity must not be null");
