@@ -73,7 +73,6 @@ public class MessageSocketService {
         // /topic/org.agent.default_agent_uid.1418711693000834
         String topic = TopicUtils.TOPIC_PREFIX + topicStr.replace("/", ".");
         // log.debug("stomp topic {}, {}", topic, messageJson);
-
         // 发送给Stomp客户端
         simpMessagingTemplate.convertAndSend(topic, messageJson);
     }
@@ -84,7 +83,7 @@ public class MessageSocketService {
         ThreadProto.Thread thread = messageProto.getThread(); // 提取线程信息到临时变量
         ThreadTypeEnum threadType = ThreadTypeEnum.valueOf(thread.getType());
         String topic = thread.getTopic(); // 提取主题信息到临时变量
-
+        // 
         if (threadType.equals(ThreadTypeEnum.MEMBER)) {
             log.info("Reversing member message for topic: {}", topic);
             // 同事一对一消息反转处理
@@ -113,8 +112,8 @@ public class MessageSocketService {
         // log.debug("doSendToSubscribers: topic={}", topic);
         Set<TopicEntity> topicSet = topicRestService.findByTopic(topic);
         log.info("topicList size {}", topicSet.size());
-        topicSet.forEach(topicElement -> {
-            Set<String> clientIdSet = topicElement.getClientIds();
+        topicSet.forEach(topicEntity -> {
+            Set<String> clientIdSet = topicEntity.getClientIds();
             clientIdSet.forEach(clientId -> {
                 doSendMessage(topic, messageProto, clientId);
             });
