@@ -99,7 +99,6 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
     public Page<ThreadResponse> queryQueuing(ThreadRequest request) {
         UserEntity user = authService.getUser();
-               
         // 设置查询条件：状态为排队中
         request.setStatus(ThreadProcessStatusEnum.QUEUING.name());
         

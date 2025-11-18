@@ -25,9 +25,14 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
+import com.bytedesk.core.topic.TopicCacheService;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
+import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +44,9 @@ public class WorkgroupEventListener {
 
     private final AgentRestService agentRestService;
     
-    private final WorkgroupRestService workgroupService;
+    private final WorkgroupRestService workgroupRestService;
 
-    // private final WorktimeRestService worktimeService;
+    private final TopicCacheService topicCacheService;
 
     private final UidUtils uidUtils;
 
@@ -72,8 +77,45 @@ public class WorkgroupEventListener {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
-        workgroupService.create(workgroupRequest);
+        workgroupRestService.create(workgroupRequest);
     }
 
+    @EventListener
+    public void onWorkgroupCreateEvent(WorkgroupCreateEvent event) {
+        WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
+        String workgroupUid = workgroup.getUid();
+        String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
+        log.info("workgroup - workgroup created: {}, topic: {}", workgroup.getNickname(), topic);
+    }
 
+    @EventListener
+    public void onWorkgroupUpdateEvent(WorkgroupUpdateEvent event) {
+        WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
+        String workgroupUid = workgroup.getUid();
+        String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
+        log.info("workgroup - workgroup updated: {}, topic: {}", workgroup.getNickname(), topic);
+        // topicCacheService.updateTopic(topic);
+    }
+
+    // @EventListener
+    // public void onWorkgroupDeleteEvent(WorkgroupDeleteEvent event) {
+    //     WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
+    //     String workgroupUid = workgroup.getUid();
+    //     String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
+    //     log.info("workgroup - workgroup deleted: {}, topic: {}", workgroup.getNickname(), topic);
+    //     // topicCacheService.removeTopic(topic);
+    // }
+
+    @EventListener
+    public void onMqttConnectedEvent(MqttConnectedEvent event) {
+        String clientId = event.getClientId();
+        // 用户clientId格式: uid/client/deviceUid
+        final String userUid = clientId.split("/")[0];
+        log.info("topic onMqttConnectedEvent uid {}, clientId {}", userUid, clientId);
+        List<String> workgroupUids = workgroupRestService.findWorkgroupUidsByUserUid(userUid);
+        for (String workgroupUid : workgroupUids) {
+            String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
+            topicCacheService.pushTopic(topic, userUid);
+        }
+    }
 }

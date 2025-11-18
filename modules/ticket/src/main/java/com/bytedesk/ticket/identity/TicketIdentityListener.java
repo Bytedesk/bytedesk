@@ -13,47 +13,47 @@
  */
 package com.bytedesk.ticket.identity;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.context.event.EventListener;
+// import org.springframework.stereotype.Component;
+// import lombok.extern.slf4j.Slf4j;
 
-import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.agent.event.AgentUpdateEvent;
-import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
+// import com.bytedesk.service.agent.AgentEntity;
+// import com.bytedesk.service.agent.event.AgentUpdateEvent;
+// import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
 
-@Slf4j
-@Component
-@RequiredArgsConstructor
-public class TicketIdentityListener {
+// @Slf4j
+// @Component
+// @RequiredArgsConstructor
+// public class TicketIdentityListener {
 
-    private final TicketIdentityService identityService;
+//     // private final TicketIdentityService identityService;
 
-    /**
-     * 监听用户创建/更新事件
-     */
-    @EventListener
-    public void onAgentUpdated(AgentUpdateEvent event) {
-        AgentEntity agent = event.getAgent();
-        // 同步用户到Flowable
-        identityService.syncUser(agent);
-    }
+//     /**
+//      * 监听用户创建/更新事件
+//      */
+//     @EventListener
+//     public void onAgentUpdated(AgentUpdateEvent event) {
+//         AgentEntity agent = event.getAgent();
+//         // 同步用户到Flowable
+//         // identityService.syncUser(agent);
+//     }
 
-    /**
-     * 监听工作组变更事件（最小载荷）
-     */
-    @EventListener
-    public void onWorkgroupUpdated(WorkgroupUpdateEvent event) {
-        // 使用最小载荷字段进行同步，避免实体序列化问题
-        identityService.syncWorkgroupByBasic(event.getWorkgroupUid(), event.getNickname());
-    }
+//     /**
+//      * 监听工作组变更事件（最小载荷）
+//      */
+//     @EventListener
+//     public void onWorkgroupUpdated(WorkgroupUpdateEvent event) {
+//         // 使用最小载荷字段进行同步，避免实体序列化问题
+//         // identityService.syncWorkgroupByBasic(event.getWorkgroupUid(), event.getNickname());
+//     }
 
-    /**
-     * 监听用户加入工作组事件
-     */
-    // @EventListener
-    // public void onAgentJoinWorkgroup(AgentJoinWorkgroupEvent event) {
-    //     // 同步用户和工作组关系
-    //     identityService.syncMembership(event.getAgentId(), event.getWorkgroupId());
-    // }
-} 
+//     /**
+//      * 监听用户加入工作组事件
+//      */
+//     // @EventListener
+//     // public void onAgentJoinWorkgroup(AgentJoinWorkgroupEvent event) {
+//     //     // 同步用户和工作组关系
+//     //     identityService.syncMembership(event.getAgentId(), event.getWorkgroupId());
+//     // }
+// } 

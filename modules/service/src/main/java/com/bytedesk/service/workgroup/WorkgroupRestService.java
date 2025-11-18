@@ -15,6 +15,7 @@ package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -56,6 +57,27 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     private final AuthService authService;
     
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
+
+    @Transactional(readOnly = true)
+    public List<String> findWorkgroupUidsByUserUid(String userUid) {
+        if (!StringUtils.hasText(userUid)) {
+            return new ArrayList<>();
+        }
+
+        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(userUid);
+        if (!agentOptional.isPresent()) {
+            return new ArrayList<>();
+        }
+
+        List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentOptional.get().getUid());
+        List<String> workgroupUids = new ArrayList<>();
+        for (WorkgroupEntity workgroup : workgroups) {
+            if (workgroup != null && !workgroup.isDeleted() && StringUtils.hasText(workgroup.getUid())) {
+                workgroupUids.add(workgroup.getUid());
+            }
+        }
+        return workgroupUids;
+    }
 
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
@@ -173,7 +195,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         return convertToResponse(updatedWorkgroup);
     }
 
-    // updateAvatar
     @Transactional
     public WorkgroupResponse updateAvatar(WorkgroupRequest request) {
         WorkgroupEntity workgroup = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("workgroup not found with uid: " + request.getUid()));

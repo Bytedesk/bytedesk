@@ -13,30 +13,30 @@
  */
 package com.bytedesk.ticket.identity;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
+// import org.springframework.beans.factory.InitializingBean;
+// import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
+// import lombok.RequiredArgsConstructor;
 
-@Component
-@RequiredArgsConstructor
-public class TicketPrivilegeInitializer implements InitializingBean {
+// @Component
+// @RequiredArgsConstructor
+// public class TicketPrivilegeInitializer implements InitializingBean {
 
-    // private final TicketIdentityService identityService;
+//     // private final TicketIdentityService identityService;
 
-    @Override
-    public void afterPropertiesSet() {
-        // 初始化系统权限
-        initializePrivileges();
-    }
+//     @Override
+//     public void afterPropertiesSet() {
+//         // 初始化系统权限
+//         initializePrivileges();
+//     }
 
-    private void initializePrivileges() {
-        // 为主管组添加权限
-        // identityService.addGroupPrivilege("supervisors", "TICKET_MANAGE");
-        // identityService.addGroupPrivilege("supervisors", "TICKET_ASSIGN");
+//     private void initializePrivileges() {
+//         // 为主管组添加权限
+//         // identityService.addGroupPrivilege("supervisors", "TICKET_MANAGE");
+//         // identityService.addGroupPrivilege("supervisors", "TICKET_ASSIGN");
         
-        // 为客服组添加权限
-        // identityService.addGroupPrivilege("agents", "TICKET_CREATE");
-        // identityService.addGroupPrivilege("agents", "TICKET_HANDLE");
-    }
-} 
+//         // 为客服组添加权限
+//         // identityService.addGroupPrivilege("agents", "TICKET_CREATE");
+//         // identityService.addGroupPrivilege("agents", "TICKET_HANDLE");
+//     }
+// } 
