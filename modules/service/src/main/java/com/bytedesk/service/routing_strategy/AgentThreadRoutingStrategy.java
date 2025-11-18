@@ -68,7 +68,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final QueueMemberRestService queueMemberRestService;
     private final MessageRestService messageRestService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
-        private final PresenceFacadeService presenceFacadeService;
+    private final PresenceFacadeService presenceFacadeService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -94,7 +94,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("步骤1: 开始获取客服信息 - agentUid: {}", visitorRequest.getSid());
         AgentEntity agentEntity = getAgentEntity(visitorRequest.getSid());
         log.info("步骤1完成: 成功获取客服信息 - agentUid: {}, 最大接待数: {}, 在线且可用: {}",
-                agentEntity.getUid(), agentEntity.getMaxThreadCount(), presenceFacadeService.isAgentOnlineAndAvailable(agentEntity));
+                agentEntity.getUid(), agentEntity.getMaxThreadCount(),
+                presenceFacadeService.isAgentOnlineAndAvailable(agentEntity));
 
         // 2. 处理现有线程或创建新线程
         log.debug("步骤2: 开始处理线程创建或获取");
@@ -225,15 +226,12 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
                 queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
 
         // 根据客服状态路由
-        log.debug("开始根据客服状态进行路由 - 可用状态: {}",
-                agentEntity.isAvailable());
-
-                if (presenceFacadeService.isAgentOnlineAndAvailable(agentEntity)) {
+        log.debug("开始根据客服状态进行路由 - 可用状态: {}", agentEntity.isAvailable());
+        if (presenceFacadeService.isAgentOnlineAndAvailable(agentEntity)) {
             log.info("客服在线且可用，路由到在线客服处理");
             return routeOnlineAgent(thread, agentEntity, queueMemberEntity);
         } else {
-            log.info("客服不可用，路由到离线处理 -  可用状态: {}",
-                    agentEntity.isAvailable());
+            log.info("客服不可用，路由到离线处理 -  可用状态: {}", agentEntity.isAvailable());
             return handleOfflineAgent(thread, agentEntity, queueMemberEntity);
         }
     }
@@ -396,7 +394,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始处理离线客服情况 - threadUid: {}, agentUid: {}, agentNickname: {}, presenceOnline: {}",
-                threadFromRequest.getUid(), agent.getUid(), agent.getNickname(), presenceFacadeService.isAgentOnline(agent));
+                threadFromRequest.getUid(), agent.getUid(), agent.getNickname(),
+                presenceFacadeService.isAgentOnline(agent));
 
         validateThread(threadFromRequest, "handle offline agent");
 
@@ -561,7 +560,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         queueMemberRestService.save(queueMemberEntity);
         // log.info("队列成员接受状态更新完成 - queueMemberUid: {}, 更新耗时: {}ms",
-        //         savedEntity.getUid(), System.currentTimeMillis() - startTime);
+        // savedEntity.getUid(), System.currentTimeMillis() - startTime);
     }
 
     /**
