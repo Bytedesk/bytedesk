@@ -37,6 +37,7 @@ import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 
@@ -69,7 +70,7 @@ public class VisitorThreadEventListener {
 
         // 使用closeType替代autoClose
         String closeType = thread.getCloseType();
-        boolean autoClose = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
+        boolean autoClose = ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
 
         // 更新队列成员状态
         updateQueueMemberOnClose(thread, autoClose);
@@ -156,7 +157,7 @@ public class VisitorThreadEventListener {
      */
     private String getCloseTip(ThreadEntity thread, String closeType) {
         String topic = thread.getTopic();
-        boolean autoClose = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
+        boolean autoClose = ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
         if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
             return getWorkgroupCloseTip(topic, autoClose, closeType);
         } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
@@ -177,7 +178,7 @@ public class VisitorThreadEventListener {
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
             if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
-                if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                if (ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
                     return workgroup.getSettings().getServiceSettings().getAgentCloseTip();
                 }
                 return autoClose ? workgroup.getSettings().getServiceSettings().getAutoCloseTip()
@@ -197,7 +198,7 @@ public class VisitorThreadEventListener {
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
-                if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                if (ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
                     return agent.getSettings().getServiceSettings().getAgentCloseTip();
                 }
                 return autoClose ? agent.getSettings().getServiceSettings().getAutoCloseTip()
@@ -225,13 +226,13 @@ public class VisitorThreadEventListener {
     }
 
     private String resolveGenericCloseTip(String closeType) {
-        if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+        if (ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
             return I18Consts.I18N_AUTO_CLOSE_TIP;
-        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
+        } else if (ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
             return I18Consts.I18N_AGENT_CLOSE_TIP;
-        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+        } else if (ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
             return I18Consts.I18N_AGENT_CLOSE_TIP; // 访客关闭复用客服关闭提示
-        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.SYSTEM.name().equalsIgnoreCase(closeType)) {
+        } else if (ThreadCloseTypeEnum.SYSTEM.name().equalsIgnoreCase(closeType)) {
             return I18Consts.I18N_AGENT_CLOSE_TIP;
         }
         return "会话已结束";

@@ -162,6 +162,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             } else if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
+
             // 其他条件
             if (StringUtils.hasText(request.getUid())) {
                 predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
@@ -170,6 +171,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             if (StringUtils.hasText(request.getTopic())) {
                 predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
             }
+
             // 主题列表查询 - 支持批量查询指定的主题
             if (request.getTopicList() != null && !request.getTopicList().isEmpty()) {
                 List<Predicate> topicPredicates = new ArrayList<>();
@@ -184,10 +186,12 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                     predicates.add(criteriaBuilder.or(topicPredicates.toArray(new Predicate[0])));
                 }
             }
+            
             // 状态查询
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
+
             // 创建一个包含inviteUids、monitorUids和ownerUid的OR条件组
             List<Predicate> filterPredicates = new ArrayList<>();
             // 通过 private List<String> inviteUids 查询 private List<String> invites
@@ -256,26 +260,32 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             if (StringUtils.hasText(request.getUserNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUserNickname() + "%"));
             }
+
             // agentNickname
             if (StringUtils.hasText(request.getAgentNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("agent"), "%" + request.getAgentNickname() + "%"));
             }
+
             // robotNickname
             if (StringUtils.hasText(request.getRobotNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("robot"), "%" + request.getRobotNickname() + "%"));
             }
+
             // workgroupNickname
             if (StringUtils.hasText(request.getWorkgroupNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("workgroup"), "%" + request.getWorkgroupNickname() + "%"));
             }
+
             //
             if (StringUtils.hasText(request.getChannel())) {
                 predicates.add(criteriaBuilder.equal(root.get("channel"), request.getChannel()));
             }
+
             // content
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
             }
+
             //
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
@@ -291,6 +301,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
+            
             // 按更新时间排序
             query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
             //
