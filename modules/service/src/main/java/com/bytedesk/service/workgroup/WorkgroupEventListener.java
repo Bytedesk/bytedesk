@@ -32,6 +32,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
+import com.bytedesk.service.workgroup.event.WorkgroupDeleteEvent;
 import com.bytedesk.service.workgroup.event.WorkgroupUpdateEvent;
 
 import lombok.AllArgsConstructor;
@@ -97,14 +98,14 @@ public class WorkgroupEventListener {
         // topicCacheService.updateTopic(topic);
     }
 
-    // @EventListener
-    // public void onWorkgroupDeleteEvent(WorkgroupDeleteEvent event) {
-    //     WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
-    //     String workgroupUid = workgroup.getUid();
-    //     String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
-    //     log.info("workgroup - workgroup deleted: {}, topic: {}", workgroup.getNickname(), topic);
-    //     // topicCacheService.removeTopic(topic);
-    // }
+    @EventListener
+    public void onWorkgroupDeleteEvent(WorkgroupDeleteEvent event) {
+        WorkgroupEntity workgroup = (WorkgroupEntity) event.getSource();
+        String workgroupUid = workgroup.getUid();
+        String topic = TopicUtils.getQueueTopicFromUid(workgroupUid);
+        log.info("workgroup - workgroup deleted: {}, topic: {}", workgroup.getNickname(), topic);
+        // topicCacheService.removeTopic(topic);
+    }
 
     @EventListener
     public void onMqttConnectedEvent(MqttConnectedEvent event) {
