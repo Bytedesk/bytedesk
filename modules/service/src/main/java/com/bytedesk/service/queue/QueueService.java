@@ -30,7 +30,7 @@ public class QueueService {
     
     private final QueueMemberRestService queueMemberRestService;
 
-    public final QueueRestService queueRestService;
+    private final QueueRestService queueRestService;
 
     private final UidUtils uidUtils;
 
