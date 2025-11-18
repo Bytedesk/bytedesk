@@ -244,7 +244,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // threadRestService.countByThreadTopicAndStateNot(agent.getUid(),
         // ThreadProcessStatusEnum.CLOSED.name());
         // agent.setCurrentThreadCount(currentThreadCount);
-        log.info("update agent: {} status", agent.getNickname());
+        // log.info("update agent: {} status", agent.getNickname());
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
@@ -256,6 +256,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
+    @Transactional
     public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
@@ -268,6 +269,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
         }
         ThreadEntity thread = threadOptional.get();
+        // 若会话非QUEUING（已存在接待坐席），则不允许重复接入
+        if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())
+                || (StringUtils.hasText(thread.getAgent()) && thread.getOwner() != null)) {
+            throw new IllegalStateException("thread already accepted");
+        }
         AgentEntity agent = agentOptional.get();
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
         UserProtobuf agentProtobuf = agent.toUserProtobuf();
