@@ -218,11 +218,11 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     public Boolean isSubscribed(TopicRequest request) {
         UserEntity user = authService.getUser();
-        
+        // 
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
         if (topicOptional.isPresent()) {
-            TopicEntity topicElement = topicOptional.get();
-            return topicElement.getTopics().contains(request.getTopic());
+            TopicEntity topicEntity = topicOptional.get();
+            return topicEntity.getTopics().contains(request.getTopic());
         } else {
             return false;
         }
@@ -286,13 +286,13 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         String topic = request.getTopic();
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
         if (topicOptional.isPresent()) {
-            TopicEntity topicElement = topicOptional.get();
-            if (topicElement.getTopics().contains(topic)) {
-                return convertToResponse(topicElement);
+            TopicEntity topicEntity = topicOptional.get();
+            if (topicEntity.getTopics().contains(topic)) {
+                return convertToResponse(topicEntity);
             } else {
-                topicElement.getTopics().add(topic);
+                topicEntity.getTopics().add(topic);
             }
-            TopicEntity savedEntity = save(topicElement);
+            TopicEntity savedEntity = save(topicEntity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update topic failed");
             }
