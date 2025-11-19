@@ -178,7 +178,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     ? aggregated.getSourceReferences()
                     : new ArrayList<>();
             log.info("LLM 模式，KB 结果数 {}, 来源数 {}", kbResults.size(), sourceReferences.size());
-
+            
             if (kbResults.isEmpty()) {
                 // 未命中 KB：根据配置选择 默认回复 或 继续使用 LLM
                 boolean useLlmWhenKbEmpty = robot.getLlm() != null

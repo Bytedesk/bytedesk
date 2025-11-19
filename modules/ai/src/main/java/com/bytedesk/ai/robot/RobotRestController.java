@@ -183,6 +183,20 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
+    @Operation(summary = "更新机器人提示词", description = "仅根据UID更新机器人提示词内容")
+    @ApiResponse(responseCode = "200", description = "更新成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = RobotResponse.class)))
+    @PreAuthorize("hasAuthority('ROBOT_UPDATE')")
+    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot prompt text")
+    @PostMapping("/update/prompt/text")
+    public ResponseEntity<?> updatePromptText(@RequestBody RobotRequest request) {
+
+        RobotResponse robotResponse = robotRestService.updatePromptText(request);
+
+        return ResponseEntity.ok(JsonResult.success(robotResponse));
+    }
+
     @Operation(summary = "更新机器人知识库", description = "更新机器人的知识库UID")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 

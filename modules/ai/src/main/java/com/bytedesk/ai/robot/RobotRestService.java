@@ -567,6 +567,33 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         return convertToResponse(savedRobot);
     }
 
+    @Transactional
+    public RobotResponse updatePromptText(RobotRequest request) {
+        if (!StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("robot uid is required");
+        }
+        Optional<RobotEntity> robotOptional = findByUid(request.getUid());
+        if (!robotOptional.isPresent()) {
+            throw new NotFoundException("Robot not found with UID: " + request.getUid());
+        }
+        String newPrompt = resolvePromptValue(request);
+        if (!StringUtils.hasText(newPrompt)) {
+            throw new IllegalArgumentException("prompt is required");
+        }
+        RobotEntity robot = robotOptional.get();
+        RobotLlm robotLlm = robot.getLlm();
+        if (robotLlm == null) {
+            robotLlm = new RobotLlm();
+        }
+        robotLlm.setPrompt(newPrompt);
+        robot.setLlm(robotLlm);
+        RobotEntity savedRobot = save(robot);
+        if (savedRobot == null) {
+            throw new RuntimeException("update robot prompt " + request.getUid() + " failed");
+        }
+        return convertToResponse(savedRobot);
+    }
+
     // 知识库更新请通过 RobotSettings 接口更新 kbEnabled/kbUid
     @Transactional
     public RobotResponse updateKbUid(RobotRequest request) {
@@ -610,6 +637,16 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setOrgUid(orgUid);
 
         return robot;
+    }
+
+    private String resolvePromptValue(RobotRequest request) {
+        if (StringUtils.hasText(request.getPrompt())) {
+            return request.getPrompt();
+        }
+        if (request.getLlm() != null && StringUtils.hasText(request.getLlm().getPrompt())) {
+            return request.getLlm().getPrompt();
+        }
+        return null;
     }
 
 
