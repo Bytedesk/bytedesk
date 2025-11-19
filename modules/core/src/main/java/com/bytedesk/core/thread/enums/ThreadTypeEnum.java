@@ -38,8 +38,7 @@ public enum ThreadTypeEnum {
     HISTORY(16), // 历史对话，用于管理后台查看历史对话
     WORKFLOW(17), // 工作流对话
     // 
-    QUEUE_AGENT(18), // 一对一排队会话-用于更新排队状态
-    QUEUE_WORKGROUP(19) // 工作组排队会话-用于更新排队状态
+    QUEUE(18), // 一对一排队会话-用于更新排队状态
     ;
 
     private final int value;

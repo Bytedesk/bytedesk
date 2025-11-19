@@ -118,6 +118,10 @@ public class AvatarConsts {
         return getDefaultHost() + "/avatars/file.png";
     }
 
+    public static String getDefaultQueueAssistantAvatarUrl() {
+        return getDefaultHost() + "/avatars/queue.png";
+    }
+
     public static String getDefaultClipboardAssistantAvatarUrl() {
         return getDefaultHost() + "/avatars/clipboard.png";
     }

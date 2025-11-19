@@ -197,11 +197,13 @@ public class I18Consts {
     public static final String I18N_AUTH_CAPTCHA_VALIDATE_FAILED = "验证码验证失败"; // 验证码验证失败
     // 助手相关
     public static final String I18N_FILE_ASSISTANT_NAME = "文件助手"; // 文件助手
+    public static final String I18N_QUEUE_ASSISTANT_NAME = "排队助手"; // 排队助手
     public static final String I18N_CLIPBOARD_ASSISTANT_NAME = "剪贴板助手"; // 剪贴板助手
     public static final String I18N_INTENT_REWRITE_ASSISTANT_NAME = "意图改写"; // 意图改写
     public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME = "意图识别"; // 意图识别
     public static final String I18N_EMOTION_ASSISTANT_NAME = "情绪分析"; // 情绪分析
     public static final String I18N_FILE_ASSISTANT_DESCRIPTION = "手机、电脑文件互传"; // 手机、电脑文件互传
+    public static final String I18N_QUEUE_ASSISTANT_DESCRIPTION = "排队助手描述"; // 排队助手描述
     public static final String I18N_CLIPBOARD_ASSISTANT_DESCRIPTION = "手机、电脑剪贴板内容互传"; // 手机、电脑剪贴板内容互传
     public static final String I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION = "用于改写客户意图"; // 用于改写客户意图
     public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION = "用于识别客户意图"; // 用于识别客户意图

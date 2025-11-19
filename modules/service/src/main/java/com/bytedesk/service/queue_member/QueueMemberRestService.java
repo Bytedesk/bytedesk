@@ -27,8 +27,17 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserUtils;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -43,6 +52,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
+    private final ThreadRestService threadRestService;
     
     /**
      * 访客主动退出排队：标记离开时间并软删除队列成员记录
@@ -284,4 +294,38 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     protected Page<QueueMemberEntity> executePageQuery(Specification<QueueMemberEntity> spec, Pageable pageable) {
         return queueMemberRepository.findAll(spec, pageable);
     }
+
+    /** 客服排队会话：org/queue/{agent_uid} */
+    public ThreadResponse createAgentQueueThread(AgentEntity agent) {
+        //
+        String topic = TopicUtils.getOrgQueueTopic(agent.getUid());
+        //
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        if (threadOptional.isPresent()) {
+            return threadRestService.convertToResponse(threadOptional.get());
+        }
+        // 排队助手-用户信息，头像、昵称等
+        UserProtobuf user = UserUtils.getQueueAssistantUser();
+        //
+        ThreadEntity assistantThread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
+                .type(ThreadTypeEnum.ASSISTANT.name())
+                .topic(topic)
+                .hide(true)
+                .status(ThreadProcessStatusEnum.NEW.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .level(LevelEnum.AGENT.name())
+                .user(user.toJson())
+                .userUid(agent.getUid())
+                .owner(agent.getMember().getUser())
+                .build();
+
+        ThreadEntity updateThread = threadRestService.save(assistantThread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+
+        return threadRestService.convertToResponse(updateThread);
+    }
+
 }

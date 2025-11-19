@@ -53,6 +53,17 @@ public class AssistantInitializer implements SmartInitializingSingleton {
                 .build();
         assistantService.create(fileAssistantRequest);
 
+        // 排队助手
+        AssistantRequest queueAssistantRequest = AssistantRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_QUEUE_ASSISTANT_UID)
+                .topic(TopicUtils.TOPIC_QUEUE_ASSISTANT)
+                .nickname(I18Consts.I18N_QUEUE_ASSISTANT_NAME)
+                .avatar(AvatarConsts.getDefaultQueueAssistantAvatarUrl())
+                .description(I18Consts.I18N_QUEUE_ASSISTANT_DESCRIPTION)
+                .level(LevelEnum.PLATFORM.name())
+                .build();
+        assistantService.create(queueAssistantRequest);
+
         // 剪贴助手
         // AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()
         //         .topic(TopicUtils.TOPIC_CLIPBOARD_ASSISTANT)

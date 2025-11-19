@@ -41,6 +41,7 @@ public class BytedeskConsts {
     public static final String DEFAULT_MEMBER_UID = "df_mb_uid";
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid";
     public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid";
+    public static final String DEFAULT_QUEUE_ASSISTANT_UID = "df_qa_uid";
     public static final String DEFAULT_CLIPBOARD_ASSISTANT_UID = "df_ca_uid";
     public static final String DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID = "df_ica_uid";
     public static final String DEFAULT_INTENT_REWRITE_ASSISTANT_UID = "df_ira_uid";

@@ -508,46 +508,6 @@ public class ThreadRestService
         return convertToResponse(updateThread);
     }
 
-    // public ThreadResponse updateUnreadCount(ThreadRequest threadRequest) {
-    //     if (!StringUtils.hasText(threadRequest.getUid())) {
-    //         throw new RuntimeException("thread uid is required");
-    //     }
-    //     //
-    //     Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
-    //     if (!threadOptional.isPresent()) {
-    //         throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
-    //     }
-    //     //
-    //     ThreadEntity thread = threadOptional.get();
-    //     // thread.setUnreadCount(threadRequest.getUnreadCount());
-    //     //
-    //     ThreadEntity updateThread = save(thread);
-    //     if (updateThread == null) {
-    //         throw new RuntimeException("thread save failed");
-    //     }
-    //     return convertToResponse(updateThread);
-    // }
-
-    // public ThreadResponse increaseUnreadCount(ThreadRequest threadRequest) {
-    //     if (!StringUtils.hasText(threadRequest.getUid())) {
-    //         throw new RuntimeException("thread uid is required");
-    //     }
-    //     //
-    //     Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
-    //     if (!threadOptional.isPresent()) {
-    //         throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
-    //     }
-    //     //
-    //     ThreadEntity thread = threadOptional.get();
-    //     thread.setUnreadCount(threadRequest.getUnreadCount() + 1);
-    //     //
-    //     ThreadEntity updateThread = save(thread);
-    //     if (updateThread == null) {
-    //         throw new RuntimeException("thread save failed");
-    //     }
-    //     return convertToResponse(updateThread);
-    // }
-
     // update unread
     public ThreadResponse updateUnread(ThreadRequest threadRequest) {
         if (!StringUtils.hasText(threadRequest.getUid())) {

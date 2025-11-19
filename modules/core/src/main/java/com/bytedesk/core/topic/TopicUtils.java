@@ -23,6 +23,7 @@ public class TopicUtils {
     public static final String TOPIC_INTERNAL_SUFFIX = "_internal";
     //
     public static final String TOPIC_FILE_ASSISTANT = "file";
+    public static final String TOPIC_QUEUE_ASSISTANT = "queue";
     public static final String TOPIC_CLIPBOARD_ASSISTANT = "clipboard";
     public static final String TOPIC_INTENT_CLASSIFICATION_ASSISTANT = "intent_classification";
     public static final String TOPIC_INTENT_REWRITE_ASSISTANT = "intent_rewrite";

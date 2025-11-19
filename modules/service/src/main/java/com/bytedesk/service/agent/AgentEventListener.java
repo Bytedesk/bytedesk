@@ -65,7 +65,6 @@ public class AgentEventListener {
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
         // log.info("agent - organization created: {}", organization.getName());
-        //
         String mobile = user.getMobile();
         // String agentUid = uidUtils.getUid();
         agentRestService.createFromMember(mobile, orgUid);
@@ -79,74 +78,8 @@ public class AgentEventListener {
         // AgentCreateEvent agentCreateEvent = (AgentCreateEvent) event.getObject();
         AgentEntity agent = event.getAgent();
         // log.info("agent onAgentCreateEvent: {}", agent.getUid());
-        // 创建快捷回复知识库
-        KbaseRequest kbaseQuickReply = KbaseRequest.builder()
-                .name(agent.getNickname() +  "Kb")
-                .descriptionHtml(agent.getNickname() + "Kb")
-                .language(LanguageEnum.ZH_CN.name())
-                .level(LevelEnum.AGENT.name())
-                .type(KbaseTypeEnum.QUICKREPLY.name())
-                .agentUid(agent.getUid())
-                .orgUid(agent.getOrgUid())
-                .build();
-        KbaseResponse kb = kbaseRestService.create(kbaseQuickReply);
-
-        // 初始化一条个人快捷回复（仅坐席本人可见）
-        try {
-            QuickReplyRequest qr = QuickReplyRequest.builder()
-                .title("我的第一条快捷回复")
-                .content("这是你的个人快捷回复。你可以在右侧面板编辑、设置快捷键并快速插入到会话中。")
-                .kbUid(kb.getUid())
-                .agentUid(agent.getUid())
-                .orgUid(agent.getOrgUid())
-                .level(LevelEnum.AGENT.name())
-                .type(MessageTypeEnum.TEXT.name())
-                .build();
-            quickReplyRestService.create(qr);
-        } catch (Exception ex) {
-            log.warn("Failed to create default personal quick reply for agent {}: {}", agent.getUid(), ex.getMessage());
-        }
+        initAgentKbase(agent);
     }
-
-    // @EventListener
-    // public void onMqttConnectedEvent(MqttConnectedEvent event) {
-    //     // String clientId = event.getClientId();
-    //     // 用户clientId格式: uid/client/deviceUid
-    //     // final String uid = clientId.split("/")[0];
-    //     // log.info("agent onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
-    //     // 标记连接（使用 ConnectionEntity 支持多端在线）
-    //     // 仍保持原有行为，确保现有业务在线状态及时更新
-    //     // agentRestService.updateConnect(uid, true);
-    // }
-
-    // @EventListener
-    // public void onMqttDisconnectedEvent(MqttDisconnectedEvent event) {
-    //     // String clientId = event.getClientId();
-    //     // 用户clientId格式: uid/client/deviceUid
-    //     // final String uid = clientId.split("/")[0];
-    //     // log.info("agent onMqttDisconnectedEvent uid {}, clientId {}", uid, clientId);
-    //     // 先标记该 client 断开
-    //     // connectionRestService.markDisconnected(clientId);
-    //     // 根据 ConnectionEntity 汇总判断是否仍在线（多端）
-    //     // boolean online = connectionRestService.isUserOnline(uid);
-    //     // agentRestService.updateConnect(uid, online);
-    // }
-
-    // // 更新agent在线状态
-    // @EventListener
-    // public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-    //     // log.info("agent QuartzOneMinEvent");
-    //     // 先清理过期会话
-    //     // connectionRestService.expireStaleSessions();
-    //     // 再同步已标记为在线的坐席，如果 TTL 过期则下线
-    //     // agentRestService.findAllConnected().forEach(agent -> {
-    //     //     boolean online = connectionRestService.isUserOnline(agent.getUserUid());
-    //     //     if (!online) {
-    //     //         log.info("agent updateConnect uid {} offline(by presence)", agent.getUserUid());
-    //     //         // agentRestService.updateConnect(agent.getUserUid(), false);
-    //     //     }
-    //     // });
-    // }
 
     // 客服接待数量发生变化，增加接待数量，发送欢迎语
     @EventListener
@@ -187,6 +120,35 @@ public class AgentEventListener {
         }
     }
 
+    private void initAgentKbase(AgentEntity agent) {
+        // 创建快捷回复知识库
+        KbaseRequest kbaseQuickReply = KbaseRequest.builder()
+                .name(agent.getNickname() +  "Kb")
+                .descriptionHtml(agent.getNickname() + "Kb")
+                .language(LanguageEnum.ZH_CN.name())
+                .level(LevelEnum.AGENT.name())
+                .type(KbaseTypeEnum.QUICKREPLY.name())
+                .agentUid(agent.getUid())
+                .orgUid(agent.getOrgUid())
+                .build();
+        KbaseResponse kb = kbaseRestService.create(kbaseQuickReply);
+
+        // 初始化一条个人快捷回复（仅坐席本人可见）
+        try {
+            QuickReplyRequest qr = QuickReplyRequest.builder()
+                .title("我的第一条快捷回复")
+                .content("这是你的个人快捷回复。你可以在右侧面板编辑、设置快捷键并快速插入到会话中。")
+                .kbUid(kb.getUid())
+                .agentUid(agent.getUid())
+                .orgUid(agent.getOrgUid())
+                .level(LevelEnum.AGENT.name())
+                .type(MessageTypeEnum.TEXT.name())
+                .build();
+            quickReplyRestService.create(qr);
+        } catch (Exception ex) {
+            log.warn("Failed to create default personal quick reply for agent {}: {}", agent.getUid(), ex.getMessage());
+        }
+    }
 
     
 }

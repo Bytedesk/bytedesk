@@ -50,14 +50,25 @@ public class UserUtils {
                 .build();
     }
 
-    // public static UserProtobuf getClipboardAssistantUser() {
-    //     UserProtobuf user = UserProtobuf.builder()
-    //             .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
-    //             .avatar(AvatarConsts.getDefaultClipboardAssistantAvatarUrl())
-    //             .build();
-    //     user.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
-    //     return user;
-    // }
+    public static UserProtobuf getQueueAssistantUser() {
+        try {
+            if (userService != null) {
+                Optional<UserEntity> optional = userService.findByUid(BytedeskConsts.DEFAULT_QUEUE_ASSISTANT_UID);
+                if (optional.isPresent()) {
+                    UserProtobuf u = UserProtobuf.fromEntity(optional.get());
+                    u.setType(UserTypeEnum.SYSTEM.name());
+                    return u;
+                }
+            }
+        } catch (Exception ignored) { }
+        // 兜底：未找到数据库记录时返回默认内置信息
+        return UserProtobuf.builder()
+                .uid(BytedeskConsts.DEFAULT_QUEUE_ASSISTANT_UID)
+                .nickname(I18Consts.I18N_QUEUE_ASSISTANT_NAME)
+                .avatar(AvatarConsts.getDefaultQueueAssistantAvatarUrl())
+                .type(UserTypeEnum.SYSTEM.name())
+                .build();
+    }
 
     public static UserProtobuf getSystemUser() {
         try {
