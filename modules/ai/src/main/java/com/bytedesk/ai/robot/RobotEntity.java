@@ -107,9 +107,6 @@ public class RobotEntity extends BaseEntity {
     @Column(name = "is_kb_source_enabled")
     private Boolean kbSourceEnabled = true;
 
-    // @Builder.Default
-    // private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
-
     /**
      * 是否启用知识库问答
      */
@@ -139,8 +136,6 @@ public class RobotEntity extends BaseEntity {
 
     // @Builder.Default
     // private Boolean published = false;
-
-    // 知识库相关字段已迁移至 RobotSettingsEntity
 
     /**
      * Whether workflow/flow integration is enabled

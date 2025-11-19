@@ -145,18 +145,38 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         true,
                         true);
                 return;
-            }
-            List<Message> messages = promptHelper.buildMessagesForSse(query, "", robot, messageProtobufQuery);
-            Prompt aiPrompt = promptHelper.toPrompt(messages);
-            try {
-                processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, new ArrayList<>(),
-                        emitter);
-            } catch (Exception e) {
-                log.error("processPromptSse 异常(无知识库)", e);
-                sseMessageHelper.handleSseError(new Exception(I18Consts.I18N_ROBOT_PROCESSING_ERROR),
+            } else if (robot.getLlm().getEnabled()) {
+                // 开启大模型对话，且无知识库
+                List<Message> messages = promptHelper.buildMessagesForSse(query, "", robot, messageProtobufQuery);
+                Prompt aiPrompt = promptHelper.toPrompt(messages);
+                try {
+                    processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, new ArrayList<>(),
+                            emitter);
+                } catch (Exception e) {
+                    log.error("processPromptSse 异常(无知识库)", e);
+                    sseMessageHelper.handleSseError(new Exception(I18Consts.I18N_ROBOT_PROCESSING_ERROR),
+                            messageProtobufQuery,
+                            messageProtobufReply, emitter);
+                }
+            } else {
+                // 未开启大模型对话，且无知识库：直接返回默认回复并结束 SSE
+                String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+                        ? robot.getLlm().getDefaultReply()
+                        : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+                String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer,
+                        new ArrayList<>(), robot);
+                sseMessageHelper.sendStreamMessage(
                         messageProtobufQuery,
-                        messageProtobufReply, emitter);
+                        messageProtobufReply,
+                        emitter,
+                        robotStreamContent,
+                        null,
+                        null,
+                        true,
+                        true,
+                        true);
             }
+            
             return;
         }
 
@@ -250,7 +270,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         RobotContent streamContent = streamContentBuilder.build();
-
         sseMessageHelper.sendStreamMessage(
                 messageProtobufQuery,
                 messageProtobufReply,
