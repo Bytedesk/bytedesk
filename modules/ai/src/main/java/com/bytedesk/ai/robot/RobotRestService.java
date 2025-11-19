@@ -579,7 +579,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         if (!robotOptional.isPresent()) {
             throw new NotFoundException("Robot not found with UID: " + request.getUid());
         }
-        return convertToResponse(robotOptional.get());
+        robotOptional.get().setKbEnabled(request.getKbEnabled());
+        robotOptional.get().setKbUid(request.getKbUid());
+        RobotEntity savedEntity = save(robotOptional.get());
+        if (savedEntity == null) {
+            throw new RuntimeException("update robot kbUid failed");
+        }
+        return convertToResponse(savedEntity);
     }
 
     @Override
