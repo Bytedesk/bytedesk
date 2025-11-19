@@ -54,6 +54,7 @@ import com.bytedesk.ai.springai.service.ChatTokenUsage;
  * 智谱AI服务类
  * 使用 oapi-java-sdk 实现聊天功能，继承自BaseSpringAIService
  * https://github.com/MetaGLM/zhipuai-sdk-java-v4
+ * 
  * @deprecated 请使用 ZhipuMultiModelService
  */
 @Slf4j
@@ -203,7 +204,7 @@ public class ZhipuaiService extends BaseSpringAIService {
     protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API websocket prompt: {}", prompt);
 
         long startTime = System.currentTimeMillis();
@@ -268,7 +269,8 @@ public class ZhipuaiService extends BaseSpringAIService {
                                     if (content != null) {
                                         String contentStr = content.toString();
                                         if (!contentStr.isEmpty() && !contentStr.equals("null")) {
-                                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, contentStr,
+                                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM,
+                                                    contentStr,
                                                     messageProtobufReply);
                                         }
                                     }
@@ -284,12 +286,14 @@ public class ZhipuaiService extends BaseSpringAIService {
                                         String extractedContent = extractContentFromDeltaString(deltaStr);
                                         if (extractedContent != null && !extractedContent.isEmpty()) {
                                             log.info("Zhipuai API websocket extracted content: {}", extractedContent);
-                                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, extractedContent,
+                                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM,
+                                                    extractedContent,
                                                     messageProtobufReply);
                                         } else if (!deltaStr.isEmpty() && !deltaStr.equals("null")
                                                 && !isEmptyAssistantMessage(deltaStr)) {
                                             // 如果无法提取content，且不是空的助手消息，则发送原始delta字符串
-                                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, deltaStr,
+                                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM,
+                                                    deltaStr,
                                                     messageProtobufReply);
                                         }
                                     }
@@ -327,7 +331,8 @@ public class ZhipuaiService extends BaseSpringAIService {
                         })
                         .doOnError(error -> {
                             log.error("Zhipuai API websocket stream error: ", error);
-                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+                                    I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
                                     messageProtobufReply);
                             success[0] = false;
                         })
@@ -336,7 +341,8 @@ public class ZhipuaiService extends BaseSpringAIService {
 
             } else {
                 log.error("Zhipuai API websocket error: {}", response.getError());
-                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+                        I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
                         messageProtobufReply);
             }
         } catch (Exception e) {
@@ -356,7 +362,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             return "Error: Robot or RobotLlm is not configured";
         }
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         //
         long startTime = System.currentTimeMillis();
         boolean success = false;
@@ -419,11 +425,12 @@ public class ZhipuaiService extends BaseSpringAIService {
             return;
         }
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         log.info("Zhipuai API SSE prompt: {}", prompt);
 
         // 发送起始消息
-    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+        sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                I18Consts.I18N_THINKING);
 
         long startTime = System.currentTimeMillis();
         final boolean[] success = { false };
