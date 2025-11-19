@@ -49,15 +49,13 @@ public class RobotProtobuf implements Serializable {
 
     private String extra;
 
-    // 
     private Boolean kbSourceEnabled;
     
     private Boolean kbEnabled;
 
-    private String kbUid; // 对应知识库
+    private String kbUid;
 
     private RobotLlm llm;
-    // private RobotLlm llm;
 
     public static RobotProtobuf fromJson(String user) {
         return JSON.parseObject(user, RobotProtobuf.class);

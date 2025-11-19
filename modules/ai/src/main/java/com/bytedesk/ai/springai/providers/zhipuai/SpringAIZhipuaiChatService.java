@@ -70,7 +70,6 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
     @Autowired
     private PromptHelper promptHelper;
 
-    
     public SpringAIZhipuaiChatService() {
         super(); // 调用基类的无参构造函数
     }
