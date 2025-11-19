@@ -121,7 +121,39 @@ public class KnowledgeBaseSearchHelper {
                 break;
         }
 
-        return new SearchResultWithSources(searchResultList, sourceReferences);
+        // 根据 uid 进行去重：
+        // - FaqProtobuf：同一 uid 仅保留一条（按首次出现的顺序保留）
+        // - SourceReference：同一 uid 仅保留分数更高的一条（若分数为空按 0.0 处理）
+        Map<String, FaqProtobuf> faqByUid = new LinkedHashMap<>();
+        for (FaqProtobuf faq : searchResultList) {
+            if (faq == null || !StringUtils.hasText(faq.getUid())) {
+                continue;
+            }
+            // 首次出现保留，后续重复跳过
+            faqByUid.putIfAbsent(faq.getUid(), faq);
+        }
+
+        Map<String, RobotContent.SourceReference> srcByUid = new LinkedHashMap<>();
+        for (RobotContent.SourceReference src : sourceReferences) {
+            if (src == null || !StringUtils.hasText(src.getSourceUid())) {
+                continue;
+            }
+            RobotContent.SourceReference existing = srcByUid.get(src.getSourceUid());
+            if (existing == null) {
+                srcByUid.put(src.getSourceUid(), src);
+            } else {
+                double newScore = src.getScore() != null ? src.getScore() : 0.0;
+                double oldScore = existing.getScore() != null ? existing.getScore() : 0.0;
+                if (newScore > oldScore) {
+                    srcByUid.put(src.getSourceUid(), src);
+                }
+            }
+        }
+
+        List<FaqProtobuf> dedupFaqs = new ArrayList<>(faqByUid.values());
+        List<RobotContent.SourceReference> dedupSources = new ArrayList<>(srcByUid.values());
+
+        return new SearchResultWithSources(dedupFaqs, dedupSources);
     }
 
 
