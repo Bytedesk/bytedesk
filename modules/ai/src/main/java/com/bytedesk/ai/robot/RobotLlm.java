@@ -224,5 +224,11 @@ public class RobotLlm {
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default
     private String defaultReply = I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+
+    // 知识库检索结果为空时的处理策略：
+    // true: 继续调用LLM会话生成回答；false: 返回 defaultReply（默认）
+    @Builder.Default
+    @Column(name = "llm_use_when_kb_empty")
+    private Boolean useLlmWhenKbEmpty = false;
     
 }

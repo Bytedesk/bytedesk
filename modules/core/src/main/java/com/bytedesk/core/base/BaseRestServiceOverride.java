@@ -111,7 +111,7 @@ public abstract class BaseRestServiceOverride<T, TRequest extends PageableReques
      * 保存实体，带重试机制
      */
     @Retryable(
-        value = ObjectOptimisticLockingFailureException.class,
+        retryFor = ObjectOptimisticLockingFailureException.class,
         maxAttempts = 3,
         backoff = @Backoff(delay = 100, multiplier = 2)
     )

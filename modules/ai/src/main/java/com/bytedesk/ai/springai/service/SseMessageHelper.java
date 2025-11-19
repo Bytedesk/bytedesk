@@ -1,5 +1,6 @@
 package com.bytedesk.ai.springai.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.ai.chat.prompt.Prompt;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.RobotProtobuf;
+import org.springframework.ai.chat.messages.Message;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeEnum;
@@ -21,6 +24,9 @@ public class SseMessageHelper {
 
     @Autowired
     private MessagePersistenceHelper messagePersistenceHelper;
+
+    @Autowired
+    private PromptHelper promptHelper;
 
     public void sendStreamStartMessage(
             MessageProtobuf messageProtobufQuery,
@@ -153,10 +159,53 @@ public class SseMessageHelper {
         }
     }
 
+        // 发送默认回复（SSE，使用已构建的 StreamContent JSON，标记未命中并完成）
+        public void sendDefaultReplySse(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, SseEmitter emitter) {
+        String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+            ? robot.getLlm().getDefaultReply()
+            : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+        String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer, new ArrayList<>(),
+            robot);
+        sendStreamMessage(
+            messageProtobufQuery,
+            messageProtobufReply,
+            emitter,
+            robotStreamContent,
+            null,
+            null,
+            true,
+            true,
+            true);
+        }
+
     public void sendMessageWebsocket(MessageTypeEnum type, String content, MessageProtobuf messageProtobufReply) {
         // WebSocket 功能暂未启用：保留方法签名以兼容其他类的调用，内部不执行发送
         log.debug("sendMessageWebsocket skipped (WebSocket disabled). type={}, uid={}",
                 type, messageProtobufReply != null ? messageProtobufReply.getUid() : null);
+    }
+
+    // 统一封装：构建 SSE 所需 Prompt 并调用 service.processPromptSse，带异常处理
+    public void processPromptSseWithContext(
+            BaseSpringAIService service,
+            String query,
+            String context,
+            RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply,
+            List<RobotContent.SourceReference> sourceReferences,
+            SseEmitter emitter,
+            String errorLogTag) {
+        List<Message> messages = promptHelper.buildMessagesForSse(query, context, robot, messageProtobufQuery);
+        Prompt aiPrompt = promptHelper.toPrompt(messages);
+        try {
+            service.processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply,
+                    sourceReferences != null ? sourceReferences : new java.util.ArrayList<>(), emitter);
+        } catch (Exception e) {
+            log.error("processPromptSse 异常({})", errorLogTag, e);
+            handleSseError(new Exception(I18Consts.I18N_ROBOT_PROCESSING_ERROR), messageProtobufQuery,
+                    messageProtobufReply, emitter);
+        }
     }
 
     public void handleSseError(Throwable error, MessageProtobuf messageProtobufQuery,

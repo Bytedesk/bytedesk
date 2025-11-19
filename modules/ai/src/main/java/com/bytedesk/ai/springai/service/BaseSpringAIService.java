@@ -146,37 +146,23 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         true);
                 return;
             } else if (robot.getLlm().getEnabled()) {
-                // 开启大模型对话，且无知识库
-                List<Message> messages = promptHelper.buildMessagesForSse(query, "", robot, messageProtobufQuery);
-                Prompt aiPrompt = promptHelper.toPrompt(messages);
-                try {
-                    processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, new ArrayList<>(),
+                // 开启大模型对话，且无知识库：根据配置决定是否使用 LLM 回答
+                boolean useLlmWhenKbEmpty = robot.getLlm() != null
+                        && Boolean.TRUE.equals(robot.getLlm().getUseLlmWhenKbEmpty());
+                if (useLlmWhenKbEmpty) {
+                    sseMessageHelper.processPromptSseWithContext(this, query, "", robot, messageProtobufQuery,
+                            messageProtobufReply, new ArrayList<>(), emitter, "无知识库");
+                } else {
+                    // 配置为不使用 LLM：直接返回默认回复
+                    sseMessageHelper.sendDefaultReplySse(query, robot, messageProtobufQuery, messageProtobufReply,
                             emitter);
-                } catch (Exception e) {
-                    log.error("processPromptSse 异常(无知识库)", e);
-                    sseMessageHelper.handleSseError(new Exception(I18Consts.I18N_ROBOT_PROCESSING_ERROR),
-                            messageProtobufQuery,
-                            messageProtobufReply, emitter);
                 }
             } else {
                 // 未开启大模型对话，且无知识库：直接返回默认回复并结束 SSE
-                String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
-                        ? robot.getLlm().getDefaultReply()
-                        : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
-                String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer,
-                        new ArrayList<>(), robot);
-                sseMessageHelper.sendStreamMessage(
-                        messageProtobufQuery,
-                        messageProtobufReply,
-                        emitter,
-                        robotStreamContent,
-                        null,
-                        null,
-                        true,
-                        true,
-                        true);
+                sseMessageHelper.sendDefaultReplySse(query, robot, messageProtobufQuery, messageProtobufReply,
+                        emitter);
             }
-            
+
             return;
         }
 
@@ -193,37 +179,23 @@ public abstract class BaseSpringAIService implements SpringAIService {
             log.info("LLM 模式，KB 结果数 {}, 来源数 {}", kbResults.size(), sourceReferences.size());
 
             if (kbResults.isEmpty()) {
-                // 未命中 KB,直接返回默认回复(ROBOT_STREAM),并结束 SSE
-                String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
-                        ? robot.getLlm().getDefaultReply()
-                        : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
-                String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer,
-                        new ArrayList<>(), robot);
-                sseMessageHelper.sendStreamMessage(
-                        messageProtobufQuery,
-                        messageProtobufReply,
-                        emitter,
-                        robotStreamContent,
-                        null,
-                        null,
-                        true,
-                        true,
-                        true);
+                // 未命中 KB：根据配置选择 默认回复 或 继续使用 LLM
+                boolean useLlmWhenKbEmpty = robot.getLlm() != null
+                        && Boolean.TRUE.equals(robot.getLlm().getUseLlmWhenKbEmpty());
+                if (useLlmWhenKbEmpty) {
+                    sseMessageHelper.processPromptSseWithContext(this, query, "", robot, messageProtobufQuery,
+                            messageProtobufReply, new ArrayList<>(), emitter, "LLM+KB空");
+                } else {
+                    // 默认：返回默认回复(ROBOT_STREAM),并结束 SSE
+                    sseMessageHelper.sendDefaultReplySse(query, robot, messageProtobufQuery, messageProtobufReply,
+                            emitter);
+                }
                 return;
             }
 
             String context = promptHelper.buildContextFromFaqs(kbResults);
-            List<Message> messages = promptHelper.buildMessagesForSse(query, context, robot, messageProtobufQuery);
-            Prompt aiPrompt = promptHelper.toPrompt(messages);
-            try {
-                processPromptSse(aiPrompt, robot, messageProtobufQuery, messageProtobufReply, sourceReferences,
-                        emitter);
-            } catch (Exception e) {
-                log.error("processPromptSse 异常(LLM+KB)", e);
-                sseMessageHelper.handleSseError(new Exception(I18Consts.I18N_ROBOT_PROCESSING_ERROR),
-                        messageProtobufQuery,
-                        messageProtobufReply, emitter);
-            }
+            sseMessageHelper.processPromptSseWithContext(this, query, context, robot, messageProtobufQuery,
+                    messageProtobufReply, sourceReferences, emitter, "LLM+KB");
             return;
         }
 
@@ -328,20 +300,50 @@ public abstract class BaseSpringAIService implements SpringAIService {
             if (llmEnabled) {
                 // LLM 启用：KB 为空→默认文本；KB 非空→带上下文调用 LLM
                 if (kbResults.isEmpty()) {
-                    String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
-                            ? robot.getLlm().getDefaultReply()
-                            : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
-                    RobotContent streamContent = RobotContent.builder()
-                            .question(query)
-                            .answer(answer)
-                            .kbUid(robot.getKbUid())
-                            .robotUid(robot.getUid())
-                            .build();
-                    messageProtobufReply.setContent(streamContent.toJson());
-                    messageProtobufReply.setType(MessageTypeEnum.ROBOT);
-                    messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true);
-                    messageSendService.sendProtobufMessage(messageProtobufReply);
-                    return answer;
+                    boolean useLlmWhenKbEmpty = robot.getLlm() != null
+                            && Boolean.TRUE.equals(robot.getLlm().getUseLlmWhenKbEmpty());
+                    if (useLlmWhenKbEmpty) {
+                        // 使用空上下文直接走 LLM
+                        List<Message> messages = promptHelper.buildMessagesForSync(query, "", robot,
+                                messageProtobufQuery);
+                        Prompt aiPrompt = promptHelper.toPrompt(messages);
+                        String response = processPromptSync(aiPrompt.toString(), robot);
+                        PromptResult promptResult = new PromptResult(response, aiPrompt);
+
+                        RobotContent streamContent = RobotContent.builder()
+                                .question(query)
+                                .answer(promptResult.getResponse())
+                                .kbUid(robot.getKbUid())
+                                .robotUid(robot.getUid())
+                                .build();
+
+                        messageProtobufReply.setContent(streamContent.toJson());
+                        messageProtobufReply.setType(MessageTypeEnum.ROBOT);
+                        String modelType = robot.getLlm() != null && robot.getLlm().getTextModel() != null
+                                ? robot.getLlm().getTextModel()
+                                : "";
+                        messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, false, 0, 0,
+                                0,
+                                promptResult.getPrompt(), "", modelType);
+                        messageSendService.sendProtobufMessage(messageProtobufReply);
+                        return promptResult.getResponse();
+                    } else {
+                        // 返回默认回复
+                        String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+                                ? robot.getLlm().getDefaultReply()
+                                : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+                        RobotContent streamContent = RobotContent.builder()
+                                .question(query)
+                                .answer(answer)
+                                .kbUid(robot.getKbUid())
+                                .robotUid(robot.getUid())
+                                .build();
+                        messageProtobufReply.setContent(streamContent.toJson());
+                        messageProtobufReply.setType(MessageTypeEnum.ROBOT);
+                        messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                        messageSendService.sendProtobufMessage(messageProtobufReply);
+                        return answer;
+                    }
                 } else {
                     String context = String.join("\n", kbResults.stream().map(FaqProtobuf::toJson).toList());
                     List<Message> messages = promptHelper.buildMessagesForSync(query, context, robot,
