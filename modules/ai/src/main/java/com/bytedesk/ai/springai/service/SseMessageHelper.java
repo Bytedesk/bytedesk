@@ -58,7 +58,8 @@ public class SseMessageHelper {
     }
 
     public void sendStreamMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
-            SseEmitter emitter, String content, String reasonContent, List<RobotContent.SourceReference> sourceReferences) {
+            SseEmitter emitter, String content, String reasonContent,
+            List<RobotContent.SourceReference> sourceReferences) {
         // 统一委托到重载版本，避免重复实现
         sendStreamMessage(
                 messageProtobufQuery,
@@ -67,9 +68,9 @@ public class SseMessageHelper {
                 content,
                 reasonContent,
                 sourceReferences,
-                false,   // isUnanswered 默认 false，与原实现一致
-                false,   // completeAfterSend 默认 false，与原实现一致
-                false    // contentIsStreamContentJson 默认 false，按入参构建 StreamContent
+                false, // isUnanswered 默认 false，与原实现一致
+                false, // completeAfterSend 默认 false，与原实现一致
+                false // contentIsStreamContentJson 默认 false，按入参构建 StreamContent
         );
     }
 
@@ -159,25 +160,25 @@ public class SseMessageHelper {
         }
     }
 
-        // 发送默认回复（SSE，使用已构建的 StreamContent JSON，标记未命中并完成）
-        public void sendDefaultReplySse(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    // 发送默认回复（SSE，使用已构建的 StreamContent JSON，标记未命中并完成）
+    public void sendDefaultReplySse(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         String answer = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
-            ? robot.getLlm().getDefaultReply()
-            : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+                ? robot.getLlm().getDefaultReply()
+                : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
         String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer, new ArrayList<>(),
-            robot);
+                robot);
         sendStreamMessage(
-            messageProtobufQuery,
-            messageProtobufReply,
-            emitter,
-            robotStreamContent,
-            null,
-            null,
-            true,
-            true,
-            true);
-        }
+                messageProtobufQuery,
+                messageProtobufReply,
+                emitter,
+                robotStreamContent,
+                null,
+                null,
+                true,
+                true,
+                true);
+    }
 
     public void sendMessageWebsocket(MessageTypeEnum type, String content, MessageProtobuf messageProtobufReply) {
         // WebSocket 功能暂未启用：保留方法签名以兼容其他类的调用，内部不执行发送
@@ -225,7 +226,8 @@ public class SseMessageHelper {
                 messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true);
                 String messageJson = messageProtobufReply.toJson();
                 try {
-                    emitter.send(SseEmitter.event().data(messageJson).id(messageProtobufReply.getUid()).name("message"));
+                    emitter.send(
+                            SseEmitter.event().data(messageJson).id(messageProtobufReply.getUid()).name("message"));
                     emitter.complete();
                 } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
                     log.debug("SSE connection no longer usable during error handling: {}", e.getMessage());
