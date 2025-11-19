@@ -187,6 +187,20 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
                         contents.add(MessageContent.builder().type(ZAI_TEXT).text(ic.getLabel()).build());
                     }
                 }
+            } else if (type == MessageTypeEnum.ROBOT_STREAM) {
+                // 仅提取历史机器人流式消息中的 answer 文本，避免把整段 JSON 作为文本传给模型
+                try {
+                    RobotContent rc = RobotContent.fromJson(raw, RobotContent.class);
+                    String answer = rc != null ? rc.getAnswer() : null;
+                    if (answer != null && !answer.isEmpty()) {
+                        contents.add(MessageContent.builder()
+                                .type(ZAI_TEXT)
+                                .text(stripThinkTags(answer))
+                                .build());
+                    }
+                } catch (Exception ignore) {
+                    // 忽略解析失败，保持不追加，避免发送原始 JSON
+                }
             } else if (type == MessageTypeEnum.VIDEO) {
                 VideoContent vc = VideoContent.fromJson(raw);
                 String url = vc != null ? vc.getUrl() : null;
@@ -627,6 +641,8 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
                 I18Consts.I18N_THINKING);
         long start = System.currentTimeMillis();
         final StringBuilder finalAnswer = new StringBuilder();
+        // 如果模型在流式输出的是 RobotContent JSON，而不是纯文本，这里做缓冲，避免被二次包裹导致嵌套
+        // 仅按纯文本分片进行推送，RobotContent 的包装统一由 SseMessageHelper 负责
         try {
             List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
             // 覆盖最新的用户消息为基于 MessageProtobuf 直接解析的多模态内容，避免 BD_MEDIA 标记往返
@@ -694,10 +710,14 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
                                             return;
                                         }
                                         if (!pieceTrim.isEmpty()) {
+                                            // 正常边流边发，由 SseMessageHelper 统一封装为 RobotContent
                                             finalAnswer.append(pieceTrim);
-                                            // 将推理内容附带在 RobotStreamContent.reasonContent 字段
-                                            sseMessageHelper.sendStreamMessage(messageProtobufQuery,
-                                                    messageProtobufReply, emitter, pieceTrim, reasoning,
+                                            sseMessageHelper.sendStreamMessage(
+                                                    messageProtobufQuery,
+                                                    messageProtobufReply,
+                                                    emitter,
+                                                    pieceTrim,
+                                                    reasoning,
                                                     sourceReferences);
                                         } else {
                                             log.debug("SSE piece is empty after trim, delta={}", delta);
@@ -715,6 +735,7 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
                             sseMessageHelper.handleSseError(err, messageProtobufQuery, messageProtobufReply, emitter);
                         },
                         () -> {
+                            // 结束时将累计文本移除 <think> 标签作为最终答案，用于用量估算
                             String answer = stripThinkTags(finalAnswer.toString());
                             long promptTokens = estimateTokens(prompt.getContents());
                             long completionTokens = estimateTokens(answer);

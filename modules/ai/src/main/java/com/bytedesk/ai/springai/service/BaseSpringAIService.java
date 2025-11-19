@@ -170,8 +170,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         if (llmEnabled) {
             // 启用 LLM：聚合 KB 结果作为上下文提示词
-            SearchResultWithSources aggregated = knowledgeBaseSearchHelper
-                    .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot), robot);
+            // SearchResultWithSources aggregated = knowledgeBaseSearchHelper
+            //         .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot), robot);
+            SearchResultWithSources aggregated = knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot);
             List<FaqProtobuf> kbResults = aggregated.getSearchResults();
             List<RobotContent.SourceReference> sourceReferences = Boolean.TRUE.equals(robot.getKbSourceEnabled())
                     ? aggregated.getSourceReferences()
@@ -200,8 +201,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         // 未启用 LLM：直接使用 KB 搜索结果回复（ROBOT_STREAM），补充来源
-        SearchResultWithSources aggregated = knowledgeBaseSearchHelper
-                .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot), robot);
+        // SearchResultWithSources aggregated = knowledgeBaseSearchHelper
+        //         .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot), robot);
+        SearchResultWithSources aggregated = knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot);
         List<FaqProtobuf> kbResults = aggregated.getSearchResults();
         List<RobotContent.SourceReference> sourceReferences = Boolean.TRUE.equals(robot.getKbSourceEnabled())
                 ? aggregated.getSourceReferences()

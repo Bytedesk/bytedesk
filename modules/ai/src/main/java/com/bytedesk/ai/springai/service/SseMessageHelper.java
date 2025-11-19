@@ -91,6 +91,24 @@ public class SseMessageHelper {
                 return;
             }
 
+            // 若未显式标记为 JSON，但传入内容看起来是 RobotContent JSON，
+            // 为避免嵌套，这里解析后仅提取其中的 answer/reasonContent，继续按统一外层包装发送。
+            if (!contentIsStreamContentJson && looksLikeRobotContentJson(content)) {
+                try {
+                    RobotContent parsed = RobotContent.fromJson(content, RobotContent.class);
+                    String parsedAnswer = parsed.getAnswer();
+                    String parsedReason = parsed.getReasonContent();
+                    if (StringUtils.hasLength(parsedAnswer)) {
+                        content = parsedAnswer;
+                    }
+                    if (!StringUtils.hasLength(reasonContent) && StringUtils.hasLength(parsedReason)) {
+                        reasonContent = parsedReason;
+                    }
+                } catch (Exception ignore) {
+                    // 解析失败则退化为按纯文本处理
+                }
+            }
+
             if (contentIsStreamContentJson) {
                 // 直接发送已构建的 StreamContent JSON
                 messageProtobufReply.setContent(content);
@@ -126,6 +144,23 @@ public class SseMessageHelper {
             log.debug("SSE connection no longer usable during stream message (overload): {}", e.getMessage());
         } catch (Exception e) {
             log.error("Error sending stream message (overload)", e);
+        }
+    }
+
+    // 尝试解析为 RobotContent，以判断传入内容是否已是完整的 StreamContent JSON
+    private boolean looksLikeRobotContentJson(String content) {
+        try {
+            if (content == null) {
+                return false;
+            }
+            // 简单的快速判断，避免无谓的反序列化尝试
+            if (!(content.startsWith("{") && content.contains("\"answer\""))) {
+                return false;
+            }
+            RobotContent.fromJson(content, RobotContent.class);
+            return true;
+        } catch (Exception ignore) {
+            return false;
         }
     }
 

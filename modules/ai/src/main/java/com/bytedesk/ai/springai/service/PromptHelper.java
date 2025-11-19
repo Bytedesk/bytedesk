@@ -66,7 +66,15 @@ public class PromptHelper {
                     } else if (MessageTypeEnum.SYSTEM.name().equals(messageEntity.getType())) {
                         messages.add(new SystemMessage(content));
                     } else if (MessageTypeEnum.ROBOT_STREAM.name().equals(messageEntity.getType())) {
-                        messages.add(new AssistantMessage(content));
+                        try {
+                            RobotContent rc = RobotContent.fromJson(messageEntity.getContent(), RobotContent.class);
+                            String answer = rc != null ? rc.getAnswer() : null;
+                            if (answer != null && !answer.isEmpty()) {
+                                messages.add(new AssistantMessage(answer));
+                            }
+                        } catch (Exception ignore) {
+                            // 忽略解析失败，保持不追加，避免发送原始 JSON
+                        }
                     }
                 }
             }
