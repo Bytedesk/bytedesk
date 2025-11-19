@@ -331,8 +331,6 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
         return contents;
     }
 
-    // 工具函数迁移至 AIFileUtils
-
     // zai-sdk 消息内容类型常量
     private static final String ZAI_TEXT = "text";
     private static final String ZAI_IMAGE_URL = "image_url";

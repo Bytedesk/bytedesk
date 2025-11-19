@@ -121,39 +121,80 @@ public class KnowledgeBaseSearchHelper {
                 break;
         }
 
-        // 根据 uid 进行去重：
-        // - FaqProtobuf：同一 uid 仅保留一条（按首次出现的顺序保留）
-        // - SourceReference：同一 uid 仅保留分数更高的一条（若分数为空按 0.0 处理）
-        Map<String, FaqProtobuf> faqByUid = new LinkedHashMap<>();
-        for (FaqProtobuf faq : searchResultList) {
-            if (faq == null || !StringUtils.hasText(faq.getUid())) {
-                continue;
+        // 读取过滤参数：scoreThreshold、topP、topK（允许为空，使用安全默认）
+        Double scoreThreshold = null;
+        Double topP = null;
+        Integer topK = null;
+        try {
+            if (robot != null && robot.getLlm() != null) {
+                scoreThreshold = robot.getLlm().getScoreThreshold();
+                topP = robot.getLlm().getTopP();
+                topK = robot.getLlm().getTopK();
             }
-            // 首次出现保留，后续重复跳过
-            faqByUid.putIfAbsent(faq.getUid(), faq);
-        }
+        } catch (Exception ignored) {}
 
-        Map<String, RobotContent.SourceReference> srcByUid = new LinkedHashMap<>();
+        // 1) 先对来源进行 uid 聚合：同一内容保留分数最高的一条
+        Map<String, RobotContent.SourceReference> bestSrcByUid = new LinkedHashMap<>();
         for (RobotContent.SourceReference src : sourceReferences) {
-            if (src == null || !StringUtils.hasText(src.getSourceUid())) {
-                continue;
-            }
-            RobotContent.SourceReference existing = srcByUid.get(src.getSourceUid());
+            if (src == null || !StringUtils.hasText(src.getSourceUid())) continue;
+            RobotContent.SourceReference existing = bestSrcByUid.get(src.getSourceUid());
+            double s = src.getScore() != null ? src.getScore() : 0.0;
             if (existing == null) {
-                srcByUid.put(src.getSourceUid(), src);
+                bestSrcByUid.put(src.getSourceUid(), src);
             } else {
-                double newScore = src.getScore() != null ? src.getScore() : 0.0;
-                double oldScore = existing.getScore() != null ? existing.getScore() : 0.0;
-                if (newScore > oldScore) {
-                    srcByUid.put(src.getSourceUid(), src);
-                }
+                double old = existing.getScore() != null ? existing.getScore() : 0.0;
+                if (s > old) bestSrcByUid.put(src.getSourceUid(), src);
             }
         }
 
-        List<FaqProtobuf> dedupFaqs = new ArrayList<>(faqByUid.values());
-        List<RobotContent.SourceReference> dedupSources = new ArrayList<>(srcByUid.values());
+        // 2) 应用 scoreThreshold 与 topP 过滤
+        double maxScore = 0.0;
+        for (RobotContent.SourceReference s : bestSrcByUid.values()) {
+            double sc = s.getScore() != null ? s.getScore() : 0.0;
+            if (sc > maxScore) maxScore = sc;
+        }
 
-        return new SearchResultWithSources(dedupFaqs, dedupSources);
+        double pCut = 0.0;
+        if (topP != null && topP > 0 && topP <= 1 && maxScore > 0) {
+            pCut = topP * maxScore; // 保留分数 >= topP*maxScore 的来源
+        }
+        double thr = scoreThreshold != null ? scoreThreshold : Double.NEGATIVE_INFINITY; // 若未设置阈值则不限制
+        double finalCut = Math.max(thr, pCut);
+
+        List<RobotContent.SourceReference> filteredSources = new ArrayList<>();
+        for (RobotContent.SourceReference s : bestSrcByUid.values()) {
+            double sc = s.getScore() != null ? s.getScore() : 0.0;
+            if (sc >= finalCut) filteredSources.add(s);
+        }
+
+        // 3) 按分数降序排序
+        filteredSources.sort((a, b) -> {
+            double sa = a.getScore() != null ? a.getScore() : 0.0;
+            double sb = b.getScore() != null ? b.getScore() : 0.0;
+            return Double.compare(sb, sa);
+        });
+
+        // 4) 应用 topK 截断
+        int useTopK = (topK != null && topK > 0) ? topK : Integer.MAX_VALUE;
+        if (filteredSources.size() > useTopK) {
+            filteredSources = filteredSources.subList(0, useTopK);
+        }
+
+        // 5) 构建 uid->Faq 的映射（保留首次出现）
+        Map<String, FaqProtobuf> faqByUidFirst = new LinkedHashMap<>();
+        for (FaqProtobuf faq : searchResultList) {
+            if (faq == null || !StringUtils.hasText(faq.getUid())) continue;
+            faqByUidFirst.putIfAbsent(faq.getUid(), faq);
+        }
+
+        // 6) 根据过滤后的来源顺序构建对应的 Faq 列表，确保两者对齐
+        List<FaqProtobuf> filteredFaqs = new ArrayList<>();
+        for (RobotContent.SourceReference s : filteredSources) {
+            FaqProtobuf f = faqByUidFirst.get(s.getSourceUid());
+            if (f != null) filteredFaqs.add(f);
+        }
+
+        return new SearchResultWithSources(filteredFaqs, filteredSources);
     }
 
 
