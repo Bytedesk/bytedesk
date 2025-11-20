@@ -176,15 +176,19 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         }
 
         int attempt = 0;
-        int nextNumber = nextQueueNumber(targetQueue, queueType);
+        Integer nextNumber = null;
         while (attempt < MAX_ENQUEUE_RETRIES) {
             QueueMemberEntity member = QueueMemberEntity.builder()
                     .uid(uidUtils.getUid())
                     .thread(threadEntity)
-                    .queueNumber(nextNumber)
                     .orgUid(threadEntity.getOrgUid())
                     .build();
             enrich.accept(member);
+
+            if (nextNumber == null) {
+                nextNumber = resolveInitialQueueNumber(member, targetQueue, queueType);
+            }
+            member.setQueueNumber(nextNumber);
             try {
                 QueueMemberEntity savedMember = save(member);
                 // queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
@@ -206,6 +210,22 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             }
         }
         throw new IllegalStateException("Unable to enqueue visitor after retries");
+    }
+
+    private int resolveInitialQueueNumber(QueueMemberEntity member, QueueEntity targetQueue, QueueTypeEnum queueType) {
+        int seed = nextQueueNumber(targetQueue, queueType);
+        if (queueType == QueueTypeEnum.WORKGROUP) {
+            seed = Math.max(seed, nextQueueNumberForAssociation(member.getAgentQueue(), QueueTypeEnum.AGENT));
+            seed = Math.max(seed, nextQueueNumberForAssociation(member.getRobotQueue(), QueueTypeEnum.ROBOT));
+        }
+        return seed;
+    }
+
+    private int nextQueueNumberForAssociation(QueueEntity queue, QueueTypeEnum associationType) {
+        if (queue == null) {
+            return 1;
+        }
+        return nextQueueNumber(queue, associationType);
     }
 
     private void detachQueueMember(QueueMemberEntity member) {

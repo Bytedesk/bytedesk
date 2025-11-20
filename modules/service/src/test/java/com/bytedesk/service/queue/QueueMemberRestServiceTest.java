@@ -181,6 +181,7 @@ class QueueMemberRestServiceTest {
         @Test
         void enqueueMonotonicallyIncrementsQueueNumberAfterCollisions() {
                 QueueEntity workgroupQueue = buildQueue("queue-wg");
+                QueueEntity robotQueue = buildQueue("queue-robot");
                 ThreadEntity thread = buildThread("thread-wg");
                 DataIntegrityViolationException collision = new DataIntegrityViolationException(
                                 "duplicate key value violates unique constraint UK7aviqofcxw7ae3fped747qrl7");
@@ -189,6 +190,7 @@ class QueueMemberRestServiceTest {
                 when(queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusInForUpdate(eq("thread-wg"),
                                 anyList())).thenReturn(Optional.empty());
                 when(queueMemberRepository.findMaxQueueNumberForQueue(eq(workgroupQueue), anyString())).thenReturn(30);
+                when(queueMemberRepository.findMaxQueueNumberForQueue(eq(robotQueue), anyString())).thenReturn(30);
 
                 AtomicInteger attempts = new AtomicInteger();
                 when(queueMemberRepository.save(any())).thenAnswer(invocation -> {
@@ -201,7 +203,10 @@ class QueueMemberRestServiceTest {
                 when(uidUtils.getUid()).thenReturn("member-31", "member-32", "member-33");
 
                 QueueMemberEntity result = queueMemberRestService.enqueue(thread, workgroupQueue, QueueTypeEnum.WORKGROUP,
-                                member -> member.setWorkgroupQueue(workgroupQueue));
+                                member -> {
+                                        member.setWorkgroupQueue(workgroupQueue);
+                                        member.setRobotQueue(robotQueue);
+                                });
 
                 assertThat(result.getQueueNumber()).isEqualTo(33);
 
@@ -210,6 +215,29 @@ class QueueMemberRestServiceTest {
                 assertThat(captor.getAllValues().stream().map(QueueMemberEntity::getQueueNumber).toList())
                                 .containsExactly(31, 32, 33);
                 verify(queueMemberRepository, times(1)).findMaxQueueNumberForQueue(eq(workgroupQueue), anyString());
+        }
+
+        @Test
+        void enqueueWorkgroupSeedsFromHighestAssociatedQueue() {
+                QueueEntity workgroupQueue = buildQueue("queue-wg-high");
+                QueueEntity robotQueue = buildQueue("queue-robot-high");
+                ThreadEntity thread = buildThread("thread-wg-high");
+
+                when(queueMemberRepository.findIdleBefore(any())).thenReturn(Collections.emptyList());
+                when(queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusInForUpdate(eq("thread-wg-high"),
+                                anyList())).thenReturn(Optional.empty());
+                when(queueMemberRepository.findMaxQueueNumberForQueue(eq(workgroupQueue), eq("WORKGROUP"))).thenReturn(30);
+                when(queueMemberRepository.findMaxQueueNumberForQueue(eq(robotQueue), eq("ROBOT"))).thenReturn(75);
+                when(queueMemberRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+                when(uidUtils.getUid()).thenReturn("member-seed");
+
+                QueueMemberEntity result = queueMemberRestService.enqueue(thread, workgroupQueue, QueueTypeEnum.WORKGROUP,
+                                member -> {
+                                        member.setWorkgroupQueue(workgroupQueue);
+                                        member.setRobotQueue(robotQueue);
+                                });
+
+                assertThat(result.getQueueNumber()).isEqualTo(76);
         }
 
         private QueueEntity buildQueue(String uid) {
