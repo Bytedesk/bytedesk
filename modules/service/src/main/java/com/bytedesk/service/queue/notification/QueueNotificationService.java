@@ -26,6 +26,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
@@ -39,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueNotificationService {
 
     private final QueueNotificationBuilder queueNotificationBuilder;
-    private final ObjectProvider<com.bytedesk.service.queue_member.QueueMemberRestService> queueMemberRestServiceProvider;
+    private final ObjectProvider<QueueMemberRestService> queueMemberRestServiceProvider;
     private final ThreadRestService threadRestService;
     private final AgentRestService agentRestService;
     private final IMessageSendService messageSendService;
