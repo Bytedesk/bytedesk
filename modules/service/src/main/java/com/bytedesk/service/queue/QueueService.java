@@ -57,12 +57,8 @@ public class QueueService {
 
     private final QueueNotificationService queueNotificationService;
 
-    private Optional<QueueMemberEntity> findQueueingMember(String threadUid) {
-        return queueMemberRestService.findByThreadUid(threadUid)
-            .filter(member -> {
-                ThreadEntity thread = member.getThread();
-                return thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus());
-            });
+    private Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
+        return queueMemberRestService.findByThreadUid(threadUid);
     }
 
     @Transactional
@@ -80,7 +76,7 @@ public class QueueService {
     public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity, AgentEntity agentEntity,
             VisitorRequest visitorRequest) {
         UserProtobuf agent = agentEntity.toUserProtobuf();
-        boolean alreadyQueued = findQueueingMember(threadEntity.getUid()).isPresent();
+        boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
         if (!alreadyQueued) {
             queueNotificationService.publishQueueJoinNotice(agentEntity, queueMemberEntity);
@@ -103,7 +99,7 @@ public class QueueService {
     @Transactional
     public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, UserProtobuf agent,
             WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-        boolean alreadyQueued = findQueueingMember(threadEntity.getUid()).isPresent();
+        boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
         return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
@@ -216,7 +212,7 @@ public class QueueService {
             WorkgroupEntity workgroupEntity, QueueTypeEnum queueType) {
         
         // 1. 检查是否已存在队列成员
-        Optional<QueueMemberEntity> memberOptional = findQueueingMember(threadEntity.getUid());
+        Optional<QueueMemberEntity> memberOptional = findByThreadUid(threadEntity.getUid());
         if (memberOptional.isPresent()) {
             return handleExistingMember(memberOptional.get(), agent, threadEntity, queueType);
         }

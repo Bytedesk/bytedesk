@@ -303,9 +303,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 决定路由方向：机器人 or 人工
         boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup);
-        log.info("路由决策结果 - 是否路由到机器人: {}, 强制转人工: {}, 工作组在线状态(presence): {}",
-                shouldUseRobot, visitorRequest.getForceAgent(), presenceFacadeService.isWorkgroupOnline(workgroup));
-
         if (shouldUseRobot) {
             log.info("路由到机器人处理");
             return routeToRobot(visitorRequest, thread, workgroup);
