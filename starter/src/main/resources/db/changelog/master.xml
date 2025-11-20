@@ -16,5 +16,6 @@
     <include file="db/changelog/migration/251111_alter_thread_content_to_text.xml" />
     <include file="db/changelog/migration/251117_rename_ticket_title_to_summary.xml" />
     <include file="db/changelog/migration/251120_queue_member_core_fields.xml" />
+    <include file="db/changelog/migration/251120_queue_settings_notice_batch_window.xml" />
 
 </databaseChangeLog>

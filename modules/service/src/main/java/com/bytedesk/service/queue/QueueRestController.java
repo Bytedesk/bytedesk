@@ -14,8 +14,14 @@
 package com.bytedesk.service.queue;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -24,8 +30,14 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.queue.dto.AgentQueueEnqueueRequest;
+import com.bytedesk.service.queue.dto.AgentQueueSnapshotResponse;
+import com.bytedesk.service.queue.exception.QueueFullException;
+import com.bytedesk.service.queue.exception.QueueMemberAlreadyExistsException;
+import com.bytedesk.service.queue_member.QueueMemberResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -138,6 +150,34 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         );
     }
 
+    @PostMapping("/agent/{agentUid}/members")
+    @Operation(summary = "加入客服排队", description = "为指定客服追加一个排队成员")
+    @ApiResponse(responseCode = "201", description = "入队成功",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = QueueMemberResponse.class)))
+    public ResponseEntity<?> enqueueAgentQueueMember(
+            @PathVariable String agentUid,
+            @Valid @RequestBody AgentQueueEnqueueRequest request) {
+        try {
+            QueueMemberResponse response = queueRestService.enqueueAgentQueueMember(agentUid, request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(JsonResult.success(response));
+        } catch (QueueMemberAlreadyExistsException | QueueFullException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(JsonResult.error(ex.getMessage(), HttpStatus.CONFLICT.value()));
+        }
+    }
+
+    @GetMapping("/agent/{agentUid}/members")
+    @Operation(summary = "获取客服排队列表", description = "按FIFO顺序返回指定客服的排队快照")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = AgentQueueSnapshotResponse.class)))
+    public ResponseEntity<?> listAgentQueueMembers(
+            @PathVariable String agentUid,
+            @PageableDefault(size = 50) Pageable pageable) {
+        AgentQueueSnapshotResponse snapshot = queueRestService.listAgentQueueMembers(agentUid, pageable);
+        return ResponseEntity.ok(JsonResult.success(snapshot));
+    }
     
 
     

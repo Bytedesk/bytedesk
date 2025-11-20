@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.ChannelEnum;
@@ -41,6 +42,7 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.queue.QueueAuditLogger;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueTypeEnum;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -59,6 +61,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
     private final ThreadRestService threadRestService;
     private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
+    private final QueueAuditLogger queueAuditLogger;
     
     /**
      * 访客主动退出排队：标记离开时间并软删除队列成员记录
@@ -100,8 +103,63 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusIn(threadUid, ACTIVE_STATUSES);
     }
 
+    public Optional<QueueMemberEntity> findActiveByThreadUidForUpdate(String threadUid) {
+        return queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusInForUpdate(threadUid, ACTIVE_STATUSES);
+    }
+
     public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
         return queueMemberRepository.findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(agentQueueUid, QueueMemberStatusEnum.QUEUING.name());
+    }
+
+    public Optional<QueueMemberEntity> findEarliestWorkgroupQueueMember(String workgroupQueueUid) {
+        return queueMemberRepository.findFirstByWorkgroupQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(workgroupQueueUid, QueueMemberStatusEnum.QUEUING.name());
+    }
+
+    public Optional<QueueMemberEntity> findEarliestRobotQueueMember(String robotQueueUid) {
+        return queueMemberRepository.findFirstByRobotQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(robotQueueUid, QueueMemberStatusEnum.QUEUING.name());
+    }
+
+    public Page<QueueMemberResponse> findAgentQueueMembers(String agentQueueUid, Pageable pageable) {
+        if (!StringUtils.hasText(agentQueueUid)) {
+            return Page.empty(pageable);
+        }
+        Page<QueueMemberEntity> page = queueMemberRepository
+                .findByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(agentQueueUid,
+                        QueueMemberStatusEnum.QUEUING.name(), pageable);
+        return page.map(ServiceConvertUtils::convertToQueueMemberResponse);
+    }
+
+    /**
+     * Remove stale queue members before enqueuing new visitors so queue numbers remain dense.
+     */
+    @Transactional
+    public int cleanupBeforeEnqueue() {
+        return cleanupIdleQueueMembers();
+    }
+
+    /**
+     * Centralized FIFO enqueue to guarantee tail placement and duplicate guard.
+     */
+    @Transactional
+    public QueueMemberEntity enqueue(ThreadEntity threadEntity, QueueEntity targetQueue, QueueTypeEnum queueType, java.util.function.Consumer<QueueMemberEntity> enrich) {
+        cleanupBeforeEnqueue();
+
+        Optional<QueueMemberEntity> existing = findActiveByThreadUidForUpdate(threadEntity.getUid());
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        int nextNumber = nextQueueNumber(targetQueue, queueType);
+        QueueMemberEntity member = QueueMemberEntity.builder()
+            .uid(uidUtils.getUid())
+            .thread(threadEntity)
+            .queueNumber(nextNumber)
+            .orgUid(threadEntity.getOrgUid())
+            .build();
+        enrich.accept(member);
+        QueueMemberEntity savedMember = save(member);
+        queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
+        return savedMember;
     }
 
     @Transactional

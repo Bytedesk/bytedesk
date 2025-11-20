@@ -157,4 +157,17 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private AgentStatusSettingEntity draftAgentStatusSettings;
+
+    /**
+     * Convenience accessor so queue notice batching is surfaced even when agent settings are shared.
+     */
+    public int resolveQueueNoticeBatchWindowMs() {
+        if (queueSettings != null && queueSettings.getQueueNoticeBatchWindowMs() != null) {
+            return queueSettings.getQueueNoticeBatchWindowMs();
+        }
+        if (draftQueueSettings != null && draftQueueSettings.getQueueNoticeBatchWindowMs() != null) {
+            return draftQueueSettings.getQueueNoticeBatchWindowMs();
+        }
+        return QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
+    }
 }

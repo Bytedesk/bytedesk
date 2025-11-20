@@ -17,6 +17,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
@@ -62,7 +64,17 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
 
     Optional<QueueMemberEntity> findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String agentQueueUid, String status);
 
+    Optional<QueueMemberEntity> findFirstByWorkgroupQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String workgroupQueueUid, String status);
+
+    Optional<QueueMemberEntity> findFirstByRobotQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String robotQueueUid, String status);
+
+    Page<QueueMemberEntity> findByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String agentQueueUid, String status, Pageable pageable);
+
     Optional<QueueMemberEntity> findFirstByThreadUidAndDeletedFalseAndStatusIn(String threadUid, List<String> statuses);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid AND qm.deleted = false AND qm.status IN :statuses")
+    Optional<QueueMemberEntity> findFirstByThreadUidAndDeletedFalseAndStatusInForUpdate(@Param("threadUid") String threadUid, @Param("statuses") List<String> statuses);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT COALESCE(MAX(qm.queueNumber), 0) FROM QueueMemberEntity qm WHERE qm.deleted = false AND ((:queueType = 'AGENT' AND qm.agentQueue = :queue) OR (:queueType = 'WORKGROUP' AND qm.workgroupQueue = :queue) OR (:queueType = 'ROBOT' AND qm.robotQueue = :queue))")

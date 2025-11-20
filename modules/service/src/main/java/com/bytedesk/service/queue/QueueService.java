@@ -12,7 +12,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
-import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
@@ -31,8 +30,6 @@ public class QueueService {
     private final QueueMemberRestService queueMemberRestService;
 
     private final QueueRestService queueRestService;
-
-    private final UidUtils uidUtils;
 
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
@@ -63,7 +60,7 @@ public class QueueService {
             WorkgroupEntity workgroupEntity, QueueTypeEnum queueType) {
         
         // 1. 检查是否已存在队列成员
-        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid());
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findActiveByThreadUidForUpdate(threadEntity.getUid());
         if (memberOptional.isPresent()) {
             return handleExistingMember(memberOptional.get(), agent, threadEntity, queueType);
         }
@@ -101,7 +98,7 @@ public class QueueService {
         
         QueueEntity primaryQueue;
         String nickname;
-        
+
         switch (queueType) {
             case ROBOT:
             case AGENT:
@@ -117,44 +114,32 @@ public class QueueService {
             default:
                 throw new IllegalArgumentException("Unsupported queue type: " + queueType);
         }
-        
+
         validateQueue(primaryQueue, "Queue is full or not active");
 
-        int nextQueueNumber = queueMemberRestService.nextQueueNumber(primaryQueue, queueType);
-
-        // 创建队列成员
-        var memberBuilder = QueueMemberEntity.builder()
-            .uid(uidUtils.getUid())
-            .thread(threadEntity)
-            .queueNumber(nextQueueNumber)
-            .joinedAt(BdDateUtils.now())
-            .orgUid(threadEntity.getOrgUid());
-        
-        // 根据队列类型设置相应的队列
-        switch (queueType) {
-            case ROBOT:
-            case WORKFLOW:
-            case UNIFIED:
-                memberBuilder.robotQueue(primaryQueue);
-                break;
-            case AGENT:
-                memberBuilder.agentQueue(primaryQueue);
-                break;
-            case WORKGROUP:
-                memberBuilder.workgroupQueue(primaryQueue);
-                // 同时设置 agent/robot 队列
-                QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
-                validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
-                
-                if (agent.getType().equals(ThreadTypeEnum.AGENT.name())) {
-                    memberBuilder.agentQueue(agentOrRobotQueue);
-                } else {
-                    memberBuilder.robotQueue(agentOrRobotQueue);
-                }
-                break;
-        }
-        
-        return saveQueueMember(memberBuilder.build());
+        return queueMemberRestService.enqueue(threadEntity, primaryQueue, queueType, member -> {
+            member.setJoinedAt(BdDateUtils.now());
+            switch (queueType) {
+                case ROBOT:
+                case WORKFLOW:
+                case UNIFIED:
+                    member.setRobotQueue(primaryQueue);
+                    break;
+                case AGENT:
+                    member.setAgentQueue(primaryQueue);
+                    break;
+                case WORKGROUP:
+                    member.setWorkgroupQueue(primaryQueue);
+                    QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
+                    validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
+                    if (agent.getType().equals(ThreadTypeEnum.AGENT.name())) {
+                        member.setAgentQueue(agentOrRobotQueue);
+                    } else {
+                        member.setRobotQueue(agentOrRobotQueue);
+                    }
+                    break;
+            }
+        });
     }
 
     /**

@@ -22,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -59,11 +60,14 @@ public class QueueSettingsEntity extends BaseEntity {
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP;
 
+    public static final int DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS = 2000;
+
     /**
      * Batch window for queue notices, in milliseconds; keeps notices always on but rate-limited per agent.
      */
     @Builder.Default
-    private Integer queueNoticeBatchWindowMs = 2000;
+    @Column(name = "queue_notice_batch_window_ms")
+    private Integer queueNoticeBatchWindowMs = DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
     
     /**
      * 从 QueueSettingsRequest 创建 QueueSettings 实体
@@ -79,6 +83,13 @@ public class QueueSettingsEntity extends BaseEntity {
         }
         
         return modelMapper.map(request, QueueSettingsEntity.class);
+    }
+
+    /**
+     * Returns a non-null batch window ensuring downstream services can rely on a default cadence.
+     */
+    public int resolveQueueNoticeBatchWindowMs() {
+        return queueNoticeBatchWindowMs != null ? queueNoticeBatchWindowMs : DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
     }
     
 }

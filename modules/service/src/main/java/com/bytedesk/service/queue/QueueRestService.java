@@ -13,6 +13,8 @@
  */
 package com.bytedesk.service.queue;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,18 +28,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.context.annotation.Description;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.queue.dto.AgentQueueEnqueueRequest;
+import com.bytedesk.service.queue.dto.AgentQueueSnapshotResponse;
+import com.bytedesk.service.queue.exception.QueueFullException;
+import com.bytedesk.service.queue.exception.QueueMemberAlreadyExistsException;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue_member.QueueMemberResponse;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
@@ -64,6 +77,10 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
     private final AgentRestService agentRestService;
 
     private final WorkgroupRepository workgroupRepository;
+
+    private final QueueMemberRestService queueMemberRestService;
+
+    private final QueueService queueService;
 
     @Override
     protected Specification<QueueEntity> createSpecification(QueueRequest request) {
@@ -233,5 +250,55 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         // queueExcel.setStatus(QueueStatusEnum.getChineseNameByString(statusStr));
         
         return queueExcel;
+    }
+
+    public QueueMemberResponse enqueueAgentQueueMember(String agentUid, AgentQueueEnqueueRequest request) {
+        AgentEntity agent = requireAgent(agentUid);
+        ThreadEntity thread = requireThread(request.getThreadUid());
+        ensureSameOrg(agent, thread);
+
+        queueMemberRestService.findActiveByThreadUid(thread.getUid()).ifPresent(existing -> {
+            throw new QueueMemberAlreadyExistsException("Thread " + thread.getUid() + " already queued");
+        });
+
+        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent.toUserProtobuf(), request.getVisitor());
+        return queueMemberRestService.convertToResponse(queueMemberEntity);
+    }
+
+    public AgentQueueSnapshotResponse listAgentQueueMembers(String agentUid, Pageable pageable) {
+        requireAgent(agentUid);
+        Optional<QueueEntity> queueOptional = findTodayAgentQueue(agentUid);
+        if (!queueOptional.isPresent()) {
+            return AgentQueueSnapshotResponse.empty(pageable);
+        }
+        Page<QueueMemberResponse> membersPage = queueMemberRestService
+                .findAgentQueueMembers(queueOptional.get().getUid(), pageable);
+        return AgentQueueSnapshotResponse.from(membersPage);
+    }
+
+    private Optional<QueueEntity> findTodayAgentQueue(String agentUid) {
+        String queueTopic = TopicUtils.getQueueTopicFromUid(agentUid);
+        String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        return findLatestByQueueTopicAndDay(queueTopic, today);
+    }
+
+    private AgentEntity requireAgent(String agentUid) {
+        return agentRestService.findByUid(agentUid)
+                .orElseThrow(() -> new NotFoundException("Agent " + agentUid + " not found"));
+    }
+
+    private ThreadEntity requireThread(String threadUid) {
+        Assert.hasText(threadUid, "threadUid must not be blank");
+        return threadRestService.findByUid(threadUid)
+                .orElseThrow(() -> new NotFoundException("Thread " + threadUid + " not found"));
+    }
+
+    private void ensureSameOrg(AgentEntity agent, ThreadEntity thread) {
+        if (agent.getOrgUid() == null || thread.getOrgUid() == null) {
+            return;
+        }
+        if (!agent.getOrgUid().equals(thread.getOrgUid())) {
+            throw new QueueFullException("Agent and thread must belong to the same organization");
+        }
     }
 }
