@@ -13,42 +13,29 @@
  */
 package com.bytedesk.service.queue_member;
 
-// /**
-//  * 队列成员状态枚举
-//  */
-// public enum QueueMemberStatusEnum {
-    
-//     WAITING("waiting"),         // 等待中
-//     SERVING("serving"),         // 正在服务
-//     COMPLETED("completed"),     // 已完成
-//     ABANDONED("abandoned"),     // 已放弃
-//     TIMEOUT("timeout"),         // 已超时
-//     REJECTED("rejected");       // 已拒绝(无可用客服)
-    
-//     private final String value;
-    
-//     QueueMemberStatusEnum(String value) {
-//         this.value = value;
-//     }
-    
-//     public String getValue() {
-//         return value;
-//     }
-    
-//     /**
-//      * 检查是否是结束状态
-//      */
-//     public Boolean isEndStatus() {
-//         return this == COMPLETED || this == ABANDONED || 
-//                this == TIMEOUT || this == REJECTED;
-//     }
-    
-//     public static QueueMemberStatusEnum fromValue(String value) {
-//         for (QueueMemberStatusEnum status : QueueMemberStatusEnum.values()) {
-//             if (status.value.equals(value)) {
-//                 return status;
-//             }
-//         }
-//         throw new IllegalArgumentException("Invalid member status: " + value);
-//     }
-// } 
+/**
+ * 队列成员状态枚举
+ */
+public enum QueueMemberStatusEnum {
+
+	QUEUING,
+	ASSIGNED,
+	TIMEOUT,
+	CANCELLED;
+
+	/**
+	 * 是否处于终止状态
+	 */
+	public boolean isTerminal() {
+		return this == ASSIGNED || this == TIMEOUT || this == CANCELLED;
+	}
+
+	public static QueueMemberStatusEnum fromValue(String value) {
+		for (QueueMemberStatusEnum status : QueueMemberStatusEnum.values()) {
+			if (status.name().equalsIgnoreCase(value)) {
+				return status;
+			}
+		}
+		throw new IllegalArgumentException("Invalid queue member status: " + value);
+	}
+} 

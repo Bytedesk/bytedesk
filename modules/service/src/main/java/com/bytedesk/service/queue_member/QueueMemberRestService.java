@@ -14,6 +14,8 @@
 package com.bytedesk.service.queue_member;
 
 import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.ChannelEnum;
@@ -38,6 +41,8 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.queue.QueueEntity;
+import com.bytedesk.service.queue.QueueTypeEnum;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -53,6 +58,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final UidUtils uidUtils;
     private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
     private final ThreadRestService threadRestService;
+    private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
     
     /**
      * 访客主动退出排队：标记离开时间并软删除队列成员记录
@@ -65,6 +71,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         QueueMemberEntity entity = optional.get();
         entity.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
         entity.setDeleted(true);
+        entity.setStatus(QueueMemberStatusEnum.CANCELLED.name());
         save(entity);
     }
 
@@ -77,14 +84,38 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         int removed = 0;
         for (QueueMemberEntity qm : idleList) {
             // 只处理仍处于排队状态的线程
-            if (qm.getThread() != null && qm.getThread().isQueuing()) {
+            if (qm.getThread() != null && qm.getThread().isQueuing()
+                    && QueueMemberStatusEnum.QUEUING.name().equals(qm.getStatus())) {
                 qm.setDeleted(true);
                 qm.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
+                qm.setStatus(QueueMemberStatusEnum.TIMEOUT.name());
                 save(qm);
                 removed++;
             }
         }
         return removed;
+    }
+
+    public Optional<QueueMemberEntity> findActiveByThreadUid(String threadUid) {
+        return queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusIn(threadUid, ACTIVE_STATUSES);
+    }
+
+    public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
+        return queueMemberRepository.findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(agentQueueUid, QueueMemberStatusEnum.QUEUING.name());
+    }
+
+    @Transactional
+    public int nextQueueNumber(QueueEntity queue, QueueTypeEnum queueType) {
+        if (queue == null) {
+            return 1;
+        }
+        String queueTypeKey = switch (queueType) {
+            case WORKGROUP -> "WORKGROUP";
+            case AGENT -> "AGENT";
+            default -> "ROBOT";
+        };
+        Integer currentMax = queueMemberRepository.findMaxQueueNumberForQueue(queue, queueTypeKey);
+        return (currentMax == null ? 0 : currentMax) + 1;
     }
     
     @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")

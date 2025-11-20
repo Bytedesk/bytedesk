@@ -59,7 +59,9 @@ public class QueueMemberResponse extends BaseResponse {
      * 统计访客消息总数
      */
     @Builder.Default
-    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
+    private ZonedDateTime joinedAt = BdDateUtils.now();  // 加入时间
+
+    private ZonedDateTime lastNotifiedAt; // 最近一次通知时间
 
     private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
@@ -72,6 +74,9 @@ public class QueueMemberResponse extends BaseResponse {
 
     @Builder.Default
     private Integer visitorPriority = 0;  // 优先级(0-100)
+
+    @Builder.Default
+    private String status = QueueMemberStatusEnum.QUEUING.name();
 
     /**
      * 客服消息统计：
@@ -236,8 +241,20 @@ public class QueueMemberResponse extends BaseResponse {
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
     // ZonedDateTime 字段的格式化 getter 方法
-    public String getVisitorEnqueueAt() {
-        return BdDateUtils.formatDatetimeToString(visitorEnqueueAt);
+    public String getJoinedAt() {
+        return BdDateUtils.formatDatetimeToString(joinedAt);
+    }
+
+    // /**
+    //  * @deprecated 请改用 {@link #getJoinedAt()}
+    //  */
+    // @Deprecated
+    // public String getVisitorEnqueueAt() {
+    //     return getJoinedAt();
+    // }
+
+    public String getLastNotifiedAt() {
+        return BdDateUtils.formatDatetimeToString(lastNotifiedAt);
     }
 
     public String getVisitorFirstMessageAt() {

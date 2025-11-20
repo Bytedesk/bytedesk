@@ -84,15 +84,21 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     private Integer queueNumber = 0;  // 排队号码
 
+    @Builder.Default
+    @Column(name = "visitor_enqueue_at")
+    private ZonedDateTime joinedAt = BdDateUtils.now();  // 加入时间
+
+    private ZonedDateTime lastNotifiedAt; // 最近一次通知时间
+
+    @Builder.Default
+    private String status = QueueMemberStatusEnum.QUEUING.name();
+
     /**
      * 访客消息统计：
      * 记录第一条访客消息的时间
      * 更新最后一条访客消息的时间
      * 统计访客消息总数
      */
-    @Builder.Default
-    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
-
     private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
     private ZonedDateTime visitorLastMessageAt;  // 访客最后发送消息时间
@@ -290,14 +296,14 @@ public class QueueMemberEntity extends BaseEntity {
      * 计算等待时间(秒)
      */
     public long getWaitLength() {
-        if (visitorEnqueueAt == null) return 0;
+        if (joinedAt == null) return 0;
         if (thread.isOffline() || agentOffline) return 0;
         // 首先判断robotAcceptTime是否为空，如果不为空，则使用robotAcceptTime作为结束时间
         if (robotAcceptedAt != null) {
-            return Duration.between(visitorEnqueueAt, robotAcceptedAt).getSeconds();
+            return Duration.between(joinedAt, robotAcceptedAt).getSeconds();
         }
         ZonedDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : BdDateUtils.now();
-        return Duration.between(visitorEnqueueAt, endWaitLength).getSeconds();
+        return Duration.between(joinedAt, endWaitLength).getSeconds();
     }
 
     public void manualAcceptThread() {

@@ -63,7 +63,7 @@ public class QueueService {
             WorkgroupEntity workgroupEntity, QueueTypeEnum queueType) {
         
         // 1. 检查是否已存在队列成员
-        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadEntity.getUid());
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid());
         if (memberOptional.isPresent()) {
             return handleExistingMember(memberOptional.get(), agent, threadEntity, queueType);
         }
@@ -119,13 +119,15 @@ public class QueueService {
         }
         
         validateQueue(primaryQueue, "Queue is full or not active");
-        
+
+        int nextQueueNumber = queueMemberRestService.nextQueueNumber(primaryQueue, queueType);
+
         // 创建队列成员
         var memberBuilder = QueueMemberEntity.builder()
             .uid(uidUtils.getUid())
             .thread(threadEntity)
-            .queueNumber(primaryQueue.getNextNumber())
-            .visitorEnqueueAt(BdDateUtils.now())
+            .queueNumber(nextQueueNumber)
+            .joinedAt(BdDateUtils.now())
             .orgUid(threadEntity.getOrgUid());
         
         // 根据队列类型设置相应的队列

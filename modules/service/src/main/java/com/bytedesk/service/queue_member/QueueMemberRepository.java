@@ -13,14 +13,19 @@
  */
 package com.bytedesk.service.queue_member;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.time.ZonedDateTime;
+
+import com.bytedesk.service.queue.QueueEntity;
+
+import jakarta.persistence.LockModeType;
 
 public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, Long>, JpaSpecificationExecutor<QueueMemberEntity> {
 
@@ -30,7 +35,7 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     
     List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndAgentAcceptType(String orgUid, ZonedDateTime startTime, ZonedDateTime endTime, String acceptType);
     // 修改查询方法，使用 JPQL 通过关联的 Thread 实体的 uid 字段查询
-    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid")
+    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid AND qm.deleted = false")
     Optional<QueueMemberEntity> findByThreadUid(@Param("threadUid") String threadUid);
 
     // 统计指定组织在指定日期范围内的会话总数
@@ -52,7 +57,15 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     /**
      * 查找在指定时间之前仍未发送任何访客消息(visitorMessageCount=0)的排队成员
      */
-    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.visitorMessageCount = 0 AND qm.deleted = false AND qm.visitorEnqueueAt < :threshold")
+    @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.visitorMessageCount = 0 AND qm.deleted = false AND qm.joinedAt < :threshold")
     List<QueueMemberEntity> findIdleBefore(@Param("threshold") ZonedDateTime threshold);
+
+    Optional<QueueMemberEntity> findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String agentQueueUid, String status);
+
+    Optional<QueueMemberEntity> findFirstByThreadUidAndDeletedFalseAndStatusIn(String threadUid, List<String> statuses);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT COALESCE(MAX(qm.queueNumber), 0) FROM QueueMemberEntity qm WHERE qm.deleted = false AND ((:queueType = 'AGENT' AND qm.agentQueue = :queue) OR (:queueType = 'WORKGROUP' AND qm.workgroupQueue = :queue) OR (:queueType = 'ROBOT' AND qm.robotQueue = :queue))")
+    Integer findMaxQueueNumberForQueue(@Param("queue") QueueEntity queue, @Param("queueType") String queueType);
 
 }

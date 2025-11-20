@@ -62,7 +62,9 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer queueNumber = 0;  // 排队号码
 
     @Builder.Default
-    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
+    private ZonedDateTime joinedAt = BdDateUtils.now();  // 加入时间
+
+    private ZonedDateTime lastNotifiedAt; // 上次通知时间
 
     private ZonedDateTime visitorFirstMessageAt;  // 访客首次发送消息时间
 
@@ -111,6 +113,9 @@ public class QueueMemberRequest extends BaseRequest {
 
     @Builder.Default
     private Integer visitorPriority = 0;  // 优先级(0-100)
+
+    @Builder.Default
+    private String status = QueueMemberStatusEnum.QUEUING.name();
 
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价
@@ -186,4 +191,20 @@ public class QueueMemberRequest extends BaseRequest {
     private String startDate;
 
     private String endDate;
+
+    // /**
+    //  * @deprecated 请改用 joinedAt
+    //  */
+    // @Deprecated
+    // public ZonedDateTime getVisitorEnqueueAt() {
+    //     return joinedAt;
+    // }
+
+    // /**
+    //  * @deprecated 请改用 joinedAt
+    //  */
+    // @Deprecated
+    // public void setVisitorEnqueueAt(ZonedDateTime visitorEnqueueAt) {
+    //     this.joinedAt = visitorEnqueueAt;
+    // }
 }
