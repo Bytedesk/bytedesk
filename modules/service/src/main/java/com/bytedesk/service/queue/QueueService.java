@@ -64,20 +64,35 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
+    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity,
+            VisitorRequest visitorRequest) {
+        return enqueueAgentWithResult(threadEntity, agentEntity, visitorRequest).queueMember();
+    }
+
+    @Transactional
+    public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity, AgentEntity agentEntity,
+            VisitorRequest visitorRequest) {
         UserProtobuf agent = agentEntity.toUserProtobuf();
         boolean alreadyQueued = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
         if (!alreadyQueued) {
             queueNotificationService.publishQueueJoinNotice(agentEntity, queueMemberEntity);
         }
-        return queueMemberEntity;
+        return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
 
     @Transactional
     public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, UserProtobuf agent, 
         WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-        return enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
+        return enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest).queueMember();
+    }
+
+    @Transactional
+    public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, UserProtobuf agent,
+            WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+        boolean alreadyQueued = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid()).isPresent();
+        QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
+        return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
 
     @Transactional
@@ -330,6 +345,8 @@ public class QueueService {
         String queueTopic = TopicUtils.getQueueTopicFromUid(user.getUid());
         return getOrCreateQueue(queueTopic, user.getNickname(), user.getType(), orgUid);
     }
+
+    public record QueueEnqueueResult(QueueMemberEntity queueMember, boolean alreadyQueued) { }
 
     public record QueueAssignmentResult(String agentUid, String threadUid, String queueMemberUid) { }
 

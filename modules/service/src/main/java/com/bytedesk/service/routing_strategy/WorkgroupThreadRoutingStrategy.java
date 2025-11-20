@@ -406,8 +406,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             log.debug("使用离线留言接待客服 - agentUid: {}", messageLeaveAgent.getUid());
             // 加入队列（用于统计和管理）
             UserProtobuf agent = messageLeaveAgent.toUserProtobuf();
-            QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup,
-                    visitorRequest);
+                QueueMemberEntity queueMemberEntity = queueService
+                    .enqueueWorkgroupWithResult(thread, agent, workgroup, visitorRequest)
+                    .queueMember();
 
             // 直接返回离线留言消息
             return getOfflineMessage(visitorRequest, thread, messageLeaveAgent, workgroup, queueMemberEntity);
@@ -423,7 +424,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         log.debug("开始将线程加入工作组队列");
         long enqueueStartTime = System.currentTimeMillis();
         UserProtobuf agent = agentEntity.toUserProtobuf();
-        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, agent, workgroup, visitorRequest);
+        QueueService.QueueEnqueueResult enqueueResult = queueService
+            .enqueueWorkgroupWithResult(thread, agent, workgroup, visitorRequest);
+        QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
         log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
 
         // 处理强制转人工
@@ -634,8 +637,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 加入队列
         UserProtobuf robotProtobuf = robotEntity.toUserProtobuf();
-        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, robotProtobuf, workgroup,
-                visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService
+            .enqueueWorkgroupWithResult(thread, robotProtobuf, workgroup, visitorRequest)
+            .queueMember();
         log.info("Robot enqueued to queue: {}", queueMemberEntity.getUid());
 
         // 设置机器人接待状态
