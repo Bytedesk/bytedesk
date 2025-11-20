@@ -1,10 +1,21 @@
 package com.bytedesk.service.queue.notification;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.beans.factory.ObjectProvider;
 
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -15,10 +26,10 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
-import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,20 +39,28 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueNotificationService {
 
     private final QueueNotificationBuilder queueNotificationBuilder;
-    private final QueueMemberRestService queueMemberRestService;
+    private final ObjectProvider<com.bytedesk.service.queue_member.QueueMemberRestService> queueMemberRestServiceProvider;
     private final ThreadRestService threadRestService;
     private final AgentRestService agentRestService;
     private final IMessageSendService messageSendService;
+
+    private final Map<String, PendingBatch> pendingBatches = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService batchingExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread thread = new Thread(r, "queue-notice-batcher");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     public void publishQueueJoinNotice(AgentEntity agent, QueueMemberEntity queueMemberEntity) {
         if (agent == null || queueMemberEntity == null) {
             return;
         }
         try {
-            ThreadEntity agentQueueThread = resolveAgentQueueThread(agent);
             QueueNotificationPayload payload = queueNotificationBuilder
                     .buildJoinNotice(queueMemberEntity, agent.getUid());
-            dispatch(agentQueueThread, payload);
+            QueueNotificationPayload.QueueNotificationSnapshot snapshot = queueNotificationBuilder
+                    .buildSnapshot(queueMemberEntity);
+            bufferAndSchedule(agent, payload, snapshot);
         } catch (Exception ex) {
             log.warn("Failed to publish queue notice for agent {} member {}: {}", agent.getUid(),
                     queueMemberEntity.getUid(), ex.getMessage(), ex);
@@ -81,7 +100,7 @@ public class QueueNotificationService {
     }
 
     private ThreadEntity resolveAgentQueueThread(AgentEntity agent) {
-        String threadUid = queueMemberRestService.ensureAgentQueueThreadUid(agent);
+        String threadUid = queueMemberRestService().ensureAgentQueueThreadUid(agent);
         return threadRestService.findByUid(threadUid)
                 .orElseThrow(() -> new NotFoundException("Agent queue thread not found: " + threadUid));
     }
@@ -89,6 +108,75 @@ public class QueueNotificationService {
     private void dispatch(ThreadEntity thread, QueueNotificationPayload payload) {
         MessageProtobuf message = ThreadMessageUtil.getAgentQueueNoticeMessage(payload, thread);
         messageSendService.sendProtobufMessage(message);
+    }
+
+    private void bufferAndSchedule(AgentEntity agent, QueueNotificationPayload payload,
+            QueueNotificationPayload.QueueNotificationSnapshot snapshot) {
+        if (agent == null || payload == null) {
+            return;
+        }
+        String agentUid = agent.getUid();
+        PendingBatch batch = pendingBatches.computeIfAbsent(agentUid, PendingBatch::new);
+        batch.addEvent(payload, snapshot);
+        scheduleFlush(agentUid, agent.resolveQueueNoticeBatchWindowMs());
+    }
+
+    private void scheduleFlush(String agentUid, int batchWindowMs) {
+        PendingBatch batch = pendingBatches.get(agentUid);
+        if (batch == null) {
+            return;
+        }
+        if (batchWindowMs <= 0) {
+            try {
+                batchingExecutor.execute(() -> flushBatch(agentUid));
+            } catch (RejectedExecutionException ex) {
+                log.warn("Skip scheduling immediate queue batch for agent {}: {}", agentUid, ex.getMessage());
+            }
+            return;
+        }
+        synchronized (batch) {
+            if (batch.hasScheduledTask()) {
+                return;
+            }
+            try {
+                ScheduledFuture<?> future = batchingExecutor.schedule(() -> flushBatch(agentUid), batchWindowMs,
+                        TimeUnit.MILLISECONDS);
+                batch.setScheduledTask(future);
+            } catch (RejectedExecutionException ex) {
+                log.warn("Skip scheduling queue batch for agent {}: {}", agentUid, ex.getMessage());
+            }
+        }
+    }
+
+    private void flushBatch(String agentUid) {
+        PendingBatch batch = pendingBatches.remove(agentUid);
+        if (batch == null) {
+            return;
+        }
+        List<QueueNotificationPayload.QueueNotificationSnapshot> snapshots = batch.snapshotValues();
+        List<QueueNotificationPayload> events = batch.drainEvents();
+        if (events.isEmpty()) {
+            return;
+        }
+        try {
+            AgentEntity agent = agentRestService.findByUid(agentUid)
+                    .orElseThrow(() -> new NotFoundException("Agent " + agentUid + " not found"));
+            ThreadEntity agentQueueThread = resolveAgentQueueThread(agent);
+            QueueNotificationPayload payloadToSend;
+            if (events.size() == 1) {
+                payloadToSend = events.get(0);
+            } else {
+                payloadToSend = queueNotificationBuilder.buildBatchUpdate(agentUid, events, snapshots);
+            }
+            dispatch(agentQueueThread, payloadToSend);
+        } catch (Exception ex) {
+            log.warn("Failed to flush queue notice batch for agent {}: {}", agentUid, ex.getMessage(), ex);
+        }
+    }
+
+    @PreDestroy
+    public void shutdownBatchingExecutor() {
+        batchingExecutor.shutdownNow();
     }
 
     private void publishMemberDelta(QueueMemberEntity member,
@@ -105,9 +193,9 @@ public class QueueNotificationService {
         try {
             AgentEntity agent = agentRestService.findByUid(agentUid)
                     .orElseThrow(() -> new NotFoundException("Agent " + agentUid + " not found"));
-            ThreadEntity agentQueueThread = resolveAgentQueueThread(agent);
             QueueNotificationPayload payload = payloadBuilder.apply(member, agentUid);
-            dispatch(agentQueueThread, payload);
+            QueueNotificationPayload.QueueNotificationSnapshot snapshot = queueNotificationBuilder.buildSnapshot(member);
+            bufferAndSchedule(agent, payload, snapshot);
         } catch (Exception ex) {
             log.warn("Failed to publish queue {} notice for member {} (agent {}): {}", context,
                     member.getUid(), agentUid, ex.getMessage(), ex);
@@ -141,5 +229,47 @@ public class QueueNotificationService {
         }
         int idx = topic.lastIndexOf('/');
         return idx >= 0 ? topic.substring(idx + 1) : topic;
+    }
+
+    private com.bytedesk.service.queue_member.QueueMemberRestService queueMemberRestService() {
+        return queueMemberRestServiceProvider.getObject();
+    }
+
+    private static final class PendingBatch {
+        private final List<QueueNotificationPayload> events = new ArrayList<>();
+        private final Map<String, QueueNotificationPayload.QueueNotificationSnapshot> snapshotByMember = new LinkedHashMap<>();
+        private ScheduledFuture<?> scheduledTask;
+
+        private PendingBatch(String agentUid) {
+            // agentUid reserved for logging/debug hooks if needed later
+        }
+
+        private synchronized void addEvent(QueueNotificationPayload payload,
+                QueueNotificationPayload.QueueNotificationSnapshot snapshot) {
+            events.add(payload);
+            if (snapshot != null && StringUtils.hasText(snapshot.getQueueMemberUid())) {
+                snapshotByMember.put(snapshot.getQueueMemberUid(), snapshot);
+            }
+        }
+
+        private synchronized List<QueueNotificationPayload.QueueNotificationSnapshot> snapshotValues() {
+            return new ArrayList<>(snapshotByMember.values());
+        }
+
+        private synchronized List<QueueNotificationPayload> drainEvents() {
+            List<QueueNotificationPayload> copy = new ArrayList<>(events);
+            events.clear();
+            snapshotByMember.clear();
+            scheduledTask = null;
+            return copy;
+        }
+
+        private synchronized boolean hasScheduledTask() {
+            return scheduledTask != null && !scheduledTask.isDone();
+        }
+
+        private synchronized void setScheduledTask(ScheduledFuture<?> future) {
+            this.scheduledTask = future;
+        }
     }
 }

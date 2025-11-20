@@ -18,10 +18,11 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
-import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -162,6 +163,16 @@ public class AgentEntity extends BaseEntity {
             return this.settings.getTimeoutRemindTip();
         }
         return I18Consts.I18N_AGENT_TIMEOUT_TIP;
+    }
+
+    /**
+     * Resolve the per-agent queue notice batch window with a sane default when the agent lacks explicit queue settings.
+     */
+    public int resolveQueueNoticeBatchWindowMs() {
+        if (this.settings != null) {
+            return this.settings.resolveQueueNoticeBatchWindowMs();
+        }
+        return QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
     }
 
 }

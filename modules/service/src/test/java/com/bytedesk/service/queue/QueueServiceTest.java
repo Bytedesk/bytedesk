@@ -36,6 +36,7 @@ import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.queue.notification.QueueNotificationService;
 
 @ExtendWith(MockitoExtension.class)
 class QueueServiceTest {
@@ -55,11 +56,14 @@ class QueueServiceTest {
     @Mock
     private BytedeskEventPublisher bytedeskEventPublisher;
 
-        @Mock
-        private QueueRepository queueRepository;
+    @Mock
+    private QueueRepository queueRepository;
 
-        @Mock
-        private UidUtils uidUtils;
+    @Mock
+    private UidUtils uidUtils;
+
+    @Mock
+    private QueueNotificationService queueNotificationService;
 
     private QueueService queueService;
 
@@ -70,9 +74,10 @@ class QueueServiceTest {
                 agentRestService,
                 threadRestService,
                 queueMemberMessageService,
-                                bytedeskEventPublisher,
-                                queueRepository,
-                                uidUtils);
+                bytedeskEventPublisher,
+                queueRepository,
+                uidUtils,
+                queueNotificationService);
     }
 
     @Test
@@ -108,14 +113,17 @@ class QueueServiceTest {
         member.setOrgUid("org-1");
 
         when(agentRestService.findByUid("agent-1")).thenReturn(Optional.of(agent));
-        when(queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(eq("org/queue/agent-1"), anyString()))
+        when(queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(eq("org/queue/agent-1"),
+                anyString()))
                 .thenReturn(Optional.of(agentQueue));
         when(queueMemberRestService.findEarliestAgentQueueMemberForUpdate("queue-agent-1"))
                 .thenReturn(Optional.of(member));
         when(threadRestService.save(any(ThreadEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(queueMemberRestService.save(any(QueueMemberEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(queueMemberRestService.save(any(QueueMemberEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        Optional<QueueService.QueueAssignmentResult> resultOptional = queueService.assignNextAgentQueueMember("agent-1");
+        Optional<QueueService.QueueAssignmentResult> resultOptional = queueService
+                .assignNextAgentQueueMember("agent-1");
 
         assertThat(resultOptional).isPresent();
         QueueService.QueueAssignmentResult result = resultOptional.get();

@@ -397,6 +397,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             if (agent.getMember() != null) {
                 agent.getMember().getUser(); // 触发加载
             }
+            if (agent.getSettings() != null) {
+                agent.getSettings().getQueueSettings();
+                agent.getSettings().getDraftQueueSettings();
+            }
         });
         return agentOptional;
     }

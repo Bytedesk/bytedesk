@@ -1,14 +1,17 @@
 package com.bytedesk.service.queue.notification;
 
 import static com.bytedesk.service.queue.notification.QueueNotificationDelta.ASSIGNED;
+import static com.bytedesk.service.queue.notification.QueueNotificationDelta.BULK_CLEANUP;
 import static com.bytedesk.service.queue.notification.QueueNotificationDelta.JOINED;
 import static com.bytedesk.service.queue.notification.QueueNotificationDelta.LEFT;
 import static com.bytedesk.service.queue.notification.QueueNotificationDelta.TIMEOUT;
 import static com.bytedesk.service.queue.notification.QueueNotificationType.QUEUE_ACCEPT;
 import static com.bytedesk.service.queue.notification.QueueNotificationType.QUEUE_NOTICE;
 import static com.bytedesk.service.queue.notification.QueueNotificationType.QUEUE_TIMEOUT;
+import static com.bytedesk.service.queue.notification.QueueNotificationType.QUEUE_UPDATE;
 
 import java.time.Clock;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -51,6 +54,48 @@ public class QueueNotificationBuilder {
                 .delta(ASSIGNED)
                 .estimatedWaitMs(0L)
                 .position(null)
+                .build();
+    }
+
+    public QueueNotificationPayload buildBatchUpdate(String agentUid,
+            List<QueueNotificationPayload> events,
+            List<QueueNotificationPayload.QueueNotificationSnapshot> snapshots) {
+        if (events == null || events.isEmpty()) {
+            throw new IllegalArgumentException("events must not be empty");
+        }
+        QueueNotificationPayload anchor = events.get(events.size() - 1);
+        List<QueueNotificationPayload.QueueNotificationSnapshot> safeSnapshots =
+                (snapshots == null || snapshots.isEmpty()) ? null : snapshots;
+        return QueueNotificationPayload.builder()
+                .messageType(QUEUE_UPDATE)
+                .delta(BULK_CLEANUP)
+                .queueMemberUid(anchor.getQueueMemberUid())
+                .threadUid(anchor.getThreadUid())
+                .agentUid(StringUtils.hasText(anchor.getAgentUid()) ? anchor.getAgentUid() : agentUid)
+                .position(anchor.getPosition())
+                .queueSize(anchor.getQueueSize())
+                .estimatedWaitMs(anchor.getEstimatedWaitMs())
+                .snapshot(safeSnapshots)
+                .serverTimestamp(clock.millis())
+                .build();
+    }
+
+    public QueueNotificationPayload.QueueNotificationSnapshot buildSnapshot(QueueMemberEntity queueMember) {
+        if (queueMember == null) {
+            return null;
+        }
+        ThreadEntity thread = queueMember.getThread();
+        String displayName = null;
+        if (thread != null && StringUtils.hasText(thread.getUser())) {
+            UserProtobuf visitor = UserProtobuf.fromJson(thread.getUser());
+            if (visitor != null) {
+                displayName = visitor.getNickname();
+            }
+        }
+        return QueueNotificationPayload.QueueNotificationSnapshot.builder()
+                .queueMemberUid(queueMember.getUid())
+                .displayName(displayName)
+                .position(queueMember.getQueueNumber())
                 .build();
     }
 

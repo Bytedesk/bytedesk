@@ -41,6 +41,7 @@ import com.bytedesk.service.queue_member.QueueMemberResponse;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.utils.ServiceConvertUtils;
+import com.bytedesk.service.queue.notification.QueueNotificationService;
 
 @ExtendWith(MockitoExtension.class)
 class QueueMemberRestServiceTest {
@@ -57,6 +58,9 @@ class QueueMemberRestServiceTest {
         @Mock
         private QueueAuditLogger queueAuditLogger;
 
+        @Mock
+        private QueueNotificationService queueNotificationService;
+
     private ModelMapper modelMapper;
 
     private QueueMemberRestService queueMemberRestService;
@@ -69,7 +73,8 @@ class QueueMemberRestServiceTest {
                 modelMapper,
                 uidUtils,
                 threadRestService,
-                queueAuditLogger);
+                queueAuditLogger,
+                queueNotificationService);
     }
 
     @Test
