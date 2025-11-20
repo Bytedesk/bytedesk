@@ -62,7 +62,13 @@ public interface QueueMemberRepository extends JpaRepository<QueueMemberEntity, 
     @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.visitorMessageCount = 0 AND qm.deleted = false AND qm.joinedAt < :threshold")
     List<QueueMemberEntity> findIdleBefore(@Param("threshold") ZonedDateTime threshold);
 
-    Optional<QueueMemberEntity> findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String agentQueueUid, String status);
+        Optional<QueueMemberEntity> findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String agentQueueUid, String status);
+
+        @Lock(LockModeType.PESSIMISTIC_WRITE)
+        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false AND qm.status = :status ORDER BY qm.queueNumber ASC")
+        List<QueueMemberEntity> findAgentQueueHeadForUpdate(@Param("agentQueueUid") String agentQueueUid,
+            @Param("status") String status,
+            Pageable pageable);
 
     Optional<QueueMemberEntity> findFirstByWorkgroupQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String workgroupQueueUid, String status);
 

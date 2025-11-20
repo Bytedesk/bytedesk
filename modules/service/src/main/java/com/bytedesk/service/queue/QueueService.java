@@ -2,21 +2,33 @@ package com.bytedesk.service.queue;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.thread.event.ThreadAcceptEvent;
+import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.queue.exception.QueueFullException;
+import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
@@ -30,6 +42,14 @@ public class QueueService {
     private final QueueMemberRestService queueMemberRestService;
 
     private final QueueRestService queueRestService;
+
+    private final AgentRestService agentRestService;
+
+    private final ThreadRestService threadRestService;
+
+    private final QueueMemberMessageService queueMemberMessageService;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
@@ -45,6 +65,89 @@ public class QueueService {
     public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, UserProtobuf agent, 
         WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
         return enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
+    }
+
+    @Transactional
+    public Optional<QueueAssignmentResult> assignNextAgentQueueMember(String agentUid) {
+        if (!StringUtils.hasText(agentUid)) {
+            return Optional.empty();
+        }
+        Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+        if (!agentOptional.isPresent()) {
+            log.warn("Skip auto-assign: agent {} not found", agentUid);
+            return Optional.empty();
+        }
+        AgentEntity agent = agentOptional.get();
+        QueueEntity agentQueue = getAgentOrRobotQueue(agent.toUserProtobuf(), agent.getOrgUid());
+        if (agentQueue == null) {
+            return Optional.empty();
+        }
+        return assignNextAgentQueueMember(agent, agentQueue);
+    }
+
+    private Optional<QueueAssignmentResult> assignNextAgentQueueMember(AgentEntity agent, QueueEntity agentQueue) {
+        while (true) {
+            Optional<QueueMemberEntity> candidateOptional = queueMemberRestService
+                    .findEarliestAgentQueueMemberForUpdate(agentQueue.getUid());
+            if (!candidateOptional.isPresent()) {
+                return Optional.empty();
+            }
+            QueueMemberEntity member = candidateOptional.get();
+            ThreadEntity thread = member.getThread();
+            if (!QueueMemberStatusEnum.QUEUING.name().equals(member.getStatus())) {
+                cleanupQueueMember(member, "status=" + member.getStatus());
+                continue;
+            }
+            if (thread == null) {
+                cleanupQueueMember(member, "missing thread");
+                continue;
+            }
+            if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
+                cleanupQueueMember(member, "threadStatus=" + thread.getStatus());
+                continue;
+            }
+            ThreadEntity savedThread = finalizeThreadAssignment(agent, thread);
+            finalizeQueueMemberAssignment(member);
+            publishAssignmentEvents(savedThread);
+            log.info("Auto-assigned thread {} to agent {}", savedThread.getUid(), agent.getUid());
+            return Optional.of(new QueueAssignmentResult(agent.getUid(), savedThread.getUid(), member.getUid()));
+        }
+    }
+
+    private ThreadEntity finalizeThreadAssignment(AgentEntity agent, ThreadEntity thread) {
+        UserProtobuf agentProtobuf = agent.toUserProtobuf();
+        thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        thread.setAgent(agentProtobuf.toJson());
+        if (agent.getMember() != null && agent.getMember().getUser() != null) {
+            thread.setOwner(agent.getMember().getUser());
+        }
+        return threadRestService.save(thread);
+    }
+
+    private void finalizeQueueMemberAssignment(QueueMemberEntity member) {
+        member.setStatus(QueueMemberStatusEnum.ASSIGNED.name());
+        member.agentAutoAcceptThread();
+        QueueMemberEntity savedMember = queueMemberRestService.save(member);
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("agentAutoAcceptThread", true);
+        updates.put("status", savedMember.getStatus());
+        queueMemberMessageService.sendUpdateMessage(savedMember, updates);
+    }
+
+    private void cleanupQueueMember(QueueMemberEntity member, String reason) {
+        member.setStatus(QueueMemberStatusEnum.CANCELLED.name());
+        member.setDeleted(true);
+        queueMemberRestService.save(member);
+        log.debug("Cleaned queue member {} during auto-assign: {}", member.getUid(), reason);
+    }
+
+    private void publishAssignmentEvents(ThreadEntity thread) {
+        try {
+            bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, thread));
+            bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, thread));
+        } catch (Exception e) {
+            log.warn("Failed to publish auto-assign events for thread {}: {}", thread.getUid(), e.getMessage());
+        }
     }
 
     // @Transactional
@@ -222,5 +325,7 @@ public class QueueService {
         String queueTopic = TopicUtils.getQueueTopicFromUid(user.getUid());
         return getOrCreateQueue(queueTopic, user.getNickname(), user.getType(), orgUid);
     }
+
+    public record QueueAssignmentResult(String agentUid, String threadUid, String queueMemberUid) { }
 
 }

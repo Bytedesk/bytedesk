@@ -22,6 +22,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -109,6 +110,17 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
 
     public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
         return queueMemberRepository.findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(agentQueueUid, QueueMemberStatusEnum.QUEUING.name());
+    }
+
+    public Optional<QueueMemberEntity> findEarliestAgentQueueMemberForUpdate(String agentQueueUid) {
+        if (!StringUtils.hasText(agentQueueUid)) {
+            return Optional.empty();
+        }
+        List<QueueMemberEntity> members = queueMemberRepository.findAgentQueueHeadForUpdate(
+                agentQueueUid,
+                QueueMemberStatusEnum.QUEUING.name(),
+                PageRequest.of(0, 1));
+        return members.isEmpty() ? Optional.empty() : Optional.of(members.get(0));
     }
 
     public Optional<QueueMemberEntity> findEarliestWorkgroupQueueMember(String workgroupQueueUid) {

@@ -1,9 +1,12 @@
 package com.bytedesk.service.queue;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
 
 /**
  * Lightweight facade for scheduling automatic queue assignments. Real dequeue logic
@@ -13,7 +16,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
+@AllArgsConstructor
 public class QueueAutoAssignService {
+
+    private final QueueService queueService;
 
     /**
      * Signal that an agent has at least one free slot and we should try to pull
@@ -29,6 +35,19 @@ public class QueueAutoAssignService {
         int normalizedSlots = Math.max(1, slotsHint);
         log.debug("Queue auto-assign scheduled for agent {} (source={}, slotsHint={})",
                 agentUid, source, normalizedSlots);
+
+        for (int attempt = 0; attempt < normalizedSlots; attempt++) {
+            Optional<QueueService.QueueAssignmentResult> result = queueService.assignNextAgentQueueMember(agentUid);
+            if (!result.isPresent()) {
+                if (attempt == 0) {
+                    log.trace("Agent {} trigger {} found no waiting visitors", agentUid, source);
+                }
+                break;
+            }
+            QueueService.QueueAssignmentResult assignment = result.get();
+            log.info("Auto-assign success (source={}): agent={}, thread={}, queueMember={}",
+                    source, assignment.agentUid(), assignment.threadUid(), assignment.queueMemberUid());
+        }
     }
 
     /**
