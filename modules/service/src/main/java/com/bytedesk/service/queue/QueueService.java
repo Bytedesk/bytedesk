@@ -248,7 +248,7 @@ public class QueueService {
         
         QueueEntity primaryQueue;
         String nickname;
-
+        
         switch (queueType) {
             case ROBOT:
             case AGENT:
@@ -264,32 +264,42 @@ public class QueueService {
             default:
                 throw new IllegalArgumentException("Unsupported queue type: " + queueType);
         }
-
+        
         validateQueue(primaryQueue, "Queue is full or not active");
-
-        return queueMemberRestService.enqueue(threadEntity, primaryQueue, queueType, member -> {
-            member.setJoinedAt(BdDateUtils.now());
-            switch (queueType) {
-                case ROBOT:
-                case WORKFLOW:
-                case UNIFIED:
-                    member.setRobotQueue(primaryQueue);
-                    break;
-                case AGENT:
-                    member.setAgentQueue(primaryQueue);
-                    break;
-                case WORKGROUP:
-                    member.setWorkgroupQueue(primaryQueue);
-                    QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
-                    validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
-                    if (agent.getType().equals(ThreadTypeEnum.AGENT.name())) {
-                        member.setAgentQueue(agentOrRobotQueue);
-                    } else {
-                        member.setRobotQueue(agentOrRobotQueue);
-                    }
-                    break;
-            }
-        });
+        
+        // 创建队列成员
+        var memberBuilder = QueueMemberEntity.builder()
+            .uid(uidUtils.getUid())
+            .thread(threadEntity)
+            .queueNumber(primaryQueue.getNextNumber())
+            .joinedAt(BdDateUtils.now())
+            .orgUid(threadEntity.getOrgUid());
+        
+        // 根据队列类型设置相应的队列
+        switch (queueType) {
+            case ROBOT:
+            case WORKFLOW:
+            case UNIFIED:
+                memberBuilder.robotQueue(primaryQueue);
+                break;
+            case AGENT:
+                memberBuilder.agentQueue(primaryQueue);
+                break;
+            case WORKGROUP:
+                memberBuilder.workgroupQueue(primaryQueue);
+                // 同时设置 agent/robot 队列
+                QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
+                validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
+                
+                if (agent.getType().equals(ThreadTypeEnum.AGENT.name())) {
+                    memberBuilder.agentQueue(agentOrRobotQueue);
+                } else {
+                    memberBuilder.robotQueue(agentOrRobotQueue);
+                }
+                break;
+        }
+        
+        return saveQueueMember(memberBuilder.build());
     }
 
     /**

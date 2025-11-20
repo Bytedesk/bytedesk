@@ -13,14 +13,11 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -48,14 +45,8 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
-// import com.bytedesk.service.queue.QueueAuditLogger;
-import com.bytedesk.service.queue.QueueEntity;
-import com.bytedesk.service.queue.QueueTypeEnum;
 import com.bytedesk.service.queue.notification.QueueNotificationService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,56 +59,20 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final QueueMemberRepository queueMemberRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
-    private final EntityManager entityManager;
+    // private final EntityManager entityManager;
     private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
     private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
     private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
-    private static final int MAX_ENQUEUE_RETRIES = 20;
-    private static final long COLLISION_BACKOFF_MILLIS = 25L;
-    private static final String QUEUE_MEMBER_TABLE_NAME = resolveQueueMemberTableName();
+    // private static final int MAX_ENQUEUE_RETRIES = 20;
+    // private static final long COLLISION_BACKOFF_MILLIS = 25L;
+    // private static final String QUEUE_MEMBER_TABLE_NAME = resolveQueueMemberTableName();
+    // private static final String QUEUE_NUMBER_UNIQUE_CONSTRAINT = "uk7aviqofcxw7ae3fped747qrl7";
     // private final QueueAuditLogger queueAuditLogger;
     @Lazy
     private final QueueNotificationService queueNotificationService;
     
-    /**
-     * 访客主动退出排队：标记离开时间并软删除队列成员记录
-     */
-    public void visitorExitQueue(String threadUid) {
-        Optional<QueueMemberEntity> optional = findByThreadUid(threadUid);
-        if (!optional.isPresent()) {
-            return;
-        }
-        QueueMemberEntity entity = optional.get();
-        entity.setVisitorLeavedAt(BdDateUtils.now());
-        entity.setDeleted(true); // 不要删除，仅修改status状态
-        entity.setStatus(QueueMemberStatusEnum.CANCELLED.name());
-        QueueMemberEntity saved = save(entity);
-        queueNotificationService.publishQueueLeaveNotice(saved);
-    }
-
-    /**
-     * 扫描超时(未发送首条消息)的排队成员并标记删除
-     */
-    public int cleanupIdleQueueMembers() {
-        java.time.ZonedDateTime threshold = BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
-        java.util.List<QueueMemberEntity> idleList = queueMemberRepository.findIdleBefore(threshold);
-        int removed = 0;
-        for (QueueMemberEntity qm : idleList) {
-            // 只处理仍处于排队状态的线程
-            if (qm.getThread() != null && qm.getThread().isQueuing()
-                    && QueueMemberStatusEnum.QUEUING.name().equals(qm.getStatus())) {
-                // qm.setDeleted(true); // 不要删除，仅修改status状态
-                qm.setVisitorLeavedAt(BdDateUtils.now());
-                qm.setStatus(QueueMemberStatusEnum.TIMEOUT.name());
-                QueueMemberEntity saved = save(qm);
-                queueNotificationService.publishQueueTimeoutNotice(saved);
-                removed++;
-            }
-        }
-        return removed;
-    }
-
+    
     public Optional<QueueMemberEntity> findActiveByThreadUid(String threadUid) {
         return queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusIn(threadUid, ACTIVE_STATUSES);
     }
@@ -167,181 +122,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return cleanupIdleQueueMembers();
     }
 
-    /**
-     * Centralized FIFO enqueue to guarantee tail placement and duplicate guard.
-     */
-    @Transactional
-    public QueueMemberEntity enqueue(ThreadEntity threadEntity, QueueEntity targetQueue, QueueTypeEnum queueType, java.util.function.Consumer<QueueMemberEntity> enrich) {
-        cleanupBeforeEnqueue();
-
-        Optional<QueueMemberEntity> existing = findActiveByThreadUidForUpdate(threadEntity.getUid());
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-
-        int attempt = 0;
-        Integer nextNumber = null;
-        while (attempt < MAX_ENQUEUE_RETRIES) {
-            QueueMemberEntity member = QueueMemberEntity.builder()
-                    .uid(uidUtils.getUid())
-                    .thread(threadEntity)
-                    .orgUid(threadEntity.getOrgUid())
-                    .build();
-            enrich.accept(member);
-
-            if (nextNumber == null) {
-                nextNumber = resolveInitialQueueNumber(member, targetQueue, queueType);
-            }
-            member.setQueueNumber(nextNumber);
-            try {
-                QueueMemberEntity savedMember = save(member);
-                // queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
-                return savedMember;
-            } catch (DataIntegrityViolationException ex) {
-                detachQueueMember(member);
-                clearPersistenceContext();
-                if (!isQueueNumberCollision(ex)) {
-                    throw ex;
-                }
-                attempt++;
-                if (attempt >= MAX_ENQUEUE_RETRIES) {
-                    log.error("Queue number collision threshold exceeded for queue {} after {} attempts", targetQueue != null ? targetQueue.getUid() : "unknown", attempt);
-                    throw ex;
-                }
-                log.warn("Queue number collision detected for queue {} (attempt {}/{}), backing off", targetQueue != null ? targetQueue.getUid() : "unknown", attempt, MAX_ENQUEUE_RETRIES);
-                nextNumber++;
-                backoffAfterCollision(attempt);
-            }
-        }
-        throw new IllegalStateException("Unable to enqueue visitor after retries");
-    }
-
-    private int resolveInitialQueueNumber(QueueMemberEntity member, QueueEntity targetQueue, QueueTypeEnum queueType) {
-        int seed = nextQueueNumber(targetQueue, queueType);
-        if (queueType == QueueTypeEnum.WORKGROUP) {
-            seed = Math.max(seed, nextQueueNumberForAssociation(member.getAgentQueue(), QueueTypeEnum.AGENT));
-            seed = Math.max(seed, nextQueueNumberForAssociation(member.getRobotQueue(), QueueTypeEnum.ROBOT));
-        }
-        return seed;
-    }
-
-    private int nextQueueNumberForAssociation(QueueEntity queue, QueueTypeEnum associationType) {
-        if (queue == null) {
-            return 1;
-        }
-        return nextQueueNumber(queue, associationType);
-    }
-
-    private void detachQueueMember(QueueMemberEntity member) {
-        if (member == null) {
-            return;
-        }
-        try {
-            if (entityManager.contains(member)) {
-                entityManager.detach(member);
-            }
-        } catch (Exception e) {
-            log.debug("Failed to detach queue member {} after persistence error: {}", member.getUid(), e.getMessage());
-        }
-    }
-
-    private void clearPersistenceContext() {
-        try {
-            entityManager.clear();
-        } catch (Exception e) {
-            log.debug("Failed to clear persistence context after persistence error: {}", e.getMessage());
-        }
-    }
-
-    private boolean isQueueNumberCollision(DataIntegrityViolationException exception) {
-        if (exception == null) {
-            return false;
-        }
-
-        org.hibernate.exception.ConstraintViolationException constraintViolation =
-                findCause(exception, org.hibernate.exception.ConstraintViolationException.class);
-        if (constraintViolation != null && looksLikeQueueNumberConstraint(constraintViolation.getConstraintName())) {
-            return true;
-        }
-
-        SQLException sqlException = findCause(exception, SQLException.class);
-        if (isDuplicateKeyViolation(sqlException) && looksLikeQueueMemberMessage(sqlException.getMessage())) {
-            return true;
-        }
-
-        String fallbackMessage = exception.getMostSpecificCause() != null
-                ? exception.getMostSpecificCause().getMessage()
-                : exception.getMessage();
-        return looksLikeQueueMemberMessage(fallbackMessage);
-    }
-
-    private static String resolveQueueMemberTableName() {
-        Table table = QueueMemberEntity.class.getAnnotation(Table.class);
-        String tableName = table != null ? table.name() : "bytedesk_service_queue_member";
-        return tableName.toLowerCase(Locale.ROOT);
-    }
-
-    private boolean looksLikeQueueNumberConstraint(String identifier) {
-        if (!StringUtils.hasText(identifier)) {
-            return false;
-        }
-        String lower = identifier.toLowerCase(Locale.ROOT);
-        return lower.contains("queue_number") || lower.contains(QUEUE_MEMBER_TABLE_NAME);
-    }
-
-    private boolean looksLikeQueueMemberMessage(String message) {
-        if (!StringUtils.hasText(message)) {
-            return false;
-        }
-        String lower = message.toLowerCase(Locale.ROOT);
-        return lower.contains("queue_number") || lower.contains(QUEUE_MEMBER_TABLE_NAME);
-    }
-
-    private boolean isDuplicateKeyViolation(SQLException sqlException) {
-        if (sqlException == null) {
-            return false;
-        }
-        String sqlState = sqlException.getSQLState();
-        if ("23000".equals(sqlState) || "23505".equals(sqlState)) {
-            return true;
-        }
-        return false;
-    }
-
-    private <T extends Throwable> T findCause(Throwable throwable, Class<T> type) {
-        Throwable current = throwable;
-        while (current != null) {
-            if (type.isInstance(current)) {
-                return type.cast(current);
-            }
-            current = current.getCause();
-        }
-        return null;
-    }
-
-    private void backoffAfterCollision(int attempt) {
-        long delay = Math.min(COLLISION_BACKOFF_MILLIS * attempt, COLLISION_BACKOFF_MILLIS * 4);
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    @Transactional
-    public int nextQueueNumber(QueueEntity queue, QueueTypeEnum queueType) {
-        if (queue == null) {
-            return 1;
-        }
-        String queueTypeKey = switch (queueType) {
-            case WORKGROUP -> "WORKGROUP";
-            case AGENT -> "AGENT";
-            default -> "ROBOT";
-        };
-        Integer currentMax = queueMemberRepository.findMaxQueueNumberForQueue(queue, queueTypeKey);
-        return (currentMax == null ? 0 : currentMax) + 1;
-    }
-    
     @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {
@@ -358,6 +138,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     protected QueueMemberEntity doSave(QueueMemberEntity entity) {
         return queueMemberRepository.save(entity);
     }
+    
 
     @Override
     public QueueMemberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
@@ -545,6 +326,45 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         ThreadResponse response = createAgentQueueThread(agent);
         return response != null ? response.getUid() : null;
     }
+
+    /**
+     * 访客主动退出排队：标记离开时间并软删除队列成员记录
+     */
+    public void visitorExitQueue(String threadUid) {
+        Optional<QueueMemberEntity> optional = findByThreadUid(threadUid);
+        if (!optional.isPresent()) {
+            return;
+        }
+        QueueMemberEntity entity = optional.get();
+        entity.setVisitorLeavedAt(BdDateUtils.now());
+        entity.setDeleted(true); // 不要删除，仅修改status状态
+        entity.setStatus(QueueMemberStatusEnum.CANCELLED.name());
+        QueueMemberEntity saved = save(entity);
+        queueNotificationService.publishQueueLeaveNotice(saved);
+    }
+
+    /**
+     * 扫描超时(未发送首条消息)的排队成员并标记删除
+     */
+    public int cleanupIdleQueueMembers() {
+        java.time.ZonedDateTime threshold = BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
+        java.util.List<QueueMemberEntity> idleList = queueMemberRepository.findIdleBefore(threshold);
+        int removed = 0;
+        for (QueueMemberEntity qm : idleList) {
+            // 只处理仍处于排队状态的线程
+            if (qm.getThread() != null && qm.getThread().isQueuing()
+                    && QueueMemberStatusEnum.QUEUING.name().equals(qm.getStatus())) {
+                // qm.setDeleted(true); // 不要删除，仅修改status状态
+                qm.setVisitorLeavedAt(BdDateUtils.now());
+                qm.setStatus(QueueMemberStatusEnum.TIMEOUT.name());
+                QueueMemberEntity saved = save(qm);
+                queueNotificationService.publishQueueTimeoutNotice(saved);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
 
     /** 客服排队会话：org/queue/{agent_uid} */
     public ThreadResponse createAgentQueueThread(AgentEntity agent) {
