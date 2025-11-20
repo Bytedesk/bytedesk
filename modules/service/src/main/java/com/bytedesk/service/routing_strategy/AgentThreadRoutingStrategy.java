@@ -225,8 +225,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 加入队列
         log.debug("开始将线程加入队列");
-        UserProtobuf agent = agentEntity.toUserProtobuf();
-        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agentEntity, visitorRequest);
 
         // 根据客服状态路由
         log.debug("开始根据客服状态进行路由 - 可用状态: {}", agentEntity.isAvailable());

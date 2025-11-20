@@ -1,7 +1,12 @@
 package com.bytedesk.service.queue.notification;
 
+import static com.bytedesk.service.queue.notification.QueueNotificationDelta.ASSIGNED;
 import static com.bytedesk.service.queue.notification.QueueNotificationDelta.JOINED;
+import static com.bytedesk.service.queue.notification.QueueNotificationDelta.LEFT;
+import static com.bytedesk.service.queue.notification.QueueNotificationDelta.TIMEOUT;
+import static com.bytedesk.service.queue.notification.QueueNotificationType.QUEUE_ACCEPT;
 import static com.bytedesk.service.queue.notification.QueueNotificationType.QUEUE_NOTICE;
+import static com.bytedesk.service.queue.notification.QueueNotificationType.QUEUE_TIMEOUT;
 
 import java.time.Clock;
 import org.springframework.stereotype.Component;
@@ -19,19 +24,52 @@ public class QueueNotificationBuilder {
 
     private final Clock clock;
 
-    public QueueNotificationPayload buildJoinNotice(QueueMemberEntity queueMember) {
-        ThreadEntity thread = queueMember.getThread();
-        return QueueNotificationPayload.builder()
+    public QueueNotificationPayload buildJoinNotice(QueueMemberEntity queueMember, String fallbackAgentUid) {
+        return basePayload(queueMember, fallbackAgentUid)
                 .messageType(QUEUE_NOTICE)
                 .delta(JOINED)
+                .build();
+    }
+
+    public QueueNotificationPayload buildLeaveNotice(QueueMemberEntity queueMember, String fallbackAgentUid) {
+        return basePayload(queueMember, fallbackAgentUid)
+                .messageType(QUEUE_NOTICE)
+                .delta(LEFT)
+                .build();
+    }
+
+    public QueueNotificationPayload buildTimeoutNotice(QueueMemberEntity queueMember, String fallbackAgentUid) {
+        return basePayload(queueMember, fallbackAgentUid)
+                .messageType(QUEUE_TIMEOUT)
+                .delta(TIMEOUT)
+                .build();
+    }
+
+    public QueueNotificationPayload buildAssignmentNotice(QueueMemberEntity queueMember, String agentUid) {
+        return basePayload(queueMember, agentUid)
+                .messageType(QUEUE_ACCEPT)
+                .delta(ASSIGNED)
+                .estimatedWaitMs(0L)
+                .position(null)
+                .build();
+    }
+
+    private QueueNotificationPayload.QueueNotificationPayloadBuilder basePayload(QueueMemberEntity queueMember,
+            String fallbackAgentUid) {
+        ThreadEntity thread = queueMember.getThread();
+        String agentUid = resolveAgentUid(thread);
+        if (!StringUtils.hasText(agentUid)) {
+            agentUid = fallbackAgentUid;
+        }
+        Integer queueSize = queueMember.getAgentQueue() != null ? queueMember.getAgentQueue().getQueuingCount() : null;
+        return QueueNotificationPayload.builder()
                 .queueMemberUid(queueMember.getUid())
                 .threadUid(thread != null ? thread.getUid() : null)
-                .agentUid(resolveAgentUid(thread))
+                .agentUid(agentUid)
                 .position(queueMember.getQueueNumber())
-                .queueSize(queueMember.getAgentQueue() != null ? queueMember.getAgentQueue().getQueuingCount() : null)
+                .queueSize(queueSize)
                 .estimatedWaitMs(estimateWaitMillis(queueMember))
-                .serverTimestamp(clock.millis())
-                .build();
+                .serverTimestamp(clock.millis());
     }
 
     private String resolveAgentUid(ThreadEntity thread) {

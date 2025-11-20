@@ -26,6 +26,7 @@ import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue.notification.QueueNotificationService;
 import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -55,14 +56,22 @@ public class QueueService {
 
     private final UidUtils uidUtils;
 
+    private final QueueNotificationService queueNotificationService;
+
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
         return enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.ROBOT);
     }
 
     @Transactional
-    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
-        return enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
+    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
+        UserProtobuf agent = agentEntity.toUserProtobuf();
+        boolean alreadyQueued = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid()).isPresent();
+        QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
+        if (!alreadyQueued) {
+            queueNotificationService.publishQueueJoinNotice(agentEntity, queueMemberEntity);
+        }
+        return queueMemberEntity;
     }
 
     @Transactional
@@ -111,7 +120,7 @@ public class QueueService {
                 continue;
             }
             ThreadEntity savedThread = finalizeThreadAssignment(agent, thread);
-            finalizeQueueMemberAssignment(member);
+            finalizeQueueMemberAssignment(agent, member);
             publishAssignmentEvents(savedThread);
             log.info("Auto-assigned thread {} to agent {}", savedThread.getUid(), agent.getUid());
             return Optional.of(new QueueAssignmentResult(agent.getUid(), savedThread.getUid(), member.getUid()));
@@ -128,7 +137,7 @@ public class QueueService {
         return threadRestService.save(thread);
     }
 
-    private void finalizeQueueMemberAssignment(QueueMemberEntity member) {
+    private void finalizeQueueMemberAssignment(AgentEntity agent, QueueMemberEntity member) {
         member.setStatus(QueueMemberStatusEnum.ASSIGNED.name());
         member.agentAutoAcceptThread();
         QueueMemberEntity savedMember = queueMemberRestService.save(member);
@@ -136,12 +145,14 @@ public class QueueService {
         updates.put("agentAutoAcceptThread", true);
         updates.put("status", savedMember.getStatus());
         queueMemberMessageService.sendUpdateMessage(savedMember, updates);
+        queueNotificationService.publishQueueAssignmentNotice(agent, savedMember);
     }
 
     private void cleanupQueueMember(QueueMemberEntity member, String reason) {
         member.setStatus(QueueMemberStatusEnum.CANCELLED.name());
         member.setDeleted(true);
-        queueMemberRestService.save(member);
+        QueueMemberEntity savedMember = queueMemberRestService.save(member);
+        queueNotificationService.publishQueueLeaveNotice(savedMember);
         log.debug("Cleaned queue member {} during auto-assign: {}", member.getUid(), reason);
     }
 

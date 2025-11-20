@@ -21,6 +21,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,7 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueAuditLogger;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueTypeEnum;
+import com.bytedesk.service.queue.notification.QueueNotificationService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -60,9 +62,12 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
+    private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
     private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
     private final QueueAuditLogger queueAuditLogger;
+    @Lazy
+    private final QueueNotificationService queueNotificationService;
     
     /**
      * 访客主动退出排队：标记离开时间并软删除队列成员记录
@@ -76,7 +81,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         entity.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
         entity.setDeleted(true);
         entity.setStatus(QueueMemberStatusEnum.CANCELLED.name());
-        save(entity);
+        QueueMemberEntity saved = save(entity);
+        queueNotificationService.publishQueueLeaveNotice(saved);
     }
 
     /**
@@ -93,7 +99,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                 qm.setDeleted(true);
                 qm.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
                 qm.setStatus(QueueMemberStatusEnum.TIMEOUT.name());
-                save(qm);
+                QueueMemberEntity saved = save(qm);
+                queueNotificationService.publishQueueTimeoutNotice(saved);
                 removed++;
             }
         }
@@ -394,6 +401,12 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     @Override
     protected Page<QueueMemberEntity> executePageQuery(Specification<QueueMemberEntity> spec, Pageable pageable) {
         return queueMemberRepository.findAll(spec, pageable);
+    }
+
+    @Cacheable(value = AGENT_QUEUE_THREAD_CACHE, key = "#agent.uid", unless = "#result == null")
+    public String ensureAgentQueueThreadUid(AgentEntity agent) {
+        ThreadResponse response = createAgentQueueThread(agent);
+        return response != null ? response.getUid() : null;
     }
 
     /** 客服排队会话：org/queue/{agent_uid} */

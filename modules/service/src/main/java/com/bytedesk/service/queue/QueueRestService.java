@@ -265,7 +265,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
             throw new QueueMemberAlreadyExistsException("Thread " + thread.getUid() + " already queued");
         });
 
-        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent.toUserProtobuf(), request.getVisitor());
+        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, request.getVisitor());
         return queueMemberRestService.convertToResponse(queueMemberEntity);
     }
 

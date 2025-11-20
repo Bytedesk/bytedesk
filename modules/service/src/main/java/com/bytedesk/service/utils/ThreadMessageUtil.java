@@ -30,6 +30,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceTrigger;
+import com.bytedesk.service.queue.notification.QueueNotificationPayload;
 import lombok.experimental.UtilityClass;
 
 // 可以根据需要选择是否使用 @Component 注解
@@ -125,6 +126,32 @@ public class ThreadMessageUtil {
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .user(user.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+    }
+
+    /**
+     * 构造发送给客服排队线程的 QUEUE_NOTICE 消息
+     */
+    public static MessageProtobuf getAgentQueueNoticeMessage(QueueNotificationPayload payload, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+
+        String json = payload != null ? JSON.toJSONString(payload) : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .type(MessageTypeEnum.QUEUE_NOTICE.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
                 .orgUid(thread.getOrgUid())
                 .createdAt(BdDateUtils.now())
                 .updatedAt(BdDateUtils.now())
