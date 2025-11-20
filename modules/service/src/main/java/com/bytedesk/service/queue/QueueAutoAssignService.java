@@ -2,6 +2,7 @@ package com.bytedesk.service.queue;
 
 import java.util.Optional;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -18,6 +19,8 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class QueueAutoAssignService {
+
+    private static final int RETRY_MULTIPLIER = 3;
 
     private final QueueService queueService;
 
@@ -36,17 +39,33 @@ public class QueueAutoAssignService {
         log.debug("Queue auto-assign scheduled for agent {} (source={}, slotsHint={})",
                 agentUid, source, normalizedSlots);
 
-        for (int attempt = 0; attempt < normalizedSlots; attempt++) {
-            Optional<QueueService.QueueAssignmentResult> result = queueService.assignNextAgentQueueMember(agentUid);
-            if (!result.isPresent()) {
-                if (attempt == 0) {
-                    log.trace("Agent {} trigger {} found no waiting visitors", agentUid, source);
+        int assignments = 0;
+        int attempts = 0;
+        int maxAttempts = Math.max(normalizedSlots * RETRY_MULTIPLIER, RETRY_MULTIPLIER);
+
+        while (assignments < normalizedSlots && attempts < maxAttempts) {
+            attempts++;
+            try {
+                Optional<QueueService.QueueAssignmentResult> result = queueService.assignNextAgentQueueMember(agentUid);
+                if (!result.isPresent()) {
+                    if (attempts == 1) {
+                        log.trace("Agent {} trigger {} found no waiting visitors", agentUid, source);
+                    }
+                    break;
                 }
-                break;
+                QueueService.QueueAssignmentResult assignment = result.get();
+                log.info("Auto-assign success (source={}): agent={}, thread={}, queueMember={}",
+                        source, assignment.agentUid(), assignment.threadUid(), assignment.queueMemberUid());
+                assignments++;
+            } catch (ObjectOptimisticLockingFailureException ex) {
+                log.debug("Optimistic lock while auto-assigning agent {} (source={}, attempt={} of {}): {}",
+                        agentUid, source, attempts, maxAttempts, ex.getMessage());
+                // Retry the same slot so do not increment assignments
             }
-            QueueService.QueueAssignmentResult assignment = result.get();
-            log.info("Auto-assign success (source={}): agent={}, thread={}, queueMember={}",
-                    source, assignment.agentUid(), assignment.threadUid(), assignment.queueMemberUid());
+        }
+
+        if (assignments < normalizedSlots && attempts >= maxAttempts) {
+            log.warn("Aborted agent {} auto-assign after {} attempts (source={})", agentUid, attempts, source);
         }
     }
 
