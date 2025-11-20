@@ -425,7 +425,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
         log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
 
-
         // 处理强制转人工
         if (visitorRequest.getForceAgent()) {
             log.debug("处理强制转人工标记");

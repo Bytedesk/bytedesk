@@ -176,8 +176,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         }
 
         int attempt = 0;
+        int nextNumber = nextQueueNumber(targetQueue, queueType);
         while (attempt < MAX_ENQUEUE_RETRIES) {
-            int nextNumber = nextQueueNumber(targetQueue, queueType);
             QueueMemberEntity member = QueueMemberEntity.builder()
                     .uid(uidUtils.getUid())
                     .thread(threadEntity)
@@ -201,6 +201,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                     throw ex;
                 }
                 log.warn("Queue number collision detected for queue {} (attempt {}/{}), backing off", targetQueue != null ? targetQueue.getUid() : "unknown", attempt, MAX_ENQUEUE_RETRIES);
+                nextNumber++;
                 backoffAfterCollision(attempt);
             }
         }
