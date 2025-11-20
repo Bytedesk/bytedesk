@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -196,6 +197,44 @@ class QueueMemberRestServiceTest {
                         assertThat(result.getContent()).containsExactly(responseOne, responseTwo);
                         assertThat(result.getTotalElements()).isEqualTo(2);
                 }
+        }
+
+        @Test
+        void enqueueClearsPersistenceContextAfterCollision() {
+                QueueEntity agentQueue = QueueEntity.builder()
+                                .uid("queue-collision")
+                                .nickname("Agent Queue")
+                                .topic("queue/topic/agent-collision")
+                                .day("2025-11-20")
+                                .status(QueueStatusEnum.ACTIVE.name())
+                                .build();
+                agentQueue.setOrgUid("org-1");
+
+                ThreadEntity threadEntity = buildThread("thread-collision");
+                DataIntegrityViolationException collision = new DataIntegrityViolationException(
+                                "duplicate key value violates unique constraint UK7aviqofcxw7ae3fped747qrl7");
+
+                when(queueMemberRepository.findIdleBefore(any())).thenReturn(Collections.emptyList());
+                when(queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusInForUpdate(eq("thread-collision"),
+                                anyList())).thenReturn(Optional.empty());
+                when(queueMemberRepository.findMaxQueueNumberForQueue(eq(agentQueue), anyString()))
+                                .thenReturn(0, 0, 1);
+                when(queueMemberRepository.save(any())).thenThrow(collision).thenAnswer(invocation -> invocation.getArgument(0));
+                when(uidUtils.getUid()).thenReturn("member-collision-1", "member-collision-2");
+                when(entityManager.contains(any())).thenReturn(true);
+
+                QueueMemberEntity result = queueMemberRestService.enqueue(
+                                threadEntity,
+                                agentQueue,
+                                QueueTypeEnum.AGENT,
+                                member -> member.setAgentQueue(agentQueue));
+
+                assertThat(result.getUid()).isEqualTo("member-collision-2");
+                verify(entityManager, atLeastOnce()).detach(any());
+                verify(entityManager).clear();
+                verify(queueMemberRepository, times(2)).save(any());
+                verify(queueAuditLogger, times(1)).logQueueJoin(any(QueueMemberEntity.class), eq(threadEntity),
+                                eq(agentQueue), eq(QueueTypeEnum.AGENT));
         }
 
         private ThreadEntity buildThread(String uid) {

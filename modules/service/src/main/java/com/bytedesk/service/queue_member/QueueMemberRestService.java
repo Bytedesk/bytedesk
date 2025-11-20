@@ -190,6 +190,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                 return savedMember;
             } catch (DataIntegrityViolationException ex) {
                 detachQueueMember(member);
+                clearPersistenceContext();
                 if (!isQueueNumberCollision(ex) || attempt == MAX_ENQUEUE_RETRIES - 1) {
                     throw ex;
                 }
@@ -210,6 +211,14 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             }
         } catch (Exception e) {
             log.debug("Failed to detach queue member {} after persistence error: {}", member.getUid(), e.getMessage());
+        }
+    }
+
+    private void clearPersistenceContext() {
+        try {
+            entityManager.clear();
+        } catch (Exception e) {
+            log.debug("Failed to clear persistence context after persistence error: {}", e.getMessage());
         }
     }
 
