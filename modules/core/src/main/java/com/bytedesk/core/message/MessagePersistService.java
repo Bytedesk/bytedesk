@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.message;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.utils.MessageTypeConverter;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -129,6 +131,7 @@ public class MessagePersistService {
         Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
         if (threadOpt.isPresent()) {
             ThreadEntity thread = threadOpt.get();
+            thread = updateThreadContent(thread, type, messageProtobuf);
             message.setThread(thread);
         } else {
             log.info("thread not found, uid: {}", threadUid);
@@ -143,6 +146,24 @@ public class MessagePersistService {
             message.setOrgUid(orgUid);
         }
         messageRestService.save(message);
+    }
+
+    private ThreadEntity updateThreadContent(ThreadEntity thread, MessageTypeEnum type, MessageProtobuf messageProtobuf) {
+        String newContent;
+        if (MessageTypeEnum.TEXT.equals(type)) {
+            newContent = messageProtobuf.getContent();
+        } else {
+            newContent = MessageTypeConverter.convertToChineseType(type != null ? type.name() : null);
+        }
+        if (newContent == null) {
+            newContent = "";
+        }
+        if (!Objects.equals(thread.getContent(), newContent)) {
+            thread.setContent(newContent);
+            // Persist the latest preview so thread lists reflect the newest message type/content.
+            return threadRestService.save(thread);
+        }
+        return thread;
     }
 
     private String concatSafe(String a, String b) {
