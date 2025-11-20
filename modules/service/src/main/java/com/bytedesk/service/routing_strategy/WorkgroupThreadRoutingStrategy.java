@@ -14,9 +14,13 @@
 package com.bytedesk.service.routing_strategy;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
@@ -37,7 +41,10 @@ import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.presence.PresenceFacadeService;
+import com.bytedesk.service.queue.QueueAutoAssignService;
+import com.bytedesk.service.queue.QueueAutoAssignTriggerSource;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
@@ -47,6 +54,7 @@ import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup.WorkgroupRoutingService;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -90,6 +98,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final QueueMemberMessageService queueMemberMessageService;
     private final PresenceFacadeService presenceFacadeService;
+    private final QueueAutoAssignService queueAutoAssignService;
+    private final WorkgroupRepository workgroupRepository;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -815,5 +825,39 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             log.warn("Failed to publish thread events for workgroup thread {}: {}", savedThread.getUid(),
                     e.getMessage());
         }
+    }
+
+    @EventListener
+    public void handleWorkgroupAutoAssign(AgentUpdateStatusEvent event) {
+        AgentEntity agent = event.getAgent();
+        if (!shouldTriggerWorkgroupAutoAssign(agent)) {
+            return;
+        }
+        List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agent.getUid());
+        if (workgroups == null || workgroups.isEmpty()) {
+            return;
+        }
+        int capacityHint = estimateAvailableSlots(agent);
+        for (WorkgroupEntity workgroup : workgroups) {
+            if (workgroup == null || !StringUtils.hasText(workgroup.getUid())) {
+                continue;
+            }
+            queueAutoAssignService.triggerWorkgroupAutoAssign(
+                    workgroup.getUid(),
+                    agent.getUid(),
+                    QueueAutoAssignTriggerSource.WORKGROUP_STATUS_EVENT,
+                    capacityHint);
+        }
+    }
+
+    private boolean shouldTriggerWorkgroupAutoAssign(AgentEntity agent) {
+        return agent != null
+                && StringUtils.hasText(agent.getUid())
+                && presenceFacadeService.isAgentOnlineAndAvailable(agent);
+    }
+
+    private int estimateAvailableSlots(AgentEntity agent) {
+        int maxThreadCount = agent.getMaxThreadCount();
+        return maxThreadCount > 0 ? maxThreadCount : 1;
     }
 }

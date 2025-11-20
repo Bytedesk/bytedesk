@@ -44,6 +44,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.queue.dto.AgentQueueAssignmentRequest;
 import com.bytedesk.service.queue.dto.AgentQueueEnqueueRequest;
 import com.bytedesk.service.queue.dto.AgentQueueSnapshotResponse;
 import com.bytedesk.service.queue.exception.QueueFullException;
@@ -54,6 +55,7 @@ import com.bytedesk.service.queue_member.QueueMemberResponse;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
+import org.springframework.util.StringUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +83,8 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
     private final QueueMemberRestService queueMemberRestService;
 
     private final QueueService queueService;
+
+    private final QueueAutoAssignService queueAutoAssignService;
 
     @Override
     protected Specification<QueueEntity> createSpecification(QueueRequest request) {
@@ -274,6 +278,30 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         Page<QueueMemberResponse> membersPage = queueMemberRestService
                 .findAgentQueueMembers(queueOptional.get().getUid(), pageable);
         return AgentQueueSnapshotResponse.from(membersPage);
+    }
+
+    public void triggerManualAgentAssignment(String agentUid, AgentQueueAssignmentRequest request) {
+        AgentEntity agent = requireAgent(agentUid);
+        validateOrgScope(agent, request);
+        int slotsHint = request != null && request.getSlotsHint() != null && request.getSlotsHint() > 0
+                ? request.getSlotsHint()
+                : 1;
+        if (request != null && StringUtils.hasText(request.getReason())) {
+            log.info("Manual queue assignment requested - agentUid: {}, orgUid: {}, reason: {}",
+                    agentUid, request.getOrgUid(), request.getReason());
+        }
+        queueAutoAssignService.triggerAgentAutoAssign(agentUid,
+                QueueAutoAssignTriggerSource.MANUAL_ENDPOINT,
+                slotsHint);
+    }
+
+    private void validateOrgScope(AgentEntity agent, AgentQueueAssignmentRequest request) {
+        if (agent == null || request == null || !StringUtils.hasText(request.getOrgUid())) {
+            return;
+        }
+        if (agent.getOrgUid() != null && !agent.getOrgUid().equals(request.getOrgUid())) {
+            throw new QueueFullException("Agent does not belong to org " + request.getOrgUid());
+        }
     }
 
     private Optional<QueueEntity> findTodayAgentQueue(String agentUid) {

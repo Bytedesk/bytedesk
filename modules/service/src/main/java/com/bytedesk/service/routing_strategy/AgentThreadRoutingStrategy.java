@@ -16,8 +16,10 @@ package com.bytedesk.service.routing_strategy;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
@@ -31,7 +33,10 @@ import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.presence.PresenceFacadeService;
+import com.bytedesk.service.queue.QueueAutoAssignService;
+import com.bytedesk.service.queue.QueueAutoAssignTriggerSource;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -69,6 +74,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final MessageRestService messageRestService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
+    private final QueueAutoAssignService queueAutoAssignService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -627,5 +633,28 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.info("客服排队消息生成完成(结构化) - threadUid: {}, agentUid: {}, agentNickname: {}",
                 thread.getUid(), user.getUid(), user.getNickname());
         return ThreadMessageUtil.getThreadQueuingMessage(qc, user, thread);
+    }
+
+    @EventListener
+    public void handleAgentStatusAutoAssign(AgentUpdateStatusEvent event) {
+        AgentEntity agent = event.getAgent();
+        if (!shouldTriggerAgentAutoAssign(agent)) {
+            return;
+        }
+        queueAutoAssignService.triggerAgentAutoAssign(
+                agent.getUid(),
+                QueueAutoAssignTriggerSource.AGENT_STATUS_EVENT,
+                estimateAvailableSlots(agent));
+    }
+
+    private boolean shouldTriggerAgentAutoAssign(AgentEntity agent) {
+        return agent != null
+                && StringUtils.hasText(agent.getUid())
+                && presenceFacadeService.isAgentOnlineAndAvailable(agent);
+    }
+
+    private int estimateAvailableSlots(AgentEntity agent) {
+        int maxThreadCount = agent.getMaxThreadCount();
+        return maxThreadCount > 0 ? maxThreadCount : 1;
     }
 }

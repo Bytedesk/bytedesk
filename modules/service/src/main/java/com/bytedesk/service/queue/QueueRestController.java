@@ -30,6 +30,7 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.queue.dto.AgentQueueAssignmentRequest;
 import com.bytedesk.service.queue.dto.AgentQueueEnqueueRequest;
 import com.bytedesk.service.queue.dto.AgentQueueSnapshotResponse;
 import com.bytedesk.service.queue.exception.QueueFullException;
@@ -177,6 +178,16 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
             @PageableDefault(size = 50) Pageable pageable) {
         AgentQueueSnapshotResponse snapshot = queueRestService.listAgentQueueMembers(agentUid, pageable);
         return ResponseEntity.ok(JsonResult.success(snapshot));
+    }
+
+    @PostMapping("/agent/{agentUid}/assignments/next")
+    @Operation(summary = "触发下一位访客分配", description = "当客服手动释放容量时，主动请求队列自动分配下一位访客")
+    @ApiResponse(responseCode = "202", description = "请求已受理")
+    public ResponseEntity<?> triggerNextAssignment(
+            @PathVariable String agentUid,
+            @RequestBody(required = false) @Valid AgentQueueAssignmentRequest request) {
+        queueRestService.triggerManualAgentAssignment(agentUid, request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(JsonResult.success());
     }
     
 
