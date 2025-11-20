@@ -27,6 +27,7 @@ public class QueueNotificationBuilder {
 
     private final Clock clock;
 
+    /** Build a QUEUE_NOTICE event emitted when a visitor newly joins the queue. */
     public QueueNotificationPayload buildJoinNotice(QueueMemberEntity queueMember, String fallbackAgentUid) {
         return basePayload(queueMember, fallbackAgentUid)
                 .messageType(QUEUE_NOTICE)
@@ -34,6 +35,7 @@ public class QueueNotificationBuilder {
                 .build();
     }
 
+    /** Build a QUEUE_NOTICE event for visitors leaving voluntarily or via backend cleanup. */
     public QueueNotificationPayload buildLeaveNotice(QueueMemberEntity queueMember, String fallbackAgentUid) {
         return basePayload(queueMember, fallbackAgentUid)
                 .messageType(QUEUE_NOTICE)
@@ -41,6 +43,7 @@ public class QueueNotificationBuilder {
                 .build();
     }
 
+    /** Build a QUEUE_TIMEOUT notification when a visitor waits longer than SLA and gets dropped. */
     public QueueNotificationPayload buildTimeoutNotice(QueueMemberEntity queueMember, String fallbackAgentUid) {
         return basePayload(queueMember, fallbackAgentUid)
                 .messageType(QUEUE_TIMEOUT)
@@ -48,6 +51,7 @@ public class QueueNotificationBuilder {
                 .build();
     }
 
+    /** Build a QUEUE_ACCEPT message once the queue member gets assigned to an agent. */
     public QueueNotificationPayload buildAssignmentNotice(QueueMemberEntity queueMember, String agentUid) {
         return basePayload(queueMember, agentUid)
                 .messageType(QUEUE_ACCEPT)
@@ -57,6 +61,10 @@ public class QueueNotificationBuilder {
                 .build();
     }
 
+    /**
+     * Bundle several queue events into a single QUEUE_UPDATE payload that carries optional
+     * member snapshots so the client can reconcile local state efficiently.
+     */
     public QueueNotificationPayload buildBatchUpdate(String agentUid,
             List<QueueNotificationPayload> events,
             List<QueueNotificationPayload.QueueNotificationSnapshot> snapshots) {
@@ -80,6 +88,7 @@ public class QueueNotificationBuilder {
                 .build();
     }
 
+    /** Create a lightweight snapshot entry for the visitor name + queue position. */
     public QueueNotificationPayload.QueueNotificationSnapshot buildSnapshot(QueueMemberEntity queueMember) {
         if (queueMember == null) {
             return null;
@@ -99,6 +108,7 @@ public class QueueNotificationBuilder {
                 .build();
     }
 
+    /** Shared builder that pre-populates common queue metadata before tweaking per event. */
     private QueueNotificationPayload.QueueNotificationPayloadBuilder basePayload(QueueMemberEntity queueMember,
             String fallbackAgentUid) {
         ThreadEntity thread = queueMember.getThread();
@@ -117,6 +127,7 @@ public class QueueNotificationBuilder {
                 .serverTimestamp(clock.millis());
     }
 
+    /** Try to read the assigned agent uid from the thread JSON blob. */
     private String resolveAgentUid(ThreadEntity thread) {
         if (thread == null) {
             return null;
@@ -129,6 +140,7 @@ public class QueueNotificationBuilder {
         return agent != null ? agent.getUid() : null;
     }
 
+    /** Very rough wait estimation (2 minutes per queued visitor) until SLA stats are available. */
     private long estimateWaitMillis(QueueMemberEntity member) {
         int queueSize = member.getAgentQueue() != null ? member.getAgentQueue().getQueuingCount() : 0;
         // 当前缺少 SLA 统计，先使用固定 2min/人估算，后续可替换为 rolling window 平均

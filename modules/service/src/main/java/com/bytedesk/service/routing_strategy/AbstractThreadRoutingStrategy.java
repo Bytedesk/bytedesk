@@ -46,6 +46,7 @@ public abstract class AbstractThreadRoutingStrategy {
 
     // ==================== 常量定义 ====================
     
+    // TODO: 后台可配置
     /** 每人预估等待时间（分钟） */
     protected static final int ESTIMATED_WAIT_TIME_PER_PERSON = 2;
     
