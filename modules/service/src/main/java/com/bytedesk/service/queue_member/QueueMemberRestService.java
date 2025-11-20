@@ -13,9 +13,11 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.util.Optional;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,8 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import jakarta.persistence.EntityManager;
-
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
@@ -46,12 +46,16 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
 // import com.bytedesk.service.queue.QueueAuditLogger;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueTypeEnum;
 import com.bytedesk.service.queue.notification.QueueNotificationService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +75,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
     private static final int MAX_ENQUEUE_RETRIES = 20;
     private static final long COLLISION_BACKOFF_MILLIS = 25L;
-    private static final String QUEUE_NUMBER_UNIQUE_CONSTRAINT = "UK7aviqofcxw7ae3fped747qrl7";
+    private static final String QUEUE_MEMBER_TABLE_NAME = resolveQueueMemberTableName();
     // private final QueueAuditLogger queueAuditLogger;
     @Lazy
     private final QueueNotificationService queueNotificationService;
@@ -85,7 +89,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             return;
         }
         QueueMemberEntity entity = optional.get();
-        entity.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
+        entity.setVisitorLeavedAt(BdDateUtils.now());
         entity.setDeleted(true);
         entity.setStatus(QueueMemberStatusEnum.CANCELLED.name());
         QueueMemberEntity saved = save(entity);
@@ -96,7 +100,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
      * 扫描超时(未发送首条消息)的排队成员并标记删除
      */
     public int cleanupIdleQueueMembers() {
-        java.time.ZonedDateTime threshold = com.bytedesk.core.utils.BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
+        java.time.ZonedDateTime threshold = BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
         java.util.List<QueueMemberEntity> idleList = queueMemberRepository.findIdleBefore(threshold);
         int removed = 0;
         for (QueueMemberEntity qm : idleList) {
@@ -104,7 +108,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             if (qm.getThread() != null && qm.getThread().isQueuing()
                     && QueueMemberStatusEnum.QUEUING.name().equals(qm.getStatus())) {
                 qm.setDeleted(true);
-                qm.setVisitorLeavedAt(com.bytedesk.core.utils.BdDateUtils.now());
+                qm.setVisitorLeavedAt(BdDateUtils.now());
                 qm.setStatus(QueueMemberStatusEnum.TIMEOUT.name());
                 QueueMemberEntity saved = save(qm);
                 queueNotificationService.publishQueueTimeoutNotice(saved);
@@ -250,9 +254,69 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     }
 
     private boolean isQueueNumberCollision(DataIntegrityViolationException exception) {
-        Throwable rootCause = exception.getMostSpecificCause();
-        String message = rootCause != null ? rootCause.getMessage() : exception.getMessage();
-        return message != null && message.contains(QUEUE_NUMBER_UNIQUE_CONSTRAINT);
+        if (exception == null) {
+            return false;
+        }
+
+        org.hibernate.exception.ConstraintViolationException constraintViolation =
+                findCause(exception, org.hibernate.exception.ConstraintViolationException.class);
+        if (constraintViolation != null && looksLikeQueueNumberConstraint(constraintViolation.getConstraintName())) {
+            return true;
+        }
+
+        SQLException sqlException = findCause(exception, SQLException.class);
+        if (isDuplicateKeyViolation(sqlException) && looksLikeQueueMemberMessage(sqlException.getMessage())) {
+            return true;
+        }
+
+        String fallbackMessage = exception.getMostSpecificCause() != null
+                ? exception.getMostSpecificCause().getMessage()
+                : exception.getMessage();
+        return looksLikeQueueMemberMessage(fallbackMessage);
+    }
+
+    private static String resolveQueueMemberTableName() {
+        Table table = QueueMemberEntity.class.getAnnotation(Table.class);
+        String tableName = table != null ? table.name() : "bytedesk_service_queue_member";
+        return tableName.toLowerCase(Locale.ROOT);
+    }
+
+    private boolean looksLikeQueueNumberConstraint(String identifier) {
+        if (!StringUtils.hasText(identifier)) {
+            return false;
+        }
+        String lower = identifier.toLowerCase(Locale.ROOT);
+        return lower.contains("queue_number") || lower.contains(QUEUE_MEMBER_TABLE_NAME);
+    }
+
+    private boolean looksLikeQueueMemberMessage(String message) {
+        if (!StringUtils.hasText(message)) {
+            return false;
+        }
+        String lower = message.toLowerCase(Locale.ROOT);
+        return lower.contains("queue_number") || lower.contains(QUEUE_MEMBER_TABLE_NAME);
+    }
+
+    private boolean isDuplicateKeyViolation(SQLException sqlException) {
+        if (sqlException == null) {
+            return false;
+        }
+        String sqlState = sqlException.getSQLState();
+        if ("23000".equals(sqlState) || "23505".equals(sqlState)) {
+            return true;
+        }
+        return false;
+    }
+
+    private <T extends Throwable> T findCause(Throwable throwable, Class<T> type) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (type.isInstance(current)) {
+                return type.cast(current);
+            }
+            current = current.getCause();
+        }
+        return null;
     }
 
     private void backoffAfterCollision(int attempt) {
@@ -429,7 +493,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         } else {
             excel.setAgentAcceptType(null);
         }
-        excel.setAgentOffline(booleanToString(response.getAgentOffline()));
+        excel.setAgentOffline(ServiceConvertUtils.booleanToString(response.getAgentOffline()));
         
         // 机器人相关
         if (response.getRobotAcceptType() != null) {
@@ -437,25 +501,25 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         } else {
             excel.setRobotAcceptType(null);
         }
-        excel.setRobotToAgent(booleanToString(response.getRobotToAgent()));
+        excel.setRobotToAgent(ServiceConvertUtils.booleanToString(response.getRobotToAgent()));
         
         // 消息统计
         // excel.setVisitorMessageCount(response.getVisitorMessageCount());
         // excel.setSystemMessageCount(response.getSystemMessageCount());
         
         // 评价与服务质量
-        excel.setRated(booleanToString(response.getRated()));
+        excel.setRated(ServiceConvertUtils.booleanToString(response.getRated()));
         excel.setRateScore(response.getRateScore());
         // excel.setRateLevel(response.getRateLevel());
-        excel.setResolved(booleanToString(response.getResolved()));
+        excel.setResolved(ServiceConvertUtils.booleanToString(response.getResolved()));
         // excel.setQualityChecked(booleanToString(response.getQualityChecked()));
         // excel.setQualityCheckResult(response.getQualityCheckResult());
         
         // 留言与小结
-        excel.setMessageLeave(booleanToString(response.getMessageLeave()));
+        excel.setMessageLeave(ServiceConvertUtils.booleanToString(response.getMessageLeave()));
         // excel.setLeaveMsg(booleanToString(response.getLeaveMsg()));
         // excel.setLeaveMsgAt(formatZonedDateTime(response.getLeaveMsgAt()));
-        excel.setSummarized(booleanToString(response.getSummarized()));
+        excel.setSummarized(ServiceConvertUtils.booleanToString(response.getSummarized()));
         
         // 交互状态
         // excel.setTransferStatus(response.getTransferStatus());
@@ -464,16 +528,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         // excel.setEmotionType(response.getEmotionType());
         
         return excel;
-    }
-
-    /**
-     * 将Boolean转换为"是"或"否"
-     */
-    private String booleanToString(Boolean value) {
-        if (value == null) {
-            return null;
-        }
-        return value ? "是" : "否";
     }
 
     @Override

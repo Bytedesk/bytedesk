@@ -344,5 +344,14 @@ public class ServiceConvertUtils {
         // return response;
     }
     
+    /**
+     * 将Boolean转换为"是"或"否"
+     */
+    public static String booleanToString(Boolean value) {
+        if (value == null) {
+            return null;
+        }
+        return value ? "是" : "否";
+    }
 
 }
