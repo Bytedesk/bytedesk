@@ -245,6 +245,7 @@ public class ServiceConvertUtils {
         // 
         QueueMemberResponse response = getModelMapper().map(entity, QueueMemberResponse.class);
         response.setThread(ConvertUtils.convertToThreadResponse(entity.getThread()));
+        response.setStatus(entity.getStatus());
         
         // 设置首次响应时长
         response.setAgentFirstResponseLength(entity.getAgentFirstResponseLength());

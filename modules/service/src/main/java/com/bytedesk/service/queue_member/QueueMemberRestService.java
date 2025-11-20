@@ -263,14 +263,14 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         if (response.getQueue() != null) {
             excel.setQueueNickname(response.getQueue().getNickname());
         }
-        
-        // 访客信息
         if (response.getThread() != null) {
             excel.setVisitorNickname(response.getThread().getUser().getNickname());
             excel.setAgentNickname(response.getThread().getAgentProtobuf().getNickname());
             excel.setRobotNickname(response.getThread().getRobotProtobuf().getNickname());
             // excel.setWorkgroupName(response.getThread().getWorkgroup().getNickname());
-            excel.setStatus(ThreadProcessStatusEnum.fromValue(response.getThread().getStatus()).toChineseDisplay());
+            if (response.getThread().getStatus() != null) {
+                excel.setStatus(ThreadProcessStatusEnum.fromValue(response.getThread().getStatus()).toChineseDisplay());
+            }
             excel.setChannel(ChannelEnum.fromValue(response.getThread().getChannel()).toChineseDisplay());
         }
         
