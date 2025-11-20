@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -20,6 +21,7 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -41,8 +43,6 @@ public class QueueService {
     
     private final QueueMemberRestService queueMemberRestService;
 
-    private final QueueRestService queueRestService;
-
     private final AgentRestService agentRestService;
 
     private final ThreadRestService threadRestService;
@@ -50,6 +50,10 @@ public class QueueService {
     private final QueueMemberMessageService queueMemberMessageService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final QueueRepository queueRepository;
+
+    private final UidUtils uidUtils;
 
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
@@ -272,19 +276,9 @@ public class QueueService {
     private QueueEntity getOrCreateQueue(String queueTopic, String nickname, String type, String orgUid) {
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         
-        return retryOperation(() -> 
-            queueRestService.findByTopicAndDay(queueTopic, today)
-                .orElseGet(() -> {
-                    QueueRequest request = QueueRequest.builder()
-                        .nickname(nickname)
-                        .type(type)
-                        .topic(queueTopic)
-                        .day(today)
-                        .status(QueueStatusEnum.ACTIVE.name())
-                        .orgUid(orgUid)
-                        .build();
-                    return queueRestService.createQueue(request);
-                })
+        return retryOperation(() ->
+            findLatestQueue(queueTopic, today)
+                .orElseGet(() -> createQueueEntity(queueTopic, nickname, type, today, orgUid))
         );
     }
 
@@ -327,5 +321,27 @@ public class QueueService {
     }
 
     public record QueueAssignmentResult(String agentUid, String threadUid, String queueMemberUid) { }
+
+    private Optional<QueueEntity> findLatestQueue(String queueTopic, String day) {
+        return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(queueTopic, day);
+    }
+
+    private QueueEntity createQueueEntity(String queueTopic, String nickname, String type, String day, String orgUid) {
+        QueueEntity queue = QueueEntity.builder()
+                .uid(uidUtils.getUid())
+                .nickname(nickname)
+                .type(type)
+                .topic(queueTopic)
+                .day(day)
+                .status(QueueStatusEnum.ACTIVE.name())
+                .orgUid(orgUid)
+                .build();
+        try {
+            return queueRepository.save(queue);
+        } catch (DataIntegrityViolationException e) {
+            return queueRepository.findByTopicAndDayAndDeletedFalse(queueTopic, day)
+                    .orElseThrow(() -> new RuntimeException("Queue creation failed for topic " + queueTopic, e));
+        }
+    }
 
 }
