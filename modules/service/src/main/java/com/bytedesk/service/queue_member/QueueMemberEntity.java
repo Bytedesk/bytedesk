@@ -35,6 +35,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -88,9 +89,6 @@ public class QueueMemberEntity extends BaseEntity {
     private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
 
     private ZonedDateTime lastNotifiedAt; // 最近一次通知时间
-
-    @Builder.Default
-    private String status = QueueMemberStatusEnum.QUEUING.name();
 
     /**
      * 访客消息统计：
@@ -334,6 +332,11 @@ public class QueueMemberEntity extends BaseEntity {
             return null;
         }
         return (int) Duration.between(visitorFirstMessageAt, agentFirstResponseAt).getSeconds();
+    }
+
+    @Transient
+    public String getStatus() {
+        return thread != null ? thread.getStatus() : null;
     }
 
 }

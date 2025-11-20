@@ -74,7 +74,9 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     
 
     public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
-        return queueMemberRepository.findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(agentQueueUid, QueueMemberStatusEnum.QUEUING.name());
+        return queueMemberRepository.findFirstAgentQueueMemberByThreadStatus(
+                agentQueueUid,
+                ThreadProcessStatusEnum.QUEUING.name());
     }
 
     public Optional<QueueMemberEntity> findEarliestAgentQueueMemberForUpdate(String agentQueueUid) {
@@ -82,18 +84,22 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             return Optional.empty();
         }
         List<QueueMemberEntity> members = queueMemberRepository.findAgentQueueHeadForUpdate(
-                agentQueueUid,
-                QueueMemberStatusEnum.QUEUING.name(),
-                PageRequest.of(0, 1));
+            agentQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name(),
+            PageRequest.of(0, 1));
         return members.isEmpty() ? Optional.empty() : Optional.of(members.get(0));
     }
 
     public Optional<QueueMemberEntity> findEarliestWorkgroupQueueMember(String workgroupQueueUid) {
-        return queueMemberRepository.findFirstByWorkgroupQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(workgroupQueueUid, QueueMemberStatusEnum.QUEUING.name());
+        return queueMemberRepository.findFirstWorkgroupQueueMemberByThreadStatus(
+            workgroupQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
     }
 
     public Optional<QueueMemberEntity> findEarliestRobotQueueMember(String robotQueueUid) {
-        return queueMemberRepository.findFirstByRobotQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(robotQueueUid, QueueMemberStatusEnum.QUEUING.name());
+        return queueMemberRepository.findFirstRobotQueueMemberByThreadStatus(
+            robotQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
     }
 
     public Page<QueueMemberResponse> findAgentQueueMembers(String agentQueueUid, Pageable pageable) {
@@ -101,8 +107,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             return Page.empty(pageable);
         }
         Page<QueueMemberEntity> page = queueMemberRepository
-                .findByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(agentQueueUid,
-                        QueueMemberStatusEnum.QUEUING.name(), pageable);
+            .findAgentQueueMembersByThreadStatus(agentQueueUid,
+                ThreadProcessStatusEnum.QUEUING.name(), pageable);
         return page.map(ServiceConvertUtils::convertToQueueMemberResponse);
     }
 
@@ -338,7 +344,11 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         QueueMemberEntity entity = optional.get();
         entity.setVisitorLeavedAt(BdDateUtils.now());
         entity.setDeleted(true); // 不要删除，仅修改status状态
-        entity.setStatus(QueueMemberStatusEnum.CANCELLED.name());
+        ThreadEntity thread = entity.getThread();
+        if (thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
+            thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+            threadRestService.save(thread);
+        }
         QueueMemberEntity saved = save(entity);
         queueNotificationService.publishQueueLeaveNotice(saved);
     }
@@ -352,11 +362,12 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         int removed = 0;
         for (QueueMemberEntity qm : idleList) {
             // 只处理仍处于排队状态的线程
-            if (qm.getThread() != null && qm.getThread().isQueuing()
-                    && QueueMemberStatusEnum.QUEUING.name().equals(qm.getStatus())) {
+            ThreadEntity thread = qm.getThread();
+            if (thread != null && thread.isQueuing()) {
                 // qm.setDeleted(true); // 不要删除，仅修改status状态
                 qm.setVisitorLeavedAt(BdDateUtils.now());
-                qm.setStatus(QueueMemberStatusEnum.TIMEOUT.name());
+                thread.setStatus(ThreadProcessStatusEnum.TIMEOUT.name());
+                threadRestService.save(thread);
                 QueueMemberEntity saved = save(qm);
                 queueNotificationService.publishQueueTimeoutNotice(saved);
                 removed++;

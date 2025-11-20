@@ -23,7 +23,6 @@ import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.queue.exception.QueueFullException;
-import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue.notification.QueueNotificationService;
@@ -60,7 +59,10 @@ public class QueueService {
 
     private Optional<QueueMemberEntity> findQueueingMember(String threadUid) {
         return queueMemberRestService.findByThreadUid(threadUid)
-                .filter(member -> QueueMemberStatusEnum.QUEUING.name().equals(member.getStatus()));
+            .filter(member -> {
+                ThreadEntity thread = member.getThread();
+                return thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus());
+            });
     }
 
     @Transactional
@@ -144,10 +146,6 @@ public class QueueService {
             }
             QueueMemberEntity member = candidateOptional.get();
             ThreadEntity thread = member.getThread();
-            if (!QueueMemberStatusEnum.QUEUING.name().equals(member.getStatus())) {
-                cleanupQueueMember(member, "status=" + member.getStatus());
-                continue;
-            }
             if (thread == null) {
                 cleanupQueueMember(member, "missing thread");
                 continue;
@@ -175,7 +173,6 @@ public class QueueService {
     }
 
     private void finalizeQueueMemberAssignment(AgentEntity agent, QueueMemberEntity member) {
-        member.setStatus(QueueMemberStatusEnum.ASSIGNED.name());
         member.agentAutoAcceptThread();
         QueueMemberEntity savedMember = queueMemberRestService.save(member);
         Map<String, Object> updates = new HashMap<>();
@@ -186,8 +183,12 @@ public class QueueService {
     }
 
     private void cleanupQueueMember(QueueMemberEntity member, String reason) {
-        member.setStatus(QueueMemberStatusEnum.CANCELLED.name());
         member.setDeleted(true);
+        ThreadEntity thread = member.getThread();
+        if (thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
+            thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+            threadRestService.save(thread);
+        }
         QueueMemberEntity savedMember = queueMemberRestService.save(member);
         queueNotificationService.publishQueueLeaveNotice(savedMember);
         log.debug("Cleaned queue member {} during auto-assign: {}", member.getUid(), reason);

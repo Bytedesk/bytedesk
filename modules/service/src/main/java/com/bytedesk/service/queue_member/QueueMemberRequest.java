@@ -19,6 +19,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.thread.enums.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadIntentionTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadSummaryStatusEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 
@@ -115,7 +116,7 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer visitorPriority = 0;  // 优先级(0-100)
 
     @Builder.Default
-    private String status = QueueMemberStatusEnum.QUEUING.name();
+    private String status = ThreadProcessStatusEnum.QUEUING.name();
 
     // 直接在评价表里面根据threadUid查询是否已经评价
     // 是否被评价

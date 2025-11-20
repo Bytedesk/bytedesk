@@ -73,23 +73,30 @@ public interface QueueMemberRepository
         @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.visitorMessageCount = 0 AND qm.deleted = false AND qm.visitorEnqueueAt < :threshold")
         List<QueueMemberEntity> findIdleBefore(@Param("threshold") ZonedDateTime threshold);
 
-        Optional<QueueMemberEntity> findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(
-                        String agentQueueUid, String status);
+        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
+        Optional<QueueMemberEntity> findFirstAgentQueueMemberByThreadStatus(
+                        @Param("agentQueueUid") String agentQueueUid, @Param("threadStatus") String threadStatus);
 
         @Lock(LockModeType.PESSIMISTIC_WRITE)
-        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false AND qm.status = :status ORDER BY qm.queueNumber ASC")
+        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
         List<QueueMemberEntity> findAgentQueueHeadForUpdate(@Param("agentQueueUid") String agentQueueUid,
-                        @Param("status") String status,
+                        @Param("threadStatus") String threadStatus,
                         Pageable pageable);
 
-        Optional<QueueMemberEntity> findFirstByWorkgroupQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(
-                        String workgroupQueueUid, String status);
+        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.workgroupQueue.uid = :workgroupQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
+        Optional<QueueMemberEntity> findFirstWorkgroupQueueMemberByThreadStatus(
+                        @Param("workgroupQueueUid") String workgroupQueueUid, @Param("threadStatus") String threadStatus);
 
-        Optional<QueueMemberEntity> findFirstByRobotQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(
-                        String robotQueueUid, String status);
+        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.robotQueue.uid = :robotQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
+        Optional<QueueMemberEntity> findFirstRobotQueueMemberByThreadStatus(
+                        @Param("robotQueueUid") String robotQueueUid, @Param("threadStatus") String threadStatus);
 
-        Page<QueueMemberEntity> findByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(String agentQueueUid,
-                        String status, Pageable pageable);
+        @Query(value = "SELECT qm FROM QueueMemberEntity qm WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC",
+                        countQuery = "SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus")
+        Page<QueueMemberEntity> findAgentQueueMembersByThreadStatus(
+                        @Param("agentQueueUid") String agentQueueUid,
+                        @Param("threadStatus") String threadStatus,
+                        Pageable pageable);
 
         @Lock(LockModeType.PESSIMISTIC_WRITE)
         @Query("SELECT COALESCE(MAX(qm.queueNumber), 0) FROM QueueMemberEntity qm WHERE qm.deleted = false AND ((:queueType = 'AGENT' AND qm.agentQueue = :queue) OR (:queueType = 'WORKGROUP' AND qm.workgroupQueue = :queue) OR (:queueType = 'ROBOT' AND qm.robotQueue = :queue))")

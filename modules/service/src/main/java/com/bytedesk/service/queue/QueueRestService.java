@@ -52,7 +52,6 @@ import com.bytedesk.service.queue.exception.QueueMemberAlreadyExistsException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.QueueMemberResponse;
-import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
@@ -263,7 +262,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         ensureSameOrg(agent, thread);
 
         queueMemberRestService.findByThreadUid(thread.getUid())
-                .filter(existing -> QueueMemberStatusEnum.QUEUING.name().equals(existing.getStatus()))
+            .filter(existing -> ThreadProcessStatusEnum.QUEUING.name().equals(existing.getStatus()))
                 .ifPresent(existing -> {
                     throw new QueueMemberAlreadyExistsException("Thread " + thread.getUid() + " already queued");
                 });

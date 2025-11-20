@@ -33,7 +33,6 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
-import com.bytedesk.service.queue_member.QueueMemberStatusEnum;
 import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.queue.notification.QueueNotificationService;
@@ -105,7 +104,6 @@ class QueueServiceTest {
         ThreadEntity thread = buildThread("thread-1", "org/agent/agent-1/visitor-1", "org-1");
         QueueMemberEntity member = QueueMemberEntity.builder()
                 .uid("member-1")
-                .status(QueueMemberStatusEnum.QUEUING.name())
                 .queueNumber(1)
                 .build();
         member.setThread(thread);
@@ -132,15 +130,15 @@ class QueueServiceTest {
         assertEquals("member-1", result.queueMemberUid());
         assertEquals(ThreadProcessStatusEnum.CHATTING.name(), thread.getStatus(),
                 "Thread status should advance to CHATTING");
-        assertEquals(QueueMemberStatusEnum.ASSIGNED.name(), member.getStatus(),
-                "Queue member should be marked as assigned");
+        assertEquals(ThreadProcessStatusEnum.CHATTING.name(), member.getStatus(),
+                "Queue member status reflects thread status");
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, Object>> updatesCaptor = ArgumentCaptor.forClass(Map.class);
         verify(queueMemberMessageService).sendUpdateMessage(eq(member), updatesCaptor.capture());
         Map<String, Object> updates = updatesCaptor.getValue();
         assertThat(updates.get("agentAutoAcceptThread")).isEqualTo(Boolean.TRUE);
-        assertThat(updates.get("status")).isEqualTo(QueueMemberStatusEnum.ASSIGNED.name());
+        assertThat(updates.get("status")).isEqualTo(ThreadProcessStatusEnum.CHATTING.name());
 
         verify(threadRestService).save(thread);
         verify(queueMemberRestService).save(member);

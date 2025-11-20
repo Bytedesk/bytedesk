@@ -20,6 +20,7 @@ import com.bytedesk.core.thread.enums.ThreadEmotionTypeEnum;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.enums.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadSummaryStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -76,7 +77,7 @@ public class QueueMemberResponse extends BaseResponse {
     private Integer visitorPriority = 0;  // 优先级(0-100)
 
     @Builder.Default
-    private String status = QueueMemberStatusEnum.QUEUING.name();
+    private String status = ThreadProcessStatusEnum.QUEUING.name();
 
     /**
      * 客服消息统计：
