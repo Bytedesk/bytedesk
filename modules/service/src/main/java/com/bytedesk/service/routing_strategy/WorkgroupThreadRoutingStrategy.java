@@ -649,10 +649,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
-
         // 更新队列状态
         updateQueueMemberForRobotAccept(queueMemberEntity);
-
         // 发布事件
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 

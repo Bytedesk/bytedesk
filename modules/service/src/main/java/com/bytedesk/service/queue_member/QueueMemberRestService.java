@@ -45,6 +45,8 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.queue.QueueEntity;
+import com.bytedesk.service.queue.QueueTypeEnum;
 import com.bytedesk.service.queue.notification.QueueNotificationService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
@@ -241,6 +243,14 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     }
     public void deleteAll() {
         queueMemberRepository.deleteAll();
+    }
+
+    public int nextQueueNumber(QueueEntity queue, QueueTypeEnum queueType) {
+        if (queue == null || queueType == null) {
+            return 1;
+        }
+        Integer max = queueMemberRepository.findMaxQueueNumberForQueue(queue, queueType.name());
+        return (max == null ? 0 : max) + 1;
     }
 
     @Override
