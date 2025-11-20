@@ -90,7 +90,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         }
         QueueMemberEntity entity = optional.get();
         entity.setVisitorLeavedAt(BdDateUtils.now());
-        entity.setDeleted(true);
+        entity.setDeleted(true); // 不要删除，仅修改status状态
         entity.setStatus(QueueMemberStatusEnum.CANCELLED.name());
         QueueMemberEntity saved = save(entity);
         queueNotificationService.publishQueueLeaveNotice(saved);
@@ -107,7 +107,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             // 只处理仍处于排队状态的线程
             if (qm.getThread() != null && qm.getThread().isQueuing()
                     && QueueMemberStatusEnum.QUEUING.name().equals(qm.getStatus())) {
-                qm.setDeleted(true);
+                // qm.setDeleted(true); // 不要删除，仅修改status状态
                 qm.setVisitorLeavedAt(BdDateUtils.now());
                 qm.setStatus(QueueMemberStatusEnum.TIMEOUT.name());
                 QueueMemberEntity saved = save(qm);
