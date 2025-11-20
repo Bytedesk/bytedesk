@@ -58,6 +58,12 @@ public class QueueSettingsEntity extends BaseEntity {
     @NotBlank
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP;
+
+    /**
+     * Batch window for queue notices, in milliseconds; keeps notices always on but rate-limited per agent.
+     */
+    @Builder.Default
+    private Integer queueNoticeBatchWindowMs = 2000;
     
     /**
      * 从 QueueSettingsRequest 创建 QueueSettings 实体

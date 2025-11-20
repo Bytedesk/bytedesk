@@ -39,6 +39,8 @@ public class QueueSettingsResponse extends BaseResponse {
     private Integer maxWaitTime; // 最大等待时间(秒)
     
     private String queueTip; // 排队提示
+
+    private Integer queueNoticeBatchWindowMs; // 排队通知批处理窗口(毫秒)
     
     /**
      * 从 QueueSettings 实体创建 QueueSettingsResponse
@@ -53,6 +55,7 @@ public class QueueSettingsResponse extends BaseResponse {
                 .maxWaiting(settings.getMaxWaiting())
                 .maxWaitTime(settings.getMaxWaitTime())
                 .queueTip(settings.getQueueTip())
+                .queueNoticeBatchWindowMs(settings.getQueueNoticeBatchWindowMs())
                 .build();
     }
     
