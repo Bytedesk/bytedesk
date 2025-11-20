@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import jakarta.persistence.EntityManager;
+
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
@@ -62,6 +64,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final QueueMemberRepository queueMemberRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
+    private final EntityManager entityManager;
     private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
     private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
@@ -186,6 +189,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                 queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
                 return savedMember;
             } catch (DataIntegrityViolationException ex) {
+                detachQueueMember(member);
                 if (!isQueueNumberCollision(ex) || attempt == MAX_ENQUEUE_RETRIES - 1) {
                     throw ex;
                 }
@@ -194,6 +198,19 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             }
         }
         throw new IllegalStateException("Unable to enqueue visitor after retries");
+    }
+
+    private void detachQueueMember(QueueMemberEntity member) {
+        if (member == null) {
+            return;
+        }
+        try {
+            if (entityManager.contains(member)) {
+                entityManager.detach(member);
+            }
+        } catch (Exception e) {
+            log.debug("Failed to detach queue member {} after persistence error: {}", member.getUid(), e.getMessage());
+        }
     }
 
     private boolean isQueueNumberCollision(DataIntegrityViolationException exception) {
