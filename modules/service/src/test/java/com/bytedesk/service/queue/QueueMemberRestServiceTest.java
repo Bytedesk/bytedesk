@@ -58,8 +58,8 @@ class QueueMemberRestServiceTest {
         @Mock
         private ThreadRestService threadRestService;
 
-        @Mock
-        private QueueAuditLogger queueAuditLogger;
+        // @Mock
+        // private QueueAuditLogger queueAuditLogger;
 
         @Mock
         private QueueNotificationService queueNotificationService;
@@ -80,7 +80,7 @@ class QueueMemberRestServiceTest {
                                 uidUtils,
                                 entityManager,
                                 threadRestService,
-                                queueAuditLogger,
+                                // queueAuditLogger,
                                 queueNotificationService);
         }
 
@@ -128,8 +128,8 @@ class QueueMemberRestServiceTest {
 
                 verify(queueMemberRepository, times(2)).save(any());
                 verify(queueMemberRepository, atLeastOnce()).findIdleBefore(any());
-                verify(queueAuditLogger, times(2)).logQueueJoin(any(QueueMemberEntity.class), any(ThreadEntity.class),
-                                eq(agentQueue), eq(QueueTypeEnum.AGENT));
+                // verify(queueAuditLogger, times(2)).logQueueJoin(any(QueueMemberEntity.class), any(ThreadEntity.class),
+                //                 eq(agentQueue), eq(QueueTypeEnum.AGENT));
         }
 
         @Test
@@ -166,7 +166,7 @@ class QueueMemberRestServiceTest {
                 assertThat(result).isSameAs(existing);
                 verify(queueMemberRepository, never()).save(any());
                 verify(queueMemberRepository, never()).findMaxQueueNumberForQueue(any(), anyString());
-                verify(queueAuditLogger, never()).logQueueJoin(any(), any(), any(), any());
+                // verify(queueAuditLogger, never()).logQueueJoin(any(), any(), any(), any());
         }
 
         @Test
@@ -233,8 +233,8 @@ class QueueMemberRestServiceTest {
                 verify(entityManager, atLeastOnce()).detach(any());
                 verify(entityManager).clear();
                 verify(queueMemberRepository, times(2)).save(any());
-                verify(queueAuditLogger, times(1)).logQueueJoin(any(QueueMemberEntity.class), eq(threadEntity),
-                                eq(agentQueue), eq(QueueTypeEnum.AGENT));
+                // verify(queueAuditLogger, times(1)).logQueueJoin(any(QueueMemberEntity.class), eq(threadEntity),
+                //                 eq(agentQueue), eq(QueueTypeEnum.AGENT));
         }
 
         private ThreadEntity buildThread(String uid) {

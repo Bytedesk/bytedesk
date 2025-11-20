@@ -47,7 +47,7 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.queue.QueueAuditLogger;
+// import com.bytedesk.service.queue.QueueAuditLogger;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueTypeEnum;
 import com.bytedesk.service.queue.notification.QueueNotificationService;
@@ -69,9 +69,10 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
     private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
-    private static final int MAX_ENQUEUE_RETRIES = 5;
+    private static final int MAX_ENQUEUE_RETRIES = 20;
+    private static final long COLLISION_BACKOFF_MILLIS = 25L;
     private static final String QUEUE_NUMBER_UNIQUE_CONSTRAINT = "UK7aviqofcxw7ae3fped747qrl7";
-    private final QueueAuditLogger queueAuditLogger;
+    // private final QueueAuditLogger queueAuditLogger;
     @Lazy
     private final QueueNotificationService queueNotificationService;
     
@@ -186,16 +187,21 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             enrich.accept(member);
             try {
                 QueueMemberEntity savedMember = save(member);
-                queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
+                // queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
                 return savedMember;
             } catch (DataIntegrityViolationException ex) {
                 detachQueueMember(member);
                 clearPersistenceContext();
-                if (!isQueueNumberCollision(ex) || attempt == MAX_ENQUEUE_RETRIES - 1) {
+                if (!isQueueNumberCollision(ex)) {
                     throw ex;
                 }
                 attempt++;
-                log.warn("Queue number collision detected for queue {} (attempt {}/{}), retrying", targetQueue != null ? targetQueue.getUid() : "unknown", attempt, MAX_ENQUEUE_RETRIES);
+                if (attempt >= MAX_ENQUEUE_RETRIES) {
+                    log.error("Queue number collision threshold exceeded for queue {} after {} attempts", targetQueue != null ? targetQueue.getUid() : "unknown", attempt);
+                    throw ex;
+                }
+                log.warn("Queue number collision detected for queue {} (attempt {}/{}), backing off", targetQueue != null ? targetQueue.getUid() : "unknown", attempt, MAX_ENQUEUE_RETRIES);
+                backoffAfterCollision(attempt);
             }
         }
         throw new IllegalStateException("Unable to enqueue visitor after retries");
@@ -226,6 +232,15 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         Throwable rootCause = exception.getMostSpecificCause();
         String message = rootCause != null ? rootCause.getMessage() : exception.getMessage();
         return message != null && message.contains(QUEUE_NUMBER_UNIQUE_CONSTRAINT);
+    }
+
+    private void backoffAfterCollision(int attempt) {
+        long delay = Math.min(COLLISION_BACKOFF_MILLIS * attempt, COLLISION_BACKOFF_MILLIS * 4);
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Transactional

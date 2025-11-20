@@ -47,6 +47,7 @@ public class WorkgroupRoutingService {
 
     /**
      * 根据工作组路由模式选择客服
+     * TODO: 综合考虑排队情况、客服负载、响应时间等因素进行优化，如果有客服接待未满则优先选择分配
      */
     public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread) {
         List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
