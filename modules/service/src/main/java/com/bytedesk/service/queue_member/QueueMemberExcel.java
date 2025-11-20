@@ -55,7 +55,7 @@ public class QueueMemberExcel extends BaseExcel {
     @ExcelProperty(value = "入队时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ColumnWidth(25)
-    private ZonedDateTime joinedAt;
+    private ZonedDateTime visitorEnqueueAt;
 
     @ExcelProperty(value = "状态")
     @ColumnWidth(20)

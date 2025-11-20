@@ -62,7 +62,7 @@ public class QueueMemberRequest extends BaseRequest {
     private Integer queueNumber = 0;  // 排队号码
 
     @Builder.Default
-    private ZonedDateTime joinedAt = BdDateUtils.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
 
     private ZonedDateTime lastNotifiedAt; // 上次通知时间
 
@@ -193,18 +193,18 @@ public class QueueMemberRequest extends BaseRequest {
     private String endDate;
 
     // /**
-    //  * @deprecated 请改用 joinedAt
+    //  * @deprecated 请改用 visitorEnqueueAt
     //  */
     // @Deprecated
     // public ZonedDateTime getVisitorEnqueueAt() {
-    //     return joinedAt;
+    //     return visitorEnqueueAt;
     // }
 
     // /**
-    //  * @deprecated 请改用 joinedAt
+    //  * @deprecated 请改用 visitorEnqueueAt
     //  */
     // @Deprecated
     // public void setVisitorEnqueueAt(ZonedDateTime visitorEnqueueAt) {
-    //     this.joinedAt = visitorEnqueueAt;
+    //     this.visitorEnqueueAt = visitorEnqueueAt;
     // }
 }

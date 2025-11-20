@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.queue_member;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +64,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
     private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
-    private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
     // private static final int MAX_ENQUEUE_RETRIES = 20;
     // private static final long COLLISION_BACKOFF_MILLIS = 25L;
     // private static final String QUEUE_MEMBER_TABLE_NAME = resolveQueueMemberTableName();
@@ -74,14 +72,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     @Lazy
     private final QueueNotificationService queueNotificationService;
     
-    
-    public Optional<QueueMemberEntity> findActiveByThreadUid(String threadUid) {
-        return queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusIn(threadUid, ACTIVE_STATUSES);
-    }
-
-    public Optional<QueueMemberEntity> findActiveByThreadUidForUpdate(String threadUid) {
-        return queueMemberRepository.findFirstByThreadUidAndDeletedFalseAndStatusInForUpdate(threadUid, ACTIVE_STATUSES);
-    }
 
     public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
         return queueMemberRepository.findFirstByAgentQueue_UidAndDeletedFalseAndStatusOrderByQueueNumberAsc(agentQueueUid, QueueMemberStatusEnum.QUEUING.name());

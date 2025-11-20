@@ -59,7 +59,7 @@ public class QueueMemberResponse extends BaseResponse {
      * 统计访客消息总数
      */
     @Builder.Default
-    private ZonedDateTime joinedAt = BdDateUtils.now();  // 加入时间
+    private ZonedDateTime visitorEnqueueAt = BdDateUtils.now();  // 加入时间
 
     private ZonedDateTime lastNotifiedAt; // 最近一次通知时间
 
@@ -242,7 +242,7 @@ public class QueueMemberResponse extends BaseResponse {
 
     // ZonedDateTime 字段的格式化 getter 方法
     public String getJoinedAt() {
-        return BdDateUtils.formatDatetimeToString(joinedAt);
+        return BdDateUtils.formatDatetimeToString(visitorEnqueueAt);
     }
 
     // /**

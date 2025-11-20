@@ -58,6 +58,11 @@ public class QueueService {
 
     private final QueueNotificationService queueNotificationService;
 
+    private Optional<QueueMemberEntity> findQueueingMember(String threadUid) {
+        return queueMemberRestService.findByThreadUid(threadUid)
+                .filter(member -> QueueMemberStatusEnum.QUEUING.name().equals(member.getStatus()));
+    }
+
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
         return enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.ROBOT);
@@ -73,7 +78,7 @@ public class QueueService {
     public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity, AgentEntity agentEntity,
             VisitorRequest visitorRequest) {
         UserProtobuf agent = agentEntity.toUserProtobuf();
-        boolean alreadyQueued = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid()).isPresent();
+        boolean alreadyQueued = findQueueingMember(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
         if (!alreadyQueued) {
             queueNotificationService.publishQueueJoinNotice(agentEntity, queueMemberEntity);
@@ -96,7 +101,7 @@ public class QueueService {
     @Transactional
     public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, UserProtobuf agent,
             WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-        boolean alreadyQueued = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid()).isPresent();
+        boolean alreadyQueued = findQueueingMember(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
         return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
@@ -210,7 +215,7 @@ public class QueueService {
             WorkgroupEntity workgroupEntity, QueueTypeEnum queueType) {
         
         // 1. 检查是否已存在队列成员
-        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findActiveByThreadUidForUpdate(threadEntity.getUid());
+        Optional<QueueMemberEntity> memberOptional = findQueueingMember(threadEntity.getUid());
         if (memberOptional.isPresent()) {
             return handleExistingMember(memberOptional.get(), agent, threadEntity, queueType);
         }
@@ -272,7 +277,7 @@ public class QueueService {
             .uid(uidUtils.getUid())
             .thread(threadEntity)
             .queueNumber(primaryQueue.getNextNumber())
-            .joinedAt(BdDateUtils.now())
+            .visitorEnqueueAt(BdDateUtils.now())
             .orgUid(threadEntity.getOrgUid());
         
         // 根据队列类型设置相应的队列
@@ -315,11 +320,23 @@ public class QueueService {
      * 保存队列成员并验证结果
      */
     private QueueMemberEntity saveQueueMember(QueueMemberEntity member) {
-        QueueMemberEntity updatedMember = queueMemberRestService.save(member);
-        if (updatedMember == null) {
-            throw new RuntimeException("Failed to save queue member");
+        try {
+            QueueMemberEntity updatedMember = queueMemberRestService.save(member);
+            if (updatedMember == null) {
+                throw new RuntimeException("Failed to save queue member");
+            }
+            return updatedMember;
+        } catch (DataIntegrityViolationException ex) {
+            String threadUid = member.getThread() != null ? member.getThread().getUid() : null;
+            if (threadUid != null) {
+                Optional<QueueMemberEntity> existingMember = queueMemberRestService.findByThreadUid(threadUid);
+                if (existingMember.isPresent()) {
+                    log.debug("Queue member already exists for thread {}, returning existing record", threadUid);
+                    return existingMember.get();
+                }
+            }
+            throw ex;
         }
-        return updatedMember;
     }
 
     /**
