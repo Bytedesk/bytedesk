@@ -402,12 +402,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                         workgroup.getUid());
                 throw new IllegalStateException("Workgroup message leave agent not found");
             }
-            // 
             log.debug("使用离线留言接待客服 - agentUid: {}", messageLeaveAgent.getUid());
-            // 加入队列（用于统计和管理）
-            UserProtobuf agent = messageLeaveAgent.toUserProtobuf();
-                QueueMemberEntity queueMemberEntity = queueService
-                    .enqueueWorkgroupWithResult(thread, agent, workgroup, visitorRequest)
+            QueueMemberEntity queueMemberEntity = queueService
+                    .enqueueWorkgroupWithResult(thread, messageLeaveAgent, workgroup, visitorRequest)
                     .queueMember();
 
             // 直接返回离线留言消息
@@ -423,11 +420,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 加入队列
         log.debug("开始将线程加入工作组队列");
         long enqueueStartTime = System.currentTimeMillis();
-        UserProtobuf agent = agentEntity.toUserProtobuf();
         QueueService.QueueEnqueueResult enqueueResult = queueService
-            .enqueueWorkgroupWithResult(thread, agent, workgroup, visitorRequest);
+            .enqueueWorkgroupWithResult(thread, agentEntity, workgroup, visitorRequest);
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
         log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
+
 
         // 处理强制转人工
         if (visitorRequest.getForceAgent()) {

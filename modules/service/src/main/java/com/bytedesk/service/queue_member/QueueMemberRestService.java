@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -65,6 +66,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
     private static final List<String> ACTIVE_STATUSES = Collections.singletonList(QueueMemberStatusEnum.QUEUING.name());
+    private static final int MAX_ENQUEUE_RETRIES = 5;
+    private static final String QUEUE_NUMBER_UNIQUE_CONSTRAINT = "UK7aviqofcxw7ae3fped747qrl7";
     private final QueueAuditLogger queueAuditLogger;
     @Lazy
     private final QueueNotificationService queueNotificationService;
@@ -168,17 +171,35 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             return existing.get();
         }
 
-        int nextNumber = nextQueueNumber(targetQueue, queueType);
-        QueueMemberEntity member = QueueMemberEntity.builder()
-            .uid(uidUtils.getUid())
-            .thread(threadEntity)
-            .queueNumber(nextNumber)
-            .orgUid(threadEntity.getOrgUid())
-            .build();
-        enrich.accept(member);
-        QueueMemberEntity savedMember = save(member);
-        queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
-        return savedMember;
+        int attempt = 0;
+        while (attempt < MAX_ENQUEUE_RETRIES) {
+            int nextNumber = nextQueueNumber(targetQueue, queueType);
+            QueueMemberEntity member = QueueMemberEntity.builder()
+                    .uid(uidUtils.getUid())
+                    .thread(threadEntity)
+                    .queueNumber(nextNumber)
+                    .orgUid(threadEntity.getOrgUid())
+                    .build();
+            enrich.accept(member);
+            try {
+                QueueMemberEntity savedMember = save(member);
+                queueAuditLogger.logQueueJoin(savedMember, threadEntity, targetQueue, queueType);
+                return savedMember;
+            } catch (DataIntegrityViolationException ex) {
+                if (!isQueueNumberCollision(ex) || attempt == MAX_ENQUEUE_RETRIES - 1) {
+                    throw ex;
+                }
+                attempt++;
+                log.warn("Queue number collision detected for queue {} (attempt {}/{}), retrying", targetQueue != null ? targetQueue.getUid() : "unknown", attempt, MAX_ENQUEUE_RETRIES);
+            }
+        }
+        throw new IllegalStateException("Unable to enqueue visitor after retries");
+    }
+
+    private boolean isQueueNumberCollision(DataIntegrityViolationException exception) {
+        Throwable rootCause = exception.getMostSpecificCause();
+        String message = rootCause != null ? rootCause.getMessage() : exception.getMessage();
+        return message != null && message.contains(QUEUE_NUMBER_UNIQUE_CONSTRAINT);
     }
 
     @Transactional

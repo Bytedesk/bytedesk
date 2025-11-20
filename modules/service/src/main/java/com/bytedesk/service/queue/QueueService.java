@@ -81,11 +81,17 @@ public class QueueService {
         return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
 
-    @Transactional
-    public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, UserProtobuf agent, 
-        WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-        return enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest).queueMember();
-    }
+    // @Transactional
+    // public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, UserProtobuf agent, 
+    //     WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+    //     return enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest).queueMember();
+    // }
+
+    // @Transactional
+    // public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, AgentEntity agentEntity, 
+    //     WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+    //     return enqueueWorkgroupWithResult(threadEntity, agentEntity, workgroupEntity, visitorRequest).queueMember();
+    // }
 
     @Transactional
     public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, UserProtobuf agent,
@@ -93,6 +99,17 @@ public class QueueService {
         boolean alreadyQueued = queueMemberRestService.findActiveByThreadUid(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
         return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
+    }
+
+    @Transactional
+    public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, AgentEntity agentEntity,
+            WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+        UserProtobuf agent = agentEntity != null ? agentEntity.toUserProtobuf() : null;
+        QueueEnqueueResult result = enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest);
+        if (agentEntity != null && !result.alreadyQueued()) {
+            queueNotificationService.publishQueueJoinNotice(agentEntity, result.queueMember());
+        }
+        return result;
     }
 
     @Transactional
