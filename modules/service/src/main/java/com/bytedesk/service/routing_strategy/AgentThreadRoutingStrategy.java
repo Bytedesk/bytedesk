@@ -351,7 +351,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         String queueContentText = generateAgentQueueMessage(queueMemberEntity);
         QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
                 .content(queueContentText)
-                .position(queueMemberEntity.getQueueNumber())
+                // .position(queueMemberEntity.getQueueNumber())
+                .position(queuingCount)
                 .queueSize(queuingCount)
                 .serverTimestamp(System.currentTimeMillis());
         if (queuingCount > 0) {

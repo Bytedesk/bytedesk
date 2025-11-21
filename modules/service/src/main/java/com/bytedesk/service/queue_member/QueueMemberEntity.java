@@ -289,20 +289,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "thread_invite_status")
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
-    /**
-     * 计算等待时间(秒)
-     */
-    public long getWaitLength() {
-        if (visitorEnqueueAt == null) return 0;
-        if (thread.isOffline() || agentOffline) return 0;
-        // 首先判断robotAcceptTime是否为空，如果不为空，则使用robotAcceptTime作为结束时间
-        if (robotAcceptedAt != null) {
-            return Duration.between(visitorEnqueueAt, robotAcceptedAt).getSeconds();
-        }
-        ZonedDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : BdDateUtils.now();
-        return Duration.between(visitorEnqueueAt, endWaitLength).getSeconds();
-    }
-
+    
     public void manualAcceptThread() {
         this.agentAcceptType = QueueMemberAcceptTypeEnum.MANUAL.name();
         this.agentAcceptedAt = BdDateUtils.now();
@@ -323,10 +310,47 @@ public class QueueMemberEntity extends BaseEntity {
         this.robotToAgentAt = BdDateUtils.now();
     }
 
+    // 
+    @Transient
+    public Boolean isRoboting() {
+        return this.thread != null && this.thread.isRoboting();
+    }
+
+    @Transient
+    public Boolean isChatting() {
+        return this.thread != null && this.thread.isChatting();
+    }
+
+    @Transient
+    public Boolean isQueuing() {
+        return this.thread != null && this.thread.isQueuing();
+    }
+
+    @Transient
+    public Boolean isClosed() {
+        return this.thread != null && this.thread.isClosed();
+    }
+
+    /**
+     * 计算等待时间(秒)
+     */
+    @Transient
+    public long getWaitLength() {
+        if (visitorEnqueueAt == null) return 0;
+        if (thread.isOffline() || agentOffline) return 0;
+        // 首先判断robotAcceptTime是否为空，如果不为空，则使用robotAcceptTime作为结束时间
+        if (robotAcceptedAt != null) {
+            return Duration.between(visitorEnqueueAt, robotAcceptedAt).getSeconds();
+        }
+        ZonedDateTime endWaitLength = agentAcceptedAt != null ? agentAcceptedAt : BdDateUtils.now();
+        return Duration.between(visitorEnqueueAt, endWaitLength).getSeconds();
+    }
+
     /**
      * 计算首次响应时长(秒)
      * 从访客首次发送消息到客服首次响应的时间间隔
      */
+    @Transient
     public Integer getAgentFirstResponseLength() {
         if (visitorFirstMessageAt == null || agentFirstResponseAt == null) {
             return null;

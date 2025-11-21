@@ -191,15 +191,15 @@ public class QueueEntity extends BaseEntity {
     // getRobotingCount
     public int getRobotingCount() {
         int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isRoboting())
+                .filter(member -> member.isRoboting())
                 .count() : 0;
 
         int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isRoboting())
+                .filter(member -> member.isRoboting())
                 .count() : 0;
 
         int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isRoboting())
+                .filter(member -> member.isRoboting())
                 .count() : 0;
 
         return count1 + count2 + count3;
@@ -210,15 +210,15 @@ public class QueueEntity extends BaseEntity {
      */
     public int getQueuingCount() {
         int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isQueuing())
+                .filter(member -> member.isQueuing())
                 .count() : 0;
 
         int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isQueuing())
+                .filter(member -> member.isQueuing())
                 .count() : 0;
 
         int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isQueuing())
+                .filter(member -> member.isQueuing())
                 .count() : 0;
 
         return count1 + count2 + count3;
@@ -229,15 +229,15 @@ public class QueueEntity extends BaseEntity {
      */
     public int getChattingCount() {
         int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isChatting())
+                .filter(member -> member.isChatting())
                 .count() : 0;
 
         int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isChatting())
+                .filter(member -> member.isChatting())
                 .count() : 0;
 
         int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isChatting())
+                .filter(member -> member.isChatting())
                 .count() : 0;
 
         return count1 + count2 + count3;
@@ -248,15 +248,15 @@ public class QueueEntity extends BaseEntity {
      */
     public int getClosedCount() {
         int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.isClosed())
                 .count() : 0;
 
         int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.isClosed())
                 .count() : 0;
 
         int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.isClosed())
                 .count() : 0;
 
         return count1 + count2 + count3;
@@ -304,19 +304,19 @@ public class QueueEntity extends BaseEntity {
      */
     public int getAvgResolveTime() {
         List<QueueMemberEntity> closedMembers1 = agentQueueMembers != null ? agentQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.isClosed())
                 .filter(member -> member.getAgentAcceptedAt() != null
                         && member.getAgentClosedAt() != null)
                 .toList() : java.util.Collections.emptyList();
 
         List<QueueMemberEntity> closedMembers2 = robotQueueMembers != null ? robotQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.isClosed())
                 .filter(member -> member.getAgentAcceptedAt() != null
                         && member.getAgentClosedAt() != null)
                 .toList() : java.util.Collections.emptyList();
 
         List<QueueMemberEntity> closedMembers3 = workgroupQueueMembers != null ? workgroupQueueMembers.stream()
-                .filter(member -> member.getThread() != null && member.getThread().isClosed())
+                .filter(member -> member.isClosed())
                 .filter(member -> member.getAgentAcceptedAt() != null
                         && member.getAgentClosedAt() != null)
                 .toList() : java.util.Collections.emptyList();
