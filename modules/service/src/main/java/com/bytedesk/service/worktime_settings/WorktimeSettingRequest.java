@@ -15,8 +15,8 @@ package com.bytedesk.service.worktime_settings;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.service.worktime.WorktimeRequest;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -35,8 +35,28 @@ public class WorktimeSettingRequest extends BaseRequest {
 
     private String name;
 
-    @Builder.Default
+    @lombok.Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
+
+    /**
+     * 是否启用该工作时间设置
+     */
+    private Boolean enabled;
+
+    /**
+     * 常规工作时间段列表（例如周一~周五的周期性工作时间）
+     */
+    private java.util.List<WorktimeRequest> regularWorktimes;
+
+    /**
+     * 特殊工作时间段列表（节假日、活动期间等覆盖性时间段）
+     */
+    private java.util.List<WorktimeRequest> specialWorktimes;
+
+    /**
+     * 节假日配置，存为 JSON 文本（key=date, value=name）
+     */
+    private String holidays;
 
     // @Builder.Default
     // private String type = WorktimeSettingTypeEnum.CUSTOMER.name();
