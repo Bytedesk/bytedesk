@@ -609,21 +609,21 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("生成客服排队消息 - threadUid: {}", thread.getUid());
 
         // 线程content可能已是结构化QueueContent JSON；尝试解析，否则构造最小QueueContent
-        QueueContent qc = null;
+        QueueContent queueContent = null;
         try {
             if (thread.getContent() != null && thread.getContent().trim().startsWith("{")) {
-                qc = com.alibaba.fastjson2.JSON.parseObject(thread.getContent(), QueueContent.class);
+                queueContent = com.alibaba.fastjson2.JSON.parseObject(thread.getContent(), QueueContent.class);
             }
         } catch (Exception e) {
             log.debug("解析线程排队内容失败，使用降级模式 - threadUid: {}, error: {}", thread.getUid(), e.getMessage());
         }
-        if (qc == null) {
-            qc = QueueContent.builder()
+        if (queueContent == null) {
+            queueContent = QueueContent.builder()
                     .content("正在排队，请稍候...")
                     .serverTimestamp(System.currentTimeMillis())
                     .build();
         }
-        return ThreadMessageUtil.getThreadQueueMessage(qc, thread);
+        return ThreadMessageUtil.getThreadQueueMessage(queueContent, thread);
     }
 
     @EventListener
