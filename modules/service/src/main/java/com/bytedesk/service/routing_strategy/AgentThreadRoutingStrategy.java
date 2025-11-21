@@ -223,7 +223,6 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("开始新线程路由 - threadUid: {}, agentUid: {}", thread.getUid(), agentEntity.getUid());
 
         // 加入队列
-        log.debug("开始将线程加入队列");
         QueueService.QueueEnqueueResult enqueueResult = queueService.enqueueAgentWithResult(thread, agentEntity, visitorRequest);
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
 
@@ -608,11 +607,6 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private MessageProtobuf getAgentQueuingMessage(ThreadEntity thread) {
         log.debug("生成客服排队消息 - threadUid: {}", thread.getUid());
 
-        UserProtobuf user = thread.getAgentProtobuf();
-        if (user == null) {
-            log.warn("线程中未找到客服信息 - threadUid: {}", thread.getUid());
-            throw new IllegalStateException("Thread agent protobuf is null");
-        }
         // 线程content可能已是结构化QueueContent JSON；尝试解析，否则构造最小QueueContent
         QueueContent qc = null;
         try {
@@ -628,9 +622,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
                     .serverTimestamp(System.currentTimeMillis())
                     .build();
         }
-        log.info("客服排队消息生成完成(结构化) - threadUid: {}, agentUid: {}, agentNickname: {}",
-                thread.getUid(), user.getUid(), user.getNickname());
-        return ThreadMessageUtil.getThreadQueuingMessage(qc, user, thread);
+        return ThreadMessageUtil.getThreadQueueMessage(qc, thread);
     }
 
     @EventListener

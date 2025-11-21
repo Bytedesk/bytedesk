@@ -376,19 +376,16 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return removed;
     }
 
-
     /** 客服排队会话：org/queue/{agent_uid} */
     public ThreadResponse createAgentQueueThread(AgentEntity agent) {
-        //
+        // 
         String topic = TopicUtils.getOrgQueueTopic(agent.getUid());
-        //
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
             return threadRestService.convertToResponse(threadOptional.get());
         }
         // 排队助手-用户信息，头像、昵称等
         UserProtobuf user = UserUtils.getQueueAssistantUser();
-        //
         ThreadEntity assistantThread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.ASSISTANT.name())
@@ -401,12 +398,12 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                 .userUid(agent.getUid())
                 .owner(agent.getMember().getUser())
                 .build();
-
+        // 
         ThreadEntity updateThread = threadRestService.save(assistantThread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-
+        // 
         return threadRestService.convertToResponse(updateThread);
     }
 

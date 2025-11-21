@@ -66,7 +66,7 @@ public class ThreadEventListener {
             request.getTopics().add(topicInternal);
             topicRestService.create(request);
         } else {
-            // 文件助手、系统通知会话延迟订阅topic
+            // 文件助手、排队助手、系统通知会话延迟订阅topic
             TopicRequest request = TopicRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())

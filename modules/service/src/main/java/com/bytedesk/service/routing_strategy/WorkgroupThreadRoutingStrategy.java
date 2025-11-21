@@ -681,8 +681,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取工作组排队消息
      */
     private MessageProtobuf getWorkgroupQueuingMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
-        UserProtobuf user = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        log.info("Getting workgroup queuing message for user: {}", user.getNickname());
 
         // 线程content通常为结构化QueueContent JSON；解析失败则降级为仅文本
         QueueContent qc = null;
@@ -701,7 +699,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                     .serverTimestamp(System.currentTimeMillis())
                     .build();
         }
-        return ThreadMessageUtil.getThreadQueuingMessage(qc, user, thread);
+        return ThreadMessageUtil.getThreadQueueMessage(qc, thread);
     }
 
     /**

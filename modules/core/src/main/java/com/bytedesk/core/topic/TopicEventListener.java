@@ -23,8 +23,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
-import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -50,7 +48,6 @@ public class TopicEventListener {
     @EventListener
     public void onTopicCreateEvent(TopicCreateEvent event) {
         log.info("topic onTopicCreateEvent: {}", event);
-        //
         TopicRequest request = TopicRequest.builder()
                 .topic(event.getTopic())
                 .userUid(event.getUserUid())
@@ -97,13 +94,13 @@ public class TopicEventListener {
         }
     }
 
-    @EventListener
-    public void onUserLogoutEvent(UserLogoutEvent event) {
-        // UserLogoutEvent userLogoutEvent = event.getObject();
-        UserEntity user = event.getUser();
-        log.info("topic onUserLogoutEvent: {}", user.getUsername());
-        // TODO: user logout event, remove user from topic
-    }
+    // @EventListener
+    // public void onUserLogoutEvent(UserLogoutEvent event) {
+    //     // UserLogoutEvent userLogoutEvent = event.getObject();
+    //     UserEntity user = event.getUser();
+    //     log.info("topic onUserLogoutEvent: {}", user.getUsername());
+    //     // TODO: user logout event, remove user from topic
+    // }
 
     @EventListener
     public void onQuartzDay0Event(QuartzDay0Event event) {

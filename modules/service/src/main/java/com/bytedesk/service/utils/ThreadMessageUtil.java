@@ -89,11 +89,11 @@ public class ThreadMessageUtil {
      * 结构化 QueueContent 的排队消息
      */
     public static MessageProtobuf getThreadQueueMessage(QueueContent content, ThreadEntity thread) {
+        // 
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-
         String json = content != null ? content.toJson() : null;
-
+        // 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(json)
@@ -107,32 +107,6 @@ public class ThreadMessageUtil {
                 .thread(thread)
                 .extra(extra.toJson())
                 .build();
-
-        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
-    }
-
-    /**
-     * 结构化 QueueContent 的排队消息（可指定消息用户，例如 agent/robot/system）。
-     */
-    public static MessageProtobuf getThreadQueuingMessage(QueueContent content, UserProtobuf user, ThreadEntity thread) {
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
-
-        String json = content != null ? content.toJson() : null;
-
-        MessageEntity message = MessageEntity.builder()
-                .uid(UidUtils.getInstance().getUid())
-                .content(json)
-                .type(MessageTypeEnum.QUEUE.name())
-                .status(MessageStatusEnum.READ.name())
-                .channel(ChannelEnum.SYSTEM.name())
-                .user(user.toJson())
-                .orgUid(thread.getOrgUid())
-                .createdAt(BdDateUtils.now())
-                .updatedAt(BdDateUtils.now())
-                .thread(thread)
-                .extra(extra.toJson())
-                .build();
-
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
