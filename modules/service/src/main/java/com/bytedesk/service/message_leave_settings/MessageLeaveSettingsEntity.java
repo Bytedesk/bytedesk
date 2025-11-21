@@ -13,21 +13,15 @@
  */
 package com.bytedesk.service.message_leave_settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.modelmapper.ModelMapper;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.message_leave.MessageLeaveNotifyTypeEnum;
-import com.bytedesk.service.worktime.WorktimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotBlank;
@@ -89,20 +83,7 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
 
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<WorktimeEntity> worktimes = new ArrayList<>();
-
     // TODO: 通知:邮箱、企业微信、钉钉、飞书、短信等
-
-    //
-    public Boolean isInServiceTime() {
-        if (worktimes == null || worktimes.isEmpty()) {
-            return true;
-        }
-        return worktimes.stream()
-            .anyMatch(WorktimeEntity::isWorkTime);
-    }
 
     /**
      * 从 MessageLeaveSettingsRequest 创建 MessageLeaveSettings 实体

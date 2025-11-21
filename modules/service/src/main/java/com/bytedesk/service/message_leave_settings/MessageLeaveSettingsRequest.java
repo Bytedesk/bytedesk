@@ -13,9 +13,6 @@
  */
 package com.bytedesk.service.message_leave_settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
 
 import com.bytedesk.core.base.BaseRequest;
@@ -76,13 +73,6 @@ public class MessageLeaveSettingsRequest extends BaseRequest {
     // 留言表单
     @Builder.Default
     private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
-
-    // @Builder.Default
-    // @OneToMany(fetch = FetchType.EAGER)
-    // private List<WorktimeRequest> worktimes = new ArrayList<>();
-    
-    @Builder.Default
-    private List<String> worktimeUids = new ArrayList<>();
 
     
 }

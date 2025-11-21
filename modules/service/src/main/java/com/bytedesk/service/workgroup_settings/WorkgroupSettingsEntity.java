@@ -9,6 +9,7 @@ import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -81,6 +82,18 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private MessageLeaveSettingsEntity draftMessageLeaveSettings;
+
+    /**
+     * Worktime settings reference (shared template)
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    private WorktimeSettingEntity worktimeSettings;
+
+    /**
+     * Draft worktime settings reference
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    private WorktimeSettingEntity draftWorktimeSettings;
 
     /**
      * Robot routing settings

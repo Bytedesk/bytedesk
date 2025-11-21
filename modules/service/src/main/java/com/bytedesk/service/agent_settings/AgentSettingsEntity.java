@@ -11,6 +11,7 @@ import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -103,6 +104,18 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private MessageLeaveSettingsEntity draftMessageLeaveSettings;
+
+    /**
+     * Worktime settings reference (shared template)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    private WorktimeSettingEntity worktimeSettings;
+
+    /**
+     * Draft worktime settings reference
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    private WorktimeSettingEntity draftWorktimeSettings;
 
     /**
      * Auto-reply settings

@@ -13,17 +13,10 @@
  */
 package com.bytedesk.service.message_leave_settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.message_leave.MessageLeaveNotifyTypeEnum;
-import com.bytedesk.service.worktime.WorktimeResponse;
-
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -77,11 +70,6 @@ public class MessageLeaveSettingsResponse extends BaseResponse {
     @Builder.Default
     private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
 
-    /** work time */
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<WorktimeResponse> worktimes = new ArrayList<>();
-    
     /**
      * 从 MessageLeaveSettings 实体创建 MessageLeaveSettingsResponse
      * @param settings MessageLeaveSettings 实体
