@@ -41,6 +41,7 @@ import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadResponse;
 
@@ -49,9 +50,38 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ConvertUtils {
 
+    // private static final AtomicBoolean THREAD_RESPONSE_TYPEMAP_CONFIGURED = new AtomicBoolean(false);
+
     private static ModelMapper getModelMapper() {
         return ApplicationContextHolder.getBean(ModelMapper.class);
     }
+
+    // private static void ensureThreadResponseTypeMapConfigured(ModelMapper modelMapper) {
+    //     if (THREAD_RESPONSE_TYPEMAP_CONFIGURED.get()) {
+    //         return;
+    //     }
+    //     synchronized (THREAD_RESPONSE_TYPEMAP_CONFIGURED) {
+    //         if (THREAD_RESPONSE_TYPEMAP_CONFIGURED.get()) {
+    //             return;
+    //         }
+    //         TypeMap<ThreadEntity, ThreadResponse> typeMap = modelMapper.getTypeMap(ThreadEntity.class, ThreadResponse.class);
+    //         if (typeMap == null) {
+    //             typeMap = modelMapper.createTypeMap(ThreadEntity.class, ThreadResponse.class);
+    //         }
+    //         typeMap.addMappings(mapper -> {
+    //             mapper.skip(ThreadResponse::setAllMessageCount);
+    //             mapper.skip(ThreadResponse::setVisitorMessageCount);
+    //             mapper.skip(ThreadResponse::setAgentMessageCount);
+    //             mapper.skip(ThreadResponse::setSystemMessageCount);
+    //             mapper.skip(ThreadResponse::setRobotMessageCount);
+    //             mapper.skip(ThreadResponse::setUnreadCount);
+    //             mapper.skip(ThreadResponse::setVisitorUnreadCount);
+    //             mapper.skip(ThreadResponse::setValid);
+    //             mapper.skip(ThreadResponse::setOwner);
+    //         });
+    //         THREAD_RESPONSE_TYPEMAP_CONFIGURED.set(true);
+    //     }
+    // }
 
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
         // 无需进行authorities转换，因为UserDetailsImpl中已经包含了authorities
@@ -155,7 +185,9 @@ public class ConvertUtils {
     }
 
     public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
-        ThreadResponse threadResponse = getModelMapper().map(thread, ThreadResponse.class);
+        ModelMapper modelMapper = getModelMapper();
+        // ensureThreadResponseTypeMapConfigured(modelMapper);
+        ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
         // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,
         // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
         // if (thread.getAgent() != null) {
@@ -173,6 +205,13 @@ public class ConvertUtils {
                 threadResponse.setUser(user);
             }
         }
+        // if (thread.getOwner() != null) {
+        //     if (Hibernate.isInitialized(thread.getOwner())) {
+        //         threadResponse.setOwner(convertToUserProtobuf(thread.getOwner()));
+        //     } else {
+        //         threadResponse.setOwner(null);
+        //     }
+        // }
         // robot
         // if (thread.getRobot() != null) {
         //     UserProtobuf robot = UserProtobuf.fromJson(thread.getRobot());
@@ -213,6 +252,7 @@ public class ConvertUtils {
                 }
             }
         }
+        
         // 手动设置状态判断字段
         // threadResponse.setNewStatus(thread.isNew());
         // threadResponse.setRobotingStatus(thread.isRoboting());
@@ -233,22 +273,93 @@ public class ConvertUtils {
         // threadResponse.setWeChatMpChannel(thread.isWeChatMp());
         // threadResponse.setWeChatMiniChannel(thread.isWeChatMini());
         
-    // 手动设置业务逻辑字段
-    threadResponse.setRobotToAgent(thread.isRobotToAgent());
-    threadResponse.setValid(thread.isValid());
-    // 关闭来源类型
-    threadResponse.setCloseType(thread.getCloseType());
-        
-        // 手动设置消息统计字段
-        threadResponse.setAllMessageCount(thread.getAllMessageCount());
-        threadResponse.setVisitorMessageCount(thread.getVisitorMessageCount());
-        threadResponse.setAgentMessageCount(thread.getAgentMessageCount());
-        threadResponse.setSystemMessageCount(thread.getSystemMessageCount());
-        threadResponse.setRobotMessageCount(thread.getRobotMessageCount());
-        
+        // 手动设置业务逻辑字段
+        threadResponse.setRobotToAgent(thread.isRobotToAgent());
+        // 关闭来源类型
+        threadResponse.setCloseType(thread.getCloseType());
+
+        // boolean messagesInitialized = thread.getMessages() != null && Hibernate.isInitialized(thread.getMessages());
+        // if (messagesInitialized) {
+        //     // Only touch lazy collection when it is fully initialized
+        //     threadResponse.setValid(thread.isValid());
+        //     threadResponse.setUnreadCount(thread.getUnreadCount());
+        //     threadResponse.setVisitorUnreadCount(thread.getVisitorUnreadCount());
+        //     threadResponse.setAllMessageCount(thread.getAllMessageCount());
+        //     threadResponse.setVisitorMessageCount(thread.getVisitorMessageCount());
+        //     threadResponse.setAgentMessageCount(thread.getAgentMessageCount());
+        //     threadResponse.setSystemMessageCount(thread.getSystemMessageCount());
+        //     threadResponse.setRobotMessageCount(thread.getRobotMessageCount());
+        // } else {
+        //     threadResponse.setValid(null);
+        //     threadResponse.setUnreadCount(null);
+        //     threadResponse.setVisitorUnreadCount(null);
+        //     threadResponse.setAllMessageCount(null);
+        //     threadResponse.setVisitorMessageCount(null);
+        //     threadResponse.setAgentMessageCount(null);
+        //     threadResponse.setSystemMessageCount(null);
+        //     threadResponse.setRobotMessageCount(null);
+        // }
         //
         return threadResponse;
     }
+
+    public static ThreadResponseSimple convertToThreadResponseSimple(ThreadEntity thread) {
+        ModelMapper modelMapper = getModelMapper();
+        // ensureThreadResponseTypeMapConfigured(modelMapper);
+        ThreadResponseSimple threadResponse = modelMapper.map(thread, ThreadResponseSimple.class);
+        // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,
+        // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
+        // if (thread.getAgent() != null) {
+        // UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
+        // threadResponse.setAgent(agent);
+        // }
+        // agent
+        // if (thread.getAgent() != null) {
+        //     UserProtobuf agent = UserProtobuf.fromJson(thread.getAgent());
+        //     threadResponse.setAgentProtobuf(agent);
+        // }
+        if (thread.getUser() != null) {
+            UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
+            if (user != null) {
+                threadResponse.setUser(user);
+            }
+        }
+        // 
+        if (thread.getInvites() != null) {
+            // 清空列表，防止modelMapper自动映射产生的空对象
+            threadResponse.getInvites().clear();
+            // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
+            for (String invite : thread.getInvites()) {
+                UserProtobuf inviteUser = UserProtobuf.fromJson(invite);
+                if (inviteUser != null) {
+                    threadResponse.getInvites().add(inviteUser);
+                }
+            }
+        }
+        if (thread.getMonitors() != null) {
+            // 清空列表，防止modelMapper自动映射产生的空对象
+            threadResponse.getMonitors().clear();
+            for (String monitor : thread.getMonitors()) {
+                UserProtobuf monitorUser = UserProtobuf.fromJson(monitor);
+                if (monitorUser != null) {
+                    threadResponse.getMonitors().add(monitorUser);
+                }
+            }
+        }
+        if (thread.getAssistants() != null) {
+            // 清空列表，防止modelMapper自动映射产生的空对象
+            threadResponse.getAssistants().clear();
+            for (String assistant : thread.getAssistants()) {
+                UserProtobuf assistantUser = UserProtobuf.fromJson(assistant);
+                if (assistantUser != null) {
+                    threadResponse.getAssistants().add(assistantUser);
+                }
+            }
+        }
+        // 
+        return threadResponse;
+    }
+    
 
     public static RoleResponse convertToRoleResponse(RoleEntity entity) {
         // return modelMapper.map(role, RoleResponse.class);

@@ -30,16 +30,16 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
-import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -219,7 +219,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
-    // updateAvatar
     @Transactional
     public AgentResponse updateAvatar(AgentRequest request) {
         AgentEntity agent = findByUid(request.getUid())
@@ -257,7 +256,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     }
 
     @Transactional
-    public ThreadResponse acceptByAgent(ThreadRequest threadRequest) {
+    public ThreadResponseSimple acceptByAgent(ThreadRequest threadRequest) {
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
         if (!agentOptional.isPresent()) {
@@ -271,12 +270,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         ThreadEntity thread = threadOptional.get();
         // 若会话非QUEUING（已存在接待坐席），则不允许重复接入
         if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
-            throw new IllegalStateException("thread already accepted");
+            throw new IllegalStateException("thread already accepted: " + thread.getStatus());
         }
-        AgentEntity agent = agentOptional.get();
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
-        UserProtobuf agentProtobuf = agent.toUserProtobuf();
-        thread.setAgent(agentProtobuf.toJson());
+        AgentEntity agent = agentOptional.get();
+        thread.setAgent(agent.toUserProtobuf().toJson());
         thread.setOwner(agent.getMember().getUser());
         //
         ThreadEntity updateThread = threadRestService.save(thread);
@@ -287,7 +285,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, updateThread));
         bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, updateThread));
 
-        return threadRestService.convertToResponse(updateThread);
+        return ConvertUtils.convertToThreadResponseSimple(updateThread);
     }
 
     public AgentResponse syncCurrentThreadCount(AgentRequest request) {

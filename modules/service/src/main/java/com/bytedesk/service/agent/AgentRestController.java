@@ -35,7 +35,7 @@ import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.thread.ThreadRequest;
-import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -107,12 +107,12 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     @Operation(summary = "客服接受会话", description = "客服接受会话请求")
     @ApiResponse(responseCode = "200", description = "接受成功",
         content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = ThreadResponse.class)))
+        schema = @Schema(implementation = ThreadResponseSimple.class)))
     @ActionAnnotation(title = "会话", action = "accept", description = "accept thread")
     @PostMapping("/accept")
     public ResponseEntity<?> acceptByAgent(@RequestBody ThreadRequest request) {
         
-        ThreadResponse threadResponse = agentRestService.acceptByAgent(request);
+        ThreadResponseSimple threadResponse = agentRestService.acceptByAgent(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));   
     }
