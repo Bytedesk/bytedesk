@@ -114,7 +114,7 @@ public class MessagePersistService {
                 }
                 return;
             }
-            log.info("message already exists, uid: {}， type: {}, content: {}", uid, type, messageProtobuf.getContent());
+            log.info("message already exists, uid: {}， type: {}", uid, type);
             return;
         }
         
