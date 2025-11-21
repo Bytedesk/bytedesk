@@ -11,15 +11,15 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.worktime.settings;
+package com.bytedesk.service.worktime_settings;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
-import com.bytedesk.service.worktime.settings.event.WorktimeSettingCreateEvent;
-import com.bytedesk.service.worktime.settings.event.WorktimeSettingUpdateEvent;
+import com.bytedesk.service.worktime_settings.event.WorktimeSettingCreateEvent;
+import com.bytedesk.service.worktime_settings.event.WorktimeSettingUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;

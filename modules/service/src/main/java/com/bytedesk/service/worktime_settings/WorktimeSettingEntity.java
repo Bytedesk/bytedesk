@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.worktime.settings;
+package com.bytedesk.service.worktime_settings;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,7 +47,6 @@ import lombok.experimental.SuperBuilder;
 public class WorktimeSettingEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
 
     private String name;
 

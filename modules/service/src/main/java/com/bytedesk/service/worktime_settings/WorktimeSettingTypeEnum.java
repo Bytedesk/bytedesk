@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.service.worktime.settings;
+package com.bytedesk.service.worktime_settings;
 
 public enum WorktimeSettingTypeEnum {
     // 审核时间段类型：ANY_TIME(任意时间)或CUSTOM_TIME(自定义时间)
