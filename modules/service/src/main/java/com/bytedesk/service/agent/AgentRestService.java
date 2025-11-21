@@ -251,6 +251,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public ThreadResponseSimple acceptByAgent(ThreadRequest threadRequest) {
+        // 
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
         if (!agentOptional.isPresent()) {
@@ -279,7 +280,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 通知queue更新，queue member更新, 增加agent接待数量
         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, updateThread));
         bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, updateThread));
-
+        // 
         return ConvertUtils.convertToThreadResponseSimple(updateThread);
     }
 

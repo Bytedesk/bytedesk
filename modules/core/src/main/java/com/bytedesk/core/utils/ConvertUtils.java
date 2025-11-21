@@ -251,52 +251,10 @@ public class ConvertUtils {
             }
         }
         
-        // 手动设置状态判断字段
-        // threadResponse.setNewStatus(thread.isNew());
-        // threadResponse.setRobotingStatus(thread.isRoboting());
-        // threadResponse.setQueuingStatus(thread.isQueuing());
-        // threadResponse.setOfflineStatus(thread.isOffline());
-        // threadResponse.setChattingStatus(thread.isChatting());
-        // threadResponse.setTimeoutStatus(thread.isTimeout());
-        // threadResponse.setClosedStatus(thread.isClosed());
-        
-        // // 手动设置类型判断字段
-        // threadResponse.setCustomerServiceType(thread.isCustomerService());
-        // threadResponse.setRobotType(thread.isRobotType());
-        // threadResponse.setWorkgroupType(thread.isWorkgroupType());
-        // threadResponse.setAgentType(thread.isAgentType());
-        // threadResponse.setUnifiedType(thread.isUnifiedType());
-        
-        // // 手动设置渠道判断字段
-        // threadResponse.setWeChatMpChannel(thread.isWeChatMp());
-        // threadResponse.setWeChatMiniChannel(thread.isWeChatMini());
-        
         // 手动设置业务逻辑字段
         threadResponse.setRobotToAgent(thread.isRobotToAgent());
         // 关闭来源类型
         threadResponse.setCloseType(thread.getCloseType());
-
-        // boolean messagesInitialized = thread.getMessages() != null && Hibernate.isInitialized(thread.getMessages());
-        // if (messagesInitialized) {
-        //     // Only touch lazy collection when it is fully initialized
-        //     threadResponse.setValid(thread.isValid());
-        //     threadResponse.setUnreadCount(thread.getUnreadCount());
-     //     threadResponse.setVisitorUnreadCount(thread.getVisitorUnreadCount());
-        //     threadResponse.setAllMessageCount(thread.getAllMessageCount());
-        //     threadResponse.setVisitorMessageCount(thread.getVisitorMessageCount());
-        //     threadResponse.setAgentMessageCount(thread.getAgentMessageCount());
-        //     threadResponse.setSystemMessageCount(thread.getSystemMessageCount());
-        //     threadResponse.setRobotMessageCount(thread.getRobotMessageCount());
-        // } else {
-        //     threadResponse.setValid(null);
-        //     threadResponse.setUnreadCount(null);
-        //     threadResponse.setVisitorUnreadCount(null);
-        //     threadResponse.setAllMessageCount(null);
-        //     threadResponse.setVisitorMessageCount(null);
-        //     threadResponse.setAgentMessageCount(null);
-        //     threadResponse.setSystemMessageCount(null);
-        //     threadResponse.setRobotMessageCount(null);
-        // }
         //
         return threadResponse;
     }
