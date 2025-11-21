@@ -362,8 +362,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         } else {
             builder.waitSeconds(0).estimatedWaitTime("即将开始");
         }
-        QueueContent qc = builder.build();
-        thread.setQueuing().setContent(qc.toJson());
+        QueueContent queueContent = builder.build();
+        thread.setQueuing().setContent(queueContent.toJson());
         log.debug("线程状态设置为排队 - threadUid: {}, 排队消息长度: {}",
                 thread.getUid(), queueContentText != null ? queueContentText.length() : 0);
 
@@ -379,7 +379,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 发送排队消息
         log.debug("开始发送排队消息");
         long msgStartTime = System.currentTimeMillis();
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(qc, savedThread);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
         log.info("排队消息发送完成 - threadUid: {}, 消息发送耗时: {}ms, 总处理耗时: {}ms",
                 savedThread.getUid(), System.currentTimeMillis() - msgStartTime,
