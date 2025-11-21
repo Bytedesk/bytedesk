@@ -118,20 +118,20 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     }
 
     // @PreAuthorize("hasAuthority('AGENT_READ')")
-    @Operation(summary = "同步当前会话数", description = "同步客服当前会话数量")
-    @ApiResponse(responseCode = "200", description = "同步成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = AgentResponse.class)))
-    // @ActionAnnotation(title = "客服", action = "同步当前会话数", description = "sync agent current thread count")
-    @PostMapping("/sync/current/thread/count")
-    public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
+    // @Operation(summary = "同步当前会话数", description = "同步客服当前会话数量")
+    // @ApiResponse(responseCode = "200", description = "同步成功",
+    //     content = @Content(mediaType = "application/json", 
+    //     schema = @Schema(implementation = AgentResponse.class)))
+    // // @ActionAnnotation(title = "客服", action = "同步当前会话数", description = "sync agent current thread count")
+    // @PostMapping("/sync/current/thread/count")
+    // public ResponseEntity<?> syncCurrentThreadCount(@RequestBody AgentRequest request) {
 
-        AgentResponse agent = agentRestService.syncCurrentThreadCount(request);
-        if (agent != null) {
-            return ResponseEntity.ok(JsonResult.success(agent));
-        }
-        return ResponseEntity.ok(JsonResult.error("sync current thread count failed"));
-    }
+    //     AgentResponse agent = agentRestService.syncCurrentThreadCount(request);
+    //     if (agent != null) {
+    //         return ResponseEntity.ok(JsonResult.success(agent));
+    //     }
+    //     return ResponseEntity.ok(JsonResult.error("sync current thread count failed"));
+    // }
 
     // @PreAuthorize("hasAuthority('AGENT_CREATE')")
     @Operation(summary = "创建客服", description = "创建新的客服")

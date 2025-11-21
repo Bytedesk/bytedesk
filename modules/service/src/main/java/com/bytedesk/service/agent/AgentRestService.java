@@ -269,7 +269,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
         AgentEntity agent = agentOptional.get();
         thread.setAgent(agent.toUserProtobuf().toJson());
-        thread.setOwner(agent.getMember().getUser());
+        MemberEntity member = agent.getMember();
+        thread.setOwner(member.getUser());
         //
         ThreadEntity updateThread = threadRestService.save(thread);
         if (updateThread == null) {
@@ -282,25 +283,25 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return ConvertUtils.convertToThreadResponseSimple(updateThread);
     }
 
-    public AgentResponse syncCurrentThreadCount(AgentRequest request) {
+    // public AgentResponse syncCurrentThreadCount(AgentRequest request) {
 
-        if (StringUtils.hasText(request.getUid())) {
-            AgentEntity agent = findByUid(request.getUid())
-                    .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
-            // int currentThreadCount =
-            // threadRestService.countByThreadTopicAndStateNot(agent.getUid(),
-            // ThreadProcessStatusEnum.CLOSED.name());
-            // agent.setCurrentThreadCount(currentThreadCount);
-            // 更新Agent的信息
-            AgentEntity updatedAgent = save(agent);
-            if (updatedAgent == null) {
-                throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
-            }
-            return convertToResponse(updatedAgent);
-        }
+    //     if (StringUtils.hasText(request.getUid())) {
+    //         AgentEntity agent = findByUid(request.getUid())
+    //                 .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+    //         // int currentThreadCount =
+    //         // threadRestService.countByThreadTopicAndStateNot(agent.getUid(),
+    //         // ThreadProcessStatusEnum.CLOSED.name());
+    //         // agent.setCurrentThreadCount(currentThreadCount);
+    //         // 更新Agent的信息
+    //         AgentEntity updatedAgent = save(agent);
+    //         if (updatedAgent == null) {
+    //             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
+    //         }
+    //         return convertToResponse(updatedAgent);
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
     @Transactional
     public AgentResponse updateAutoReply(AgentRequest request) {

@@ -199,11 +199,9 @@ public class ConvertUtils {
         //     UserProtobuf agent = UserProtobuf.fromJson(thread.getAgent());
         //     threadResponse.setAgentProtobuf(agent);
         // }
-        if (thread.getUser() != null) {
-            UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
-            if (user != null) {
-                threadResponse.setUser(user);
-            }
+        UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
+        if (user != null) {
+            threadResponse.setUser(user);
         }
         // if (thread.getOwner() != null) {
         //     if (Hibernate.isInitialized(thread.getOwner())) {
@@ -283,7 +281,7 @@ public class ConvertUtils {
         //     // Only touch lazy collection when it is fully initialized
         //     threadResponse.setValid(thread.isValid());
         //     threadResponse.setUnreadCount(thread.getUnreadCount());
-        //     threadResponse.setVisitorUnreadCount(thread.getVisitorUnreadCount());
+     //     threadResponse.setVisitorUnreadCount(thread.getVisitorUnreadCount());
         //     threadResponse.setAllMessageCount(thread.getAllMessageCount());
         //     threadResponse.setVisitorMessageCount(thread.getVisitorMessageCount());
         //     threadResponse.setAgentMessageCount(thread.getAgentMessageCount());
@@ -308,53 +306,9 @@ public class ConvertUtils {
         // ensureThreadResponseTypeMapConfigured(modelMapper);
         ThreadResponseSimple threadResponse = modelMapper.map(thread, ThreadResponseSimple.class);
         // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,
-        // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
-        // if (thread.getAgent() != null) {
-        // UserProtobuf agent = JSON.parseObject(thread.getAgent(), UserProtobuf.class);
-        // threadResponse.setAgent(agent);
-        // }
-        // agent
-        // if (thread.getAgent() != null) {
-        //     UserProtobuf agent = UserProtobuf.fromJson(thread.getAgent());
-        //     threadResponse.setAgentProtobuf(agent);
-        // }
-        if (thread.getUser() != null) {
-            UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
-            if (user != null) {
-                threadResponse.setUser(user);
-            }
-        }
-        // 
-        if (thread.getInvites() != null) {
-            // 清空列表，防止modelMapper自动映射产生的空对象
-            threadResponse.getInvites().clear();
-            // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
-            for (String invite : thread.getInvites()) {
-                UserProtobuf inviteUser = UserProtobuf.fromJson(invite);
-                if (inviteUser != null) {
-                    threadResponse.getInvites().add(inviteUser);
-                }
-            }
-        }
-        if (thread.getMonitors() != null) {
-            // 清空列表，防止modelMapper自动映射产生的空对象
-            threadResponse.getMonitors().clear();
-            for (String monitor : thread.getMonitors()) {
-                UserProtobuf monitorUser = UserProtobuf.fromJson(monitor);
-                if (monitorUser != null) {
-                    threadResponse.getMonitors().add(monitorUser);
-                }
-            }
-        }
-        if (thread.getAssistants() != null) {
-            // 清空列表，防止modelMapper自动映射产生的空对象
-            threadResponse.getAssistants().clear();
-            for (String assistant : thread.getAssistants()) {
-                UserProtobuf assistantUser = UserProtobuf.fromJson(assistant);
-                if (assistantUser != null) {
-                    threadResponse.getAssistants().add(assistantUser);
-                }
-            }
+        UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
+        if (user != null) {
+            threadResponse.setUser(user);
         }
         // 
         return threadResponse;

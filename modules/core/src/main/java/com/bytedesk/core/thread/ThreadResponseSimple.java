@@ -55,11 +55,6 @@ public class ThreadResponseSimple extends BaseResponse {
     @Builder.Default
     private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
 
-    // 迁移到QueueMemberEntity.resolvedStatus
-    // resolved status
-    // @Builder.Default
-    // private String resolvedStatus = ThreadSummaryStatusEnum.NONE.name();
-
     private Boolean top;
 
     private Boolean unread;
@@ -92,26 +87,6 @@ public class ThreadResponseSimple extends BaseResponse {
     private String channel;
 
     private String extra;
-
-    // 存放被转接客服，存放多个 UserProtobuf 实体转换成的 JSON
-    // @Builder.Default
-    // private List<UserProtobuf> transfers = new ArrayList<>();
-    private UserProtobuf transfer;
-
-    // 邀请多个客服参与会话
-    @Builder.Default
-    private List<UserProtobuf> invites = new ArrayList<>();
-
-    // 多个管理员监听会话
-    @Builder.Default
-    private List<UserProtobuf> monitors = new ArrayList<>();
-
-    @Builder.Default
-    private List<UserProtobuf> assistants = new ArrayList<>();
-
-    // ticket observers
-    @Builder.Default
-    private List<UserProtobuf> ticketors = new ArrayList<>();
 
     private UserProtobuf user;
     //
