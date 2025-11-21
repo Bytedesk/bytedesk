@@ -270,8 +270,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         }
         ThreadEntity thread = threadOptional.get();
         // 若会话非QUEUING（已存在接待坐席），则不允许重复接入
-        if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())
-                || (StringUtils.hasText(thread.getAgent()) && thread.getOwner() != null)) {
+        if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
             throw new IllegalStateException("thread already accepted");
         }
         AgentEntity agent = agentOptional.get();
