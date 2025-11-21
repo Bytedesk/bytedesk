@@ -24,10 +24,10 @@ import com.bytedesk.kbase.settings.ServiceSettingsHelper;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
+import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
+import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.agent.AgentRepository;
 
 import lombok.AllArgsConstructor;

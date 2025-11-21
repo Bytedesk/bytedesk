@@ -7,7 +7,7 @@ package com.bytedesk.service.workgroup_settings;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
-import com.bytedesk.service.message_leave.settings.MessageLeaveSettingsEntity;
+import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 
 import jakarta.persistence.FetchType;

@@ -54,6 +54,7 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
 public class RobotRoutingSettingsEntity extends BaseEntity {
+    
     private static final long serialVersionUID = 1L;
 
     // 开启机器人之后，robot字段为必填

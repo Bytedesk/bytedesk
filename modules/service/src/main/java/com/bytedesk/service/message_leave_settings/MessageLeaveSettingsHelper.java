@@ -3,7 +3,7 @@
  * @Date: 2025-10-30 16:52:00
  * @Description: MessageLeaveSettings 辅助工具类，用于处理 Worktime 关联实体的解析
  */
-package com.bytedesk.service.message_leave.settings;
+package com.bytedesk.service.message_leave_settings;
 
 import java.util.ArrayList;
 import java.util.List;
