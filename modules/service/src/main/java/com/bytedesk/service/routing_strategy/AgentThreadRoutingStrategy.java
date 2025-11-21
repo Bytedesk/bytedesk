@@ -211,7 +211,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             log.info("Already have a processing thread {}", updatedThread.getAgent());
             return getAgentContinueMessage(updatedThread);
         } else if (thread.isQueuing()) {
-            return getAgentQueuingMessage(thread);
+            return getAgentQueueMessage(thread);
         }
         throw new IllegalStateException("Unexpected thread state: " + thread.getStatus());
     }
@@ -604,7 +604,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取客服排队消息
      */
-    private MessageProtobuf getAgentQueuingMessage(ThreadEntity thread) {
+    private MessageProtobuf getAgentQueueMessage(ThreadEntity thread) {
         log.debug("生成客服排队消息 - threadUid: {}", thread.getUid());
 
         // 线程content可能已是结构化QueueContent JSON；尝试解析，否则构造最小QueueContent

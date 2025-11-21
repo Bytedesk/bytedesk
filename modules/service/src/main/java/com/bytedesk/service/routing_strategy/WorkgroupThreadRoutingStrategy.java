@@ -227,7 +227,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         if (thread.isQueuing()) {
             log.info("发现现有排队会话，返回排队消息");
-            return getWorkgroupQueuingMessage(visitorRequest, thread);
+            return getWorkgroupQueueMessage(visitorRequest, thread);
         }
 
         if (thread.isOffline()) {
@@ -680,7 +680,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 获取工作组排队消息
      */
-    private MessageProtobuf getWorkgroupQueuingMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
+    private MessageProtobuf getWorkgroupQueueMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
 
         // 线程content通常为结构化QueueContent JSON；解析失败则降级为仅文本
         QueueContent qc = null;
