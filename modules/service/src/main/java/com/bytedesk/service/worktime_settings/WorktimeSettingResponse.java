@@ -33,16 +33,10 @@ public class WorktimeSettingResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
 
     private String type;
 
-    private String color;
-
-    private Integer order;
-
-    // private ZonedDateTime createdAt;
 }

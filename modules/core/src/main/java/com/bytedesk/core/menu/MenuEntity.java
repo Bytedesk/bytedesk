@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-13 13:15:16
+ * @LastEditTime: 2025-06-04 15:35:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -14,8 +14,10 @@
 package com.bytedesk.core.menu;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+// import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +27,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Menu entity for content categorization and organization
+ * Provides menuging functionality for various system entities
+ * 
+ * Database Table: bytedesk_core_menu
+ * Purpose: Stores menu definitions, colors, and organization settings
+ */
 @Entity
 @Data
 @SuperBuilder
@@ -32,20 +41,29 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+// @EntityListeners({MenuEntityListener.class})
 @Table(name = "bytedesk_core_menu")
 public class MenuEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-
+    /**
+     * Name of the menu
+     */
     private String name;
 
+    /**
+     * Description of the menu
+     */
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
+
+    /**
+     * Type of menu (CUSTOMER, TICKET, ARTICLE, etc.)
+     */
     @Builder.Default
     @Column(name = "menu_type")
     private String type = MenuTypeEnum.CUSTOMER.name();
 
-    @Builder.Default
-    @Column(nullable = false)
-    private String color = "red";
-
+ 
 }

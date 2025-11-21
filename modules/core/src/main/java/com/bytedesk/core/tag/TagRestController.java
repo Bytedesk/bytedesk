@@ -39,7 +39,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
 
     private final TagRestService tagRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
+    @ActionAnnotation(title = "Tag", action = "组织查询", description = "query tag by org")
     @Operation(summary = "Query Tags by Organization", description = "Retrieve tags for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(TagRequest request) {
@@ -49,7 +49,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
+    @ActionAnnotation(title = "Tag", action = "用户查询", description = "query tag by user")
     @Operation(summary = "Query Tags by User", description = "Retrieve tags for the current user")
     @Override
     public ResponseEntity<?> queryByUser(TagRequest request) {
@@ -59,7 +59,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @ActionAnnotation(title = "Tag", action = "查询详情", description = "query tag by uid")
     @Operation(summary = "Query Tag by UID", description = "Retrieve a specific tag by its unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(TagRequest request) {
@@ -69,7 +69,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @ActionAnnotation(title = "Tag", action = "新建", description = "create tag")
     @Operation(summary = "Create Tag", description = "Create a new tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
@@ -80,7 +80,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @ActionAnnotation(title = "Tag", action = "更新", description = "update tag")
     @Operation(summary = "Update Tag", description = "Update an existing tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
@@ -91,7 +91,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @ActionAnnotation(title = "Tag", action = "删除", description = "delete tag")
     @Operation(summary = "Delete Tag", description = "Delete a tag")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
@@ -102,7 +102,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @ActionAnnotation(title = "Tag", action = "导出", description = "export tag")
     @Operation(summary = "Export Tags", description = "Export tags to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -113,7 +113,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
             response,
             tagRestService,
             TagExcel.class,
-            "标签",
+            "Tag",
             "tag"
         );
     }

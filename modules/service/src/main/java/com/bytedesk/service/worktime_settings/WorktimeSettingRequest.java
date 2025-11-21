@@ -33,7 +33,6 @@ public class WorktimeSettingRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     @Builder.Default
@@ -41,11 +40,5 @@ public class WorktimeSettingRequest extends BaseRequest {
 
     // @Builder.Default
     // private String type = WorktimeSettingTypeEnum.CUSTOMER.name();
-
-    @Builder.Default
-    private String color = "red";
-
-    @Builder.Default
-    private Integer order = 0;
 
 }

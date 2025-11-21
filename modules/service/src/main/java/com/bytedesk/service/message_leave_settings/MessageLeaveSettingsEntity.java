@@ -81,7 +81,6 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
     // @Builder.Default
     // private String messageLeaveNotifyWechat = BytedeskConsts.EMPTY_STRING;
 
-    // 留言提醒时间
     // @Builder.Default
     // private String messageLeaveNotifyTime = BytedeskConsts.EMPTY_STRING;
 
@@ -90,7 +89,6 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
 
-    /** work time */
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER)
     private List<WorktimeEntity> worktimes = new ArrayList<>();
