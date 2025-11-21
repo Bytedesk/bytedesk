@@ -15,6 +15,7 @@ package com.bytedesk.service.queue;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 
 import jakarta.persistence.*;
@@ -26,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,25 +101,28 @@ public class QueueEntity extends BaseEntity {
     public List<Integer> getThreadsCountByHour() {
         List<Integer> threadsCountByHour = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
-            // 读取workgroupQueueMembers.thread.created 按照24小时分组，统计每个分组的数量
             final int hour = i;
-            int count = workgroupQueueMembers != null
-                    ? (int) workgroupQueueMembers.stream().filter(member -> member.getThread() != null
-                            && member.getThread().getCreatedAt().getHour() == hour).count()
-                    : 0;
-            // 读取agentQueueMembers.thread.created 按照24小时分组，统计每个分组的数量
-            count += agentQueueMembers != null
-                    ? (int) agentQueueMembers.stream().filter(member -> member.getThread() != null
-                            && member.getThread().getCreatedAt().getHour() == hour).count()
-                    : 0;
-            // 读取robotQueueMembers.thread.created 按照24小时分组，统计每个分组的数量
-            count += robotQueueMembers != null
-                    ? (int) robotQueueMembers.stream().filter(member -> member.getThread() != null
-                            && member.getThread().getCreatedAt().getHour() == hour).count()
-                    : 0;
+            int count = countThreadsCreatedInHour(workgroupQueueMembers, hour);
+            count += countThreadsCreatedInHour(agentQueueMembers, hour);
+            count += countThreadsCreatedInHour(robotQueueMembers, hour);
             threadsCountByHour.add(count);
         }
         return threadsCountByHour;
+    }
+
+    private int countThreadsCreatedInHour(List<QueueMemberEntity> members, int hour) {
+        if (members == null) {
+            return 0;
+        }
+        // Align every timestamp to the display timezone before extracting the hour bucket
+        return (int) members.stream()
+                .filter(member -> member.getThread() != null && member.getThread().getCreatedAt() != null)
+                .filter(member -> {
+                    ZonedDateTime displayTime = member.getThread().getCreatedAt()
+                            .withZoneSameInstant(BdDateUtils.getDisplayZoneId());
+                    return displayTime.getHour() == hour;
+                })
+                .count();
     }
 
     /**
