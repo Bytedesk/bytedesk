@@ -67,14 +67,12 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity,
-            VisitorRequest visitorRequest) {
+    public QueueMemberEntity enqueueAgent(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
         return enqueueAgentWithResult(threadEntity, agentEntity, visitorRequest).queueMember();
     }
 
     @Transactional
-    public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity, AgentEntity agentEntity,
-            VisitorRequest visitorRequest) {
+    public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
         UserProtobuf agent = agentEntity.toUserProtobuf();
         boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
@@ -83,18 +81,6 @@ public class QueueService {
         }
         return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
-
-    // @Transactional
-    // public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, UserProtobuf agent, 
-    //     WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-    //     return enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest).queueMember();
-    // }
-
-    // @Transactional
-    // public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, AgentEntity agentEntity, 
-    //     WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-    //     return enqueueWorkgroupWithResult(threadEntity, agentEntity, workgroupEntity, visitorRequest).queueMember();
-    // }
 
     @Transactional
     public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, UserProtobuf agent,

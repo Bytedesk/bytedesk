@@ -219,14 +219,12 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 路由新线程
      */
-    private MessageProtobuf routeNewThread(ThreadEntity thread, AgentEntity agentEntity,
-            VisitorRequest visitorRequest) {
+    private MessageProtobuf routeNewThread(ThreadEntity thread, AgentEntity agentEntity, VisitorRequest visitorRequest) {
         log.debug("开始新线程路由 - threadUid: {}, agentUid: {}", thread.getUid(), agentEntity.getUid());
 
         // 加入队列
         log.debug("开始将线程加入队列");
-        QueueService.QueueEnqueueResult enqueueResult = queueService
-                .enqueueAgentWithResult(thread, agentEntity, visitorRequest);
+        QueueService.QueueEnqueueResult enqueueResult = queueService.enqueueAgentWithResult(thread, agentEntity, visitorRequest);
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
 
         // 根据客服状态路由
@@ -243,8 +241,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 路由在线客服
      */
-    private MessageProtobuf routeOnlineAgent(ThreadEntity thread, AgentEntity agentEntity,
-            QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf routeOnlineAgent(ThreadEntity thread, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始在线客服路由处理 - threadUid: {}, agentUid: {}, agentNickname: {}",
                 thread.getUid(), agentEntity.getUid(), agentEntity.getNickname());
