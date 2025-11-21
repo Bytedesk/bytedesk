@@ -239,12 +239,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
                 .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
         agent.setStatus(request.getStatus()); // 更新接待状态
         //
-        // int currentThreadCount =
-        // threadRestService.countByThreadTopicAndStateNot(agent.getUid(),
-        // ThreadProcessStatusEnum.CLOSED.name());
-        // agent.setCurrentThreadCount(currentThreadCount);
-        // log.info("update agent: {} status", agent.getNickname());
-        //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             throw new RuntimeException("Failed to save agent.");
