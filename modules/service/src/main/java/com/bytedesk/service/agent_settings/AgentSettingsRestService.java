@@ -28,6 +28,8 @@ import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
+import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.service.worktime_settings.WorktimeSettingRepository;
 import com.bytedesk.service.agent.AgentRepository;
 
 import lombok.AllArgsConstructor;
@@ -52,6 +54,8 @@ public class AgentSettingsRestService
     private final ServiceSettingsHelper serviceSettingsHelper;
 
     private final MessageLeaveSettingsHelper messageLeaveSettingsHelper;
+
+    private final WorktimeSettingRepository worktimeSettingRepository;
 
     @Cacheable(value = "agentSettings", key = "#uid", unless = "#result == null")
     @Override
@@ -107,18 +111,19 @@ public class AgentSettingsRestService
         MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
                 modelMapper);
         mls.setUid(uidUtils.getUid());
-        // 处理 MessageLeaveSettings 关联（工作时间段）
-        if (request.getMessageLeaveSettings() != null) {
-            messageLeaveSettingsHelper.updateWorktimesIfPresent(mls, request.getMessageLeaveSettings());
-        }
         entity.setMessageLeaveSettings(mls);
         MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
                 modelMapper);
         mlsDraft.setUid(uidUtils.getUid());
-        if (request.getMessageLeaveSettings() != null) {
-            messageLeaveSettingsHelper.updateWorktimesIfPresent(mlsDraft, request.getMessageLeaveSettings());
-        }
         entity.setDraftMessageLeaveSettings(mlsDraft);
+
+        WorktimeSettingEntity publishedWorktime = resolveWorktimeSetting(request.getWorktimeSettingUid());
+        entity.setWorktimeSettings(publishedWorktime);
+        WorktimeSettingEntity draftWorktime = resolveWorktimeSetting(request.getDraftWorktimeSettingUid());
+        if (draftWorktime == null) {
+            draftWorktime = publishedWorktime;
+        }
+        entity.setDraftWorktimeSettings(draftWorktime);
 
         AutoReplySettingsEntity ars = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
         ars.setUid(uidUtils.getUid());
@@ -199,8 +204,15 @@ public class AgentSettingsRestService
                 modelMapper.map(request.getMessageLeaveSettings(), draft);
                 draft.setUid(originalUid);
             }
-            // 根据 request 中的 worktime uids 映射关联
-            messageLeaveSettingsHelper.updateWorktimesIfPresent(draft, request.getMessageLeaveSettings());
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        if (request.getWorktimeSettingUid() != null) {
+            entity.setWorktimeSettings(resolveWorktimeSetting(request.getWorktimeSettingUid()));
+        }
+
+        if (request.getDraftWorktimeSettingUid() != null) {
+            entity.setDraftWorktimeSettings(resolveWorktimeSetting(request.getDraftWorktimeSettingUid()));
             entity.setHasUnpublishedChanges(true);
         }
 
@@ -519,6 +531,10 @@ public class AgentSettingsRestService
                 entity.setMessageLeaveSettings(newPublished);
             }
         }
+
+        if (entity.getDraftWorktimeSettings() != null || entity.getWorktimeSettings() != entity.getDraftWorktimeSettings()) {
+            entity.setWorktimeSettings(entity.getDraftWorktimeSettings());
+        }
         
         if (entity.getDraftAutoReplySettings() != null) {
             AutoReplySettingsEntity published = entity.getAutoReplySettings();
@@ -614,4 +630,13 @@ public class AgentSettingsRestService
         } else {
             messageLeaveSettingsHelper.copyPropertiesExcludingIds(source, target);
         }
-    }}
+    }
+
+    private WorktimeSettingEntity resolveWorktimeSetting(String uid) {
+        if (uid == null || uid.isBlank()) {
+            return null;
+        }
+        return worktimeSettingRepository.findByUid(uid)
+                .orElseThrow(() -> new RuntimeException("WorktimeSetting not found by uid: " + uid));
+    }
+}

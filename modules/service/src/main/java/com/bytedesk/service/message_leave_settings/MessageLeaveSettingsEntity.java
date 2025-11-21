@@ -44,7 +44,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageLeaveSettingsEntity extends BaseEntity {
 
-    // 留言开关
     @Builder.Default
     @Column(name = "is_leave_msg_enabled")
     private Boolean messageLeaveEnabled = true;

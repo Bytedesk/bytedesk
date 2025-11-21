@@ -17,8 +17,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.worktime.WorktimeEntity;
 
 import jakarta.persistence.CascadeType;
@@ -48,11 +46,6 @@ public class WorktimeSettingEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
-
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
-
     // 工作时间设置是否启用
     @Builder.Default
     private Boolean enabled = true;
@@ -71,26 +64,6 @@ public class WorktimeSettingEntity extends BaseEntity {
     @Builder.Default
     @Column(columnDefinition = "text")
     private String holidays = "{}";
-
-    // 非工作时间是否启用机器人
-    @Builder.Default
-    private Boolean nonWorktimeRobotEnabled = true;
-
-    // 非工作时间是否启用留言功能
-    @Builder.Default
-    private Boolean nonWorktimeLeaveMessageEnabled = true;
-
-    // 工作时间通知设置
-    @Builder.Default
-    private Boolean worktimeNotificationEnabled = false;
-
-    // 工作时间通知方式（邮件、短信、企业微信等）
-    @Builder.Default
-    private String worktimeNotificationType = "EMAIL";
-
-    // 工作时间通知接收人
-    @Builder.Default
-    private String worktimeNotificationRecipients = BytedeskConsts.EMPTY_STRING;
 
     /**
      * 检查当前时间是否在工作时间内

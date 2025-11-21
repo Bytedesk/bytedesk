@@ -19,6 +19,7 @@ import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
+import com.bytedesk.service.worktime_settings.WorktimeSettingResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -65,6 +66,15 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
      * Draft message leave settings (Agent-specific)
      */
     private MessageLeaveSettingsResponse draftMessageLeaveSettings;
+
+    /**
+     * Worktime settings reference (Agent-specific)
+     */
+    private WorktimeSettingResponse worktimeSettings;
+    /**
+     * Draft worktime settings reference (Agent-specific)
+     */
+    private WorktimeSettingResponse draftWorktimeSettings;
 
     /**
      * Auto-reply settings (Agent-specific)

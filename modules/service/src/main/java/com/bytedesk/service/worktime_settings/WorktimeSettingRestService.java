@@ -107,7 +107,7 @@ public class WorktimeSettingRestService extends BaseRestServiceWithExport<Workti
             if (latest.isPresent()) {
                 WorktimeSettingEntity latestEntity = latest.get();
                 // 合并需要保留的数据
-                latestEntity.setName(entity.getName());
+                // latestEntity.setName(entity.getName());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
                 return tagRepository.save(latestEntity);

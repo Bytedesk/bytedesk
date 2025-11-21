@@ -46,6 +46,16 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
     private MessageLeaveSettingsRequest messageLeaveSettings;
 
     /**
+     * Published worktime setting uid
+     */
+    private String worktimeSettingUid;
+
+    /**
+     * Draft worktime setting uid
+     */
+    private String draftWorktimeSettingUid;
+
+    /**
      * Robot routing settings (Workgroup-specific)
      */
     private RobotRoutingSettingsRequest robotRoutingSettings;

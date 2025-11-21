@@ -63,6 +63,16 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
     private MessageLeaveSettingsRequest messageLeaveSettings;
 
     /**
+     * Published worktime setting uid
+     */
+    private String worktimeSettingUid;
+
+    /**
+     * Draft worktime setting uid
+     */
+    private String draftWorktimeSettingUid;
+
+    /**
      * Auto-reply settings (Agent-specific)
      */
     private AutoReplySettingsRequest autoReplySettings;

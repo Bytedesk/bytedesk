@@ -26,6 +26,8 @@ import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.service.worktime_settings.WorktimeSettingRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +49,8 @@ public class WorkgroupSettingsRestService
     private final MessageLeaveSettingsHelper messageLeaveSettingsHelper;
 
     private final RobotRepository robotRepository;
+
+    private final WorktimeSettingRepository worktimeSettingRepository;
 
     @Cacheable(value = "workgroupSettings", key = "#uid", unless = "#result == null")
     @Override
@@ -93,6 +97,14 @@ public class WorkgroupSettingsRestService
                 modelMapper);
         mlsDraft.setUid(uidUtils.getUid());
         entity.setDraftMessageLeaveSettings(mlsDraft);
+
+        WorktimeSettingEntity publishedWorktime = resolveWorktimeSetting(request.getWorktimeSettingUid());
+        entity.setWorktimeSettings(publishedWorktime);
+        WorktimeSettingEntity draftWorktime = resolveWorktimeSetting(request.getDraftWorktimeSettingUid());
+        if (draftWorktime == null) {
+            draftWorktime = publishedWorktime;
+        }
+        entity.setDraftWorktimeSettings(draftWorktime);
 
         // create 场景：不将 robotUid 解析成 RobotEntity，统一使用 Entity.fromRequest 风格
         RobotRoutingSettingsEntity rrs = RobotRoutingSettingsEntity.fromRequest(request.getRobotRoutingSettings());
@@ -196,6 +208,15 @@ public class WorkgroupSettingsRestService
                 modelMapper.map(request.getMessageLeaveSettings(), draft);
                 draft.setUid(originalUid);
             }
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        if (request.getWorktimeSettingUid() != null) {
+            entity.setWorktimeSettings(resolveWorktimeSetting(request.getWorktimeSettingUid()));
+        }
+
+        if (request.getDraftWorktimeSettingUid() != null) {
+            entity.setDraftWorktimeSettings(resolveWorktimeSetting(request.getDraftWorktimeSettingUid()));
             entity.setHasUnpublishedChanges(true);
         }
 
@@ -403,6 +424,10 @@ public class WorkgroupSettingsRestService
             }
         }
 
+        if (entity.getDraftWorktimeSettings() != null || entity.getWorktimeSettings() != entity.getDraftWorktimeSettings()) {
+            entity.setWorktimeSettings(entity.getDraftWorktimeSettings());
+        }
+
         if (entity.getDraftRobotSettings() != null) {
             RobotRoutingSettingsEntity published = entity.getRobotSettings();
             if (published != null) {
@@ -488,6 +513,14 @@ public class WorkgroupSettingsRestService
         RobotEntity robot = robotRepository.findByUid(robotUid)
                 .orElseThrow(() -> new RuntimeException("Robot not found by uid: " + robotUid));
         target.setRobot(robot);
+    }
+
+    private WorktimeSettingEntity resolveWorktimeSetting(String uid) {
+        if (uid == null || uid.isBlank()) {
+            return null;
+        }
+        return worktimeSettingRepository.findByUid(uid)
+                .orElseThrow(() -> new RuntimeException("WorktimeSetting not found by uid: " + uid));
     }
 
     @Override

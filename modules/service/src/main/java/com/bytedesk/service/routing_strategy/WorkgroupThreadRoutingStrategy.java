@@ -53,6 +53,7 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
+import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
@@ -326,10 +327,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 检查机器人配置和服务时间
         boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
-        boolean isInServiceTime = workgroup.getSettings() != null
-                && workgroup.getSettings().getMessageLeaveSettings() != null
-                        ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
-                        : true;
+        boolean isInServiceTime = resolveIsInServiceTime(workgroup);
 
         log.debug("路由决策参数 - 工作组离线状态: {}, 在服务时间内: {}",
                 isOffline, isInServiceTime);
@@ -384,10 +382,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 thread.getUid(), workgroup.getUid());
 
         // 检查是否在工作时间内
-        boolean isInServiceTime = workgroup.getSettings() != null
-                && workgroup.getSettings().getMessageLeaveSettings() != null
-                        ? workgroup.getSettings().getMessageLeaveSettings().isInServiceTime()
-                        : true;
+        boolean isInServiceTime = resolveIsInServiceTime(workgroup);
         log.debug("服务时间检查 - 是否在服务时间内: {}", isInServiceTime);
 
         if (!isInServiceTime) {
@@ -852,5 +847,20 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private int estimateAvailableSlots(AgentEntity agent) {
         int maxThreadCount = agent.getMaxThreadCount();
         return maxThreadCount > 0 ? maxThreadCount : 1;
+    }
+
+    private boolean resolveIsInServiceTime(WorkgroupEntity workgroup) {
+        if (workgroup == null || workgroup.getSettings() == null) {
+            return true;
+        }
+        WorktimeSettingEntity published = workgroup.getSettings().getWorktimeSettings();
+        if (published != null) {
+            return Boolean.TRUE.equals(published.isInWorktime());
+        }
+        WorktimeSettingEntity draft = workgroup.getSettings().getDraftWorktimeSettings();
+        if (draft != null) {
+            return Boolean.TRUE.equals(draft.isInWorktime());
+        }
+        return true;
     }
 }
