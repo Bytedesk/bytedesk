@@ -226,7 +226,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 加入队列
         log.debug("开始将线程加入队列");
         QueueService.QueueEnqueueResult enqueueResult = queueService
-            .enqueueAgentWithResult(thread, agentEntity, visitorRequest);
+                .enqueueAgentWithResult(thread, agentEntity, visitorRequest);
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
 
         // 根据客服状态路由
@@ -243,8 +243,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 路由在线客服
      */
-            private MessageProtobuf routeOnlineAgent(ThreadEntity thread, AgentEntity agentEntity,
-                QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf routeOnlineAgent(ThreadEntity thread, AgentEntity agentEntity,
+            QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始在线客服路由处理 - threadUid: {}, agentUid: {}, agentNickname: {}",
                 thread.getUid(), agentEntity.getUid(), agentEntity.getNickname());
@@ -338,7 +338,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理排队客服（客服在线但已达到最大接待人数）
      */
-        private MessageProtobuf handleQueuedAgent(ThreadEntity threadFromRequest, AgentEntity agent,
+    private MessageProtobuf handleQueuedAgent(ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始处理客服排队情况 - threadUid: {}, agentUid: {}, agentNickname: {}",
