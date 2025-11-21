@@ -250,7 +250,7 @@ public class QueueNotificationService {
     }
 
     /** Lazily fetch the queue member rest service to avoid circular dependencies. */
-    private com.bytedesk.service.queue_member.QueueMemberRestService queueMemberRestService() {
+    private QueueMemberRestService queueMemberRestService() {
         return queueMemberRestServiceProvider.getObject();
     }
 
