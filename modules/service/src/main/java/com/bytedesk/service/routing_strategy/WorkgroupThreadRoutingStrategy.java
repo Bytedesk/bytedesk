@@ -547,10 +547,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 构建结构化 QueueContent
         QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
                 .content(queueContentText)
-                .position(queueMemberEntity.getQueueNumber())
+                // .position(queueMemberEntity.getQueueNumber())
+                .position(queuingCount)
                 .queueSize(queuingCount)
                 .serverTimestamp(System.currentTimeMillis());
-
         // 计算预估等待时间（分钟 -> 秒）与描述
         if (queuingCount > 0) {
             int estimatedMinutes = queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
