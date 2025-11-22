@@ -46,6 +46,7 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String privacyPolicyUrl;
         private String termsOfServiceUrl;
         private Boolean loginUsernameEnable = true;
+        private Boolean login2faEnable = false;
         private Integer loginMaxRetryCount = 3;
         private Integer loginMaxRetryLockTime = 10;
         private Boolean loginMobileEnable = true;
