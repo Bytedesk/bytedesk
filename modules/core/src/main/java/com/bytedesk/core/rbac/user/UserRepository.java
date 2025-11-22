@@ -42,6 +42,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
 
     Boolean existsByEmailAndPlatformAndDeletedFalse(String email, String platform);
 
+    Boolean existsByUsernameAndMobileAndPlatformAndDeletedFalse(String username, String mobile, String platform);
+
     Boolean existsBySuperUserAndDeletedFalse(Boolean superUser);
 
 }

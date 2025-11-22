@@ -616,6 +616,12 @@ public class UserService {
         return userRepository.existsByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
+    // exists by username and mobile
+    @Cacheable(value = "user:exists", key = "#username + '-' + #mobile + '-' + #platform", unless = "#result == null")
+    public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile, @NonNull String platform) {
+        return userRepository.existsByUsernameAndMobileAndPlatformAndDeletedFalse(username, mobile, platform);
+    }
+
     public Boolean existsBySuperUser() {
         return userRepository.existsBySuperUserAndDeletedFalse(true);
     }

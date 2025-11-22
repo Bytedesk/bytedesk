@@ -95,6 +95,16 @@ public class AuthController {
             if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
                 return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
             }
+            // 验证用户名和手机号是否为同一个用户
+            if (StringUtils.hasText(authRequest.getUsername()) && StringUtils.hasText(authRequest.getMobile())) {
+                Boolean userMatch = userService.existsByUsernameAndMobileAndPlatform(
+                        authRequest.getUsername(),
+                        authRequest.getMobile(),
+                        authRequest.getPlatform());
+                if (!userMatch) {
+                    return ResponseEntity.ok().body(JsonResult.error("用户名和手机号不匹配，请检查后重新输入", -3, false));
+                }
+            }
         }
 
         try {
