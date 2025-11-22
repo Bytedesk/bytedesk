@@ -33,6 +33,7 @@ public class AuthRequest extends BaseRequest {
     private String passwordHash; // 密码hash
     private String passwordSalt; // 密码盐
     //
+    private Boolean twoFactorEnabled = false; // 是否启用两步验证
     private String country;
     private String mobile;
     private String email;

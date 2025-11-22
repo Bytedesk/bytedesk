@@ -81,12 +81,19 @@ public class AuthController {
 
     @PostMapping("/login")
     @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password")
-    public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login {}", authRequest.toString());
 
         if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
+        }
+
+        if (authRequest.getTwoFactorEnabled() != null && authRequest.getTwoFactorEnabled()) {
+            log.debug("Two-factor authentication is enabled for user: {}", authRequest.getUsername());
+            if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
+            }
         }
 
         try {
