@@ -89,6 +89,7 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
 
+        // validate two-factor code if enabled 双重验证
         if (authRequest.getTwoFactorEnabled() != null && authRequest.getTwoFactorEnabled()) {
             log.debug("Two-factor authentication is enabled for user: {}", authRequest.getUsername());
             if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
@@ -109,7 +110,6 @@ public class AuthController {
                 if (authentication == null) {
                     return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
                 }
-                
             } else if (StringUtils.hasText(authRequest.getPasswordHash())
                     && StringUtils.hasText(authRequest.getPasswordSalt())) {
                 // 使用密码哈希登录（AES解密）
@@ -118,11 +118,10 @@ public class AuthController {
                 if (authentication == null) {
                     return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
                 }
-                
             } else {
                 return ResponseEntity.ok().body(JsonResult.error("Password or password hash is required", -1, false));
             }
-            
+         
             // 登录成功，重置失败次数
             authLoginRetryHelper.resetLoginFailedCount(authRequest.getUsername());
             
@@ -168,6 +167,7 @@ public class AuthController {
                 authRequest.getChannel())) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
         }
+
         // validate mobile & code
         if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
