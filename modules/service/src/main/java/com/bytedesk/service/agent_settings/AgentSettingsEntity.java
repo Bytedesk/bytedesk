@@ -94,40 +94,40 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     /**
      * Message leave settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private MessageLeaveSettingsEntity messageLeaveSettings;
 
     /**
      * Draft Message leave settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private MessageLeaveSettingsEntity draftMessageLeaveSettings;
 
     /**
      * Worktime settings reference (shared template)
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private WorktimeSettingEntity worktimeSettings;
 
     /**
      * Draft worktime settings reference
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private WorktimeSettingEntity draftWorktimeSettings;
 
     /**
      * Auto-reply settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private AutoReplySettingsEntity autoReplySettings;
 
     /**
      * Draft Auto-reply settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     // @NotFound(action = NotFoundAction.IGNORE)
     private AutoReplySettingsEntity draftAutoReplySettings;
 

@@ -86,13 +86,13 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
     /**
      * Worktime settings reference (shared template)
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private WorktimeSettingEntity worktimeSettings;
 
     /**
      * Draft worktime settings reference
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private WorktimeSettingEntity draftWorktimeSettings;
 
     /**

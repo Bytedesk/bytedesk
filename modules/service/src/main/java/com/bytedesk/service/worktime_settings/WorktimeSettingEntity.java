@@ -14,16 +14,18 @@
 package com.bytedesk.service.worktime_settings;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.service.worktime.WorktimeEntity;
 
-import jakarta.persistence.CascadeType;
+import org.modelmapper.ModelMapper;
+
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,24 +48,22 @@ public class WorktimeSettingEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // 工作时间设置是否启用
     @Builder.Default
     private Boolean enabled = true;
 
-    // 默认工作时间列表（周一至周五 9:00-18:00）
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorktimeEntity> regularWorktimes = new ArrayList<>();
+    @Convert(converter = WorktimeSlotListConverter.class)
+    @Column(name = "regular_worktimes", columnDefinition = "text")
+    private List<WorktimeSlotValue> regularWorktimes = new ArrayList<>();
 
-    // 特殊工作时间列表（如节假日前后、促销活动期间等特殊工作时间）
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorktimeEntity> specialWorktimes = new ArrayList<>();
+    @Convert(converter = WorktimeSlotListConverter.class)
+    @Column(name = "special_worktimes", columnDefinition = "text")
+    private List<WorktimeSlotValue> specialWorktimes = new ArrayList<>();
 
-    // 节假日设置（key=日期，value=节假日名称）
     @Builder.Default
-    @Column(columnDefinition = "text")
-    private String holidays = "{}";
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String holidays = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 检查当前时间是否在工作时间内
@@ -71,42 +71,46 @@ public class WorktimeSettingEntity extends BaseEntity {
      * @return true 如果当前时间在工作时间内，false 如果不在
      */
     public Boolean isInWorktime() {
-        LocalDate today = LocalDate.now();
-        
-        // 1. 检查是否是节假日
-        if (!holidays.equals("{}") && holidays.contains(today.toString())) {
-            // 如果是节假日，检查是否有特殊工作时间安排
-            return isInSpecialWorktime();
-        }
-        
-        // 2. 检查是否在特殊工作时间内
-        if (isInSpecialWorktime()) {
+        if (Boolean.FALSE.equals(enabled)) {
             return true;
         }
-        
-        // 3. 检查是否在正常工作时间内
-        return isInRegularWorktime();
+
+        LocalDate today = LocalDate.now();
+
+        if (holidays != null && !"{}".equals(holidays) && holidays.contains(today.toString())) {
+            return isInSpecialWorktime(today);
+        }
+
+        if (isInSpecialWorktime(today)) {
+            return true;
+        }
+
+        return isInRegularWorktime(today);
     }
-    
-    /**
-     * 检查当前时间是否在特殊工作时间内
-     */
-    private Boolean isInSpecialWorktime() {
+
+    private Boolean isInSpecialWorktime(LocalDate date) {
         if (specialWorktimes == null || specialWorktimes.isEmpty()) {
             return false;
         }
-        return specialWorktimes.stream()
-            .anyMatch(WorktimeEntity::isWorkTime);
+        LocalTime now = LocalTime.now();
+        return specialWorktimes.stream().anyMatch(slot -> slot.isActive(date, now));
     }
-    
-    /**
-     * 检查当前时间是否在正常工作时间内
-     */
-    private Boolean isInRegularWorktime() {
+
+    private Boolean isInRegularWorktime(LocalDate date) {
         if (regularWorktimes == null || regularWorktimes.isEmpty()) {
             return false;
         }
-        return regularWorktimes.stream()
-            .anyMatch(WorktimeEntity::isWorkTime);
+        LocalTime now = LocalTime.now();
+        return regularWorktimes.stream().anyMatch(slot -> slot.isActive(date, now));
+    }
+
+    public static WorktimeSettingEntity fromRequest(WorktimeSettingRequest request, ModelMapper modelMapper) {
+        if (modelMapper == null) {
+            throw new IllegalArgumentException("ModelMapper is required");
+        }
+        if (request == null) {
+            return WorktimeSettingEntity.builder().build();
+        }
+        return modelMapper.map(request, WorktimeSettingEntity.class);
     }
 }

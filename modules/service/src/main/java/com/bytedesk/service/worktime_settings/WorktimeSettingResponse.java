@@ -14,8 +14,9 @@
 package com.bytedesk.service.worktime_settings;
 
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.service.worktime.WorktimeResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,9 +41,9 @@ public class WorktimeSettingResponse extends BaseResponse {
 
     private Boolean enabled;
 
-    private java.util.List<WorktimeResponse> regularWorktimes;
+    private List<WorktimeSlotValue> regularWorktimes;
 
-    private java.util.List<WorktimeResponse> specialWorktimes;
+    private List<WorktimeSlotValue> specialWorktimes;
 
     private String holidays;
 

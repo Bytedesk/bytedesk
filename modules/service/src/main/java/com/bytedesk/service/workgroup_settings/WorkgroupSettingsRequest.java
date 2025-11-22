@@ -17,6 +17,7 @@ import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;
+import com.bytedesk.service.worktime_settings.WorktimeSettingRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,14 +47,9 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
     private MessageLeaveSettingsRequest messageLeaveSettings;
 
     /**
-     * Published worktime setting uid
+     * Worktime settings (inline, behaves like message leave)
      */
-    private String worktimeSettingUid;
-
-    /**
-     * Draft worktime setting uid
-     */
-    private String draftWorktimeSettingUid;
+    private WorktimeSettingRequest worktimeSettings;
 
     /**
      * Robot routing settings (Workgroup-specific)
