@@ -182,22 +182,40 @@ services:
       # https://www.weiyuai.cn/docs/zh-CN/docs/faq#%E9%97%AE%E9%A2%9813%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E8%AF%95%E7%94%A8%E7%89%88license
       BYTEDESK_LICENSE_KEY: 
       # enable custom config: name, logo, description
+      # enable custom system config 是否开启自定义系统配置
       BYTEDESK_CUSTOM_ENABLED: "false"
+      # custom system name 自定义系统名称
       BYTEDESK_CUSTOM_NAME: 
+      # custom logo url 自定义logo地址
       BYTEDESK_CUSTOM_LOGO: 
-      BYTEDESK_CUSTOM_DESCRIPTION: ""
+      # custom system description 自定义系统描述
+      BYTEDESK_CUSTOM_DESCRIPTION: 
       BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: "false"
       BYTEDESK_CUSTOM_SHOW_DEMO: "false"
       BYTEDESK_CUSTOM_PRIVACY_POLICY_URL: https://www.weiyuai.cn/privacy.html
       BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL: https://www.weiyuai.cn/terms.html
+      # enable login username 登录用户名开启
       BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: "true"
+      # enable 2fa 双重验证开启
+      BYTEDESK_CUSTOM_LOGIN_2FA_ENABLE: "false"
+      # 密码错误最大重试次数, 默认3次, 0表示不限制。
+      BYTEDESK_CUSTOM_LOGIN_MAX_RETRY_COUNT: 3
+      # 超过次数默认锁定10分钟, 0表示不锁定
+      BYTEDESK_CUSTOM_LOGIN_LOCK_TIME_MINUTES: 10
+      # enable login mobile 手机号登录开启
       BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE: "true"
+      # enable login scan 扫码登录开启
       BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE: "true"
+      # enable github login
+      BYTEDESK_CUSTOM_LOGIN_GITHUB_ENABLE: "false"
       BYTEDESK_CUSTOM_DOC_URL_SHOW: "true"
       BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
       BYTEDESK_CUSTOM_LANG: zh-CN
+      # allow register 注册开启
       BYTEDESK_CUSTOM_ALLOW_REGISTER: "true"
+      # force validate mobile 强制验证手机号
       BYTEDESK_CUSTOM_FORCE_VALIDATE_MOBILE: "true"
+      # force validate email 强制验证邮箱
       BYTEDESK_CUSTOM_FORCE_VALIDATE_EMAIL: "true"
       # Admin config
       BYTEDESK_ADMIN_EMAIL: admin@email.com
