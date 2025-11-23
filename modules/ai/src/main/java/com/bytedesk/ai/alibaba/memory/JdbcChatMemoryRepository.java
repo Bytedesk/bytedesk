@@ -27,6 +27,7 @@ import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class JdbcChatMemoryRepository implements ChatMemoryRepository {
@@ -149,7 +150,7 @@ public abstract class JdbcChatMemoryRepository implements ChatMemoryRepository {
 				// The content is always stored empty for ToolResponseMessages.
 				// If we want to capture the actual content, we need to extend
 				// AddBatchPreparedStatement to support it.
-				case TOOL -> new ToolResponseMessage(List.of());
+				case TOOL -> ToolResponseMessage.builder().responses(List.of()).metadata(Map.of()).build();
 			};
 		}
 

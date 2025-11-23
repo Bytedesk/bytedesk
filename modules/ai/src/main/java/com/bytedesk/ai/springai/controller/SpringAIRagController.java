@@ -19,7 +19,11 @@ import java.util.HashMap;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.observation.AdvisorObservationConvention;
+import org.springframework.ai.chat.client.advisor.observation.DefaultAdvisorObservationConvention;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.observation.ChatClientObservationConvention;
+import org.springframework.ai.chat.client.observation.DefaultChatClientObservationConvention;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -68,6 +72,11 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnBean({ChatModel.class, VectorStore.class, EmbeddingModel.class})
 public class SpringAIRagController {
 
+    private static final ChatClientObservationConvention DEFAULT_CHAT_OBSERVATION_CONVENTION =
+        new DefaultChatClientObservationConvention();
+    private static final AdvisorObservationConvention DEFAULT_ADVISOR_OBSERVATION_CONVENTION =
+        new DefaultAdvisorObservationConvention();
+
     private final VectorStore vectorStore;
 
     private final EmbeddingModel embeddingModel;
@@ -99,7 +108,7 @@ public class SpringAIRagController {
                         .build())
                 .build();
         // 使用chatClient，添加ObservationRegistry
-        ChatResponse response = ChatClient.builder(primaryChatModel, observationRegistry, null)
+        ChatResponse response = chatClientBuilderWithObservation()
                 .build()
                 .prompt()
                 .advisors(qaAdvisor)
@@ -449,7 +458,7 @@ public class SpringAIRagController {
             return ResponseEntity.ok(JsonResult.error("Service is not available"));
         }
 
-        ChatClient chatClient = ChatClient.builder(primaryChatModel, observationRegistry, null)
+        ChatClient chatClient = chatClientBuilderWithObservation()
                 .build();
                 
         ChatResponse response = chatClient.prompt()
@@ -551,6 +560,14 @@ public class SpringAIRagController {
         }
         
         return ResponseEntity.ok(JsonResult.success(embeddingModelInfo));
+    }
+
+    private ChatClient.Builder chatClientBuilderWithObservation() {
+        if (observationRegistry == null) {
+            return ChatClient.builder(primaryChatModel);
+        }
+        return ChatClient.builder(primaryChatModel, observationRegistry,
+                DEFAULT_CHAT_OBSERVATION_CONVENTION, DEFAULT_ADVISOR_OBSERVATION_CONVENTION);
     }
 
 }
