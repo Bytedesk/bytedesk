@@ -25,6 +25,9 @@ public class RedisConsts {
     public static final String MESSAGE_UNREAD_PREFIX = BYTEDESK_REDIS_PREFIX + "message_unread:";
     public static final String MESSAGE_UNREAD_EXISTS_VALUE = "1";
 
+    // 会话内消息序号缓存前缀
+    public static final String THREAD_SEQUENCE_PREFIX = BYTEDESK_REDIS_PREFIX + "thread:sequence:";
+
     // 自动回复去重相关常量
     public static final String AUTO_REPLY_PROCESSED_PREFIX = BYTEDESK_REDIS_PREFIX + "auto_reply_processed:";
     public static final String AUTO_REPLY_PROCESSED_VALUE = "1";

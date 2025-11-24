@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.thread;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,6 +47,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -68,6 +73,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ThreadRestService
         extends BaseRestServiceWithExport<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
 
+    private static final Duration THREAD_SEQUENCE_CACHE_TTL = Duration.ofHours(12);
+    private static final long THREAD_SEQUENCE_SYNC_INTERVAL = 50L;
+    private static final int MAX_SEQUENCE_DB_RETRIES = 3;
+
     private final AuthService authService;
 
     private final ModelMapper modelMapper;
@@ -79,6 +88,8 @@ public class ThreadRestService
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final TopicRestService topicRestService;
+
+    private final StringRedisTemplate stringRedisTemplate;
     
     public Map<String, Long> reportClosedByCloseType(java.time.ZonedDateTime start, java.time.ZonedDateTime end) {
         List<Object[]> rows = threadRepository.countClosedGroupedByCloseType(start, end);
@@ -121,6 +132,40 @@ public class ThreadRestService
         return queryByOrg(request);
     }
 
+    public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("login required");
+        }
+
+        Optional<TopicEntity> topicOptional = topicRestService.findByUserUid(user.getUid());
+        if (!topicOptional.isPresent()) {
+            return Page.empty();
+        }
+
+        Set<String> customerServiceTopics = topicOptional.get().getTopics().stream()
+                .filter(TopicUtils::isCustomerServiceTopic)
+                .collect(Collectors.toSet());
+
+        if (customerServiceTopics.isEmpty()) {
+            return Page.empty();
+        }
+
+        Pageable pageable = request.getPageable();
+        Page<ThreadEntity> threadPage = threadRepository.findByTopicsInAndDeletedFalse(customerServiceTopics, pageable);
+
+        Map<String, ThreadEntity> uniqueThreadsByTopic = new HashMap<>();
+        threadPage.getContent().forEach(thread -> uniqueThreadsByTopic.putIfAbsent(thread.getTopic(), thread));
+
+        List<ThreadEntity> uniqueThreads = new ArrayList<>(uniqueThreadsByTopic.values());
+        Page<ThreadEntity> filteredPage = new PageImpl<>(
+                uniqueThreads,
+                pageable,
+                Math.min(uniqueThreads.size(), threadPage.getTotalElements()));
+
+        return filteredPage.map(this::convertToResponse);
+    }
+
     public Page<ThreadResponse> queryByTopic(ThreadRequest request) {
         Pageable pageable = request.getPageable();
         Specification<ThreadEntity> specs = ThreadSpecification.search(request, authService);
@@ -149,45 +194,6 @@ public class ThreadRestService
         } else {
             throw new NotFoundException("thread " + request.getUid() + " not found");
         }
-    }
-
-    public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException("login required");
-        }
-        Optional<TopicEntity> topicOptional = topicRestService.findByUserUid(user.getUid());
-        if (!topicOptional.isPresent()) {
-            return Page.empty();
-        }
-
-        // 过滤出客服相关主题
-        Set<String> customerServiceTopics = topicOptional.get().getTopics().stream()
-                .filter(TopicUtils::isCustomerServiceTopic)
-                .collect(java.util.stream.Collectors.toSet());
-
-        if (customerServiceTopics.isEmpty()) {
-            return Page.empty();
-        }
-
-        Pageable pageable = request.getPageable();
-        Page<ThreadEntity> threadPage = threadRepository.findByTopicsInAndDeletedFalse(customerServiceTopics, pageable);
-
-        // 对结果按topic进行过滤，每个topic只保留一条记录
-        Map<String, ThreadEntity> uniqueThreadsByTopic = new HashMap<>();
-        threadPage.getContent().forEach(thread -> {
-            uniqueThreadsByTopic.putIfAbsent(thread.getTopic(), thread);
-        });
-
-        // 将过滤后的结果转换为Page对象
-        List<ThreadEntity> uniqueThreads = new ArrayList<>(uniqueThreadsByTopic.values());
-        Page<ThreadEntity> filteredPage = new PageImpl<>(
-                uniqueThreads,
-                pageable,
-                Math.min(uniqueThreads.size(), threadPage.getTotalElements()) // 调整总数
-        );
-
-        return filteredPage.map(this::convertToResponse);
     }
 
     @Transactional
@@ -760,28 +766,88 @@ public class ThreadRestService
         return threadPage.map(this::convertToResponse);
     }
 
-    // TODO: 直接操作数据库，避免频繁更新导致的性能问题，考虑使用Redis缓存或队列异步处理
     @Transactional
     public ThreadSequenceResponse allocateMessageMetadata(@NonNull String threadUid) {
         if (!StringUtils.hasText(threadUid)) {
             throw new IllegalArgumentException("thread uid is required");
         }
 
-        final int maxRetries = 3;
+        long sequenceNumber;
+        boolean usedCache = false;
+        try {
+            sequenceNumber = allocateSequenceFromCache(threadUid);
+            usedCache = true;
+        } catch (Exception cacheException) {
+            log.warn("Falling back to database allocation for thread {} due to cache error", threadUid,
+                    cacheException);
+            sequenceNumber = allocateSequenceDirectly(threadUid);
+        }
+
+        if (usedCache && shouldSyncSequence(sequenceNumber)) {
+            syncSequenceToDatabase(threadUid, sequenceNumber);
+        }
+
+        return ThreadSequenceResponse.builder()
+                .threadUid(threadUid)
+                .messageUid(uidUtils.getUid())
+                .sequenceNumber(sequenceNumber)
+                .timestamp(System.currentTimeMillis()) //
+                .build();
+    }
+
+    private long allocateSequenceFromCache(String threadUid) {
+        String cacheKey = buildSequenceCacheKey(threadUid);
+        ensureSequenceInitialized(cacheKey, threadUid);
+        Long nextSequence = stringRedisTemplate.opsForValue().increment(cacheKey);
+        if (nextSequence == null) {
+            throw new IllegalStateException("Failed to increment sequence for thread " + threadUid);
+        }
+        refreshSequenceKeyTtl(cacheKey);
+        return nextSequence;
+    }
+
+    private void ensureSequenceInitialized(String cacheKey, String threadUid) {
+        Boolean hasKey = stringRedisTemplate.hasKey(cacheKey);
+        if (Boolean.TRUE.equals(hasKey)) {
+            return;
+        }
+        long persistedSequence = loadPersistedSequence(threadUid);
+        Boolean initialized = stringRedisTemplate.opsForValue()
+                .setIfAbsent(cacheKey, Long.toString(persistedSequence), THREAD_SEQUENCE_CACHE_TTL);
+        if (!Boolean.TRUE.equals(initialized)) {
+            refreshSequenceKeyTtl(cacheKey);
+        }
+    }
+
+    private void refreshSequenceKeyTtl(String cacheKey) {
+        stringRedisTemplate.expire(cacheKey, THREAD_SEQUENCE_CACHE_TTL);
+    }
+
+    private long loadPersistedSequence(String threadUid) {
+        ThreadEntity thread = getThreadOrThrow(threadUid);
+        String extraJson = thread.getExtra();
+        if (!StringUtils.hasText(extraJson) || BytedeskConsts.EMPTY_JSON_STRING.equals(extraJson)) {
+            return 0L;
+        }
+        ThreadExtra threadExtra = ThreadExtra.fromJson(extraJson);
+        if (threadExtra == null || threadExtra.getSequenceNumber() == null) {
+            return 0L;
+        }
+        return threadExtra.getSequenceNumber();
+    }
+
+    private long allocateSequenceDirectly(String threadUid) {
         int attempt = 0;
         while (true) {
             try {
-                ThreadEntity thread = findByUid(threadUid)
-                        .orElseThrow(() -> new NotFoundException("thread " + threadUid + " not found"));
-
-                String extraJson = thread.getExtra();
-                ThreadExtra threadExtra = ThreadExtra.fromJson(extraJson);
+                ThreadEntity thread = getThreadOrThrow(threadUid);
+                ThreadExtra threadExtra = ThreadExtra.fromJson(thread.getExtra());
                 if (threadExtra == null) {
                     threadExtra = ThreadExtra.builder().sequenceNumber(0L).build();
                 }
 
                 long currentSequence = threadExtra.getSequenceNumber() != null ? threadExtra.getSequenceNumber() : 0L;
-                if (!StringUtils.hasText(extraJson) || BytedeskConsts.EMPTY_JSON_STRING.equals(extraJson)) {
+                if (!StringUtils.hasText(thread.getExtra()) || BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getExtra())) {
                     currentSequence = 0L;
                 }
                 long nextSequence = currentSequence + 1;
@@ -789,16 +855,10 @@ public class ThreadRestService
                 threadExtra.setSequenceNumber(nextSequence);
                 thread.setExtra(threadExtra.toJson());
                 save(thread);
-
-                return ThreadSequenceResponse.builder()
-                        .threadUid(threadUid)
-                        .messageUid(uidUtils.getUid())
-                        .sequenceNumber(nextSequence)
-                        .timestamp(System.currentTimeMillis())
-                        .build();
+                return nextSequence;
             } catch (ObjectOptimisticLockingFailureException ex) {
                 attempt++;
-                if (attempt >= maxRetries) {
+                if (attempt >= MAX_SEQUENCE_DB_RETRIES) {
                     log.error("Failed to allocate sequence for thread {} after {} attempts", threadUid, attempt, ex);
                     throw ex;
                 }
@@ -806,6 +866,40 @@ public class ThreadRestService
                         attempt);
             }
         }
+    }
+
+    private boolean shouldSyncSequence(long sequenceNumber) {
+        return sequenceNumber > 0 && sequenceNumber % THREAD_SEQUENCE_SYNC_INTERVAL == 0;
+    }
+
+    private void syncSequenceToDatabase(String threadUid, long sequenceNumber) {
+        try {
+            ThreadEntity thread = getThreadOrThrow(threadUid);
+            ThreadExtra threadExtra = ThreadExtra.fromJson(thread.getExtra());
+            if (threadExtra == null) {
+                threadExtra = ThreadExtra.builder().build();
+            }
+            Long persisted = threadExtra.getSequenceNumber();
+            if (persisted != null && persisted >= sequenceNumber) {
+                return;
+            }
+            threadExtra.setSequenceNumber(sequenceNumber);
+            thread.setExtra(threadExtra.toJson());
+            save(thread);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.debug("Sequence sync hit optimistic lock for thread {}, skipping", threadUid, ex);
+        } catch (Exception ex) {
+            log.warn("Failed to sync thread {} sequence {} to database", threadUid, sequenceNumber, ex);
+        }
+    }
+
+    private ThreadEntity getThreadOrThrow(String threadUid) {
+        return findByUid(threadUid)
+                .orElseThrow(() -> new NotFoundException("thread " + threadUid + " not found"));
+    }
+
+    private String buildSequenceCacheKey(String threadUid) {
+        return RedisConsts.THREAD_SEQUENCE_PREFIX + threadUid;
     }
 
     public List<ThreadEntity> findServiceThreadStateStarted() {
