@@ -13,20 +13,29 @@
  */
 package com.bytedesk.core.thread;
 
-import java.io.Serializable;
+import com.bytedesk.core.base.BaseExtra;
 
-import lombok.Data;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Data
-@SuperBuilder
-// @NoArgsConstructor
-@AllArgsConstructor
-@Accessors(chain = true)
-public class ThreadExtra implements Serializable {
+@Getter
+@Setter
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+public class ThreadExtra extends BaseExtra {
 
     private static final long serialVersionUID = 1L;
+
+    // Thread会话内消息排序序号，服务端分配的自增值
+    @Builder.Default
+    private Long sequenceNumber = 1L;
+    
+    public static ThreadExtra fromJson(String json) {
+        ThreadExtra result = BaseExtra.fromJson(json, ThreadExtra.class);
+        return result != null ? result : ThreadExtra.builder().build();
+    }
     
 }

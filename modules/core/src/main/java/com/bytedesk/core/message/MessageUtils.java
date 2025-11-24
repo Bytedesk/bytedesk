@@ -23,6 +23,9 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.utils.BdDateUtils;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class MessageUtils {
     
     public static MessageExtra getMessageExtra(String orgUid) {
@@ -153,5 +156,7 @@ public class MessageUtils {
         
         return message;
     }
+
+    
     
 }
