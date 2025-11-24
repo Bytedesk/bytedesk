@@ -16,7 +16,8 @@ package com.bytedesk.service.workgroup;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.service.workgroup_settings.WorkgroupSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,25 +42,26 @@ public class WorkgroupResponse extends BaseResponse {
 
     private String description;
 
-    // routingMode moved to settings; read from settings.routingMode
-
     private String status;
 
     /**
      * Workgroup settings (loaded from settings entity)
      */
-    private com.bytedesk.service.workgroup_settings.WorkgroupSettingsResponse settings;
+    private WorkgroupSettingsResponse settings;
 
     // 
-    private List<UserProtobuf> agents;
+    private List<AgentResponse> agents;
 
-    private UserProtobuf messageLeaveAgent;
+    private AgentResponse messageLeaveAgent;
 
     // agent connected count
     private Long connectedAgentCount;
 
     // agent available count
     private Long availableAgentCount;
+
+    // agent connected && available count
+    private Long connectedAndAvailableAgentCount;
 
     // agent offline count
     private Long offlineAgentCount;

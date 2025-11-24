@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
@@ -36,6 +35,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     private final AgentRestService agentRestService;
 
-    private final ModelMapper modelMapper;
+    // private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
@@ -58,7 +58,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
-    
     @Transactional
     public WorkgroupResponse create(WorkgroupRequest request) {
         // 判断uid是否已经存储，如果已经存在，则不创建新的workgroup
@@ -308,7 +307,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     @Override
     public WorkgroupResponse convertToResponse(WorkgroupEntity entity) {
-        return modelMapper.map(entity, WorkgroupResponse.class);
+        return ServiceConvertUtils.convertToWorkgroupResponse(entity);
     }
 
     @Override

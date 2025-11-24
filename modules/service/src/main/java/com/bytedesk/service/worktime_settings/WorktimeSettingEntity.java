@@ -90,7 +90,7 @@ public class WorktimeSettingEntity extends BaseEntity {
 
     private Boolean isInSpecialWorktime(LocalDate date) {
         if (specialWorktimes == null || specialWorktimes.isEmpty()) {
-            return false;
+            return true;
         }
         LocalTime now = LocalTime.now();
         return specialWorktimes.stream().anyMatch(slot -> slot.isActive(date, now));
@@ -98,7 +98,7 @@ public class WorktimeSettingEntity extends BaseEntity {
 
     private Boolean isInRegularWorktime(LocalDate date) {
         if (regularWorktimes == null || regularWorktimes.isEmpty()) {
-            return false;
+            return true;
         }
         LocalTime now = LocalTime.now();
         return regularWorktimes.stream().anyMatch(slot -> slot.isActive(date, now));

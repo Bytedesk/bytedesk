@@ -125,11 +125,6 @@ public class WorkgroupEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private AgentEntity messageLeaveAgent;
 
-    // 监控管理员agents
-    // @Builder.Default
-    // @ManyToMany(fetch = FetchType.LAZY)
-    // private List<AgentEntity> monitorAgents = new ArrayList<>();
-
     /**
      * Additional configuration data stored as JSON
      */
@@ -178,6 +173,15 @@ public class WorkgroupEntity extends BaseEntity {
         }
         return WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
     }
+
+    // agent connected count
+    // @JsonIgnore
+    // public long getConnectedAgentCount() {
+    //     if (this.agents == null || this.agents.isEmpty()) {
+    //         return 0;
+    //     }
+    //     return this.agents.stream().filter(agent -> agent.isConnected()).count();
+    // }
 
     // agent available count
     @JsonIgnore

@@ -46,6 +46,7 @@ import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupResponse;
+import com.bytedesk.service.presence.PresenceFacadeService;
 
 @UtilityClass
 public class ServiceConvertUtils {
@@ -167,7 +168,55 @@ public class ServiceConvertUtils {
 
     //
     public static WorkgroupResponse convertToWorkgroupResponse(WorkgroupEntity workgroup) {
-        return getModelMapper().map(workgroup, WorkgroupResponse.class);
+        WorkgroupResponse resp = getModelMapper().map(workgroup, WorkgroupResponse.class);
+        try {
+            PresenceFacadeService presenceFacadeService = ApplicationContextHolder.getBean(PresenceFacadeService.class);
+            if (workgroup != null && workgroup.getAgents() != null) {
+                // 使用 presence + convertToAgentResponse 构建响应坐席列表
+                java.util.List<AgentResponse> agentResponses = new java.util.ArrayList<>();
+                long connected = 0L;
+                long available = 0L;
+                long connectedAndAvailable = 0L;
+                long offline = 0L;
+                long busy = 0L;
+                long away = 0L;
+                for (AgentEntity agent : workgroup.getAgents()) {
+                    if (agent == null) continue;
+                    boolean isOnline = presenceFacadeService.isAgentOnline(agent);
+                    boolean isAvailable = agent.isAvailable();
+                    boolean isOnlineAndAvailable = presenceFacadeService.isAgentOnlineAndAvailable(agent);
+                    // 
+                    if (isOnline) connected++; else offline++;
+                    if (isAvailable) available++;
+                    if (isOnlineAndAvailable) connectedAndAvailable++;
+                    if (agent.isBusy()) busy++;
+                    if (agent.isAway()) away++;
+                    agentResponses.add(convertToAgentResponse(agent));
+                }
+                resp.setAgents(agentResponses);
+                // 留言坐席转换（保留 null 安全）
+                if (workgroup.getMessageLeaveAgent() != null) {
+                    resp.setMessageLeaveAgent(convertToAgentResponse(workgroup.getMessageLeaveAgent()));
+                }
+                resp.setConnectedAgentCount(connected)
+                    .setAvailableAgentCount(available)
+                    .setConnectedAndAvailableAgentCount(connectedAndAvailable)
+                    .setOfflineAgentCount(offline)
+                    .setBusyAgentCount(busy)
+                    .setAwayAgentCount(away);
+            } else {
+                resp.setConnectedAgentCount(0L)
+                    .setAvailableAgentCount(0L)
+                    .setOfflineAgentCount(0L)
+                    .setBusyAgentCount(0L)
+                    .setAwayAgentCount(0L)
+                    .setAgents(new java.util.ArrayList<>())
+                    .setMessageLeaveAgent(null);
+            }
+        } catch (Exception ignore) {
+            // 如果 PresenceFacadeService 不可用，保持已有映射（可能在早期启动阶段）
+        }
+        return resp;
     }
     
     /**

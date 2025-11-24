@@ -118,9 +118,6 @@ public class AgentEntity extends BaseEntity {
         return this.status.equals(AgentStatusEnum.AWAY.name());
     }
 
-    // 已完全移除 legacy connected 语义：请使用 PresenceFacadeService 进行在线/可接待判断
-    // 如仍存在调用方，请重构为 presenceFacadeService.isAgentOnline...(agent)
-
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
             .uid(this.getUid())
