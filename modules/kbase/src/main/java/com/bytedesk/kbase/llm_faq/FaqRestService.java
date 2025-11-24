@@ -37,10 +37,8 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -55,8 +53,7 @@ import com.bytedesk.kbase.llm_faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.llm_faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.llm_faq.event.FaqUpdateDocEvent;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
-import com.bytedesk.core.utils.BdDateUtils;
-
+import com.bytedesk.kbase.utils.KbaseMessageUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -130,14 +127,14 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             if (thread.isPresent()) {
                 ThreadEntity threadEntity = thread.get();
                 // 插入问题消息
-                MessageEntity questionMessage = getFaqQuestionMessage(faqResponse, threadEntity);
+                MessageEntity questionMessage = KbaseMessageUtils.getFaqQuestionMessage(faqResponse, threadEntity);
                 MessageEntity savedQuestionMessage = messageRestService.save(questionMessage);
                 if (savedQuestionMessage == null) {
                     throw new RuntimeException("Failed to insert question message");
                 }
                 faqResponse.setQuestionMessage(ConvertUtils.convertToMessageResponse(savedQuestionMessage));
                 // 
-                MessageEntity answerMessage = getFaqAnswerMessage(faqResponse, threadEntity);
+                MessageEntity answerMessage = KbaseMessageUtils.getFaqAnswerMessage(faqResponse, threadEntity);
                 MessageEntity savedAnswerMessage = messageRestService.save(answerMessage);
                 if (savedAnswerMessage == null) {
                     throw new RuntimeException("Failed to insert answer message");
@@ -583,7 +580,33 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         }
     }
 
-    // @Transactional
+    
+    /**
+     * 获取一个随机FAQ，用于测试
+     * 
+     * @return 随机FAQ的Optional包装
+     */
+    public Optional<FaqEntity> findRandomFaq() {
+        try {
+            // 获取系统中任意一个FAQ
+            List<FaqEntity> randomFaqs = faqRepository.findRandomFaq(1);
+            if (randomFaqs != null && !randomFaqs.isEmpty()) {
+                return Optional.of(randomFaqs.get(0));
+            }
+        } catch (Exception e) {
+            log.error("获取随机FAQ时出错: {}", e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+
+    // generateSimilarQuestions
+    // public List<String> generateSimilarQuestions(FaqRequest request) {
+    //     List<String> similarQuestions = new ArrayList<>();
+    //     // 使用OpenAI API生成相似问题
+    // }
+
+        // @Transactional
     // public void initRelationFaqs(String orgUid, String kbUid) {
     //     try {
     //         // 加载JSON文件中的FAQ数据
@@ -629,98 +652,6 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
     //         log.error("Failed to initialize FAQ relations: {}", e.getMessage(), e);
     //         throw new RuntimeException("Failed to initialize FAQ relations", e);
     //     }
-    // }
-
-    public static MessageEntity getFaqQuestionMessage(FaqResponse faqResponse, ThreadEntity threadEntity) {
-        // 
-        FaqMessageExtra questionExtra = FaqMessageExtra.builder()
-                .faqUid(faqResponse.getUid())
-                .build();
-        //
-        String content = faqResponse.getQuestion();
-        String extra = questionExtra.toJson();
-        String user = threadEntity.getUser();
-        //
-        MessageEntity message = MessageEntity.builder()
-                .uid(UidUtils.getInstance().getUid())
-                .content(content)
-                .type(MessageTypeEnum.FAQ_QUESTION.name())
-                .status(MessageStatusEnum.READ.name())
-                .channel(threadEntity.getChannel())
-                .user(user)
-                .orgUid(threadEntity.getOrgUid())
-                .createdAt(BdDateUtils.now())
-                .updatedAt(BdDateUtils.now())
-                .thread(threadEntity)
-                .extra(extra)
-                .build();
-
-        return message;
-    }
-
-    public static MessageEntity getFaqAnswerMessage(FaqResponse faqResponse, ThreadEntity threadEntity) {
-        // 
-        FaqMessageExtra answerExtra = FaqMessageExtra.builder()
-                        .faqUid(faqResponse.getUid())
-                        .images(faqResponse.getImages())
-                        .attachments(faqResponse.getAttachments())
-                        .answerList(faqResponse.getAnswerList())
-                        .relatedFaqs(faqResponse.getRelatedFaqs())
-                        .build();
-        // 
-        String content = faqResponse.getAnswer();
-        if (StringUtils.hasText(faqResponse.getAnswerHtml())) {
-            content = faqResponse.getAnswerHtml();
-        }
-        String extra = answerExtra.toJson();
-        // 插入答案消息
-        String answerUser = threadEntity.getRobot();
-        if (threadEntity.isAgentType()) {
-            answerUser = threadEntity.getAgent();
-        } else if (answerUser == null) {
-            answerUser = threadEntity.getWorkgroup();
-        }
-        // 
-        MessageEntity message = MessageEntity.builder()
-                .uid(UidUtils.getInstance().getUid())
-                .content(content)
-                .type(MessageTypeEnum.FAQ_ANSWER.name())
-                .status(MessageStatusEnum.READ.name())
-                .channel(ChannelEnum.SYSTEM.name())
-                .user(answerUser)
-                .orgUid(threadEntity.getOrgUid())
-                .createdAt(BdDateUtils.now())
-                .updatedAt(BdDateUtils.now())
-                .thread(threadEntity)
-                .extra(extra)
-                .build();
-
-        return message;
-    }
-
-    /**
-     * 获取一个随机FAQ，用于测试
-     * 
-     * @return 随机FAQ的Optional包装
-     */
-    public Optional<FaqEntity> findRandomFaq() {
-        try {
-            // 获取系统中任意一个FAQ
-            List<FaqEntity> randomFaqs = faqRepository.findRandomFaq(1);
-            if (randomFaqs != null && !randomFaqs.isEmpty()) {
-                return Optional.of(randomFaqs.get(0));
-            }
-        } catch (Exception e) {
-            log.error("获取随机FAQ时出错: {}", e.getMessage(), e);
-        }
-        return Optional.empty();
-    }
-
-
-    // generateSimilarQuestions
-    // public List<String> generateSimilarQuestions(FaqRequest request) {
-    //     List<String> similarQuestions = new ArrayList<>();
-    //     // 使用OpenAI API生成相似问题
     // }
 
 }
