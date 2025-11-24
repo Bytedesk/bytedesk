@@ -430,6 +430,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
     /**
      * 选择客服
+     * TODO: 存在选择逻辑bug：当某个客服agent在线，却选择了另外不在线的客服agent，导致无法正确路由，请首先排除离线客服agent，
+     * 请结合在线状态和接待负载进行优化
      */
     private AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread) {
         AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread);
