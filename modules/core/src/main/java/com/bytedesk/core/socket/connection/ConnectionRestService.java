@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -56,10 +57,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    // Redis 缓存心跳Key
-    private static final String REDIS_HEARTBEAT_HASH_KEY = "core:conn:hb";
-    // Redis 最近一次数据库写入时间Key
-    private static final String REDIS_LAST_DB_WRITE_HASH_KEY = "core:conn:hb:lastdb";
+    
     // 最小数据库写入间隔（毫秒）
     private static final long MIN_INTERVAL_MS = 5000L;
 
@@ -134,7 +132,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     private void tryWriteHeartbeatToCache(String clientId, long ts) {
         try {
             if (stringRedisTemplate != null) {
-                stringRedisTemplate.opsForHash().put(REDIS_HEARTBEAT_HASH_KEY, clientId, String.valueOf(ts));
+                stringRedisTemplate.opsForHash().put(RedisConsts.REDIS_HEARTBEAT_HASH_KEY, clientId, String.valueOf(ts));
             }
         } catch (Exception ignore) {}
     }
@@ -142,7 +140,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     private void cacheLastDbWrite(String clientId, long ts) {
         try {
             if (stringRedisTemplate != null) {
-                stringRedisTemplate.opsForHash().put(REDIS_LAST_DB_WRITE_HASH_KEY, clientId, String.valueOf(ts));
+                stringRedisTemplate.opsForHash().put(RedisConsts.REDIS_LAST_DB_WRITE_HASH_KEY, clientId, String.valueOf(ts));
             }
         } catch (Exception ignore) {}
     }

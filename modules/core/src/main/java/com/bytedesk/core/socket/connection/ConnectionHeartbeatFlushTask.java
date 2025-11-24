@@ -25,9 +25,7 @@ public class ConnectionHeartbeatFlushTask {
     private final StringRedisTemplate stringRedisTemplate;
     private final ConnectionRestService connectionRestService;
 
-    private static final String REDIS_HEARTBEAT_HASH_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX + "core:conn:hb";
-    private static final String REDIS_LAST_DB_WRITE_HASH_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX + "core:conn:hb:lastdb";
-
+    
     // 每 10 秒批量刷新一次
     @Scheduled(fixedDelay = 10_000)
     @Transactional
@@ -37,7 +35,7 @@ public class ConnectionHeartbeatFlushTask {
         }
         try {
             long start = System.nanoTime();
-            Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(REDIS_HEARTBEAT_HASH_KEY);
+            Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(RedisConsts.REDIS_HEARTBEAT_HASH_KEY);
             if (entries == null || entries.isEmpty()) {
                 return;
             }
@@ -62,12 +60,12 @@ public class ConnectionHeartbeatFlushTask {
             for (Map.Entry<String, Long> e : heartbeats.entrySet()) {
                 String clientId = e.getKey();
                 Long hbTs = e.getValue();
-                Object lastDbStr = stringRedisTemplate.opsForHash().get(REDIS_LAST_DB_WRITE_HASH_KEY, clientId);
+                Object lastDbStr = stringRedisTemplate.opsForHash().get(RedisConsts.REDIS_LAST_DB_WRITE_HASH_KEY, clientId);
                 if (lastDbStr != null) {
                     try {
                         long lastDb = Long.parseLong(String.valueOf(lastDbStr));
                         if (lastDb >= hbTs) {
-                            stringRedisTemplate.opsForHash().delete(REDIS_HEARTBEAT_HASH_KEY, clientId);
+                            stringRedisTemplate.opsForHash().delete(RedisConsts.REDIS_HEARTBEAT_HASH_KEY, clientId);
                         }
                     } catch (NumberFormatException ignore) {}
                 }

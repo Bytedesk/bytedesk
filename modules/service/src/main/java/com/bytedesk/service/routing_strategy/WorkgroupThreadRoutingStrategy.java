@@ -387,66 +387,109 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         if (!isInServiceTime) {
             log.info("不在服务时间内，路由到离线留言");
-            // 选择离线留言接待客服
-            AgentEntity messageLeaveAgent = workgroup.getMessageLeaveAgent();
-            if (messageLeaveAgent == null) {
-                log.error("离线留言接待客服不存在，请配置工作组留言接待客服 - workgroupUid: {}",
-                        workgroup.getUid());
-                throw new IllegalStateException("Workgroup message leave agent not found");
-            }
-            log.debug("使用离线留言接待客服 - agentUid: {}", messageLeaveAgent.getUid());
-            QueueMemberEntity queueMemberEntity = queueService
-                    .enqueueWorkgroupWithResult(thread, messageLeaveAgent, workgroup, visitorRequest)
-                    .queueMember();
-
-            // 直接返回离线留言消息
-            return getOfflineMessage(visitorRequest, thread, messageLeaveAgent, workgroup, queueMemberEntity);
+            return routeToOfflineMessage(visitorRequest, thread, workgroup);
         }
 
-        // 选择客服
+        return routeToAgentDuringServiceTime(visitorRequest, thread, workgroup);
+    }
+
+    /**
+     * 在服务时间内分配客服并根据在线/负载状态进行路由
+     */
+    private MessageProtobuf routeToAgentDuringServiceTime(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         log.debug("在服务时间内，开始选择客服");
+
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+        if (availableAgents.isEmpty()) {
+            log.info("无在线客服可用，降级为离线留言");
+            return routeToOfflineMessage(visitorRequest, thread, workgroup);
+        }
+
         long selectStartTime = System.currentTimeMillis();
-        AgentEntity agentEntity = selectAgent(workgroup, thread);
-        log.info("客服选择完成 - agentUid: {}, 选择耗时: {}ms", agentEntity.getUid(), System.currentTimeMillis() - selectStartTime);
+        AgentEntity agentEntity = resolvePreferredAgent(workgroup, thread, availableAgents);
+        if (agentEntity == null) {
+            log.warn("未能根据路由策略选出可用客服，降级为离线留言 - workgroupUid: {}", workgroup.getUid());
+            return routeToOfflineMessage(visitorRequest, thread, workgroup);
+        }
+        log.info("客服选择完成 - agentUid: {}, 选择耗时: {}ms", agentEntity.getUid(),
+                System.currentTimeMillis() - selectStartTime);
 
         // 加入队列
         log.debug("开始将线程加入工作组队列");
         long enqueueStartTime = System.currentTimeMillis();
         QueueService.QueueEnqueueResult enqueueResult = queueService
-            .enqueueWorkgroupWithResult(thread, agentEntity, workgroup, visitorRequest);
+                .enqueueWorkgroupWithResult(thread, agentEntity, workgroup, visitorRequest);
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
-        log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", queueMemberEntity.getUid(), System.currentTimeMillis() - enqueueStartTime);
+        log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", queueMemberEntity.getUid(),
+                System.currentTimeMillis() - enqueueStartTime);
 
-        // 处理强制转人工
         if (visitorRequest.getForceAgent()) {
             log.debug("处理强制转人工标记");
             handleForceAgentTransfer(visitorRequest, thread, queueMemberEntity);
         }
 
-        // 根据客服状态进行路由
-        log.debug("开始根据客服状态进行最终路由");
-        return routeByAgentStatus(agentEntity, thread, queueMemberEntity, workgroup, visitorRequest);
+        boolean onlineAndAvailable = presenceFacadeService.isAgentOnlineAndAvailable(agentEntity);
+        if (onlineAndAvailable) {
+            log.debug("客服在线且可接待，检查接待名额");
+            boolean hasCapacity = queueMemberEntity.getWorkgroupQueue().getChattingCount() < agentEntity.getMaxThreadCount();
+            if (hasCapacity) {
+                log.info("客服有接待名额，进入接待流程 - agentUid: {}, agentName {}", agentEntity.getUid(),
+                        agentEntity.getNickname());
+                return handleAvailableWorkgroup(thread, agentEntity, queueMemberEntity);
+            }
+            log.info("客服接待名额已满，进入排队 - agentUid: {}, agentName {}", agentEntity.getUid(),
+                    agentEntity.getNickname());
+            return handleQueuedWorkgroup(thread, agentEntity, queueMemberEntity);
+        }
+
+        log.info("客服离线或不可接待，降级为离线留言 - agentUid: {}, agentName {}", agentEntity.getUid(),
+                agentEntity.getNickname());
+        return getOfflineMessage(visitorRequest, thread, agentEntity, workgroup, queueMemberEntity);
     }
 
     /**
-     * 选择客服
-     * TODO: 存在选择逻辑bug：当某个客服agent在线，却选择了另外不在线的客服agent，导致无法正确路由，请首先排除离线客服agent，
-     * 请结合在线状态和接待负载进行优化
-     * 合并 selectAgent 和 routeByAgentStatus 方法
+     * 选择优先客服：优先使用路由策略结果，其次选择第一个在线可用客服
      */
-    private AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread) {
-        AgentEntity agentEntity = workgroupRoutingService.selectAgent(workgroup, thread);
+    private AgentEntity resolvePreferredAgent(WorkgroupEntity workgroup, ThreadEntity thread,
+            List<AgentEntity> candidates) {
+        if (candidates == null || candidates.isEmpty()) {
+            return null;
+        }
+        log.debug("选择优先客服：优先使用路由策略结果，其次选择第一个在线可用客服");
 
-        if (agentEntity == null) {
-            // 离线留言接待客服
-            agentEntity = workgroup.getMessageLeaveAgent();
-            if (agentEntity == null) {
-                log.error("离线留言接待客服不存在，请配置工作组留言接待客服");
-                throw new IllegalStateException("Workgroup message leave agent not found");
+        AgentEntity routedAgent = workgroupRoutingService.selectAgent(workgroup, thread);
+        if (routedAgent != null && presenceFacadeService.isAgentOnlineAndAvailable(routedAgent)) {
+            boolean existsInCandidate = candidates.stream()
+                    .anyMatch(agent -> StringUtils.hasText(agent.getUid())
+                            && agent.getUid().equals(routedAgent.getUid()));
+            if (existsInCandidate) {
+                return routedAgent;
             }
         }
+        log.debug("未能使用路由策略结果，选择第一个在线可用客服");
 
-        return agentEntity;
+        return candidates.stream()
+                .filter(presenceFacadeService::isAgentOnlineAndAvailable)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * 不满足服务时间或无在线客服时，统一进入离线留言流程
+     */
+    private MessageProtobuf routeToOfflineMessage(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
+        AgentEntity messageLeaveAgent = workgroup.getMessageLeaveAgent();
+        if (messageLeaveAgent == null) {
+            log.error("离线留言接待客服不存在，请配置工作组留言接待客服 - workgroupUid: {}", workgroup.getUid());
+            throw new IllegalStateException("Workgroup message leave agent not found");
+        }
+        log.debug("使用离线留言接待客服 - agentUid: {}", messageLeaveAgent.getUid());
+        QueueMemberEntity queueMemberEntity = queueService
+                .enqueueWorkgroupWithResult(thread, messageLeaveAgent, workgroup, visitorRequest)
+                .queueMember();
+        return getOfflineMessage(visitorRequest, thread, messageLeaveAgent, workgroup, queueMemberEntity);
     }
 
     /**
@@ -470,29 +513,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
     }
 
-    /**
-     * 根据客服状态进行路由
-     */
-    private MessageProtobuf routeByAgentStatus(AgentEntity agentEntity, ThreadEntity thread,
-            QueueMemberEntity queueMemberEntity, WorkgroupEntity workgroup, VisitorRequest visitorRequest) {
-
-        if (presenceFacadeService.isAgentOnlineAndAvailable(agentEntity)) {
-            log.info("客服在线且可接待 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
-            // 客服在线且可接待
-            if (queueMemberEntity.getWorkgroupQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
-                log.info("客服有可用接待名额 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
-                // 有可用接待名额
-                return handleAvailableWorkgroup(thread, agentEntity, queueMemberEntity);
-            } else {
-                log.info("客服接待名额已满，进入排队 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
-                return handleQueuedWorkgroup(thread, agentEntity, queueMemberEntity);
-            }
-        } else {
-            log.info("客服离线或不可接待 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
-            // 客服离线或不可接待
-            return getOfflineMessage(visitorRequest, thread, agentEntity, workgroup, queueMemberEntity);
-        }
-    }
 
     /**
      * 处理可用工作组客服

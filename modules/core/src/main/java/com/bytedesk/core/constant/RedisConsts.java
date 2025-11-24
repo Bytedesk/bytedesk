@@ -50,4 +50,9 @@ public class RedisConsts {
     // 验证码相关常量
     public static final String KAPTCHA_PREFIX = BYTEDESK_REDIS_PREFIX + "kaptcha:";
 
+    // Redis 缓存心跳Key
+    public static final String REDIS_HEARTBEAT_HASH_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX + "core:conn:hb";
+    // Redis 最近一次数据库写入时间Key
+    public static final String REDIS_LAST_DB_WRITE_HASH_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX + "core:conn:hb:lastdb";
+
 }
