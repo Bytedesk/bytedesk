@@ -150,9 +150,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             long dbStartTime = System.currentTimeMillis();
             log.debug("开始查询现有线程 - topic: {}", topic);
 
-            Optional<ThreadEntity> existingThread = threadRestService.findFirstByTopic(topic);
-            log.debug("线程查询完成 - 耗时: {}ms", System.currentTimeMillis() - dbStartTime);
-
+            Optional<ThreadEntity> existingThread = threadRestService.findFirstByTopicNotClosed(topic);
             if (existingThread.isPresent()) {
                 ThreadEntity thread = existingThread.get();
                 log.info("发现现有线程 - threadUid: {}, 状态: {}, 创建时间: {}, 查询耗时: {}ms",

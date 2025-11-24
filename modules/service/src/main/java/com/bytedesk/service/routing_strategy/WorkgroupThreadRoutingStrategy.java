@@ -189,7 +189,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         log.debug("开始查询现有工作组线程 - topic: {}", topic);
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicNotClosed(topic);
         if (threadOptional.isPresent()) {
             ThreadEntity existingThread = threadOptional.get();
             log.info("发现现有工作组线程 - threadUid: {}, 状态: {}, 创建时间: {}",
@@ -856,10 +856,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         WorktimeSettingEntity published = workgroup.getSettings().getWorktimeSettings();
         if (published != null) {
             return Boolean.TRUE.equals(published.isInWorktime());
-        }
-        WorktimeSettingEntity draft = workgroup.getSettings().getDraftWorktimeSettings();
-        if (draft != null) {
-            return Boolean.TRUE.equals(draft.isInWorktime());
         }
         return true;
     }
