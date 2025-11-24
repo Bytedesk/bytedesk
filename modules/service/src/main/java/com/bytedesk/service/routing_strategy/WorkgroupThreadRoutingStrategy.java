@@ -474,13 +474,18 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             QueueMemberEntity queueMemberEntity, WorkgroupEntity workgroup, VisitorRequest visitorRequest) {
 
         if (presenceFacadeService.isAgentOnlineAndAvailable(agentEntity)) {
+            log.info("客服在线且可接待 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
             // 客服在线且可接待
             if (queueMemberEntity.getWorkgroupQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
+                log.info("客服有可用接待名额 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
+                // 有可用接待名额
                 return handleAvailableWorkgroup(thread, agentEntity, queueMemberEntity);
             } else {
+                log.info("客服接待名额已满，进入排队 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
                 return handleQueuedWorkgroup(thread, agentEntity, queueMemberEntity);
             }
         } else {
+            log.info("客服离线或不可接待 - agentUid: {}, agentName {}", agentEntity.getUid(), agentEntity.getNickname());
             // 客服离线或不可接待
             return getOfflineMessage(visitorRequest, thread, agentEntity, workgroup, queueMemberEntity);
         }

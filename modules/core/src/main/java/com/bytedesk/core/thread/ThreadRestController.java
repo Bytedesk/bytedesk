@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +44,22 @@ import lombok.AllArgsConstructor;
 public class ThreadRestController extends BaseRestController<ThreadRequest, ThreadRestService> {
 
     private final ThreadRestService threadRestService;
+
+    /**
+     * 发送消息前申请服务端分配的消息元信息
+     *
+     * @param request 包含 threadUid 的请求
+     * @return 包含 messageUid、timestamp、sequenceNumber 的元信息
+     */
+    @Operation(summary = "申请消息元信息", description = "发送消息前获取服务端分配的消息UID、时间戳与序号")
+    @PostMapping("/message/meta")
+    public ResponseEntity<?> requestMessageMetadata(@RequestBody ThreadRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            return ResponseEntity.ok(JsonResult.error("thread uid required"));
+        }
+        ThreadSequenceResponse response = threadRestService.allocateMessageMetadata(request.getUid());
+        return ResponseEntity.ok(JsonResult.success("获取消息元信息成功", response));
+    }
 
     /**
      * 根据组织查询会话

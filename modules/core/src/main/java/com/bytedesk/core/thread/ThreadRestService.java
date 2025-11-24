@@ -760,6 +760,7 @@ public class ThreadRestService
         return threadPage.map(this::convertToResponse);
     }
 
+    // TODO: 直接操作数据库，避免频繁更新导致的性能问题，考虑使用Redis缓存或队列异步处理
     @Transactional
     public ThreadSequenceResponse allocateMessageMetadata(@NonNull String threadUid) {
         if (!StringUtils.hasText(threadUid)) {
