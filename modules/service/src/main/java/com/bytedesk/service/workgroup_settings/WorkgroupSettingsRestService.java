@@ -145,10 +145,13 @@ public class WorkgroupSettingsRestService
         if (request.getServiceSettings() != null) {
             ServiceSettingsEntity draft = entity.getDraftServiceSettings();
             if (draft == null) {
-                draft = new ServiceSettingsEntity();
+                draft = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
-                modelMapper.map(request.getServiceSettings(), draft);
                 entity.setDraftServiceSettings(draft);
+                // 
+                ServiceSettingsEntity settings = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setServiceSettings(settings);
             } else {
                 // 保留草稿唯一标识，避免被请求体覆盖
                 String originalUid = draft.getUid();
@@ -165,10 +168,12 @@ public class WorkgroupSettingsRestService
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
             if (draft == null) {
                 draft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftInviteSettings(draft);
+                // 
+                InviteSettingsEntity settings = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setInviteSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getInviteSettings(), draft);
@@ -185,6 +190,10 @@ public class WorkgroupSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftIntentionSettings(draft);
+                // 
+                IntentionSettingsEntity settings = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setIntentionSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getIntentionSettings(), draft);
@@ -201,6 +210,10 @@ public class WorkgroupSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftMessageLeaveSettings(draft);
+                // 
+                MessageLeaveSettingsEntity settings = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setMessageLeaveSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getMessageLeaveSettings(), draft);
@@ -235,6 +248,7 @@ public class WorkgroupSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftRobotSettings(draft);
+                // 
             } else {
                 String originalUid = draft.getUid();
                 // 先用 mapper 覆盖简单字段
@@ -254,6 +268,10 @@ public class WorkgroupSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftQueueSettings(draft);
+                // 
+                QueueSettingsEntity settings = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setQueueSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getQueueSettings(), draft);

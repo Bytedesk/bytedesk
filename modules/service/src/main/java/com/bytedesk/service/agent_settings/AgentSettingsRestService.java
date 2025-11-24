@@ -174,10 +174,13 @@ public class AgentSettingsRestService
             // 复用并更新现有草稿，避免新建导致孤儿记录
             ServiceSettingsEntity draft = entity.getDraftServiceSettings();
             if (draft == null) {
-                draft = new ServiceSettingsEntity();
+                draft = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
-                modelMapper.map(request.getServiceSettings(), draft);
                 entity.setDraftServiceSettings(draft);
+                // 
+                ServiceSettingsEntity settings = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setServiceSettings(settings);
             } else {
                 // 保留草稿自身的唯一标识，避免被请求体中的 uid/uuid 覆盖
                 String originalUid = draft.getUid();
@@ -197,6 +200,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftMessageLeaveSettings(draft);
+                // 
+                MessageLeaveSettingsEntity settings = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setMessageLeaveSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getMessageLeaveSettings(), draft);
@@ -213,6 +220,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftWorktimeSettings(draft);
+                // 
+                WorktimeSettingEntity settings = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setWorktimeSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getWorktimeSettings(), draft);
@@ -229,6 +240,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftAutoReplySettings(draft);
+                // 
+                AutoReplySettingsEntity settings = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setAutoReplySettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getAutoReplySettings(), draft);
@@ -246,6 +261,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftInviteSettings(draft);
+                // 
+                InviteSettingsEntity settings = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setInviteSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getInviteSettings(), draft);
@@ -262,6 +281,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftIntentionSettings(draft);
+                // 
+                IntentionSettingsEntity settings = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setIntentionSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getIntentionSettings(), draft);
@@ -278,6 +301,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftQueueSettings(draft);
+                // 
+                QueueSettingsEntity settings = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setQueueSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getQueueSettings(), draft);
@@ -294,6 +321,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftRateDownSettings(draft);
+                // 
+                RatedownSettingsEntity settings = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setRateDownSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getRateDownSettings(), draft);
@@ -310,6 +341,10 @@ public class AgentSettingsRestService
                     draft.setUid(uidUtils.getUid());
                 }
                 entity.setDraftAgentStatusSettings(draft);
+                // 
+                AgentStatusSettingEntity settings = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setAgentStatusSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getAgentStatusSettings(), draft);
