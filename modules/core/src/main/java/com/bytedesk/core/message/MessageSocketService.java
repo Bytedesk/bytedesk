@@ -56,7 +56,7 @@ public class MessageSocketService {
     private final TopicRestService topicRestService;
 
     // 发送消息给stomp访客端
-    public void sendJsonMessage(@NonNull String messageJson) {
+    public void sendStompMessage(@NonNull String messageJson) {
         Assert.notNull(messageJson, "messageJson is null");
         //
         MessageProtobuf messageObject = JSON.parseObject(messageJson, MessageProtobuf.class);
@@ -78,7 +78,7 @@ public class MessageSocketService {
     }
 
     // 发送消息给mqtt客户端
-    public void sendProtoMessage(@NonNull MessageProto.Message messageProto) {
+    public void sendMqttMessage(@NonNull MessageProto.Message messageProto) {
         // log.debug("send proto message");
         ThreadProto.Thread thread = messageProto.getThread(); // 提取线程信息到临时变量
         ThreadTypeEnum threadType = ThreadTypeEnum.valueOf(thread.getType());

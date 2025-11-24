@@ -46,14 +46,14 @@ public class MessageEventListener {
                 return;
             }
             // Send to Stomp clients
-            messageSocketService.sendJsonMessage(messageJson);
+            messageSocketService.sendStompMessage(messageJson);
             
             // Send to MQTT clients - with additional error handling
             try {
                 MessageProto.Message.Builder builder = MessageProto.Message.newBuilder();
                 MessageProto.Message message = MessageConvertUtils.toProtoBean(builder, messageJson);
                 if (message != null) {
-                    messageSocketService.sendProtoMessage(message);
+                    messageSocketService.sendMqttMessage(message);
                 } else {
                     log.error("Failed to convert message to proto format");
                 }

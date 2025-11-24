@@ -89,7 +89,6 @@ public class ThreadMessageUtil {
      * 结构化 QueueContent 的排队消息
      */
     public static MessageProtobuf getThreadQueueMessage(QueueContent content, ThreadEntity thread) {
-        // 
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
         String json = content != null ? content.toJson() : null;
@@ -157,7 +156,6 @@ public class ThreadMessageUtil {
     }
 
     public static MessageEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
-        // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(agent);
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
 
@@ -179,7 +177,6 @@ public class ThreadMessageUtil {
     }
 
     public static MessageEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
-        // UserProtobuf user = ServiceConvertUtils.convertToUserProtobuf(workgroup);
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
 
