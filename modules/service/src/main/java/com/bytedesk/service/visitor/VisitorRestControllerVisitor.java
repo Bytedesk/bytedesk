@@ -149,7 +149,6 @@ public class VisitorRestControllerVisitor {
      * @param request 查询请求
      * @return 分页消息列表
      */
-    // @Operation(summary = "根据会话UID查询消息", description = "通过会话唯一标识符查询相关消息")
     @GetMapping("/message/thread/uid")
     public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
 
@@ -159,8 +158,6 @@ public class VisitorRestControllerVisitor {
     }
 
     // 访客拉取未读消息
-    // @VisitorAnnotation(title = "visitor", action = "getMessageUnread",
-    // description = "get unread messages")
     @GetMapping("/message/unread")
     public ResponseEntity<?> getMessageUnread(MessageUnreadRequest request) {
 
