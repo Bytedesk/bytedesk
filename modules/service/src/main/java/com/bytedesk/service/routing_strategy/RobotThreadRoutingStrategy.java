@@ -132,7 +132,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             return visitorThreadService.createRobotThread(request, robotEntity, topic);
         }
 
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
+        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicNotClosed(topic);
         if (threadOptional.isPresent()) {
             ThreadEntity existingThread = threadOptional.get();
 
