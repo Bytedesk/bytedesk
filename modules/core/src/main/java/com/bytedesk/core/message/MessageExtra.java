@@ -50,4 +50,9 @@ public class MessageExtra extends BaseExtra {
         MessageExtra result = BaseExtra.fromJson(json, MessageExtra.class);
         return result != null ? result : MessageExtra.builder().build();
     }
+
+    public static MessageExtra fromOrgUid(String orgUid) {
+        return MessageExtra.builder().orgUid(orgUid).build();
+    }
+
 }

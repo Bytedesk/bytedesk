@@ -34,9 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MessageUtils {
     
-    public static MessageExtra getMessageExtra(String orgUid) {
-        return MessageExtra.builder().orgUid(orgUid).build();
-    }
 
     public static void attachSequenceNumber(MessageExtra extra, String threadUid) {
         if (extra == null || !StringUtils.hasText(threadUid)) {
@@ -56,7 +53,7 @@ public class MessageUtils {
     public static MessageProtobuf createLoginNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
         // 
         UserProtobuf system = UserUtils.getSystemUser();
-        MessageExtra messageExtra = MessageUtils.getMessageExtra(orgUid);
+        MessageExtra messageExtra = MessageExtra.fromOrgUid(orgUid);
         MessageUtils.attachSequenceNumber(messageExtra, threadProtobuf.getUid());
         // 
         MessageProtobuf message = MessageProtobuf.builder()
@@ -76,7 +73,7 @@ public class MessageUtils {
     public static MessageProtobuf createNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
         // 
         UserProtobuf system = UserUtils.getSystemUser();
-        MessageExtra messageExtra = MessageUtils.getMessageExtra(orgUid);
+        MessageExtra messageExtra = MessageExtra.fromOrgUid(orgUid);
         MessageUtils.attachSequenceNumber(messageExtra, threadProtobuf.getUid());
         // 
         MessageProtobuf message = MessageProtobuf.builder()
@@ -97,7 +94,7 @@ public class MessageUtils {
         //
         UserProtobuf sender = UserUtils.getSystemUser();
         ThreadProtobuf threadProtobuf = thread.toProtobuf();
-        MessageExtra extra = MessageUtils.getMessageExtra(thread.getOrgUid());
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         MessageUtils.attachSequenceNumber(extra, thread.getUid());
         //
         MessageProtobuf message = MessageProtobuf.builder()

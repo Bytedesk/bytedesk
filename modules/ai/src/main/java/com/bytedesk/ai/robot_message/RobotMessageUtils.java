@@ -27,7 +27,7 @@ public class RobotMessageUtils {
 
         public static MessageProtobuf createRobotMessage(ThreadProtobuf thread, RobotProtobuf robot,
                         MessageProtobuf messageProtobuf) {
-                MessageExtra extra = MessageUtils.getMessageExtra(messageProtobuf.getExtra());
+                MessageExtra extra = MessageExtra.fromJson(messageProtobuf.getExtra());
                 MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
                 return MessageProtobuf.builder()
