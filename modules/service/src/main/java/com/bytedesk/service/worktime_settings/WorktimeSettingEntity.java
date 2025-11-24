@@ -105,10 +105,7 @@ public class WorktimeSettingEntity extends BaseEntity {
     }
 
     public static WorktimeSettingEntity fromRequest(WorktimeSettingRequest request, ModelMapper modelMapper) {
-        if (modelMapper == null) {
-            throw new IllegalArgumentException("ModelMapper is required");
-        }
-        if (request == null) {
+        if (modelMapper == null || request == null) {
             return WorktimeSettingEntity.builder().build();
         }
         return modelMapper.map(request, WorktimeSettingEntity.class);

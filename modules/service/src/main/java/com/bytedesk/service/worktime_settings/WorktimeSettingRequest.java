@@ -16,7 +16,6 @@ package com.bytedesk.service.worktime_settings;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.core.constant.I18Consts;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,11 +32,6 @@ import lombok.experimental.SuperBuilder;
 public class WorktimeSettingRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
-
-    private String name;
-
-    @lombok.Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
      * 是否启用该工作时间设置

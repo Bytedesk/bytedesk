@@ -215,6 +215,10 @@ public class WorkgroupSettingsRestService
                 draft = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftWorktimeSettings(draft);
+                // 
+                WorktimeSettingEntity settings = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setWorktimeSettings(settings);
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getWorktimeSettings(), draft);

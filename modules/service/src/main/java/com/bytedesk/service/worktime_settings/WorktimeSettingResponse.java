@@ -35,10 +35,6 @@ public class WorktimeSettingResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
-
-    private String description;
-
     private Boolean enabled;
 
     private List<WorktimeSlotValue> regularWorktimes;
