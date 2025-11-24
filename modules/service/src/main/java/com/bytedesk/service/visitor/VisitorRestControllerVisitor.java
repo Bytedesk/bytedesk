@@ -48,6 +48,7 @@ import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
+import com.bytedesk.core.thread.ThreadSequenceResponse;
 import java.time.ZonedDateTime;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.core.utils.JsonResult;
@@ -116,6 +117,18 @@ public class VisitorRestControllerVisitor {
         MessageProtobuf messageProtobuf = visitorRestService.requestThread(request);
         //
         return ResponseEntity.ok(JsonResult.success(messageProtobuf));
+    }
+
+    /**
+     * 访客发送消息前，先从服务端申请消息元信息，确保sequence由服务端分配
+     */
+    @PostMapping("/thread/message/meta")
+    public ResponseEntity<?> requestMessageMetadata(@RequestBody ThreadRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            return ResponseEntity.ok(JsonResult.error("thread uid required"));
+        }
+        ThreadSequenceResponse response = threadRestService.allocateMessageMetadata(request.getUid());
+        return ResponseEntity.ok(JsonResult.success("获取消息元信息成功", response));
     }
 
     @GetMapping("/ping")

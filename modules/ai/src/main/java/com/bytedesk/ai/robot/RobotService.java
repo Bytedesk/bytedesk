@@ -22,8 +22,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
-import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
 import com.bytedesk.ai.segment.SegmentService;
+import com.bytedesk.ai.service.SpringAIServiceRegistry;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;

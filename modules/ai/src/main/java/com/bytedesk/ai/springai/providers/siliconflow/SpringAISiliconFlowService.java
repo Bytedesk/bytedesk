@@ -17,8 +17,9 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.ai.springai.service.TokenUsageHelper;
+import com.bytedesk.ai.service.BaseSpringAIService;
+import com.bytedesk.ai.service.ChatTokenUsage;
+import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -39,7 +40,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.List;
 import java.util.Optional;
-import com.bytedesk.ai.springai.service.ChatTokenUsage;
 
 /**
  * @author: https://github.com/fzj111

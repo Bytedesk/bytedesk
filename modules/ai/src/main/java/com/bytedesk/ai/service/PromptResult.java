@@ -1,4 +1,4 @@
-package com.bytedesk.ai.springai.service;
+package com.bytedesk.ai.service;
 
 import org.springframework.ai.chat.prompt.Prompt;
 

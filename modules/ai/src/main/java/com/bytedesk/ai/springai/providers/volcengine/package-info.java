@@ -37,7 +37,7 @@
  * </ul&gt;
  *
  * @author bytedesk.com
- * @see com.bytedesk.ai.springai.service.BaseSpringAIService
+ * @see com.bytedesk.ai.service.BaseSpringAIService
  * @since 1.0.0
  */
 @NonNullApi

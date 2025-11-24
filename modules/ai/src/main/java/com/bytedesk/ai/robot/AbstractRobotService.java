@@ -15,8 +15,8 @@ package com.bytedesk.ai.robot;
 
 import java.util.Optional;
 
-import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.ai.springai.service.SpringAIServiceRegistry;
+import com.bytedesk.ai.service.BaseSpringAIService;
+import com.bytedesk.ai.service.SpringAIServiceRegistry;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;

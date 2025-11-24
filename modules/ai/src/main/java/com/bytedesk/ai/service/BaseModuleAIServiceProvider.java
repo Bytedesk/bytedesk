@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.ai.springai.service;
+package com.bytedesk.ai.service;
 
 import java.util.HashMap;
 import java.util.Map;

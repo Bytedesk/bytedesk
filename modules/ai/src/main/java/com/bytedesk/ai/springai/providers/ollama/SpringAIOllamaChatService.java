@@ -32,9 +32,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.springai.service.BaseSpringAIService;
-import com.bytedesk.ai.springai.service.ChatTokenUsage;
-import com.bytedesk.ai.springai.service.TokenUsageHelper;
+import com.bytedesk.ai.service.BaseSpringAIService;
+import com.bytedesk.ai.service.ChatTokenUsage;
+import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;

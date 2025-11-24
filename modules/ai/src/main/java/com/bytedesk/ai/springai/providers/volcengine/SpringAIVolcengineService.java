@@ -31,7 +31,9 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.springai.service.BaseSpringAIService;
+import com.bytedesk.ai.service.BaseSpringAIService;
+import com.bytedesk.ai.service.ChatTokenUsage;
+import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -39,8 +41,6 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
-import com.bytedesk.ai.springai.service.ChatTokenUsage;
-import com.bytedesk.ai.springai.service.TokenUsageHelper;
 
 @Slf4j
 @Service

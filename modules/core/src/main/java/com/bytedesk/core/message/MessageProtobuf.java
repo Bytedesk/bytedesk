@@ -81,8 +81,8 @@ public class MessageProtobuf implements Serializable {
 		return createdAt;
 	}
 
-	public static MessageProtobuf fromJson(String user) {
-        return JSON.parseObject(user, MessageProtobuf.class);
+	public static MessageProtobuf fromJson(String json) {
+        return JSON.parseObject(json, MessageProtobuf.class);
     }
 
     public String toJson() {

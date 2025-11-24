@@ -31,7 +31,7 @@ public class ThreadExtra extends BaseExtra {
 
     // Thread会话内消息排序序号，服务端分配的自增值
     @Builder.Default
-    private Long sequenceNumber = 1L;
+    private Long sequenceNumber = 0L;
     
     public static ThreadExtra fromJson(String json) {
         ThreadExtra result = BaseExtra.fromJson(json, ThreadExtra.class);

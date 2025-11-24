@@ -42,6 +42,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -757,6 +758,53 @@ public class ThreadRestService
     public Page<ThreadResponse> queryByVisitorUid(String visitorUid, Pageable pageable) {
         Page<ThreadEntity> threadPage = threadRepository.findByVisitorUidInUserField(visitorUid, pageable);
         return threadPage.map(this::convertToResponse);
+    }
+
+    @Transactional
+    public ThreadSequenceResponse allocateMessageMetadata(@NonNull String threadUid) {
+        if (!StringUtils.hasText(threadUid)) {
+            throw new IllegalArgumentException("thread uid is required");
+        }
+
+        final int maxRetries = 3;
+        int attempt = 0;
+        while (true) {
+            try {
+                ThreadEntity thread = findByUid(threadUid)
+                        .orElseThrow(() -> new NotFoundException("thread " + threadUid + " not found"));
+
+                String extraJson = thread.getExtra();
+                ThreadExtra threadExtra = ThreadExtra.fromJson(extraJson);
+                if (threadExtra == null) {
+                    threadExtra = ThreadExtra.builder().sequenceNumber(0L).build();
+                }
+
+                long currentSequence = threadExtra.getSequenceNumber() != null ? threadExtra.getSequenceNumber() : 0L;
+                if (!StringUtils.hasText(extraJson) || BytedeskConsts.EMPTY_JSON_STRING.equals(extraJson)) {
+                    currentSequence = 0L;
+                }
+                long nextSequence = currentSequence + 1;
+
+                threadExtra.setSequenceNumber(nextSequence);
+                thread.setExtra(threadExtra.toJson());
+                save(thread);
+
+                return ThreadSequenceResponse.builder()
+                        .threadUid(threadUid)
+                        .messageUid(uidUtils.getUid())
+                        .sequenceNumber(nextSequence)
+                        .timestamp(System.currentTimeMillis())
+                        .build();
+            } catch (ObjectOptimisticLockingFailureException ex) {
+                attempt++;
+                if (attempt >= maxRetries) {
+                    log.error("Failed to allocate sequence for thread {} after {} attempts", threadUid, attempt, ex);
+                    throw ex;
+                }
+                log.warn("Optimistic lock conflict when allocating sequence for thread {}, retry {}", threadUid,
+                        attempt);
+            }
+        }
     }
 
     public List<ThreadEntity> findServiceThreadStateStarted() {
