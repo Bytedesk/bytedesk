@@ -179,8 +179,8 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 2. 配置线程状态
         String tip = getRobotWelcomeMessage(robotEntity);
-        WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
-        thread.setRoboting().setContent(wc != null ? wc.toJson() : null);
+        WelcomeContent welcomeContent = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
+        thread.setRoboting().setContent(welcomeContent != null ? welcomeContent.toJson() : null);
 
         // 3. 设置机器人信息
         String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
@@ -196,7 +196,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         publishRobotThreadEvent(savedThread);
 
         // 7. 创建并保存欢迎消息
-        return createAndSaveWelcomeMessage(wc, savedThread);
+        return createAndSaveWelcomeMessage(welcomeContent, savedThread);
     }
 
     /**

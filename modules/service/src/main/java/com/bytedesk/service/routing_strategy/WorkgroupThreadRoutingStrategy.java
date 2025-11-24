@@ -497,9 +497,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
 
         // 设置欢迎内容和线程状态
-        String welcomeContent = getAgentWelcomeMessage(agentEntity);
+        String welcomeTip = getAgentWelcomeMessage(agentEntity);
         thread.setUserUid(agentEntity.getUid());
-        thread.setChatting().setContent(welcomeContent);
+        thread.setChatting().setContent(welcomeTip);
 
         // 设置线程所有者
         setThreadOwner(thread, agentEntity);
@@ -518,8 +518,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         publishWorkgroupThreadEvents(savedThread);
 
         // 发送欢迎消息（结构化 WelcomeContent）
-        WelcomeContent wc = WelcomeContentUtils.buildAgentWelcomeContent(agentEntity);
-        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(wc, savedThread);
+        WelcomeContent welcomeContent = WelcomeContentUtils.buildAgentWelcomeContent(agentEntity);
+        MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
         return messageProtobuf;

@@ -284,8 +284,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             log.debug("获取最新线程状态并更新为聊天状态");
             ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
             String tip = getAgentWelcomeMessage(agent);
-            WelcomeContent wc = WelcomeContentUtils.buildAgentWelcomeContent(agent, tip);
-            String jsonWelcome = wc != null ? wc.toJson() : null;
+            WelcomeContent welcomeContent = WelcomeContentUtils.buildAgentWelcomeContent(agent, tip);
+            String jsonWelcome = welcomeContent != null ? welcomeContent.toJson() : null;
             thread.setChatting().setContent(jsonWelcome);
             log.debug("线程状态更新完成 - 状态: {}, 欢迎消息长度: {}",
                     thread.getStatus(), jsonWelcome != null ? jsonWelcome.length() : 0);
@@ -309,7 +309,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             // 发送欢迎消息
             log.debug("开始发送欢迎消息");
             long msgStartTime = System.currentTimeMillis();
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(wc, savedThread);
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
             messageSendService.sendProtobufMessage(messageProtobuf);
             log.info("可用客服处理完成 - threadUid: {}, agentUid: {}, 消息发送耗时: {}ms, 总处理耗时: {}ms",
                     savedThread.getUid(), agent.getUid(), System.currentTimeMillis() - msgStartTime,
