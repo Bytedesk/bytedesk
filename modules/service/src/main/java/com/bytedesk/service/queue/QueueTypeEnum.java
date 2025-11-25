@@ -4,6 +4,6 @@ public enum QueueTypeEnum {
     ROBOT, 
     AGENT, 
     WORKGROUP, 
-    WORKFLOW, 
-    UNIFIED
+    // WORKFLOW, 
+    // UNIFIED
 }

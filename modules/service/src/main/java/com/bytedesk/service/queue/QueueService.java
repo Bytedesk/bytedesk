@@ -30,19 +30,9 @@ public class QueueService {
     
     private final QueueMemberRestService queueMemberRestService;
 
-    // private final AgentRestService agentRestService;
-
-    // private final ThreadRestService threadRestService;
-
-    // private final QueueMemberMessageService queueMemberMessageService;
-
-    // private final BytedeskEventPublisher bytedeskEventPublisher;
-
     private final QueueRepository queueRepository;
 
     private final UidUtils uidUtils;
-
-    // private final QueueNotificationService queueNotificationService;
 
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
@@ -59,116 +49,6 @@ public class QueueService {
             VisitorRequest visitorRequest) {
             return enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
     }
-
-
-
-    // @Transactional
-    // public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
-    //     UserProtobuf agent = agentEntity.toUserProtobuf();
-    //     boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
-    //     QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
-    //     return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
-    // }
-
-    // @Transactional
-    // public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, UserProtobuf agent,
-    //         WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-    //     boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
-    //     QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
-    //     return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
-    // }
-
-    // @Transactional
-    // public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, AgentEntity agentEntity,
-    //         WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-    //     UserProtobuf agent = agentEntity != null ? agentEntity.toUserProtobuf() : null;
-    //     QueueEnqueueResult result = enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest);
-    //     return result;
-    // }
-
-    // @Transactional
-    // public Optional<QueueAssignmentResult> assignNextAgentQueueMember(String agentUid) {
-    //     if (!StringUtils.hasText(agentUid)) {
-    //         return Optional.empty();
-    //     }
-    //     Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-    //     if (!agentOptional.isPresent()) {
-    //         log.warn("Skip auto-assign: agent {} not found", agentUid);
-    //         return Optional.empty();
-    //     }
-    //     AgentEntity agent = agentOptional.get();
-    //     QueueEntity agentQueue = getAgentOrRobotQueue(agent.toUserProtobuf(), agent.getOrgUid());
-    //     if (agentQueue == null) {
-    //         return Optional.empty();
-    //     }
-    //     return assignNextAgentQueueMember(agent, agentQueue);
-    // }
-
-    // private Optional<QueueAssignmentResult> assignNextAgentQueueMember(AgentEntity agent, QueueEntity agentQueue) {
-    //     while (true) {
-    //         Optional<QueueMemberEntity> candidateOptional = queueMemberRestService
-    //                 .findEarliestAgentQueueMemberForUpdate(agentQueue.getUid());
-    //         if (!candidateOptional.isPresent()) {
-    //             return Optional.empty();
-    //         }
-    //         QueueMemberEntity member = candidateOptional.get();
-    //         ThreadEntity thread = member.getThread();
-    //         if (thread == null) {
-    //             cleanupQueueMember(member, "missing thread");
-    //             continue;
-    //         }
-    //         if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
-    //             cleanupQueueMember(member, "threadStatus=" + thread.getStatus());
-    //             continue;
-    //         }
-    //         ThreadEntity savedThread = finalizeThreadAssignment(agent, thread);
-    //         finalizeQueueMemberAssignment(agent, member);
-    //         publishAssignmentEvents(savedThread);
-    //         log.info("Auto-assigned thread {} to agent {}", savedThread.getUid(), agent.getUid());
-    //         return Optional.of(new QueueAssignmentResult(agent.getUid(), savedThread.getUid(), member.getUid()));
-    //     }
-    // }
-
-    // private ThreadEntity finalizeThreadAssignment(AgentEntity agent, ThreadEntity thread) {
-    //     UserProtobuf agentProtobuf = agent.toUserProtobuf();
-    //     thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
-    //     thread.setAgent(agentProtobuf.toJson());
-    //     if (agent.getMember() != null && agent.getMember().getUser() != null) {
-    //         thread.setOwner(agent.getMember().getUser());
-    //     }
-    //     return threadRestService.save(thread);
-    // }
-
-    // private void finalizeQueueMemberAssignment(AgentEntity agent, QueueMemberEntity member) {
-    //     member.agentAutoAcceptThread();
-    //     QueueMemberEntity savedMember = queueMemberRestService.save(member);
-    //     Map<String, Object> updates = new HashMap<>();
-    //     updates.put("agentAutoAcceptThread", true);
-    //     updates.put("status", savedMember.getStatus());
-    //     queueMemberMessageService.sendUpdateMessage(savedMember, updates);
-    //     // queueNotificationService.publishQueueAssignmentNotice(agent, savedMember);
-    // }
-
-    // private void cleanupQueueMember(QueueMemberEntity member, String reason) {
-    //     member.setDeleted(true);
-    //     ThreadEntity thread = member.getThread();
-    //     if (thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
-    //         thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
-    //         threadRestService.save(thread);
-    //     }
-    //     // QueueMemberEntity savedMember = queueMemberRestService.save(member);
-    //     // queueNotificationService.publishQueueLeaveNotice(savedMember);
-    //     log.debug("Cleaned queue member {} during auto-assign: {}", member.getUid(), reason);
-    // }
-
-    // private void publishAssignmentEvents(ThreadEntity thread) {
-    //     try {
-    //         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, thread));
-    //         bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, thread));
-    //     } catch (Exception e) {
-    //         log.warn("Failed to publish auto-assign events for thread {}: {}", thread.getUid(), e.getMessage());
-    //     }
-    // }
 
     /**
      * 统一的入队方法
@@ -220,8 +100,8 @@ public class QueueService {
         switch (queueType) {
             case ROBOT:
             case AGENT:
-            case WORKFLOW:
-            case UNIFIED:
+            // case WORKFLOW:
+            // case UNIFIED:
                 nickname = agent.getNickname();
                 primaryQueue = getQueue(threadEntity, nickname);
                 break;
@@ -246,8 +126,8 @@ public class QueueService {
         // 根据队列类型设置相应的队列
         switch (queueType) {
             case ROBOT:
-            case WORKFLOW:
-            case UNIFIED:
+            // case WORKFLOW:
+            // case UNIFIED:
                 memberBuilder.robotQueue(primaryQueue);
                 break;
             case AGENT:
@@ -385,5 +265,115 @@ public class QueueService {
                     .orElseThrow(() -> new RuntimeException("Queue creation failed for topic " + queueTopic, e));
         }
     }
+
+
+    // @Transactional
+    // public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity, AgentEntity agentEntity, VisitorRequest visitorRequest) {
+    //     UserProtobuf agent = agentEntity.toUserProtobuf();
+    //     boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
+    //     QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
+    //     return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
+    // }
+
+    // @Transactional
+    // public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, UserProtobuf agent,
+    //         WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+    //     boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
+    //     QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
+    //     return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
+    // }
+
+    // @Transactional
+    // public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity threadEntity, AgentEntity agentEntity,
+    //         WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
+    //     UserProtobuf agent = agentEntity != null ? agentEntity.toUserProtobuf() : null;
+    //     QueueEnqueueResult result = enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest);
+    //     return result;
+    // }
+
+    // @Transactional
+    // public Optional<QueueAssignmentResult> assignNextAgentQueueMember(String agentUid) {
+    //     if (!StringUtils.hasText(agentUid)) {
+    //         return Optional.empty();
+    //     }
+    //     Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
+    //     if (!agentOptional.isPresent()) {
+    //         log.warn("Skip auto-assign: agent {} not found", agentUid);
+    //         return Optional.empty();
+    //     }
+    //     AgentEntity agent = agentOptional.get();
+    //     QueueEntity agentQueue = getAgentOrRobotQueue(agent.toUserProtobuf(), agent.getOrgUid());
+    //     if (agentQueue == null) {
+    //         return Optional.empty();
+    //     }
+    //     return assignNextAgentQueueMember(agent, agentQueue);
+    // }
+
+    // private Optional<QueueAssignmentResult> assignNextAgentQueueMember(AgentEntity agent, QueueEntity agentQueue) {
+    //     while (true) {
+    //         Optional<QueueMemberEntity> candidateOptional = queueMemberRestService
+    //                 .findEarliestAgentQueueMemberForUpdate(agentQueue.getUid());
+    //         if (!candidateOptional.isPresent()) {
+    //             return Optional.empty();
+    //         }
+    //         QueueMemberEntity member = candidateOptional.get();
+    //         ThreadEntity thread = member.getThread();
+    //         if (thread == null) {
+    //             cleanupQueueMember(member, "missing thread");
+    //             continue;
+    //         }
+    //         if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
+    //             cleanupQueueMember(member, "threadStatus=" + thread.getStatus());
+    //             continue;
+    //         }
+    //         ThreadEntity savedThread = finalizeThreadAssignment(agent, thread);
+    //         finalizeQueueMemberAssignment(agent, member);
+    //         publishAssignmentEvents(savedThread);
+    //         log.info("Auto-assigned thread {} to agent {}", savedThread.getUid(), agent.getUid());
+    //         return Optional.of(new QueueAssignmentResult(agent.getUid(), savedThread.getUid(), member.getUid()));
+    //     }
+    // }
+
+    // private ThreadEntity finalizeThreadAssignment(AgentEntity agent, ThreadEntity thread) {
+    //     UserProtobuf agentProtobuf = agent.toUserProtobuf();
+    //     thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+    //     thread.setAgent(agentProtobuf.toJson());
+    //     if (agent.getMember() != null && agent.getMember().getUser() != null) {
+    //         thread.setOwner(agent.getMember().getUser());
+    //     }
+    //     return threadRestService.save(thread);
+    // }
+
+    // private void finalizeQueueMemberAssignment(AgentEntity agent, QueueMemberEntity member) {
+    //     member.agentAutoAcceptThread();
+    //     QueueMemberEntity savedMember = queueMemberRestService.save(member);
+    //     Map<String, Object> updates = new HashMap<>();
+    //     updates.put("agentAutoAcceptThread", true);
+    //     updates.put("status", savedMember.getStatus());
+    //     queueMemberMessageService.sendUpdateMessage(savedMember, updates);
+    //     // queueNotificationService.publishQueueAssignmentNotice(agent, savedMember);
+    // }
+
+    // private void cleanupQueueMember(QueueMemberEntity member, String reason) {
+    //     member.setDeleted(true);
+    //     ThreadEntity thread = member.getThread();
+    //     if (thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
+    //         thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+    //         threadRestService.save(thread);
+    //     }
+    //     // QueueMemberEntity savedMember = queueMemberRestService.save(member);
+    //     // queueNotificationService.publishQueueLeaveNotice(savedMember);
+    //     log.debug("Cleaned queue member {} during auto-assign: {}", member.getUid(), reason);
+    // }
+
+    // private void publishAssignmentEvents(ThreadEntity thread) {
+    //     try {
+    //         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, thread));
+    //         bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, thread));
+    //     } catch (Exception e) {
+    //         log.warn("Failed to publish auto-assign events for thread {}: {}", thread.getUid(), e.getMessage());
+    //     }
+    // }
+
 
 }
