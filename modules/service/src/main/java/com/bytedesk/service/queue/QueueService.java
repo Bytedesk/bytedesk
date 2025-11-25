@@ -153,36 +153,6 @@ public class QueueService {
         return saveQueueMember(memberBuilder.build());
     }
 
-    
-    /**
-     * 通用的队列获取或创建方法
-     */
-    @Transactional
-    private QueueEntity getOrCreateQueue(String queueTopic, String nickname, String type, String orgUid) {
-        String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-
-        return retryOperation(() -> findByTopicAndDay(queueTopic, today)
-                .orElseGet(() -> createQueueEntity(queueTopic, nickname, type, today, orgUid)));
-    }
-
-    /**
-     * 重试操作的通用方法
-     */
-    private <T> T retryOperation(java.util.function.Supplier<T> operation) {
-        while (true) {
-            try {
-                return operation.get();
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Queue operation interrupted", ie);
-                }
-            }
-        }
-    }
-
     /**
      * 根据线程实体获取或创建队列
      */
@@ -203,12 +173,18 @@ public class QueueService {
         return getOrCreateQueue(queueTopic, agent.getNickname(), agent.getType(), orgUid);
     }
 
-    // public record QueueEnqueueResult(QueueMemberEntity queueMember, boolean
-    // alreadyQueued) { }
+    /**
+     * 通用的队列获取或创建方法
+     */
+    @Transactional
+    private QueueEntity getOrCreateQueue(String queueTopic, String nickname, String type, String orgUid) {
+        String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
 
-    // public record QueueAssignmentResult(String agentUid, String threadUid, String
-    // queueMemberUid) { }
+        return retryOperation(() -> findByTopicAndDay(queueTopic, today)
+                .orElseGet(() -> createQueueEntity(queueTopic, nickname, type, today, orgUid)));
+    }
 
+    
     /**
      * 根据队列主题和日期查询队列
      * 
@@ -239,15 +215,6 @@ public class QueueService {
     }
 
     /**
-     * 验证队列是否可以入队
-     */
-    private void validateQueue(QueueEntity queue, String errorMessage) {
-        if (!queue.canEnqueue()) {
-            throw new QueueFullException(errorMessage);
-        }
-    }
-
-    /**
      * 保存队列成员并验证结果
      */
     private QueueMemberEntity saveQueueMember(QueueMemberEntity member) {
@@ -269,6 +236,39 @@ public class QueueService {
             throw ex;
         }
     }
+
+    /**
+     * 验证队列是否可以入队
+     */
+    private void validateQueue(QueueEntity queue, String errorMessage) {
+        if (!queue.canEnqueue()) {
+            throw new QueueFullException(errorMessage);
+        }
+    }
+
+    /**
+     * 重试操作的通用方法
+     */
+    private <T> T retryOperation(java.util.function.Supplier<T> operation) {
+        while (true) {
+            try {
+                return operation.get();
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Queue operation interrupted", ie);
+                }
+            }
+        }
+    }
+
+    // public record QueueEnqueueResult(QueueMemberEntity queueMember, boolean
+    // alreadyQueued) { }
+
+    // public record QueueAssignmentResult(String agentUid, String threadUid, String
+    // queueMemberUid) { }
 
 
     // @Transactional
