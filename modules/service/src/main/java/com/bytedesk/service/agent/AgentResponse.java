@@ -58,5 +58,4 @@ public class AgentResponse extends BaseResponse {
     private MemberProtobuf member;
 
     private String userUid;
-    // private UserProtobuf user;
 }
