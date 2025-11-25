@@ -19,8 +19,10 @@ public class QueueNotification {
     /** Associated conversation thread uid so clients can correlate with chat sessions. */
     String threadUid;
 
+    String threadTopic;
+
     /** Agent currently responsible for the visitor, falls back to provided agent when unknown. */
-    String agentUid;
+    // String agentUid;
 
     /** Member position in the agent queue; null when no longer waiting (e.g. assigned). */
     Integer position;
@@ -36,6 +38,9 @@ public class QueueNotification {
 
     /** Server side epoch millis when the payload was produced. */
     long serverTimestamp;
+
+    // 访客json信息
+    String user;
 
     // @Value
     // @Builder

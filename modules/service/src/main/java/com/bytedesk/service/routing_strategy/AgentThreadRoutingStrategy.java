@@ -52,6 +52,7 @@ import com.bytedesk.core.utils.BdDateUtils;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.QueueContent;
 import lombok.AllArgsConstructor;
@@ -402,6 +403,33 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.info("排队消息发送完成 - threadUid: {}, 消息发送耗时: {}ms, 总处理耗时: {}ms",
                 savedThread.getUid(), System.currentTimeMillis() - msgStartTime,
                 System.currentTimeMillis() - startTime);
+
+        // 向客服发送排队通知消息
+        log.debug("开始向客服发送排队通知 - agentUid: {}", agent.getUid());
+        try {
+            // 获取客服的排队会话线程
+            ThreadEntity agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
+            
+            // 构建排队通知内容
+            QueueNotification queueNotification = QueueNotification.builder()
+                    .queueMemberUid(queueMemberEntity.getUid())
+                    .threadUid(savedThread.getUid())
+                    .threadTopic(savedThread.getTopic())
+                    .position(queuingCount)
+                    .queueSize(queuingCount)
+                    .estimatedWaitMs((long) waitSeconds * 1000)
+                    .serverTimestamp(System.currentTimeMillis())
+                    .user(savedThread.getUser())
+                    .build();
+            
+            // 创建并发送排队通知消息
+            MessageProtobuf agentNoticeMessage = ThreadMessageUtil.getAgentQueueNoticeMessage(queueNotification, agentQueueThread);
+            messageSendService.sendProtobufMessage(agentNoticeMessage);
+            log.info("客服排队通知发送完成 - agentUid: {}, queueMemberUid: {}, position: {}",
+                    agent.getUid(), queueMemberEntity.getUid(), queuingCount);
+        } catch (Exception e) {
+            log.error("发送客服排队通知失败 - agentUid: {}, error: {}", agent.getUid(), e.getMessage(), e);
+        }
 
         return messageProtobuf;
     }

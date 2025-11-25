@@ -34,7 +34,6 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
@@ -58,7 +57,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final UidUtils uidUtils;
     // private final EntityManager entityManager;
     // private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
-    private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
+    // private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
     // private static final int MAX_ENQUEUE_RETRIES = 20;
     // private static final long COLLISION_BACKOFF_MILLIS = 25L;
@@ -322,11 +321,11 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return queueMemberRepository.findAll(spec, pageable);
     }
 
-    @Cacheable(value = AGENT_QUEUE_THREAD_CACHE, key = "#agent.uid", unless = "#result == null")
-    public String ensureAgentQueueThreadUid(AgentEntity agent) {
-        ThreadResponse response = createAgentQueueThread(agent);
-        return response != null ? response.getUid() : null;
-    }
+    // @Cacheable(value = AGENT_QUEUE_THREAD_CACHE, key = "#agent.uid", unless = "#result == null")
+    // public String ensureAgentQueueThreadUid(AgentEntity agent) {
+    //     ThreadResponse response = createAgentQueueThread(agent);
+    //     return response != null ? response.getUid() : null;
+    // }
 
     /**
      * 访客主动退出排队：标记离开时间并软删除队列成员记录
@@ -372,12 +371,12 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     // }
 
     /** 客服排队会话：org/queue/{agent_uid} */
-    public ThreadResponse createAgentQueueThread(AgentEntity agent) {
+    public ThreadEntity createAgentQueueThread(AgentEntity agent) {
         // 
         String topic = TopicUtils.getOrgQueueTopic(agent.getUid());
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
-            return threadRestService.convertToResponse(threadOptional.get());
+            return threadOptional.get();
         }
         // 排队助手-用户信息，头像、昵称等
         UserProtobuf user = UserUtils.getQueueAssistantUser();
@@ -399,7 +398,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             throw new RuntimeException("thread save failed");
         }
         // 
-        return threadRestService.convertToResponse(updateThread);
+        return updateThread;
     }
 
 }
