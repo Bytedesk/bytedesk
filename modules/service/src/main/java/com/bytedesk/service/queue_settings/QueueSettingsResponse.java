@@ -34,6 +34,12 @@ public class QueueSettingsResponse extends BaseResponse {
     
     private static final long serialVersionUID = 1L;
 
+    private Boolean showQueuePosition; // 是否显示前面排队人数
+
+    private Boolean showEstimatedWaitTime; // 是否显示大概等待时间
+
+    private Integer avgWaitTimePerPerson; // 每个人大致等待时长(秒)
+
     private Integer maxWaiting; // 最大等待人数
 
     private Integer maxWaitTime; // 最大等待时间(秒)
@@ -52,6 +58,9 @@ public class QueueSettingsResponse extends BaseResponse {
             return null;
         }
         return QueueSettingsResponse.builder()
+                .showQueuePosition(settings.getShowQueuePosition())
+                .showEstimatedWaitTime(settings.getShowEstimatedWaitTime())
+                .avgWaitTimePerPerson(settings.getAvgWaitTimePerPerson())
                 .maxWaiting(settings.getMaxWaiting())
                 .maxWaitTime(settings.getMaxWaitTime())
                 .queueTip(settings.getQueueTip())

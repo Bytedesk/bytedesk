@@ -50,6 +50,18 @@ public class QueueSettingsEntity extends BaseEntity {
     @Builder.Default
     private Boolean queueRobot = false;
 
+    // 是否显示前面排队人数
+    @Builder.Default
+    private Boolean showQueuePosition = true;
+
+    // 是否显示大概等待时间
+    @Builder.Default
+    private Boolean showEstimatedWaitTime = true;
+
+    // 每个人大致等待时长(秒)，用于计算预估等待时间
+    @Builder.Default
+    private Integer avgWaitTimePerPerson = 60;
+
     @Builder.Default
     private Integer maxWaiting = 10000; // 最大等待人数
 
