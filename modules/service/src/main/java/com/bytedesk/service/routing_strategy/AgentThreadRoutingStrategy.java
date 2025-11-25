@@ -374,16 +374,12 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         String estimatedWaitTime = QueueTipTemplateUtils.formatWaitTime(waitSeconds);
         
         QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
-                .content(queueContentText)
-                .position(queuingCount)
-                .queueSize(queuingCount)
-                .serverTimestamp(System.currentTimeMillis());
-        if (queuingCount > 0) {
-            builder.waitSeconds(waitSeconds)
-                    .estimatedWaitTime(estimatedWaitTime);
-        } else {
-            builder.waitSeconds(0).estimatedWaitTime("即将开始");
-        }
+            .content(queueContentText)
+            .position(queuingCount)
+            .queueSize(queuingCount)
+            .serverTimestamp(System.currentTimeMillis())
+            .waitSeconds(waitSeconds)
+            .estimatedWaitTime(estimatedWaitTime);
         QueueContent queueContent = builder.build();
         thread.setQueuing().setContent(queueContent.toJson());
         log.debug("线程状态设置为排队 - threadUid: {}, 排队消息长度: {}, 预计等待: {}分钟",

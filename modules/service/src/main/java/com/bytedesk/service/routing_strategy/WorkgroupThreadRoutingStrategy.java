@@ -592,16 +592,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 构建结构化 QueueContent
         QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
-                .content(queueContentText)
-                .position(queuingCount)
-                .queueSize(queuingCount)
-                .serverTimestamp(System.currentTimeMillis());
-        if (queuingCount > 0) {
-            builder.waitSeconds(waitSeconds)
-                    .estimatedWaitTime(estimatedWaitTime);
-        } else {
-            builder.waitSeconds(0).estimatedWaitTime("即将开始");
-        }
+            .content(queueContentText)
+            .position(queuingCount)
+            .queueSize(queuingCount)
+            .serverTimestamp(System.currentTimeMillis())
+            .waitSeconds(waitSeconds)
+            .estimatedWaitTime(estimatedWaitTime);
         QueueContent queueContent = builder.build();
 
         // 设置线程状态（使用结构化JSON）
