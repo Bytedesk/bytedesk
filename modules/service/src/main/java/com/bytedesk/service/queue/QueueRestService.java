@@ -13,8 +13,6 @@
  */
 package com.bytedesk.service.queue;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,35 +26,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.context.annotation.Description;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
-import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.queue.dto.AgentQueueAssignmentRequest;
-import com.bytedesk.service.queue.dto.AgentQueueEnqueueRequest;
-import com.bytedesk.service.queue.dto.AgentQueueSnapshotResponse;
-import com.bytedesk.service.queue.exception.QueueFullException;
-import com.bytedesk.service.queue.exception.QueueMemberAlreadyExistsException;
-import com.bytedesk.service.queue_member.QueueMemberEntity;
-import com.bytedesk.service.queue_member.QueueMemberRestService;
-import com.bytedesk.service.queue_member.QueueMemberResponse;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
-import org.springframework.util.StringUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,11 +64,11 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
     private final WorkgroupRepository workgroupRepository;
 
-    private final QueueMemberRestService queueMemberRestService;
+    // private final QueueMemberRestService queueMemberRestService;
 
-    private final QueueService queueService;
+    // private final QueueService queueService;
 
-    private final QueueAutoAssignService queueAutoAssignService;
+    // private final QueueAutoAssignService queueAutoAssignService;
 
     @Override
     protected Specification<QueueEntity> createSpecification(QueueRequest request) {
@@ -112,7 +96,6 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
     @Override
     public Page<QueueResponse> queryByUser(QueueRequest request) {
         UserEntity user = authService.getUser();
-        
         // set user uid
         request.setUserUid(user.getUid());
         return queryByOrg(request);
@@ -256,79 +239,79 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         return queueExcel;
     }
 
-    public QueueMemberResponse enqueueAgentQueueMember(String agentUid, AgentQueueEnqueueRequest request) {
-        AgentEntity agent = requireAgent(agentUid);
-        ThreadEntity thread = requireThread(request.getThreadUid());
-        ensureSameOrg(agent, thread);
+    // public QueueMemberResponse enqueueAgentQueueMember(String agentUid, AgentQueueEnqueueRequest request) {
+    //     AgentEntity agent = requireAgent(agentUid);
+    //     ThreadEntity thread = requireThread(request.getThreadUid());
+    //     ensureSameOrg(agent, thread);
 
-        queueMemberRestService.findByThreadUid(thread.getUid())
-            .filter(existing -> ThreadProcessStatusEnum.QUEUING.name().equals(existing.getStatus()))
-                .ifPresent(existing -> {
-                    throw new QueueMemberAlreadyExistsException("Thread " + thread.getUid() + " already queued");
-                });
+    //     queueMemberRestService.findByThreadUid(thread.getUid())
+    //         .filter(existing -> ThreadProcessStatusEnum.QUEUING.name().equals(existing.getStatus()))
+    //             .ifPresent(existing -> {
+    //                 throw new QueueMemberAlreadyExistsException("Thread " + thread.getUid() + " already queued");
+    //             });
 
-        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent, request.getVisitor());
-        return queueMemberRestService.convertToResponse(queueMemberEntity);
-    }
+    //     QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent.toUserProtobuf(), request.getVisitor());
+    //     return queueMemberRestService.convertToResponse(queueMemberEntity);
+    // }
 
-    public AgentQueueSnapshotResponse listAgentQueueMembers(String agentUid, Pageable pageable) {
-        requireAgent(agentUid);
-        Optional<QueueEntity> queueOptional = findTodayAgentQueue(agentUid);
-        if (!queueOptional.isPresent()) {
-            return AgentQueueSnapshotResponse.empty(pageable);
-        }
-        Page<QueueMemberResponse> membersPage = queueMemberRestService
-                .findAgentQueueMembers(queueOptional.get().getUid(), pageable);
-        return AgentQueueSnapshotResponse.from(membersPage);
-    }
+    // public AgentQueueSnapshotResponse listAgentQueueMembers(String agentUid, Pageable pageable) {
+    //     requireAgent(agentUid);
+    //     Optional<QueueEntity> queueOptional = findTodayAgentQueue(agentUid);
+    //     if (!queueOptional.isPresent()) {
+    //         return AgentQueueSnapshotResponse.empty(pageable);
+    //     }
+    //     Page<QueueMemberResponse> membersPage = queueMemberRestService
+    //             .findAgentQueueMembers(queueOptional.get().getUid(), pageable);
+    //     return AgentQueueSnapshotResponse.from(membersPage);
+    // }
 
-    public void triggerManualAgentAssignment(String agentUid, AgentQueueAssignmentRequest request) {
-        AgentEntity agent = requireAgent(agentUid);
-        validateOrgScope(agent, request);
-        int slotsHint = request != null && request.getSlotsHint() != null && request.getSlotsHint() > 0
-                ? request.getSlotsHint()
-                : 1;
-        if (request != null && StringUtils.hasText(request.getReason())) {
-            log.info("Manual queue assignment requested - agentUid: {}, orgUid: {}, reason: {}",
-                    agentUid, request.getOrgUid(), request.getReason());
-        }
-        queueAutoAssignService.triggerAgentAutoAssign(agentUid,
-                QueueAutoAssignTriggerSource.MANUAL_ENDPOINT,
-                slotsHint);
-    }
+    // public void triggerManualAgentAssignment(String agentUid, AgentQueueAssignmentRequest request) {
+    //     AgentEntity agent = requireAgent(agentUid);
+    //     validateOrgScope(agent, request);
+    //     int slotsHint = request != null && request.getSlotsHint() != null && request.getSlotsHint() > 0
+    //             ? request.getSlotsHint()
+    //             : 1;
+    //     if (request != null && StringUtils.hasText(request.getReason())) {
+    //         log.info("Manual queue assignment requested - agentUid: {}, orgUid: {}, reason: {}",
+    //                 agentUid, request.getOrgUid(), request.getReason());
+    //     }
+    //     queueAutoAssignService.triggerAgentAutoAssign(agentUid,
+    //             QueueAutoAssignTriggerSource.MANUAL_ENDPOINT,
+    //             slotsHint);
+    // }
 
-    private void validateOrgScope(AgentEntity agent, AgentQueueAssignmentRequest request) {
-        if (agent == null || request == null || !StringUtils.hasText(request.getOrgUid())) {
-            return;
-        }
-        if (agent.getOrgUid() != null && !agent.getOrgUid().equals(request.getOrgUid())) {
-            throw new QueueFullException("Agent does not belong to org " + request.getOrgUid());
-        }
-    }
+    // private void validateOrgScope(AgentEntity agent, AgentQueueAssignmentRequest request) {
+    //     if (agent == null || request == null || !StringUtils.hasText(request.getOrgUid())) {
+    //         return;
+    //     }
+    //     if (agent.getOrgUid() != null && !agent.getOrgUid().equals(request.getOrgUid())) {
+    //         throw new QueueFullException("Agent does not belong to org " + request.getOrgUid());
+    //     }
+    // }
 
-    private Optional<QueueEntity> findTodayAgentQueue(String agentUid) {
-        String queueTopic = TopicUtils.getQueueTopicFromUid(agentUid);
-        String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        return findLatestByQueueTopicAndDay(queueTopic, today);
-    }
+    // private Optional<QueueEntity> findTodayAgentQueue(String agentUid) {
+    //     String queueTopic = TopicUtils.getQueueTopicFromUid(agentUid);
+    //     String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+    //     return findLatestByQueueTopicAndDay(queueTopic, today);
+    // }
 
-    private AgentEntity requireAgent(String agentUid) {
-        return agentRestService.findByUid(agentUid)
-                .orElseThrow(() -> new NotFoundException("Agent " + agentUid + " not found"));
-    }
+    // private AgentEntity requireAgent(String agentUid) {
+    //     return agentRestService.findByUid(agentUid)
+    //             .orElseThrow(() -> new NotFoundException("Agent " + agentUid + " not found"));
+    // }
 
-    private ThreadEntity requireThread(String threadUid) {
-        Assert.hasText(threadUid, "threadUid must not be blank");
-        return threadRestService.findByUid(threadUid)
-                .orElseThrow(() -> new NotFoundException("Thread " + threadUid + " not found"));
-    }
+    // private ThreadEntity requireThread(String threadUid) {
+    //     Assert.hasText(threadUid, "threadUid must not be blank");
+    //     return threadRestService.findByUid(threadUid)
+    //             .orElseThrow(() -> new NotFoundException("Thread " + threadUid + " not found"));
+    // }
 
-    private void ensureSameOrg(AgentEntity agent, ThreadEntity thread) {
-        if (agent.getOrgUid() == null || thread.getOrgUid() == null) {
-            return;
-        }
-        if (!agent.getOrgUid().equals(thread.getOrgUid())) {
-            throw new QueueFullException("Agent and thread must belong to the same organization");
-        }
-    }
+    // private void ensureSameOrg(AgentEntity agent, ThreadEntity thread) {
+    //     if (agent.getOrgUid() == null || thread.getOrgUid() == null) {
+    //         return;
+    //     }
+    //     if (!agent.getOrgUid().equals(thread.getOrgUid())) {
+    //         throw new QueueFullException("Agent and thread must belong to the same organization");
+    //     }
+    // }
 }

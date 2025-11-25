@@ -16,7 +16,6 @@ package com.bytedesk.service.routing_strategy;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -33,10 +32,7 @@ import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
-import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.presence.PresenceFacadeService;
-import com.bytedesk.service.queue.QueueAutoAssignService;
-import com.bytedesk.service.queue.QueueAutoAssignTriggerSource;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
@@ -78,7 +74,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final MessageRestService messageRestService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
-    private final QueueAutoAssignService queueAutoAssignService;
+    // private final QueueAutoAssignService queueAutoAssignService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -225,8 +221,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("开始新线程路由 - threadUid: {}, agentUid: {}", thread.getUid(), agentEntity.getUid());
 
         // 加入队列
-        QueueService.QueueEnqueueResult enqueueResult = queueService.enqueueAgentWithResult(thread, agentEntity, visitorRequest);
-        QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
+        // QueueService.QueueEnqueueResult enqueueResult = queueService.enqueueAgentWithResult(thread, agentEntity, visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agentEntity.toUserProtobuf(), visitorRequest);
         QueueEntity agentQueue = queueMemberEntity.getAgentQueue();
 
         QueueSettingsEntity queueSettings = getAgentQueueSettings(agentEntity);
@@ -715,26 +711,26 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         return ThreadMessageUtil.getThreadQueueMessage(queueContent, thread);
     }
 
-    @EventListener
-    public void handleAgentStatusAutoAssign(AgentUpdateStatusEvent event) {
-        AgentEntity agent = event.getAgent();
-        if (!shouldTriggerAgentAutoAssign(agent)) {
-            return;
-        }
-        queueAutoAssignService.triggerAgentAutoAssign(
-                agent.getUid(),
-                QueueAutoAssignTriggerSource.AGENT_STATUS_EVENT,
-                estimateAvailableSlots(agent));
-    }
+    // @EventListener
+    // public void handleAgentStatusAutoAssign(AgentUpdateStatusEvent event) {
+    //     AgentEntity agent = event.getAgent();
+    //     if (!shouldTriggerAgentAutoAssign(agent)) {
+    //         return;
+    //     }
+    //     queueAutoAssignService.triggerAgentAutoAssign(
+    //             agent.getUid(),
+    //             QueueAutoAssignTriggerSource.AGENT_STATUS_EVENT,
+    //             estimateAvailableSlots(agent));
+    // }
 
-    private boolean shouldTriggerAgentAutoAssign(AgentEntity agent) {
-        return agent != null
-                && StringUtils.hasText(agent.getUid())
-                && presenceFacadeService.isAgentOnlineAndAvailable(agent);
-    }
+    // private boolean shouldTriggerAgentAutoAssign(AgentEntity agent) {
+    //     return agent != null
+    //             && StringUtils.hasText(agent.getUid())
+    //             && presenceFacadeService.isAgentOnlineAndAvailable(agent);
+    // }
 
-    private int estimateAvailableSlots(AgentEntity agent) {
-        int maxThreadCount = agent.getMaxThreadCount();
-        return maxThreadCount > 0 ? maxThreadCount : 1;
-    }
+    // private int estimateAvailableSlots(AgentEntity agent) {
+    //     int maxThreadCount = agent.getMaxThreadCount();
+    //     return maxThreadCount > 0 ? maxThreadCount : 1;
+    // }
 }
