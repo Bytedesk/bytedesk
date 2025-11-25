@@ -90,6 +90,36 @@ public class QueueTipTemplateUtils {
     }
 
     /**
+     * 解析排队提示语模板（基于 QueueSettings 设置）
+     *
+     * @param settings    队列设置
+     * @param position    当前排队位置
+     * @param queueSize   当前队列总人数
+     * @return 替换变量后的提示语
+     */
+    public static String resolveTemplate(QueueSettingsEntity settings, int position, int queueSize) {
+        int resolvedAvgWaitTime = settings != null && settings.getAvgWaitTimePerPerson() != null
+                ? settings.getAvgWaitTimePerPerson()
+                : DEFAULT_AVG_WAIT_TIME_PER_PERSON;
+        return resolveTemplate(settings, position, queueSize, resolvedAvgWaitTime);
+    }
+
+    /**
+     * 解析排队提示语模板（基于 QueueSettings 设置并自定义平均等待时长）
+     *
+     * @param settings              队列设置
+     * @param position              当前排队位置
+     * @param queueSize             当前队列总人数
+     * @param avgWaitTimePerPerson  每人平均等待时长（秒）
+     * @return 替换变量后的提示语
+     */
+    public static String resolveTemplate(QueueSettingsEntity settings, int position, int queueSize,
+            int avgWaitTimePerPerson) {
+        String template = settings != null ? settings.getQueueTip() : null;
+        return resolveTemplate(template, position, queueSize, avgWaitTimePerPerson);
+    }
+
+    /**
      * 格式化等待时间为人性化描述
      *
      * @param waitSeconds 等待秒数

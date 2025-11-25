@@ -587,20 +587,17 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private String generateAgentQueueMessage(AgentEntity agent, int queuingCount, int avgWaitTimePerPerson) {
         log.debug("开始生成客服排队消息 - agentUid: {}, 排队数: {}", agent.getUid(), queuingCount);
 
-        // 获取自定义排队提示语模板
-        String queueTipTemplate = null;
         QueueSettingsEntity queueSettings = getAgentQueueSettings(agent);
         if (queueSettings != null && StringUtils.hasText(queueSettings.getQueueTip())) {
-            queueTipTemplate = queueSettings.getQueueTip();
-            log.debug("使用自定义排队提示语模板 - agentUid: {}, 模板: {}", agent.getUid(), queueTipTemplate);
+            log.debug("使用自定义排队提示语模板 - agentUid: {}, 模板: {}", agent.getUid(), queueSettings.getQueueTip());
         }
 
         // 使用模板工具类解析并替换变量
         String queueMessage = QueueTipTemplateUtils.resolveTemplate(
-                queueTipTemplate, 
-                queuingCount,  // position = 排队人数（前面的人）
-                queuingCount,  // queueSize = 当前队列总人数
-                avgWaitTimePerPerson
+            queueSettings,
+            queuingCount,  // position = 排队人数（前面的人）
+            queuingCount,  // queueSize = 当前队列总人数
+            avgWaitTimePerPerson
         );
 
         log.info("客服排队消息生成完成 - agentUid: {}, 排队数: {}, 消息: {}",

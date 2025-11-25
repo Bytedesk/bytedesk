@@ -832,20 +832,17 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private String generateWorkgroupQueueMessage(WorkgroupEntity workgroup, int queuingCount, int avgWaitTimePerPerson) {
         log.debug("开始生成工作组排队消息 - workgroupUid: {}, 排队数: {}", workgroup.getUid(), queuingCount);
 
-        // 获取自定义排队提示语模板
-        String queueTipTemplate = null;
         QueueSettingsEntity queueSettings = getWorkgroupQueueSettings(workgroup);
         if (queueSettings != null && StringUtils.hasText(queueSettings.getQueueTip())) {
-            queueTipTemplate = queueSettings.getQueueTip();
-            log.debug("使用自定义排队提示语模板 - workgroupUid: {}, 模板: {}", workgroup.getUid(), queueTipTemplate);
+            log.debug("使用自定义排队提示语模板 - workgroupUid: {}, 模板: {}", workgroup.getUid(), queueSettings.getQueueTip());
         }
 
         // 使用模板工具类解析并替换变量
         String queueMessage = QueueTipTemplateUtils.resolveTemplate(
-                queueTipTemplate,
-                queuingCount,  // position = 排队人数（前面的人）
-                queuingCount,  // queueSize = 当前队列总人数
-                avgWaitTimePerPerson
+            queueSettings,
+            queuingCount,  // position = 排队人数（前面的人）
+            queuingCount,  // queueSize = 当前队列总人数
+            avgWaitTimePerPerson
         );
 
         log.info("工作组排队消息生成完成 - workgroupUid: {}, 排队数: {}, 消息: {}",
