@@ -310,7 +310,7 @@ public class QueueService {
         String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         
         return retryOperation(() ->
-            findLatestQueue(queueTopic, today)
+            findByTopicAndDay(queueTopic, today)
                 .orElseGet(() -> createQueueEntity(queueTopic, nickname, type, today, orgUid))
         );
     }
@@ -347,10 +347,10 @@ public class QueueService {
      * 根据用户获取或创建 agent/robot 队列
      */
     @Transactional
-    private QueueEntity getAgentOrRobotQueue(UserProtobuf user, String orgUid) {
-        Assert.notNull(user, "User cannot be null");
-        String queueTopic = TopicUtils.getQueueTopicFromUid(user.getUid());
-        return getOrCreateQueue(queueTopic, user.getNickname(), user.getType(), orgUid);
+    private QueueEntity getAgentOrRobotQueue(UserProtobuf agent, String orgUid) {
+        Assert.notNull(agent, "User cannot be null");
+        String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
+        return getOrCreateQueue(queueTopic, agent.getNickname(), agent.getType(), orgUid);
     }
 
     // public record QueueEnqueueResult(QueueMemberEntity queueMember, boolean alreadyQueued) { }
@@ -365,10 +365,6 @@ public class QueueService {
      * @return 队列实体（可选）
      */
     public Optional<QueueEntity> findByTopicAndDay(String queueTopic, String day) {
-        return findLatestQueue(queueTopic, day);
-    }
-
-    private Optional<QueueEntity> findLatestQueue(String queueTopic, String day) {
         return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(queueTopic, day);
     }
 
