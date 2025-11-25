@@ -27,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
@@ -42,7 +41,6 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueTypeEnum;
@@ -61,7 +59,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     // private final EntityManager entityManager;
-    private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
+    // private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
     private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
     // private static final int MAX_ENQUEUE_RETRIES = 20;
@@ -115,10 +113,10 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     /**
      * Remove stale queue members before enqueuing new visitors so queue numbers remain dense.
      */
-    @Transactional
-    public int cleanupBeforeEnqueue() {
-        return cleanupIdleQueueMembers();
-    }
+    // @Transactional
+    // public int cleanupBeforeEnqueue() {
+    //     return cleanupIdleQueueMembers();
+    // }
 
     @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
     @Override
@@ -336,45 +334,45 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     /**
      * 访客主动退出排队：标记离开时间并软删除队列成员记录
      */
-    public void visitorExitQueue(String threadUid) {
-        Optional<QueueMemberEntity> optional = findByThreadUid(threadUid);
-        if (!optional.isPresent()) {
-            return;
-        }
-        QueueMemberEntity entity = optional.get();
-        entity.setVisitorLeavedAt(BdDateUtils.now());
-        entity.setDeleted(true); // 不要删除，仅修改status状态
-        ThreadEntity thread = entity.getThread();
-        if (thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
-            thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
-            threadRestService.save(thread);
-        }
-        QueueMemberEntity saved = save(entity);
-        queueNotificationService.publishQueueLeaveNotice(saved);
-    }
+    // public void visitorExitQueue(String threadUid) {
+    //     Optional<QueueMemberEntity> optional = findByThreadUid(threadUid);
+    //     if (!optional.isPresent()) {
+    //         return;
+    //     }
+    //     QueueMemberEntity entity = optional.get();
+    //     entity.setVisitorLeavedAt(BdDateUtils.now());
+    //     entity.setDeleted(true); // 不要删除，仅修改status状态
+    //     ThreadEntity thread = entity.getThread();
+    //     if (thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
+    //         thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+    //         threadRestService.save(thread);
+    //     }
+    //     QueueMemberEntity saved = save(entity);
+    //     queueNotificationService.publishQueueLeaveNotice(saved);
+    // }
 
     /**
      * 扫描超时(未发送首条消息)的排队成员并标记删除
      */
-    public int cleanupIdleQueueMembers() {
-        java.time.ZonedDateTime threshold = BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
-        java.util.List<QueueMemberEntity> idleList = queueMemberRepository.findIdleBefore(threshold);
-        int removed = 0;
-        for (QueueMemberEntity qm : idleList) {
-            // 只处理仍处于排队状态的线程
-            ThreadEntity thread = qm.getThread();
-            if (thread != null && thread.isQueuing()) {
-                // qm.setDeleted(true); // 不要删除，仅修改status状态
-                qm.setVisitorLeavedAt(BdDateUtils.now());
-                thread.setStatus(ThreadProcessStatusEnum.TIMEOUT.name());
-                threadRestService.save(thread);
-                QueueMemberEntity saved = save(qm);
-                queueNotificationService.publishQueueTimeoutNotice(saved);
-                removed++;
-            }
-        }
-        return removed;
-    }
+    // public int cleanupIdleQueueMembers() {
+    //     java.time.ZonedDateTime threshold = BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
+    //     java.util.List<QueueMemberEntity> idleList = queueMemberRepository.findIdleBefore(threshold);
+    //     int removed = 0;
+    //     for (QueueMemberEntity qm : idleList) {
+    //         // 只处理仍处于排队状态的线程
+    //         ThreadEntity thread = qm.getThread();
+    //         if (thread != null && thread.isQueuing()) {
+    //             // qm.setDeleted(true); // 不要删除，仅修改status状态
+    //             qm.setVisitorLeavedAt(BdDateUtils.now());
+    //             thread.setStatus(ThreadProcessStatusEnum.TIMEOUT.name());
+    //             threadRestService.save(thread);
+    //             QueueMemberEntity saved = save(qm);
+    //             queueNotificationService.publishQueueTimeoutNotice(saved);
+    //             removed++;
+    //         }
+    //     }
+    //     return removed;
+    // }
 
     /** 客服排队会话：org/queue/{agent_uid} */
     public ThreadResponse createAgentQueueThread(AgentEntity agent) {

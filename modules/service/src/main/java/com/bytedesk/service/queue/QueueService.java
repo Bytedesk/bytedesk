@@ -25,7 +25,6 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.queue.exception.QueueFullException;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
-import com.bytedesk.service.queue.notification.QueueNotificationService;
 import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -55,7 +54,7 @@ public class QueueService {
 
     private final UidUtils uidUtils;
 
-    private final QueueNotificationService queueNotificationService;
+    // private final QueueNotificationService queueNotificationService;
 
     private Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
         return queueMemberRestService.findByThreadUid(threadUid);
@@ -76,9 +75,6 @@ public class QueueService {
         UserProtobuf agent = agentEntity.toUserProtobuf();
         boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
-        // if (!alreadyQueued) {
-        //     queueNotificationService.publishQueueJoinNotice(agentEntity, queueMemberEntity);
-        // }
         return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
 
@@ -95,9 +91,6 @@ public class QueueService {
             WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
         UserProtobuf agent = agentEntity != null ? agentEntity.toUserProtobuf() : null;
         QueueEnqueueResult result = enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest);
-        // if (agentEntity != null && !result.alreadyQueued()) {
-        //     queueNotificationService.publishQueueJoinNotice(agentEntity, result.queueMember());
-        // }
         return result;
     }
 
@@ -161,7 +154,7 @@ public class QueueService {
         updates.put("agentAutoAcceptThread", true);
         updates.put("status", savedMember.getStatus());
         queueMemberMessageService.sendUpdateMessage(savedMember, updates);
-        queueNotificationService.publishQueueAssignmentNotice(agent, savedMember);
+        // queueNotificationService.publishQueueAssignmentNotice(agent, savedMember);
     }
 
     private void cleanupQueueMember(QueueMemberEntity member, String reason) {
@@ -171,8 +164,8 @@ public class QueueService {
             thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
             threadRestService.save(thread);
         }
-        QueueMemberEntity savedMember = queueMemberRestService.save(member);
-        queueNotificationService.publishQueueLeaveNotice(savedMember);
+        // QueueMemberEntity savedMember = queueMemberRestService.save(member);
+        // queueNotificationService.publishQueueLeaveNotice(savedMember);
         log.debug("Cleaned queue member {} during auto-assign: {}", member.getUid(), reason);
     }
 

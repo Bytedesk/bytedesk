@@ -50,7 +50,6 @@ import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.ThreadSequenceResponse;
 import java.time.ZonedDateTime;
-import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -84,7 +83,7 @@ public class VisitorRestControllerVisitor {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private final QueueMemberRestService queueMemberRestService;
+    // private final QueueMemberRestService queueMemberRestService;
 
     @ApiRateLimiter(value = 1, timeout = 1)
     @PostMapping("/init")
@@ -197,20 +196,20 @@ public class VisitorRestControllerVisitor {
         if (!StringUtils.hasText(request.getCloseType())) {
             request.setCloseType(ThreadCloseTypeEnum.VISITOR.name());
         }
-        ThreadResponse response;
-        if (StringUtils.hasText(request.getUid())) {
-            response = threadRestService.closeByUid(request);
-            // 从排队中退出（若存在）
-            queueMemberRestService.visitorExitQueue(request.getUid());
-        } else if (StringUtils.hasText(request.getTopic())) {
-            response = threadRestService.closeByTopic(request);
-            if (response != null && StringUtils.hasText(response.getUid())) {
-                queueMemberRestService.visitorExitQueue(response.getUid());
-            }
-        } else {
-            return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
-        }
-        return ResponseEntity.ok(JsonResult.success("close success", response));
+        // ThreadResponse response;
+        // if (StringUtils.hasText(request.getUid())) {
+        //     response = threadRestService.closeByUid(request);
+        //     // 从排队中退出（若存在）
+        //     queueMemberRestService.visitorExitQueue(request.getUid());
+        // } else if (StringUtils.hasText(request.getTopic())) {
+        //     response = threadRestService.closeByTopic(request);
+        //     if (response != null && StringUtils.hasText(response.getUid())) {
+        //         queueMemberRestService.visitorExitQueue(response.getUid());
+        //     }
+        // } else {
+        //     return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
+        // }
+        return ResponseEntity.ok(JsonResult.success("close success"));
     }
 
     /**

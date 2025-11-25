@@ -169,17 +169,17 @@ public class QueueMemberEventListener {
 
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        int removed = queueMemberRestService.cleanupIdleQueueMembers();
-        if (removed > 0) {
-            log.info("Idle queue members removed: {}", removed);
-            // 广播所有前缀的队列位置刷新：这里简化处理，按当前活跃排队线程重新计算
-            // 获取任意还在排队的线程列表，通过提取前缀分组刷新
-            // 为避免复杂度，这里只刷新受影响的所有排队会话(全量刷新)
-            // 查找所有排队中的线程(匹配已有查询方法前缀需要 topicPrefix, 此处使用简单遍历 prefix 集合)
-            // 简化：不区分前缀，逐个线程重新发送其位置
-            // 由于缺少批量查询接口，这里暂不实现全量广播以免性能问题，可后续优化
-            // (占位注释)
-        }
+        // int removed = queueMemberRestService.cleanupIdleQueueMembers();
+        // if (removed > 0) {
+        //     log.info("Idle queue members removed: {}", removed);
+        //     // 广播所有前缀的队列位置刷新：这里简化处理，按当前活跃排队线程重新计算
+        //     // 获取任意还在排队的线程列表，通过提取前缀分组刷新
+        //     // 为避免复杂度，这里只刷新受影响的所有排队会话(全量刷新)
+        //     // 查找所有排队中的线程(匹配已有查询方法前缀需要 topicPrefix, 此处使用简单遍历 prefix 集合)
+        //     // 简化：不区分前缀，逐个线程重新发送其位置
+        //     // 由于缺少批量查询接口，这里暂不实现全量广播以免性能问题，可后续优化
+        //     // (占位注释)
+        // }
     }
 
     @EventListener
