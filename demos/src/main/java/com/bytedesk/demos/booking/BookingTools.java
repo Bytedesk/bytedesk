@@ -36,7 +36,7 @@ public class BookingTools {
 	private static final Logger logger = LoggerFactory.getLogger(BookingTools.class);
 
 	@Autowired
-	private FlightBookingService flightBookingService;
+	private BookingService flightBookingService;
 
 	public record BookingDetailsRequest(String bookingNumber, String name) {
 	}
@@ -48,7 +48,7 @@ public class BookingTools {
 	}
 
 	@JsonInclude(Include.NON_NULL)
-	public record BookingDetails(String bookingNumber, String name, LocalDate date, BookingStatus bookingStatus,
+	public record BookingDetails(String bookingNumber, String name, LocalDate date, BookingStatusEnum bookingStatus,
 			String from, String to, String bookingClass) {
 	}
 

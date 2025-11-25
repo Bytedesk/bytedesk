@@ -25,11 +25,11 @@ import reactor.core.publisher.Flux;
 
 @RequestMapping("/demo/booking/api/assistant")
 @RestController
-public class AssistantController {
+public class BookingAssistantController {
 
-	private final CustomerSupportAssistant agent;
+	private final BookingAssistant agent;
 
-	public AssistantController(CustomerSupportAssistant agent) {
+	public BookingAssistantController(BookingAssistant agent) {
 		this.agent = agent;
 	}
 

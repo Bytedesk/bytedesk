@@ -26,18 +26,18 @@ public class Booking {
 
 	private LocalDate bookingTo;
 
-	private Customer customer;
+	private BookingCustomer customer;
 
 	private String from;
 
 	private String to;
 
-	private BookingStatus bookingStatus;
+	private BookingStatusEnum bookingStatus;
 
-	private BookingClass bookingClass;
+	private BookingClassEnum bookingClass;
 
-	public Booking(String bookingNumber, LocalDate date, Customer customer, BookingStatus bookingStatus, String from,
-			String to, BookingClass bookingClass) {
+	public Booking(String bookingNumber, LocalDate date, BookingCustomer customer, BookingStatusEnum bookingStatus, String from,
+			String to, BookingClassEnum bookingClass) {
 		this.bookingNumber = bookingNumber;
 		this.date = date;
 		this.customer = customer;
@@ -71,19 +71,19 @@ public class Booking {
 		this.bookingTo = bookingTo;
 	}
 
-	public Customer getCustomer() {
+	public BookingCustomer getCustomer() {
 		return customer;
 	}
 
-	public void setCustomer(Customer customer) {
+	public void setCustomer(BookingCustomer customer) {
 		this.customer = customer;
 	}
 
-	public BookingStatus getBookingStatus() {
+	public BookingStatusEnum getBookingStatus() {
 		return bookingStatus;
 	}
 
-	public void setBookingStatus(BookingStatus bookingStatus) {
+	public void setBookingStatus(BookingStatusEnum bookingStatus) {
 		this.bookingStatus = bookingStatus;
 	}
 
@@ -103,11 +103,11 @@ public class Booking {
 		this.to = to;
 	}
 
-	public BookingClass getBookingClass() {
+	public BookingClassEnum getBookingClass() {
 		return bookingClass;
 	}
 
-	public void setBookingClass(BookingClass bookingClass) {
+	public void setBookingClass(BookingClassEnum bookingClass) {
 		this.bookingClass = bookingClass;
 	}
 

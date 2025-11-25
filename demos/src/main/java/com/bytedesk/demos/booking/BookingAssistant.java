@@ -39,11 +39,11 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
  * 函数调用（Function Calling）
  */
 @Service
-public class CustomerSupportAssistant {
+public class BookingAssistant {
 
 	private final ChatClient chatClient;
 
-	public CustomerSupportAssistant(ChatClient.Builder modelBuilder, VectorStore vectorStore, ChatMemory chatMemory) {
+	public BookingAssistant(ChatClient.Builder modelBuilder, VectorStore vectorStore, ChatMemory chatMemory) {
 
 		// @formatter:off
 		this.chatClient = modelBuilder

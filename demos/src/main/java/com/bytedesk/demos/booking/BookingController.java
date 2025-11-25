@@ -29,9 +29,9 @@ import java.util.List;
 @RequestMapping("/demo/booking/api")
 public class BookingController {
 
-	private final FlightBookingService flightBookingService;
+	private final BookingService flightBookingService;
 
-	public BookingController(FlightBookingService flightBookingService) {
+	public BookingController(BookingService flightBookingService) {
 		this.flightBookingService = flightBookingService;
 	}
 

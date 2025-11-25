@@ -31,11 +31,11 @@ import java.util.Random;
  * 业务规则验证：如时间限制（48小时内不可取消）
  */
 @Service
-public class FlightBookingService {
+public class BookingService {
 
 	private final BookingData db;
 
-	public FlightBookingService() {
+	public BookingService() {
 		db = new BookingData();
 
 		initDemoData();
@@ -50,20 +50,20 @@ public class FlightBookingService {
 				"天津");
 		Random random = new Random();
 
-		var customers = new ArrayList<Customer>();
+		var customers = new ArrayList<BookingCustomer>();
 		var bookings = new ArrayList<Booking>();
 
 		for (int i = 0; i < 5; i++) {
 			String name = names.get(i);
 			String from = airportCodes.get(random.nextInt(airportCodes.size()));
 			String to = airportCodes.get(random.nextInt(airportCodes.size()));
-			BookingClass bookingClass = BookingClass.values()[random.nextInt(BookingClass.values().length)];
-			Customer customer = new Customer();
+			BookingClassEnum bookingClass = BookingClassEnum.values()[random.nextInt(BookingClassEnum.values().length)];
+			BookingCustomer customer = new BookingCustomer();
 			customer.setName(name);
 
 			LocalDate date = LocalDate.now().plusDays(2 * (i + 1));
 
-			Booking booking = new Booking("10" + (i + 1), date, customer, BookingStatus.CONFIRMED, from, to,
+			Booking booking = new Booking("10" + (i + 1), date, customer, BookingStatusEnum.CONFIRMED, from, to,
 					bookingClass);
 			customer.getBookings().add(booking);
 
@@ -109,7 +109,7 @@ public class FlightBookingService {
 		if (booking.getDate().isBefore(LocalDate.now().plusDays(2))) {
 			throw new IllegalArgumentException("Booking cannot be cancelled within 48 hours of the start date.");
 		}
-		booking.setBookingStatus(BookingStatus.CANCELLED);
+		booking.setBookingStatus(BookingStatusEnum.CANCELLED);
 	}
 
 	private BookingDetails toBookingDetails(Booking booking) {

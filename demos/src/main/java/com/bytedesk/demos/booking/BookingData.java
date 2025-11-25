@@ -21,15 +21,15 @@ import java.util.List;
 
 public class BookingData {
 
-	private List<Customer> customers = new ArrayList<>();
+	private List<BookingCustomer> customers = new ArrayList<>();
 
 	private List<Booking> bookings = new ArrayList<>();
 
-	public List<Customer> getCustomers() {
+	public List<BookingCustomer> getCustomers() {
 		return customers;
 	}
 
-	public void setCustomers(List<Customer> customers) {
+	public void setCustomers(List<BookingCustomer> customers) {
 		this.customers = customers;
 	}
 
