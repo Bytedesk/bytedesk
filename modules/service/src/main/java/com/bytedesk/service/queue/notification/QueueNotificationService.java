@@ -1,6 +1,10 @@
 package com.bytedesk.service.queue.notification;
 
 import org.springframework.stereotype.Service;
+
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class QueueNotificationService {
 
-    // private final QueueNotificationBuilder queueNotificationBuilder;
+    private final QueueNotificationBuilder queueNotificationBuilder;
     // private final ObjectProvider<QueueMemberRestService> queueMemberRestServiceProvider;
     // private final ThreadRestService threadRestService;
     // private final AgentRestService agentRestService;
@@ -22,22 +26,22 @@ public class QueueNotificationService {
     //     return thread;
     // });
 
-    // /** Enqueue a QUEUE_NOTICE event when a visitor joins the agent's waiting list. */
-    // public void publishQueueJoinNotice(AgentEntity agent, QueueMemberEntity queueMemberEntity) {
-    //     if (agent == null || queueMemberEntity == null) {
-    //         return;
-    //     }
-    //     try {
-    //         QueueNotificationPayload payload = queueNotificationBuilder
-    //                 .buildJoinNotice(queueMemberEntity, agent.getUid());
-    //         QueueNotificationPayload.QueueNotificationSnapshot snapshot = queueNotificationBuilder
-    //                 .buildSnapshot(queueMemberEntity);
-    //         bufferAndSchedule(agent, payload, snapshot);
-    //     } catch (Exception ex) {
-    //         log.warn("Failed to publish queue notice for agent {} member {}: {}", agent.getUid(),
-    //                 queueMemberEntity.getUid(), ex.getMessage(), ex);
-    //     }
-    // }
+    /** Enqueue a QUEUE_NOTICE event when a visitor joins the agent's waiting list. */
+    public void publishQueueJoinNotice(AgentEntity agent, QueueMemberEntity queueMemberEntity) {
+        if (agent == null || queueMemberEntity == null) {
+            return;
+        }
+        try {
+            QueueNotificationPayload payload = queueNotificationBuilder
+                    .buildJoinNotice(queueMemberEntity, agent.getUid());
+            // QueueNotificationPayload.QueueNotificationSnapshot snapshot = queueNotificationBuilder
+            //         .buildSnapshot(queueMemberEntity);
+            // bufferAndSchedule(agent, payload, snapshot);
+        } catch (Exception ex) {
+            log.warn("Failed to publish queue notice for agent {} member {}: {}", agent.getUid(),
+                    queueMemberEntity.getUid(), ex.getMessage(), ex);
+        }
+    }
 
     // /** Send the assignment notification immediately once the visitor is matched to the agent. */
     // public void publishQueueAssignmentNotice(AgentEntity agent, QueueMemberEntity queueMemberEntity) {
@@ -91,7 +95,7 @@ public class QueueNotificationService {
     //     messageSendService.sendProtobufMessage(message);
     // }
 
-    // /** Buffer single-member deltas so we can batch them later, unless they must be sent immediately. */
+    /** Buffer single-member deltas so we can batch them later, unless they must be sent immediately. */
     // private void bufferAndSchedule(AgentEntity agent, QueueNotificationPayload payload,
     //         QueueNotificationPayload.QueueNotificationSnapshot snapshot) {
     //     if (agent == null || payload == null) {

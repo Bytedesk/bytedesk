@@ -1,6 +1,6 @@
 package com.bytedesk.service.queue.notification;
 
-import java.util.List;
+// import java.util.List;
 
 import lombok.Builder;
 import lombok.Value;
@@ -8,11 +8,12 @@ import lombok.Value;
 @Value
 @Builder
 public class QueueNotificationPayload {
+    
     /** High level channel that consumers use to route the message (notice/update/timeout/etc). */
-    QueueNotificationType messageType;
+    QueueNotificationType type;
 
     /** Fine grained delta describing what changed for this queue member. */
-    QueueNotificationDelta delta;
+    // QueueNotificationDelta delta;
 
     /** Queue member that triggered the update (null only for legacy fallbacks). */
     String queueMemberUid;
@@ -33,21 +34,21 @@ public class QueueNotificationPayload {
     Long estimatedWaitMs;
 
     /** Populated only for QUEUE_UPDATE payloads so clients can refresh multiple members at once. */
-    List<QueueNotificationSnapshot> snapshot;
+    // List<QueueNotificationSnapshot> snapshot;
 
     /** Server side epoch millis when the payload was produced. */
     long serverTimestamp;
 
-    @Value
-    @Builder
-    public static class QueueNotificationSnapshot {
-        /** Queue member represented by this snapshot entry. */
-        String queueMemberUid;
+    // @Value
+    // @Builder
+    // public static class QueueNotificationSnapshot {
+    //     /** Queue member represented by this snapshot entry. */
+    //     String queueMemberUid;
 
-        /** Human friendly visitor name rendered on the queue list. */
-        String displayName;
+    //     /** Human friendly visitor name rendered on the queue list. */
+    //     String displayName;
 
-        /** Position for this member at the time the snapshot was generated. */
-        Integer position;
-    }
+    //     /** Position for this member at the time the snapshot was generated. */
+    //     Integer position;
+    // }
 }

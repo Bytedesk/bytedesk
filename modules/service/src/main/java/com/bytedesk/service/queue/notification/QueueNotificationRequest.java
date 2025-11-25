@@ -2,7 +2,6 @@ package com.bytedesk.service.queue.notification;
 
 import java.util.List;
 
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import jakarta.validation.constraints.NotBlank;
@@ -19,9 +18,9 @@ import lombok.NoArgsConstructor;
 public class QueueNotificationRequest {
 
     @NotNull
-    private QueueNotificationType messageType;
+    private QueueNotificationType type;
 
-    private QueueNotificationDelta delta;
+    // private QueueNotificationDelta delta;
 
     @NotBlank
     private String queueMemberUid;
@@ -43,8 +42,8 @@ public class QueueNotificationRequest {
 
     public QueueNotificationPayload toPayload(String fallbackAgentUid) {
         QueueNotificationPayload.QueueNotificationPayloadBuilder builder = QueueNotificationPayload.builder()
-                .messageType(messageType)
-                .delta(delta)
+                .type(type)
+                // .delta(delta)
                 .queueMemberUid(queueMemberUid)
                 .threadUid(threadUid)
                 .agentUid(StringUtils.hasText(agentUid) ? agentUid : fallbackAgentUid)
@@ -53,15 +52,15 @@ public class QueueNotificationRequest {
                 .estimatedWaitMs(estimatedWaitMs)
                 .serverTimestamp(serverTimestamp);
 
-        if (!CollectionUtils.isEmpty(snapshot)) {
-            builder.snapshot(snapshot.stream()
-                    .map(item -> QueueNotificationPayload.QueueNotificationSnapshot.builder()
-                            .queueMemberUid(item.getQueueMemberUid())
-                            .displayName(item.getDisplayName())
-                            .position(item.getPosition())
-                            .build())
-                    .toList());
-        }
+        // if (!CollectionUtils.isEmpty(snapshot)) {
+        //     builder.snapshot(snapshot.stream()
+        //             .map(item -> QueueNotificationPayload.QueueNotificationSnapshot.builder()
+        //                     .queueMemberUid(item.getQueueMemberUid())
+        //                     .displayName(item.getDisplayName())
+        //                     .position(item.getPosition())
+        //                     .build())
+        //             .toList());
+        // }
 
         return builder.build();
     }
