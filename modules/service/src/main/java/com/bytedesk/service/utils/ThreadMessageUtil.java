@@ -30,7 +30,6 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceTrigger;
-import com.bytedesk.service.queue.notification.QueueNotificationPayload;
 import lombok.experimental.UtilityClass;
 
 // 可以根据需要选择是否使用 @Component 注解
@@ -115,29 +114,29 @@ public class ThreadMessageUtil {
     /**
      * 构造发送给客服排队线程的 QUEUE_NOTICE 消息
      */
-    public static MessageProtobuf getAgentQueueNoticeMessage(QueueNotificationPayload payload, ThreadEntity thread) {
-        UserProtobuf system = UserProtobuf.getSystemUser();
-        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
+    // public static MessageProtobuf getAgentQueueNoticeMessage(QueueNotificationPayload payload, ThreadEntity thread) {
+    //     UserProtobuf system = UserProtobuf.getSystemUser();
+    //     MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+    //     MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
-        String json = payload != null ? JSON.toJSONString(payload) : null;
+    //     String json = payload != null ? JSON.toJSONString(payload) : null;
 
-        MessageEntity message = MessageEntity.builder()
-                .uid(UidUtils.getInstance().getUid())
-                .content(json)
-                .type(MessageTypeEnum.QUEUE_NOTICE.name())
-                .status(MessageStatusEnum.READ.name())
-                .channel(ChannelEnum.SYSTEM.name())
-                .user(system.toJson())
-                .orgUid(thread.getOrgUid())
-                .createdAt(BdDateUtils.now())
-                .updatedAt(BdDateUtils.now())
-                .thread(thread)
-                .extra(extra.toJson())
-                .build();
+    //     MessageEntity message = MessageEntity.builder()
+    //             .uid(UidUtils.getInstance().getUid())
+    //             .content(json)
+    //             .type(MessageTypeEnum.QUEUE_NOTICE.name())
+    //             .status(MessageStatusEnum.READ.name())
+    //             .channel(ChannelEnum.SYSTEM.name())
+    //             .user(system.toJson())
+    //             .orgUid(thread.getOrgUid())
+    //             .createdAt(BdDateUtils.now())
+    //             .updatedAt(BdDateUtils.now())
+    //             .thread(thread)
+    //             .extra(extra.toJson())
+    //             .build();
 
-        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
-    }
+    //     return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+    // }
 
     public static MessageProtobuf getThreadContinueMessage(UserProtobuf user, ThreadEntity thread) {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());

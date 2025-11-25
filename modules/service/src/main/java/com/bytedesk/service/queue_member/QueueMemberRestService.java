@@ -20,7 +20,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +43,6 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueTypeEnum;
-import com.bytedesk.service.queue.notification.QueueNotificationService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -67,8 +65,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     // private static final String QUEUE_MEMBER_TABLE_NAME = resolveQueueMemberTableName();
     // private static final String QUEUE_NUMBER_UNIQUE_CONSTRAINT = "uk7aviqofcxw7ae3fped747qrl7";
     // private final QueueAuditLogger queueAuditLogger;
-    @Lazy
-    private final QueueNotificationService queueNotificationService;
+    // @Lazy
+    // private final QueueNotificationService queueNotificationService;
     
 
     public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
@@ -134,7 +132,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     protected QueueMemberEntity doSave(QueueMemberEntity entity) {
         return queueMemberRepository.save(entity);
     }
-    
 
     @Override
     public QueueMemberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,

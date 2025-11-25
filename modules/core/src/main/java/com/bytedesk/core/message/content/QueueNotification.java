@@ -1,16 +1,14 @@
-package com.bytedesk.service.queue.notification;
-
-// import java.util.List;
+package com.bytedesk.core.message.content;
 
 import lombok.Builder;
 import lombok.Value;
 
 @Value
 @Builder
-public class QueueNotificationPayload {
+public class QueueNotification {
     
     /** High level channel that consumers use to route the message (notice/update/timeout/etc). */
-    QueueNotificationType type;
+    // QueueNotificationType type;
 
     /** Fine grained delta describing what changed for this queue member. */
     // QueueNotificationDelta delta;
