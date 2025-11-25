@@ -134,14 +134,19 @@ public class QueueService {
                 break;
             case WORKGROUP:
                 memberBuilder.workgroupQueue(primaryQueue);
-                // 同时设置 agent/robot 队列
-                QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
-                validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
+                // 同时设置 agent/robot 队列（仅当 agent 不为 null 时）
+                // agent 为 null 表示所有客服满员，进入排队等待分配
+                if (agent != null) {
+                    QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
+                    validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
 
-                if (ThreadTypeEnum.AGENT.name().equalsIgnoreCase(agent.getType())) {
-                    memberBuilder.agentQueue(agentOrRobotQueue);
+                    if (ThreadTypeEnum.AGENT.name().equalsIgnoreCase(agent.getType())) {
+                        memberBuilder.agentQueue(agentOrRobotQueue);
+                    } else {
+                        memberBuilder.robotQueue(agentOrRobotQueue);
+                    }
                 } else {
-                    memberBuilder.robotQueue(agentOrRobotQueue);
+                    // 当 agent 为 null 时，表示所有客服满员，进入排队等待分配。
                 }
                 break;
         }
