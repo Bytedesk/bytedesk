@@ -186,9 +186,7 @@ public class WorkgroupSettingsRestService
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
             if (draft == null) {
                 draft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftIntentionSettings(draft);
                 // 
                 IntentionSettingsEntity settings = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
@@ -206,9 +204,7 @@ public class WorkgroupSettingsRestService
             MessageLeaveSettingsEntity draft = entity.getDraftMessageLeaveSettings();
             if (draft == null) {
                 draft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftMessageLeaveSettings(draft);
                 // 
                 MessageLeaveSettingsEntity settings = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
@@ -244,9 +240,7 @@ public class WorkgroupSettingsRestService
             RobotRoutingSettingsEntity draft = entity.getDraftRobotSettings();
             if (draft == null) {
                 draft = RobotRoutingSettingsEntity.fromRequest(request.getRobotRoutingSettings());
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftRobotSettings(draft);
                 // 
             } else {
@@ -264,9 +258,7 @@ public class WorkgroupSettingsRestService
             QueueSettingsEntity draft = entity.getDraftQueueSettings();
             if (draft == null) {
                 draft = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftQueueSettings(draft);
                 // 
                 QueueSettingsEntity settings = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);

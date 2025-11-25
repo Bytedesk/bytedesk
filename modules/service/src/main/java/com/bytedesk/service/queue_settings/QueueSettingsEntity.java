@@ -46,7 +46,8 @@ import lombok.Builder;
 public class QueueSettingsEntity extends BaseEntity {
 
     // 当排队人数超过指定值时，自动分配机器人
-    // 仅适用于workgroup，对一对一人工客服无效
+    // 仅适用于workgroup，对一对一人工客服无效。默认进入留言流程。
+    // TODO: 暂不启用
     @Builder.Default
     private Boolean queueRobot = false;
 
@@ -62,9 +63,11 @@ public class QueueSettingsEntity extends BaseEntity {
     @Builder.Default
     private Integer avgWaitTimePerPerson = 60;
 
+    // 设置允许同时排队等待的最大访客数量，超过该数量将进入留言流程
     @Builder.Default
     private Integer maxWaiting = 10000; // 最大等待人数
 
+    // 设置访客最长排队等待时间（秒），超时后将进入留言流程
     @Builder.Default
     private Integer maxWaitTime = 24 * 60 * 60; // 最大等待时间(秒)
     

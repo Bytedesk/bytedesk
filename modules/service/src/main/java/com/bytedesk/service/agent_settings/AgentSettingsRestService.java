@@ -196,9 +196,7 @@ public class AgentSettingsRestService
             MessageLeaveSettingsEntity draft = entity.getDraftMessageLeaveSettings();
             if (draft == null) {
                 draft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftMessageLeaveSettings(draft);
                 // 
                 MessageLeaveSettingsEntity settings = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
@@ -216,9 +214,7 @@ public class AgentSettingsRestService
             WorktimeSettingEntity draft = entity.getDraftWorktimeSettings();
             if (draft == null) {
                 draft = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftWorktimeSettings(draft);
                 // 
                 WorktimeSettingEntity settings = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
@@ -236,9 +232,7 @@ public class AgentSettingsRestService
             AutoReplySettingsEntity draft = entity.getDraftAutoReplySettings();
             if (draft == null) {
                 draft = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftAutoReplySettings(draft);
                 // 
                 AutoReplySettingsEntity settings = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
@@ -257,9 +251,7 @@ public class AgentSettingsRestService
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
             if (draft == null) {
                 draft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftInviteSettings(draft);
                 // 
                 InviteSettingsEntity settings = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
@@ -277,9 +269,7 @@ public class AgentSettingsRestService
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
             if (draft == null) {
                 draft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftIntentionSettings(draft);
                 // 
                 IntentionSettingsEntity settings = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
@@ -297,9 +287,7 @@ public class AgentSettingsRestService
             QueueSettingsEntity draft = entity.getDraftQueueSettings();
             if (draft == null) {
                 draft = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftQueueSettings(draft);
                 // 
                 QueueSettingsEntity settings = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
@@ -317,9 +305,7 @@ public class AgentSettingsRestService
             RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
             if (draft == null) {
                 draft = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftRateDownSettings(draft);
                 // 
                 RatedownSettingsEntity settings = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
@@ -337,9 +323,7 @@ public class AgentSettingsRestService
             AgentStatusSettingEntity draft = entity.getDraftAgentStatusSettings();
             if (draft == null) {
                 draft = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
-                if (draft != null && draft.getUid() == null) {
-                    draft.setUid(uidUtils.getUid());
-                }
+                draft.setUid(uidUtils.getUid());
                 entity.setDraftAgentStatusSettings(draft);
                 // 
                 AgentStatusSettingEntity settings = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
