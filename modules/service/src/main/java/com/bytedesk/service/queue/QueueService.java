@@ -103,8 +103,6 @@ public class QueueService {
         switch (queueType) {
             case ROBOT:
             case AGENT:
-                // case WORKFLOW:
-                // case UNIFIED:
                 nickname = agent.getNickname();
                 primaryQueue = getQueue(threadEntity, nickname);
                 break;
@@ -129,8 +127,6 @@ public class QueueService {
         // 根据队列类型设置相应的队列
         switch (queueType) {
             case ROBOT:
-                // case WORKFLOW:
-                // case UNIFIED:
                 memberBuilder.robotQueue(primaryQueue);
                 break;
             case AGENT:
@@ -142,7 +138,7 @@ public class QueueService {
                 QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
                 validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
 
-                if (agent.getType().equals(ThreadTypeEnum.AGENT.name())) {
+                if (ThreadTypeEnum.AGENT.name().equalsIgnoreCase(agent.getType())) {
                     memberBuilder.agentQueue(agentOrRobotQueue);
                 } else {
                     memberBuilder.robotQueue(agentOrRobotQueue);
@@ -184,7 +180,6 @@ public class QueueService {
                 .orElseGet(() -> createQueueEntity(queueTopic, nickname, type, today, orgUid)));
     }
 
-    
     /**
      * 根据队列主题和日期查询队列
      * 
