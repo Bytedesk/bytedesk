@@ -108,6 +108,36 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     }
 
     /**
+     * 统计客服队列中处于排队状态的会话数
+     * 
+     * @param agentQueueUid 客服队列UID
+     * @return 排队中的会话数
+     */
+    public int countQueuingByAgentQueueUid(String agentQueueUid) {
+        if (!StringUtils.hasText(agentQueueUid)) {
+            return 0;
+        }
+        return queueMemberRepository.countQueuingByAgentQueueUid(
+            agentQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    /**
+     * 统计工作组队列中未分配客服且处于排队状态的会话数
+     * 
+     * @param workgroupQueueUids 工作组队列UID列表
+     * @return 未分配客服的排队会话数
+     */
+    public int countUnassignedQueuingByWorkgroupQueueUids(List<String> workgroupQueueUids) {
+        if (workgroupQueueUids == null || workgroupQueueUids.isEmpty()) {
+            return 0;
+        }
+        return queueMemberRepository.countUnassignedQueuingByWorkgroupQueueUids(
+            workgroupQueueUids,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    /**
      * Remove stale queue members before enqueuing new visitors so queue numbers remain dense.
      */
     // @Transactional

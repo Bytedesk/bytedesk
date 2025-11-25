@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
@@ -87,6 +88,30 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         Page<ThreadResponse> threadPage = queueRestService.queryQueuing(request);
         
         return ResponseEntity.ok(JsonResult.success(threadPage));
+    }
+
+    // 获取客服完整排队人数统计
+    @GetMapping("/agent/queuing/count")
+    @Operation(summary = "获取客服排队统计", description = "获取客服的完整排队人数统计，包括一对一会话和工作组未分配的排队会话")
+    @ApiResponse(responseCode = "200", description = "查询成功")
+    public ResponseEntity<?> getAgentQueuingCount(@RequestParam String agentUid) {
+        
+        var queuingCount = queueRestService.getAgentTotalQueuingCount(agentUid);
+        
+        return ResponseEntity.ok(JsonResult.success(queuingCount));
+    }
+
+    // 获取客服完整队列统计信息
+    @GetMapping("/agent/stats")
+    @Operation(summary = "获取客服队列统计", description = "获取客服的完整队列统计信息，包括今日服务人数、排队人数、接待人数、留言数、转人工数等")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = AgentQueueStatsResponse.class)))
+    public ResponseEntity<?> getAgentQueueStats(@RequestParam String agentUid) {
+        
+        AgentQueueStatsResponse stats = queueRestService.getAgentQueueStats(agentUid);
+        
+        return ResponseEntity.ok(JsonResult.success(stats));
     }
 
     @Operation(summary = "创建队列", description = "创建新的队列")

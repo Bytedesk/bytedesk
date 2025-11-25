@@ -66,7 +66,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
     // private final QueueMemberRestService queueMemberRestService;
 
-    // private final QueueService queueService;
+    private final QueueService queueService;
 
     // private final QueueAutoAssignService queueAutoAssignService;
 
@@ -239,79 +239,27 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         return queueExcel;
     }
 
-    // public QueueMemberResponse enqueueAgentQueueMember(String agentUid, AgentQueueEnqueueRequest request) {
-    //     AgentEntity agent = requireAgent(agentUid);
-    //     ThreadEntity thread = requireThread(request.getThreadUid());
-    //     ensureSameOrg(agent, thread);
+    /**
+     * 获取客服的完整排队人数统计
+     * 包括：
+     * 1. 直接在客服队列（agentQueue）中排队的人数（一对一会话）
+     * 2. 客服所在工作组队列中等待分配的排队人数（工作组会话，agentQueue 为 null）
+     * 
+     * @param agentUid 客服UID
+     * @return 完整排队人数统计结果
+     */
+    public QueueService.AgentQueuingCount getAgentTotalQueuingCount(String agentUid) {
+        return queueService.getAgentTotalQueuingCount(agentUid);
+    }
 
-    //     queueMemberRestService.findByThreadUid(thread.getUid())
-    //         .filter(existing -> ThreadProcessStatusEnum.QUEUING.name().equals(existing.getStatus()))
-    //             .ifPresent(existing -> {
-    //                 throw new QueueMemberAlreadyExistsException("Thread " + thread.getUid() + " already queued");
-    //             });
-
-    //     QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agent.toUserProtobuf(), request.getVisitor());
-    //     return queueMemberRestService.convertToResponse(queueMemberEntity);
-    // }
-
-    // public AgentQueueSnapshotResponse listAgentQueueMembers(String agentUid, Pageable pageable) {
-    //     requireAgent(agentUid);
-    //     Optional<QueueEntity> queueOptional = findTodayAgentQueue(agentUid);
-    //     if (!queueOptional.isPresent()) {
-    //         return AgentQueueSnapshotResponse.empty(pageable);
-    //     }
-    //     Page<QueueMemberResponse> membersPage = queueMemberRestService
-    //             .findAgentQueueMembers(queueOptional.get().getUid(), pageable);
-    //     return AgentQueueSnapshotResponse.from(membersPage);
-    // }
-
-    // public void triggerManualAgentAssignment(String agentUid, AgentQueueAssignmentRequest request) {
-    //     AgentEntity agent = requireAgent(agentUid);
-    //     validateOrgScope(agent, request);
-    //     int slotsHint = request != null && request.getSlotsHint() != null && request.getSlotsHint() > 0
-    //             ? request.getSlotsHint()
-    //             : 1;
-    //     if (request != null && StringUtils.hasText(request.getReason())) {
-    //         log.info("Manual queue assignment requested - agentUid: {}, orgUid: {}, reason: {}",
-    //                 agentUid, request.getOrgUid(), request.getReason());
-    //     }
-    //     queueAutoAssignService.triggerAgentAutoAssign(agentUid,
-    //             QueueAutoAssignTriggerSource.MANUAL_ENDPOINT,
-    //             slotsHint);
-    // }
-
-    // private void validateOrgScope(AgentEntity agent, AgentQueueAssignmentRequest request) {
-    //     if (agent == null || request == null || !StringUtils.hasText(request.getOrgUid())) {
-    //         return;
-    //     }
-    //     if (agent.getOrgUid() != null && !agent.getOrgUid().equals(request.getOrgUid())) {
-    //         throw new QueueFullException("Agent does not belong to org " + request.getOrgUid());
-    //     }
-    // }
-
-    // private Optional<QueueEntity> findTodayAgentQueue(String agentUid) {
-    //     String queueTopic = TopicUtils.getQueueTopicFromUid(agentUid);
-    //     String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-    //     return findLatestByQueueTopicAndDay(queueTopic, today);
-    // }
-
-    // private AgentEntity requireAgent(String agentUid) {
-    //     return agentRestService.findByUid(agentUid)
-    //             .orElseThrow(() -> new NotFoundException("Agent " + agentUid + " not found"));
-    // }
-
-    // private ThreadEntity requireThread(String threadUid) {
-    //     Assert.hasText(threadUid, "threadUid must not be blank");
-    //     return threadRestService.findByUid(threadUid)
-    //             .orElseThrow(() -> new NotFoundException("Thread " + threadUid + " not found"));
-    // }
-
-    // private void ensureSameOrg(AgentEntity agent, ThreadEntity thread) {
-    //     if (agent.getOrgUid() == null || thread.getOrgUid() == null) {
-    //         return;
-    //     }
-    //     if (!agent.getOrgUid().equals(thread.getOrgUid())) {
-    //         throw new QueueFullException("Agent and thread must belong to the same organization");
-    //     }
-    // }
+    /**
+     * 获取客服的完整队列统计信息
+     * 包括今日服务人数、排队人数、接待人数、留言数、转人工数等
+     * 
+     * @param agentUid 客服UID
+     * @return 完整队列统计响应
+     */
+    public AgentQueueStatsResponse getAgentQueueStats(String agentUid) {
+        return queueService.getAgentQueueStats(agentUid);
+    }
 }

@@ -2,12 +2,16 @@ package com.bytedesk.service.queue;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
@@ -18,6 +22,7 @@ import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
@@ -31,6 +36,8 @@ public class QueueService {
     private final QueueMemberRestService queueMemberRestService;
 
     private final QueueRepository queueRepository;
+
+    private final WorkgroupRepository workgroupRepository;
 
     private final UidUtils uidUtils;
 
@@ -264,136 +271,155 @@ public class QueueService {
         }
     }
 
-    // public record QueueEnqueueResult(QueueMemberEntity queueMember, boolean
-    // alreadyQueued) { }
+    /**
+     * 获取客服的完整排队人数统计
+     * 包括：
+     * 1. 直接在客服队列（agentQueue）中排队的人数（一对一会话）
+     * 2. 客服所在工作组队列中等待分配的排队人数（工作组会话，agentQueue 为 null）
+     * 
+     * @param agentUid 客服UID
+     * @return 完整排队人数统计结果
+     */
+    public AgentQueuingCount getAgentTotalQueuingCount(String agentUid) {
+        if (!StringUtils.hasText(agentUid)) {
+            return new AgentQueuingCount(0, 0, 0);
+        }
 
-    // public record QueueAssignmentResult(String agentUid, String threadUid, String
-    // queueMemberUid) { }
+        String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        
+        // 1. 统计客服队列中的排队人数（一对一会话）
+        String agentQueueTopic = TopicUtils.getQueueTopicFromUid(agentUid);
+        Optional<QueueEntity> agentQueueOpt = findByTopicAndDay(agentQueueTopic, today);
+        int agentDirectQueuingCount = 0;
+        if (agentQueueOpt.isPresent()) {
+            agentDirectQueuingCount = queueMemberRestService.countQueuingByAgentQueueUid(agentQueueOpt.get().getUid());
+        }
 
+        // 2. 统计客服所在工作组中未分配客服的排队人数
+        List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentUid);
+        int workgroupUnassignedQueuingCount = 0;
+        
+        if (!workgroups.isEmpty()) {
+            List<String> workgroupQueueUids = new ArrayList<>();
+            for (WorkgroupEntity workgroup : workgroups) {
+                String workgroupQueueTopic = TopicUtils.getQueueTopicFromUid(workgroup.getUid());
+                Optional<QueueEntity> workgroupQueueOpt = findByTopicAndDay(workgroupQueueTopic, today);
+                if (workgroupQueueOpt.isPresent()) {
+                    workgroupQueueUids.add(workgroupQueueOpt.get().getUid());
+                }
+            }
+            
+            if (!workgroupQueueUids.isEmpty()) {
+                workgroupUnassignedQueuingCount = queueMemberRestService
+                    .countUnassignedQueuingByWorkgroupQueueUids(workgroupQueueUids);
+            }
+        }
 
-    // @Transactional
-    // public QueueEnqueueResult enqueueAgentWithResult(ThreadEntity threadEntity,
-    // AgentEntity agentEntity, VisitorRequest visitorRequest) {
-    // UserProtobuf agent = agentEntity.toUserProtobuf();
-    // boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
-    // QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent,
-    // null, QueueTypeEnum.AGENT);
-    // return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
-    // }
+        int totalQueuingCount = agentDirectQueuingCount + workgroupUnassignedQueuingCount;
+        
+        log.debug("客服排队统计 - agentUid: {}, 一对一排队: {}, 工作组未分配排队: {}, 总计: {}",
+                agentUid, agentDirectQueuingCount, workgroupUnassignedQueuingCount, totalQueuingCount);
+        
+        return new AgentQueuingCount(agentDirectQueuingCount, workgroupUnassignedQueuingCount, totalQueuingCount);
+    }
 
-    // @Transactional
-    // public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity
-    // threadEntity, UserProtobuf agent,
-    // WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-    // boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
-    // QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent,
-    // workgroupEntity, QueueTypeEnum.WORKGROUP);
-    // return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
-    // }
+    /**
+     * 客服排队人数统计结果
+     */
+    public record AgentQueuingCount(
+        int directQueuingCount,           // 一对一排队人数
+        int workgroupUnassignedCount,     // 工作组未分配排队人数
+        int totalQueuingCount             // 总排队人数
+    ) {}
 
-    // @Transactional
-    // public QueueEnqueueResult enqueueWorkgroupWithResult(ThreadEntity
-    // threadEntity, AgentEntity agentEntity,
-    // WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
-    // UserProtobuf agent = agentEntity != null ? agentEntity.toUserProtobuf() :
-    // null;
-    // QueueEnqueueResult result = enqueueWorkgroupWithResult(threadEntity, agent,
-    // workgroupEntity, visitorRequest);
-    // return result;
-    // }
+    /**
+     * 获取客服的完整队列统计信息
+     * 包括今日服务人数、排队人数、接待人数、留言数、转人工数等
+     * 
+     * @param agentUid 客服UID
+     * @return 完整队列统计响应
+     */
+    public AgentQueueStatsResponse getAgentQueueStats(String agentUid) {
+        if (!StringUtils.hasText(agentUid)) {
+            return AgentQueueStatsResponse.builder()
+                    .agentUid(agentUid)
+                    .build();
+        }
 
-    // @Transactional
-    // public Optional<QueueAssignmentResult> assignNextAgentQueueMember(String
-    // agentUid) {
-    // if (!StringUtils.hasText(agentUid)) {
-    // return Optional.empty();
-    // }
-    // Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
-    // if (!agentOptional.isPresent()) {
-    // log.warn("Skip auto-assign: agent {} not found", agentUid);
-    // return Optional.empty();
-    // }
-    // AgentEntity agent = agentOptional.get();
-    // QueueEntity agentQueue = getAgentOrRobotQueue(agent.toUserProtobuf(),
-    // agent.getOrgUid());
-    // if (agentQueue == null) {
-    // return Optional.empty();
-    // }
-    // return assignNextAgentQueueMember(agent, agentQueue);
-    // }
+        String today = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        String agentQueueTopic = TopicUtils.getQueueTopicFromUid(agentUid);
+        Optional<QueueEntity> agentQueueOpt = findByTopicAndDay(agentQueueTopic, today);
 
-    // private Optional<QueueAssignmentResult>
-    // assignNextAgentQueueMember(AgentEntity agent, QueueEntity agentQueue) {
-    // while (true) {
-    // Optional<QueueMemberEntity> candidateOptional = queueMemberRestService
-    // .findEarliestAgentQueueMemberForUpdate(agentQueue.getUid());
-    // if (!candidateOptional.isPresent()) {
-    // return Optional.empty();
-    // }
-    // QueueMemberEntity member = candidateOptional.get();
-    // ThreadEntity thread = member.getThread();
-    // if (thread == null) {
-    // cleanupQueueMember(member, "missing thread");
-    // continue;
-    // }
-    // if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
-    // cleanupQueueMember(member, "threadStatus=" + thread.getStatus());
-    // continue;
-    // }
-    // ThreadEntity savedThread = finalizeThreadAssignment(agent, thread);
-    // finalizeQueueMemberAssignment(agent, member);
-    // publishAssignmentEvents(savedThread);
-    // log.info("Auto-assigned thread {} to agent {}", savedThread.getUid(),
-    // agent.getUid());
-    // return Optional.of(new QueueAssignmentResult(agent.getUid(),
-    // savedThread.getUid(), member.getUid()));
-    // }
-    // }
+        // 获取排队统计
+        AgentQueuingCount queuingCount = getAgentTotalQueuingCount(agentUid);
 
-    // private ThreadEntity finalizeThreadAssignment(AgentEntity agent, ThreadEntity
-    // thread) {
-    // UserProtobuf agentProtobuf = agent.toUserProtobuf();
-    // thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
-    // thread.setAgent(agentProtobuf.toJson());
-    // if (agent.getMember() != null && agent.getMember().getUser() != null) {
-    // thread.setOwner(agent.getMember().getUser());
-    // }
-    // return threadRestService.save(thread);
-    // }
+        // 如果客服队列不存在，返回基础统计
+        if (agentQueueOpt.isEmpty()) {
+            return AgentQueueStatsResponse.builder()
+                    .agentUid(agentUid)
+                    .queuingCount(queuingCount.totalQueuingCount())
+                    .directQueuingCount(queuingCount.directQueuingCount())
+                    .workgroupUnassignedCount(queuingCount.workgroupUnassignedCount())
+                    .build();
+        }
 
-    // private void finalizeQueueMemberAssignment(AgentEntity agent,
-    // QueueMemberEntity member) {
-    // member.agentAutoAcceptThread();
-    // QueueMemberEntity savedMember = queueMemberRestService.save(member);
-    // Map<String, Object> updates = new HashMap<>();
-    // updates.put("agentAutoAcceptThread", true);
-    // updates.put("status", savedMember.getStatus());
-    // queueMemberMessageService.sendUpdateMessage(savedMember, updates);
-    // // queueNotificationService.publishQueueAssignmentNotice(agent, savedMember);
-    // }
+        QueueEntity agentQueue = agentQueueOpt.get();
 
-    // private void cleanupQueueMember(QueueMemberEntity member, String reason) {
-    // member.setDeleted(true);
-    // ThreadEntity thread = member.getThread();
-    // if (thread != null &&
-    // ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
-    // thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
-    // threadRestService.save(thread);
-    // }
-    // // QueueMemberEntity savedMember = queueMemberRestService.save(member);
-    // // queueNotificationService.publishQueueLeaveNotice(savedMember);
-    // log.debug("Cleaned queue member {} during auto-assign: {}", member.getUid(),
-    // reason);
-    // }
+        // 统计客服所在工作组的汇总数据
+        List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentUid);
+        
+        int totalCount = agentQueue.getTotalCount();
+        int chattingCount = agentQueue.getChattingCount();
+        int offlineCount = agentQueue.getOfflineCount();
+        int closedCount = agentQueue.getClosedCount();
+        int leaveMsgCount = agentQueue.getMessageLeaveCount();
+        int robotToAgentCount = agentQueue.getRobotToAgentCount();
+        int robotingCount = agentQueue.getRobotingCount();
+        List<Integer> threadsCountByHour = new ArrayList<>(agentQueue.getThreadsCountByHour());
 
-    // private void publishAssignmentEvents(ThreadEntity thread) {
-    // try {
-    // bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, thread));
-    // bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, thread));
-    // } catch (Exception e) {
-    // log.warn("Failed to publish auto-assign events for thread {}: {}",
-    // thread.getUid(), e.getMessage());
-    // }
-    // }
+        // 汇总工作组队列的统计数据
+        for (WorkgroupEntity workgroup : workgroups) {
+            String workgroupQueueTopic = TopicUtils.getQueueTopicFromUid(workgroup.getUid());
+            Optional<QueueEntity> workgroupQueueOpt = findByTopicAndDay(workgroupQueueTopic, today);
+            if (workgroupQueueOpt.isPresent()) {
+                QueueEntity workgroupQueue = workgroupQueueOpt.get();
+                totalCount += workgroupQueue.getTotalCount();
+                chattingCount += workgroupQueue.getChattingCount();
+                offlineCount += workgroupQueue.getOfflineCount();
+                closedCount += workgroupQueue.getClosedCount();
+                leaveMsgCount += workgroupQueue.getMessageLeaveCount();
+                robotToAgentCount += workgroupQueue.getRobotToAgentCount();
+                robotingCount += workgroupQueue.getRobotingCount();
+                
+                // 合并每小时统计
+                List<Integer> workgroupHourly = workgroupQueue.getThreadsCountByHour();
+                for (int i = 0; i < 24 && i < workgroupHourly.size(); i++) {
+                    if (i < threadsCountByHour.size()) {
+                        threadsCountByHour.set(i, threadsCountByHour.get(i) + workgroupHourly.get(i));
+                    } else {
+                        threadsCountByHour.add(workgroupHourly.get(i));
+                    }
+                }
+            }
+        }
+
+        log.debug("客服队列统计 - agentUid: {}, 总人数: {}, 排队: {}, 接待: {}, 留言: {}, 转人工: {}",
+                agentUid, totalCount, queuingCount.totalQueuingCount(), chattingCount, leaveMsgCount, robotToAgentCount);
+
+        return AgentQueueStatsResponse.builder()
+                .agentUid(agentUid)
+                .totalCount(totalCount)
+                .queuingCount(queuingCount.totalQueuingCount())
+                .directQueuingCount(queuingCount.directQueuingCount())
+                .workgroupUnassignedCount(queuingCount.workgroupUnassignedCount())
+                .chattingCount(chattingCount)
+                .offlineCount(offlineCount)
+                .closedCount(closedCount)
+                .leaveMsgCount(leaveMsgCount)
+                .robotToAgentCount(robotToAgentCount)
+                .robotingCount(robotingCount)
+                .threadsCountByHour(threadsCountByHour)
+                .build();
+    }
 
 }

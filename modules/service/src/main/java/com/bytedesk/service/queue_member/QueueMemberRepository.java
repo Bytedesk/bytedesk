@@ -102,4 +102,29 @@ public interface QueueMemberRepository
         @Query("SELECT COALESCE(MAX(qm.queueNumber), 0) FROM QueueMemberEntity qm WHERE qm.deleted = false AND ((:queueType = 'AGENT' AND qm.agentQueue = :queue) OR (:queueType = 'WORKGROUP' AND qm.workgroupQueue = :queue) OR (:queueType = 'ROBOT' AND qm.robotQueue = :queue))")
         Integer findMaxQueueNumberForQueue(@Param("queue") QueueEntity queue, @Param("queueType") String queueType);
 
+        /**
+         * 统计指定工作组队列UIDs中未分配客服（agentQueue 为 null）且处于排队状态的会话数
+         * 用于计算某个客服所在工作组中等待分配的排队人数
+         * 
+         * @param workgroupQueueUids 工作组队列UID列表
+         * @param threadStatus 线程状态（如 QUEUING）
+         * @return 未分配客服的排队会话数
+         */
+        @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.workgroupQueue.uid IN :workgroupQueueUids AND qm.agentQueue IS NULL AND qm.deleted = false AND qm.thread.status = :threadStatus")
+        int countUnassignedQueuingByWorkgroupQueueUids(
+                        @Param("workgroupQueueUids") List<String> workgroupQueueUids,
+                        @Param("threadStatus") String threadStatus);
+
+        /**
+         * 统计指定客服队列中处于排队状态的会话数
+         * 
+         * @param agentQueueUid 客服队列UID
+         * @param threadStatus 线程状态（如 QUEUING）
+         * @return 排队会话数
+         */
+        @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus")
+        int countQueuingByAgentQueueUid(
+                        @Param("agentQueueUid") String agentQueueUid,
+                        @Param("threadStatus") String threadStatus);
+
 }
