@@ -75,11 +75,13 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 	private final AuthService authService;
 
-	private final UploadWatermarkService uploadWatermarkService;
-
 	private final UploadSecurityConfig uploadSecurityConfig;
 
 	private final UploadSecurityLogger uploadSecurityLogger;
+
+	// 可选依赖：水印服务（当 bytedesk.watermark.enabled=false 时不加载）
+	@Autowired(required = false)
+	private UploadWatermarkService uploadWatermarkService;
 
 	@Autowired(required = false)
 	private UploadMinioService uploadMinioService;
@@ -231,8 +233,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				throw new UploadStorageException("Cannot store file outside current directory.");
 			}
 
-			// 检查是否需要添加水印
-			if (uploadWatermarkService.shouldAddWatermark(file, request)) {
+			// 检查是否需要添加水印（水印服务可能未启用）
+			if (uploadWatermarkService != null && uploadWatermarkService.shouldAddWatermark(file, request)) {
 				log.info("为图片添加水印: {}", fileName);
 				uploadWatermarkService.addWatermarkToFile(file, destinationFile, request);
 			} else {
