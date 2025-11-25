@@ -141,6 +141,14 @@ public class ServiceConvertUtils {
             // ApplicationContext not ready or bean missing; set false as safe default
             resp.setConnected(false);
         }
+        // 获取客服队列统计信息
+        try {
+            com.bytedesk.service.queue.QueueService queueService = ApplicationContextHolder.getBean(com.bytedesk.service.queue.QueueService.class);
+            com.bytedesk.service.queue.AgentQueueStatsResponse queueStats = queueService.getAgentQueueStats(agent.getUid());
+            resp.setQueueStats(queueStats);
+        } catch (Exception ignore) {
+            // QueueService not ready; skip queue stats
+        }
         return resp;
     }
 
