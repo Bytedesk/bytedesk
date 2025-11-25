@@ -58,6 +58,10 @@ public class QueueSettingsRequest extends BaseRequest {
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP_TEMPLATE;
 
+    // 即将接入提示语（当排队位置为0时使用，即前面没有人排队，下一个就是该用户）
+    @Builder.Default
+    private String queueReadyTip = I18Consts.I18N_QUEUE_READY_TIP;
+
     // @Builder.Default
     // private Integer queueNoticeBatchWindowMs = QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS; // 排队通知批处理窗口(毫秒)
     

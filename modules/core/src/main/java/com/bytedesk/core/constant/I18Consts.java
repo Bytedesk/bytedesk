@@ -228,6 +228,8 @@ public class I18Consts {
     // 排队提示语模板（新版，支持模板变量）
     // 支持变量: {position}-排队位置, {queueSize}-队列总人数, {waitSeconds}-等待秒数, {waitMinutes}-等待分钟数, {waitTime}-格式化等待时间
     public static final String I18N_QUEUE_TIP_TEMPLATE = "您前面还有 {position} 人排队，预计等待 {waitTime}，请耐心等候。"; // 排队提示语模板
+    // 即将接入提示语（当排队位置为0时使用）
+    public static final String I18N_QUEUE_READY_TIP = "客服即将为您服务，请稍候..."; // 即将接入提示语
     public static final String I18N_AUTO_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 会话已自动关闭
     public static final String I18N_AGENT_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 客服已关闭会话
     public static final String I18N_AGENT_TRANSFER_TIP = "客服已将会话转接"; // 客服已将会话转接

@@ -46,6 +46,8 @@ public class QueueSettingsResponse extends BaseResponse {
     
     private String queueTip; // 排队提示
 
+    private String queueReadyTip; // 即将接入提示语（当排队位置为0时使用）
+
     // private Integer queueNoticeBatchWindowMs; // 排队通知批处理窗口(毫秒)
     
     /**
@@ -64,6 +66,7 @@ public class QueueSettingsResponse extends BaseResponse {
                 .maxWaiting(settings.getMaxWaiting())
                 .maxWaitTime(settings.getMaxWaitTime())
                 .queueTip(settings.getQueueTip())
+                .queueReadyTip(settings.getQueueReadyTip())
                 // .queueNoticeBatchWindowMs(settings.getQueueNoticeBatchWindowMs())
                 .build();
     }

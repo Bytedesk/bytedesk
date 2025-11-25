@@ -53,6 +53,32 @@ public class QueueTipTemplateUtils {
      * @return 替换变量后的提示语
      */
     public static String resolveTemplate(String template, int position, int queueSize, int avgWaitTimePerPerson) {
+        return resolveTemplate(template, null, position, queueSize, avgWaitTimePerPerson);
+    }
+
+    /**
+     * 解析排队提示语模板，替换模板变量为实际值
+     * 当 position 为 0 时，使用 queueReadyTip（即将接入提示语）
+     *
+     * @param template              排队提示语模板
+     * @param queueReadyTip         即将接入提示语（position 为 0 时使用）
+     * @param position              当前排队位置（从1开始，0表示即将接入）
+     * @param queueSize             当前队列总人数
+     * @param avgWaitTimePerPerson  每人平均等待时长（秒），用于计算预估等待时间
+     * @return 替换变量后的提示语
+     */
+    public static String resolveTemplate(String template, String queueReadyTip, int position, int queueSize, int avgWaitTimePerPerson) {
+        // 当 position 为 0 时，使用即将接入提示语
+        if (position <= 0) {
+            if (StringUtils.hasText(queueReadyTip)) {
+                log.debug("使用即将接入提示语 - queueReadyTip: {}", queueReadyTip);
+                return queueReadyTip;
+            }
+            // 使用默认的即将接入提示语
+            log.debug("使用默认即将接入提示语");
+            return I18Consts.I18N_QUEUE_READY_TIP;
+        }
+
         if (!StringUtils.hasText(template)) {
             // 使用默认模板
             template = I18Consts.I18N_QUEUE_TIP_TEMPLATE;
@@ -116,7 +142,8 @@ public class QueueTipTemplateUtils {
     public static String resolveTemplate(QueueSettingsEntity settings, int position, int queueSize,
             int avgWaitTimePerPerson) {
         String template = settings != null ? settings.getQueueTip() : null;
-        return resolveTemplate(template, position, queueSize, avgWaitTimePerPerson);
+        String queueReadyTip = settings != null ? settings.getQueueReadyTip() : null;
+        return resolveTemplate(template, queueReadyTip, position, queueSize, avgWaitTimePerPerson);
     }
 
     /**
