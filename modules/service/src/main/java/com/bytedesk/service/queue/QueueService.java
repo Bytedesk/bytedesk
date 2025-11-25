@@ -76,9 +76,9 @@ public class QueueService {
         UserProtobuf agent = agentEntity.toUserProtobuf();
         boolean alreadyQueued = findByThreadUid(threadEntity.getUid()).isPresent();
         QueueMemberEntity queueMemberEntity = enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.AGENT);
-        if (!alreadyQueued) {
-            queueNotificationService.publishQueueJoinNotice(agentEntity, queueMemberEntity);
-        }
+        // if (!alreadyQueued) {
+        //     queueNotificationService.publishQueueJoinNotice(agentEntity, queueMemberEntity);
+        // }
         return new QueueEnqueueResult(queueMemberEntity, alreadyQueued);
     }
 
@@ -95,9 +95,9 @@ public class QueueService {
             WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
         UserProtobuf agent = agentEntity != null ? agentEntity.toUserProtobuf() : null;
         QueueEnqueueResult result = enqueueWorkgroupWithResult(threadEntity, agent, workgroupEntity, visitorRequest);
-        if (agentEntity != null && !result.alreadyQueued()) {
-            queueNotificationService.publishQueueJoinNotice(agentEntity, result.queueMember());
-        }
+        // if (agentEntity != null && !result.alreadyQueued()) {
+        //     queueNotificationService.publishQueueJoinNotice(agentEntity, result.queueMember());
+        // }
         return result;
     }
 
@@ -184,11 +184,6 @@ public class QueueService {
             log.warn("Failed to publish auto-assign events for thread {}: {}", thread.getUid(), e.getMessage());
         }
     }
-
-    // @Transactional
-    // public QueueMemberEntity enqueueWorkflow(ThreadEntity threadEntity, UserProtobuf workflow, VisitorRequest visitorRequest) {
-    //     return enqueueToQueue(threadEntity, workflow, null, QueueTypeEnum.WORKFLOW);
-    // }
 
     /**
      * 统一的入队方法
