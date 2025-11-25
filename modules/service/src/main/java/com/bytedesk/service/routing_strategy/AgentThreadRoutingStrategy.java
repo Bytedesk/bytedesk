@@ -566,7 +566,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             return false;
         }
         int limit = resolveMaxWaiting(settings);
-        return limit > 0 && queue.getQueuingCount() > limit;
+        return limit > 0 && queue.getQueuingCount() >= limit;
     }
 
     private int resolveMaxWaiting(QueueSettingsEntity settings) {
