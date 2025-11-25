@@ -49,6 +49,8 @@ import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
+import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -440,7 +442,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             }
             log.info("客服接待名额已满，进入排队 - agentUid: {}, agentName {}", agentEntity.getUid(),
                     agentEntity.getNickname());
-            return handleQueuedWorkgroup(thread, agentEntity, queueMemberEntity);
+            return handleQueuedWorkgroup(thread, agentEntity, workgroup, queueMemberEntity);
         }
 
         log.info("客服离线或不可接待，降级为离线留言 - agentUid: {}, agentName {}", agentEntity.getUid(),
@@ -557,28 +559,35 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 处理排队工作组客服
      */
     private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity,
-            QueueMemberEntity queueMemberEntity) {
+            WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
         log.info("Handling queued workgroup agent: {}", agentEntity.getNickname());
 
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
 
-        // 生成排队消息文本
+        // 获取排队配置
+        QueueSettingsEntity queueSettings = getWorkgroupQueueSettings(workgroup);
+        int avgWaitTimePerPerson = queueSettings != null && queueSettings.getAvgWaitTimePerPerson() != null
+                ? queueSettings.getAvgWaitTimePerPerson()
+                : QueueTipTemplateUtils.DEFAULT_AVG_WAIT_TIME_PER_PERSON;
+
+        // 生成排队消息文本（使用模板）
         int queuingCount = queueMemberEntity.getWorkgroupQueue().getQueuingCount();
-        String queueContentText = generateWorkgroupQueueMessage(queueMemberEntity);
+        String queueContentText = generateWorkgroupQueueMessage(workgroup, queuingCount, avgWaitTimePerPerson);
+
+        // 计算等待时间
+        int waitSeconds = queuingCount * avgWaitTimePerPerson;
+        String estimatedWaitTime = QueueTipTemplateUtils.formatWaitTime(waitSeconds);
 
         // 构建结构化 QueueContent
         QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
                 .content(queueContentText)
-                // .position(queueMemberEntity.getQueueNumber())
                 .position(queuingCount)
                 .queueSize(queuingCount)
                 .serverTimestamp(System.currentTimeMillis());
-        // 计算预估等待时间（分钟 -> 秒）与描述
         if (queuingCount > 0) {
-            int estimatedMinutes = queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
-            builder.waitSeconds(estimatedMinutes * 60)
-                    .estimatedWaitTime("约" + estimatedMinutes + "分钟");
+            builder.waitSeconds(waitSeconds)
+                    .estimatedWaitTime(estimatedWaitTime);
         } else {
             builder.waitSeconds(0).estimatedWaitTime("即将开始");
         }
@@ -776,11 +785,50 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     }
 
     /**
-     * 生成工作组排队消息
+     * 获取工作组排队配置
      */
-    private String generateWorkgroupQueueMessage(QueueMemberEntity queueMemberEntity) {
-        int queuingCount = queueMemberEntity.getWorkgroupQueue().getQueuingCount();
-        return generateQueueMessage(queuingCount);
+    private QueueSettingsEntity getWorkgroupQueueSettings(WorkgroupEntity workgroup) {
+        if (workgroup.getSettings() == null) {
+            return null;
+        }
+        // 优先使用已发布的配置，如果没有则使用草稿配置
+        QueueSettingsEntity settings = workgroup.getSettings().getQueueSettings();
+        if (settings == null) {
+            settings = workgroup.getSettings().getDraftQueueSettings();
+        }
+        return settings;
+    }
+
+    /**
+     * 生成工作组排队消息（使用模板）
+     * 
+     * @param workgroup 工作组实体
+     * @param queuingCount 当前排队人数
+     * @param avgWaitTimePerPerson 每人平均等待时长（秒）
+     * @return 替换模板变量后的排队提示语
+     */
+    private String generateWorkgroupQueueMessage(WorkgroupEntity workgroup, int queuingCount, int avgWaitTimePerPerson) {
+        log.debug("开始生成工作组排队消息 - workgroupUid: {}, 排队数: {}", workgroup.getUid(), queuingCount);
+
+        // 获取自定义排队提示语模板
+        String queueTipTemplate = null;
+        QueueSettingsEntity queueSettings = getWorkgroupQueueSettings(workgroup);
+        if (queueSettings != null && StringUtils.hasText(queueSettings.getQueueTip())) {
+            queueTipTemplate = queueSettings.getQueueTip();
+            log.debug("使用自定义排队提示语模板 - workgroupUid: {}, 模板: {}", workgroup.getUid(), queueTipTemplate);
+        }
+
+        // 使用模板工具类解析并替换变量
+        String queueMessage = QueueTipTemplateUtils.resolveTemplate(
+                queueTipTemplate,
+                queuingCount,  // position = 排队人数（前面的人）
+                queuingCount,  // queueSize = 当前队列总人数
+                avgWaitTimePerPerson
+        );
+
+        log.info("工作组排队消息生成完成 - workgroupUid: {}, 排队数: {}, 消息: {}",
+                workgroup.getUid(), queuingCount, queueMessage);
+        return queueMessage;
     }
 
     /**
