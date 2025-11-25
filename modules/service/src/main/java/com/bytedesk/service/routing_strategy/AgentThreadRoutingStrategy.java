@@ -41,6 +41,8 @@ import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
@@ -344,26 +346,37 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("获取最新线程状态用于排队处理");
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
 
+        // 获取排队配置
+        QueueSettingsEntity queueSettings = getAgentQueueSettings(agent);
+        int avgWaitTimePerPerson = queueSettings != null && queueSettings.getAvgWaitTimePerPerson() != null
+                ? queueSettings.getAvgWaitTimePerPerson()
+                : QueueTipTemplateUtils.DEFAULT_AVG_WAIT_TIME_PER_PERSON;
+
         log.debug("生成排队消息内容");
         int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
-        String queueContentText = generateAgentQueueMessage(queueMemberEntity);
+        // 使用模板生成排队提示语
+        String queueContentText = generateAgentQueueMessage(agent, queuingCount, avgWaitTimePerPerson);
+        
+        // 计算等待时间
+        int waitSeconds = queuingCount * avgWaitTimePerPerson;
+        int waitMinutes = (int) Math.ceil(waitSeconds / 60.0);
+        String estimatedWaitTime = QueueTipTemplateUtils.formatWaitTime(waitSeconds);
+        
         QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
                 .content(queueContentText)
-                // .position(queueMemberEntity.getQueueNumber())
                 .position(queuingCount)
                 .queueSize(queuingCount)
                 .serverTimestamp(System.currentTimeMillis());
         if (queuingCount > 0) {
-            int estimatedMinutes = queuingCount * ESTIMATED_WAIT_TIME_PER_PERSON;
-            builder.waitSeconds(estimatedMinutes * 60)
-                    .estimatedWaitTime("约" + estimatedMinutes + "分钟");
+            builder.waitSeconds(waitSeconds)
+                    .estimatedWaitTime(estimatedWaitTime);
         } else {
             builder.waitSeconds(0).estimatedWaitTime("即将开始");
         }
         QueueContent queueContent = builder.build();
         thread.setQueuing().setContent(queueContent.toJson());
-        log.debug("线程状态设置为排队 - threadUid: {}, 排队消息长度: {}",
-                thread.getUid(), queueContentText != null ? queueContentText.length() : 0);
+        log.debug("线程状态设置为排队 - threadUid: {}, 排队消息长度: {}, 预计等待: {}分钟",
+                thread.getUid(), queueContentText != null ? queueContentText.length() : 0, waitMinutes);
 
         // 保存线程
         log.debug("保存排队状态的线程");
@@ -527,18 +540,49 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     }
 
     /**
-     * 生成客服排队消息
+     * 获取客服排队配置
      */
-    private String generateAgentQueueMessage(QueueMemberEntity queueMemberEntity) {
-        log.debug("开始生成客服排队消息 - queueMemberUid: {}", queueMemberEntity.getUid());
+    private QueueSettingsEntity getAgentQueueSettings(AgentEntity agent) {
+        if (agent.getSettings() == null) {
+            return null;
+        }
+        // 优先使用已发布的配置，如果没有则使用草稿配置
+        QueueSettingsEntity settings = agent.getSettings().getQueueSettings();
+        if (settings == null) {
+            settings = agent.getSettings().getDraftQueueSettings();
+        }
+        return settings;
+    }
 
-        int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
-        log.debug("获取队列信息 - queueUid: {}, 当前排队数: {}",
-                queueMemberEntity.getAgentQueue().getUid(), queuingCount);
+    /**
+     * 生成客服排队消息（使用模板）
+     * 
+     * @param agent 客服实体
+     * @param queuingCount 当前排队人数
+     * @param avgWaitTimePerPerson 每人平均等待时长（秒）
+     * @return 替换模板变量后的排队提示语
+     */
+    private String generateAgentQueueMessage(AgentEntity agent, int queuingCount, int avgWaitTimePerPerson) {
+        log.debug("开始生成客服排队消息 - agentUid: {}, 排队数: {}", agent.getUid(), queuingCount);
 
-        String queueMessage = generateQueueMessage(queuingCount);
-        log.info("客服排队消息生成完成 - queueMemberUid: {}, 排队数: {}, 消息长度: {}",
-                queueMemberEntity.getUid(), queuingCount, queueMessage != null ? queueMessage.length() : 0);
+        // 获取自定义排队提示语模板
+        String queueTipTemplate = null;
+        QueueSettingsEntity queueSettings = getAgentQueueSettings(agent);
+        if (queueSettings != null && StringUtils.hasText(queueSettings.getQueueTip())) {
+            queueTipTemplate = queueSettings.getQueueTip();
+            log.debug("使用自定义排队提示语模板 - agentUid: {}, 模板: {}", agent.getUid(), queueTipTemplate);
+        }
+
+        // 使用模板工具类解析并替换变量
+        String queueMessage = QueueTipTemplateUtils.resolveTemplate(
+                queueTipTemplate, 
+                queuingCount,  // position = 排队人数（前面的人）
+                queuingCount,  // queueSize = 当前队列总人数
+                avgWaitTimePerPerson
+        );
+
+        log.info("客服排队消息生成完成 - agentUid: {}, 排队数: {}, 消息: {}",
+                agent.getUid(), queuingCount, queueMessage);
         return queueMessage;
     }
 

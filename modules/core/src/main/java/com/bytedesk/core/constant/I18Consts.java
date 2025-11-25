@@ -223,8 +223,11 @@ public class I18Consts {
     public static final String I18N_TOP_TIP = "置顶提示"; // 置顶提示
     public static final String I18N_LEAVEMSG_TIP = "您好，请留言，我们会尽快回复您"; // 留言提示
     // public static final String I18N_REENTER_TIP = "继续会话"; // 重新进入提示
-    public static final String I18N_QUEUE_TIP = "您好，客服繁忙，请稍后"; // 排队提示
-    public static final String I18N_QUEUE_MESSAGE_TEMPLATE = "您前面还有{0}人排队"; // 您前面还有{0}人排队
+    public static final String I18N_QUEUE_TIP = "您好，客服繁忙，请稍后"; // 排队提示（旧版，保持兼容）
+    public static final String I18N_QUEUE_MESSAGE_TEMPLATE = "您前面还有{0}人排队"; // 您前面还有{0}人排队（旧版）
+    // 排队提示语模板（新版，支持模板变量）
+    // 支持变量: {position}-排队位置, {queueSize}-队列总人数, {waitSeconds}-等待秒数, {waitMinutes}-等待分钟数, {waitTime}-格式化等待时间
+    public static final String I18N_QUEUE_TIP_TEMPLATE = "您前面还有 {position} 人排队，预计等待 {waitTime}，请耐心等候。"; // 排队提示语模板
     public static final String I18N_AUTO_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 会话已自动关闭
     public static final String I18N_AGENT_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 客服已关闭会话
     public static final String I18N_AGENT_TRANSFER_TIP = "客服已将会话转接"; // 客服已将会话转接
