@@ -586,33 +586,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     }
 
     /**
-     * 选择优先客服：优先使用路由策略结果，其次选择第一个在线可用客服
-     */
-    // private AgentEntity resolvePreferredAgent(WorkgroupEntity workgroup, ThreadEntity thread,
-    //         List<AgentEntity> candidates) {
-    //     if (candidates == null || candidates.isEmpty()) {
-    //         return null;
-    //     }
-    //     log.debug("选择优先客服：优先使用路由策略结果，其次选择第一个在线可用客服");
-
-    //     AgentEntity routedAgent = workgroupRoutingService.selectAgent(workgroup, thread);
-    //     if (routedAgent != null && presenceFacadeService.isAgentOnlineAndAvailable(routedAgent)) {
-    //         boolean existsInCandidate = candidates.stream()
-    //                 .anyMatch(agent -> StringUtils.hasText(agent.getUid())
-    //                         && agent.getUid().equals(routedAgent.getUid()));
-    //         if (existsInCandidate) {
-    //             return routedAgent;
-    //         }
-    //     }
-    //     log.debug("未能使用路由策略结果，选择第一个在线可用客服");
-
-    //     return candidates.stream()
-    //             .filter(presenceFacadeService::isAgentOnlineAndAvailable)
-    //             .findFirst()
-    //             .orElse(null);
-    // }
-
-    /**
      * 不满足服务时间或无在线客服时，统一进入离线留言流程
      */
     private MessageProtobuf routeToOfflineMessage(VisitorRequest visitorRequest, ThreadEntity thread,
@@ -688,54 +661,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         return messageProtobuf;
     }
-
-    /**
-     * 处理排队工作组客服
-     */
-    // private MessageProtobuf handleQueuedWorkgroup(ThreadEntity threadFromRequest, AgentEntity agentEntity,
-    //         WorkgroupEntity workgroup, QueueMemberEntity queueMemberEntity) {
-    //     log.info("Handling queued workgroup agent: {}", agentEntity.getNickname());
-
-    //     // 获取最新线程状态
-    //     ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-
-    //     // 获取排队配置
-    //     QueueSettingsEntity queueSettings = getWorkgroupQueueSettings(workgroup);
-    //     int avgWaitTimePerPerson = queueSettings != null && queueSettings.getAvgWaitTimePerPerson() != null
-    //             ? queueSettings.getAvgWaitTimePerPerson()
-    //             : QueueTipTemplateUtils.DEFAULT_AVG_WAIT_TIME_PER_PERSON;
-
-    //     // 生成排队消息文本（使用模板）
-    //     int queuingCount = queueMemberEntity.getWorkgroupQueue().getQueuingCount();
-    //     String queueContentText = generateWorkgroupQueueMessage(workgroup, queuingCount, avgWaitTimePerPerson);
-
-    //     // 计算等待时间
-    //     int waitSeconds = queuingCount * avgWaitTimePerPerson;
-    //     String estimatedWaitTime = QueueTipTemplateUtils.formatWaitTime(waitSeconds);
-
-    //     // 构建结构化 QueueContent
-    //     QueueContent.QueueContentBuilder<?, ?> builder = QueueContent.builder()
-    //         .content(queueContentText)
-    //         .position(queuingCount)
-    //         .queueSize(queuingCount)
-    //         .serverTimestamp(System.currentTimeMillis())
-    //         .waitSeconds(waitSeconds)
-    //         .estimatedWaitTime(estimatedWaitTime);
-    //     QueueContent queueContent = builder.build();
-
-    //     // 设置线程状态（使用结构化JSON）
-    //     thread.setUserUid(agentEntity.getUid());
-    //     thread.setQueuing().setContent(queueContent.toJson());
-
-    //     // 保存线程
-    //     ThreadEntity savedThread = saveThread(thread);
-
-    //     // 发送结构化排队消息
-    //     MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, savedThread);
-    //     messageSendService.sendProtobufMessage(messageProtobuf);
-
-    //     return messageProtobuf;
-    // }
 
     /**
      * 获取离线消息
@@ -1032,6 +957,17 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
     }
 
+    private boolean resolveIsInServiceTime(WorkgroupEntity workgroup) {
+        if (workgroup == null || workgroup.getSettings() == null) {
+            return true;
+        }
+        WorktimeSettingEntity published = workgroup.getSettings().getWorktimeSettings();
+        if (published != null) {
+            return Boolean.TRUE.equals(published.isInWorktime());
+        }
+        return true;
+    }
+
     // @EventListener
     // public void handleWorkgroupAutoAssign(AgentUpdateStatusEvent event) {
     //     AgentEntity agent = event.getAgent();
@@ -1066,14 +1002,5 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     //     return maxThreadCount > 0 ? maxThreadCount : 1;
     // }
 
-    private boolean resolveIsInServiceTime(WorkgroupEntity workgroup) {
-        if (workgroup == null || workgroup.getSettings() == null) {
-            return true;
-        }
-        WorktimeSettingEntity published = workgroup.getSettings().getWorktimeSettings();
-        if (published != null) {
-            return Boolean.TRUE.equals(published.isInWorktime());
-        }
-        return true;
-    }
+    
 }
