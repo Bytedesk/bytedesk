@@ -101,8 +101,9 @@ public class ServiceSettingsRequest  implements Serializable {
     // 工作流uid
     private String workflowUid;
 
+    // 排队提示语模板，支持变量: {position}-排队位置, {queueSize}-队列总人数, {waitSeconds}-等待秒数, {waitMinutes}-等待分钟数, {waitTime}-格式化等待时间
     @Builder.Default
-    private String queueTip = I18Consts.I18N_QUEUE_TIP;
+    private String queueTip = I18Consts.I18N_QUEUE_TIP_TEMPLATE;
 
     @Builder.Default
     private String leavemsgTip = I18Consts.I18N_LEAVEMSG_TIP;

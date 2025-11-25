@@ -121,42 +121,36 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
      * Auto-reply settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private AutoReplySettingsEntity autoReplySettings;
 
     /**
      * Draft Auto-reply settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private AutoReplySettingsEntity draftAutoReplySettings;
 
     /**
      * Queue settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private QueueSettingsEntity queueSettings;
 
     /**
      * Draft Queue settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private QueueSettingsEntity draftQueueSettings;
 
     /**
      * Rating down settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity rateDownSettings;
 
     /**
      * Draft Rating down settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity draftRateDownSettings;
 
     /**

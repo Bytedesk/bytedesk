@@ -53,9 +53,10 @@ public class QueueSettingsRequest extends BaseRequest {
 
     private Integer maxWaitTime; // 最大等待时间(秒)
     
+    // 排队提示语模板，支持变量: {position}-排队位置, {queueSize}-队列总人数, {waitSeconds}-等待秒数, {waitMinutes}-等待分钟数, {waitTime}-格式化等待时间
     @NotBlank
     @Builder.Default
-    private String queueTip = I18Consts.I18N_QUEUE_TIP;
+    private String queueTip = I18Consts.I18N_QUEUE_TIP_TEMPLATE;
 
     @Builder.Default
     private Integer queueNoticeBatchWindowMs = QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS; // 排队通知批处理窗口(毫秒)
