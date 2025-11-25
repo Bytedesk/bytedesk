@@ -37,6 +37,7 @@ import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue.QueueAutoAssignService;
 import com.bytedesk.service.queue.QueueAutoAssignTriggerSource;
+import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberAcceptTypeEnum;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -225,6 +226,16 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 加入队列
         QueueService.QueueEnqueueResult enqueueResult = queueService.enqueueAgentWithResult(thread, agentEntity, visitorRequest);
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
+        QueueEntity agentQueue = queueMemberEntity.getAgentQueue();
+
+        QueueSettingsEntity queueSettings = getAgentQueueSettings(agentEntity);
+        if (shouldForceLeaveMessage(agentQueue, queueSettings)) {
+            int queuingCount = agentQueue != null ? agentQueue.getQueuingCount() : 0;
+            int maxWaiting = resolveMaxWaiting(queueSettings);
+            log.info("Agent queue limit reached, diverting to leave message - agentUid: {}, queueSize: {}, maxWaiting: {}",
+                agentEntity.getUid(), queuingCount, maxWaiting);
+            return visitorThreadService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
+        }
 
         // 根据客服状态路由
         log.debug("开始根据客服状态进行路由 - 可用状态: {}", agentEntity.isAvailable());
@@ -552,6 +563,21 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             settings = agent.getSettings().getDraftQueueSettings();
         }
         return settings;
+    }
+
+    private boolean shouldForceLeaveMessage(QueueEntity queue, QueueSettingsEntity settings) {
+        if (queue == null) {
+            return false;
+        }
+        int limit = resolveMaxWaiting(settings);
+        return limit > 0 && queue.getQueuingCount() > limit;
+    }
+
+    private int resolveMaxWaiting(QueueSettingsEntity settings) {
+        if (settings == null) {
+            return QueueSettingsEntity.DEFAULT_MAX_WAITING;
+        }
+        return settings.resolveMaxWaiting();
     }
 
     /**

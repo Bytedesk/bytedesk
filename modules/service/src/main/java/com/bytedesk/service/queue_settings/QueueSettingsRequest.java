@@ -58,7 +58,7 @@ public class QueueSettingsRequest extends BaseRequest {
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP_TEMPLATE;
 
-    @Builder.Default
-    private Integer queueNoticeBatchWindowMs = QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS; // 排队通知批处理窗口(毫秒)
+    // @Builder.Default
+    // private Integer queueNoticeBatchWindowMs = QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS; // 排队通知批处理窗口(毫秒)
     
 }

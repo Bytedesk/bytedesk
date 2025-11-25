@@ -130,29 +130,31 @@ public class QueueNotificationService {
         String agentUid = agent.getUid();
         PendingBatch batch = pendingBatches.computeIfAbsent(agentUid, PendingBatch::new);
         batch.addEvent(payload, snapshot);
-        scheduleFlush(agentUid, agent.resolveQueueNoticeBatchWindowMs());
+        // scheduleFlush(agentUid, agent.resolveQueueNoticeBatchWindowMs());
+        scheduleFlush(agentUid);
     }
 
     /** Schedule the batch flush task based on the agent-configured batching window. */
-    private void scheduleFlush(String agentUid, int batchWindowMs) {
+    // , int batchWindowMs
+    private void scheduleFlush(String agentUid) {
         PendingBatch batch = pendingBatches.get(agentUid);
         if (batch == null) {
             return;
         }
-        if (batchWindowMs <= 0) {
-            try {
-                batchingExecutor.execute(() -> flushBatch(agentUid));
-            } catch (RejectedExecutionException ex) {
-                log.warn("Skip scheduling immediate queue batch for agent {}: {}", agentUid, ex.getMessage());
-            }
-            return;
-        }
+        // if (batchWindowMs <= 0) {
+        //     try {
+        //         batchingExecutor.execute(() -> flushBatch(agentUid));
+        //     } catch (RejectedExecutionException ex) {
+        //         log.warn("Skip scheduling immediate queue batch for agent {}: {}", agentUid, ex.getMessage());
+        //     }
+        //     return;
+        // }
         synchronized (batch) {
             if (batch.hasScheduledTask()) {
                 return;
             }
             try {
-                ScheduledFuture<?> future = batchingExecutor.schedule(() -> flushBatch(agentUid), batchWindowMs,
+                ScheduledFuture<?> future = batchingExecutor.schedule(() -> flushBatch(agentUid), 2000,
                         TimeUnit.MILLISECONDS);
                 batch.setScheduledTask(future);
             } catch (RejectedExecutionException ex) {

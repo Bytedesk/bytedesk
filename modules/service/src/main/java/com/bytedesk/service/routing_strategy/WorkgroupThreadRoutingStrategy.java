@@ -45,6 +45,7 @@ import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue.QueueAutoAssignService;
 import com.bytedesk.service.queue.QueueAutoAssignTriggerSource;
+import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
@@ -421,10 +422,20 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         log.debug("开始将线程加入工作组队列");
         long enqueueStartTime = System.currentTimeMillis();
         QueueService.QueueEnqueueResult enqueueResult = queueService
-                .enqueueWorkgroupWithResult(thread, agentEntity, workgroup, visitorRequest);
+            .enqueueWorkgroupWithResult(thread, agentEntity, workgroup, visitorRequest);
         QueueMemberEntity queueMemberEntity = enqueueResult.queueMember();
+        QueueEntity workgroupQueue = queueMemberEntity.getWorkgroupQueue();
         log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", queueMemberEntity.getUid(),
                 System.currentTimeMillis() - enqueueStartTime);
+
+        QueueSettingsEntity queueSettings = getWorkgroupQueueSettings(workgroup);
+        if (shouldForceLeaveMessage(workgroupQueue, queueSettings)) {
+            int queuingCount = workgroupQueue != null ? workgroupQueue.getQueuingCount() : 0;
+            int maxWaiting = resolveMaxWaiting(queueSettings);
+            log.info("Workgroup queue limit reached, diverting to leave message - workgroupUid: {}, queueSize: {}, maxWaiting: {}",
+                workgroup.getUid(), queuingCount, maxWaiting);
+            return visitorThreadService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
+        }
 
         if (visitorRequest.getForceAgent()) {
             log.debug("处理强制转人工标记");
@@ -797,6 +808,21 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             settings = workgroup.getSettings().getDraftQueueSettings();
         }
         return settings;
+    }
+
+    private boolean shouldForceLeaveMessage(QueueEntity queue, QueueSettingsEntity settings) {
+        if (queue == null) {
+            return false;
+        }
+        int limit = resolveMaxWaiting(settings);
+        return limit > 0 && queue.getQueuingCount() > limit;
+    }
+
+    private int resolveMaxWaiting(QueueSettingsEntity settings) {
+        if (settings == null) {
+            return QueueSettingsEntity.DEFAULT_MAX_WAITING;
+        }
+        return settings.resolveMaxWaiting();
     }
 
     /**

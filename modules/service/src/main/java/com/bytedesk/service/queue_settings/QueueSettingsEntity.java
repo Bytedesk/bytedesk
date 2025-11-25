@@ -22,7 +22,6 @@ import org.modelmapper.ModelMapper;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -45,6 +44,10 @@ import lombok.Builder;
 @NoArgsConstructor
 public class QueueSettingsEntity extends BaseEntity {
 
+    public static final int DEFAULT_MAX_WAITING = 10_000;
+
+    public static final int DEFAULT_MAX_WAIT_TIME_SECONDS = 24 * 60 * 60;
+
     // 当排队人数超过指定值时，自动分配机器人
     // 仅适用于workgroup，对一对一人工客服无效。默认进入留言流程。
     // TODO: 暂不启用
@@ -65,25 +68,25 @@ public class QueueSettingsEntity extends BaseEntity {
 
     // 设置允许同时排队等待的最大访客数量，超过该数量将进入留言流程
     @Builder.Default
-    private Integer maxWaiting = 10000; // 最大等待人数
+    private Integer maxWaiting = DEFAULT_MAX_WAITING; // 最大等待人数
 
     // 设置访客最长排队等待时间（秒），超时后将进入留言流程
     @Builder.Default
-    private Integer maxWaitTime = 24 * 60 * 60; // 最大等待时间(秒)
+    private Integer maxWaitTime = DEFAULT_MAX_WAIT_TIME_SECONDS; // 最大等待时间(秒)
     
     // 排队提示语模板，支持变量: {position}-排队位置, {queueSize}-队列总人数, {waitSeconds}-等待秒数, {waitMinutes}-等待分钟数, {waitTime}-格式化等待时间
     @NotBlank
     @Builder.Default
     private String queueTip = I18Consts.I18N_QUEUE_TIP_TEMPLATE;
 
-    public static final int DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS = 2000;
+    // public static final int DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS = 2000;
 
     /**
      * Batch window for queue notices, in milliseconds; keeps notices always on but rate-limited per agent.
      */
-    @Builder.Default
-    @Column(name = "queue_notice_batch_window_ms")
-    private Integer queueNoticeBatchWindowMs = DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
+    // @Builder.Default
+    // @Column(name = "queue_notice_batch_window_ms")
+    // private Integer queueNoticeBatchWindowMs = DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
     
     /**
      * 从 QueueSettingsRequest 创建 QueueSettings 实体
@@ -101,12 +104,20 @@ public class QueueSettingsEntity extends BaseEntity {
         return modelMapper.map(request, QueueSettingsEntity.class);
     }
 
+    public int resolveMaxWaiting() {
+        return maxWaiting != null && maxWaiting > 0 ? maxWaiting : DEFAULT_MAX_WAITING;
+    }
+
+    public int resolveMaxWaitTimeSeconds() {
+        return maxWaitTime != null && maxWaitTime > 0 ? maxWaitTime : DEFAULT_MAX_WAIT_TIME_SECONDS;
+    }
+
     /**
      * Returns a non-null batch window ensuring downstream services can rely on a default cadence.
      */
-    public int resolveQueueNoticeBatchWindowMs() {
-        return queueNoticeBatchWindowMs != null ? queueNoticeBatchWindowMs : DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
-    }
+    // public int resolveQueueNoticeBatchWindowMs() {
+    //     return queueNoticeBatchWindowMs != null ? queueNoticeBatchWindowMs : DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
+    // }
     
 }
 
