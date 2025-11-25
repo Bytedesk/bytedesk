@@ -221,7 +221,6 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("开始新线程路由 - threadUid: {}, agentUid: {}", thread.getUid(), agentEntity.getUid());
 
         // 加入队列
-        // QueueService.QueueEnqueueResult enqueueResult = queueService.enqueueAgentWithResult(thread, agentEntity, visitorRequest);
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agentEntity.toUserProtobuf(), visitorRequest);
         QueueEntity agentQueue = queueMemberEntity.getAgentQueue();
 

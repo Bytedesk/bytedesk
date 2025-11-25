@@ -44,10 +44,6 @@ public class QueueService {
 
     // private final QueueNotificationService queueNotificationService;
 
-    private Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
-        return queueMemberRestService.findByThreadUid(threadUid);
-    }
-
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent, VisitorRequest visitorRequest) {
         return enqueueToQueue(threadEntity, agent, null, QueueTypeEnum.ROBOT);
@@ -182,7 +178,7 @@ public class QueueService {
             WorkgroupEntity workgroupEntity, QueueTypeEnum queueType) {
         
         // 1. 检查是否已存在队列成员
-        Optional<QueueMemberEntity> memberOptional = findByThreadUid(threadEntity.getUid());
+        Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(threadEntity.getUid());
         if (memberOptional.isPresent()) {
             return handleExistingMember(memberOptional.get(), agent, threadEntity, queueType);
         }

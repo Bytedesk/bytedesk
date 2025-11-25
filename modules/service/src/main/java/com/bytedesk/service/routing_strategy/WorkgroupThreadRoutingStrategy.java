@@ -424,7 +424,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 加入队列（此时设置 agent，因为有空闲客服可以直接接入）
         log.debug("开始将线程加入工作组队列");
         long enqueueStartTime = System.currentTimeMillis();
-        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, availableAgentWithCapacity.toUserProtobuf(), workgroup, visitorRequest);
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(thread, availableAgentWithCapacity.toUserProtobuf(), 
+            workgroup, visitorRequest);
         QueueEntity workgroupQueue = queueMemberEntity.getWorkgroupQueue();
         log.info("工作组队列加入完成 - queueMemberUid: {}, 耗时: {}ms", queueMemberEntity.getUid(),
                 System.currentTimeMillis() - enqueueStartTime);
