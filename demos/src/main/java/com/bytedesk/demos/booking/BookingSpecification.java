@@ -34,7 +34,7 @@ public class BookingSpecification extends BaseSpecification<BookingEntity, Booki
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             // 使用基类方法处理超级管理员权限和组织过滤
-            addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);  
+            // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);  
             // 
             // 
             // if (StringUtils.hasText(request.getUserUid())) {
