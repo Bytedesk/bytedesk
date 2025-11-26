@@ -85,6 +85,11 @@ public class QueueService {
 
         if (queueType == QueueTypeEnum.WORKGROUP) {
             // 更新工作组队列的 agent/robot 队列
+            if (agent == null) {
+                log.debug("Existing workgroup queue member stays unassigned - threadUid: {}", threadEntity.getUid());
+                return saveQueueMember(member);
+            }
+
             QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
             validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
 
