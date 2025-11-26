@@ -75,6 +75,9 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
                     // MESSAGE_TYPE_NOTIFICATION_AGENT_REPLY_TIMEOUT
                     predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.NOTIFICATION_AGENT_REPLY_TIMEOUT.name()));
                     predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.NOTIFICATION_RATE_SUBMITTED.name()));
+                    // QUEUE_NOTICE, QUEUE_UPDATE
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.QUEUE_NOTICE.name()));
+                    predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.QUEUE_ACCEPT.name()));
                 }
             }
             // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));

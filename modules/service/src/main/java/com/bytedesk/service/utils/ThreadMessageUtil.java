@@ -105,10 +105,16 @@ public class ThreadMessageUtil {
         return buildAgentQueueMessage(MessageTypeEnum.QUEUE_NOTICE, payload, thread);
     }
 
+    /**
+     * 构造发送给访客的 QUEUE_UPDATE 消息，更新访客排队位置
+     */
     public static MessageProtobuf getAgentQueueUpdateMessage(QueueNotification payload, ThreadEntity thread) {
         return buildAgentQueueMessage(MessageTypeEnum.QUEUE_UPDATE, payload, thread);
     }
 
+    /**
+     * 构造发送给客服排队线程的 QUEUE_ACCEPT 消息，通知其他客服，该thread会话被某个客服接入
+     */
     public static MessageProtobuf getAgentQueueAcceptMessage(QueueNotification payload, ThreadEntity thread) {
         return buildAgentQueueMessage(MessageTypeEnum.QUEUE_ACCEPT, payload, thread);
     }
