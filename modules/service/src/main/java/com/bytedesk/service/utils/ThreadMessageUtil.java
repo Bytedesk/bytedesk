@@ -141,7 +141,7 @@ public class ThreadMessageUtil {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
-        String json = payload != null ? JSON.toJSONString(payload) : null;
+        String json = payload != null ? payload.toJson() : null;
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())

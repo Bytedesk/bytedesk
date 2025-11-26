@@ -1,11 +1,21 @@
 package com.bytedesk.core.message.content;
 
-import lombok.Builder;
-import lombok.Value;
+import com.bytedesk.core.base.BaseContent;
 
-@Value
-@Builder
-public class QueueNotification {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+@Getter
+@Setter
+@SuperBuilder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class QueueNotification extends BaseContent {
+
+    private static final long serialVersionUID = 1L;
     
     /** High level channel that consumers use to route the message (notice/update/timeout/etc). */
     // QueueNotificationType type;
