@@ -370,9 +370,6 @@ public class QueueService {
 
         QueueEntity agentQueue = agentQueueOpt.get();
 
-        // 统计客服所在工作组的汇总数据
-        List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentUid);
-        
         int totalCount = agentQueue.getTotalCount();
         int chattingCount = agentQueue.getChattingCount();
         int offlineCount = agentQueue.getOfflineCount();
@@ -382,33 +379,6 @@ public class QueueService {
         int robotingCount = agentQueue.getRobotingCount();
         int agentServedCount = agentQueue.getAgentServedCount();
         List<Integer> threadsCountByHour = new ArrayList<>(agentQueue.getThreadsCountByHour());
-
-        // 汇总工作组队列的统计数据
-        for (WorkgroupEntity workgroup : workgroups) {
-            String workgroupQueueTopic = TopicUtils.getQueueTopicFromUid(workgroup.getUid());
-            Optional<QueueEntity> workgroupQueueOpt = findByTopicAndDay(workgroupQueueTopic, today);
-            if (workgroupQueueOpt.isPresent()) {
-                QueueEntity workgroupQueue = workgroupQueueOpt.get();
-                totalCount += workgroupQueue.getTotalCount();
-                chattingCount += workgroupQueue.getChattingCount();
-                offlineCount += workgroupQueue.getOfflineCount();
-                closedCount += workgroupQueue.getClosedCount();
-                leaveMsgCount += workgroupQueue.getMessageLeaveCount();
-                robotToAgentCount += workgroupQueue.getRobotToAgentCount();
-                robotingCount += workgroupQueue.getRobotingCount();
-                agentServedCount += workgroupQueue.getAgentServedCount();
-                
-                // 合并每小时统计
-                List<Integer> workgroupHourly = workgroupQueue.getThreadsCountByHour();
-                for (int i = 0; i < 24 && i < workgroupHourly.size(); i++) {
-                    if (i < threadsCountByHour.size()) {
-                        threadsCountByHour.set(i, threadsCountByHour.get(i) + workgroupHourly.get(i));
-                    } else {
-                        threadsCountByHour.add(workgroupHourly.get(i));
-                    }
-                }
-            }
-        }
 
         log.debug("客服队列统计 - agentUid: {}, 总人数: {}, 排队: {}, 接待: {}, 留言: {}, 转人工: {}",
                 agentUid, totalCount, queuingCount.totalQueuingCount(), chattingCount, leaveMsgCount, robotToAgentCount);
