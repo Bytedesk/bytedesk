@@ -18,5 +18,6 @@
     <!-- <include file="db/changelog/migration/251120_queue_member_core_fields.xml" /> -->
     <include file="db/changelog/migration/251120_queue_settings_notice_batch_window.xml" />
     <include file="db/changelog/migration/251125_queue_settings_add_fields.xml" />
+    <include file="db/changelog/migration/251126_queue_topic_day_unique_constraint.xml" />
 
 </databaseChangeLog>

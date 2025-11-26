@@ -77,6 +77,9 @@ public class QueueResponse extends BaseResponse {
     private Integer closedCount = 0;  // 对话结束人数
 
     @Builder.Default
+    private Integer agentServedCount = 0;  // 客服接待人数
+
+    @Builder.Default
     private Integer avgWaitTime = 0;  // 平均等待时间(秒)
 
     @Builder.Default

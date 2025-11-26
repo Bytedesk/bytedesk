@@ -52,7 +52,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ QueueEntityListener.class })
-@Table(name = "bytedesk_service_queue")
+@Table(name = "bytedesk_service_queue",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_queue_topic_day", columnNames = { "queue_topic", "queue_day" })
+        })
 public class QueueEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -238,6 +241,25 @@ public class QueueEntity extends BaseEntity {
 
         int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
                 .filter(member -> member.isChatting())
+                .count() : 0;
+
+        return count1 + count2 + count3;
+    }
+
+    /**
+     * 获取已有客服响应的人数（至少发送过一条客服消息）
+     */
+    public int getAgentServedCount() {
+        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+                .filter(member -> member.getAgentMessageCount() != null && member.getAgentMessageCount() > 0)
+                .count() : 0;
+
+        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
+                .filter(member -> member.getAgentMessageCount() != null && member.getAgentMessageCount() > 0)
+                .count() : 0;
+
+        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
+                .filter(member -> member.getAgentMessageCount() != null && member.getAgentMessageCount() > 0)
                 .count() : 0;
 
         return count1 + count2 + count3;
