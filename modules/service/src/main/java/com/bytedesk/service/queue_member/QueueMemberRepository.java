@@ -87,6 +87,11 @@ public interface QueueMemberRepository
         Optional<QueueMemberEntity> findFirstWorkgroupQueueMemberByThreadStatus(
                         @Param("workgroupQueueUid") String workgroupQueueUid, @Param("threadStatus") String threadStatus);
 
+        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.workgroupQueue.uid = :workgroupQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
+        List<QueueMemberEntity> findWorkgroupQueueMembersByThreadStatus(
+                        @Param("workgroupQueueUid") String workgroupQueueUid,
+                        @Param("threadStatus") String threadStatus);
+
         @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.robotQueue.uid = :robotQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
         Optional<QueueMemberEntity> findFirstRobotQueueMemberByThreadStatus(
                         @Param("robotQueueUid") String robotQueueUid, @Param("threadStatus") String threadStatus);

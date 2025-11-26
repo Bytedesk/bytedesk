@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.queue_member;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,6 +88,15 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
 
     public Optional<QueueMemberEntity> findEarliestWorkgroupQueueMember(String workgroupQueueUid) {
         return queueMemberRepository.findFirstWorkgroupQueueMemberByThreadStatus(
+            workgroupQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    public List<QueueMemberEntity> findQueuingMembersByWorkgroupQueueUid(String workgroupQueueUid) {
+        if (!StringUtils.hasText(workgroupQueueUid)) {
+            return Collections.emptyList();
+        }
+        return queueMemberRepository.findWorkgroupQueueMembersByThreadStatus(
             workgroupQueueUid,
             ThreadProcessStatusEnum.QUEUING.name());
     }

@@ -91,15 +91,38 @@ public class ThreadMessageUtil {
      * 结构化 QueueContent 的排队消息
      */
     public static MessageProtobuf getThreadQueueMessage(QueueContent content, ThreadEntity thread) {
+        return buildThreadQueueMessage(MessageTypeEnum.QUEUE, content, thread);
+    }
+
+    public static MessageProtobuf getThreadQueueUpdateMessage(QueueContent content, ThreadEntity thread) {
+        return buildThreadQueueMessage(MessageTypeEnum.QUEUE_UPDATE, content, thread);
+    }
+
+    /**
+     * 构造发送给客服排队线程的 QUEUE_NOTICE 消息
+     */
+    public static MessageProtobuf getAgentQueueNoticeMessage(QueueNotification payload, ThreadEntity thread) {
+        return buildAgentQueueMessage(MessageTypeEnum.QUEUE_NOTICE, payload, thread);
+    }
+
+    public static MessageProtobuf getAgentQueueUpdateMessage(QueueNotification payload, ThreadEntity thread) {
+        return buildAgentQueueMessage(MessageTypeEnum.QUEUE_UPDATE, payload, thread);
+    }
+
+    public static MessageProtobuf getAgentQueueAcceptMessage(QueueNotification payload, ThreadEntity thread) {
+        return buildAgentQueueMessage(MessageTypeEnum.QUEUE_ACCEPT, payload, thread);
+    }
+
+    private static MessageProtobuf buildThreadQueueMessage(MessageTypeEnum messageType, QueueContent content,
+            ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         MessageUtils.attachSequenceNumber(extra, thread.getUid());
         String json = content != null ? content.toJson() : null;
-        // 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(json)
-                .type(MessageTypeEnum.QUEUE.name())
+                .type(messageType.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .user(system.toJson())
@@ -112,10 +135,8 @@ public class ThreadMessageUtil {
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
-    /**
-     * 构造发送给客服排队线程的 QUEUE_NOTICE 消息
-     */
-    public static MessageProtobuf getAgentQueueNoticeMessage(QueueNotification payload, ThreadEntity thread) {
+    private static MessageProtobuf buildAgentQueueMessage(MessageTypeEnum messageType, QueueNotification payload,
+            ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         MessageUtils.attachSequenceNumber(extra, thread.getUid());
@@ -125,7 +146,7 @@ public class ThreadMessageUtil {
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
                 .content(json)
-                .type(MessageTypeEnum.QUEUE_NOTICE.name())
+                .type(messageType.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .user(system.toJson())

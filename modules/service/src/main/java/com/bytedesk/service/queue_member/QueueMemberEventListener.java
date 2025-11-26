@@ -15,19 +15,27 @@ package com.bytedesk.service.queue_member;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.content.QueueContent;
+import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
+import com.bytedesk.service.routing_strategy.ThreadRoutingConstants;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.utils.ThreadMessageUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +48,7 @@ public class QueueMemberEventListener {
 
     private final ThreadRestService threadRestService;
 
-    // private final IMessageSendService messageSendService;
+    private final IMessageSendService messageSendService;
 
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
@@ -51,6 +59,7 @@ public class QueueMemberEventListener {
             QueueMemberEntity member = memberOptional.get();
             member.manualAcceptThread();
             queueMemberRestService.save(member);
+            handleQueueAcceptBroadcast(thread, member);
         } else {
             log.error("queue member onThreadAcceptEvent: member not found: {}", thread.getUid());
         }
@@ -176,6 +185,130 @@ public class QueueMemberEventListener {
         //     // 由于缺少批量查询接口，这里暂不实现全量广播以免性能问题，可后续优化
         //     // (占位注释)
         // }
+    }
+
+    private void handleQueueAcceptBroadcast(ThreadEntity thread, QueueMemberEntity acceptedMember) {
+        if (thread == null || acceptedMember == null) {
+            return;
+        }
+        if (acceptedMember.getWorkgroupQueue() == null) {
+            log.debug("queue accept broadcast skipped, no workgroup queue bound: threadUid={}", thread.getUid());
+            return;
+        }
+
+        List<QueueMemberEntity> queueMembers = new ArrayList<>(
+                queueMemberRestService.findQueuingMembersByWorkgroupQueueUid(
+                        acceptedMember.getWorkgroupQueue().getUid()));
+        queueMembers.removeIf(member -> member.getThread() == null);
+        queueMembers.removeIf(member -> thread.getUid().equals(member.getThread().getUid()));
+
+        notifyAgentsQueueAccepted(thread, acceptedMember, queueMembers.size());
+        if (queueMembers.isEmpty()) {
+            return;
+        }
+        broadcastQueueUpdates(queueMembers);
+    }
+
+    private void notifyAgentsQueueAccepted(ThreadEntity thread, QueueMemberEntity acceptedMember, int remainingQueueSize) {
+        QueueNotification payload = buildQueueNotification(thread, acceptedMember, null, remainingQueueSize, null);
+        try {
+            MessageProtobuf message = ThreadMessageUtil.getAgentQueueAcceptMessage(payload, thread);
+            messageSendService.sendProtobufMessage(message);
+        } catch (Exception e) {
+            log.error("Failed to send QUEUE_ACCEPT notice: threadUid={}, queueMemberUid={}, error={}",
+                    thread.getUid(), acceptedMember.getUid(), e.getMessage(), e);
+        }
+    }
+
+    private void broadcastQueueUpdates(List<QueueMemberEntity> queueMembers) {
+        int totalCount = queueMembers.size();
+        for (int i = 0; i < queueMembers.size(); i++) {
+            QueueMemberEntity member = queueMembers.get(i);
+            int position = i + 1;
+            sendAgentQueueUpdate(member, position, totalCount);
+            sendVisitorQueueUpdate(member, position, totalCount);
+        }
+    }
+
+    private void sendAgentQueueUpdate(QueueMemberEntity queueMember, int position, int totalCount) {
+        ThreadEntity targetThread = queueMember.getThread();
+        if (targetThread == null) {
+            log.warn("queue update skipped, queueMember thread missing: queueMemberUid={}", queueMember.getUid());
+            return;
+        }
+        int waitSeconds = computeWaitSeconds(position);
+        QueueNotification payload = buildQueueNotification(targetThread, queueMember, position, totalCount, waitSeconds);
+        try {
+            MessageProtobuf message = ThreadMessageUtil.getAgentQueueUpdateMessage(payload, targetThread);
+            messageSendService.sendProtobufMessage(message);
+        } catch (Exception e) {
+            log.error("Failed to send QUEUE_UPDATE notice: threadUid={}, queueMemberUid={}, error={}",
+                    targetThread.getUid(), queueMember.getUid(), e.getMessage(), e);
+        }
+    }
+
+    private void sendVisitorQueueUpdate(QueueMemberEntity queueMember, int position, int totalCount) {
+        ThreadEntity targetThread = queueMember.getThread();
+        if (targetThread == null) {
+            return;
+        }
+        QueueContent queueContent = buildQueueContent(position, totalCount);
+        try {
+            targetThread.setContent(queueContent.toJson());
+            threadRestService.save(targetThread);
+        } catch (Exception e) {
+            log.debug("queue update content persistence skipped: threadUid={}, error={}",
+                    targetThread.getUid(), e.getMessage());
+        }
+        try {
+            MessageProtobuf message = ThreadMessageUtil.getThreadQueueUpdateMessage(queueContent, targetThread);
+            messageSendService.sendProtobufMessage(message);
+        } catch (Exception e) {
+            log.error("Failed to send visitor QUEUE_UPDATE: threadUid={}, queueMemberUid={}, error={}",
+                    targetThread.getUid(), queueMember.getUid(), e.getMessage(), e);
+        }
+    }
+
+    private QueueNotification buildQueueNotification(ThreadEntity thread, QueueMemberEntity queueMember,
+            Integer position, int queueSize, Integer waitSeconds) {
+        Long estimatedWaitMs = waitSeconds != null ? waitSeconds.longValue() * 1000L : null;
+        return QueueNotification.builder()
+                .queueMemberUid(queueMember.getUid())
+                .threadUid(thread.getUid())
+                .threadTopic(thread.getTopic())
+                .position(position)
+                .queueSize(queueSize)
+                .estimatedWaitMs(estimatedWaitMs)
+                .serverTimestamp(System.currentTimeMillis())
+                .user(thread.getUser())
+                .build();
+    }
+
+    private QueueContent buildQueueContent(int position, int totalCount) {
+        String displayText;
+        if (position <= 1) {
+            displayText = ThreadRoutingConstants.Messages.QUEUE_NEXT;
+        } else {
+            int waitMinutes = (position - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON;
+            displayText = String.format(ThreadRoutingConstants.Messages.QUEUE_WAITING_TEMPLATE, totalCount, waitMinutes);
+        }
+        int waitSeconds = computeWaitSeconds(position);
+        String estimatedWaitTime = position <= 1 ? "即将开始" : "约" + (waitSeconds / 60) + "分钟";
+        return QueueContent.builder()
+                .content(displayText)
+                .position(position)
+                .queueSize(totalCount)
+                .waitSeconds(waitSeconds)
+                .estimatedWaitTime(estimatedWaitTime)
+                .serverTimestamp(System.currentTimeMillis())
+                .build();
+    }
+
+    private int computeWaitSeconds(int position) {
+        if (position <= 1) {
+            return 0;
+        }
+        return (position - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON * 60;
     }
 
     @EventListener
