@@ -37,7 +37,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
-import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
@@ -92,36 +91,32 @@ public class QueueMemberEventListener {
     /**
      * 当某个会话关闭，则检查当前客服队列或所在工作组队列中是否有排队成员，如果有，则自动接入最前面的排队成员
      */
-    @EventListener
-    public void onThreadCloseEvent(ThreadCloseEvent event) {
-        ThreadEntity thread = event.getThread();
-        if (thread == null || thread.getTopic() == null) {
-            return;
-        }
-
-        // UserProtobuf agentProto = resolveAgentProtobuf(thread);
-        // if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
-        //     log.debug("queue member auto accept skipped, agent missing: threadUid={}",
-        //             thread != null ? thread.getUid() : null);
-        //     return;
-        // }
-
-        // QueueMemberEntity closingQueueMember = queueMemberRestService.findByThreadUid(thread.getUid())
-        //         .orElse(null);
-
-        // boolean assigned = tryAssignFromAgentQueue(agentProto, thread, closingQueueMember);
-        // if (!assigned) {
-        //     assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
-        // }
-
-        // if (assigned) {
-        //     log.info("queue member auto accept completed: agentUid={} closedThreadUid={}", agentProto.getUid(),
-        //             thread.getUid());
-        // } else {
-        //     log.debug("queue member auto accept skipped, no queued members: agentUid={} closedThreadUid={}",
-        //             agentProto.getUid(), thread.getUid());
-        // }
-    }
+    // @EventListener
+    // public void onThreadCloseEvent(ThreadCloseEvent event) {
+    //     ThreadEntity thread = event.getThread();
+    //     if (thread == null || thread.getTopic() == null) {
+    //         return;
+    //     }
+    //     // UserProtobuf agentProto = resolveAgentProtobuf(thread);
+    //     // if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
+    //     //     log.debug("queue member auto accept skipped, agent missing: threadUid={}",
+    //     //             thread != null ? thread.getUid() : null);
+    //     //     return;
+    //     // }
+    //     // QueueMemberEntity closingQueueMember = queueMemberRestService.findByThreadUid(thread.getUid())
+    //     //         .orElse(null);
+    //     // boolean assigned = tryAssignFromAgentQueue(agentProto, thread, closingQueueMember);
+    //     // if (!assigned) {
+    //     //     assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
+    //     // }
+    //     // if (assigned) {
+    //     //     log.info("queue member auto accept completed: agentUid={} closedThreadUid={}", agentProto.getUid(),
+    //     //             thread.getUid());
+    //     // } else {
+    //     //     log.debug("queue member auto accept skipped, no queued members: agentUid={} closedThreadUid={}",
+    //     //             agentProto.getUid(), thread.getUid());
+    //     // }
+    // }
 
     /**
      * 1. 通知工作组内其他成员该排队会话已被接受 QUEUE_ACCEPT, 并在desktop端从队列中删除此排队会话
