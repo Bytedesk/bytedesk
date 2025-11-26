@@ -15,7 +15,6 @@ package com.bytedesk.service.queue_member;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
@@ -25,17 +24,10 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.service.utils.ThreadMessageUtil;
-import com.bytedesk.core.message.content.QueueContent;
-import com.bytedesk.service.routing_strategy.ThreadRoutingConstants;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessageProtobuf;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +40,7 @@ public class QueueMemberEventListener {
 
     private final ThreadRestService threadRestService;
 
-    private final IMessageSendService messageSendService;
+    // private final IMessageSendService messageSendService;
 
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
@@ -64,86 +56,86 @@ public class QueueMemberEventListener {
         }
 
         // 从thread.topic中提取前三个部分作为搜索前缀
-        String topicPrefix = extractTopicPrefix(thread.getTopic());
-        if (topicPrefix != null) {
-            log.info("搜索topic前缀: {}, 状态: QUEUING", topicPrefix);
-            // 查询状态为QUEUING的会话，按创建时间升序排序
-            List<ThreadEntity> queuingThreads = threadRestService.findByTopicStartsWithAndStatus(
-                    topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
-            log.info("找到{}个排队中的会话", queuingThreads.size());
+        // String topicPrefix = extractTopicPrefix(thread.getTopic());
+        // if (topicPrefix != null) {
+        //     log.info("搜索topic前缀: {}, 状态: QUEUING", topicPrefix);
+        //     // 查询状态为QUEUING的会话，按创建时间升序排序
+        //     List<ThreadEntity> queuingThreads = threadRestService.findByTopicStartsWithAndStatus(
+        //             topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
+        //     log.info("找到{}个排队中的会话", queuingThreads.size());
 
-            // 遍历排队中的会话并发送更新的排队人数消息
-            int totalQueuingCount = queuingThreads.size();
-            for (int i = 0; i < queuingThreads.size(); i++) {
-                ThreadEntity queuingThread = queuingThreads.get(i);
-                log.info("排队中的会话: {}, topic: {}, 当前排队位置: {}/{}",
-                        queuingThread.getUid(), queuingThread.getTopic(), i + 1, totalQueuingCount);
+        //     // 遍历排队中的会话并发送更新的排队人数消息
+        //     int totalQueuingCount = queuingThreads.size();
+        //     for (int i = 0; i < queuingThreads.size(); i++) {
+        //         ThreadEntity queuingThread = queuingThreads.get(i);
+        //         log.info("排队中的会话: {}, topic: {}, 当前排队位置: {}/{}",
+        //                 queuingThread.getUid(), queuingThread.getTopic(), i + 1, totalQueuingCount);
 
-                // 发送最新排队人数消息
-                sendQueueUpdateMessage(queuingThread, i + 1, totalQueuingCount);
-            }
-        }
+        //         // 发送最新排队人数消息
+        //         sendQueueUpdateMessage(queuingThread, i + 1, totalQueuingCount);
+        //     }
+        // }
     }
 
     /**
      * 发送排队更新消息
      */
-    private void sendQueueUpdateMessage(ThreadEntity thread, int currentPosition, int totalCount) {
-        try {
-            // 构建用于展示的提示文本
-            String displayText;
-            if (currentPosition == 1) {
-                displayText = "请稍后，下一个就是您";
-            } else {
-                int waitMinutes = (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON;
-                displayText = "当前排队人数：" + totalCount + "，您的位置：" + currentPosition +
-                        "，大约等待时间：" + waitMinutes + " 分钟";
-            }
+    // private void sendQueueUpdateMessage(ThreadEntity thread, int currentPosition, int totalCount) {
+    //     try {
+    //         // 构建用于展示的提示文本
+    //         String displayText;
+    //         if (currentPosition == 1) {
+    //             displayText = "请稍后，下一个就是您";
+    //         } else {
+    //             int waitMinutes = (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON;
+    //             displayText = "当前排队人数：" + totalCount + "，您的位置：" + currentPosition +
+    //                     "，大约等待时间：" + waitMinutes + " 分钟";
+    //         }
 
-            // 计算等待时间（秒）与人性化描述
-            int waitSeconds = currentPosition == 1 ? 0
-                    : (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON * 60;
-            String estimatedWaitTime = currentPosition == 1 ? "即将开始" : ("约" + (waitSeconds / 60) + "分钟");
+    //         // 计算等待时间（秒）与人性化描述
+    //         int waitSeconds = currentPosition == 1 ? 0
+    //                 : (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON * 60;
+    //         String estimatedWaitTime = currentPosition == 1 ? "即将开始" : ("约" + (waitSeconds / 60) + "分钟");
 
-            QueueContent queueContent = QueueContent.builder()
-                    .content(displayText)
-                    .position(currentPosition)
-                    .queueSize(totalCount)
-                    .waitSeconds(waitSeconds)
-                    .estimatedWaitTime(estimatedWaitTime)
-                    .serverTimestamp(System.currentTimeMillis())
-                    .build();
+    //         QueueContent queueContent = QueueContent.builder()
+    //                 .content(displayText)
+    //                 .position(currentPosition)
+    //                 .queueSize(totalCount)
+    //                 .waitSeconds(waitSeconds)
+    //                 .estimatedWaitTime(estimatedWaitTime)
+    //                 .serverTimestamp(System.currentTimeMillis())
+    //                 .build();
 
-            // 将结构化内容写入线程（保持与其它策略一致）
-            thread.setContent(queueContent.toJson());
-            threadRestService.save(thread);
+    //         // 将结构化内容写入线程（保持与其它策略一致）
+    //         thread.setContent(queueContent.toJson());
+    //         threadRestService.save(thread);
 
-            // 发送结构化排队消息
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, thread);
-            messageSendService.sendProtobufMessage(messageProtobuf);
+    //         // 发送结构化排队消息
+    //         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, thread);
+    //         messageSendService.sendProtobufMessage(messageProtobuf);
 
-            log.debug("已发送排队更新消息(结构化): threadUid={}, position={}/{}, waitSeconds={}, content={}",
-                    thread.getUid(), currentPosition, totalCount, waitSeconds, displayText);
-        } catch (Exception e) {
-            log.error("发送排队更新消息时出错: threadUid={}, error={}", thread.getUid(), e.getMessage(), e);
-        }
-    }
+    //         log.debug("已发送排队更新消息(结构化): threadUid={}, position={}/{}, waitSeconds={}, content={}",
+    //                 thread.getUid(), currentPosition, totalCount, waitSeconds, displayText);
+    //     } catch (Exception e) {
+    //         log.error("发送排队更新消息时出错: threadUid={}, error={}", thread.getUid(), e.getMessage(), e);
+    //     }
+    // }
 
     /**
      * 从topic中提取前三个部分作为搜索前缀
      * 例如：org/agent/{agent_uid}/{visitor_uid} -&gt; org/agent/{agent_uid}
      */
-    private String extractTopicPrefix(String topic) {
-        if (topic == null || topic.isEmpty()) {
-            return null;
-        }
+    // private String extractTopicPrefix(String topic) {
+    //     if (topic == null || topic.isEmpty()) {
+    //         return null;
+    //     }
 
-        String[] parts = topic.split("/");
-        if (parts.length >= 3) {
-            return parts[0] + "/" + parts[1] + "/" + parts[2];
-        }
-        return null;
-    }
+    //     String[] parts = topic.split("/");
+    //     if (parts.length >= 3) {
+    //         return parts[0] + "/" + parts[1] + "/" + parts[2];
+    //     }
+    //     return null;
+    // }
 
     /**
      * 会话关闭时(包含访客主动关闭/系统自动关闭/客服关闭)，刷新同队列其余排队成员位置
@@ -154,17 +146,17 @@ public class QueueMemberEventListener {
         if (thread == null || thread.getTopic() == null) {
             return;
         }
-        String topicPrefix = extractTopicPrefix(thread.getTopic());
-        if (topicPrefix == null) {
-            return;
-        }
-        List<ThreadEntity> queuingThreads = threadRestService.findByTopicStartsWithAndStatus(
-                topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
-        int totalQueuingCount = queuingThreads.size();
-        for (int i = 0; i < queuingThreads.size(); i++) {
-            ThreadEntity queuingThread = queuingThreads.get(i);
-            sendQueueUpdateMessage(queuingThread, i + 1, totalQueuingCount);
-        }
+        // String topicPrefix = extractTopicPrefix(thread.getTopic());
+        // if (topicPrefix == null) {
+        //     return;
+        // }
+        // List<ThreadEntity> queuingThreads = threadRestService.findByTopicStartsWithAndStatus(
+        //         topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
+        // int totalQueuingCount = queuingThreads.size();
+        // for (int i = 0; i < queuingThreads.size(); i++) {
+        //     ThreadEntity queuingThread = queuingThreads.get(i);
+        //     sendQueueUpdateMessage(queuingThread, i + 1, totalQueuingCount);
+        // }
     }
 
     @EventListener
