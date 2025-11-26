@@ -39,7 +39,7 @@ public class QueueNotification {
     /** Server side epoch millis when the payload was produced. */
     long serverTimestamp;
 
-    // 访客json信息
+    // UserProtobuf访客json信息 
     String user;
 
     // @Value
