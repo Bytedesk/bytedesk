@@ -99,28 +99,28 @@ public class QueueMemberEventListener {
             return;
         }
 
-        UserProtobuf agentProto = resolveAgentProtobuf(thread);
-        if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
-            log.debug("queue member auto accept skipped, agent missing: threadUid={}",
-                    thread != null ? thread.getUid() : null);
-            return;
-        }
+        // UserProtobuf agentProto = resolveAgentProtobuf(thread);
+        // if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
+        //     log.debug("queue member auto accept skipped, agent missing: threadUid={}",
+        //             thread != null ? thread.getUid() : null);
+        //     return;
+        // }
 
-        QueueMemberEntity closingQueueMember = queueMemberRestService.findByThreadUid(thread.getUid())
-                .orElse(null);
+        // QueueMemberEntity closingQueueMember = queueMemberRestService.findByThreadUid(thread.getUid())
+        //         .orElse(null);
 
-        boolean assigned = tryAssignFromAgentQueue(agentProto, thread, closingQueueMember);
-        if (!assigned) {
-            assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
-        }
+        // boolean assigned = tryAssignFromAgentQueue(agentProto, thread, closingQueueMember);
+        // if (!assigned) {
+        //     assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
+        // }
 
-        if (assigned) {
-            log.info("queue member auto accept completed: agentUid={} closedThreadUid={}", agentProto.getUid(),
-                    thread.getUid());
-        } else {
-            log.debug("queue member auto accept skipped, no queued members: agentUid={} closedThreadUid={}",
-                    agentProto.getUid(), thread.getUid());
-        }
+        // if (assigned) {
+        //     log.info("queue member auto accept completed: agentUid={} closedThreadUid={}", agentProto.getUid(),
+        //             thread.getUid());
+        // } else {
+        //     log.debug("queue member auto accept skipped, no queued members: agentUid={} closedThreadUid={}",
+        //             agentProto.getUid(), thread.getUid());
+        // }
     }
 
     /**
@@ -147,14 +147,14 @@ public class QueueMemberEventListener {
         broadcastQueueUpdates(queueMembers);
     }
 
-    private UserProtobuf resolveAgentProtobuf(ThreadEntity thread) {
+    public UserProtobuf resolveAgentProtobuf(ThreadEntity thread) {
         if (thread == null || !StringUtils.hasText(thread.getAgent())) {
             return null;
         }
         return UserProtobuf.fromJson(thread.getAgent());
     }
 
-    private boolean tryAssignFromAgentQueue(UserProtobuf agentProto, ThreadEntity closedThread,
+    public boolean tryAssignFromAgentQueue(UserProtobuf agentProto, ThreadEntity closedThread,
             QueueMemberEntity closingQueueMember) {
         if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
             return false;
@@ -180,7 +180,7 @@ public class QueueMemberEventListener {
         return autoAcceptQueueMember(nextMember, closedThread, agentProto, agentQueueOpt.get());
     }
 
-    private boolean tryAssignFromWorkgroupQueue(UserProtobuf agentProto, ThreadEntity closedThread,
+    public boolean tryAssignFromWorkgroupQueue(UserProtobuf agentProto, ThreadEntity closedThread,
             QueueMemberEntity closingQueueMember) {
         Optional<QueueEntity> workgroupQueueOpt = resolveWorkgroupQueueEntity(closedThread, closingQueueMember);
         if (!workgroupQueueOpt.isPresent()) {
