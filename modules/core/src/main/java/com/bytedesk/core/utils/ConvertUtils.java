@@ -260,14 +260,27 @@ public class ConvertUtils {
     }
 
     public static ThreadResponseSimple convertToThreadResponseSimple(ThreadEntity thread) {
-        ModelMapper modelMapper = getModelMapper();
-        // ensureThreadResponseTypeMapConfigured(modelMapper);
-        ThreadResponseSimple threadResponse = modelMapper.map(thread, ThreadResponseSimple.class);
-        // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,
-        UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
-        if (user != null) {
-            threadResponse.setUser(user);
-        }
+        ThreadResponseSimple threadResponse = ThreadResponseSimple.builder()
+            .topic(thread.getTopic())
+            .content(thread.getContent())
+            .type(thread.getType())
+            .status(thread.getStatus())
+            .top(thread.getTop())
+            .unread(thread.getUnread())
+            .mute(thread.getMute())
+            .hide(thread.getHide())
+            .star(thread.getStar())
+            .fold(thread.getFold())
+            .closeType(thread.getCloseType())
+            .note(thread.getNote())
+            // .offline(thread.getOffline())
+            .channel(thread.getChannel())
+            .extra(thread.getExtra())
+            .agent(thread.getAgent())
+            .workgroup(thread.getWorkgroup())
+        .build();
+        // ThreadResponseSimple threadResponse = getModelMapper().map(thread, ThreadResponseSimple.class);
+        threadResponse.setUser(thread.getUserProtobuf());
         // 
         return threadResponse;
     }

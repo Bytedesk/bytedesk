@@ -13,14 +13,8 @@
  */
 package com.bytedesk.core.thread;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
-import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -47,23 +41,9 @@ public class ThreadResponseSimple extends BaseResponse {
 
     private String status;
 
-    // transfer status
-    @Builder.Default
-    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
-
-    // invite status
-    @Builder.Default
-    private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
-
     private Boolean top;
 
     private Boolean unread;
-
-    // 给客服端使用，统计未读消息数量
-    private Integer unreadCount;
-
-    // 给访客端使用，统计未读消息数量
-    private Integer visitorUnreadCount;
 
     private Boolean mute;
 
@@ -78,11 +58,7 @@ public class ThreadResponseSimple extends BaseResponse {
 
     private String note;
 
-    private Boolean offline;
-
-    // 标签
-    @Builder.Default
-    private List<String> tagList = new ArrayList<>();
+    // private Boolean offline;
 
     private String channel;
 
@@ -96,28 +72,8 @@ public class ThreadResponseSimple extends BaseResponse {
     // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
     private String agent;
 
-    public UserProtobuf getAgentProtobuf() {
-        if (agent == null) {
-            return null;
-        }
-        return UserProtobuf.fromJson(agent);
-    }
-
-    private String robot;
-
-    public UserProtobuf getRobotProtobuf() {
-        if (robot == null) {
-            return null;
-        }
-        return UserProtobuf.fromJson(robot);
-    }
+    // private String robot;
 
     private String workgroup;
 
-    public UserProtobuf getWorkgroupProtobuf() {
-        if (workgroup == null) {
-            return null;
-        }
-        return UserProtobuf.fromJson(workgroup);
-    }
 }
