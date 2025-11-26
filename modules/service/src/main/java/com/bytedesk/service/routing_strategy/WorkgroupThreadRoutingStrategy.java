@@ -13,9 +13,7 @@
  */
 package com.bytedesk.service.routing_strategy;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -45,7 +43,7 @@ import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
-import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
+// import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -95,7 +93,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final MessageRestService messageRestService;
     private final WorkgroupRoutingService workgroupRoutingService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
-    private final QueueMemberMessageService queueMemberMessageService;
+    // private final QueueMemberMessageService queueMemberMessageService;
     private final PresenceFacadeService presenceFacadeService;
     // private final QueueAutoAssignService queueAutoAssignService;
     // private final WorkgroupRepository workgroupRepository;
@@ -616,9 +614,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             queueMemberEntity.transferRobotToAgent();
 
             // 异步处理转人工操作
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("robotToAgent", true);
-            queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
+            // Map<String, Object> updates = new HashMap<>();
+            // updates.put("robotToAgent", true);
+            // queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
         }
     }
 
@@ -918,9 +916,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             queueMemberEntity.agentAutoAcceptThread();
 
             // 使用MQ异步处理自动接受会话操作
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("agentAutoAcceptThread", true);
-            queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
+            // Map<String, Object> updates = new HashMap<>();
+            // updates.put("agentAutoAcceptThread", true);
+            // queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
 
             log.debug("Updated queue member status for agent auto-accept: {}", queueMemberEntity.getUid());
         } catch (Exception e) {

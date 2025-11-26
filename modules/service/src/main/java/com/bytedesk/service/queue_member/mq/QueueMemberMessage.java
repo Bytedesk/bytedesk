@@ -13,147 +13,147 @@
  */
 package com.bytedesk.service.queue_member.mq;
 
-import java.io.Serializable;
-import java.time.ZonedDateTime;
-import java.util.Map;
+// import java.io.Serializable;
+// import java.time.ZonedDateTime;
+// import java.util.Map;
 
-import com.alibaba.fastjson2.annotation.JSONField;
+// import com.alibaba.fastjson2.annotation.JSONField;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Data;
+// import lombok.NoArgsConstructor;
 
-/**
- * 队列成员消息
- * 用于在消息队列中传递队列成员更新信息
- */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class QueueMemberMessage implements Serializable {
+// /**
+//  * 队列成员消息
+//  * 用于在消息队列中传递队列成员更新信息
+//  */
+// @Data
+// @Builder
+// @NoArgsConstructor
+// @AllArgsConstructor
+// public class QueueMemberMessage implements Serializable {
     
-    private static final long serialVersionUID = 1L;
+//     private static final long serialVersionUID = 1L;
     
-    /**
-     * 队列成员唯一标识
-     */
-    @JSONField(ordinal = 1)
-    private String memberUid;
+//     /**
+//      * 队列成员唯一标识
+//      */
+//     @JSONField(ordinal = 1)
+//     private String memberUid;
     
-    /**
-     * 操作类型：update, delete
-     */
-    @JSONField(ordinal = 2)
-    private String operationType;
+//     /**
+//      * 操作类型：update, delete
+//      */
+//     @JSONField(ordinal = 2)
+//     private String operationType;
     
-    /**
-     * 需要更新的字段
-     */
-    @JSONField(ordinal = 3)
-    private Map<String, Object> updates;
+//     /**
+//      * 需要更新的字段
+//      */
+//     @JSONField(ordinal = 3)
+//     private Map<String, Object> updates;
     
-    /**
-     * 是否需要更新统计信息
-     */
-    @JSONField(ordinal = 4)
-    private Boolean updateStats;
+//     /**
+//      * 是否需要更新统计信息
+//      */
+//     @JSONField(ordinal = 4)
+//     private Boolean updateStats;
     
-    /**
-     * 消息计数更新
-     */
-    @JSONField(ordinal = 5)
-    private Integer visitorMessageCount;
+//     /**
+//      * 消息计数更新
+//      */
+//     @JSONField(ordinal = 5)
+//     private Integer visitorMessageCount;
     
-    @JSONField(ordinal = 6)
-    private Integer agentMessageCount;
+//     @JSONField(ordinal = 6)
+//     private Integer agentMessageCount;
     
-    @JSONField(ordinal = 7)
-    private Integer robotMessageCount;
+//     @JSONField(ordinal = 7)
+//     private Integer robotMessageCount;
     
-    @JSONField(ordinal = 8)
-    private Integer systemMessageCount;
+//     @JSONField(ordinal = 8)
+//     private Integer systemMessageCount;
     
-    /**
-     * 时间戳更新
-     */
-    @JSONField(ordinal = 9, format = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime visitorLastMessageAt;
+//     /**
+//      * 时间戳更新
+//      */
+//     @JSONField(ordinal = 9, format = "yyyy-MM-dd HH:mm:ss")
+//     private ZonedDateTime visitorLastMessageAt;
     
-    @JSONField(ordinal = 10, format = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime agentLastResponseAt;
+//     @JSONField(ordinal = 10, format = "yyyy-MM-dd HH:mm:ss")
+//     private ZonedDateTime agentLastResponseAt;
     
-    @JSONField(ordinal = 11, format = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime robotLastResponseAt;
+//     @JSONField(ordinal = 11, format = "yyyy-MM-dd HH:mm:ss")
+//     private ZonedDateTime robotLastResponseAt;
     
-    @JSONField(ordinal = 12, format = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime workgroupLastResponseAt;
+//     @JSONField(ordinal = 12, format = "yyyy-MM-dd HH:mm:ss")
+//     private ZonedDateTime workgroupLastResponseAt;
     
-    /**
-     * 状态更新
-     */
-    @JSONField(ordinal = 13)
-    private String agentAcceptType;
+//     /**
+//      * 状态更新
+//      */
+//     @JSONField(ordinal = 13)
+//     private String agentAcceptType;
     
-    @JSONField(ordinal = 14)
-    private String robotAcceptType;
+//     @JSONField(ordinal = 14)
+//     private String robotAcceptType;
     
-    @JSONField(ordinal = 15)
-    private String workgroupAcceptType;
+//     @JSONField(ordinal = 15)
+//     private String workgroupAcceptType;
     
-    @JSONField(ordinal = 16)
-    private Boolean agentOffline;
+//     @JSONField(ordinal = 16)
+//     private Boolean agentOffline;
     
-    @JSONField(ordinal = 17)
-    private Boolean robotToAgent;
+//     @JSONField(ordinal = 17)
+//     private Boolean robotToAgent;
     
-    @JSONField(ordinal = 18)
-    private Boolean rated;
+//     @JSONField(ordinal = 18)
+//     private Boolean rated;
     
-    @JSONField(ordinal = 19)
-    private Integer rateLevel;
+//     @JSONField(ordinal = 19)
+//     private Integer rateLevel;
     
-    @JSONField(ordinal = 20)
-    private Boolean resolved;
+//     @JSONField(ordinal = 20)
+//     private Boolean resolved;
     
-    @JSONField(ordinal = 21)
-    private Boolean qualityChecked;
+//     @JSONField(ordinal = 21)
+//     private Boolean qualityChecked;
     
-    @JSONField(ordinal = 22)
-    private String qualityCheckResult;
+//     @JSONField(ordinal = 22)
+//     private String qualityCheckResult;
     
-    @JSONField(ordinal = 23)
-    private Boolean messageLeave;
+//     @JSONField(ordinal = 23)
+//     private Boolean messageLeave;
     
-    @JSONField(ordinal = 24)
-    private String leaveMsg;
+//     @JSONField(ordinal = 24)
+//     private String leaveMsg;
     
-    @JSONField(ordinal = 25)
-    private Boolean summarized;
+//     @JSONField(ordinal = 25)
+//     private Boolean summarized;
     
-    @JSONField(ordinal = 26)
-    private String transferStatus;
+//     @JSONField(ordinal = 26)
+//     private String transferStatus;
     
-    @JSONField(ordinal = 27)
-    private String inviteStatus;
+//     @JSONField(ordinal = 27)
+//     private String inviteStatus;
     
-    @JSONField(ordinal = 28)
-    private String intentionType;
+//     @JSONField(ordinal = 28)
+//     private String intentionType;
     
-    @JSONField(ordinal = 29)
-    private String emotionType;
+//     @JSONField(ordinal = 29)
+//     private String emotionType;
     
-    /**
-     * 自动接受会话标志
-     */
-    @JSONField(ordinal = 30)
-    private Boolean agentAutoAcceptThread;
+//     /**
+//      * 自动接受会话标志
+//      */
+//     @JSONField(ordinal = 30)
+//     private Boolean agentAutoAcceptThread;
     
-    /**
-     * 消息类型标记，便于接收端识别
-     */
-    @JSONField(ordinal = 0)
-    @Builder.Default
-    private String _type = "queueMemberMessage";
-}
+//     /**
+//      * 消息类型标记，便于接收端识别
+//      */
+//     @JSONField(ordinal = 0)
+//     @Builder.Default
+//     private String _type = "queueMemberMessage";
+// }
