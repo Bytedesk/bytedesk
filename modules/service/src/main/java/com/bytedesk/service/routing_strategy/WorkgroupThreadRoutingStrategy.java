@@ -599,10 +599,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         for (AgentEntity agent : availableAgents) {
             try {
-                if (!presenceFacadeService.isAgentOnlineAndAvailable(agent)) {
-                    continue;
-                }
-
                 ThreadEntity agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
 
                 QueueNotification queueNotification = QueueNotification.builder()
