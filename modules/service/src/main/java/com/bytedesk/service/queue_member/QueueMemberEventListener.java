@@ -14,7 +14,9 @@
 package com.bytedesk.service.queue_member;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -31,12 +34,16 @@ import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
+import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
-import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.presence.PresenceFacadeService;
+import com.bytedesk.service.queue.QueueEntity;
+import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
@@ -50,6 +57,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class QueueMemberEventListener {
 
+    private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_DATE;
+
     private final QueueMemberRestService queueMemberRestService;
 
     private final ThreadRestService threadRestService;
@@ -59,6 +68,10 @@ public class QueueMemberEventListener {
     private final WorkgroupRestService workgroupRestService;
 
     private final PresenceFacadeService presenceFacadeService;
+
+    private final QueueService queueService;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
@@ -77,7 +90,7 @@ public class QueueMemberEventListener {
     }
 
     /**
-     * 会话关闭时(包含访客主动关闭/系统自动关闭/客服关闭)，刷新同队列其余排队成员位置
+     * 当某个会话关闭，则检查当前客服队列或所在工作组队列中是否有排队成员，如果有，则自动接入最前面的排队成员
      */
     @EventListener
     public void onThreadCloseEvent(ThreadCloseEvent event) {
@@ -86,31 +99,33 @@ public class QueueMemberEventListener {
             return;
         }
 
-        // 当某个会话关闭，则检查当前客服队列或所在工作组队列中是否有排队成员，如果有，则自动接入最前面的排队成员
+        UserProtobuf agentProto = resolveAgentProtobuf(thread);
+        if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
+            log.debug("queue member auto accept skipped, agent missing: threadUid={}",
+                    thread != null ? thread.getUid() : null);
+            return;
+        }
 
-        
-    }
+        QueueMemberEntity closingQueueMember = queueMemberRestService.findByThreadUid(thread.getUid())
+                .orElse(null);
 
-    @EventListener
-    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        // int removed = queueMemberRestService.cleanupIdleQueueMembers();
-        // if (removed > 0) {
-        //     log.info("Idle queue members removed: {}", removed);
-        //     // 广播所有前缀的队列位置刷新：这里简化处理，按当前活跃排队线程重新计算
-        //     // 获取任意还在排队的线程列表，通过提取前缀分组刷新
-        //     // 为避免复杂度，这里只刷新受影响的所有排队会话(全量刷新)
-        //     // 查找所有排队中的线程(匹配已有查询方法前缀需要 topicPrefix, 此处使用简单遍历 prefix 集合)
-        //     // 简化：不区分前缀，逐个线程重新发送其位置
-        //     // 由于缺少批量查询接口，这里暂不实现全量广播以免性能问题，可后续优化
-        //     // (占位注释)
-        // }
+        boolean assigned = tryAssignFromAgentQueue(agentProto, thread, closingQueueMember);
+        if (!assigned) {
+            assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
+        }
+
+        if (assigned) {
+            log.info("queue member auto accept completed: agentUid={} closedThreadUid={}", agentProto.getUid(),
+                    thread.getUid());
+        } else {
+            log.debug("queue member auto accept skipped, no queued members: agentUid={} closedThreadUid={}",
+                    agentProto.getUid(), thread.getUid());
+        }
     }
 
     /**
      * 1. 通知工作组内其他成员该排队会话已被接受 QUEUE_ACCEPT, 并在desktop端从队列中删除此排队会话
      * 2. 刷新同队列其余排队成员位置 QUEUE_UPDATE，并在visitor端更新排队位置显示
-     * @param thread
-     * @param acceptedMember
      */
     private void handleQueueAcceptBroadcast(ThreadEntity thread, QueueMemberEntity acceptedMember) {
         if (thread == null || acceptedMember == null) {
@@ -130,6 +145,140 @@ public class QueueMemberEventListener {
             return;
         }
         broadcastQueueUpdates(queueMembers);
+    }
+
+    private UserProtobuf resolveAgentProtobuf(ThreadEntity thread) {
+        if (thread == null || !StringUtils.hasText(thread.getAgent())) {
+            return null;
+        }
+        return UserProtobuf.fromJson(thread.getAgent());
+    }
+
+    private boolean tryAssignFromAgentQueue(UserProtobuf agentProto, ThreadEntity closedThread,
+            QueueMemberEntity closingQueueMember) {
+        if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
+            return false;
+        }
+        Optional<QueueEntity> agentQueueOpt = Optional.empty();
+        if (closingQueueMember != null && closingQueueMember.getAgentQueue() != null) {
+            agentQueueOpt = Optional.of(closingQueueMember.getAgentQueue());
+        } else {
+            agentQueueOpt = resolveAgentQueueEntity(agentProto.getUid());
+        }
+        if (!agentQueueOpt.isPresent()) {
+            return false;
+        }
+        Optional<QueueMemberEntity> nextMemberOpt = queueMemberRestService
+                .findEarliestAgentQueueMemberForUpdate(agentQueueOpt.get().getUid());
+        if (!nextMemberOpt.isPresent()) {
+            return false;
+        }
+        QueueMemberEntity nextMember = nextMemberOpt.get();
+        if (isSameThread(nextMember, closedThread)) {
+            return false;
+        }
+        return autoAcceptQueueMember(nextMember, closedThread, agentProto, agentQueueOpt.get());
+    }
+
+    private boolean tryAssignFromWorkgroupQueue(UserProtobuf agentProto, ThreadEntity closedThread,
+            QueueMemberEntity closingQueueMember) {
+        Optional<QueueEntity> workgroupQueueOpt = resolveWorkgroupQueueEntity(closedThread, closingQueueMember);
+        if (!workgroupQueueOpt.isPresent()) {
+            return false;
+        }
+        Optional<QueueMemberEntity> nextMemberOpt = queueMemberRestService
+                .findEarliestWorkgroupQueueMember(workgroupQueueOpt.get().getUid());
+        if (!nextMemberOpt.isPresent()) {
+            return false;
+        }
+        QueueMemberEntity nextMember = nextMemberOpt.get();
+        if (isSameThread(nextMember, closedThread)) {
+            return false;
+        }
+        QueueEntity agentQueue = resolveAgentQueueEntity(agentProto.getUid()).orElse(null);
+        return autoAcceptQueueMember(nextMember, closedThread, agentProto, agentQueue);
+    }
+
+    private Optional<QueueEntity> resolveAgentQueueEntity(String agentUid) {
+        if (!StringUtils.hasText(agentUid)) {
+            return Optional.empty();
+        }
+        String today = LocalDate.now().format(ISO_DATE);
+        String topic = TopicUtils.getQueueTopicFromUid(agentUid);
+        return queueService.findByTopicAndDay(topic, today);
+    }
+
+    private Optional<QueueEntity> resolveWorkgroupQueueEntity(ThreadEntity thread,
+            QueueMemberEntity closingQueueMember) {
+        if (closingQueueMember != null && closingQueueMember.getWorkgroupQueue() != null) {
+            return Optional.of(closingQueueMember.getWorkgroupQueue());
+        }
+        Optional<WorkgroupEntity> workgroupOpt = resolveWorkgroupEntity(thread);
+        if (!workgroupOpt.isPresent()) {
+            return Optional.empty();
+        }
+        String today = LocalDate.now().format(ISO_DATE);
+        String topic = TopicUtils.getQueueTopicFromUid(workgroupOpt.get().getUid());
+        return queueService.findByTopicAndDay(topic, today);
+    }
+
+    private boolean autoAcceptQueueMember(QueueMemberEntity queueMember, ThreadEntity referenceThread,
+            UserProtobuf agentProto, QueueEntity agentQueue) {
+        if (queueMember == null || agentProto == null) {
+            return false;
+        }
+        ThreadEntity targetThread = queueMember.getThread();
+        if (targetThread == null) {
+            return false;
+        }
+        if (!ThreadProcessStatusEnum.QUEUING.name().equals(targetThread.getStatus())) {
+            return false;
+        }
+
+        targetThread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        targetThread.setAgent(agentProto.toJson());
+        targetThread.setUserUid(agentProto.getUid());
+        if (referenceThread != null && referenceThread.getOwner() != null) {
+            targetThread.setOwner(referenceThread.getOwner());
+        }
+
+        ThreadEntity savedThread = threadRestService.save(targetThread);
+        if (savedThread == null) {
+            log.warn("Auto accept skipped, thread persistence failed: threadUid={}", targetThread.getUid());
+            return false;
+        }
+
+        if (agentQueue != null) {
+            queueMember.setAgentQueue(agentQueue);
+        }
+        queueMember.agentAutoAcceptThread();
+        queueMemberRestService.save(queueMember);
+
+        publishThreadAcceptedEvents(savedThread);
+        return true;
+    }
+
+    private void publishThreadAcceptedEvents(ThreadEntity thread) {
+        if (thread == null) {
+            return;
+        }
+        try {
+            bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, thread));
+        } catch (Exception e) {
+            log.warn("Failed to publish ThreadAddTopicEvent for thread {}: {}", thread.getUid(), e.getMessage());
+        }
+        try {
+            bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, thread));
+        } catch (Exception e) {
+            log.warn("Failed to publish ThreadAcceptEvent for thread {}: {}", thread.getUid(), e.getMessage());
+        }
+    }
+
+    private boolean isSameThread(QueueMemberEntity queueMember, ThreadEntity thread) {
+        if (queueMember == null || queueMember.getThread() == null || thread == null) {
+            return false;
+        }
+        return thread.getUid().equals(queueMember.getThread().getUid());
     }
 
     private void notifyAgentsQueueAccepted(ThreadEntity thread, QueueMemberEntity acceptedMember, int remainingQueueSize) {
