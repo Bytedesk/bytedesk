@@ -37,6 +37,7 @@ import com.bytedesk.kbase.quick_reply.QuickReplyRequest;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
@@ -53,7 +54,7 @@ public class AgentEventListener {
     private final KbaseRestService kbaseRestService;
     private final IMessageSendService messageSendService;
     private final QuickReplyRestService quickReplyRestService;
-    // private final ConnectionRestService connectionRestService;
+    private final QueueMemberRestService queueMemberRestService;
 
     // 新注册管理员，创建组织之后，自动生成一个客服账号，主要方便入手
     @Order(6)
@@ -78,6 +79,8 @@ public class AgentEventListener {
         AgentEntity agent = event.getAgent();
         // log.info("agent onAgentCreateEvent: {}", agent.getUid());
         initAgentKbase(agent);
+        // 为客服创建默认排队助手会话
+        queueMemberRestService.createAgentQueueThread(agent);
     }
 
     // 客服接待数量发生变化，增加接待数量，发送欢迎语

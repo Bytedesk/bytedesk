@@ -32,6 +32,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -420,6 +421,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         }
         // 排队助手-用户信息，头像、昵称等
         UserProtobuf user = UserUtils.getQueueAssistantUser();
+        UserEntity owner = agent.getMember().getUser();
+        //
         ThreadEntity assistantThread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.ASSISTANT.name())
@@ -430,7 +433,8 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                 .level(LevelEnum.AGENT.name())
                 .user(user.toJson())
                 .userUid(agent.getUid())
-                .owner(agent.getMember().getUser())
+                .owner(owner)
+                .orgUid(agent.getOrgUid())
                 .build();
         // 
         ThreadEntity updateThread = threadRestService.save(assistantThread);
