@@ -65,6 +65,7 @@ public class QueueMemberEventListener {
             QueueMemberEntity member = memberOptional.get();
             member.manualAcceptThread();
             queueMemberRestService.save(member);
+            // 
             handleQueueAcceptBroadcast(thread, member);
         } else {
             log.error("queue member onThreadAcceptEvent: member not found: {}", thread.getUid());
