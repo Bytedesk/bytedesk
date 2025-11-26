@@ -121,12 +121,6 @@ public class ThreadEventListener {
         }
     }
 
-    // @EventListener
-    // public void onThreadCloseEvent(ThreadCloseEvent event) {
-    //     ThreadEntity thread = event.getThread();
-    //     log.info("ThreadEventListener onThreadCloseEvent: {}", thread.getUid());
-    // }
-
     @EventListener
     public void onThreadRemoveTopicEvent(ThreadRemoveTopicEvent event) {
         ThreadEntity thread = event.getThread();

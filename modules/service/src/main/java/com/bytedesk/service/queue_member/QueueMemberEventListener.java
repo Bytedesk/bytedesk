@@ -85,17 +85,10 @@ public class QueueMemberEventListener {
         if (thread == null || thread.getTopic() == null) {
             return;
         }
-        // String topicPrefix = extractTopicPrefix(thread.getTopic());
-        // if (topicPrefix == null) {
-        //     return;
-        // }
-        // List<ThreadEntity> queuingThreads = threadRestService.findByTopicStartsWithAndStatus(
-        //         topicPrefix + "%", ThreadProcessStatusEnum.QUEUING.name());
-        // int totalQueuingCount = queuingThreads.size();
-        // for (int i = 0; i < queuingThreads.size(); i++) {
-        //     ThreadEntity queuingThread = queuingThreads.get(i);
-        //     sendQueueUpdateMessage(queuingThread, i + 1, totalQueuingCount);
-        // }
+
+        // 当某个会话关闭，则检查当前客服队列或所在工作组队列中是否有排队成员，如果有，则自动接入最前面的排队成员
+
+        
     }
 
     @EventListener
