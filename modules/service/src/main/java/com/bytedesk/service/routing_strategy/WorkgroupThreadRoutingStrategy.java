@@ -30,6 +30,7 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.QueueContent;
+import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
@@ -580,7 +581,52 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
+        notifyAvailableAgentsOfQueue(workgroup, savedThread, queueMemberEntity, queuingCount, waitSeconds);
+
         return messageProtobuf;
+    }
+
+    /**
+     * 向工作组内在线可用客服广播排队通知
+     */
+    private void notifyAvailableAgentsOfQueue(WorkgroupEntity workgroup, ThreadEntity queuedThread,
+            QueueMemberEntity queueMemberEntity, int queuingCount, int waitSeconds) {
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+        if (availableAgents == null || availableAgents.isEmpty()) {
+            log.debug("工作组暂无在线可用客服，不发送排队通知 - workgroupUid: {}", workgroup.getUid());
+            return;
+        }
+
+        for (AgentEntity agent : availableAgents) {
+            try {
+                if (!presenceFacadeService.isAgentOnlineAndAvailable(agent)) {
+                    continue;
+                }
+
+                ThreadEntity agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
+
+                QueueNotification queueNotification = QueueNotification.builder()
+                        .queueMemberUid(queueMemberEntity.getUid())
+                        .threadUid(queuedThread.getUid())
+                        .threadTopic(queuedThread.getTopic())
+                        .position(queuingCount)
+                        .queueSize(queuingCount)
+                        .estimatedWaitMs((long) waitSeconds * 1000)
+                        .serverTimestamp(System.currentTimeMillis())
+                        .user(queuedThread.getUser())
+                        .build();
+
+                MessageProtobuf agentNoticeMessage = ThreadMessageUtil
+                        .getAgentQueueNoticeMessage(queueNotification, agentQueueThread);
+                messageSendService.sendProtobufMessage(agentNoticeMessage);
+
+                log.info("工作组排队通知已发送 - workgroupUid: {}, agentUid: {}, queueMemberUid: {}",
+                        workgroup.getUid(), agent.getUid(), queueMemberEntity.getUid());
+            } catch (Exception e) {
+                log.error("工作组排队通知发送失败 - workgroupUid: {}, agentUid: {}, error: {}",
+                        workgroup.getUid(), agent.getUid(), e.getMessage(), e);
+            }
+        }
     }
 
     /**
