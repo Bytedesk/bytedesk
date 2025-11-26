@@ -95,6 +95,12 @@ public class AgentQueueStatsResponse {
     private Integer robotingCount = 0;
 
     /**
+     * 客服接待人数（至少回复过一次）
+     */
+    @Builder.Default
+    private Integer agentServedCount = 0;
+
+    /**
      * 每小时接待人数（24小时数组）
      */
     @Builder.Default

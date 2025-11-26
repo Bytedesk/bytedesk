@@ -375,6 +375,7 @@ public class QueueService {
         int leaveMsgCount = agentQueue.getMessageLeaveCount();
         int robotToAgentCount = agentQueue.getRobotToAgentCount();
         int robotingCount = agentQueue.getRobotingCount();
+        int agentServedCount = agentQueue.getAgentServedCount();
         List<Integer> threadsCountByHour = new ArrayList<>(agentQueue.getThreadsCountByHour());
 
         // 汇总工作组队列的统计数据
@@ -390,6 +391,7 @@ public class QueueService {
                 leaveMsgCount += workgroupQueue.getMessageLeaveCount();
                 robotToAgentCount += workgroupQueue.getRobotToAgentCount();
                 robotingCount += workgroupQueue.getRobotingCount();
+                agentServedCount += workgroupQueue.getAgentServedCount();
                 
                 // 合并每小时统计
                 List<Integer> workgroupHourly = workgroupQueue.getThreadsCountByHour();
@@ -418,6 +420,7 @@ public class QueueService {
                 .leaveMsgCount(leaveMsgCount)
                 .robotToAgentCount(robotToAgentCount)
                 .robotingCount(robotingCount)
+                .agentServedCount(agentServedCount)
                 .threadsCountByHour(threadsCountByHour)
                 .build();
     }
