@@ -322,8 +322,8 @@ public class QueueService {
 
         int totalQueuingCount = agentDirectQueuingCount + workgroupUnassignedQueuingCount;
         
-        log.debug("客服排队统计 - agentUid: {}, 一对一排队: {}, 工作组未分配排队: {}, 总计: {}",
-                agentUid, agentDirectQueuingCount, workgroupUnassignedQueuingCount, totalQueuingCount);
+        // log.debug("客服排队统计 - agentUid: {}, 一对一排队: {}, 工作组未分配排队: {}, 总计: {}",
+        //         agentUid, agentDirectQueuingCount, workgroupUnassignedQueuingCount, totalQueuingCount);
         
         return new AgentQueuingCount(agentDirectQueuingCount, workgroupUnassignedQueuingCount, totalQueuingCount);
     }
