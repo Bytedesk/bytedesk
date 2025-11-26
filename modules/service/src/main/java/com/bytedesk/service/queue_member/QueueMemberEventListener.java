@@ -35,6 +35,8 @@ import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
@@ -55,6 +57,8 @@ public class QueueMemberEventListener {
     private final IMessageSendService messageSendService;
 
     private final WorkgroupRestService workgroupRestService;
+
+    private final PresenceFacadeService presenceFacadeService;
 
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
@@ -136,13 +140,39 @@ public class QueueMemberEventListener {
     }
 
     private void notifyAgentsQueueAccepted(ThreadEntity thread, QueueMemberEntity acceptedMember, int remainingQueueSize) {
+        Optional<WorkgroupEntity> workgroupOpt = resolveWorkgroupEntity(thread);
+        if (!workgroupOpt.isPresent()) {
+            log.debug("queue accept broadcast skipped, workgroup missing: threadUid={}", thread != null ? thread.getUid() : null);
+            return;
+        }
+
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroupOpt.get());
+        if (availableAgents == null || availableAgents.isEmpty()) {
+            log.debug("queue accept broadcast skipped, no available agents: workgroupUid={}", workgroupOpt.get().getUid());
+            return;
+        }
+
+        String acceptedAgentUid = resolveAgentUid(thread);
+        List<AgentEntity> targetAgents = availableAgents.stream()
+                .filter(agent -> !StringUtils.hasText(acceptedAgentUid) || !acceptedAgentUid.equals(agent.getUid()))
+                .toList();
+
+        if (targetAgents.isEmpty()) {
+            log.debug("queue accept broadcast skipped, only accepting agent online: threadUid={} workgroupUid={}",
+                    thread.getUid(), workgroupOpt.get().getUid());
+            return;
+        }
+
         QueueNotification payload = buildQueueNotification(thread, acceptedMember, null, remainingQueueSize, null);
-        try {
-            MessageProtobuf message = ThreadMessageUtil.getAgentQueueAcceptMessage(payload, thread);
-            messageSendService.sendProtobufMessage(message);
-        } catch (Exception e) {
-            log.error("Failed to send QUEUE_ACCEPT notice: threadUid={}, queueMemberUid={}, error={}",
-                    thread.getUid(), acceptedMember.getUid(), e.getMessage(), e);
+        for (AgentEntity agent : targetAgents) {
+            try {
+                ThreadEntity agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
+                MessageProtobuf message = ThreadMessageUtil.getAgentQueueAcceptMessage(payload, agentQueueThread);
+                messageSendService.sendProtobufMessage(message);
+            } catch (Exception e) {
+                log.error("Failed to send QUEUE_ACCEPT notice: workgroupUid={}, agentUid={}, queueMemberUid={}, error={}",
+                        workgroupOpt.get().getUid(), agent.getUid(), acceptedMember.getUid(), e.getMessage(), e);
+            }
         }
     }
 
@@ -226,23 +256,8 @@ public class QueueMemberEventListener {
             return null;
         }
 
-        UserProtobuf workgroupProtobuf = UserProtobuf.fromJson(thread.getWorkgroup());
-        if (workgroupProtobuf == null || !StringUtils.hasText(workgroupProtobuf.getUid())) {
-            return null;
-        }
-
-        try {
-            Optional<WorkgroupEntity> workgroupOpt = workgroupRestService.findByUid(workgroupProtobuf.getUid());
-            if (!workgroupOpt.isPresent()) {
-                log.debug("workgroup not found when resolving queue settings: {}", workgroupProtobuf.getUid());
-                return null;
-            }
-            return extractQueueSettings(workgroupOpt.get());
-        } catch (Exception e) {
-            log.warn("Failed to resolve queue settings for workgroup {}: {}", workgroupProtobuf.getUid(),
-                    e.getMessage());
-            return null;
-        }
+        Optional<WorkgroupEntity> workgroupOpt = resolveWorkgroupEntity(thread);
+        return workgroupOpt.map(this::extractQueueSettings).orElse(null);
     }
 
     private QueueSettingsEntity extractQueueSettings(WorkgroupEntity workgroup) {
@@ -254,6 +269,36 @@ public class QueueMemberEventListener {
             settings = workgroup.getSettings().getDraftQueueSettings();
         }
         return settings;
+    }
+
+    private Optional<WorkgroupEntity> resolveWorkgroupEntity(ThreadEntity thread) {
+        if (thread == null) {
+            return Optional.empty();
+        }
+
+        UserProtobuf workgroupProtobuf = UserProtobuf.fromJson(thread.getWorkgroup());
+        if (workgroupProtobuf == null || !StringUtils.hasText(workgroupProtobuf.getUid())) {
+            return Optional.empty();
+        }
+
+        try {
+            Optional<WorkgroupEntity> workgroupOpt = workgroupRestService.findByUid(workgroupProtobuf.getUid());
+            if (!workgroupOpt.isPresent()) {
+                log.debug("workgroup not found when resolving thread workgroup: {}", workgroupProtobuf.getUid());
+            }
+            return workgroupOpt;
+        } catch (Exception e) {
+            log.warn("Failed to resolve workgroup {}: {}", workgroupProtobuf.getUid(), e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    private String resolveAgentUid(ThreadEntity thread) {
+        if (thread == null || !StringUtils.hasText(thread.getAgent())) {
+            return null;
+        }
+        UserProtobuf agentProto = UserProtobuf.fromJson(thread.getAgent());
+        return agentProto != null ? agentProto.getUid() : null;
     }
 
     @EventListener
