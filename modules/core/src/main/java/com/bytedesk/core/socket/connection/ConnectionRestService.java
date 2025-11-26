@@ -16,6 +16,7 @@ package com.bytedesk.core.socket.connection;
 import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -57,9 +58,132 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    
     // 最小数据库写入间隔（毫秒）
     private static final long MIN_INTERVAL_MS = 5000L;
+    
+    @Override
+    protected Specification<ConnectionEntity> createSpecification(ConnectionRequest request) {
+        return ConnectionSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<ConnectionEntity> executePageQuery(Specification<ConnectionEntity> spec, Pageable pageable) {
+        return connectionRepository.findAll(spec, pageable);
+    }
+
+    @Cacheable(value = "connection", key = "#uid", unless="#result==null")
+    @Override
+    public Optional<ConnectionEntity> findByUid(String uid) {
+        return connectionRepository.findByUid(uid);
+    }
+
+    public Boolean existsByUid(String uid) {
+        return connectionRepository.existsByUid(uid);
+    }
+
+    @Transactional
+    @Override
+    public ConnectionResponse create(ConnectionRequest request) {
+        // 判断是否已经存在
+        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            return convertToResponse(findByUid(request.getUid()).get());
+        }
+        // 
+        UserEntity user = authService.getUser();
+        if (user != null) {
+            request.setUserUid(user.getUid());
+        }
+        // 
+        ConnectionEntity entity = modelMapper.map(request, ConnectionEntity.class);
+        if (!StringUtils.hasText(request.getUid())) {
+            entity.setUid(uidUtils.getUid());
+        }
+        // 
+        ConnectionEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create connection failed");
+        }
+        return convertToResponse(savedEntity);
+    }
+
+    @Transactional
+    @Override
+    public ConnectionResponse update(ConnectionRequest request) {
+        Optional<ConnectionEntity> optional = connectionRepository.findByUid(request.getUid());
+        if (optional.isPresent()) {
+            ConnectionEntity entity = optional.get();
+            modelMapper.map(request, entity);
+            //
+            ConnectionEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Update connection failed");
+            }
+            return convertToResponse(savedEntity);
+        }
+        else {
+            throw new RuntimeException("Connection not found");
+        }
+    }
+
+    @Override
+    protected ConnectionEntity doSave(ConnectionEntity entity) {
+        return connectionRepository.saveAndFlush(entity);
+    }
+
+    @Override
+    public ConnectionEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ConnectionEntity entity) {
+        try {
+            Optional<ConnectionEntity> latest = connectionRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                ConnectionEntity latestEntity = latest.get();
+                // 合并最新状态后重试保存
+                latestEntity
+                        .setStatus(entity.getStatus())
+                        .setConnectedAt(entity.getConnectedAt())
+                        .setLastHeartbeatAt(entity.getLastHeartbeatAt())
+                        .setDisconnectedAt(entity.getDisconnectedAt())
+                        .setTtlSeconds(entity.getTtlSeconds())
+                        .setProtocol(entity.getProtocol())
+                        .setChannel(entity.getChannel())
+                        .setIp(entity.getIp())
+                        .setUserAgent(entity.getUserAgent())
+                        .setDeviceUid(entity.getDeviceUid());
+                return connectionRepository.saveAndFlush(latestEntity);
+            }
+        } catch (Exception ex) {
+            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
+        }
+        throw new RuntimeException("无法处理乐观锁冲突: " + e.getMessage(), e);
+    }
+
+    @Transactional
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<ConnectionEntity> optional = connectionRepository.findByUid(uid);
+        if (optional.isPresent()) {
+            optional.get().setDeleted(true);
+            save(optional.get());
+            // connectionRepository.delete(optional.get());
+        }
+        else {
+            throw new RuntimeException("Connection not found");
+        }
+    }
+
+    @Override
+    public void delete(ConnectionRequest request) {
+        deleteByUid(request.getUid());
+    }
+
+    @Override
+    public ConnectionResponse convertToResponse(ConnectionEntity entity) {
+        return modelMapper.map(entity, ConnectionResponse.class);
+    }
+
+    @Override
+    public ConnectionExcel convertToExcel(ConnectionEntity entity) {
+        return modelMapper.map(entity, ConnectionExcel.class);
+    }
 
     /* ================= Presence APIs (multi-client) ================= */
 
@@ -70,25 +194,18 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     @Transactional
     public void markConnected(String userUid, String orgUid, String clientId, String deviceUid, String protocol, String channel, String ip, String userAgent, Integer ttlSeconds) {
         long now = System.currentTimeMillis();
-        Optional<ConnectionEntity> optional = connectionRepository.findByClientId(clientId);
-        ConnectionEntity entity = optional.orElseGet(() -> ConnectionEntity.builder()
-                .uid(uidUtils.getUid())
-                .userUid(userUid)
-                .orgUid(orgUid)
-                .clientId(clientId)
-                .deviceUid(deviceUid)
-                .protocol(protocol)
-                .channel(channel)
-                .ip(ip)
-                .userAgent(userAgent)
-                .build());
-        // Resolve TTL with policy (default 90s, range 60–180s, per-protocol override)
-        int resolvedTtl = presenceTtlResolver.resolve(protocol, ttlSeconds);
-        entity.setStatus(CONNECTED.name())
-              .setConnectedAt(entity.getConnectedAt() == null ? now : entity.getConnectedAt())
-              .setLastHeartbeatAt(now)
-              .setDisconnectedAt(null)
-              .setTtlSeconds(resolvedTtl);
+        ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
+            .uid(uidUtils.getUid())
+            .userUid(userUid)
+            .orgUid(orgUid)
+            .clientId(clientId)
+            .deviceUid(deviceUid)
+            .protocol(protocol)
+            .channel(channel)
+            .ip(ip)
+            .userAgent(userAgent)
+            .build());
+        applyConnectedState(entity, protocol, ttlSeconds, now);
         save(entity);
     }
 
@@ -110,19 +227,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             connectionMetrics.incDbWrite();
         } else {
             // 未更新，可能记录不存在或刚刚已写入；尝试兜底创建（只在不存在时）
-            if (!connectionRepository.existsByClientId(clientId) && clientId.contains("/")) {
-                try {
-                    String[] parts = clientId.split("/");
-                    String userUid = parts.length > 0 ? parts[0] : null;
-                    String deviceUid = parts.length > 2 ? parts[2] : null;
-                    if (userUid != null) {
-                        markConnected(userUid, null, clientId, deviceUid, ConnectionProtocalEnum.MQTT.name(), null, null, null, null);
-                        cacheLastDbWrite(clientId, now);
-                        connectionMetrics.incCreated();
-                    }
-                } catch (Exception ignore) {
-                }
-            } else {
+            if (!ensureConnectionExistsFromHeartbeat(clientId, now)) {
                 // 间隔不足，跳过数据库写
                 connectionMetrics.incSkipped();
             }
@@ -143,6 +248,51 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                 stringRedisTemplate.opsForHash().put(RedisConsts.REDIS_LAST_DB_WRITE_HASH_KEY, clientId, String.valueOf(ts));
             }
         } catch (Exception ignore) {}
+    }
+
+    private ConnectionEntity fetchConnectionForUpdate(String clientId, Supplier<ConnectionEntity> creator) {
+        return connectionRepository.findByClientIdForUpdate(clientId).orElseGet(creator);
+    }
+
+    private void applyConnectedState(ConnectionEntity entity, String protocol, Integer ttlSeconds, long now) {
+        int resolvedTtl = presenceTtlResolver.resolve(protocol, ttlSeconds);
+        entity.setStatus(CONNECTED.name())
+              .setConnectedAt(entity.getConnectedAt() == null ? now : entity.getConnectedAt())
+              .setLastHeartbeatAt(now)
+              .setDisconnectedAt(null)
+              .setTtlSeconds(resolvedTtl);
+    }
+
+    private boolean ensureConnectionExistsFromHeartbeat(String clientId, long now) {
+        if (!clientId.contains("/")) {
+            return false;
+        }
+        try {
+            String[] parts = clientId.split("/");
+            String userUid = parts.length > 0 ? parts[0] : null;
+            String deviceUid = parts.length > 2 ? parts[2] : null;
+            if (userUid == null) {
+                return false;
+            }
+            ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
+                    .uid(uidUtils.getUid())
+                    .userUid(userUid)
+                    .clientId(clientId)
+                    .deviceUid(deviceUid)
+                    .protocol(ConnectionProtocalEnum.MQTT.name())
+                    .build());
+            if (entity.getId() != null) {
+                return false;
+            }
+            applyConnectedState(entity, entity.getProtocol(), null, now);
+            save(entity);
+            cacheLastDbWrite(clientId, now);
+            connectionMetrics.incCreated();
+            return true;
+        } catch (Exception ex) {
+            log.warn("ensureConnectionExistsFromHeartbeat failed clientId {}: {}", clientId, ex.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -171,8 +321,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     /** Mark a client connection as disconnected */
     @Transactional
     public void markDisconnected(String clientId) {
-        Optional<ConnectionEntity> optional = connectionRepository.findByClientId(clientId);
-        optional.ifPresent(entity -> {
+        connectionRepository.findByClientIdForUpdate(clientId).ifPresent(entity -> {
             if (!DISCONNECTED.name().equals(entity.getStatus())) {
                 entity.setStatus(DISCONNECTED.name())
                       .setDisconnectedAt(System.currentTimeMillis());
@@ -267,120 +416,5 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         return result;
     }
 
-    @Override
-    protected Specification<ConnectionEntity> createSpecification(ConnectionRequest request) {
-        return ConnectionSpecification.search(request, authService);
-    }
-
-    @Override
-    protected Page<ConnectionEntity> executePageQuery(Specification<ConnectionEntity> spec, Pageable pageable) {
-        return connectionRepository.findAll(spec, pageable);
-    }
-
-    @Cacheable(value = "connection", key = "#uid", unless="#result==null")
-    @Override
-    public Optional<ConnectionEntity> findByUid(String uid) {
-        return connectionRepository.findByUid(uid);
-    }
-
-    public Boolean existsByUid(String uid) {
-        return connectionRepository.existsByUid(uid);
-    }
-
-    @Transactional
-    @Override
-    public ConnectionResponse create(ConnectionRequest request) {
-        // 判断是否已经存在
-        if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
-            return convertToResponse(findByUid(request.getUid()).get());
-        }
-        // 
-        UserEntity user = authService.getUser();
-        if (user != null) {
-            request.setUserUid(user.getUid());
-        }
-        // 
-        ConnectionEntity entity = modelMapper.map(request, ConnectionEntity.class);
-        if (!StringUtils.hasText(request.getUid())) {
-            entity.setUid(uidUtils.getUid());
-        }
-        // 
-        ConnectionEntity savedEntity = save(entity);
-        if (savedEntity == null) {
-            throw new RuntimeException("Create connection failed");
-        }
-        return convertToResponse(savedEntity);
-    }
-
-    @Transactional
-    @Override
-    public ConnectionResponse update(ConnectionRequest request) {
-        Optional<ConnectionEntity> optional = connectionRepository.findByUid(request.getUid());
-        if (optional.isPresent()) {
-            ConnectionEntity entity = optional.get();
-            modelMapper.map(request, entity);
-            //
-            ConnectionEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Update connection failed");
-            }
-            return convertToResponse(savedEntity);
-        }
-        else {
-            throw new RuntimeException("Connection not found");
-        }
-    }
-
-    @Override
-    protected ConnectionEntity doSave(ConnectionEntity entity) {
-        return connectionRepository.save(entity);
-    }
-
-    @Override
-    public ConnectionEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ConnectionEntity entity) {
-        try {
-            Optional<ConnectionEntity> latest = connectionRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                ConnectionEntity latestEntity = latest.get();
-                // 保留最新实体，回写必要字段
-                return connectionRepository.save(latestEntity);
-            }
-        } catch (Exception ex) {
-            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
-        }
-        return null;
-    }
-
-    @Transactional
-    @Override
-    public void deleteByUid(String uid) {
-        Optional<ConnectionEntity> optional = connectionRepository.findByUid(uid);
-        if (optional.isPresent()) {
-            optional.get().setDeleted(true);
-            save(optional.get());
-            // connectionRepository.delete(optional.get());
-        }
-        else {
-            throw new RuntimeException("Connection not found");
-        }
-    }
-
-    @Override
-    public void delete(ConnectionRequest request) {
-        deleteByUid(request.getUid());
-    }
-
-    @Override
-    public ConnectionResponse convertToResponse(ConnectionEntity entity) {
-        return modelMapper.map(entity, ConnectionResponse.class);
-    }
-
-    @Override
-    public ConnectionExcel convertToExcel(ConnectionEntity entity) {
-        return modelMapper.map(entity, ConnectionExcel.class);
-    }
-
-    
     
 }

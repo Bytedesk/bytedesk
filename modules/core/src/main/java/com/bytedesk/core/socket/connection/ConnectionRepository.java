@@ -17,9 +17,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
 
 public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Long>, JpaSpecificationExecutor<ConnectionEntity> {
 
@@ -34,6 +36,10 @@ public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Lo
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update ConnectionEntity c set c.lastHeartbeatAt = :now where c.clientId = :clientId and (c.lastHeartbeatAt is null or c.lastHeartbeatAt <= :threshold)")
     int updateHeartbeatIfOlder(@Param("clientId") String clientId, @Param("now") long now, @Param("threshold") long threshold);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select c from ConnectionEntity c where c.clientId = :clientId")
+    Optional<ConnectionEntity> findByClientIdForUpdate(@Param("clientId") String clientId);
 
     java.util.List<ConnectionEntity> findByUserUidAndDeletedFalse(String userUid);
 
