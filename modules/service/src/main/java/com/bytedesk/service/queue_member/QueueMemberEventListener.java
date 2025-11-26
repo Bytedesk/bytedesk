@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
@@ -27,14 +28,18 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.event.MessageCreateEvent;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
-import com.bytedesk.service.routing_strategy.ThreadRoutingConstants;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRestService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,6 +53,8 @@ public class QueueMemberEventListener {
     private final ThreadRestService threadRestService;
 
     private final IMessageSendService messageSendService;
+
+    private final WorkgroupRestService workgroupRestService;
 
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
@@ -143,25 +150,7 @@ public class QueueMemberEventListener {
         for (int i = 0; i < queueMembers.size(); i++) {
             QueueMemberEntity member = queueMembers.get(i);
             int position = i + 1;
-            sendAgentQueueUpdate(member, position, totalCount);
             sendVisitorQueueUpdate(member, position, totalCount);
-        }
-    }
-
-    private void sendAgentQueueUpdate(QueueMemberEntity queueMember, int position, int totalCount) {
-        ThreadEntity targetThread = queueMember.getThread();
-        if (targetThread == null) {
-            log.warn("queue update skipped, queueMember thread missing: queueMemberUid={}", queueMember.getUid());
-            return;
-        }
-        int waitSeconds = computeWaitSeconds(position);
-        QueueNotification payload = buildQueueNotification(targetThread, queueMember, position, totalCount, waitSeconds);
-        try {
-            MessageProtobuf message = ThreadMessageUtil.getAgentQueueUpdateMessage(payload, targetThread);
-            messageSendService.sendProtobufMessage(message);
-        } catch (Exception e) {
-            log.error("Failed to send QUEUE_UPDATE notice: threadUid={}, queueMemberUid={}, error={}",
-                    targetThread.getUid(), queueMember.getUid(), e.getMessage(), e);
         }
     }
 
@@ -170,7 +159,7 @@ public class QueueMemberEventListener {
         if (targetThread == null) {
             return;
         }
-        QueueContent queueContent = buildQueueContent(position, totalCount);
+        QueueContent queueContent = buildQueueContent(queueMember, position, totalCount);
         try {
             targetThread.setContent(queueContent.toJson());
             threadRestService.save(targetThread);
@@ -202,31 +191,68 @@ public class QueueMemberEventListener {
                 .build();
     }
 
-    private QueueContent buildQueueContent(int position, int totalCount) {
-        String displayText;
-        if (position <= 1) {
-            displayText = ThreadRoutingConstants.Messages.QUEUE_NEXT;
-        } else {
-            int waitMinutes = (position - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON;
-            displayText = String.format(ThreadRoutingConstants.Messages.QUEUE_WAITING_TEMPLATE, totalCount, waitMinutes);
-        }
-        int waitSeconds = computeWaitSeconds(position);
-        String estimatedWaitTime = position <= 1 ? "即将开始" : "约" + (waitSeconds / 60) + "分钟";
+    private QueueContent buildQueueContent(QueueMemberEntity queueMember, int position, int totalCount) {
+        int safePosition = Math.max(position, 1);
+        int safeQueueSize = Math.max(totalCount, safePosition);
+
+        QueueSettingsEntity queueSettings = resolveQueueSettings(queueMember);
+        int avgWaitTimePerPerson = queueSettings != null && queueSettings.getAvgWaitTimePerPerson() != null
+                ? queueSettings.getAvgWaitTimePerPerson()
+                : QueueTipTemplateUtils.DEFAULT_AVG_WAIT_TIME_PER_PERSON;
+
+        String displayText = QueueTipTemplateUtils.resolveTemplate(queueSettings, safePosition, safeQueueSize,
+                avgWaitTimePerPerson);
+
+        int waitSeconds = safePosition * avgWaitTimePerPerson;
+        String estimatedWaitTime = QueueTipTemplateUtils.formatWaitTime(waitSeconds);
+
         return QueueContent.builder()
                 .content(displayText)
-                .position(position)
-                .queueSize(totalCount)
+                .position(safePosition)
+                .queueSize(safeQueueSize)
                 .waitSeconds(waitSeconds)
                 .estimatedWaitTime(estimatedWaitTime)
                 .serverTimestamp(System.currentTimeMillis())
                 .build();
     }
 
-    private int computeWaitSeconds(int position) {
-        if (position <= 1) {
-            return 0;
+    private QueueSettingsEntity resolveQueueSettings(QueueMemberEntity queueMember) {
+        if (queueMember == null) {
+            return null;
         }
-        return (position - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON * 60;
+        ThreadEntity thread = queueMember.getThread();
+        if (thread == null) {
+            return null;
+        }
+
+        UserProtobuf workgroupProtobuf = UserProtobuf.fromJson(thread.getWorkgroup());
+        if (workgroupProtobuf == null || !StringUtils.hasText(workgroupProtobuf.getUid())) {
+            return null;
+        }
+
+        try {
+            Optional<WorkgroupEntity> workgroupOpt = workgroupRestService.findByUid(workgroupProtobuf.getUid());
+            if (!workgroupOpt.isPresent()) {
+                log.debug("workgroup not found when resolving queue settings: {}", workgroupProtobuf.getUid());
+                return null;
+            }
+            return extractQueueSettings(workgroupOpt.get());
+        } catch (Exception e) {
+            log.warn("Failed to resolve queue settings for workgroup {}: {}", workgroupProtobuf.getUid(),
+                    e.getMessage());
+            return null;
+        }
+    }
+
+    private QueueSettingsEntity extractQueueSettings(WorkgroupEntity workgroup) {
+        if (workgroup == null || workgroup.getSettings() == null) {
+            return null;
+        }
+        QueueSettingsEntity settings = workgroup.getSettings().getQueueSettings();
+        if (settings == null) {
+            settings = workgroup.getSettings().getDraftQueueSettings();
+        }
+        return settings;
     }
 
     @EventListener
