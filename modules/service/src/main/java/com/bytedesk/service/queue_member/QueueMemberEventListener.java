@@ -55,6 +55,10 @@ public class QueueMemberEventListener {
             log.error("queue member onThreadAcceptEvent: member not found: {}", thread.getUid());
         }
 
+        // 1. 通知工作组内其他成员该排队会话已被接受 QUEUE_ACCEPT, 并在desktop端从队列中删除此排队会话
+
+        // 2. 刷新同队列其余排队成员位置 QUEUE_UPDATE，并在visitor端更新排队位置显示
+
         // 从thread.topic中提取前三个部分作为搜索前缀
         // String topicPrefix = extractTopicPrefix(thread.getTopic());
         // if (topicPrefix != null) {
