@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.thread.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.thread.ThreadEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ThreadProcessCreateEvent extends ApplicationEvent {
+public class ThreadProcessCreateEvent extends AbstractThreadEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private ThreadEntity thread;
-
     public ThreadProcessCreateEvent(Object source, ThreadEntity thread) {
-        super(source);
-        this.thread = thread;
+        super(source, thread);
     }
 
 }
