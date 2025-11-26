@@ -103,12 +103,9 @@ public class QueueEntity extends BaseEntity {
     @JsonIgnore
     public List<Integer> getThreadsCountByHour() {
         List<Integer> threadsCountByHour = new ArrayList<>();
+        List<QueueMemberEntity> members = getSelectedMembers();
         for (int i = 0; i < 24; i++) {
-            final int hour = i;
-            int count = countThreadsCreatedInHour(workgroupQueueMembers, hour);
-            count += countThreadsCreatedInHour(agentQueueMembers, hour);
-            count += countThreadsCreatedInHour(robotQueueMembers, hour);
-            threadsCountByHour.add(count);
+            threadsCountByHour.add(countThreadsCreatedInHour(members, i));
         }
         return threadsCountByHour;
     }
@@ -132,251 +129,149 @@ public class QueueEntity extends BaseEntity {
      * 获取当天请求服务总人数（当前分配的排队号码）
      */
     public int getTotalCount() {
-        int agentSize = agentQueueMembers != null ? agentQueueMembers.size() : 0;
-        int robotSize = robotQueueMembers != null ? robotQueueMembers.size() : 0;
-        int workgroupSize = workgroupQueueMembers != null ? workgroupQueueMembers.size() : 0;
-        return agentSize + robotSize + workgroupSize;
+        return getSelectedMembers().size();
     }
 
     /**
      * 获取请求时客服离线的人数（包括当前离线和曾经离线但已关闭的）
      */
     public int getOfflineCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> (member.getThread() != null && member.getAgentOffline()))
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> (member.getThread() != null && member.getAgentOffline()))
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> (member.getThread() != null && member.getAgentOffline()))
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     // messageLeaveCount
     public int getMessageLeaveCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> (member.getMessageLeave()))
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> (member.getMessageLeave()))
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> (member.getMessageLeave()))
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     // robotToAgentCount
     public int getRobotToAgentCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> member.getRobotToAgent())
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.getRobotToAgent())
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.getRobotToAgent())
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     // getRobotingCount
     public int getRobotingCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> member.isRoboting())
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.isRoboting())
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.isRoboting())
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     /**
      * 获取当前排队中的人数
      */
     public int getQueuingCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> member.isQueuing())
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.isQueuing())
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.isQueuing())
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     /**
      * 获取当前正在会话的人数
      */
     public int getChattingCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> member.isChatting())
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.isChatting())
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.isChatting())
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     /**
      * 获取已有客服响应的人数（至少发送过一条客服消息）
      */
     public int getAgentServedCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> member.getAgentMessageCount() != null && member.getAgentMessageCount() > 0)
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.getAgentMessageCount() != null && member.getAgentMessageCount() > 0)
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.getAgentMessageCount() != null && member.getAgentMessageCount() > 0)
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     /**
      * 获取已结束会话的人数
      */
     public int getClosedCount() {
-        int count1 = agentQueueMembers != null ? (int) agentQueueMembers.stream()
+        return (int) getSelectedMembers().stream()
                 .filter(member -> member.isClosed())
-                .count() : 0;
-
-        int count2 = robotQueueMembers != null ? (int) robotQueueMembers.stream()
-                .filter(member -> member.isClosed())
-                .count() : 0;
-
-        int count3 = workgroupQueueMembers != null ? (int) workgroupQueueMembers.stream()
-                .filter(member -> member.isClosed())
-                .count() : 0;
-
-        return count1 + count2 + count3;
+                .count();
     }
 
     /**
      * 获取平均等待时间(秒)
      */
     public int getAvgWaitTime() {
-        List<QueueMemberEntity> servedMembers1 = agentQueueMembers != null ? agentQueueMembers.stream()
+        List<QueueMemberEntity> servedMembers = getSelectedMembers().stream()
                 .filter(member -> member.getAgentAcceptedAt() != null)
-                .toList() : java.util.Collections.emptyList();
+                .toList();
 
-        List<QueueMemberEntity> servedMembers2 = robotQueueMembers != null ? robotQueueMembers.stream()
-                .filter(member -> member.getAgentAcceptedAt() != null)
-                .toList() : java.util.Collections.emptyList();
-
-        List<QueueMemberEntity> servedMembers3 = workgroupQueueMembers != null ? workgroupQueueMembers.stream()
-                .filter(member -> member.getAgentAcceptedAt() != null)
-                .toList() : java.util.Collections.emptyList();
-
-        int totalCount = servedMembers1.size() + servedMembers2.size() + servedMembers3.size();
-
-        if (totalCount == 0) {
+        if (servedMembers.isEmpty()) {
             return 0;
         }
 
-        long totalWaitTime1 = servedMembers1.stream()
+        long totalWaitTime = servedMembers.stream()
                 .mapToLong(QueueMemberEntity::getWaitLength)
                 .sum();
 
-        long totalWaitTime2 = servedMembers2.stream()
-                .mapToLong(QueueMemberEntity::getWaitLength)
-                .sum();
-
-        long totalWaitTime3 = servedMembers3.stream()
-                .mapToLong(QueueMemberEntity::getWaitLength)
-                .sum();
-
-        return (int) ((totalWaitTime1 + totalWaitTime2 + totalWaitTime3) / totalCount);
+        return (int) (totalWaitTime / servedMembers.size());
     }
 
     /**
      * 获取平均解决时间(秒)
      */
     public int getAvgResolveTime() {
-        List<QueueMemberEntity> closedMembers1 = agentQueueMembers != null ? agentQueueMembers.stream()
+        List<QueueMemberEntity> closedMembers = getSelectedMembers().stream()
                 .filter(member -> member.isClosed())
                 .filter(member -> member.getAgentAcceptedAt() != null
                         && member.getAgentClosedAt() != null)
-                .toList() : java.util.Collections.emptyList();
+                .toList();
 
-        List<QueueMemberEntity> closedMembers2 = robotQueueMembers != null ? robotQueueMembers.stream()
-                .filter(member -> member.isClosed())
-                .filter(member -> member.getAgentAcceptedAt() != null
-                        && member.getAgentClosedAt() != null)
-                .toList() : java.util.Collections.emptyList();
-
-        List<QueueMemberEntity> closedMembers3 = workgroupQueueMembers != null ? workgroupQueueMembers.stream()
-                .filter(member -> member.isClosed())
-                .filter(member -> member.getAgentAcceptedAt() != null
-                        && member.getAgentClosedAt() != null)
-                .toList() : java.util.Collections.emptyList();
-
-        int totalCount = closedMembers1.size() + closedMembers2.size() + closedMembers3.size();
-
-        if (totalCount == 0) {
+        if (closedMembers.isEmpty()) {
             return 0;
         }
 
-        long totalResolveTime1 = closedMembers1.stream()
-                .mapToLong(member -> {
-                    return java.time.Duration.between(
-                            member.getAgentAcceptedAt(),
-                            member.getAgentClosedAt())
-                            .getSeconds();
-                })
+        long totalResolveTime = closedMembers.stream()
+                .mapToLong(member -> java.time.Duration.between(
+                        member.getAgentAcceptedAt(),
+                        member.getAgentClosedAt())
+                        .getSeconds())
                 .sum();
 
-        long totalResolveTime2 = closedMembers2.stream()
-                .mapToLong(member -> {
-                    return java.time.Duration.between(
-                            member.getAgentAcceptedAt(),
-                            member.getAgentClosedAt())
-                            .getSeconds();
-                })
-                .sum();
+        return (int) (totalResolveTime / closedMembers.size());
+    }
 
-        long totalResolveTime3 = closedMembers3.stream()
-                .mapToLong(member -> {
-                    return java.time.Duration.between(
-                            member.getAgentAcceptedAt(),
-                            member.getAgentClosedAt())
-                            .getSeconds();
-                })
-                .sum();
+    private List<QueueMemberEntity> getSelectedMembers() {
+        if (ThreadTypeEnum.AGENT.name().equals(type)) {
+            return agentQueueMembers != null ? agentQueueMembers : java.util.Collections.emptyList();
+        }
+        if (ThreadTypeEnum.ROBOT.name().equals(type)) {
+            return robotQueueMembers != null ? robotQueueMembers : java.util.Collections.emptyList();
+        }
+        if (ThreadTypeEnum.WORKGROUP.name().equals(type)) {
+            return workgroupQueueMembers != null ? workgroupQueueMembers : java.util.Collections.emptyList();
+        }
+        return mergeAllMembers();
+    }
 
-        return (int) ((totalResolveTime1 + totalResolveTime2 + totalResolveTime3) / totalCount);
+    private List<QueueMemberEntity> mergeAllMembers() {
+        if ((workgroupQueueMembers == null || workgroupQueueMembers.isEmpty())
+                && (agentQueueMembers == null || agentQueueMembers.isEmpty())
+                && (robotQueueMembers == null || robotQueueMembers.isEmpty())) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<QueueMemberEntity> mergedMembers = new ArrayList<>();
+        if (workgroupQueueMembers != null) {
+            mergedMembers.addAll(workgroupQueueMembers);
+        }
+        if (agentQueueMembers != null) {
+            mergedMembers.addAll(agentQueueMembers);
+        }
+        if (robotQueueMembers != null) {
+            mergedMembers.addAll(robotQueueMembers);
+        }
+        return mergedMembers;
     }
 
     /**
