@@ -317,17 +317,21 @@ public class QueueMemberEventListener {
         int totalCount = queueMembers.size();
         for (int i = 0; i < queueMembers.size(); i++) {
             QueueMemberEntity member = queueMembers.get(i);
-            int position = i + 1;
+            int position = i;
             sendVisitorQueueUpdate(member, position, totalCount);
         }
     }
 
     private void sendVisitorQueueUpdate(QueueMemberEntity queueMember, int position, int totalCount) {
+        log.debug("sendVisitorQueueUpdate: queueMemberUid={}, position={}, totalCount={}",
+                queueMember.getUid(), position, totalCount);
         ThreadEntity targetThread = queueMember.getThread();
         if (targetThread == null) {
             return;
         }
         QueueContent queueContent = buildQueueContent(queueMember, position, totalCount);
+        log.debug("sendVisitorQueueUpdate: queueMemberUid={}, content={}",
+                queueMember.getUid(), queueContent.getContent());
         try {
             targetThread.setContent(queueContent.toJson());
             threadRestService.save(targetThread);
