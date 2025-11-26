@@ -284,26 +284,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return ConvertUtils.convertToThreadResponseSimple(updateThread);
     }
 
-    // public AgentResponse syncCurrentThreadCount(AgentRequest request) {
-
-    //     if (StringUtils.hasText(request.getUid())) {
-    //         AgentEntity agent = findByUid(request.getUid())
-    //                 .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
-    //         // int currentThreadCount =
-    //         // threadRestService.countByThreadTopicAndStateNot(agent.getUid(),
-    //         // ThreadProcessStatusEnum.CLOSED.name());
-    //         // agent.setCurrentThreadCount(currentThreadCount);
-    //         // 更新Agent的信息
-    //         AgentEntity updatedAgent = save(agent);
-    //         if (updatedAgent == null) {
-    //             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
-    //         }
-    //         return convertToResponse(updatedAgent);
-    //     }
-
-    //     return null;
-    // }
-
     @Transactional
     public AgentResponse updateAutoReply(AgentRequest request) {
         AgentEntity agent = findByUid(request.getUid())
@@ -315,16 +295,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         }
         return convertToResponse(updatedAgent);
     }
-
-    /**
-     * 更新坐席在线状态
-     * 
-     * @param userUid   用户ID
-     * @param connected 是否在线
-     */
-    // @Async
-    // @Transactional
-    // public void updateConnect(String userUid, boolean connected) { /* no-op: presence driven */ }
 
     @Cacheable(value = "agent", key = "#entity.uid", unless = "#result == null")
     @Override

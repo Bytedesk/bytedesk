@@ -19,7 +19,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.IMessageSendService;
@@ -86,9 +85,8 @@ public class AgentEventListener {
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
         // log.info("agent onThreadAcceptEvent: {}", event);
         ThreadEntity thread = event.getThread();
-        String agentString = thread.getAgent();
         // log.info("agent onThreadAcceptEvent: {}", agentString);
-        UserProtobuf agentProtobuf = JSON.parseObject(agentString, UserProtobuf.class);
+        UserProtobuf agentProtobuf = thread.getAgentProtobuf();
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentProtobuf.getUid());
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
@@ -116,7 +114,7 @@ public class AgentEventListener {
             MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(builder.build(), thread);
             messageSendService.sendProtobufMessage(messageProtobuf);
         } else {
-            log.error("agent not found");
+            log.error("agent not found {}", agentProtobuf.getUid());
         }
     }
 
