@@ -338,9 +338,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     public ResponseEntity<?> closeByTopic(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.closeByTopic(request);
-        if (threadResponse == null) {
-            return ResponseEntity.ok(JsonResult.error("not found"));
-        }
+
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
     
