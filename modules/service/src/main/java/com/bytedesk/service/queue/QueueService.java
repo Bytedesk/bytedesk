@@ -380,8 +380,8 @@ public class QueueService {
         int agentServedCount = agentQueue.getAgentServedCount();
         List<Integer> threadsCountByHour = new ArrayList<>(agentQueue.getThreadsCountByHour());
 
-        log.debug("客服队列统计 - agentUid: {}, 总人数: {}, 排队: {}, 接待: {}, 留言: {}, 转人工: {}",
-                agentUid, totalCount, queuingCount.totalQueuingCount(), chattingCount, leaveMsgCount, robotToAgentCount);
+        // log.debug("客服队列统计 - agentUid: {}, 总人数: {}, 排队: {}, 接待: {}, 留言: {}, 转人工: {}",
+        //         agentUid, totalCount, queuingCount.totalQueuingCount(), chattingCount, leaveMsgCount, robotToAgentCount);
 
         return AgentQueueStatsResponse.builder()
                 .agentUid(agentUid)
