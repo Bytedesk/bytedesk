@@ -182,7 +182,6 @@ public class BookingRestService extends BaseRestServiceWithExport<BookingEntity,
         }
         log.info("Initializing demo bookings for orgUid: {}", orgUid);
 
-        
         List<String> names = List.of("张三", "李四", "王五", "赵六", "钱七");
         List<String> airportCodes = List.of("北京", "上海", "广州", "深圳", "杭州", "南京", "青岛", "成都", "武汉", "西安", "重庆", "大连", "天津");
         Random random = new Random();

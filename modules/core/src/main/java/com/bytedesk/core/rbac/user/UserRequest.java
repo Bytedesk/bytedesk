@@ -87,4 +87,7 @@ public class UserRequest extends BaseRequest {
 	private String captchaUid;
 	private String captchaCode;
 
+	// 组织名称搜索
+	private String currentOrganization;
+
 }

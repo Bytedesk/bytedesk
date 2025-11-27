@@ -29,29 +29,36 @@ import lombok.extern.slf4j.Slf4j;
 public class UserSpecification extends BaseSpecification<UserEntity, UserRequest> {
 
     public static Specification<UserEntity> search(UserRequest request, AuthService authService) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // load all users, including deleted users
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // username
+            // username - 模糊匹配
             if (StringUtils.hasText(request.getUsername())) {
-                predicates.add(criteriaBuilder.equal(root.get("username"), request.getUsername()));
+                predicates.add(criteriaBuilder.like(root.get("username"), "%" + request.getUsername() + "%"));
             }
-            // 
+            // nickname - 模糊匹配
             if (StringUtils.hasText(request.getNickname())) {
-                predicates.add(criteriaBuilder.equal(root.get("nickname"), request.getNickname()));
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
             }
-            // email
+            // email - 模糊匹配
             if (StringUtils.hasText(request.getEmail())) {
-                predicates.add(criteriaBuilder.equal(root.get("email"), request.getEmail()));
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + request.getEmail() + "%"));
             }
-            // mobile
+            // mobile - 模糊匹配
             if (StringUtils.hasText(request.getMobile())) {
-                predicates.add(criteriaBuilder.equal(root.get("mobile"), request.getMobile()));
+                predicates.add(criteriaBuilder.like(root.get("mobile"), "%" + request.getMobile() + "%"));
             }
-            // searchText
+            // currentOrganization - 组织名称模糊匹配
+            if (StringUtils.hasText(request.getCurrentOrganization())) {
+                predicates.add(criteriaBuilder.like(
+                    root.get("currentOrganization").get("name"), 
+                    "%" + request.getCurrentOrganization() + "%"
+                ));
+            }
+            // searchText - 综合模糊搜索
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();
                 String searchText = request.getSearchText();
@@ -60,6 +67,11 @@ public class UserSpecification extends BaseSpecification<UserEntity, UserRequest
                 orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("email"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("mobile"), "%" + searchText + "%"));
+                // 添加组织名称到综合搜索
+                orPredicates.add(criteriaBuilder.like(
+                    root.get("currentOrganization").get("name"), 
+                    "%" + searchText + "%"
+                ));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
