@@ -47,10 +47,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({ConsumerEntityListener.class})
-@Table(name = "bytedesk_ai_consumer")
+@Table(name = "bytedesk_demo_consumer")
 public class ConsumerEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * Name of the consumer

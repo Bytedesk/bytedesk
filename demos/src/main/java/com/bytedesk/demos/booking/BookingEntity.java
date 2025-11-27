@@ -41,11 +41,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({BookingEntityListener.class})
-@Table(name = "bytedesk_ai_booking")
+@Table(name = "bytedesk_demo_booking")
 public class BookingEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
-
 
 	private String bookingNumber;
 

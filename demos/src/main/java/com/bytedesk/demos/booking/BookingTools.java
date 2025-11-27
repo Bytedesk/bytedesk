@@ -1,42 +1,102 @@
 /*
- * Copyright 2024-2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-02-27 11:18:12
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-07-21 11:38:52
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-
 package com.bytedesk.demos.booking;
 
 import java.time.LocalDate;
-import java.util.function.Function;
 
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.core.NestedExceptionUtils;
 
+@Slf4j
 @Configuration
 public class BookingTools {
 
-	private static final Logger logger = LoggerFactory.getLogger(BookingTools.class);
+	// @Autowired
+	// private BookingRestService bookingRestService;
 
-	@Autowired
-	private BookingService flightBookingService;
+	private static final String BOOKING_DETAILS_SCHEMA = """
+			{
+				"type": "object",
+				"properties": {
+					"bookingNumber": {
+						"type": "string",
+						"description": "预订号"
+					},
+					"name": {
+						"type": "string",
+						"description": "客户姓名"
+					}
+				},
+				"required": ["bookingNumber", "name"]
+			}
+			""";
+
+	private static final String CHANGE_BOOKING_SCHEMA = """
+			{
+				"type": "object",
+				"properties": {
+					"bookingNumber": {
+						"type": "string",
+						"description": "预订号"
+					},
+					"name": {
+						"type": "string",
+						"description": "客户姓名"
+					},
+					"date": {
+						"type": "string",
+						"description": "新的航班日期"
+					},
+					"from": {
+						"type": "string",
+						"description": "出发地"
+					},
+					"to": {
+						"type": "string",
+						"description": "目的地"
+					}
+				},
+				"required": ["bookingNumber", "name", "date", "from", "to"]
+			}
+			""";
+
+	private static final String CANCEL_BOOKING_SCHEMA = """
+			{
+				"type": "object",
+				"properties": {
+					"bookingNumber": {
+						"type": "string",
+						"description": "预订号"
+					},
+					"name": {
+						"type": "string",
+						"description": "客户姓名"
+					}
+				},
+				"required": ["bookingNumber", "name"]
+			}
+			""";
 
 	public record BookingDetailsRequest(String bookingNumber, String name) {
 	}
@@ -52,41 +112,89 @@ public class BookingTools {
 			String from, String to, String bookingClass) {
 	}
 
-	/**
-	 * 通过 @Bean + Function<...> 注册为可被模型调用的函数
-	 * 并与具体业务实现类进行解耦
-	 * @return
-	 */
-	@Bean
+	@Bean("getBookingDetails")
 	@Description("获取机票预定详细信息")
-	public Function<BookingDetailsRequest, BookingDetails> getBookingDetails() {
-		return request -> {
-			try {
-				return flightBookingService.getBookingDetails(request.bookingNumber(), request.name());
+	public ToolCallback getBookingDetails() {
+		return new ToolCallback() {
+			@Override
+			public ToolDefinition getToolDefinition() {
+				return ToolDefinition.builder()
+					.name("getBookingDetails")
+					.description("获取机票预定详细信息")
+					.inputSchema(BOOKING_DETAILS_SCHEMA)
+					.build();
 			}
-			catch (Exception e) {
-				logger.warn("Booking details: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
-				return new BookingDetails(request.bookingNumber(), request.name(), null, null, null, null, null);
+
+			@Override
+			public String call(String json) {
+				try {
+					// BookingDetailsRequest request = JSON.parseObject(json, BookingDetailsRequest.class);
+					// BookingDetails details = flightBookingService.getBookingDetails(request.bookingNumber(), request.name());
+					// return JSON.toJSONString(details);
+					return "获取预订信息失败";
+				} catch (Exception e) {
+					log.warn("Booking details: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
+					return "获取预订信息失败: " + e.getMessage();
+				}
 			}
 		};
 	}
 
-	@Bean
+	@Bean("changeBooking")
 	@Description("修改机票预定日期")
-	public Function<ChangeBookingDatesRequest, String> changeBooking() {
-		return request -> {
-			flightBookingService.changeBooking(request.bookingNumber(), request.name(), request.date(), request.from(),
-					request.to());
-			return "";
+	public ToolCallback changeBooking() {
+		return new ToolCallback() {
+			@Override
+			public ToolDefinition getToolDefinition() {
+				return ToolDefinition.builder()
+					.name("changeBooking")
+					.description("修改机票预定日期")
+					.inputSchema(CHANGE_BOOKING_SCHEMA)
+					.build();
+			}
+
+			@Override
+			public String call(String json) {
+				try {
+					ChangeBookingDatesRequest request = JSON.parseObject(json, ChangeBookingDatesRequest.class);
+					// TODO: 实现通过 BookingRestService 修改预订的逻辑
+					// 需要先根据 bookingNumber 查找预订，然后更新相关信息
+					log.info("Change booking request: {}", request);
+					return "预订修改功能暂未实现，请联系客服";
+				} catch (Exception e) {
+					log.warn("Change booking: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
+					return "修改预订失败: " + e.getMessage();
+				}
+			}
 		};
 	}
 
-	@Bean
+	@Bean("cancelBooking")
 	@Description("取消机票预定")
-	public Function<CancelBookingRequest, String> cancelBooking() {
-		return request -> {
-			flightBookingService.cancelBooking(request.bookingNumber(), request.name());
-			return "";
+	public ToolCallback cancelBooking() {
+		return new ToolCallback() {
+			@Override
+			public ToolDefinition getToolDefinition() {
+				return ToolDefinition.builder()
+					.name("cancelBooking")
+					.description("取消机票预定")
+					.inputSchema(CANCEL_BOOKING_SCHEMA)
+					.build();
+			}
+
+			@Override
+			public String call(String json) {
+				try {
+					CancelBookingRequest request = JSON.parseObject(json, CancelBookingRequest.class);
+					// TODO: 实现通过 BookingRestService 取消预订的逻辑
+					// 需要先根据 bookingNumber 查找预订，然后更新状态为 CANCELLED
+					log.info("Cancel booking request: {}", request);
+					return "预订取消功能暂未实现，请联系客服";
+				} catch (Exception e) {
+					log.warn("Cancel booking: {}", NestedExceptionUtils.getMostSpecificCause(e).getMessage());
+					return "取消预订失败: " + e.getMessage();
+				}
+			}
 		};
 	}
 
