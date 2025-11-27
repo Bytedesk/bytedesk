@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[7444],{74595:function(e,n,i){i.r(n);var r=i(31549);n.default=function(){return(0,r.jsx)("div",{children:"全局邮箱配置：发送验证码邮箱，替代properties中的配置"})}}}]);

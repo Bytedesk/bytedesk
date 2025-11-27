@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[3959],{33591:function(e,n,t){t.r(n);var c=t(31549);n.default=function(){return(0,c.jsx)("div",{children:"为ticket-center平台工单的全局配置"})}}}]);

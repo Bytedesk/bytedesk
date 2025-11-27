@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[6898],{69764:function(e,n,i){i.r(n);var r=i(31549);n.default=function(){return(0,r.jsx)("div",{children:"全局短信配置：登录验证码短信配置，替代properties中的配置"})}}}]);
