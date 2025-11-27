@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:14:28
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-18 17:30:32
+ * @LastEditTime: 2025-06-04 15:35:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -11,18 +11,12 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.demos.consumer;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.bytedesk.demos.goods;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.demos.booking.BookingEntity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -34,13 +28,13 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 预定、商品、订单等 关联消费者实体信息
+ * 商品信息演示
  * 
- * Consumer entity for content categorization and organization
- * Provides consumer functionality for various system entities
+ * Goods entity for content categorization and organization
+ * Provides goodsging functionality for various system entities
  * 
- * Database Table: bytedesk_ai_consumer
- * Purpose: Stores consumer definitions, colors, and organization settings
+ * Database Table: bytedesk_core_goods
+ * Purpose: Stores goods definitions, colors, and organization settings
  */
 @Entity
 @Data
@@ -49,31 +43,41 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({ConsumerEntityListener.class})
-@Table(name = "bytedesk_demo_consumer")
-public class ConsumerEntity extends BaseEntity {
+// @EntityListeners({GoodsEntityListener.class})
+@Table(name = "bytedesk_demo_goods")
+public class GoodsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Name of the consumer
+     * Name of the goods
      */
     private String name;
 
     /**
-     * Description of the consumer
+     * Description of the goods
      */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of consumer (BOOKING, SHOPPING, etc.)
+     * Type of goods (CUSTOMER, TICKET, ARTICLE, etc.)
      */
     @Builder.Default
-    @Column(name = "consumer_type")
-    private String type = ConsumerTypeEnum.BOOKING.name();
+    @Column(name = "goods_type")
+    private String type = GoodsTypeEnum.CUSTOMER.name();
 
+    /**
+     * Color theme for the goods display
+     */
     @Builder.Default
-    @OneToMany(mappedBy = "consumer")
-	private List<BookingEntity> bookings = new ArrayList<>();
+    @Column(name = "goods_color")
+    private String color = "red";
+
+    /**
+     * Display order of the goods
+     */
+    @Builder.Default
+    @Column(name = "goods_order")
+    private Integer order = 0;
 }

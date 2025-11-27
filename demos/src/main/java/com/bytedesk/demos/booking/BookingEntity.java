@@ -20,7 +20,6 @@ import com.bytedesk.core.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-// import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +30,14 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
+ * 预定演示
  * 
+ * 机票预定、退票、改签
+ * 酒店预定、退房、续住
+ * 租车预定、还车
+ * 旅游线路预定、取消
+ * 电影票预定、退票
+ * 餐厅订座、取消
  */
 @Entity
 @Data
