@@ -32,17 +32,6 @@ import lombok.experimental.SuperBuilder;
 public class RobotSettingsResponse extends BaseSettingsResponse {
 
     private static final long serialVersionUID = 1L;
-
-    // private Boolean kbSourceEnabled;
-
-    // // 从 RobotEntity 迁移
-    // private Boolean kbEnabled;
-    // private String kbUid;
-
-    // LLM 配置（实体引用）
-    // private RobotLlm llm;
-    // Draft LLM 配置（实体引用）
-    // private RobotLlmResponse draftLlm;
     
     /**
      * Rating down settings (Robot-specific)
