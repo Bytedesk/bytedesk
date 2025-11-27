@@ -13,20 +13,11 @@
  */
 package com.bytedesk.ai.utils;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
-
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.util.FileCopyUtils;
 
 import lombok.experimental.UtilityClass;
 import lombok.Data;
@@ -47,53 +38,49 @@ public class AIFileUtils {
         private String content;
     }
     
-    public static List<LocalFileContent> getAllFiles() {
-        List<LocalFileContent> fileContents = new ArrayList<>();
-        try {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            // 获取 aidemo/bytedesk 目录下所有的 .md 文件
-            Resource[] resources = resolver.getResources("classpath:aidemo/bytedesk/**/*.md");
-            
-            for (Resource resource : resources) {
-                try {
-                    // 读取文件内容
-                    byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
-                    String content = new String(bytes, StandardCharsets.UTF_8);
-                    
-                    // 获取文件名
-                    String filename = resource.getFilename();
-                    log.info("Reading file: {}", filename);
-                    
-                    fileContents.add(LocalFileContent.builder().filename(filename).content(content).build());
-                } catch (IOException e) {
-                    log.error("Error reading file: " + resource.getFilename(), e);
-                }
-            }
-        } catch (IOException e) {
-            log.error("Error getting resources", e);
-        }
-        return fileContents;
-    }
+    // public static List<LocalFileContent> getAllFiles() {
+    //     List<LocalFileContent> fileContents = new ArrayList<>();
+    //     try {
+    //         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    //         // 获取 aidemo/bytedesk 目录下所有的 .md 文件
+    //         Resource[] resources = resolver.getResources("classpath:aidemo/bytedesk/**/*.md");           
+    //         for (Resource resource : resources) {
+    //             try {
+    //                 // 读取文件内容
+    //                 byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
+    //                 String content = new String(bytes, StandardCharsets.UTF_8);
+    //                 // 获取文件名
+    //                 String filename = resource.getFilename();
+    //                 log.info("Reading file: {}", filename);         
+    //                 fileContents.add(LocalFileContent.builder().filename(filename).content(content).build());
+    //             } catch (IOException e) {
+    //                 log.error("Error reading file: " + resource.getFilename(), e);
+    //             }
+    //         }
+    //     } catch (IOException e) {
+    //         log.error("Error getting resources", e);
+    //     }
+    //     return fileContents;
+    // }
 
-    public static List<String> getAllFolders() {
-        List<String> folders = new ArrayList<>();
-        try {
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            // 获取 aidemo/bytedesk 目录下所有的文件夹
-            Resource[] resources = resolver.getResources("classpath:aidemo/bytedesk/**/");
-            
-            for (Resource resource : resources) {
-                String path = resource.getURL().getPath();
-                // 从路径中提取文件夹名
-                String folderName = path.substring(path.indexOf("aidemo/bytedesk"));
-                log.info("Found folder: {}", folderName);
-                folders.add(folderName);
-            }
-        } catch (IOException e) {
-            log.error("Error getting folders", e);
-        }
-        return folders;
-    }
+    // public static List<String> getAllFolders() {
+    //     List<String> folders = new ArrayList<>();
+    //     try {
+    //         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    //         // 获取 aidemo/bytedesk 目录下所有的文件夹
+    //         Resource[] resources = resolver.getResources("classpath:aidemo/bytedesk/**/");
+    //         for (Resource resource : resources) {
+    //             String path = resource.getURL().getPath();
+    //             // 从路径中提取文件夹名
+    //             String folderName = path.substring(path.indexOf("aidemo/bytedesk"));
+    //             log.info("Found folder: {}", folderName);
+    //             folders.add(folderName);
+    //         }
+    //     } catch (IOException e) {
+    //         log.error("Error getting folders", e);
+    //     }
+    //     return folders;
+    // }
 
     /**
      * 判断是否为本地回环 HTTP(S) 地址（127.* 或 localhost）
