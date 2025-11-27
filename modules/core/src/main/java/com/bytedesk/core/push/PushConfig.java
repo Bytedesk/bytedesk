@@ -13,9 +13,14 @@
  */
 package com.bytedesk.core.push;
 
+import java.util.concurrent.Executor;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * async push
@@ -26,14 +31,27 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @Configuration
 public class PushConfig implements AsyncConfigurer {
     
-    // @Override
-    // public Executor getAsyncExecutor() {
-    //     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-    //     threadPoolTaskExecutor.setCorePoolSize(2);
-    //     threadPoolTaskExecutor.setMaxPoolSize(2);
-    //     threadPoolTaskExecutor.setQueueCapacity(500);
-    //     threadPoolTaskExecutor.setThreadNamePrefix("PushService-"); // default prefix ：TaskExecutor-
-    //     threadPoolTaskExecutor.initialize();
-    //     return threadPoolTaskExecutor;
-    // }
+    /**
+     * 定义 applicationTaskExecutor bean
+     * Spring Boot 3.5.x 不再自动创建此 bean，但 Flowable 等框架需要它
+     * 
+     * @return AsyncTaskExecutor
+     */
+    @Bean(name = "applicationTaskExecutor")
+    public AsyncTaskExecutor applicationTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(32);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("async-executor-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.initialize();
+        return executor;
+    }
+
+    @Override
+    public Executor getAsyncExecutor() {
+        return applicationTaskExecutor();
+    }
 }

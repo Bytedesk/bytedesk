@@ -68,7 +68,8 @@ public class MqttWebSocketServerInitializer extends ChannelInitializer<SocketCha
         // 自定义http handler，加载.html文件
         // pipeline.addLast(new HttpRequestHandler());
         // webSocket 数据压缩扩展，当添加这个的时候WebSocketServerProtocolHandler的第三个参数需要设置成true
-        pipeline.addLast(new WebSocketServerCompressionHandler());
+        // 使用默认的最大窗口位数 15（deflate 压缩的最大值）
+        pipeline.addLast(new WebSocketServerCompressionHandler(15));
         // 聚合 websocket 的数据帧，因为客户端可能分段向服务器端发送数据
         // https://github.com/netty/netty/issues/1112
         // https://github.com/netty/netty/pull/1207
