@@ -83,8 +83,6 @@ public class VisitorRestControllerVisitor {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    // private final QueueMemberRestService queueMemberRestService;
-
     @ApiRateLimiter(value = 1, timeout = 1)
     @PostMapping("/init")
     public ResponseEntity<?> init(@RequestBody VisitorRequest request, HttpServletRequest httpRequest) {
