@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/ai/api/v1/booking")
+@RequestMapping("/demo/api/v1/booking")
 @AllArgsConstructor
 @Tag(name = "Booking Management", description = "Booking management APIs for organizing and categorizing content with bookings")
 @Description("Booking Management Controller - Content booking and categorization APIs")

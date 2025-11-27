@@ -16,10 +16,10 @@ package com.bytedesk.demos.booking;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
-import com.bytedesk.demos.booking.event.BookingCreateEvent;
-import com.bytedesk.demos.booking.event.BookingUpdateEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.demos.booking.event.BookingCreateEvent;
+import com.bytedesk.demos.booking.event.BookingUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;

@@ -16,9 +16,10 @@ package com.bytedesk.demos.consumer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.demos.booking.BookingEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.demos.booking.BookingEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;

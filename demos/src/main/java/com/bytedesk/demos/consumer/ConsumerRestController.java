@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/ai/api/v1/consumer")
+@RequestMapping("/demo/api/v1/consumer")
 @AllArgsConstructor
 @Tag(name = "Consumer Management", description = "Consumer management APIs for organizing and categorizing content with consumers")
 @Description("Consumer Management Controller - Content consumer and categorization APIs")
