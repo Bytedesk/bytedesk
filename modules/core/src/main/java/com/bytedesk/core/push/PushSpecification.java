@@ -41,6 +41,14 @@ public class PushSpecification extends BaseSpecification<PushEntity, PushRequest
                 Predicate p3 = criteriaBuilder.like(root.get("receiver"), "%" + searchText + "%");
                 predicates.add(criteriaBuilder.or(p1, p2, p3));
             }
+            // type
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            // status
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

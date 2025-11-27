@@ -45,7 +45,8 @@ public class PushRequest extends BaseRequest {
     private Boolean forceRefresh; // 强制刷新
     private String deviceUid; // 设备唯一标识
 
-    private String status;
+    private String type; // 推送类型
+    private String status; // 推送状态
 
     // 修改邮箱、手机号需要记录用户uid和组织uid
     private String name;
