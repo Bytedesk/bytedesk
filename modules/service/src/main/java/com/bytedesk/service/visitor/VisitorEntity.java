@@ -29,6 +29,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,8 +39,6 @@ import lombok.experimental.Accessors;
 
 /**
  * visitor no need to login, without login can reduce the press of the database
- * TODO: 对于平台型app来说，visitor不属于某个org，所有备注信息都应该按照org单独存储，
- * TODO: 而不是和visitor合并到一起，将备注信息写入到customer表中
  */
 @Entity
 @Data
@@ -49,12 +48,16 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({ VisitorEntityListener.class })
-@Table(name = "bytedesk_service_visitor")
+@Table(name = "bytedesk_service_visitor", 
+	uniqueConstraints = {
+		@UniqueConstraint(name = "uk_visitor_uid_org_uid", columnNames = {"visitor_uid", "org_uid"})
+	})
 public class VisitorEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
 
 	// 用户自定义uid，用于区别于自动生成uid
+	@Column(name = "visitor_uid")
 	private String visitorUid;
 
 	private String nickname;
