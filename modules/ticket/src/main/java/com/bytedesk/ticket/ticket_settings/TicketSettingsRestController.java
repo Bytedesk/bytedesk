@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Description;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -193,6 +192,61 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         }
         return ResponseEntity.ok(JsonResult.success(ticketSettingsRestService.listBindings(request.getUid())));
     }
+
+    // ===== 新增：按工作组查询工单分类列表（供 admin 前端调用）=====
+    @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询分类", description = "通过 orgUid+workgroupUid 获取工单分类列表")
+    @Operation(summary = "Get ticket categories by workgroup", description = "Get enabled ticket categories for given orgUid+workgroupUid")
+    @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/categories")
+    public ResponseEntity<?> getCategoriesByWorkgroup(
+            @PathVariable("orgUid") String orgUid,
+            @PathVariable("workgroupUid") String workgroupUid) {
+        TicketSettingsResponse settings = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+        com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse response = 
+            toCategoryVisitorResponse(settings != null ? settings.getCategorySettings() : null);
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 将分类设置转换为访客端响应格式
+     */
+    private com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse toCategoryVisitorResponse(
+            com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse categorySettings) {
+        if (categorySettings == null) {
+            return com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse.empty();
+        }
+
+        java.util.List<com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse> items = 
+            categorySettings.getItems().stream()
+                .filter(item -> Boolean.TRUE.equals(item.getEnabled()))
+                .sorted(java.util.Comparator.comparing(
+                    (com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategoryItemResponse item) -> 
+                        item.getOrderIndex() != null ? item.getOrderIndex() : Integer.MAX_VALUE)
+                    .thenComparing(
+                        com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategoryItemResponse::getName, 
+                        java.util.Comparator.nullsLast(String::compareToIgnoreCase)))
+                .map(item -> com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse.builder()
+                        .uid(item.getUid())
+                        .name(item.getName())
+                        .description(item.getDescription())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+
+        String configuredDefaultUid = categorySettings.getDefaultCategoryUid();
+        boolean defaultAvailable = items.stream()
+            .anyMatch(item -> java.util.Objects.equals(item.getUid(), configuredDefaultUid));
+        String effectiveDefaultUid = defaultAvailable
+            ? configuredDefaultUid
+            : items.stream().findFirst()
+                .map(com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse::getUid)
+                .orElse(null);
+
+        return com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse.builder()
+            .defaultCategoryUid(effectiveDefaultUid)
+            .categories(items)
+            .build();
+    }
+
+    
     
     
 }
