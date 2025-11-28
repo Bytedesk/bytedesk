@@ -50,6 +50,10 @@ public class PushResponse extends BaseResponse {
 
     private String channel;
 
+    // 发送结果
+    private Boolean sendSuccess; // 是否发送成功
+    private String sendMessage; // 发送结果消息
+
     // private PlatformEnum platform;
 
     // private ZonedDateTime createdAt;

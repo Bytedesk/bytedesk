@@ -65,4 +65,9 @@ public class PushEntity extends BaseEntity {
 
     @Builder.Default
     private String channel = ChannelEnum.WEB.name();
+
+    // 发送结果
+    private Boolean sendSuccess; // 是否发送成功
+
+    private String sendMessage; // 发送结果消息
 }

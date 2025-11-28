@@ -50,4 +50,8 @@ public class PushRequest extends BaseRequest {
 
     // 修改邮箱、手机号需要记录用户uid和组织uid
     private String name;
+
+    // 发送结果
+    private Boolean sendSuccess; // 是否发送成功
+    private String sendMessage; // 发送结果消息
 }

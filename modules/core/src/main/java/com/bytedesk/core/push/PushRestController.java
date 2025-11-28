@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.push.service.PushSendService;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -36,14 +37,15 @@ import lombok.RequiredArgsConstructor;
 @Description("Push Notification Controller - Push notification and messaging APIs")
 public class PushRestController extends BaseRestController<PushRequest, PushRestService> {
 
-    private final PushRestService pushService;
+    private final PushRestService pushRestService;
+    private final PushSendService pushSendService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Operation(summary = "Query Push Notifications by Organization", description = "Retrieve push notifications for the current organization (Admin only)")
     @Override
     public ResponseEntity<?> queryByOrg(PushRequest request) {
 
-        Page<PushResponse> page = pushService.queryByOrg(request);
+        Page<PushResponse> page = pushRestService.queryByOrg(request);
         
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -52,7 +54,7 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
     @Override
     public ResponseEntity<?> queryByUser(PushRequest request) {
         
-        Page<PushResponse> page = pushService.queryByUser(request);
+        Page<PushResponse> page = pushRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -61,23 +63,31 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
     @Override
     public ResponseEntity<?> create(PushRequest request) {
         
-        return ResponseEntity.ok(JsonResult.success(pushService.create(request)));
+        return ResponseEntity.ok(JsonResult.success(pushRestService.create(request)));
     }
 
     @Operation(summary = "Update Push Notification", description = "Update an existing push notification")
     @Override
     public ResponseEntity<?> update(PushRequest request) {
         
-        return ResponseEntity.ok(JsonResult.success(pushService.update(request)));
+        return ResponseEntity.ok(JsonResult.success(pushRestService.update(request)));
     }
 
     @Operation(summary = "Delete Push Notification", description = "Delete a push notification")
     @Override
     public ResponseEntity<?> delete(PushRequest request) {
 
-        pushService.delete(request);
+        pushRestService.delete(request);
         
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Resend Push Notification", description = "Resend a failed push notification with the same verification code")
+    @RequestMapping("/resend")
+    public ResponseEntity<?> resend(PushRequest request) {
+        
+        return ResponseEntity.ok(JsonResult.success(pushSendService.resend(request)));
     }
 
     @Override

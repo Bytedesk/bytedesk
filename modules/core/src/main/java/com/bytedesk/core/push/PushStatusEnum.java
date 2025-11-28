@@ -19,7 +19,7 @@ public enum PushStatusEnum {
     CONFIRMED,
     EXPIRED,
     SUCCESS,
-    FAILURE;
+    ERROR;
 
     // 根据字符串查找对应的枚举常量
     public static PushStatusEnum fromValue(String value) {
