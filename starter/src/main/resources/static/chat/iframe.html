@@ -68,9 +68,9 @@
                 const config = await response.json();
                 console.log('config:', config?.data);
                 if (config?.data?.custom?.enabled) {
-                    document.title = config?.data?.custom?.name || '全场景云客服'
+                    document.title = config?.data?.custom?.name || '微语'
                 } else {
-                    document.title = '全场景云客服'
+                    document.title = '微语'
                 }
                 // 获取当前语言
                 // const lang = getUrlParam('lang') || 'zh-cn';
