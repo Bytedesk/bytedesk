@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.rbac.authority.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class AuthorityDeleteEvent extends ApplicationEvent {
+public class AuthorityDeleteEvent extends AbstractAuthorityEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private AuthorityEntity authority;
-
     public AuthorityDeleteEvent(AuthorityEntity authority) {
-        super(authority);
-        this.authority = authority;
+        super(authority, authority);
     }
 }

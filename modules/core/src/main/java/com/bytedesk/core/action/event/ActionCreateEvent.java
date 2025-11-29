@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.action.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.action.ActionEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ActionCreateEvent extends ApplicationEvent {
+public class ActionCreateEvent extends AbstractActionEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final ActionEntity action;
-
     public ActionCreateEvent(Object source, ActionEntity action) {
-        super(source);
-        this.action = action;
+        super(source, action);
     }
 
 }

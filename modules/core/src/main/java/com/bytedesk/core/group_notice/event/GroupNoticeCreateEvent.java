@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.group_notice.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.group_notice.GroupNoticeEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class GroupNoticeCreateEvent extends ApplicationEvent {
+public class GroupNoticeCreateEvent extends AbstractGroupNoticeEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private GroupNoticeEntity group_notice;
-
-    public GroupNoticeCreateEvent(GroupNoticeEntity group_notice) {
-        super(group_notice);
-        this.group_notice = group_notice;
+    public GroupNoticeCreateEvent(GroupNoticeEntity groupNotice) {
+        super(groupNotice, groupNotice);
     }
 
 }

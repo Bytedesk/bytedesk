@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.moment.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.moment.MomentEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class MomentUpdateEvent extends ApplicationEvent {
+public class MomentUpdateEvent extends AbstractMomentEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private MomentEntity moment;
-
     public MomentUpdateEvent(MomentEntity moment) {
-        super(moment);
-        this.moment = moment;
+        super(moment, moment);
     }
 
 }

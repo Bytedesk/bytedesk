@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.group_invite.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.group_invite.GroupInviteEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class GroupInviteDeleteEvent extends ApplicationEvent {
+public class GroupInviteDeleteEvent extends AbstractGroupInviteEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private GroupInviteEntity group_invite;
-
-    public GroupInviteDeleteEvent(GroupInviteEntity group_invite) {
-        super(group_invite);
-        this.group_invite = group_invite;
+    public GroupInviteDeleteEvent(GroupInviteEntity groupInvite) {
+        super(groupInvite, groupInvite);
     }
 }

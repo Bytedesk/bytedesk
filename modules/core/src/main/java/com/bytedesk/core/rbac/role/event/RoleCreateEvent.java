@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.rbac.role.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.rbac.role.RoleEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class RoleCreateEvent extends ApplicationEvent {
+public class RoleCreateEvent extends AbstractRoleEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private RoleEntity roleEntity;
-
-    public RoleCreateEvent(Object source, RoleEntity roleEntity) {
-        super(source);
-        this.roleEntity = roleEntity;
+    public RoleCreateEvent(Object source, RoleEntity role) {
+        super(source, role);
     }
     
 }

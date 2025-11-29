@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.category.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.category.CategoryEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class CategoryUpdateEvent extends ApplicationEvent {
+public class CategoryUpdateEvent extends AbstractCategoryEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private CategoryEntity category;
-
     public CategoryUpdateEvent(Object source, CategoryEntity category) {
-        super(source);
-        this.category = category;
+        super(source, category);
     }
 
 }

@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.upload.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.upload.UploadEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class UploadCreateEvent extends ApplicationEvent {
+public class UploadCreateEvent extends AbstractUploadEvent {
     
     private static final long serialVersionUID = 1L;
-
-    private final UploadEntity upload;
     
     public UploadCreateEvent(Object source, UploadEntity upload) {
-        super(source);
-        this.upload = upload;
+        super(source, upload);
     }
 }

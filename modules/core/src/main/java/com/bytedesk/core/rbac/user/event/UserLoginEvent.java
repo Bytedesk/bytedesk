@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.rbac.user.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.rbac.user.UserEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class UserLoginEvent extends ApplicationEvent {
+public class UserLoginEvent extends AbstractUserEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private UserEntity user;
-
     public UserLoginEvent(Object source, UserEntity user) {
-        super(source);
-        this.user = user;
+        super(source, user);
     }
 }

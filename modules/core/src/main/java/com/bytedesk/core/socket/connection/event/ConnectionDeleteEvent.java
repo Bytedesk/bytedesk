@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.socket.connection.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.socket.connection.ConnectionEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ConnectionDeleteEvent extends ApplicationEvent {
+public class ConnectionDeleteEvent extends AbstractConnectionEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private ConnectionEntity connection;
-
     public ConnectionDeleteEvent(ConnectionEntity connection) {
-        super(connection);
-        this.connection = connection;
+        super(connection, connection);
     }
 }

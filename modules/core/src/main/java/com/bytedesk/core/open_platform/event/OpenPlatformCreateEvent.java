@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.open_platform.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.open_platform.OpenPlatformEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class OpenPlatformCreateEvent extends ApplicationEvent {
+public class OpenPlatformCreateEvent extends AbstractOpenPlatformEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private OpenPlatformEntity openPlatform;
-
     public OpenPlatformCreateEvent(OpenPlatformEntity openPlatform) {
-        super(openPlatform);
-        this.openPlatform = openPlatform;
+        super(openPlatform, openPlatform);
     }
 
 }

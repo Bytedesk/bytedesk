@@ -336,6 +336,8 @@ services:
       SPRING_AI_MODEL_RERANK: none
       # 多模态模型
       SPRING_AI_MODEL_MULTIMODAL: none
+      # 
+      SPRING_AI_CHAT_CLIENT_ENABLED: "false"
       # ollama
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
       SPRING_AI_OLLAMA_CHAT_ENABLED: "false"

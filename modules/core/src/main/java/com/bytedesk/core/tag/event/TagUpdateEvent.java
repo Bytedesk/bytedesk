@@ -13,24 +13,16 @@
  */
 package com.bytedesk.core.tag.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.tag.TagEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class TagUpdateEvent extends ApplicationEvent {
+/**
+ * Event published when an existing tag is updated.
+ */
+public class TagUpdateEvent extends AbstractTagEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TagEntity tag;
-
     public TagUpdateEvent(TagEntity tag) {
-        super(tag);
-        this.tag = tag;
+        super(tag, tag);
     }
-
 }

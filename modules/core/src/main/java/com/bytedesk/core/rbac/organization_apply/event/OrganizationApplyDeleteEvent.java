@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.rbac.organization_apply.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.rbac.organization_apply.OrganizationApplyEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class OrganizationApplyDeleteEvent extends ApplicationEvent {
+public class OrganizationApplyDeleteEvent extends AbstractOrganizationApplyEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private OrganizationApplyEntity organizationApply;
-
     public OrganizationApplyDeleteEvent(OrganizationApplyEntity organizationApply) {
-        super(organizationApply);
-        this.organizationApply = organizationApply;
+        super(organizationApply, organizationApply);
     }
 }

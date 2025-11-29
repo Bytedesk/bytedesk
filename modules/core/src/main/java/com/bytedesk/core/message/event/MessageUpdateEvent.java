@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.message.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.message.MessageEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class MessageUpdateEvent extends ApplicationEvent {
+public class MessageUpdateEvent extends AbstractMessageEvent {
 
     private static final long serialVersionUID = 1L;
-    
-    private final MessageEntity message;
 
     public MessageUpdateEvent(Object source, MessageEntity message) {
-        super(source);
-        this.message = message;
+        super(source, message);
     }
 
 }

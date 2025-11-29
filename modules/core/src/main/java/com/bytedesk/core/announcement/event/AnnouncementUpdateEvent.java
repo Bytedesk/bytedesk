@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.announcement.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.announcement.AnnouncementEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class AnnouncementUpdateEvent extends ApplicationEvent {
+public class AnnouncementUpdateEvent extends AbstractAnnouncementEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private AnnouncementEntity announcement;
-
     public AnnouncementUpdateEvent(AnnouncementEntity announcement) {
-        super(announcement);
-        this.announcement = announcement;
+        super(announcement, announcement);
     }
 
 }

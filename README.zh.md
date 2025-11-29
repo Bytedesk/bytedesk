@@ -100,7 +100,12 @@
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
+# 默认不使用AI
+docker compose -p bytedesk -f docker-compose-noai.yaml up -d
+# 或 默认使用 智谱AI，需要配置 智谱ai key
 docker compose -p bytedesk -f docker-compose.yaml up -d
+# 或 默认使用 ollama
+docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 ```
 
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)

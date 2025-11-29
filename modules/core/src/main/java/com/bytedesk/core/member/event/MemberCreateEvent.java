@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.member.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.member.MemberEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class MemberCreateEvent extends ApplicationEvent {
+public class MemberCreateEvent extends AbstractMemberEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private MemberEntity member;
-
     public MemberCreateEvent(Object source, MemberEntity member) {
-        super(source);
-        this.member = member;
+        super(source, member);
     }
 }

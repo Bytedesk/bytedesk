@@ -112,7 +112,12 @@ AI powered Omnichannel customer service With Team Cooperation
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
+# start without ai
+docker compose -p bytedesk -f docker-compose-noai.yaml up -d
+# or default zhipuai
 docker compose -p bytedesk -f docker-compose.yaml up -d
+# or default ollama
+docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 ```
 
 ```bash

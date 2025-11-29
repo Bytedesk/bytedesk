@@ -11,7 +11,7 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-package com.bytedesk.demos.order;
+package com.bytedesk.core.order;
 
 import com.bytedesk.core.base.BaseResponse;
 

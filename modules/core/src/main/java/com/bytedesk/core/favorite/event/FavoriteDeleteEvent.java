@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.favorite.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.favorite.FavoriteEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class FavoriteDeleteEvent extends ApplicationEvent {
+public class FavoriteDeleteEvent extends AbstractFavoriteEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private FavoriteEntity favorite;
-
     public FavoriteDeleteEvent(FavoriteEntity favorite) {
-        super(favorite);
-        this.favorite = favorite;
+        super(favorite, favorite);
     }
 }

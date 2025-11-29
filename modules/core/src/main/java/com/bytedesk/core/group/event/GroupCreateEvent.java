@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.group.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.group.GroupEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class GroupCreateEvent extends ApplicationEvent {
+public class GroupCreateEvent extends AbstractGroupEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private GroupEntity group;
-
     public GroupCreateEvent(Object source, GroupEntity group) {
-        super(source);
-        this.group = group;
+        super(source, group);
     }
 }

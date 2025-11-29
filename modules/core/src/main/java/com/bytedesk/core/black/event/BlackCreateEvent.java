@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.black.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.black.BlackEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class BlackCreateEvent extends ApplicationEvent {
+public class BlackCreateEvent extends AbstractBlackEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private final BlackEntity blackEntity;
-
-    public BlackCreateEvent(Object source, BlackEntity blackEntity) {
-        super(source);
-        this.blackEntity = blackEntity;
+    public BlackCreateEvent(Object source, BlackEntity black) {
+        super(source, black);
     }
 }

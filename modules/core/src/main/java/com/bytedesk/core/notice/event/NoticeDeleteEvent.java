@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.notice.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.notice.NoticeEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class NoticeDeleteEvent extends ApplicationEvent {
+public class NoticeDeleteEvent extends AbstractNoticeEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final NoticeEntity notice;
-
     public NoticeDeleteEvent(Object source, NoticeEntity notice) {
-        super(source);
-        this.notice = notice;
+        super(source, notice);
     }
 }

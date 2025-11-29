@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.announcement.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.announcement.AnnouncementEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class AnnouncementDeleteEvent extends ApplicationEvent {
+public class AnnouncementDeleteEvent extends AbstractAnnouncementEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private AnnouncementEntity announcement;
-
     public AnnouncementDeleteEvent(AnnouncementEntity announcement) {
-        super(announcement);
-        this.announcement = announcement;
+        super(announcement, announcement);
     }
 }

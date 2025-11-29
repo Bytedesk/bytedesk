@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.task_list.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.task_list.TaskListEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class TaskListDeleteEvent extends ApplicationEvent {
+public class TaskListDeleteEvent extends AbstractTaskListEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TaskListEntity task_list;
-
-    public TaskListDeleteEvent(TaskListEntity task_list) {
-        super(task_list);
-        this.task_list = task_list;
+    public TaskListDeleteEvent(TaskListEntity taskList) {
+        super(taskList, taskList);
     }
 }

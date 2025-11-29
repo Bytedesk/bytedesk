@@ -13,23 +13,13 @@
  */
 package com.bytedesk.core.relation.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.relation.RelationEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class RelationDeleteEvent extends ApplicationEvent {
+public class RelationDeleteEvent extends AbstractRelationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private RelationEntity relation;
-
     public RelationDeleteEvent(RelationEntity relation) {
-        super(relation);
-        this.relation = relation;
+        super(relation, relation);
     }
 }

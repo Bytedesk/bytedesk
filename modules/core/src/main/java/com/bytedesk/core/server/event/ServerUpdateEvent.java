@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.server.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.server.ServerEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ServerUpdateEvent extends ApplicationEvent {
+public class ServerUpdateEvent extends AbstractServerEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private ServerEntity server;
-
     public ServerUpdateEvent(ServerEntity server) {
-        super(server);
-        this.server = server;
+        super(server, server);
     }
 
 }

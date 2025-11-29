@@ -13,24 +13,14 @@
  */
 package com.bytedesk.core.email.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.core.email.EmailEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class EmailUpdateEvent extends ApplicationEvent {
+public class EmailUpdateEvent extends AbstractEmailEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private EmailEntity email;
-
     public EmailUpdateEvent(EmailEntity email) {
-        super(email);
-        this.email = email;
+        super(email, email);
     }
 
 }
