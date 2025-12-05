@@ -60,6 +60,12 @@ public class QueueService {
         return enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
     }
 
+    @Transactional
+    public QueueMemberEntity enqueueWorkflow(ThreadEntity threadEntity, UserProtobuf workflow,
+            VisitorRequest visitorRequest) {
+        return enqueueToQueue(threadEntity, workflow, null, QueueTypeEnum.WORKFLOW);
+    }
+
     /**
      * 统一的入队方法
      */
@@ -115,6 +121,7 @@ public class QueueService {
         switch (queueType) {
             case ROBOT:
             case AGENT:
+            case WORKFLOW:
                 nickname = agent.getNickname();
                 primaryQueue = getQueue(threadEntity, nickname);
                 break;
@@ -143,6 +150,9 @@ public class QueueService {
                 break;
             case AGENT:
                 memberBuilder.agentQueue(primaryQueue);
+                break;
+            case WORKFLOW:
+                memberBuilder.workflowQueue(primaryQueue);
                 break;
             case WORKGROUP:
                 memberBuilder.workgroupQueue(primaryQueue);

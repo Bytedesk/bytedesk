@@ -30,16 +30,18 @@ public interface TicketSettingsRepository extends JpaRepository<TicketSettingsEn
 
     Boolean existsByUid(String uid);
 
-    Optional<TicketSettingsEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
+    Optional<TicketSettingsEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
     List<TicketSettingsEntity> findByOrgUidAndIsDefaultTrue(String orgUid);
+
+    List<TicketSettingsEntity> findByOrgUidAndTypeAndIsDefaultTrue(String orgUid, String type);
 
     /**
      * 悲观锁读取 org 默认 TicketSettings，保证并发下只创建一个默认。
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select t from TicketSettingsEntity t where t.orgUid = :orgUid and t.isDefault = true and t.deleted = false")
-    Optional<TicketSettingsEntity> findDefaultForUpdate(@Param("orgUid") String orgUid);
+    @Query("select t from TicketSettingsEntity t where t.orgUid = :orgUid and t.type = :type and t.isDefault = true and t.deleted = false")
+    Optional<TicketSettingsEntity> findDefaultForUpdate(@Param("orgUid") String orgUid, @Param("type") String type);
 
     // 2025-11: workgroupUid 已移除，按工作组查询请先通过 BindingRepository 解析 settingsUid
 

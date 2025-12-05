@@ -56,7 +56,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
         if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
           String subject = JwtUtils.getSubjectFromJwtToken(accessToken);
-          // log.debug("subject {}", subject);
           //
           UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);
           SecurityContextHolder.getContext().setAuthentication(authentication);

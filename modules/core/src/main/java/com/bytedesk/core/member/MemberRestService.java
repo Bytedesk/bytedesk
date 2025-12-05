@@ -115,7 +115,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
-        //
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {
             throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
@@ -139,7 +138,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         userRequest.setAvatar(AvatarConsts.getDefaultUserAvatarUrl());
         userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
         userRequest.setOrgUid(request.getOrgUid());
-
         // TODO: 同一个用户增加支持绑定多个组织
         UserEntity user = null;
         if (StringUtils.hasText(request.getMobile())) {
@@ -341,7 +339,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (StringUtils.hasText(excel.getMobile()) && existsByMobileAndOrgUid(excel.getMobile(), orgUid)) {
             return null;
         }
-        Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
+        Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_AGENT_UID));
         // 创建member
         MemberEntity member = modelMapper.map(excel, MemberEntity.class);
         member.setUid(uidUtils.getUid());

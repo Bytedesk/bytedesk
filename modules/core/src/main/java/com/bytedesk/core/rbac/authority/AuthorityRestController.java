@@ -54,8 +54,10 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
 
     @Override
     public ResponseEntity<?> queryByUid(AuthorityRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        
+        AuthorityResponse authority = authorityService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(authority));
     }
 
     // @PreAuthorize(AuthorityPermissions.AUTHORITY_CREATE)

@@ -300,7 +300,8 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         RobotEntity robotEntity = robotOptional.get();
         robotEntity.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
         String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
-        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
+        String robot = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())

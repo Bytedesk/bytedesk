@@ -18,6 +18,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
@@ -66,8 +67,16 @@ public class AgentEventListener {
         String orgUid = organization.getUid();
         // log.info("agent - organization created: {}", organization.getName());
         String mobile = user.getMobile();
-        // String agentUid = uidUtils.getUid();
-        agentRestService.createFromMember(mobile, orgUid);
+        if (StringUtils.hasText(mobile)) {
+            agentRestService.createFromMember(mobile, orgUid);
+            return;
+        }
+        String email = user.getEmail();
+        if (StringUtils.hasText(email)) {
+            agentRestService.createFromMemberByEmail(email, orgUid);
+            return;
+        }
+        log.warn("agent - skip default agent creation, mobile/email empty for org {}", orgUid);
     }
     
     // 新创建客服，创建默认知识库

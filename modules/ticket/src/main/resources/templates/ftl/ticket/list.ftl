@@ -57,7 +57,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>摘要</th>
+                                <th>标题</th>
                                 <th>状态</th>
                                 <th>优先级</th>
                                 <th>分类</th>
@@ -72,7 +72,7 @@
                                 <tr>
                                     <td>${ticket.id}</td>
                                     <td>
-                                        <a href="/tickets/${ticket.id}">${ticket.summary}</a>
+                                        <a href="/tickets/${ticket.id}">${ticket.title}</a>
                                         <#if ticket.attachments?size gt 0>
                                             <i class="fas fa-paperclip text-muted"></i>
                                         </#if>

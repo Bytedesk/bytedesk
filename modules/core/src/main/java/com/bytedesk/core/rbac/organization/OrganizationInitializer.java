@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 // import com.bytedesk.core.rbac.authority.AuthorityInitializer;
 import com.bytedesk.core.rbac.role.RoleInitializer;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -48,7 +50,9 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
 
     private final UserService userService;
 
-    private final OrganizationRestService organizationService;
+    private final OrganizationRestService organizationRestService;
+
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -57,9 +61,9 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
         userInitializer.init();
         // 
         init();
+        initPermissions();
     }
 
-    // @PostConstruct
     @Transactional
     public void init() {
         // 
@@ -82,7 +86,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
                     .user(user)
                     .build();
             //
-           OrganizationEntity savedOrganization = organizationService.save(organization);
+           OrganizationEntity savedOrganization = organizationRestService.save(organization);
             if (savedOrganization != null) {
                 user.setCurrentOrganization(savedOrganization);
                 user = userService.addRoleSuper(user);
@@ -91,6 +95,13 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
             }
         } else {
             throw new NotFoundException("Organization: Super User Not Found");
+        }
+    }
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = OrganizationPermissions.ORGANIZATION_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
         }
     }
     

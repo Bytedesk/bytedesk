@@ -15,6 +15,7 @@ package com.bytedesk.kbase.kbase;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,7 +48,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "知识库", action = "组织查询", description = "query kbase by org")
     @Override
     public ResponseEntity<?> queryByOrg(KbaseRequest request) {
 
@@ -60,7 +62,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "知识库", action = "用户查询", description = "query kbase by user")
     @Override
     public ResponseEntity<?> queryByUser(KbaseRequest request) {
         
@@ -73,7 +76,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "知识库", action = "查询详情", description = "query kbase by uid")
     @Override
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
 
@@ -86,8 +90,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
+    @PreAuthorize(KbasePermissions.HAS_KBASE_CREATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库", action = "新建", description = "create kbase")
-    @PreAuthorize("hasAuthority('KBASE_CREATE')")
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
 
@@ -100,8 +104,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
+    @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库", action = "更新", description = "update kbase")
-    @PreAuthorize("hasAuthority('KBASE_UPDATE')")
     @Override
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
 
@@ -112,8 +116,8 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
 
     @Operation(summary = "删除知识库", description = "删除指定的知识库")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_DELETE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库", action = "删除", description = "delete kbase")
-    @PreAuthorize("hasAuthority('KBASE_DELETE')")
     @Override
     public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
 
@@ -124,8 +128,9 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
 
     @Operation(summary = "导出知识库", description = "导出知识库数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_EXPORT_ANY_LEVEL)
     @ActionAnnotation(title = "知识库", action = "导出", description = "export kbase")
-    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
+    @GetMapping("/export")
     @Override
     public Object export(KbaseRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

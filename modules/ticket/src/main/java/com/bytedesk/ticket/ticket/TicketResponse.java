@@ -32,10 +32,10 @@ import lombok.Builder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketResponse extends BaseResponse {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
     // 
-    private String summary;
+    private String title;
     private String description;
 
     private String contactName;

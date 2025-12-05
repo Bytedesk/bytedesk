@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytedesk.ai.workflow.compiler.FlowableBpmnCompiler;
-import com.bytedesk.ai.workflow.compiler.WorkflowCompiler;
-import com.bytedesk.ai.workflow.compiler.WorkflowDefinitionAggregate;
-import com.bytedesk.ai.workflow.WorkflowEntity;
+import com.bytedesk.core.workflow.WorkflowEntity;
+import com.bytedesk.core.workflow.compiler.FlowableBpmnCompiler;
+import com.bytedesk.core.workflow.compiler.WorkflowCompiler;
+import com.bytedesk.core.workflow.compiler.WorkflowDefinitionAggregate;
+import com.bytedesk.core.workflow_edge.WorkflowEdgeEntity;
+import com.bytedesk.core.workflow_node.WorkflowNodeEntity;
+import com.bytedesk.core.workflow_variable.WorkflowVariableEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,9 +52,9 @@ public class FlowableDeploymentController {
         public String name;
         public String key;
         public String tenantId;
-        public List<com.bytedesk.ai.workflow_node.WorkflowNodeEntity> nodes;
-        public List<com.bytedesk.ai.workflow_edge.WorkflowEdgeEntity> edges;
-        public List<com.bytedesk.ai.workflow.variable.WorkflowVariableEntity> variables;
+        public List<WorkflowNodeEntity> nodes;
+        public List<WorkflowEdgeEntity> edges;
+        public List<WorkflowVariableEntity> variables;
     }
 
     public static class StartRequest {

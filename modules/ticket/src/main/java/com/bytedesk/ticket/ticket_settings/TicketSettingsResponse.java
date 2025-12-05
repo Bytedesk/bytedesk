@@ -45,6 +45,8 @@ public class TicketSettingsResponse extends BaseResponse {
 
     private String description;
 
+    private String type;
+
     /**
      * 是否为组织默认配置
      */

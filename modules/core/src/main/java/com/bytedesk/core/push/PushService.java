@@ -49,8 +49,6 @@ public class PushService {
         return codeSendService.sendCode(authRequest, request);
     }
 
-    
-
     // =============== 业务逻辑方法 ===============
 
     /**

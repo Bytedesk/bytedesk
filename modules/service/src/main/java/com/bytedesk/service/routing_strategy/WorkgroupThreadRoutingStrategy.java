@@ -94,10 +94,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final MessageRestService messageRestService;
     private final WorkgroupRoutingService workgroupRoutingService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
-    // private final QueueMemberMessageService queueMemberMessageService;
     private final PresenceFacadeService presenceFacadeService;
-    // private final QueueAutoAssignService queueAutoAssignService;
-    // private final WorkgroupRepository workgroupRepository;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -252,7 +249,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                             : null;
             if (robotEntity != null) {
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
-                String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+                // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
+                String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
                 thread.setRobot(robotString);
                 ThreadEntity savedThread = saveThread(thread);
 
@@ -651,7 +649,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
             // 发布转人工事件
             bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-
             // 更新队列状态
             queueMemberEntity.transferRobotToAgent();
 
@@ -766,8 +763,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         thread.setUserUid(robotEntity.getUid());
         thread.setRoboting().setContent(welcomeContent);
 
-        // 设置机器人信息
-        String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        // 设置机器人信息（使用精简版，避免 prompt 过长导致字段超限）
+        String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
         thread.setRobot(robotString);
 
         // 保存线程
@@ -836,6 +833,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity);
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
+        messageRestService.save(message);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }

@@ -37,7 +37,6 @@ public class TicketProcessRestController extends BaseRestController<TicketProces
 
     private final TicketProcessService processService;
     
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(TicketProcessRequest request) {
         

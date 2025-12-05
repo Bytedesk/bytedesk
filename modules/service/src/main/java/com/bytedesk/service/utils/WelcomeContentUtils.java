@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.service.agent.AgentEntity;
 
@@ -95,6 +96,38 @@ public final class WelcomeContentUtils {
                 builder.faqs(qas);
             }
         }
+        return builder.build();
+    }
+
+    // ================= Workflow =================
+
+    /**
+     * Resolve welcome tip for workflow with fallback to description.
+     */
+    public static String resolveWorkflowWelcomeTip(WorkflowEntity workflow) {
+        if (workflow == null) {
+            return null;
+        }
+        // 工作流目前没有设置实体，使用描述作为欢迎消息
+        return workflow.getDescription();
+    }
+
+    public static WelcomeContent buildWorkflowWelcomeContent(WorkflowEntity workflow) {
+        String tip = resolveWorkflowWelcomeTip(workflow);
+        return buildWorkflowWelcomeContent(workflow, tip);
+    }
+
+    public static WelcomeContent buildWorkflowWelcomeContent(WorkflowEntity workflow, String tip) {
+        WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
+        // 工作流目前没有设置实体，暂不设置 kbUid 和 faqs
+        // 未来可扩展：
+        // if (workflow != null && workflow.getSettings() != null) {
+        //     var settings = workflow.getSettings().getServiceSettings();
+        //     if (settings != null) {
+        //         builder.kbUid(settings.getWelcomeKbUid());
+        //         // ... 设置 faqs
+        //     }
+        // }
         return builder.build();
     }
 }

@@ -33,7 +33,7 @@ import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;

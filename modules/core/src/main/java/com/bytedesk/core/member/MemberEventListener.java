@@ -91,7 +91,7 @@ public class MemberEventListener {
         DepartmentResponse departmentResponse = departmentRestService.create(departmentRequest);
         //
         if (departmentResponse != null) {
-            Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID));
+            Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_MEMBER_UID));
             // 创建团队成员
             MemberRequest memberRequest = modelMapper.map(user, MemberRequest.class);
             memberRequest.setJobNo("001");

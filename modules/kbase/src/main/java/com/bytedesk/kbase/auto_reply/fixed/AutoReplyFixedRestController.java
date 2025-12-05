@@ -15,7 +15,7 @@ package com.bytedesk.kbase.auto_reply.fixed;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,7 +46,8 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "固定回复", action = "组织查询", description = "query autoReplyFixed by org")
     @Override
     public ResponseEntity<?> queryByOrg(AutoReplyFixedRequest request) {
         
@@ -59,6 +60,8 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
+    @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "固定回复", action = "用户查询", description = "query autoReplyFixed by user")
     @Override
     public ResponseEntity<?> queryByUser(AutoReplyFixedRequest request) {
         
@@ -71,7 +74,8 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
-    @ActionAnnotation(title = "自动回复", action = "新建", description = "create autoReplyFixed")
+    @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_CREATE_ANY_LEVEL)
+    @ActionAnnotation(title = "固定回复", action = "新建", description = "create autoReplyFixed")
     @Override
     public ResponseEntity<?> create(AutoReplyFixedRequest request) {
         
@@ -84,7 +88,8 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
-    @ActionAnnotation(title = "自动回复", action = "更新", description = "update autoReplyFixed")
+    @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "固定回复", action = "更新", description = "update autoReplyFixed")
     @Override
     public ResponseEntity<?> update(AutoReplyFixedRequest request) {
         
@@ -95,7 +100,8 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
 
     @Operation(summary = "删除固定回复", description = "删除指定的固定回复")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @ActionAnnotation(title = "自动回复", action = "删除", description = "delete autoReplyFixed")
+    @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_DELETE_ANY_LEVEL)
+    @ActionAnnotation(title = "固定回复", action = "删除", description = "delete autoReplyFixed")
     @Override
     public ResponseEntity<?> delete(AutoReplyFixedRequest request) {
         
@@ -108,7 +114,8 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     @ApiResponse(responseCode = "200", description = "操作成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
-    @ActionAnnotation(title = "自动回复", action = "启用", description = "enable autoReply")
+    @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "固定回复", action = "启用", description = "enable autoReplyFixed")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody AutoReplyFixedRequest request) {
         
@@ -121,7 +128,8 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @Operation(summary = "导出固定回复", description = "导出固定回复数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
-    @ActionAnnotation(title = "自动回复", action = "导出", description = "export autoReplyFixed")
+    @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_EXPORT_ANY_LEVEL)
+    @ActionAnnotation(title = "固定回复", action = "导出", description = "export autoReplyFixed")
     @GetMapping("/export")
     public Object export(AutoReplyFixedRequest request, HttpServletResponse response) {
         return exportTemplate(

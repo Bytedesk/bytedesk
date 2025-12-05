@@ -38,18 +38,16 @@ public class RoleRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
 
     // 是否是系统角色
-	@Builder.Default
-	private Boolean system = false;
+    private Boolean system;
 
     @Builder.Default
     private Set<String> authorityUids = new HashSet<>();
 
     // 组织+平台角色
-    private Boolean orgAndPlatform;
+    // private Boolean orgAndPlatform;
 }

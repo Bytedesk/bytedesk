@@ -15,11 +15,15 @@ package com.bytedesk.service.visitor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
+
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -43,11 +47,12 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
 
     private final VisitorRestService visitorRestService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @ActionAnnotation(title = "访客", action = "组织查询", description = "query visitor by org")
     @Operation(summary = "查询组织下的访客", description = "根据组织ID查询访客列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByOrg(VisitorRequest request) {
 
@@ -56,10 +61,12 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = "访客", action = "用户查询", description = "query visitor by user")
     @Operation(summary = "查询用户下的访客", description = "根据用户ID查询访客列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUser(VisitorRequest visitorRequest) {
         //
@@ -68,10 +75,12 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
+    @ActionAnnotation(title = "访客", action = "查询详情", description = "query visitor by uid")
     @Operation(summary = "查询指定访客", description = "根据UID查询访客详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(VisitorRequest request) {
         
@@ -80,10 +89,12 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
+    @ActionAnnotation(title = "访客", action = "新建", description = "create visitor")
     @Operation(summary = "创建访客", description = "创建新的访客")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_CREATE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> create(VisitorRequest request) {
         
@@ -92,10 +103,12 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
+    @ActionAnnotation(title = "访客", action = "更新", description = "update visitor")
     @Operation(summary = "更新访客", description = "更新访客信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
 
@@ -105,10 +118,12 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     }
 
     // update tagList
+    @ActionAnnotation(title = "访客", action = "更新标签", description = "update visitor tagList")
     @Operation(summary = "更新访客标签", description = "更新访客的标签列表")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE_ANY_LEVEL)
     @PostMapping("/update/tagList")
     public ResponseEntity<?> updateTagList(@RequestBody VisitorRequest visitorRequest) {
 
@@ -117,8 +132,10 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
+    @ActionAnnotation(title = "访客", action = "删除", description = "delete visitor")
     @Operation(summary = "删除访客", description = "删除指定的访客")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_DELETE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
 
@@ -127,8 +144,11 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success("delete success"));
     }
 
+    @ActionAnnotation(title = "访客", action = "导出", description = "export visitor")
     @Operation(summary = "导出访客", description = "导出访客数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_EXPORT_ANY_LEVEL)
+    @GetMapping("/export")
     @Override
     public Object export(VisitorRequest request, HttpServletResponse response) {
         return exportTemplate(

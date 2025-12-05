@@ -45,21 +45,6 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
 
     private final ThreadRestService threadRestService;
 
-    /**
-     * 发送消息前申请服务端分配的消息元信息
-     *
-     * @param request 包含 threadUid 的请求
-     * @return 包含 messageUid、timestamp、sequenceNumber 的元信息
-     */
-    @Operation(summary = "申请消息元信息", description = "发送消息前获取服务端分配的消息UID、时间戳与序号")
-    @PostMapping("/message/meta")
-    public ResponseEntity<?> requestMessageMetadata(@RequestBody ThreadRequest request) {
-        if (request == null || !StringUtils.hasText(request.getUid())) {
-            return ResponseEntity.ok(JsonResult.error("thread uid required"));
-        }
-        ThreadSequenceResponse response = threadRestService.allocateMessageMetadata(request.getUid());
-        return ResponseEntity.ok(JsonResult.success("获取消息元信息成功", response));
-    }
 
     /**
      * 根据组织查询会话
@@ -67,6 +52,8 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 查询请求
      * @return 分页会话列表
      */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "查询组织会话", description = "queryByOrg thread")
     @Operation(summary = "根据组织查询会话", description = "返回当前组织的会话列表")
     @Override
     public ResponseEntity<?> queryByOrg(ThreadRequest request) {
@@ -82,6 +69,8 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 查询请求
      * @return 分页会话列表
      */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "查询用户会话", description = "queryByUser thread")
     @Operation(summary = "根据用户查询会话", description = "返回当前用户的会话列表") 
     @Override
     public ResponseEntity<?> queryByUser(ThreadRequest request) {
@@ -97,8 +86,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 查询请求
      * @return 分页邀请会话列表
      */
-    @Operation(summary = "查询邀请会话", description = "查询邀请相关的会话")
     @GetMapping("/query/invite")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "查询邀请会话", description = "query invite threads")
+    @Operation(summary = "查询邀请会话", description = "查询邀请相关的会话")
     public ResponseEntity<?> queryByThreadInvite(ThreadRequest request) {
 
         Page<ThreadResponse> threadPage = threadRestService.queryByOrg(request);
@@ -112,8 +103,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 查询请求
      * @return 会话信息
      */
-    @Operation(summary = "根据主题查询会话", description = "通过主题查找相关会话")
     @GetMapping("/query/topic")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "根据主题查询", description = "query thread by topic")
+    @Operation(summary = "根据主题查询会话", description = "通过主题查找相关会话")
     public ResponseEntity<?> queryByThreadTopic(ThreadRequest request) {
   
         Page<ThreadResponse> threadResponse = threadRestService.queryByTopic(request);
@@ -126,8 +119,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request
      * @return
      */
-    @Operation(summary = "根据主题和用户查询会话", description = "通过主题和用户查找相关会话")
     @GetMapping("/query/topic/owner")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "根据主题和用户查询", description = "query thread by topic and owner")
+    @Operation(summary = "根据主题和用户查询会话", description = "通过主题和用户查找相关会话")
     public ResponseEntity<?> queryByTopicAndOwner(ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.queryByTopicAndOwner(request);
@@ -141,6 +136,8 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 查询请求
      * @return 会话信息
      */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "查询会话详情", description = "queryByUid thread")
     @Operation(summary = "根据UID查询会话", description = "通过唯一标识符查询会话")
     @Override
     public ResponseEntity<?> queryByUid(ThreadRequest request) {
@@ -156,8 +153,9 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 创建会话请求
      * @return 创建的会话
      */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_CREATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "创建会话", description = "create thread")
     @Operation(summary = "创建会话", description = "创建新的会话")
-    @ActionAnnotation(title = "会话", action = "新建", description = "create thread")
     @Override
     public ResponseEntity<?> create(@RequestBody ThreadRequest request) {
         //
@@ -172,8 +170,9 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 更新会话请求
      * @return 更新后的会话
      */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新会话", description = "update thread")
     @Operation(summary = "更新会话", description = "更新已存在的会话信息")
-    @ActionAnnotation(title = "会话", action = "更新", description = "update thread")
     @Override
     public ResponseEntity<?> update(@RequestBody ThreadRequest request) {
 
@@ -188,8 +187,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 更新请求
      * @return 更新后的会话
      */
-    @Operation(summary = "更新会话置顶状态", description = "设置或取消会话置顶")
     @PostMapping("/update/top")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新置顶状态", description = "update thread top")
+    @Operation(summary = "更新会话置顶状态", description = "设置或取消会话置顶")
     public ResponseEntity<?> updateTop(@RequestBody ThreadRequest request) {
 
         ThreadResponse thread = threadRestService.updateTop(request);
@@ -203,8 +204,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 更新请求
      * @return 更新后的会话
      */
-    @Operation(summary = "更新会话标星状态", description = "设置或取消会话标星")
     @PostMapping("/update/star")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新标星状态", description = "update thread star")
+    @Operation(summary = "更新会话标星状态", description = "设置或取消会话标星")
     public ResponseEntity<?> updateStar(@RequestBody ThreadRequest request) {
 
         ThreadResponse threadResponse = threadRestService.updateStar(request);
@@ -218,8 +221,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 更新请求
      * @return 更新后的会话
      */
-    @Operation(summary = "更新会话静音状态", description = "设置或取消会话静音")
     @PostMapping("/update/mute")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新静音状态", description = "update thread mute")
+    @Operation(summary = "更新会话静音状态", description = "设置或取消会话静音")
     public ResponseEntity<?> updateMute(@RequestBody ThreadRequest request) {
 
         ThreadResponse threadResponse = threadRestService.updateMute(request);
@@ -227,9 +232,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
-    // update/hide
-    @Operation(summary = "更新会话隐藏状态", description = "设置或取消会话隐藏")
     @PostMapping("/update/hide")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新隐藏状态", description = "update thread hide")
+    @Operation(summary = "更新会话隐藏状态", description = "设置或取消会话隐藏")
     public ResponseEntity<?> updateHide(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.updateHide(request);
@@ -237,9 +243,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
-    // update/fold
-    @Operation(summary = "更新会话折叠状态", description = "设置或取消会话折叠")
     @PostMapping("/update/fold")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新折叠状态", description = "update thread fold")
+    @Operation(summary = "更新会话折叠状态", description = "设置或取消会话折叠")
     public ResponseEntity<?> updateFold(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.updateFold(request);
@@ -253,8 +260,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 更新请求
      * @return 更新后的会话
      */
-    @Operation(summary = "更新会话用户信息", description = "更新会话关联的用户信息")
     @PostMapping("/update/user")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新用户信息", description = "update thread user")
+    @Operation(summary = "更新会话用户信息", description = "更新会话关联的用户信息")
     public ResponseEntity<?> updateUser(@RequestBody ThreadRequest request) {
 
         ThreadResponse threadResponse = threadRestService.updateUser(request);
@@ -268,8 +277,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 更新请求
      * @return 更新后的会话
      */
-    @Operation(summary = "更新会话标签列表", description = "更新会话的标签信息")
     @PostMapping("/update/tagList")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新标签列表", description = "update thread tagList")
+    @Operation(summary = "更新会话标签列表", description = "更新会话的标签信息")
     public ResponseEntity<?> updateTagList(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.updateTagList(request);
@@ -283,8 +294,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 更新请求
      * @return 更新后的会话
      */
-    @Operation(summary = "更新会话未读状态", description = "标记会话为已读或未读")
     @PostMapping("/update/unread")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新未读状态", description = "update thread unread")
+    @Operation(summary = "更新会话未读状态", description = "标记会话为已读或未读")
     public ResponseEntity<?> updateUnread(@RequestBody ThreadRequest request) {
 
         ThreadResponse threadResponse = threadRestService.updateUnread(request);
@@ -297,8 +310,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * 
      * @return 用户所有会话列表
      */
-    @Operation(summary = "查询用户所有客服会话", description = "查询用户所有客服会话")
     @GetMapping("/query/by/user/topics")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "查询用户客服会话", description = "query threads by user topics")
+    @Operation(summary = "查询用户所有客服会话", description = "查询用户所有客服会话")
     public ResponseEntity<?> queryByUserTopics(ThreadRequest request) {
         
         Page<ThreadResponse> responses = threadRestService.queryThreadsByUserTopics(request);
@@ -306,9 +321,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         return ResponseEntity.ok(JsonResult.success(responses));
     }
 
-    // update/note
-    @Operation(summary = "更新会话备注", description = "更新会话的备注信息")
     @PostMapping("/update/note")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "更新备注", description = "update thread note")
+    @Operation(summary = "更新会话备注", description = "更新会话的备注信息")
     public ResponseEntity<?> updateNote(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.updateNote(request);
@@ -322,9 +338,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 关闭请求
      * @return 关闭后的会话
      */
-    @Operation(summary = "关闭会话", description = "关闭指定会话")
-    @ActionAnnotation(title = "会话", action = "close", description = "close thread")
     @PostMapping("/close")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "关闭会话", description = "close thread")
+    @Operation(summary = "关闭会话", description = "关闭指定会话")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
 
         ThreadResponse threadResponse = threadRestService.closeByUid(request);
@@ -332,9 +349,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
-    // close thread by topic
-    @Operation(summary = "关闭会话", description = "关闭指定主题的会话")
     @PostMapping("/close/topic")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "根据主题关闭会话", description = "close thread by topic")
+    @Operation(summary = "关闭会话", description = "关闭指定主题的会话")
     public ResponseEntity<?> closeByTopic(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.closeByTopic(request);
@@ -348,6 +366,8 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param request 删除请求
      * @return 删除结果
      */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_DELETE_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "删除会话", description = "delete thread")
     @Operation(summary = "删除会话", description = "删除指定会话")
     @Override
     public ResponseEntity<?> delete(@RequestBody ThreadRequest request) {
@@ -364,9 +384,10 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * @param response HTTP响应
      * @return 导出结果
      */
-    @Operation(summary = "导出会话列表", description = "将会话数据导出为Excel格式")
-    @ActionAnnotation(title = "会话", action = "导出", description = "export thread")
     @GetMapping("/export")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_EXPORT_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "导出会话", description = "export thread")
+    @Operation(summary = "导出会话列表", description = "将会话数据导出为Excel格式")
     public Object export(ThreadRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
@@ -377,5 +398,24 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
             "thread"
         );
     }
+
+    /**
+     * 发送消息前申请服务端分配的消息元信息
+     *
+     * @param request 包含 threadUid 的请求
+     * @return 包含 messageUid、timestamp、sequenceNumber 的元信息
+     */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "会话管理", action = "申请消息元信息", description = "request message metadata")
+    @Operation(summary = "申请消息元信息", description = "发送消息前获取服务端分配的消息UID、时间戳与序号")
+    @PostMapping("/message/meta")
+    public ResponseEntity<?> requestMessageMetadata(@RequestBody ThreadRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            return ResponseEntity.ok(JsonResult.error("thread uid required"));
+        }
+        ThreadSequenceResponse response = threadRestService.allocateMessageMetadata(request.getUid());
+        return ResponseEntity.ok(JsonResult.success("获取消息元信息成功", response));
+    }
+
     
 }

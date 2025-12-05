@@ -156,6 +156,17 @@ public class ConvertUtils {
                 .collect(Collectors.toSet()));
         // log.info("authorities with roles: {}", authorities);
 
+        // currentRoles already reflects the active organization; merge their authorities and role names
+        if (user.getCurrentRoles() != null) {
+            user.getCurrentRoles().forEach(role -> {
+            if (role.getAuthorities() != null) {
+                role.getAuthorities().forEach(authority ->
+                    authorities.add(new SimpleGrantedAuthority(authority.getValue())));
+            }
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+            });
+        }
+
         return authorities;
     }
 

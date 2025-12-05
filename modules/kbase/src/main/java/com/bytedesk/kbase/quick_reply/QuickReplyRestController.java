@@ -15,6 +15,8 @@ package com.bytedesk.kbase.quick_reply;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +37,8 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     private final QuickReplyRestService quickReplyRestService;
 
     // 管理后台加载
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "快捷回复", action = "组织查询", description = "query quickReply by org")
     @Override
     public ResponseEntity<?> queryByOrg(QuickReplyRequest request) {
         
@@ -45,7 +48,8 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     // 客服端加载
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "快捷回复", action = "用户查询", description = "query quickReply by user")
     @Override
     public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
 
@@ -55,8 +59,8 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(page));
     }
     
-    // @PreAuthorize("hasAuthority('KBASE_CREATE')")
-    @ActionAnnotation(title = "快捷回复", action = "新建", description = "create quick_reply")
+    @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_CREATE_ANY_LEVEL)
+    @ActionAnnotation(title = "快捷回复", action = "新建", description = "create quickReply")
     @Override
     public ResponseEntity<?> create(@RequestBody QuickReplyRequest request) {
         
@@ -65,8 +69,8 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_UPDATE')")
-    @ActionAnnotation(title = "快捷回复", action = "更新", description = "update quick_reply")
+    @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "快捷回复", action = "更新", description = "update quickReply")
     @Override
     public ResponseEntity<?> update(@RequestBody QuickReplyRequest request) {
         
@@ -75,8 +79,8 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_DELETE')")
-    @ActionAnnotation(title = "快捷回复", action = "删除", description = "delete quick_reply")
+    @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_DELETE_ANY_LEVEL)
+    @ActionAnnotation(title = "快捷回复", action = "删除", description = "delete quickReply")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuickReplyRequest request) {
 
@@ -85,8 +89,8 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
     
-    // @PreAuthorize("hasAuthority('KBASE_UPDATE')")
-    @ActionAnnotation(title = "快捷回复", action = "启用", description = "enable quick_reply")
+    @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "快捷回复", action = "启用", description = "enable quickReply")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody QuickReplyRequest request) {
         
@@ -95,8 +99,9 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
     
-    // @PreAuthorize("hasAuthority('KBASE_EXPORT')")
+    @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_EXPORT_ANY_LEVEL)
     @ActionAnnotation(title = "快捷回复", action = "导出", description = "export quickReply")
+    @GetMapping("/export")
     @Override
     public Object export(QuickReplyRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -109,7 +114,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         );
     }
 
-    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    // @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(QuickReplyRequest request) {
         // TODO Auto-generated method stub

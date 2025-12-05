@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.message.content.RobotContent;
-import com.bytedesk.core.utils.MessageTypeConverter;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;

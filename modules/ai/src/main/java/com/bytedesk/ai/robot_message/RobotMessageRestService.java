@@ -30,7 +30,7 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.core.utils.MessageTypeConverter;
+import com.bytedesk.core.message.MessageTypeConverter;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.RequiredArgsConstructor;

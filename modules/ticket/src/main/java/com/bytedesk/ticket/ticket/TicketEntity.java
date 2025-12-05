@@ -65,9 +65,9 @@ public class TicketEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
     
     /**
-     * Summary of the support ticket (previously title)
+     * Title of the support ticket
      */
-    private String summary;           // 工单摘要
+    private String title;             // 工单标题
     
     /**
      * Detailed description of the ticket issue (optional)
@@ -102,10 +102,11 @@ public class TicketEntity extends BaseEntity {
     private String ticketNumber;
 
     /**
-     * Type of ticket (AGENT, GROUP)
+     * Ticket scope type (INTERNAL/EXTERNAL)
      */
     @Builder.Default
-    private String type = TicketTypeEnum.AGENT.name();        // 类型(agent/group)
+    @Column(name = "ticket_type", length = 32)
+    private String type = TicketTypeEnum.EXTERNAL.name();        // 工单领域(内部/外部)
 
     /**
      * Thread topic for online customer service session

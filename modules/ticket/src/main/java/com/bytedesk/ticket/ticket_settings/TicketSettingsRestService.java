@@ -32,6 +32,7 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository;
 import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
@@ -80,8 +81,8 @@ public class TicketSettingsRestService extends
     }
 
     @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' + #type", unless = "#result==null")
-    public Optional<TicketSettingsEntity> findByNameAndOrgUid(String name, String orgUid) {
-        return ticketSettingsRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
+    public Optional<TicketSettingsEntity> findByNameAndOrgUid(String name, String orgUid, String type) {
+        return ticketSettingsRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
 
     public Boolean existsByUid(String uid) {
@@ -91,13 +92,19 @@ public class TicketSettingsRestService extends
     @Transactional
     @Override
     public TicketSettingsResponse create(TicketSettingsRequest request) {
+        String normalizedType = resolveSettingsType(request.getType());
+        request.setType(normalizedType);
+        request.setType(normalizedType);
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
         if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid())) {
-            Optional<TicketSettingsEntity> ticketSettings = findByNameAndOrgUid(request.getName(), request.getOrgUid());
+            Optional<TicketSettingsEntity> ticketSettings = findByNameAndOrgUid(
+                request.getName(),
+                request.getOrgUid(),
+                normalizedType);
             if (ticketSettings.isPresent()) {
                 return convertToResponse(ticketSettings.get());
             }
@@ -109,6 +116,7 @@ public class TicketSettingsRestService extends
         }
         // 基础实体
         TicketSettingsEntity entity = modelMapper.map(request, TicketSettingsEntity.class);
+        entity.setType(normalizedType);
         // 赋 UID
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
@@ -197,7 +205,7 @@ public class TicketSettingsRestService extends
         }
         // 若请求设置为默认，保证同 org 仅有一个默认
         if (Boolean.TRUE.equals(entity.getIsDefault())) {
-            ensureSingleDefault(entity.getOrgUid(), entity);
+            ensureSingleDefault(entity.getOrgUid(), normalizedType, entity);
         } else if (entity.getIsDefault() == null) {
             entity.setIsDefault(false);
         }
@@ -215,8 +223,12 @@ public class TicketSettingsRestService extends
         Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             TicketSettingsEntity entity = optional.get();
+            String normalizedType = StringUtils.hasText(request.getType())
+                ? resolveSettingsType(request.getType())
+                : resolveSettingsType(entity.getType());
             // 更新基础字段（不直接覆盖子配置）
             modelMapper.map(request, entity);
+            entity.setType(normalizedType);
             boolean draftUpdated = false;
 
             TicketBasicSettingsRequest draftBasicRequest = resolveDraftBasicRequest(request);
@@ -329,7 +341,7 @@ public class TicketSettingsRestService extends
             // 处理 isDefault / enabled
             if (request.getIsDefault() != null) {
                 if (Boolean.TRUE.equals(request.getIsDefault())) {
-                    ensureSingleDefault(entity.getOrgUid(), entity);
+                    ensureSingleDefault(entity.getOrgUid(), normalizedType, entity);
                 } else {
                     entity.setIsDefault(false);
                 }
@@ -352,41 +364,76 @@ public class TicketSettingsRestService extends
      * 根据 org + workgroup 获取设置；若未绑定则创建/获取组织默认设置并自动绑定该工作组。
      */
     public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid) {
+        return getOrDefaultByWorkgroup(orgUid, workgroupUid, TicketTypeEnum.EXTERNAL.name());
+    }
+
+    public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid, String rawType) {
+        String normalizedType = resolveSettingsType(rawType);
         // 1) 已绑定则直接返回
-        Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
-                .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
-        if (bindingOpt.isPresent()) {
-            Optional<TicketSettingsEntity> settingsOpt = findByUid(bindingOpt.get().getTicketSettingsUid());
-            if (settingsOpt.isPresent()) {
-                return convertToResponse(settingsOpt.get());
+        if (TicketTypeEnum.EXTERNAL.name().equals(normalizedType)) {
+            Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
+                    .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
+            if (bindingOpt.isPresent()) {
+                Optional<TicketSettingsEntity> settingsOpt = findByUid(bindingOpt.get().getTicketSettingsUid());
+                if (settingsOpt.isPresent()) {
+                    TicketSettingsEntity entity = settingsOpt.get();
+                    if (!normalizedType.equals(entity.getType())) {
+                        entity.setType(normalizedType);
+                        save(entity);
+                    }
+                    return convertToResponse(entity);
+                }
             }
+            // 2) 获取或创建默认，并建立绑定
+            TicketSettingsEntity def = getOrCreateDefault(orgUid, normalizedType);
+            if (bindingOpt.isEmpty()) {
+                TicketSettingsBindingEntity binding = TicketSettingsBindingEntity
+                        .builder()
+                        .uid(uidUtils.getUid())
+                        .orgUid(orgUid)
+                        .workgroupUid(workgroupUid)
+                        .ticketSettingsUid(def.getUid())
+                        .build();
+                bindingRepository.save(binding);
+            }
+            return convertToResponse(def);
         }
-        // 2) 获取或创建默认，并建立绑定
-        TicketSettingsEntity def = getOrCreateDefault(orgUid);
-        if (bindingOpt.isEmpty()) {
-            TicketSettingsBindingEntity binding = TicketSettingsBindingEntity
-                    .builder()
-                    .uid(uidUtils.getUid())
-                    .orgUid(orgUid)
-                    .workgroupUid(workgroupUid)
-                    .ticketSettingsUid(def.getUid())
-                    .build();
-            bindingRepository.save(binding);
-        }
+        // INTERNAL 类型暂不绑定工作组，直接返回对应默认配置
+        TicketSettingsEntity def = getOrCreateDefault(orgUid, normalizedType);
         return convertToResponse(def);
     }
 
     /** 获取或创建组织默认 TicketSettings（发布+草稿齐全，保证并发唯一） */
     @Transactional
     public TicketSettingsEntity getOrCreateDefault(String orgUid) {
-        Optional<TicketSettingsEntity> existing = ticketSettingsRepository.findDefaultForUpdate(orgUid);
+        return getOrCreateDefault(orgUid, TicketTypeEnum.EXTERNAL.name());
+    }
+
+    @Transactional
+    public TicketSettingsEntity getOrCreateDefault(String orgUid, String rawType) {
+        String normalizedType = resolveSettingsType(rawType);
+        Optional<TicketSettingsEntity> existing = ticketSettingsRepository.findDefaultForUpdate(orgUid, normalizedType);
         if (existing.isPresent())
             return existing.get();
+
+        // 兼容旧数据：若存在未设置 type 的默认记录，则补全后复用
+        List<TicketSettingsEntity> legacyDefaults = ticketSettingsRepository.findByOrgUidAndIsDefaultTrue(orgUid);
+        if (legacyDefaults != null) {
+            Optional<TicketSettingsEntity> legacy = legacyDefaults.stream()
+                    .filter(item -> !StringUtils.hasText(item.getType()))
+                    .findFirst();
+            if (legacy.isPresent()) {
+                TicketSettingsEntity legacyEntity = legacy.get();
+                legacyEntity.setType(normalizedType);
+                return save(legacyEntity);
+            }
+        }
 
         // 按 WorkgroupSettingsRestService 模式创建：发布 + 草稿各自独立初始化并分配唯一 UID
         TicketSettingsEntity settings = TicketSettingsEntity.builder()
                 .uid(uidUtils.getUid())
                 .orgUid(orgUid)
+                .type(normalizedType)
                 .name("默认工单配置")
                 .description("系统默认工单配置")
                 .isDefault(true)
@@ -447,7 +494,7 @@ public class TicketSettingsRestService extends
         // settings.setDraftCustomFieldSettings(draftCustomField);
 
         // 确保同 org 仅有一个默认（虽然已锁定查询，此调用保持一致性）
-        ensureSingleDefault(orgUid, settings);
+        ensureSingleDefault(orgUid, normalizedType, settings);
 
         TicketSettingsEntity saved = save(settings);
         if (saved == null) {
@@ -493,6 +540,13 @@ public class TicketSettingsRestService extends
         @Transactional
         public TicketSettingsResponse saveByWorkgroup(String orgUid, String workgroupUid,
             TicketSettingsRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("request cannot be null");
+        }
+        String normalizedType = resolveSettingsType(request.getType());
+        if (!TicketTypeEnum.EXTERNAL.name().equals(normalizedType)) {
+            throw new IllegalArgumentException("Workgroup scoped ticket settings only support EXTERNAL type");
+        }
         // 先获取已绑定的 settings；没有则创建/获取默认并绑定
         Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
                 .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
@@ -504,7 +558,7 @@ public class TicketSettingsRestService extends
             }
         }
         if (entity == null) {
-            entity = getOrCreateDefault(orgUid); // 默认 settings 已包含发布+草稿
+            entity = getOrCreateDefault(orgUid, normalizedType); // 默认 settings 已包含发布+草稿
             // 建立绑定
             TicketSettingsBindingEntity binding = TicketSettingsBindingEntity
                     .builder()
@@ -514,6 +568,9 @@ public class TicketSettingsRestService extends
                     .ticketSettingsUid(entity.getUid())
                     .build();
             bindingRepository.save(binding);
+        }
+        if (entity != null && !normalizedType.equals(entity.getType())) {
+            entity.setType(normalizedType);
         }
         // 更新基础可编辑字段（name/description）
         if (request.getName() != null) {
@@ -1032,14 +1089,18 @@ public class TicketSettingsRestService extends
         return modelMapper.map(entity, TicketSettingsExcel.class);
     }
 
+    private String resolveSettingsType(String rawType) {
+        return TicketTypeEnum.fromValue(rawType).name();
+    }
+
     /**
      * 保证同一个 orgUid 下仅有一个 isDefault=true（参考 WorkgroupSettingsRestService）
      */
-    private void ensureSingleDefault(String orgUid, TicketSettingsEntity target) {
+    private void ensureSingleDefault(String orgUid, String type, TicketSettingsEntity target) {
         if (!StringUtils.hasText(orgUid) || target == null) {
             return;
         }
-        Optional<TicketSettingsEntity> currentOpt = ticketSettingsRepository.findDefaultForUpdate(orgUid);
+        Optional<TicketSettingsEntity> currentOpt = ticketSettingsRepository.findDefaultForUpdate(orgUid, type);
         if (currentOpt.isPresent()) {
             TicketSettingsEntity current = currentOpt.get();
             if (!current.getUid().equals(target.getUid())) {
@@ -1047,75 +1108,22 @@ public class TicketSettingsRestService extends
                 ticketSettingsRepository.save(current);
             }
         }
+        List<TicketSettingsEntity> legacyDefaults = ticketSettingsRepository.findByOrgUidAndIsDefaultTrue(orgUid);
+        if (legacyDefaults != null) {
+            for (TicketSettingsEntity candidate : legacyDefaults) {
+                if (candidate == null || candidate.getUid().equals(target.getUid())) {
+                    continue;
+                }
+                boolean sameOrLegacyType = !StringUtils.hasText(candidate.getType())
+                    || candidate.getType().equals(type);
+                if (sameOrLegacyType && Boolean.TRUE.equals(candidate.getIsDefault())) {
+                    candidate.setIsDefault(false);
+                    ticketSettingsRepository.save(candidate);
+                }
+            }
+        }
         target.setIsDefault(true);
     }
-
-    /**
-     * 克隆草稿配置为新的发布配置，分配新的 uid，清空 id/version。
-     */
-    // @SuppressWarnings("unchecked")
-    // private <T> T cloneSettings(T source) {
-    //     if (source == null) {
-    //         return null;
-    //     }
-    //     T target = (T) modelMapper.map(source, source.getClass());
-    //     try {
-    //         // 通过反射设置基础标识字段（BaseEntity: setUid, setId, setVersion）
-    //         source.getClass().getMethod("setUid", String.class).invoke(target, uidUtils.getUid());
-    //         // id 设为 null
-    //         try {
-    //             source.getClass().getMethod("setId", Long.class).invoke(target, (Long) null);
-    //         } catch (NoSuchMethodException ignore) {
-    //         }
-    //         try {
-    //             source.getClass().getMethod("setVersion", Long.class).invoke(target, 0L);
-    //         } catch (NoSuchMethodException ignore) {
-    //         }
-    //     } catch (Exception e) {
-    //         log.warn("cloneSettings reflection failed: {}", e.getMessage());
-    //     }
-    //     return target;
-    // }
-
-    /**
-     * 复制业务字段：使用 modelMapper 覆盖（保留目标 uid/id/version）。
-     */
-    // private void copyBusinessFields(Object draft, Object published) {
-    //     if (draft == null || published == null) {
-    //         return;
-    //     }
-    //     String uid = null;
-    //     Long id = null;
-    //     Long version = null;
-    //     try {
-    //         uid = (String) published.getClass().getMethod("getUid").invoke(published);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         id = (Long) published.getClass().getMethod("getId").invoke(published);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         version = (Long) published.getClass().getMethod("getVersion").invoke(published);
-    //     } catch (Exception ignore) {
-    //     }
-    //     modelMapper.map(draft, published);
-    //     try {
-    //         if (uid != null)
-    //             published.getClass().getMethod("setUid", String.class).invoke(published, uid);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         if (id != null)
-    //             published.getClass().getMethod("setId", Long.class).invoke(published, id);
-    //     } catch (Exception ignore) {
-    //     }
-    //     try {
-    //         if (version != null)
-    //             published.getClass().getMethod("setVersion", Long.class).invoke(published, version);
-    //     } catch (Exception ignore) {
-    //     }
-    // }
 
 
 }

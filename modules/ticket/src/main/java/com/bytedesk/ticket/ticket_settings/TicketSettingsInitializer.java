@@ -8,6 +8,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository;
 import com.bytedesk.core.uid.UidUtils;
@@ -39,8 +40,9 @@ public class TicketSettingsInitializer implements SmartInitializingSingleton {
         final String defaultWorkgroupUid = BytedeskConsts.DEFAULT_WORKGROUP_UID;
 
         // 1) 获取或创建组织默认 TicketSettings
-        TicketSettingsEntity def = ticketSettingsRestService.getOrCreateDefault(orgUid);
-        log.info("Default TicketSettings ready for org {}: {}", orgUid, def.getUid());
+        TicketSettingsEntity defExternal = ticketSettingsRestService.getOrCreateDefault(orgUid, TicketTypeEnum.EXTERNAL.name());
+        ticketSettingsRestService.getOrCreateDefault(orgUid, TicketTypeEnum.INTERNAL.name());
+        log.info("Default TicketSettings ready for org {}: {} (external)", orgUid, defExternal.getUid());
 
         // 2) 绑定默认工作组（若尚未绑定）
         bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, defaultWorkgroupUid)
@@ -49,10 +51,10 @@ public class TicketSettingsInitializer implements SmartInitializingSingleton {
                             .uid(uidUtils.getUid())
                             .orgUid(orgUid)
                             .workgroupUid(defaultWorkgroupUid)
-                            .ticketSettingsUid(def.getUid())
+                                .ticketSettingsUid(defExternal.getUid())
                             .build();
-                    log.info("Bind default workgroup {} to default TicketSettings {}", defaultWorkgroupUid,
-                            def.getUid());
+                                log.info("Bind default workgroup {} to default external TicketSettings {}", defaultWorkgroupUid,
+                                    defExternal.getUid());
                     return bindingRepository.save(binding);
                 });
     }

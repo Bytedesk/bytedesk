@@ -17,6 +17,7 @@ import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;
+import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingRequest;
 
 import lombok.AllArgsConstructor;
@@ -60,4 +61,9 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
      * Queue settings (Workgroup-specific)
      */
     private QueueSettingsRequest queueSettings;
+
+    /**
+     * Robot to agent transition settings (Workgroup-specific)
+     */
+    private RobotToAgentSettingsRequest robotToAgentSettings;
 }

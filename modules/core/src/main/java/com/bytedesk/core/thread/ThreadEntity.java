@@ -217,6 +217,10 @@ public class ThreadEntity extends AbstractThreadEntity {
         return JSON.parseObject(getWorkgroup(), UserProtobuf.class);
     }
 
+    public UserProtobuf getWorkflowProtobuf() {
+        return JSON.parseObject(getWorkflow(), UserProtobuf.class);
+    }
+
     public UserProtobuf getTransferProtobuf() {
         return JSON.parseObject(getTransfer(), UserProtobuf.class);
     }

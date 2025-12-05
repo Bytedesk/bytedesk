@@ -26,6 +26,7 @@ import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 
 import lombok.AllArgsConstructor;
@@ -120,6 +121,15 @@ public class WorkgroupSettingsRestService
         qsDraft.setUid(uidUtils.getUid());
         entity.setDraftQueueSettings(qsDraft);
 
+        RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(),
+            modelMapper);
+        rtas.setUid(uidUtils.getUid());
+        entity.setRobotToAgentSettings(rtas);
+        RobotToAgentSettingsEntity rtasDraft = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(),
+            modelMapper);
+        rtasDraft.setUid(uidUtils.getUid());
+        entity.setDraftRobotToAgentSettings(rtasDraft);
+
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
             ensureSingleDefault(entity.getOrgUid(), entity);
@@ -139,7 +149,12 @@ public class WorkgroupSettingsRestService
 
         WorkgroupSettingsEntity entity = optional.get();
         // 使用 ModelMapper 批量更新基础字段
-        modelMapper.map(request, entity);
+        // modelMapper.map(request, entity);
+        entity.setName(request.getName());
+        entity.setDescription(request.getDescription());
+        entity.setIsDefault(request.getIsDefault());
+        entity.setEnabled(request.getEnabled());
+        entity.setRoutingMode(request.getRoutingMode());
 
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
@@ -267,6 +282,26 @@ public class WorkgroupSettingsRestService
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getQueueSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        if (request.getRobotToAgentSettings() != null) {
+            RobotToAgentSettingsEntity draft = entity.getDraftRobotToAgentSettings();
+            if (draft == null) {
+                draft = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(), modelMapper);
+                draft.setUid(uidUtils.getUid());
+                entity.setDraftRobotToAgentSettings(draft);
+                // 
+                RobotToAgentSettingsEntity settings = RobotToAgentSettingsEntity
+                        .fromRequest(request.getRobotToAgentSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setRobotToAgentSettings(settings);
+            } else {
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getRobotToAgentSettings(), draft);
+                RobotToAgentSettingsEntity.ensureDefaults(draft);
                 draft.setUid(originalUid);
             }
             entity.setHasUnpublishedChanges(true);
@@ -407,6 +442,13 @@ public class WorkgroupSettingsRestService
         settings.setQueueSettings(qs);
         settings.setDraftQueueSettings(qsDraft);
 
+        RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(null, modelMapper);
+        rtas.setUid(uidUtils.getUid());
+        RobotToAgentSettingsEntity rtasDraft = RobotToAgentSettingsEntity.fromRequest(null, modelMapper);
+        rtasDraft.setUid(uidUtils.getUid());
+        settings.setRobotToAgentSettings(rtas);
+        settings.setDraftRobotToAgentSettings(rtasDraft);
+
         // 刚创建的即为默认，确保同 org 唯一
         ensureSingleDefault(orgUid, settings);
         return save(settings);
@@ -485,6 +527,18 @@ public class WorkgroupSettingsRestService
             }
         }
 
+        if (entity.getDraftRobotToAgentSettings() != null) {
+            RobotToAgentSettingsEntity published = entity.getRobotToAgentSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftRobotToAgentSettings(), published);
+            } else {
+                RobotToAgentSettingsEntity newPublished = new RobotToAgentSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftRobotToAgentSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setRobotToAgentSettings(newPublished);
+            }
+        }
+
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
             if (published != null) {
@@ -515,7 +569,6 @@ public class WorkgroupSettingsRestService
         return convertToResponse(updated);
     }
 
-    // 仅复制业务字段,忽略 id/uid/version 与时间字段
     // 仅复制业务字段,忽略 id/uid/version 与时间字段
     // 使用 Helper 类处理懒加载集合的正确复制
     private void copyPropertiesExcludingIds(Object source, Object target) {
@@ -565,7 +618,8 @@ public class WorkgroupSettingsRestService
             resp.setRobotRoutingSettings(modelMapper.map(entity.getRobotSettings(),
                     com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse.class));
         } else {
-            resp.setRobotRoutingSettings(null);
+            resp.setRobotRoutingSettings(modelMapper.map(RobotRoutingSettingsEntity.builder().uid(uidUtils.getUid()).build(), 
+                com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse.class));
         }
 
         // 机器人路由（草稿）
@@ -573,7 +627,24 @@ public class WorkgroupSettingsRestService
             resp.setDraftRobotRoutingSettings(modelMapper.map(entity.getDraftRobotSettings(),
                     com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse.class));
         } else {
-            resp.setDraftRobotRoutingSettings(null);
+            resp.setDraftRobotRoutingSettings(modelMapper.map(RobotRoutingSettingsEntity.builder().uid(uidUtils.getUid()).build(), 
+                com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse.class));
+        }
+
+        if (entity.getRobotToAgentSettings() != null) {
+            resp.setRobotToAgentSettings(modelMapper.map(entity.getRobotToAgentSettings(),
+                    com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsResponse.class));
+        } else {
+            resp.setRobotToAgentSettings(modelMapper.map(RobotToAgentSettingsEntity.builder().uid(uidUtils.getUid()).build(), 
+                com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsResponse.class));
+        }
+
+        if (entity.getDraftRobotToAgentSettings() != null) {
+            resp.setDraftRobotToAgentSettings(modelMapper.map(entity.getDraftRobotToAgentSettings(),
+                    com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsResponse.class));
+        } else {
+            resp.setDraftRobotToAgentSettings(modelMapper.map(RobotToAgentSettingsEntity.builder().uid(uidUtils.getUid()).build(), 
+                com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsResponse.class));
         }
 
         return resp;

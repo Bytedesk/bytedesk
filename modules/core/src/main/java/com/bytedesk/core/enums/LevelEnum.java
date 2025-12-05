@@ -20,7 +20,6 @@ public enum LevelEnum {
     WORKGROUP,
     AGENT,
     ROBOT,
-    GROUP,
     USER;
 
     // 根据字符串查找对应的枚举常量

@@ -61,6 +61,53 @@ public class RobotProtobuf implements Serializable {
         return JSON.parseObject(user, RobotProtobuf.class);
     }
 
+    /**
+     * 从 RobotEntity 创建完整的 RobotProtobuf
+     * 
+     * @param entity 机器人实体
+     * @return 完整的机器人协议对象（包含 LLM 配置）
+     */
+    public static RobotProtobuf fromEntity(RobotEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return RobotProtobuf.builder()
+                .uid(entity.getUid())
+                .nickname(entity.getNickname())
+                .avatar(entity.getAvatar())
+                .type(UserTypeEnum.ROBOT.name())
+                .orgUid(entity.getOrgUid())
+                .kbSourceEnabled(entity.getKbSourceEnabled())
+                .kbEnabled(entity.getKbEnabled())
+                .kbUid(entity.getKbUid())
+                .llm(entity.getLlm())
+                .build();
+    }
+
+    /**
+     * 从 RobotEntity 创建完整的 RobotProtobuf，保留指定的 type
+     * 
+     * @param entity 机器人实体
+     * @param type 指定的类型（用于兼容旧数据）
+     * @return 完整的机器人协议对象（包含 LLM 配置）
+     */
+    public static RobotProtobuf fromEntity(RobotEntity entity, String type) {
+        if (entity == null) {
+            return null;
+        }
+        return RobotProtobuf.builder()
+                .uid(entity.getUid())
+                .nickname(entity.getNickname())
+                .avatar(entity.getAvatar())
+                .type(type != null ? type : UserTypeEnum.ROBOT.name())
+                .orgUid(entity.getOrgUid())
+                .kbSourceEnabled(entity.getKbSourceEnabled())
+                .kbEnabled(entity.getKbEnabled())
+                .kbUid(entity.getKbUid())
+                .llm(entity.getLlm())
+                .build();
+    }
+
     public String toJson() {
         return JSON.toJSONString(this);
     }

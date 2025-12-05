@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
 
 @Component
@@ -26,9 +28,13 @@ public class FaqInitializer implements SmartInitializingSingleton {
     @Autowired
     private FaqRestService faqRestService;
 
+    @Autowired
+    private AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
         // init();
+        initPermissions();
     }
 
     // 迁移到kbaseInitializer
@@ -39,5 +45,12 @@ public class FaqInitializer implements SmartInitializingSingleton {
         // 
         faqRestService.importFaqs(orgUid, kbUid);
         // faqService.initRelationFaqs(orgUid, kbUid);
+    }
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = FaqPermissions.FAQ_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 }

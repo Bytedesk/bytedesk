@@ -17,6 +17,7 @@ import com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
+import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsResponse;
 import com.bytedesk.service.worktime_settings.WorktimeSettingResponse;
 
 import lombok.AllArgsConstructor;
@@ -76,4 +77,13 @@ public class WorkgroupSettingsResponse extends BaseSettingsResponse {
      * Draft queue settings (Workgroup-specific)
      */
     private QueueSettingsResponse draftQueueSettings;
+
+    /**
+     * Robot to agent transition settings (Workgroup-specific)
+     */
+    private RobotToAgentSettingsResponse robotToAgentSettings;
+    /**
+     * Draft robot to agent transition settings (Workgroup-specific)
+     */
+    private RobotToAgentSettingsResponse draftRobotToAgentSettings;
 }

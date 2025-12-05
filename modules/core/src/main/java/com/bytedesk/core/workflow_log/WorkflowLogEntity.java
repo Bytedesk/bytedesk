@@ -1,0 +1,81 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-05-11 18:14:28
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-09-02 16:44:41
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.core.workflow_log;
+
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.workflow.node.WorkflowNodeStatusEnum;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+// import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
+
+@Entity
+@Data
+@SuperBuilder
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+// @EntityListeners({WorkflowLogEntityListener.class})
+@Table(name = "bytedesk_core_workflow_log")
+public class WorkflowLogEntity extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    private String name;
+
+    @Builder.Default
+    private String description = I18Consts.I18N_DESCRIPTION;
+
+    @Builder.Default
+    @Column(name = "workflow_type")
+    private String type = WorkflowLogTypeEnum.WORKFLOW.name();
+
+    private String workflowUid;
+
+    private String executionUid;
+
+    private Integer sequence;
+
+    private String nodeUid;
+
+    private String nodeName;
+
+    private String nodeType;
+
+    @Builder.Default
+    private String nodeStatus = WorkflowNodeStatusEnum.IDLE.name();
+
+    private Long durationMs;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String inputPayload;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String outputPayload;
+
+    private String errorMessage;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String errorStacktrace;
+}

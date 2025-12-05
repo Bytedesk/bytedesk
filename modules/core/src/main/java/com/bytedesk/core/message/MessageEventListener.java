@@ -18,9 +18,10 @@ import java.util.List;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import com.bytedesk.core.message.event.MessageJsonEvent;
+import com.bytedesk.core.message.utils.MessageConvertUtils;
 import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
-import com.bytedesk.core.utils.MessageConvertUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

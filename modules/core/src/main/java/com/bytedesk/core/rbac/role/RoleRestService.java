@@ -33,23 +33,43 @@ import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor
 @Service
 public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, RoleResponse> {
 
+        private static final Map<String, LevelEnum> SYSTEM_ROLE_LEVEL_HINTS = Map.of(
+                        BytedeskConsts.DEFAULT_ROLE_SUPER_UID, LevelEnum.PLATFORM,
+                        BytedeskConsts.DEFAULT_ROLE_ADMIN_UID, LevelEnum.ORGANIZATION,
+                        BytedeskConsts.DEFAULT_ROLE_DEPT_ADMIN_UID, LevelEnum.DEPARTMENT,
+                        BytedeskConsts.DEFAULT_ROLE_WORKGROUP_ADMIN_UID, LevelEnum.WORKGROUP,
+                        BytedeskConsts.DEFAULT_ROLE_AGENT_UID, LevelEnum.AGENT,
+                        BytedeskConsts.DEFAULT_ROLE_USER_UID, LevelEnum.USER);
+
+        private static final Map<String, LevelEnum> SYSTEM_ROLE_LEVEL_HINTS_BY_NAME = Map.of(
+                        RoleConsts.ROLE_SUPER, LevelEnum.PLATFORM,
+                        RoleConsts.ROLE_ADMIN, LevelEnum.ORGANIZATION,
+                        RoleConsts.ROLE_DEPT_ADMIN, LevelEnum.DEPARTMENT,
+                        RoleConsts.ROLE_WORKGROUP_ADMIN, LevelEnum.WORKGROUP,
+                        RoleConsts.ROLE_AGENT, LevelEnum.AGENT,
+                        RoleConsts.ROLE_USER, LevelEnum.USER);
+
         private final RoleRepository roleRepository;
 
         private final UidUtils uidUtils;
 
-        private final AuthorityRestService authorityService;
+        private final AuthorityRestService authorityRestService;
 
         private final AuthService authService;
 
@@ -96,7 +116,24 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         @Cacheable(value = "role", key = "#name", unless = "#result == null")
         public Optional<RoleEntity> findByNamePlatform(String name) {
-                return roleRepository.findByNameAndLevel(name, LevelEnum.PLATFORM.name());
+                LevelEnum preferredLevel = SYSTEM_ROLE_LEVEL_HINTS_BY_NAME.getOrDefault(name, LevelEnum.PLATFORM);
+
+                Optional<RoleEntity> roleOptional = roleRepository.findByNameAndLevel(name, preferredLevel.name());
+                if (roleOptional.isPresent()) {
+                        return roleOptional;
+                }
+
+                for (LevelEnum level : LevelEnum.values()) {
+                        if (level == preferredLevel) {
+                                continue;
+                        }
+                        roleOptional = roleRepository.findByNameAndLevel(name, level.name());
+                        if (roleOptional.isPresent()) {
+                                return roleOptional;
+                        }
+                }
+
+                return Optional.empty();
         }
 
         public Boolean existsByUid(String uid) {
@@ -128,7 +165,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         Iterator<String> iterator = request.getAuthorityUids().iterator();
                         while (iterator.hasNext()) {
                                 String authorityUid = iterator.next();
-                                Optional<AuthorityEntity> authorityOptional = authorityService.findByUid(authorityUid);
+                                Optional<AuthorityEntity> authorityOptional = authorityRestService.findByUid(authorityUid);
                                 if (authorityOptional.isPresent()) {
                                         role.addAuthority(authorityOptional.get());
                                 }
@@ -155,7 +192,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         role.getAuthorities().clear();
                         if (request.getAuthorityUids() != null) {
                                 for (String authorityUid : request.getAuthorityUids()) {
-                                        Optional<AuthorityEntity> authorityOptional = authorityService
+                                        Optional<AuthorityEntity> authorityOptional = authorityRestService
                                                         .findByUid(authorityUid);
                                         authorityOptional.ifPresent(role::addAuthority);
                                 }
@@ -178,7 +215,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         RoleEntity role = roleOptional.get();
                         if (request.getAuthorityUids() != null) {
                                 for (String authorityUid : request.getAuthorityUids()) {
-                                        Optional<AuthorityEntity> authorityOptional = authorityService
+                                        Optional<AuthorityEntity> authorityOptional = authorityRestService
                                                         .findByUid(authorityUid);
                                         authorityOptional.ifPresent(role::addAuthority);
                                 }
@@ -212,6 +249,11 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         @Override
         public RoleResponse convertToResponse(RoleEntity entity) {
                 return ConvertUtils.convertToRoleResponse(entity);
+        }
+
+        // @Override
+        public RoleExcel convertToExcel(RoleEntity entity) {
+                return modelMapper.map(entity, RoleExcel.class);
         }
 
         @Cacheable(value = "roleExists", key = "#name + '-' + #orgUid", unless = "#result == null")
@@ -264,6 +306,72 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         @Override
         protected Page<RoleEntity> executePageQuery(Specification<RoleEntity> spec, Pageable pageable) {
                 return roleRepository.findAll(spec, pageable);
+        }
+
+        @Transactional
+        public RoleResponse resetLevelAuthorities(RoleRequest request) {
+                if (request == null || !StringUtils.hasText(request.getUid())) {
+                        throw new IllegalArgumentException("role uid is required for reset");
+                }
+
+                Optional<RoleEntity> roleOptional = findByUid(request.getUid());
+                if (roleOptional.isEmpty()) {
+                        throw new RuntimeException("role " + request.getUid() + " not found");
+                }
+                RoleEntity role = roleOptional.get();
+
+                LevelEnum level = resolveTargetLevel(role, request);
+
+                String levelMarker = "_" + level.name() + "_";
+                Set<AuthorityEntity> levelAuthorities = authorityRestService.findByLevelMarker(levelMarker);
+                if (levelAuthorities.isEmpty()) {
+                        throw new RuntimeException("no authorities found for level " + level.name());
+                }
+
+                String markerUpper = levelMarker.toUpperCase(Locale.ROOT);
+                role.getAuthorities().removeIf(authority -> {
+                        String value = authority.getValue();
+                        if (!StringUtils.hasText(value)) {
+                                return true;
+                        }
+                        return !value.toUpperCase(Locale.ROOT).contains(markerUpper);
+                });
+
+                levelAuthorities.forEach(role::addAuthority);
+
+                role.setLevel(level.name());
+
+                RoleEntity savedRole = save(role);
+                if (savedRole == null) {
+                        throw new RuntimeException("role " + request.getUid() + " reset failed");
+                }
+                return convertToResponse(savedRole);
+        }
+
+        private LevelEnum resolveTargetLevel(RoleEntity role, RoleRequest request) {
+                LevelEnum systemLevel = SYSTEM_ROLE_LEVEL_HINTS.get(role.getUid());
+                if (systemLevel != null) {
+                        return systemLevel;
+                }
+
+                String roleLevel = role.getLevel();
+                if (StringUtils.hasText(roleLevel)) {
+                        try {
+                                return LevelEnum.valueOf(roleLevel.toUpperCase(Locale.ROOT));
+                        } catch (IllegalArgumentException ex) {
+                                log.warn("role {} carries unsupported level {}, fallback to request payload", role.getUid(), roleLevel);
+                        }
+                }
+
+                if (request != null && StringUtils.hasText(request.getLevel())) {
+                        try {
+                                return LevelEnum.valueOf(request.getLevel().toUpperCase(Locale.ROOT));
+                        } catch (IllegalArgumentException ex) {
+                                throw new IllegalArgumentException("unsupported level: " + request.getLevel(), ex);
+                        }
+                }
+
+                throw new IllegalArgumentException("level is required for reset");
         }
 
 }

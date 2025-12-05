@@ -36,8 +36,8 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
 
     private final MemberInitializer memberInitializer;
     private final AgentInitializer agentInitializer;
-    private final WorkgroupRestService workgroupService;
-    private final AuthorityRestService authorityService;
+    private final WorkgroupRestService workgroupRestService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -64,7 +64,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
-        workgroupService.create(workgroupRequest);
+        workgroupRestService.create(workgroupRequest);
          // add workgroup before
         WorkgroupRequest workgroupBeforeRequest = WorkgroupRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_PRESALES)
@@ -73,7 +73,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
-        workgroupService.create(workgroupBeforeRequest);
+        workgroupRestService.create(workgroupBeforeRequest);
         // add workgroup after
         WorkgroupRequest workgroupAfterRequest = WorkgroupRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_AFTERSALES)
@@ -82,13 +82,13 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
-        workgroupService.create(workgroupAfterRequest);
+        workgroupRestService.create(workgroupAfterRequest);
     }
 
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = WorkgroupPermissions.WORKGROUP_PREFIX + permission.name();
-            authorityService.createForPlatform(permissionValue);
+            authorityRestService.createForPlatform(permissionValue);
         }
     }
 }

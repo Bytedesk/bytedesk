@@ -28,9 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RoleInitializer {
 
-    private final RoleRestService roleService;
+    private final RoleRestService roleRestService;
 
-    private final AuthorityRestService authorityService;
+    private final AuthorityRestService authorityRestService;
 
     // 初始化角色, 在 OrganizationInitializer 中调用
     public void init() {
@@ -41,17 +41,17 @@ public class RoleInitializer {
     }
 
     private void initRoles() {
-        // 1. 访客
-        // createVisitor();
-        // 2. 用户
+        // 0 用户
         createUser();
-        // 3. 客服
+        // 1. 客服
         createAgent();
-        // 4. 团队成员
-        createMember();
-        // 5. 管理员
+        // 2. 工作组管理员
+        createWorkgroupAdmin();
+        // 3. 部门管理员
+        createDeptAdmin();
+        // 4. 组织管理员
         createAdmin();
-        // 6. 超级管理员
+        // 5. 超级管理员
         createSuper();
     }
 
@@ -63,28 +63,40 @@ public class RoleInitializer {
                 .level(LevelEnum.PLATFORM.name())
                 .system(true)
                 .build();
-        roleService.create(roleRequest);
+        roleRestService.create(roleRequest);
     }
+    
     private void createAdmin() {
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID)
                 .name(RoleConsts.ROLE_ADMIN)
-                .description("Admin")
-                .level(LevelEnum.PLATFORM.name())
+                .description("Organization Admin")
+                .level(LevelEnum.ORGANIZATION.name())
                 .system(true)
                 .build();
-        roleService.create(roleRequest);
+        roleRestService.create(roleRequest);
     }
 
-    private void createMember() {
+    private void createDeptAdmin() {
         RoleRequest roleRequest = RoleRequest.builder()
-                .uid(BytedeskConsts.DEFAULT_ROLE_MEMBER_UID)
-                .name(RoleConsts.ROLE_MEMBER)
-                .description("Member")
-                .level(LevelEnum.PLATFORM.name())
+                .uid(BytedeskConsts.DEFAULT_ROLE_DEPT_ADMIN_UID)
+                .name(RoleConsts.ROLE_DEPT_ADMIN)
+                .description("Department Admin")
+                .level(LevelEnum.DEPARTMENT.name())
                 .system(true)
                 .build();
-        roleService.create(roleRequest);
+        roleRestService.create(roleRequest);
+    }
+
+    private void createWorkgroupAdmin() {
+        RoleRequest roleRequest = RoleRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_ROLE_WORKGROUP_ADMIN_UID)
+                .name(RoleConsts.ROLE_WORKGROUP_ADMIN)
+                .description("Workgroup Admin")
+                .level(LevelEnum.WORKGROUP.name())
+                .system(true)
+                .build();
+        roleRestService.create(roleRequest);
     }
 
     private void createAgent() {
@@ -92,40 +104,27 @@ public class RoleInitializer {
                 .uid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID)
                 .name(RoleConsts.ROLE_AGENT)
                 .description("Agent")
-                .level(LevelEnum.PLATFORM.name())
+                .level(LevelEnum.AGENT.name())
                 .system(true)
                 .build();
-        roleService.create(roleRequest);
+        roleRestService.create(roleRequest);
     }
 
-    // createUser
     private void createUser() {
         RoleRequest roleRequest = RoleRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_ROLE_USER_UID)
                 .name(RoleConsts.ROLE_USER)
                 .description("User")
-                .level(LevelEnum.PLATFORM.name())
+                .level(LevelEnum.USER.name())
                 .system(true)
                 .build();
-        roleService.create(roleRequest);
+        roleRestService.create(roleRequest);
     }
-
-    // create visitor
-    // private void createVisitor() {
-    //     RoleRequest roleRequest = RoleRequest.builder()
-    //             .uid(BytedeskConsts.DEFAULT_ROLE_VISITOR_UID)
-    //             .name(RoleConsts.ROLE_VISITOR)
-    //             .description("Visitor")
-    //             .level(LevelEnum.PLATFORM.name())
-    //             .system(true)
-    //             .build();
-    //     roleService.create(roleRequest);
-    // }
 
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = RolePermissions.ROLE_PREFIX + permission.name();
-            authorityService.createForPlatform(permissionValue);
+            authorityRestService.createForPlatform(permissionValue);
         }
     }
 

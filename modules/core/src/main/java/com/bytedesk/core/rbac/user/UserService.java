@@ -64,7 +64,7 @@ public class UserService {
 
     private final ModelMapper modelMapper;
 
-    private final RoleRestService roleService;
+    private final RoleRestService roleRestService;
 
     private final BytedeskProperties bytedeskProperties;
 
@@ -173,14 +173,11 @@ public class UserService {
             }
         }
         user.setEnabled(true);
-        
         // 设置密码修改时间为账号创建时间（当前时间）
         user.setPasswordModifiedAt(BdDateUtils.now());
         //
         user = save(user);
-        // 新注册用户添加role_user
-        addRoleUser(user);
-        //
+        user = addRoleUser(user);
         return ConvertUtils.convertToUserResponse(user);
     }
 
@@ -405,7 +402,8 @@ public class UserService {
             user.setCurrentOrganization(orgOptional.get());
         }
         //
-        return addRoleMember(user);
+        user = addRoleUser(user);
+        return addRoleAgent(user);
     }
 
     public UserEntity updateUserFromMember(UserEntity user, MemberRequest request) {
@@ -421,7 +419,7 @@ public class UserService {
 
         // 增加角色，遍历roleUids，逐个添加
         for (String roleUid : roleUids) {
-            Optional<RoleEntity> optional = roleService.findByUid(roleUid);
+            Optional<RoleEntity> optional = roleRestService.findByUid(roleUid);
             if (optional.isPresent()) {
                 RoleEntity role = optional.get();
                 // 处理乐观锁冲突：使用重试机制或重新获取最新实体
@@ -432,7 +430,7 @@ public class UserService {
                 } catch (jakarta.persistence.OptimisticLockException e) {
                     log.warn("乐观锁冲突，重新获取角色实体: {}", roleUid);
                     // 重新从数据库获取最新的角色实体
-                    Optional<RoleEntity> freshRoleOptional = roleService.findByUid(roleUid);
+                    Optional<RoleEntity> freshRoleOptional = roleRestService.findByUid(roleUid);
                     if (freshRoleOptional.isPresent()) {
                         managedRole = freshRoleOptional.get();
                     } else {
@@ -448,55 +446,6 @@ public class UserService {
         return save(user);
     }
 
-    // add/remove role methods
-    // add role_user
-    public UserEntity addRoleUser(UserEntity user) {
-        // return addRole(user, RoleConsts.ROLE_USER);
-        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_USER);
-        if (roleOptional.isPresent()) {
-            RoleEntity role = roleOptional.get();
-            // 处理乐观锁冲突：使用重试机制或重新获取最新实体
-            RoleEntity managedRole;
-            try {
-                // 尝试合并实体状态
-                managedRole = entityManager.merge(role);
-            } catch (jakarta.persistence.OptimisticLockException e) {
-                log.warn("乐观锁冲突，重新获取用户角色实体: {}", RoleConsts.ROLE_USER);
-                // 重新从数据库获取最新的角色实体
-                Optional<RoleEntity> freshRoleOptional = roleService.findByNamePlatform(RoleConsts.ROLE_USER);
-                if (freshRoleOptional.isPresent()) {
-                    managedRole = freshRoleOptional.get();
-                } else {
-                    throw new RuntimeException("重新获取用户角色失败: " + RoleConsts.ROLE_USER);
-                }
-            }
-            // ROLE_USER 不需要organization的限制，直接添加到用户角色列表中
-            user.getCurrentRoles().add(managedRole);
-
-            // 直接保存用户实体
-            try {
-                return userRepository.save(user);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("User add user role failed..!!", e);
-            }
-        } else {
-            throw new RuntimeException("user Role not found..!!");
-        }
-    }
-
-    public UserEntity removeRoleUser(UserEntity user) {
-        return removeRole(user, RoleConsts.ROLE_USER);
-    }
-
-    public UserEntity addRoleMember(UserEntity user) {
-        return addRole(user, RoleConsts.ROLE_MEMBER);
-    }
-
-    public UserEntity removeRoleMember(UserEntity user) {
-        return removeRole(user, RoleConsts.ROLE_MEMBER);
-    }
-
     public UserEntity addRoleAgent(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_AGENT);
     }
@@ -505,12 +454,32 @@ public class UserService {
         return removeRole(user, RoleConsts.ROLE_AGENT);
     }
 
+    public UserEntity addRoleUser(UserEntity user) {
+        return addRole(user, RoleConsts.ROLE_USER);
+    }
+
     public UserEntity addRoleAdmin(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_ADMIN);
     }
 
     public UserEntity removeRoleAdmin(UserEntity user) {
         return removeRole(user, RoleConsts.ROLE_ADMIN);
+    }
+
+    public UserEntity addRoleDeptAdmin(UserEntity user) {
+        return addRole(user, RoleConsts.ROLE_DEPT_ADMIN);
+    }
+
+    public UserEntity removeRoleDeptAdmin(UserEntity user) {
+        return removeRole(user, RoleConsts.ROLE_DEPT_ADMIN);
+    }
+
+    public UserEntity addRoleWorkgroupAdmin(UserEntity user) {
+        return addRole(user, RoleConsts.ROLE_WORKGROUP_ADMIN);
+    }
+
+    public UserEntity removeRoleWorkgroupAdmin(UserEntity user) {
+        return removeRole(user, RoleConsts.ROLE_WORKGROUP_ADMIN);
     }
 
     @Transactional
@@ -525,7 +494,7 @@ public class UserService {
 
     @Transactional
     public UserEntity addRole(UserEntity user, String roleName) {
-        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(roleName);
+        Optional<RoleEntity> roleOptional = roleRestService.findByNamePlatform(roleName);
         if (roleOptional.isPresent()) {
             RoleEntity role = roleOptional.get();
             
@@ -537,15 +506,37 @@ public class UserService {
             } catch (jakarta.persistence.OptimisticLockException e) {
                 log.warn("乐观锁冲突，重新获取角色实体: {}", roleName);
                 // 重新从数据库获取最新的角色实体
-                Optional<RoleEntity> freshRoleOptional = roleService.findByNamePlatform(roleName);
+                Optional<RoleEntity> freshRoleOptional = roleRestService.findByNamePlatform(roleName);
                 if (freshRoleOptional.isPresent()) {
                     managedRole = freshRoleOptional.get();
                 } else {
                     throw new RuntimeException("重新获取角色失败: " + roleName);
                 }
             }
-            
-            user.addOrganizationRole(managedRole);
+
+            final RoleEntity targetRole = managedRole;
+
+            // Allow ROLE_USER without organization context so auto-registered users have a default role
+            if (user.getCurrentOrganization() == null) {
+                if (!RoleConsts.ROLE_USER.equals(roleName)) {
+                    throw new RuntimeException("当前用户未加入任何组织，无法分配角色: " + roleName);
+                }
+
+                boolean alreadyHasRole = user.getCurrentRoles().stream()
+                        .anyMatch(r -> r.getId() != null && r.getId().equals(targetRole.getId()));
+                if (!alreadyHasRole) {
+                    user.getCurrentRoles().add(targetRole);
+                }
+
+                try {
+                    return userRepository.save(user);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("User add role failed..!!", e);
+                }
+            }
+
+            user.addOrganizationRole(targetRole);
 
             // 直接保存用户实体
             try {
@@ -560,7 +551,7 @@ public class UserService {
     }
 
     public UserEntity removeRole(UserEntity user, String roleName) {
-        Optional<RoleEntity> roleOptional = roleService.findByNamePlatform(roleName);
+        Optional<RoleEntity> roleOptional = roleRestService.findByNamePlatform(roleName);
         if (roleOptional.isPresent()) {
             user.removeOrganizationRole(roleOptional.get());
             //

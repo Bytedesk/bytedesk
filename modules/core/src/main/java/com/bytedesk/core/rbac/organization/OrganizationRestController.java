@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.organization;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,8 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
 
     private final OrganizationRestService organizationRestService;
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = "组织", action = "组织查询", description = "query organization by org")
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByOrg(OrganizationRequest request) {
         
@@ -47,6 +49,8 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
+    @ActionAnnotation(title = "组织", action = "用户查询", description = "query organization by user")
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUser(OrganizationRequest request) {
         
@@ -55,6 +59,8 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
+    @ActionAnnotation(title = "组织", action = "查询详情", description = "query organization by uid")
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(OrganizationRequest request) {
         //
@@ -63,6 +69,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_CREATE_ANY_LEVEL)
     @ActionAnnotation(title = "组织", action = "新建", description = "organization create")
     @Override
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
@@ -82,6 +89,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "组织", action = "更新", description = "organization update")
     @Override
     public ResponseEntity<?> update(@RequestBody OrganizationRequest request) {
@@ -101,7 +109,8 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_DELETE_ANY_LEVEL)
+    @ActionAnnotation(title = "组织", action = "删除", description = "organization delete")
     @Override
     public ResponseEntity<?> delete(OrganizationRequest request) {
         
@@ -110,7 +119,9 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_EXPORT_ANY_LEVEL)
+    @ActionAnnotation(title = "组织", action = "导出", description = "organization export")
+    @GetMapping("/export")
     @Override
     public Object export(OrganizationRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

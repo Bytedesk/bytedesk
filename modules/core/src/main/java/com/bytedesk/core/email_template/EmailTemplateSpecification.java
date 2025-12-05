@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
 
 public class EmailTemplateSpecification extends BaseSpecification<EmailTemplateEntity, EmailTemplateRequest> {
+	
 	public static Specification<EmailTemplateEntity> search(EmailTemplateRequest request, AuthService authService) {
 		return (root, query, cb) -> {
 			List<Predicate> predicates = new ArrayList<>();

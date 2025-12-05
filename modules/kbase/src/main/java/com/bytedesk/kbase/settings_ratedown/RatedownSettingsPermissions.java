@@ -19,11 +19,11 @@ public class RatedownSettingsPermissions extends BasePermissions {
 
     public static final String TAG_PREFIX = "TAG_";
     //
-    public static final String TAG_CREATE = formatAuthority(TAG_PREFIX + CREATE);
-    public static final String TAG_READ = formatAuthority(TAG_PREFIX + READ);
-    public static final String TAG_UPDATE = formatAuthority(TAG_PREFIX + UPDATE);
-    public static final String TAG_DELETE = formatAuthority(TAG_PREFIX + DELETE);
-    public static final String TAG_EXPORT = formatAuthority(TAG_PREFIX + EXPORT);
+    public static final String TAG_CREATE = hasAuthority(TAG_PREFIX + CREATE);
+    public static final String TAG_READ = hasAuthority(TAG_PREFIX + READ);
+    public static final String TAG_UPDATE = hasAuthority(TAG_PREFIX + UPDATE);
+    public static final String TAG_DELETE = hasAuthority(TAG_PREFIX + DELETE);
+    public static final String TAG_EXPORT = hasAuthority(TAG_PREFIX + EXPORT);
     // 
-    public static final String TAG_ANY = formatAnyAuthority(TAG_PREFIX + CREATE, TAG_PREFIX + READ, TAG_PREFIX + UPDATE, TAG_PREFIX + EXPORT, TAG_PREFIX + DELETE);
+    public static final String TAG_ANY = hasAnyAuthority(TAG_PREFIX + CREATE, TAG_PREFIX + READ, TAG_PREFIX + UPDATE, TAG_PREFIX + EXPORT, TAG_PREFIX + DELETE);
 }

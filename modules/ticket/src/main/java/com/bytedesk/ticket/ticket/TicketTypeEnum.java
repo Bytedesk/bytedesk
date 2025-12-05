@@ -14,10 +14,18 @@
 package com.bytedesk.ticket.ticket;
 
 public enum TicketTypeEnum {
-    AGENT, // agent 一对一处理的工单
-    DEPARTMENT, // department 部门工单
-    WORKGROUP, // workgroup 工作组工单
-    MEMBER, // member 组织成员工单
-    USER, // user 提交的工单
-    VISITOR // visitor 提交的工单
+    INTERNAL, // 内部工单：面向企业内部成员
+    EXTERNAL; // 外部工单：面向访客/客户
+
+    public static TicketTypeEnum fromValue(String value) {
+        if (value == null || value.isBlank()) {
+            return TicketTypeEnum.EXTERNAL;
+        }
+        for (TicketTypeEnum item : TicketTypeEnum.values()) {
+            if (item.name().equalsIgnoreCase(value)) {
+                return item;
+            }
+        }
+        return TicketTypeEnum.EXTERNAL;
+    }
 }

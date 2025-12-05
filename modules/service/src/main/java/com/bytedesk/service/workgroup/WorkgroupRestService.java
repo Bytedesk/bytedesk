@@ -37,6 +37,7 @@ import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
+import org.modelmapper.ModelMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +51,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     private final AgentRestService agentRestService;
 
-    // private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
 
@@ -308,6 +309,10 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     @Override
     public WorkgroupResponse convertToResponse(WorkgroupEntity entity) {
         return ServiceConvertUtils.convertToWorkgroupResponse(entity);
+    }
+
+    public WorkgroupExcel convertToExcel(WorkgroupEntity entity) {
+        return modelMapper.map(entity, WorkgroupExcel.class);
     }
 
     @Override

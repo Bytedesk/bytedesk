@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.ExistsException;
 import com.bytedesk.core.exception.ForbiddenException;
 import com.bytedesk.core.exception.NotFoundException;
@@ -92,6 +93,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         log.info("Creating organization: {}", organization.toString());
         organization.setVip(true);
         organization.setVipExpireDate(BdDateUtils.now().plusDays(30));
+        organization.setLevel(LevelEnum.ORGANIZATION.name());
         //
         OrganizationEntity savedOrganization = save(organization);
         if (savedOrganization == null) {

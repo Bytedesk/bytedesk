@@ -15,6 +15,7 @@ package com.bytedesk.core.department;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,8 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
 
     private final DepartmentRestService departmentRestService;
 
-    // @PreAuthorize("hasAuthority('MEMBER_READ')") // 暂时不加权限
+    @ActionAnnotation(title = "部门", action = "组织查询", description = "query department by org")
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByOrg(DepartmentRequest request) {
 
@@ -47,7 +49,8 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
-    // @PreAuthorize("hasAuthority('MEMBER_READ')") // 暂时不加权限
+    @ActionAnnotation(title = "部门", action = "用户查询", description = "query department by user")
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUser(DepartmentRequest request) {
         
@@ -56,14 +59,15 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
-    // @PreAuthorize("hasAuthority('MEMBER_READ')") // 暂时不加权限
+    @ActionAnnotation(title = "部门", action = "查询详情", description = "query department by uid")
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(DepartmentRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @PreAuthorize("hasAuthority('MEMBER_CREATE')")
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_CREATE_ANY_LEVEL)
     @ActionAnnotation(title = "部门", action = "新建", description = "create department")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest request) {
 
@@ -72,7 +76,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
-    @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "部门", action = "更新", description = "update department")
     public ResponseEntity<?> update(@RequestBody DepartmentRequest request) {
 
@@ -81,7 +85,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
-    @PreAuthorize("hasAuthority('MEMBER_DELETE')")
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_DELETE_ANY_LEVEL)
     @ActionAnnotation(title = "部门", action = "删除", description = "delete department")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest request) {
@@ -91,7 +95,9 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
     }
 
-    @PreAuthorize("hasAuthority('MEMBER_EXPORT')")
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_EXPORT_ANY_LEVEL)
+    @ActionAnnotation(title = "部门", action = "导出", description = "export department")
+    @GetMapping("/export")
     @Override
     public Object export(DepartmentRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-06-05 22:46:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-26 16:42:38
+ * @LastEditTime: 2025-11-29 12:00:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -15,14 +15,19 @@ package com.bytedesk.core.base;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.utils.ApplicationContextHolder;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -59,17 +64,18 @@ public abstract class BaseSpecification<T, TRequest> {
         validateSuperUserPermission(request, authService);
         
         UserEntity user = authService.getUser();
+        boolean platformDefaultOrgRequest = isPlatformDefaultOrgRequest(request);
         // 非超级管理员必须提供 orgUid
         if (user != null && !Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
-            throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
+            throw new IllegalArgumentException("orgUid should not be null (org uid must be provided for non-super admin users)");
         }
         
         // 验证请求的 orgUid 是否与当前用户的 orgUid 相同
         if (StringUtils.hasText(request.getOrgUid())) {
-            if (user != null && !Boolean.TRUE.equals(request.getSuperUser())) {
+            if (user != null && !Boolean.TRUE.equals(request.getSuperUser()) && !platformDefaultOrgRequest) {
                 String userOrgUid = user.getOrgUid();
                 if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
-                    throw new IllegalArgumentException("无权访问其他组织的数据");
+                    throw new IllegalArgumentException("No permission to access data of other organizations");
                 }
             }
         }
@@ -80,6 +86,73 @@ public abstract class BaseSpecification<T, TRequest> {
         // 只有非超级管理员且有 orgUid 时才加 orgUid 条件
         if (!Boolean.TRUE.equals(request.getSuperUser()) && StringUtils.hasText(request.getOrgUid())) {
             predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+        }
+        
+        return predicates;
+    }
+
+    /**
+     * 获取带层级过滤的查询条件
+     * 根据用户权限过滤可访问的数据层级
+     * 
+     * @param root 查询根对象
+     * @param criteriaBuilder 条件构建器
+     * @param request 请求对象
+     * @param authService 认证服务
+     * @param module 模块名称，如 TAG, QUICKREPLY 等
+     * @return 基础查询条件列表
+     */
+    protected static List<Predicate> getBasicPredicatesWithLevel(
+            Root<?> root, 
+            CriteriaBuilder criteriaBuilder, 
+            BaseRequest request, 
+            AuthService authService,
+            String module) {
+        
+        // 先获取基础条件
+        List<Predicate> predicates = getBasicPredicates(root, criteriaBuilder, request, authService);
+        
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            return predicates;
+        }
+        
+        // 超级管理员可以访问所有数据
+        if (user.isSuperUser() || Boolean.TRUE.equals(request.getSuperUser())) {
+            return predicates;
+        }
+        
+        // 获取权限服务
+        PermissionService permissionService = ApplicationContextHolder.getBean(PermissionService.class);
+        if (permissionService == null) {
+            return predicates;
+        }
+        
+        // 获取用户可访问的层级
+        Set<String> accessibleLevels = permissionService.getAccessibleLevels(module, "READ");
+        
+        if (accessibleLevels.isEmpty()) {
+            // 没有任何层级权限，只能访问自己创建的数据
+            predicates.add(criteriaBuilder.equal(root.get("userUid"), user.getUid()));
+        } else {
+            // 构建层级过滤条件
+            List<Predicate> levelPredicates = new ArrayList<>();
+            
+            // 用户可以访问的层级数据
+            if (!accessibleLevels.isEmpty()) {
+                levelPredicates.add(root.get("level").in(accessibleLevels));
+            }
+            
+            // 用户始终可以访问自己创建的数据
+            levelPredicates.add(criteriaBuilder.equal(root.get("userUid"), user.getUid()));
+            
+            // 平台级数据对所有登录用户可见（只读）
+            if (!accessibleLevels.contains(LevelEnum.PLATFORM.name())) {
+                levelPredicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.PLATFORM.name()));
+            }
+            
+            // 使用 OR 组合层级条件
+            predicates.add(criteriaBuilder.or(levelPredicates.toArray(new Predicate[0])));
         }
         
         return predicates;
@@ -105,6 +178,18 @@ public abstract class BaseSpecification<T, TRequest> {
                 request.setSuperUser(false);
             }
         }
+    }
+
+    private static boolean isPlatformDefaultOrgRequest(BaseRequest request) {
+        if (request == null) {
+            return false;
+        }
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            return false;
+        }
+        boolean isDefaultOrg = BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(request.getOrgUid());
+        boolean isPlatformLevel = LevelEnum.PLATFORM.name().equalsIgnoreCase(request.getLevel());
+        return isDefaultOrg && isPlatformLevel;
     }
 
 }

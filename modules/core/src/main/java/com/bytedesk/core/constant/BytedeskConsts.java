@@ -62,10 +62,10 @@ public class BytedeskConsts {
 
     public static final String DEFAULT_ROLE_SUPER_UID = "df_role_super_uid";
     public static final String DEFAULT_ROLE_ADMIN_UID = "df_role_admin_uid";
-    public static final String DEFAULT_ROLE_MEMBER_UID = "df_role_member_uid";
+    public static final String DEFAULT_ROLE_DEPT_ADMIN_UID = "df_role_dept_admin_uid"; // 部门管理员
+    public static final String DEFAULT_ROLE_WORKGROUP_ADMIN_UID = "df_role_wg_admin_uid"; // 工作组管理员
     public static final String DEFAULT_ROLE_AGENT_UID = "df_role_agent_uid";
     public static final String DEFAULT_ROLE_USER_UID = "df_role_user_uid";
-    public static final String DEFAULT_ROLE_VISITOR_UID = "df_role_visitor_uid";
     // 
     public static final String ACTION_LOGIN_USERNAME = "密码登录";
     public static final String ACTION_LOGIN_MOBILE = "手机号登录";
@@ -74,8 +74,6 @@ public class BytedeskConsts {
     public static final String ACTION_LOGOUT = "退出登录";
     // 
     public static final int COLUMN_EXTRA_LENGTH = 2048;
-    // 
-    public static final String HAS_ANY_ROLE = "hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT', 'USER')";
     // 
     public static final String DEFAULT_SORT_BY = "updatedAt";
     public static final String DEFAULT_SORT_DIRECTION = "descend"; // 默认降序

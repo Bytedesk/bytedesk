@@ -182,8 +182,8 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         WelcomeContent welcomeContent = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
         thread.setRoboting().setContent(welcomeContent != null ? welcomeContent.toJson() : null);
 
-        // 3. 设置机器人信息
-        String robotString = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        // 3. 设置机器人信息（只存储基础信息，避免 prompt 过长导致字段超限）
+        String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
         thread.setRobot(robotString);
 
         // 4. 保存线程

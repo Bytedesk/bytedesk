@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,6 +56,15 @@ public class TransferKeywordUtil {
             "需要真人",
             "人工处理",
             "专员服务");
+
+    /**
+     * 返回默认的转人工关键词副本，供配置界面或实体初始化使用。
+     *
+     * @return 新的关键词列表，调用方可自由修改
+     */
+    public static List<String> getDefaultKeywords() {
+        return new ArrayList<>(TRANSFER_KEYWORDS);
+    }
 
     /**
      * 检查文本是否包含转人工关键词

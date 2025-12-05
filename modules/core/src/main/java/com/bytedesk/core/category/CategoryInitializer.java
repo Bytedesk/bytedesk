@@ -17,6 +17,8 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -26,18 +28,26 @@ public class CategoryInitializer implements SmartInitializingSingleton {
 
     private final CategoryRestService categoryRestService;
 
+    private final AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
-        init();
+        // init();
+        initPermissions();
         // 创建默认的工单分类
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         categoryRestService.initCategories(orgUid);
     }
 
     // @PostConstruct
-    public void init() {
+    // public void init() {
+    // }
 
-       
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = CategoryPermissions.CATEGORY_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
     
 }

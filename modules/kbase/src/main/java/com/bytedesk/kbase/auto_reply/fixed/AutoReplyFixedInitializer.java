@@ -17,6 +17,8 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +30,12 @@ public class AutoReplyFixedInitializer implements SmartInitializingSingleton {
 
     private final AutoReplyFixedRestService autoReplyFixedRestService;
 
+    private final AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
         // init();
+        initPermissions();
     }
 
     // 迁移到kbaseInitializer
@@ -38,6 +43,13 @@ public class AutoReplyFixedInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_FIXED_UID);
         autoReplyFixedRestService.initData(orgUid);
+    }
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = AutoReplyFixedPermissions.AUTO_REPLY_FIXED_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
     
 }

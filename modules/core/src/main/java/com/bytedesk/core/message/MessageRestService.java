@@ -33,7 +33,6 @@ import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
-import com.bytedesk.core.utils.MessageTypeConverter;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

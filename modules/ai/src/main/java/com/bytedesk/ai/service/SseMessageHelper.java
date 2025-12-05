@@ -253,7 +253,7 @@ public class SseMessageHelper {
                 RobotContent errorContent = RobotContent.builder()
                         .question(messageProtobufQuery != null ? messageProtobufQuery.getContent() : null)
                         .questionUid(messageProtobufQuery != null ? messageProtobufQuery.getUid() : null)
-                        .answer("")
+                        .answer(errorText)
                         .reasonContent(errorText)
                         .build();
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_ERROR);
@@ -275,7 +275,7 @@ public class SseMessageHelper {
                 RobotContent errorContent = RobotContent.builder()
                         .question(messageProtobufQuery != null ? messageProtobufQuery.getContent() : null)
                         .questionUid(messageProtobufQuery != null ? messageProtobufQuery.getUid() : null)
-                        .answer("")
+                        .answer(errorText)
                         .reasonContent(errorText)
                         .build();
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_ERROR);

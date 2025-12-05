@@ -18,20 +18,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class TextInitializer implements SmartInitializingSingleton {
 
     @Autowired
     private TextRestService textRestService;
 
+    private final AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
         // init();
+        initPermissions();
     }
 
     // 迁移到kbaseInitializer
@@ -39,6 +46,13 @@ public class TextInitializer implements SmartInitializingSingleton {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
         textRestService.initText(kbUid, orgUid);
+    }
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = TextPermissions.TEXT_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
     
 }

@@ -29,9 +29,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AgentInitializer implements SmartInitializingSingleton {
 
-    private final AgentRestService agentService;
+    private final AgentRestService agentRestService;
     private final BytedeskProperties bytedeskProperties;
-    private final AuthorityRestService authorityService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -57,13 +57,13 @@ public class AgentInitializer implements SmartInitializingSingleton {
                 .memberUid(memberUid)
                 .orgUid(orgUid)
                 .build();
-        agentService.create(agentRequest);
+        agentRestService.create(agentRequest);
     }
 
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = AgentPermissions.AGENT_PREFIX + permission.name();
-            authorityService.createForPlatform(permissionValue);
+            authorityRestService.createForPlatform(permissionValue);
         }
     }
     

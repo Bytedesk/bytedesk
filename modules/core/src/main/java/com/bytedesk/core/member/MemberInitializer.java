@@ -37,7 +37,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
 
     private final BytedeskProperties bytedeskProperties;
 
-    private final AuthorityRestService authorityService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -80,7 +80,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
     private void initPermissions() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = MemberPermissions.MEMBER_PREFIX + permission.name();
-            authorityService.createForPlatform(permissionValue);
+            authorityRestService.createForPlatform(permissionValue);
         }
     }
 }

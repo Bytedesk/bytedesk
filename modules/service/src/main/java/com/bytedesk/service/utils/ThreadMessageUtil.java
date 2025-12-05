@@ -21,10 +21,10 @@ import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageUtils;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -54,6 +54,30 @@ public class ThreadMessageUtil {
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .user(thread.getRobot())
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        return message;
+    }
+
+    /**
+     * 结构化 WelcomeContent 的工作流欢迎消息
+     */
+    public static MessageEntity getThreadWorkflowWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        MessageUtils.attachSequenceNumber(extra, thread.getUid());
+        String json = content != null ? content.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .thread(thread)
+                .type(MessageTypeEnum.WELCOME.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(thread.getWorkflow())
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
                 .createdAt(BdDateUtils.now())

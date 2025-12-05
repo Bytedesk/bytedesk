@@ -15,6 +15,7 @@ package com.bytedesk.kbase.llm_chunk;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +46,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         this.chunkElasticService = chunkElasticService;
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByOrg(ChunkRequest request) {
         
@@ -54,7 +55,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunks));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUser(ChunkRequest request) {
         
@@ -63,7 +64,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunks));
     }
 
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(ChunkRequest request) {
         // TODO Auto-generated method stub
@@ -71,6 +72,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @ActionAnnotation(title = "文件分块", action = "新建", description = "create chunk")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_CREATE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> create(ChunkRequest request) {
         
@@ -80,6 +82,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @ActionAnnotation(title = "文件分块", action = "更新", description = "update chunk")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> update(ChunkRequest request) {
         
@@ -89,6 +92,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @ActionAnnotation(title = "文件分块", action = "删除", description = "delete chunk")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_DELETE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> delete(ChunkRequest request) {
         
@@ -99,6 +103,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
 
     // deleteAll
     @PostMapping("/deleteAll")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_DELETE_ANY_LEVEL)
     public ResponseEntity<?> deleteAll(@RequestBody ChunkRequest request) {
 
         chunkRestService.deleteAll(request);
@@ -108,6 +113,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
 
     // enable/disable chunk
     @PostMapping("/enable")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> enable(@RequestBody ChunkRequest request) {
 
         ChunkResponse chunk = chunkRestService.enable(request);
@@ -116,6 +122,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @ActionAnnotation(title = "文件分块", action = "导出", description = "export chunk")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_EXPORT_ANY_LEVEL)
     @Override
     public Object export(ChunkRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -131,6 +138,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     // update elasticsearch index
     @ActionAnnotation(title = "文件分块", action = "更新索引", description = "update chunk index")
     @PostMapping("/updateIndex")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> updateIndex(@RequestBody ChunkRequest request) {
 
         chunkElasticService.updateIndex(request);
@@ -141,6 +149,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     // update elasticsearch vector index
     @ActionAnnotation(title = "文件分块", action = "更新向量索引", description = "update chunk vector index")
     @PostMapping("/updateVectorIndex")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> updateVectorIndex(@RequestBody ChunkRequest request) {
 
         if (chunkVectorService != null) {
@@ -153,6 +162,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     // update elasticsearch all index
     @ActionAnnotation(title = "文件分块", action = "更新所有索引", description = "update all chunk index")
     @PostMapping("/updateAllIndex")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> updateAllIndex(@RequestBody ChunkRequest request) {
 
         chunkElasticService.updateAllIndex(request);
@@ -163,6 +173,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     // update elasticsearch all vector index
     @ActionAnnotation(title = "文件分块", action = "更新所有向量索引", description = "update all chunk vector index")
     @PostMapping("/updateAllVectorIndex")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ChunkRequest request) {
 
         if (chunkVectorService != null) {

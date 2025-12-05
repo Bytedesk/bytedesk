@@ -16,27 +16,27 @@ package com.bytedesk.service.message_template;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class MessageTemplateInitializer implements SmartInitializingSingleton {
 
-    // private final MessageTemplateRestService templateRestService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initPermissions();
-        // 创建默认的工单分类
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // templateRestService.initMessageTemplates(orgUid);
     }
 
     private void initPermissions() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = MessageTemplatePermissions.ARTICLE_PREFIX + permission.name();
-        //     authorityService.createForPlatform(permissionValue);
-        // }
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = MessageTemplatePermissions.MESSAGE_TEMPLATE_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 
     

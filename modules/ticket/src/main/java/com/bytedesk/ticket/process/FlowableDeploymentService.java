@@ -10,7 +10,7 @@ import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.ai.workflow.compiler.CompileResult;
+import com.bytedesk.core.workflow.compiler.CompileResult;
 
 import lombok.RequiredArgsConstructor;
 

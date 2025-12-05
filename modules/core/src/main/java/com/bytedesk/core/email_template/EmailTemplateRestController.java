@@ -18,10 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/api/v1/email-template")
-public class EmailTemplateRestController extends BaseRestController<EmailTemplateRequest, EmailTemplateService> {
+@AllArgsConstructor
+public class EmailTemplateRestController extends BaseRestController<EmailTemplateRequest, EmailTemplateRestService> {
 
+    private final EmailTemplateRestService emailTemplateRestService;
 
+    @Override
+    protected EmailTemplateRestService getService() {
+        return emailTemplateRestService;
+    }
     
 }

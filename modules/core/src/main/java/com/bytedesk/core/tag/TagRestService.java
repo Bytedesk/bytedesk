@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-05-11 18:25:45
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-22 07:04:17
+ * @LastEditTime: 2025-11-29 12:00:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -28,6 +28,7 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
@@ -47,15 +48,30 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+    
+    private final PermissionService permissionService;
 
+    // 模块名称，用于权限检查
+    private static final String MODULE_NAME = "TAG";
+    
     @Override
-    protected Specification<TagEntity> createSpecification(TagRequest request) {
-        return TagSpecification.search(request, authService);
+    public Page<TagEntity> queryByOrgEntity(TagRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<TagEntity> specs = TagSpecification.search(request, authService);
+        return tagRepository.findAll(specs, pageable);
     }
 
     @Override
-    protected Page<TagEntity> executePageQuery(Specification<TagEntity> spec, Pageable pageable) {
-        return tagRepository.findAll(spec, pageable);
+    public Page<TagResponse> queryByOrg(TagRequest request) {
+        Page<TagEntity> tagPage = queryByOrgEntity(request);
+        return tagPage.map(this::convertToResponse);
+    }
+
+    @Override
+    public Page<TagResponse> queryByUser(TagRequest request) {
+        UserEntity user = authService.getUser();
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "tag", key = "#uid", unless="#result==null")
@@ -76,6 +92,15 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     @Transactional
     @Override
     public TagResponse create(TagRequest request) {
+        return createInternal(request, false);
+    }
+
+    @Transactional
+    public TagResponse createSystemTag(TagRequest request) {
+        return createInternal(request, true);
+    }
+
+    private TagResponse createInternal(TagRequest request, boolean skipPermissionCheck) {
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -87,11 +112,25 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
                 return convertToResponse(tag.get());
             }
         }
-        // 
+        
+        // 获取用户信息
         UserEntity user = authService.getUser();
         if (user != null) {
             request.setUserUid(user.getUid());
         }
+        
+        // 确定数据层级
+        String level = request.getLevel();
+        if (!StringUtils.hasText(level)) {
+            level = LevelEnum.ORGANIZATION.name();
+            request.setLevel(level);
+        }
+        
+        // 检查用户是否有权限创建该层级的数据
+        if (!skipPermissionCheck && !permissionService.canCreateAtLevel(MODULE_NAME, level)) {
+            throw new RuntimeException("无权限创建该层级的标签数据");
+        }
+        
         // 
         TagEntity entity = modelMapper.map(request, TagEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
@@ -111,6 +150,12 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
         Optional<TagEntity> optional = tagRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             TagEntity entity = optional.get();
+            
+            // 检查用户是否有权限更新该实体
+            if (!permissionService.hasEntityPermission(MODULE_NAME, "UPDATE", entity)) {
+                throw new RuntimeException("无权限更新该标签数据");
+            }
+            
             modelMapper.map(request, entity);
             //
             TagEntity savedEntity = save(entity);
@@ -153,8 +198,15 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     public void deleteByUid(String uid) {
         Optional<TagEntity> optional = tagRepository.findByUid(uid);
         if (optional.isPresent()) {
-            optional.get().setDeleted(true);
-            save(optional.get());
+            TagEntity entity = optional.get();
+            
+            // 检查用户是否有权限删除该实体
+            if (!permissionService.hasEntityPermission(MODULE_NAME, "DELETE", entity)) {
+                throw new RuntimeException("无权限删除该标签数据");
+            }
+            
+            entity.setDeleted(true);
+            save(entity);
             // tagRepository.delete(optional.get());
         }
         else {
@@ -176,9 +228,19 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     public TagExcel convertToExcel(TagEntity entity) {
         return modelMapper.map(entity, TagExcel.class);
     }
+
+    @Override
+    protected Specification<TagEntity> createSpecification(TagRequest request) {
+        return TagSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<TagEntity> executePageQuery(Specification<TagEntity> spec, Pageable pageable) {
+        return tagRepository.findAll(spec, pageable);
+    }
     
     public void initTags(String orgUid) {
-        // log.info("initThreadTag");
+        // log.info("initTagTag");
         for (String tag : TagInitData.getAllTags()) {
             TagRequest tagRequest = TagRequest.builder()
                     .uid(Utils.formatUid(orgUid, tag))
@@ -189,7 +251,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
                     .platform(BytedeskConsts.PLATFORM_BYTEDESK)
                     .orgUid(orgUid)
                     .build();
-            create(tagRequest);
+            createSystemTag(tagRequest);
         }
     }
 

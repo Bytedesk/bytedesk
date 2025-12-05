@@ -17,6 +17,8 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -26,9 +28,12 @@ public class QuickReplyInitializer implements SmartInitializingSingleton {
 
     private final QuickReplyRestService quickReplyRestService;
 
+    private final AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
         // 为保证执行顺序，迁移到KbaseInitializer中
+        initPermissions();
     }
 
     // 迁移到kbaseInitializer
@@ -40,7 +45,12 @@ public class QuickReplyInitializer implements SmartInitializingSingleton {
         quickReplyRestService.initQuickReply(orgUid);
     }
 
-    
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = QuickReplyPermissions.QUICKREPLY_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
+    }
 
     
 }

@@ -38,7 +38,7 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -65,6 +65,7 @@ import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 
 import lombok.AllArgsConstructor;
@@ -212,8 +213,8 @@ public class VisitorThreadService
     }
 
     public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
-        //
-        String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
+        // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
+        String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robot);
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
         String extra = buildRobotExtra(visitorRequest, robot);
@@ -241,8 +242,8 @@ public class VisitorThreadService
         //
         String extra = buildRobotExtra(visitorRequest, robot);
         thread.setExtra(extra);
-        // 使用agent的serviceSettings配置
-        String robotString = ConvertAiUtils.convertToRobotProtobufString(robot);
+        // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
+        String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robot);
         // thread.setAgent(robotString); // 人工客服
         thread.setRobot(robotString); // 机器人
         // 保存
@@ -252,6 +253,56 @@ public class VisitorThreadService
         }
         //
         return savedEntity;
+    }
+
+    public ThreadEntity createWorkflowThread(VisitorRequest visitorRequest, WorkflowEntity workflow, String topic) {
+        //
+        String workflowString = ServiceConvertUtils.convertToWorkflowProtobufString(workflow);
+        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
+        // 生成 thread.extra（工作流暂时不支持 debug 预览）
+        String extra = buildWorkflowExtra(visitorRequest, workflow);
+        //
+        ThreadEntity thread = ThreadEntity.builder()
+                .uid(uidUtils.getUid())
+                .topic(topic)
+                .type(ThreadTypeEnum.WORKFLOW.name())
+                .workflow(workflowString) // 工作流
+                .userUid(workflow.getUid()) // 工作流uid
+                .user(visitor)
+                .channel(visitorRequest.getChannel())
+                .orgUid(workflow.getOrgUid())
+                .extra(extra)
+                .build();
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
+        return savedEntity;
+    }
+
+    public ThreadEntity reInitWorkflowThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkflowEntity workflow) {
+        //
+        String extra = buildWorkflowExtra(visitorRequest, workflow);
+        thread.setExtra(extra);
+        // 设置工作流信息
+        String workflowString = ServiceConvertUtils.convertToWorkflowProtobufString(workflow);
+        thread.setWorkflow(workflowString); // 工作流
+        // 保存
+        ThreadEntity savedEntity = threadRestService.save(thread);
+        if (savedEntity == null) {
+            throw new RuntimeException("Could not save visitor thread");
+        }
+        //
+        return savedEntity;
+    }
+
+    /**
+     * 根据请求与工作流实体构建 thread.extra
+     * - 工作流暂时不支持 debug 预览
+     */
+    private String buildWorkflowExtra(VisitorRequest visitorRequest, WorkflowEntity workflow) {
+        // 工作流暂时没有设置实体，返回空的 JSON 对象
+        return BytedeskConsts.EMPTY_JSON_STRING;
     }
 
     /**

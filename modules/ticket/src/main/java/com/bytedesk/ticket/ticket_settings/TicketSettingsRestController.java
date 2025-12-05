@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
@@ -130,8 +132,11 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}")
     public ResponseEntity<?> getByWorkgroup(
             @PathVariable("orgUid") String orgUid,
-            @PathVariable("workgroupUid") String workgroupUid) {
-        TicketSettingsResponse resp = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+            @PathVariable("workgroupUid") String workgroupUid,
+            @RequestParam(value = "type", required = false) String type) {
+        TicketSettingsResponse resp = StringUtils.hasText(type)
+            ? ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid, type)
+            : ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
@@ -199,8 +204,11 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/categories")
     public ResponseEntity<?> getCategoriesByWorkgroup(
             @PathVariable("orgUid") String orgUid,
-            @PathVariable("workgroupUid") String workgroupUid) {
-        TicketSettingsResponse settings = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+            @PathVariable("workgroupUid") String workgroupUid,
+            @RequestParam(value = "type", required = false) String type) {
+        TicketSettingsResponse settings = StringUtils.hasText(type)
+            ? ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid, type)
+            : ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
         com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse response = 
             toCategoryVisitorResponse(settings != null ? settings.getCategorySettings() : null);
         return ResponseEntity.ok(JsonResult.success(response));

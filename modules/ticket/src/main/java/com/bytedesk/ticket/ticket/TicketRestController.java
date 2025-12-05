@@ -30,7 +30,7 @@ import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Slf4j
 @RestController
@@ -42,7 +42,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     private final TicketService ticketService;
 
-    // @PreAuthorize("hasAuthority('TICKET_READ')") // 查询放开权限
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "工单", action = "组织查询", description = "query ticket by org")
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {
 
@@ -51,7 +52,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    // @PreAuthorize("hasAuthority('TICKET_READ')") 
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "工单", action = "用户查询", description = "query ticket by user")
     @Override
     public ResponseEntity<?> queryByUser(TicketRequest request) {
 
@@ -60,7 +62,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    // @PreAuthorize("hasAuthority('TICKET_READ')")
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "工单", action = "查询详情", description = "query ticket by uid")
     @Override
     public ResponseEntity<?> queryByUid(TicketRequest request) {
         
@@ -69,7 +72,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // @PreAuthorize("hasAuthority('TICKET_READ')")
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "工单", action = "按主题查询", description = "query ticket by topic")
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(TicketRequest request) {
 
@@ -78,7 +82,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    // @PreAuthorize("hasAuthority('TICKET_READ')")
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "工单", action = "按会话查询", description = "query ticket by thread uid")
     @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
 
@@ -87,7 +92,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    // @PreAuthorize("hasAuthority('TICKET_CREATE')")
+    @PreAuthorize(TicketPermissions.HAS_TICKET_CREATE_ANY_LEVEL)
     @ActionAnnotation(title = "工单", action = "新建", description = "create ticket")
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
@@ -97,7 +102,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // @PreAuthorize("hasAuthority('TICKET_UPDATE')")
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "工单", action = "更新", description = "update ticket")
     @Override
     public ResponseEntity<?> update(TicketRequest request) {
@@ -107,7 +112,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    // @PreAuthorize("hasAuthority('TICKET_DELETE')")
+    @PreAuthorize(TicketPermissions.HAS_TICKET_DELETE_ANY_LEVEL)
     @ActionAnnotation(title = "工单", action = "删除", description = "delete ticket")
     @Override
     public ResponseEntity<?> delete(TicketRequest request) {
@@ -119,7 +124,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    // @PreAuthorize("hasAuthority('TICKET_EXPORT')")
+    @PreAuthorize(TicketPermissions.HAS_TICKET_EXPORT_ANY_LEVEL)
     @ActionAnnotation(title = "工单", action = "导出", description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
@@ -140,9 +145,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     public ResponseEntity<?> claimTicket(@RequestBody TicketRequest request) {
         
         TicketResponse response = ticketService.claimTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -153,9 +156,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     public ResponseEntity<?> startTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.startTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -165,9 +166,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     @PostMapping("/unclaim")
     public ResponseEntity<?> unclaimTicket(@RequestBody TicketRequest request) {
         TicketResponse response = ticketService.unclaimTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -179,9 +178,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     public ResponseEntity<?> transferTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.transferTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -192,51 +189,40 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     public ResponseEntity<?> holdTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.holdTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 恢复工单
      */
-    
     @PostMapping("/resume")
     public ResponseEntity<?> resumeTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.resumeTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 待回应工单
      */
-    
     @PostMapping("/pend")
     public ResponseEntity<?> pendTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.pendTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 重新打开工单
      */
-    
     @PostMapping("/reopen")
     public ResponseEntity<?> reopenTicket(@RequestBody TicketRequest request) {
         
         TicketResponse response = ticketService.reopenTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -246,69 +232,59 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @PostMapping("/escalate")
     public ResponseEntity<?> escalateTicket(@RequestBody TicketRequest request) {
+        
         TicketResponse response = ticketService.escalateTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 完成工单
      */
-    
     @PostMapping("/resolve")
     public ResponseEntity<?> resolveTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.resolveTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 客户验证工单
      */
-    
     @PostMapping("/verify")
     public ResponseEntity<?> verifyTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.verifyTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 关闭工单
      */
-    
     @PostMapping("/close")
     public ResponseEntity<?> closeTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.closeTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 取消工单
      */
-    
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.cancelTicket(request);
-        if (response == null) {
-            return ResponseEntity.ok(JsonResult.error("工单不存在"));
-        }
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
     /**
      * 查询工单任务历史
      */
-    
     @GetMapping("/history/task")
     public ResponseEntity<?> queryTicketTaskHistory(TicketRequest request) {
         List<TicketHistoryTaskResponse> histories = ticketService.queryTicketTaskHistory(request);

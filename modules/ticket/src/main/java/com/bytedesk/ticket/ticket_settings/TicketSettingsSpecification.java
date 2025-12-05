@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.ticket.ticket.TicketTypeEnum;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,8 @@ public class TicketSettingsSpecification extends BaseSpecification<TicketSetting
             }
             // type
             if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+                String normalizedType = TicketTypeEnum.fromValue(request.getType()).name();
+                predicates.add(criteriaBuilder.equal(root.get("type"), normalizedType));
             }
             // 
             if (StringUtils.hasText(request.getUserUid())) {

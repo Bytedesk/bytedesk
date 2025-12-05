@@ -21,7 +21,7 @@ import org.springframework.util.Assert;
 
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageUtils;
+import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.topic.TopicUtils;

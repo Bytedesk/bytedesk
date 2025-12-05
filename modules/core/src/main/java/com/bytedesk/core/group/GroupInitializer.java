@@ -16,14 +16,30 @@ package com.bytedesk.core.group;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
+import lombok.AllArgsConstructor;
+
 @Component
+@AllArgsConstructor
 public class GroupInitializer implements SmartInitializingSingleton {
+
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         init();
+        initPermissions();
     }
 
     private void init() {}
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = GroupPermissions.GROUP_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
+    }
     
 }

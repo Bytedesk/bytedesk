@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.RedisConsts;
 
 import java.util.concurrent.TimeUnit;
@@ -25,15 +26,20 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class PushFilterService {
     
-
     // 验证码发送间隔阈值（单位：秒）
     private static final long VALIDATE_CODE_SEND_INTERVAL_SECONDS = 10 * 60; // 10分钟
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    private BytedeskProperties bytedeskProperties;
+
     // 检查是否可以发送验证码
     public Boolean canSendCode(String ip) {
+        if (Boolean.TRUE.equals(bytedeskProperties.getDebug())) {
+            return true;
+        }
         String key = RedisConsts.PUSH_CODE_IP_PREFIX + ip;
         Boolean exists = stringRedisTemplate.hasKey(key);
         return exists == null || !exists;
@@ -44,7 +50,6 @@ public class PushFilterService {
         String key = RedisConsts.PUSH_CODE_IP_PREFIX + ip;
         stringRedisTemplate.opsForValue().set(key, "1", VALIDATE_CODE_SEND_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
-
 
     // 删除发送验证码的ip
     public void removeIpLastSentTime(String ip) {

@@ -20,44 +20,5 @@ import lombok.AllArgsConstructor;
 @Component
 @AllArgsConstructor
 public class AuthorityInitializer {
-
-    // private AuthorityRestService authorityService;
-
-    // 在 OrganizationInitializer 中调用
-    // public void init() {
-
-    //     // 平台权限数组
-    //     // String[] authoritiesPlatform = {
-    //     //     AuthorityPermissions.AUTHORITY_PREFIX,
-    //     // };
-    //     // for (String prefix : authoritiesPlatform) {
-    //     // for (PermissionEnum permission : PermissionEnum.values()) {
-    //     //     String permissionValue = AuthorityPermissions.AUTHORITY_PREFIX + permission.name();
-    //     //     authorityService.createForPlatform(permissionValue);
-    //     // }
-    //     // }
-        
-    //     /// 
-    //     // 组织权限：初始化权限前缀数组
-    //     // String[] authoritiesOrganization = {
-    //     //     RolePermissions.ROLE_PREFIX,
-    //     //     // OrganizationPermissions.ORGANIZATION_PREFIX,
-    //     //     // UserPermissions.USER_PREFIX,
-    //     //     // AssistantPermissions.ASSISTANT_PREFIX,
-    //     //     // BlackPermissions.BLACK_PREFIX,
-    //     //     // CategoryPermissions.CATEGORY_PREFIX,
-    //     //     // ChannelPermissions.CHANNEL_PREFIX,
-    //     //     // IpPermissions.IP_PREFIX,
-    //     //     // MessagePermissions.MESSAGE_PREFIX,
-    //     //     // ThreadPermissions.THREAD_PREFIX,
-    //     //     // PushPermissions.PUSH_PREFIX
-    //     // };
-    //     // // 遍历权限前缀数组
-    //     // for (String prefix : authoritiesOrganization) {
-    //     // for (PermissionEnum permission : PermissionEnum.values()) {
-    //     //     String permissionValue = RolePermissions.ROLE_PREFIX + permission.name();
-    //     //     authorityService.createForPlatform(permissionValue);
-    //     // }
-    //     // }
-    // }
+    // 迁移到 RoleInitializer 中
 }

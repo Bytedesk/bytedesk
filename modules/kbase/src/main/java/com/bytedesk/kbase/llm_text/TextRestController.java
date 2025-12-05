@@ -15,6 +15,8 @@ package com.bytedesk.kbase.llm_text;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +49,8 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         this.textElasticService = textElasticService;
     }
 
-    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
+    @PreAuthorize(TextPermissions.HAS_TEXT_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "知识库文本", action = "组织查询", description = "query text by org")
     @Override
     public ResponseEntity<?> queryByOrg(TextRequest request) {
         
@@ -56,7 +59,8 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
-    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize(TextPermissions.HAS_TEXT_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "知识库文本", action = "用户查询", description = "query text by user")
     @Override
     public ResponseEntity<?> queryByUser(TextRequest request) {
         
@@ -65,6 +69,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
+    @PreAuthorize(TextPermissions.HAS_TEXT_CREATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "新建", description = "create text")
     @Override
     public ResponseEntity<?> create(TextRequest request) {
@@ -74,6 +79,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "更新", description = "update text")
     @Override
     public ResponseEntity<?> update(TextRequest request) {
@@ -83,6 +89,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
+    @PreAuthorize(TextPermissions.HAS_TEXT_DELETE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "删除", description = "delete text")
     @Override
     public ResponseEntity<?> delete(TextRequest request) {
@@ -92,6 +99,8 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(TextPermissions.HAS_TEXT_DELETE_ANY_LEVEL)
+    @ActionAnnotation(title = "知识库文本", action = "删除所有", description = "delete all text")
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(@RequestBody TextRequest request) {
 
@@ -101,6 +110,8 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // enable/disable text
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "知识库文本", action = "启用", description = "enable text")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody TextRequest request) {
 
@@ -109,7 +120,9 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(textResponse));
     }
 
+    @PreAuthorize(TextPermissions.HAS_TEXT_EXPORT_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "导出", description = "export text")
+    @GetMapping("/export")
     @Override
     public Object export(TextRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -122,7 +135,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         );
     }
 
-    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
+    @PreAuthorize(TextPermissions.HAS_TEXT_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(TextRequest request) {
         // TODO Auto-generated method stub
@@ -130,6 +143,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch index
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "更新索引", description = "update text index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody TextRequest request) {
@@ -140,6 +154,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch vector index
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "更新向量索引", description = "update text vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody TextRequest request) {
@@ -152,6 +167,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch all index
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "更新所有索引", description = "update all text index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody TextRequest request) {
@@ -162,6 +178,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch all vector index
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "知识库文本", action = "更新所有向量索引", description = "update all text vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody TextRequest request) {

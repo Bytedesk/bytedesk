@@ -22,6 +22,7 @@ import com.bytedesk.ai.robot.RobotResponse;
 import com.bytedesk.ai.robot_message.RobotMessageEntity;
 import com.bytedesk.ai.robot_message.RobotMessageResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.robot.RobotProtobufBasic;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 // import com.bytedesk.core.message.MessageExtra;
@@ -50,6 +51,20 @@ public class ConvertAiUtils {
     public static String convertToRobotProtobufString(RobotEntity entity) {
         RobotProtobuf robotProtobuf = convertToRobotProtobuf(entity);
         return robotProtobuf.toJson();
+    }
+
+    /**
+     * 转换为精简版机器人协议 JSON 字符串
+     * 
+     * <p>只包含基础显示信息（uid, nickname, avatar, type, orgUid），
+     * 不包含 LLM 配置等大字段，适合存储到 thread.robot 字段。
+     * 
+     * @param entity 机器人实体
+     * @return 精简版 JSON 字符串
+     */
+    public static String convertToRobotProtobufBasicString(RobotEntity entity) {
+        RobotProtobufBasic robotProtobufBasic = RobotProtobufBasic.fromEntity(entity);
+        return robotProtobufBasic.toJson();
     }
 
     public static String convertToUserProtobufString(RobotEntity entity) {

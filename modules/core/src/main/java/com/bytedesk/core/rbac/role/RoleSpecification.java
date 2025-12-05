@@ -21,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.enums.LevelEnum;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -35,13 +34,13 @@ public class RoleSpecification extends BaseSpecification<RoleEntity, RoleRequest
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
 
-            if (request.getOrgAndPlatform() != null && request.getOrgAndPlatform()) {
-                predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()),
-                        criteriaBuilder.equal(root.get("level"), LevelEnum.PLATFORM.name())));
+            if (request.getSystem() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("system"), request.getSystem()));
+                if (Boolean.FALSE.equals(request.getSystem()) && StringUtils.hasText(request.getOrgUid())) {
+                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                }
             } else {
                 //
-                // 过滤 level = LevelEnum.PLATFORM.name()
                 if (StringUtils.hasText(request.getLevel())) {
                     predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
                 }

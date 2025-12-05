@@ -65,12 +65,13 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     /**
      * 通用的queryByOrg实现
      * 减少子类重复代码
+     * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByOrg", request.getClass());
+            Method method = service.getClass().getMethod("queryByOrg", PageableRequest.class);
             Object result = method.invoke(service, request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
@@ -81,12 +82,13 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     /**
      * 通用的queryByUser实现
      * 减少子类重复代码
+     * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
     @GetMapping("/query")
     public ResponseEntity<?> queryByUser(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByUser", request.getClass());
+            Method method = service.getClass().getMethod("queryByUser", PageableRequest.class);
             Object result = method.invoke(service, request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
@@ -97,12 +99,13 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     /**
      * 通用的queryByUid实现
      * 减少子类重复代码
+     * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByUid", request.getClass());
+            Method method = service.getClass().getMethod("queryByUid", PageableRequest.class);
             Object result = method.invoke(service, request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
@@ -113,12 +116,13 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     /**
      * 通用的create实现
      * 减少子类重复代码
+     * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("create", request.getClass());
+            Method method = service.getClass().getMethod("create", PageableRequest.class);
             Object result = method.invoke(service, request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
@@ -129,12 +133,13 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     /**
      * 通用的update实现
      * 减少子类重复代码
+     * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("update", request.getClass());
+            Method method = service.getClass().getMethod("update", PageableRequest.class);
             Object result = method.invoke(service, request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
@@ -145,12 +150,13 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     /**
      * 通用的delete实现
      * 减少子类重复代码
+     * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("delete", request.getClass());
+            Method method = service.getClass().getMethod("delete", PageableRequest.class);
             method.invoke(service, request);
             return ResponseEntity.ok(JsonResult.success());
         } catch (Exception e) {

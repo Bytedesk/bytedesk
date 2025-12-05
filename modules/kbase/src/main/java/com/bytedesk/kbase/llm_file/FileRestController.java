@@ -15,6 +15,7 @@ package com.bytedesk.kbase.llm_file;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +46,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FileResponse.class)))
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(FilePermissions.HAS_FILE_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByOrg(FileRequest request) {
         
@@ -58,7 +59,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FileResponse.class)))
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(FilePermissions.HAS_FILE_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUser(FileRequest request) {
         
@@ -72,6 +73,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FileResponse.class)))
     @ActionAnnotation(title = "文件", action = "新建", description = "create file")
+    @PreAuthorize(FilePermissions.HAS_FILE_CREATE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> create(FileRequest request) {
         
@@ -85,6 +87,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FileResponse.class)))
     @ActionAnnotation(title = "文件", action = "更新", description = "update file")
+    @PreAuthorize(FilePermissions.HAS_FILE_UPDATE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> update(FileRequest request) {
         
@@ -96,6 +99,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
     @Operation(summary = "删除文件", description = "删除指定的文件")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = "文件", action = "删除", description = "delete file")
+    @PreAuthorize(FilePermissions.HAS_FILE_DELETE_ANY_LEVEL)
     @Override
     public ResponseEntity<?> delete(FileRequest request) {
         
@@ -107,6 +111,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
     @Operation(summary = "删除所有文件", description = "删除所有文件")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @PostMapping("/deleteAll")
+    @PreAuthorize(FilePermissions.HAS_FILE_DELETE_ANY_LEVEL)
     public ResponseEntity<?> deleteAll(@RequestBody FileRequest request) {
 
         fileRestService.deleteAll(request);
@@ -119,6 +124,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FileResponse.class)))
     @PostMapping("/enable")
+    @PreAuthorize(FilePermissions.HAS_FILE_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> enable(@RequestBody FileRequest request) {
 
         FileResponse file = fileRestService.enable(request);
@@ -129,6 +135,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
     @Operation(summary = "导出文件", description = "导出文件数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
     @ActionAnnotation(title = "文件", action = "导出", description = "export file")
+    @PreAuthorize(FilePermissions.HAS_FILE_EXPORT_ANY_LEVEL)
     @Override
     public Object export(FileRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -146,6 +153,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FileResponse.class)))
     @PostMapping("/rechunk")
+    @PreAuthorize(FilePermissions.HAS_FILE_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> rechunkFile(@RequestBody FileRequest request) {
         
         FileResponse file = fileRestService.rechunkFile(request.getUid());

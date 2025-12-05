@@ -22,51 +22,19 @@ public class RoleConsts {
 
     private RoleConsts() {}
 
-    // super - 超级管理员
+    // public static final String HAS_ANY_ROLE = "hasAnyRole('SUPER', 'ADMIN', 'AGENT')";
+
+    // super - 超级管理员（平台级）
     public static final String ROLE_SUPER = "ROLE_SUPER";
-    // admin - 管理员
+    // admin - 组织管理员（组织级）
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
-    // member - 团队成员
-    public static final String ROLE_MEMBER = "ROLE_MEMBER";
+    // dept_admin - 部门管理员（部门级）
+    public static final String ROLE_DEPT_ADMIN = "ROLE_DEPT_ADMIN";
+    // workgroup_admin - 工作组管理员（工作组级）
+    public static final String ROLE_WORKGROUP_ADMIN = "ROLE_WORKGROUP_ADMIN";
     // customer service - 客服
     public static final String ROLE_AGENT = "ROLE_AGENT";
-    // USER
+    // end user - 注册用户
     public static final String ROLE_USER = "ROLE_USER";
-    // VISITOR
-    // public static final String ROLE_VISITOR = "ROLE_VISITOR";
-
-
-    /**
-     * 付费注册用户
-     */
-    // public static final String ROLE_VIP = "ROLE_VIP";
-    /**
-     * 试用会员
-     */
-    // public static final String ROLE_TRY = "ROLE_TRY";
-    /**
-     * 第三方代理公司
-     */
-    // public static final String ROLE_PROXY = "ROLE_PROXY";
-    /**
-     * 免费注册用户
-     */
-    // public static final String ROLE_FREE = "ROLE_FREE";
-
-    /**
-     * 工作组：
-     * 客服组长
-     */
-    // public static final String ROLE_WORKGROUP_ADMIN = "ROLE_WORKGROUP_ADMIN";
-    // /**
-    //  * 客服账号：
-    //  * 接待访客角色，如果要接待访客，必须赋予此角色
-    //  */
-    // public static final String ROLE_WORKGROUP_AGENT = "ROLE_WORKGROUP_AGENT";
-    // /**
-    //  * 质检账号
-    //  */
-    // public static final String ROLE_WORKGROUP_CHECKER = "ROLE_WORKGROUP_CHECKER";
-
 
 }

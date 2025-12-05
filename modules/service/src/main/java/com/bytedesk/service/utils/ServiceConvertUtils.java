@@ -19,11 +19,11 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
-import com.bytedesk.ai.workflow.WorkflowEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -83,6 +83,25 @@ public class ServiceConvertUtils {
 
     public static String convertToUserProtobufString(WorkflowEntity workflow) {
         UserProtobuf userProtobuf = convertToUserProtobuf(workflow);
+        return JSON.toJSONString(userProtobuf);
+    }
+
+    /**
+     * 将工作流实体转换为 UserProtobuf JSON 字符串
+     * 只包含基本信息（uid, nickname, avatar）和 schema，不包含 nodes/edges
+     */
+    public static String convertToWorkflowProtobufString(WorkflowEntity workflow) {
+        if (workflow == null) {
+            return null;
+        }
+        // 手动构建 UserProtobuf，只传递基本信息和 schema
+        UserProtobuf userProtobuf = UserProtobuf.builder()
+                .uid(workflow.getUid())
+                .nickname(workflow.getNickname())
+                .avatar(workflow.getAvatar())
+                .type(UserTypeEnum.WORKFLOW.name())
+                .extra(workflow.getSchema()) // 将 schema 存储在 extra 字段中
+                .build();
         return JSON.toJSONString(userProtobuf);
     }
 

@@ -63,7 +63,8 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ArticleResponse.class)))
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "文章", action = "组织查询", description = "query article by org")
     @Override
     public ResponseEntity<?> queryByOrg(ArticleRequest request) {
 
@@ -76,7 +77,8 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ArticleResponse.class)))
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "文章", action = "用户查询", description = "query article by user")
     @Override
     public ResponseEntity<?> queryByUser(ArticleRequest request) {
         
@@ -89,7 +91,8 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ArticleResponse.class)))
-    // @PreAuthorize("hasAuthority('KBASE_READ')")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "文章", action = "查询详情", description = "query article by uid")
     @Override
     public ResponseEntity<?> queryByUid(ArticleRequest request) {
         
@@ -106,6 +109,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ArticleResponse.class)))
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_CREATE_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "新建", description = "create article")
     @Override
     public ResponseEntity<?> create(@RequestBody ArticleRequest request) {
@@ -119,6 +123,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ArticleResponse.class)))
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "更新", description = "update article")
     @Override
     public ResponseEntity<?> update(@RequestBody ArticleRequest request) {
@@ -130,6 +135,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
     @Operation(summary = "删除文章", description = "删除指定的文章")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_DELETE_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "删除", description = "delete article")
     @Override
     public ResponseEntity<?> delete(@RequestBody ArticleRequest request) {
@@ -141,8 +147,9 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
     @Operation(summary = "导出文章", description = "导出文章数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_EXPORT_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "导出", description = "export article")
-    @PreAuthorize("hasAuthority('KBASE_EXPORT')")
+    @GetMapping("/export")
     @Override
     public Object export(ArticleRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -157,6 +164,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
     @Operation(summary = "更新文章索引", description = "更新文章的Elasticsearch索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "更新索引", description = "update article index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody ArticleRequest request) {
@@ -168,6 +176,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
     @Operation(summary = "更新文章向量索引", description = "更新文章的向量索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "更新向量索引", description = "update article vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody ArticleRequest request) {
@@ -182,6 +191,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
     @Operation(summary = "更新所有文章索引", description = "更新所有文章的Elasticsearch索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "更新所有索引", description = "update all article index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody ArticleRequest request) {
@@ -193,6 +203,7 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
     @Operation(summary = "更新所有文章向量索引", description = "更新所有文章的向量索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "文章", action = "更新所有向量索引", description = "update all article vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ArticleRequest request) {
@@ -209,6 +220,8 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
     @ApiResponse(responseCode = "200", description = "搜索成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ArticleElasticSearchResult.class)))
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "文章", action = "搜索", description = "search article")
     @GetMapping("/search")
     public ResponseEntity<?> searchElastic(ArticleRequest request) {
 

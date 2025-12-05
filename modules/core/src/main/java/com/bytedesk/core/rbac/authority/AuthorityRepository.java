@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -41,5 +42,7 @@ public interface AuthorityRepository extends JpaRepository<AuthorityEntity, Long
 
     @Transactional
     void deleteById(@NonNull Long id);
+
+    List<AuthorityEntity> findByValueContainingIgnoreCaseAndDeletedFalse(String value);
 
 }

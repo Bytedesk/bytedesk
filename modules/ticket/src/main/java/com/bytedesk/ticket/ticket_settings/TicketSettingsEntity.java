@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.sub.TicketCategorySettingsEntity;
 
@@ -65,6 +66,13 @@ public class TicketSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
+
+    /**
+     * Ticket scope type (INTERNAL / EXTERNAL)
+     */
+    @Builder.Default
+    @Column(name = "ticket_type", length = 32)
+    private String type = TicketTypeEnum.EXTERNAL.name();
 
     /**
      * Whether this is a default settings template for new entities

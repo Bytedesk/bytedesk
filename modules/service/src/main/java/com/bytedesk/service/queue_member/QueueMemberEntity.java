@@ -78,6 +78,11 @@ public class QueueMemberEntity extends BaseEntity {
     @JsonBackReference("robotQueueMembers")
     private QueueEntity robotQueue;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflow_queue_id")
+    @JsonBackReference("workflowQueueMembers")
+    private QueueEntity workflowQueue;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
     private ThreadEntity thread;
@@ -301,6 +306,12 @@ public class QueueMemberEntity extends BaseEntity {
     }
 
     public void robotAutoAcceptThread() {
+        this.robotAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
+        this.robotAcceptedAt = BdDateUtils.now();
+    }
+
+    public void workflowAutoAcceptThread() {
+        // 工作流自动接受线程，复用机器人的接受逻辑
         this.robotAcceptType = QueueMemberAcceptTypeEnum.AUTO.name();
         this.robotAcceptedAt = BdDateUtils.now();
     }

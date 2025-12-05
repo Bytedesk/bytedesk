@@ -47,6 +47,7 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 
+import org.modelmapper.ModelMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,6 +71,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     private final ThreadRestService threadRestService;
     
     private final AgentSettingsRestService agentSettingsRestService;
+
+    private final ModelMapper modelMapper;
 
     @Override
     protected Specification<AgentEntity> createSpecification(AgentRequest request) {
@@ -158,6 +161,23 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         }
         MemberEntity member = memberOptional.get();
         // 创建默认客服
+        AgentRequest agentRequest = AgentRequest.builder()
+                .uid(uidUtils.getUid())
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .mobile(member.getMobile())
+                .memberUid(member.getUid())
+                .orgUid(orgUid)
+                .build();
+        create(agentRequest);
+    }
+
+    public void createFromMemberByEmail(String email, String orgUid) {
+        Optional<MemberEntity> memberOptional = memberRestService.findByEmailAndOrgUid(email, orgUid);
+        if (!memberOptional.isPresent()) {
+            return;
+        }
+        MemberEntity member = memberOptional.get();
         AgentRequest agentRequest = AgentRequest.builder()
                 .uid(uidUtils.getUid())
                 .nickname(member.getNickname())
@@ -319,6 +339,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     @Override
     public AgentResponse convertToResponse(AgentEntity entity) {
         return ServiceConvertUtils.convertToAgentResponse(entity);
+    }
+
+    public AgentExcel convertToExcel(AgentEntity entity) {
+        return modelMapper.map(entity, AgentExcel.class);
     }
 
     @Override

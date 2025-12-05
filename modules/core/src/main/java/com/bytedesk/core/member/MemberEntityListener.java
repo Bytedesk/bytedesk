@@ -35,7 +35,6 @@ public class MemberEntityListener {
     @PostPersist
     public void postPersist(MemberEntity member) {
         MemberEntity clonedMember = SerializationUtils.clone(member);
-        // UserEntity user = clonedMember.getUser();
         log.info("postPersist member {}", clonedMember.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
@@ -45,7 +44,6 @@ public class MemberEntityListener {
     @PostUpdate
     public void postUpdate(MemberEntity member) {
         MemberEntity clonedMember = SerializationUtils.clone(member);
-        // UserEntity user = clonedMember.getUser();
         log.info("postUpdate member {}", clonedMember.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);

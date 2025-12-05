@@ -16,6 +16,9 @@ package com.bytedesk.core.thread;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,35 +27,19 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ThreadInitializer implements SmartInitializingSingleton {
 
-    // private final ThreadRestService threadRestService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        // 创建默认的工单分类
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // threadRestService.initThreadCategory(orgUid);
-        // threadRestService.initThreadTag(orgUid);
     }
 
     private void initAuthority() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = ThreadPermissions.THREAD_PREFIX + permission.name();
-        //     if (authorityService.existsByValue(permissionValue)) {
-        //         // log.info("Thread authority {} already exists", permissionValue);
-        //         continue;
-        //     }
-        //     AuthorityRequest authRequest = AuthorityRequest.builder()
-        //             .name(I18Consts.I18N_PREFIX + permissionValue)
-        //             .value(permissionValue)
-        //             .description("Permission for " + permissionValue)
-        //             .build();
-        //     authRequest.setUid(permissionValue.toLowerCase());
-        //     authorityService.create(authRequest);
-        // }
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = ThreadPermissions.THREAD_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
-
-    
 
     
 

@@ -16,33 +16,28 @@ package com.bytedesk.kbase.article_archive;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class ArticleArchiveInitializer implements SmartInitializingSingleton {
 
-    // private final AuthorityRestService authorityService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         // init();
+        initPermissions();
     }
 
-    // private void init() {
-    //     for (PermissionEnum permission : PermissionEnum.values()) {
-    //         String permissionValue = ArticleArchivePermissions.ARTICLE_ARCHIVE_PREFIX + permission.name();
-    //         if (authorityService.existsByValue(permissionValue)) {
-    //             continue;
-    //         }
-    //         AuthorityRequest authRequest = AuthorityRequest.builder()
-    //                 .name(I18Consts.I18N_PREFIX + permissionValue)
-    //                 .value(permissionValue)
-    //                 .description("Permission for " + permissionValue)
-    //                 .build();
-    //         authRequest.setUid(permissionValue.toLowerCase());
-    //         authorityService.create(authRequest);
-    //     }
-    // }
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = ArticleArchivePermissions.ARTICLE_ARCHIVE_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
+    }
 
 }

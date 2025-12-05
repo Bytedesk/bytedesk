@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -120,9 +121,15 @@ public class TicketRestService
     }
 
     private TicketResponse createInternal(TicketRequest request, boolean skipLoginEnforce) {
+        ensurePlatformTicketRequestDefaults(request);
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
+        ticket.setType(resolveTicketType(request.getType()));
         ticket.setUid(uidUtils.getUid());
+        if (isPlatformTicketCenterRequest(request)) {
+            ticket.setLevel(LevelEnum.PLATFORM.name());
+            ticket.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        }
         if (!StringUtils.hasText(ticket.getUserUid())) {
             String reporterUid = resolveReporterUid(request);
             if (StringUtils.hasText(reporterUid)) {
@@ -202,10 +209,13 @@ public class TicketRestService
         TicketEntity ticket = ticketOptional.get();
 
         // 更新基本信息
-        ticket.setSummary(request.getSummary());
+        ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
         ticket.setStatus(request.getStatus());
+        if (StringUtils.hasText(request.getType())) {
+            ticket.setType(resolveTicketType(request.getType()));
+        }
 
         // 更新工作组和处理人信息
         ticket.setAssignee(request.getAssigneeJson());
@@ -329,7 +339,7 @@ public class TicketRestService
             if (latest.isPresent()) {
                 TicketEntity latestEntity = latest.get();
                 // 合并需要保留的数据
-                latestEntity.setSummary(entity.getSummary());
+                latestEntity.setTitle(entity.getTitle());
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setPriority(entity.getPriority());
                 latestEntity.setStatus(entity.getStatus());
@@ -393,18 +403,20 @@ public class TicketRestService
     public void initTicketCategory(String orgUid) {
         log.info("initTicketCategory", orgUid);
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        List<CategoryTypeEnum> ticketCategoryTypes = List.of(CategoryTypeEnum.TICKET_INTERNAL, CategoryTypeEnum.TICKET_EXTERNAL);
         for (String category : TicketCategories.getAllCategories()) {
-            // log.info("initTicketCategory: {}", category);
-            CategoryRequest categoryRequest = CategoryRequest.builder()
-                    .uid(Utils.formatUid(orgUid, category))
-                    .name(category)
-                    .order(0)
-                    .type(CategoryTypeEnum.TICKET.name())
-                    .level(LevelEnum.ORGANIZATION.name())
-                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                    .orgUid(orgUid)
-                    .build();
-            categoryRestService.create(categoryRequest);
+            for (CategoryTypeEnum categoryType : ticketCategoryTypes) {
+                CategoryRequest categoryRequest = CategoryRequest.builder()
+                        .uid(Utils.formatUid(orgUid, categoryType.name() + "_" + category))
+                        .name(category)
+                        .order(0)
+                        .type(categoryType.name())
+                        .level(LevelEnum.ORGANIZATION.name())
+                        .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                        .orgUid(orgUid)
+                        .build();
+                categoryRestService.create(categoryRequest);
+            }
         }
     }
 
@@ -415,6 +427,7 @@ public class TicketRestService
 
     @Override
     protected Specification<TicketEntity> createSpecification(TicketRequest request) {
+        ensurePlatformTicketRequestDefaults(request);
         return TicketSpecification.search(request, authService);
     }
 
@@ -429,12 +442,16 @@ public class TicketRestService
         }
         String orgUid = resolveOrgUid(ticket, request);
         String workgroupUid = resolveWorkgroupUid(ticket, request);
-        ticket.setTicketNumber(generateTicketNumber(orgUid, workgroupUid));
+        ticket.setTicketNumber(generateTicketNumber(orgUid, workgroupUid, ticket.getType()));
     }
 
-    private String generateTicketNumber(String orgUid, String workgroupUid) {
+    private String resolveTicketType(String requestedType) {
+        return TicketTypeEnum.fromValue(requestedType).name();
+    }
+
+    private String generateTicketNumber(String orgUid, String workgroupUid, String ticketType) {
         String scopedOrgUid = StringUtils.hasText(orgUid) ? orgUid : BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(scopedOrgUid, workgroupUid);
+        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(scopedOrgUid, workgroupUid, ticketType);
         String prefix = resolvePrefix(basicSettings);
         int numericLength = resolveNumericLength(prefix, basicSettings);
         for (int i = 0; i < 5; i++) {
@@ -446,12 +463,17 @@ public class TicketRestService
         return generateFallbackTicketNumber(scopedOrgUid, prefix);
     }
 
-    private TicketBasicSettingsResponse fetchBasicSettings(String orgUid, String workgroupUid) {
-        if (!StringUtils.hasText(orgUid) || !StringUtils.hasText(workgroupUid)) {
+    private TicketBasicSettingsResponse fetchBasicSettings(String orgUid, String workgroupUid, String ticketType) {
+        if (!StringUtils.hasText(orgUid)) {
+            return null;
+        }
+        String normalizedType = resolveTicketType(ticketType);
+        if (TicketTypeEnum.EXTERNAL.name().equals(normalizedType) && !StringUtils.hasText(workgroupUid)) {
             return null;
         }
         try {
-            TicketSettingsResponse settings = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+            TicketSettingsResponse settings = ticketSettingsRestService
+                    .getOrDefaultByWorkgroup(orgUid, workgroupUid, normalizedType);
             if (settings == null) {
                 return null;
             }
@@ -542,7 +564,7 @@ public class TicketRestService
     private void enforceRequireLoginRule(TicketEntity ticket, TicketRequest request) {
         String orgUid = resolveOrgUid(ticket, request);
         String workgroupUid = resolveWorkgroupUid(ticket, request);
-        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(orgUid, workgroupUid);
+        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(orgUid, workgroupUid, ticket.getType());
         if (basicSettings == null || !Boolean.TRUE.equals(basicSettings.getRequireLogin())) {
             return;
         }
@@ -564,5 +586,42 @@ public class TicketRestService
             return reporter.getUid();
         }
         return null;
+    }
+
+    private void ensurePlatformTicketRequestDefaults(TicketRequest request) {
+        if (!isPlatformTicketCenterRequest(request)) {
+            return;
+        }
+        UserEntity currentUser = requireLoginUser();
+        request.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        request.setLevel(LevelEnum.PLATFORM.name());
+        if (!StringUtils.hasText(request.getUserUid())) {
+            request.setUserUid(currentUser.getUid());
+        }
+        if (!StringUtils.hasText(request.getReporterUid())) {
+            request.setReporterUid(currentUser.getUid());
+        }
+        if (request.getReporter() == null) {
+            request.setReporter(ConvertUtils.convertToUserProtobuf(currentUser));
+        }
+    }
+
+    private boolean isPlatformTicketCenterRequest(TicketRequest request) {
+        if (request == null) {
+            return false;
+        }
+        boolean defaultOrg = StringUtils.hasText(request.getOrgUid())
+                && BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(request.getOrgUid());
+        boolean platformLevel = StringUtils.hasText(request.getLevel())
+                && LevelEnum.PLATFORM.name().equalsIgnoreCase(request.getLevel());
+        return defaultOrg && platformLevel;
+    }
+
+    private UserEntity requireLoginUser() {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        return user;
     }
 }

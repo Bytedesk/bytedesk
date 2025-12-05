@@ -20,5 +20,10 @@
     <include file="db/changelog/migration/251125_queue_settings_add_fields.xml" />
     <include file="db/changelog/migration/251126_queue_topic_day_unique_constraint.xml" />
     <include file="db/changelog/migration/251127_visitor_uid_org_uid_unique_constraint.xml" />
+    <include file="db/changelog/migration/251129_cleanup_legacy_authorities.xml" />
+    <include file="db/changelog/migration/251201_remove_default_member_role.xml" />
+    <include file="db/changelog/migration/251202_grant_role_level_permissions.xml" />
+    <include file="db/changelog/migration/251205_rename_ticket_summary_to_title.xml" />
+    <include file="db/changelog/migration/251206_update_default_role_levels.xml" />
 
 </databaseChangeLog>

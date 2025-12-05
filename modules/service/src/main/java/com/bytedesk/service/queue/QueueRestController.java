@@ -15,12 +15,14 @@ package com.bytedesk.service.queue;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -43,7 +45,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
 
     private final QueueRestService queueRestService;
 
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "查询组织队列", description = "queryByOrg queue")
     @Operation(summary = "查询组织下的队列", description = "根据组织ID查询队列列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
@@ -56,6 +59,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success(queues));
     }
 
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "查询用户队列", description = "queryByUser queue")
     @Operation(summary = "查询用户下的队列", description = "根据用户ID查询队列列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
@@ -68,6 +73,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success(queues));
     }
 
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "查询队列详情", description = "queryByUid queue")
     @Operation(summary = "查询指定队列", description = "根据UID查询队列详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
@@ -82,6 +89,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
 
     // 查询排队中会话 query/queuing
     @GetMapping("/query/queuing")
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "查询排队会话", description = "query queuing threads")
     @Operation(summary = "查询排队中会话", description = "查询当前排队中的会话")
     public ResponseEntity<?> queryQueuing(ThreadRequest request) {
 
@@ -92,6 +101,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
 
     // 获取客服完整排队人数统计
     @GetMapping("/agent/queuing/count")
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "获取排队统计", description = "get agent queuing count")
     @Operation(summary = "获取客服排队统计", description = "获取客服的完整排队人数统计，包括一对一会话和工作组未分配的排队会话")
     @ApiResponse(responseCode = "200", description = "查询成功")
     public ResponseEntity<?> getAgentQueuingCount(@RequestParam String agentUid) {
@@ -103,6 +114,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
 
     // 获取客服完整队列统计信息
     @GetMapping("/agent/stats")
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "获取队列统计", description = "get agent queue stats")
     @Operation(summary = "获取客服队列统计", description = "获取客服的完整队列统计信息，包括今日服务人数、排队人数、接待人数、留言数、转人工数等")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
@@ -114,6 +127,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success(stats));
     }
 
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_CREATE_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "创建队列", description = "create queue")
     @Operation(summary = "创建队列", description = "创建新的队列")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
@@ -126,6 +141,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success(queue));
     }
 
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_UPDATE_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "更新队列", description = "update queue")
     @Operation(summary = "更新队列", description = "更新队列信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
@@ -138,6 +155,8 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success(queue));
     }
 
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_DELETE_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "删除队列", description = "delete queue")
     @Operation(summary = "删除队列", description = "删除指定的队列")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @Override
@@ -148,6 +167,9 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @GetMapping("/export")
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_EXPORT_ANY_LEVEL)
+    @ActionAnnotation(title = "队列管理", action = "导出队列", description = "export queue")
     @Operation(summary = "导出队列", description = "导出队列数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
     @Override

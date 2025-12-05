@@ -13,13 +13,6 @@
  */
 package com.bytedesk.service.queue_member;
 
-// public class QueueMemberPermissions {
+public class QueueMemberPermissions {
 
-//     public static final String VISITOR_COUNTER_PREFIX = "VISITOR_COUNTER_";
-//     // QueueMember permissions
-//     public static final String VISITOR_COUNTER_CREATE = "hasAuthority('VISITOR_COUNTER_CREATE')";
-//     public static final String VISITOR_COUNTER_READ = "hasAuthority('VISITOR_COUNTER_READ')";
-//     public static final String VISITOR_COUNTER_UPDATE = "hasAuthority('VISITOR_COUNTER_UPDATE')";
-//     public static final String VISITOR_COUNTER_DELETE = "hasAuthority('VISITOR_COUNTER_DELETE')";
-//     public static final String VISITOR_COUNTER_EXPORT = "hasAuthority('VISITOR_COUNTER_EXPORT')";
-// }
+}

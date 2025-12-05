@@ -19,8 +19,7 @@ package com.bytedesk.core.thread.enums;
 // Chatting结束后，直接Closed
 public enum ThreadProcessStatusEnum {
     NEW, // 新会话，待处理
-    ROBOTING, // 机器人接待中，外部访客跟大模型机器人会话
-    // LLMING, // 大模型对话中，内部成员跟大模型对话
+    ROBOTING, // 机器人接待中/跟大模型机器人会话
     OFFLINE, // 客服离线
     QUEUING, // 排队中
     CHATTING, // 对话中

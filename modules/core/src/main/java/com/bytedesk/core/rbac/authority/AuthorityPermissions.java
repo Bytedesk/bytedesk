@@ -14,15 +14,4 @@
 package com.bytedesk.core.rbac.authority;
 
 // public class AuthorityPermissions {
-    
-//     public static final String AUTHORITY_PREFIX = "AUTHORITY_";
-//     // Authority permissions
-//     public static final String AUTHORITY_CREATE = "hasAuthority('AUTHORITY_CREATE')";
-//     public static final String AUTHORITY_READ = "hasAuthority('AUTHORITY_READ')";
-//     public static final String AUTHORITY_UPDATE = "hasAuthority('AUTHORITY_UPDATE')";
-//     public static final String AUTHORITY_EXPORT = "hasAuthority('AUTHORITY_EXPORT')";
-//     public static final String AUTHORITY_DELETE = "hasAuthority('AUTHORITY_DELETE')";
-//     // 
-//     public static final String AUTHORITY_ANY = "hasAnyAuthority('AUTHORITY_CREATE', 'AUTHORITY_READ', 'AUTHORITY_UPDATE', 'AUTHORITY_EXPORT', 'AUTHORITY_DELETE')";
-//     // public static final String AUTHORITY_ALL = "isFullyAuthenticated()";
 // }

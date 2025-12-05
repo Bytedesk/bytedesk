@@ -16,11 +16,27 @@ package com.bytedesk.kbase.article;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
+import lombok.AllArgsConstructor;
+
 @Component
+@AllArgsConstructor
 public class ArticleInitializer implements SmartInitializingSingleton {
+
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         // 文章初始化逻辑已迁移至 KbaseInitializer 和 KbaseEventListener，避免与 Kbase 创建时序冲突与重复创建。
+        initPermissions();
+    }
+
+    private void initPermissions() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = ArticlePermissions.ARTICLE_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 }

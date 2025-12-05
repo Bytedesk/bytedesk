@@ -17,7 +17,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
+import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
 
 import lombok.AllArgsConstructor;
@@ -34,6 +37,30 @@ public class TicketSettingsEventListener {
 
 	@EventListener
 	@Transactional
+	public void handleOrganizationCreate(OrganizationCreateEvent event) {
+		if (event == null) {
+			return;
+		}
+		OrganizationEntity organization = event.getOrganization();
+		if (organization == null) {
+			return;
+		}
+		String orgUid = organization.getUid();
+		if (orgUid == null || orgUid.isBlank()) {
+			return;
+		}
+		try {
+			TicketSettingsEntity external = ticketSettingsRestService.getOrCreateDefault(orgUid, TicketTypeEnum.EXTERNAL.name());
+			TicketSettingsEntity internal = ticketSettingsRestService.getOrCreateDefault(orgUid, TicketTypeEnum.INTERNAL.name());
+			log.info("Organization {} initialized default ticket settings external={} internal={}",
+				orgUid, external.getUid(), internal.getUid());
+		} catch (Exception e) {
+			log.error("Initialize ticket settings failed for organization {}: {}", orgUid, e.getMessage(), e);
+		}
+	}
+
+	@EventListener
+	@Transactional
 	public void handleWorkgroupCreate(WorkgroupCreateEvent event) {
 		if (event == null) {
 			return;
@@ -45,7 +72,7 @@ public class TicketSettingsEventListener {
 		}
 		try {
 			// 获取或创建默认 TicketSettings
-			TicketSettingsEntity defaultSettings = ticketSettingsRestService.getOrCreateDefault(orgUid);
+			TicketSettingsEntity defaultSettings = ticketSettingsRestService.getOrCreateDefault(orgUid, TicketTypeEnum.EXTERNAL.name());
 			// 若该工作组尚未绑定则绑定
 			bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid)
 				.orElseGet(() -> {

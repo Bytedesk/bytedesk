@@ -15,7 +15,7 @@ package com.bytedesk.core.task_list;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +41,7 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
 
     @ActionAnnotation(title = "TaskList", action = "组织查询", description = "query task_list by org")
     @Operation(summary = "Query TaskLists by Organization", description = "Retrieve task_lists for the current organization")
+    @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByOrg(TaskListRequest request) {
         
@@ -51,6 +52,7 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
 
     @ActionAnnotation(title = "TaskList", action = "用户查询", description = "query task_list by user")
     @Operation(summary = "Query TaskLists by User", description = "Retrieve task_lists for the current user")
+    @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUser(TaskListRequest request) {
         
@@ -61,6 +63,7 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
 
     @ActionAnnotation(title = "TaskList", action = "查询详情", description = "query task_list by uid")
     @Operation(summary = "Query TaskList by UID", description = "Retrieve a specific task_list by its unique identifier")
+    @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(TaskListRequest request) {
         
@@ -72,7 +75,7 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
     @ActionAnnotation(title = "TaskList", action = "新建", description = "create task_list")
     @Operation(summary = "Create TaskList", description = "Create a new task_list")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_CREATE_ANY_LEVEL)
     public ResponseEntity<?> create(TaskListRequest request) {
         
         TaskListResponse task_list = taskListRestService.create(request);
@@ -83,7 +86,7 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
     @ActionAnnotation(title = "TaskList", action = "更新", description = "update task_list")
     @Operation(summary = "Update TaskList", description = "Update an existing task_list")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_UPDATE_ANY_LEVEL)
     public ResponseEntity<?> update(TaskListRequest request) {
         
         TaskListResponse task_list = taskListRestService.update(request);
@@ -94,7 +97,7 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
     @ActionAnnotation(title = "TaskList", action = "删除", description = "delete task_list")
     @Operation(summary = "Delete TaskList", description = "Delete a task_list")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_DELETE_ANY_LEVEL)
     public ResponseEntity<?> delete(TaskListRequest request) {
         
         taskListRestService.delete(request);
@@ -105,7 +108,7 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
     @ActionAnnotation(title = "TaskList", action = "导出", description = "export task_list")
     @Operation(summary = "Export TaskLists", description = "Export task_lists to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_EXPORT_ANY_LEVEL)
     @GetMapping("/export")
     public Object export(TaskListRequest request, HttpServletResponse response) {
         return exportTemplate(

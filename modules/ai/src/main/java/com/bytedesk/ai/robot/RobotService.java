@@ -103,7 +103,7 @@ public class RobotService extends AbstractRobotService {
                 robot,
                 validationResult.getMessageProtobuf());
 
-        // TODO: 待完善后开启
+        // TODO: 影响回答速度，待完善后开启
         // 查询重写 + 分词扩展查询（原 Pipeline 逻辑合并至访客接口）
         // String rewritten = query;
         // try {
@@ -402,18 +402,43 @@ public class RobotService extends AbstractRobotService {
 
     /**
      * 获取机器人的公共方法
+     * 
+     * <p>从 thread.robot 中解析机器人基础信息（uid, nickname, avatar 等），
+     * 然后根据 uid 从数据库/缓存获取完整的机器人配置（包含 LLM 配置）。
+     * 
+     * <p>兼容性说明：
+     * - 新数据：thread.robot 只存储基础信息，LLM 配置从数据库获取
+     * - 旧数据：thread.robot 可能包含完整 LLM 配置，若数据库查询失败则使用旧数据
      */
     private RobotProtobuf getRobotByThreadTopic(String threadTopic) {
         ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic + " not found"));
         Assert.notNull(thread.getRobot(), "thread robot is null, threadTopic:" + threadTopic);
 
-        RobotProtobuf robot = RobotProtobuf.fromJson(thread.getRobot());
-        if (robot == null) {
-            throw new RuntimeException("robot is null, threadTopic:" + threadTopic);
+        // 首先解析 thread.robot 获取基础信息（兼容新旧数据格式）
+        RobotProtobuf robotBasic = RobotProtobuf.fromJson(thread.getRobot());
+        if (robotBasic == null || !StringUtils.hasText(robotBasic.getUid())) {
+            throw new RuntimeException("robot uid is null, threadTopic:" + threadTopic);
         }
 
-        return robot;
+        // 从数据库/缓存获取完整的机器人配置（RobotRestService.findByUid 已有 @Cacheable）
+        try {
+            RobotEntity robotEntity = robotRestService.findByUid(robotBasic.getUid())
+                    .orElse(null);
+            
+            if (robotEntity != null) {
+                // 使用数据库中的最新配置构建完整的 RobotProtobuf
+                RobotProtobuf fullRobot = RobotProtobuf.fromEntity(robotEntity, robotBasic.getType());
+                log.debug("Got full robot config from database for uid: {}", robotEntity.getUid());
+                return fullRobot;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get robot from database, fallback to thread data: {}", e.getMessage());
+        }
+
+        // 如果数据库查询失败，回退使用 thread.robot 中的数据（兼容旧数据）
+        log.warn("Using robot data from thread for topic: {}", threadTopic);
+        return robotBasic;
     }
 
     /**

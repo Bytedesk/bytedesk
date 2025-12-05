@@ -17,6 +17,8 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -25,6 +27,8 @@ import lombok.AllArgsConstructor;
 public class TagInitializer implements SmartInitializingSingleton {
 
     private final TagRestService tagRestService;
+
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -35,10 +39,10 @@ public class TagInitializer implements SmartInitializingSingleton {
     }
 
     private void initPermissions() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = TagPermissions.ARTICLE_PREFIX + permission.name();
-        //     authorityService.createForPlatform(permissionValue);
-        // }
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = TagPermissions.TAG_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 
     

@@ -3,8 +3,8 @@
     "name": "创建工单",
     "fields": [
         {
-            "id": "summary",
-            "name": "摘要",
+            "id": "title",
+            "name": "标题",
             "type": "text",
             "required": true
         },

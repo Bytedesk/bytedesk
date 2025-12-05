@@ -15,6 +15,7 @@ package com.bytedesk.service.workgroup;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,10 +45,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
 
     private final WorkgroupRestService workgroupRestService;
 
+    @ActionAnnotation(title = "工作组", action = "组织查询", description = "query workgroup by org")
     @Operation(summary = "查询组织下的工作组", description = "根据组织ID查询工作组列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ_ANY_LEVEL)
+    @Override
     public ResponseEntity<?> queryByOrg(WorkgroupRequest request) {
 
         Page<WorkgroupResponse> workgroups = workgroupRestService.queryByOrg(request);
@@ -55,10 +59,12 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
+    @ActionAnnotation(title = "工作组", action = "用户查询", description = "query workgroup by user")
     @Operation(summary = "查询用户下的工作组", description = "根据用户ID查询工作组列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUser(WorkgroupRequest request) {
         
@@ -67,10 +73,12 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
+    @ActionAnnotation(title = "工作组", action = "查询详情", description = "query workgroup by uid")
     @Operation(summary = "查询指定工作组", description = "根据UID查询工作组详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ_ANY_LEVEL)
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
         
@@ -79,12 +87,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
+    @ActionAnnotation(title = "工作组", action = "新建", description = "create workgroup")
     @Operation(summary = "创建工作组", description = "创建新的工作组")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
-    @PreAuthorize("hasAuthority('WORKGROUP_CREATE')")
-    @ActionAnnotation(title = "工作组", action = "新建", description = "create workgroup")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_CREATE_ANY_LEVEL)
+    @Override
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest request) {
 
         WorkgroupResponse workgroup = workgroupRestService.create(request);
@@ -92,12 +101,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
+    @ActionAnnotation(title = "工作组", action = "更新", description = "update workgroup")
     @Operation(summary = "更新工作组", description = "更新工作组信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
-    @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
-    @ActionAnnotation(title = "工作组", action = "更新", description = "update workgroup")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE_ANY_LEVEL)
+    @Override
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest request) {
 
         WorkgroupResponse workgroup = workgroupRestService.update(request);
@@ -105,12 +115,12 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
+    @ActionAnnotation(title = "工作组", action = "updateAvatar", description = "update workgroup avatar")
     @Operation(summary = "更新工作组头像", description = "更新工作组的头像")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
-    @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
-    @ActionAnnotation(title = "工作组", action = "updateAvatar", description = "update workgroup avatar")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE_ANY_LEVEL)
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody WorkgroupRequest request) {
 
@@ -119,12 +129,12 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
+    @ActionAnnotation(title = "工作组", action = "updateStatus", description = "update workgroup status")
     @Operation(summary = "更新工作组状态", description = "更新工作组的状态")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
-    @PreAuthorize("hasAuthority('WORKGROUP_UPDATE')")
-    @ActionAnnotation(title = "工作组", action = "updateStatus", description = "update workgroup status")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE_ANY_LEVEL)
     @PostMapping("/update/status")
     public ResponseEntity<?> updateStatus(@RequestBody WorkgroupRequest request) {
 
@@ -133,10 +143,11 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
+    @ActionAnnotation(title = "工作组", action = "删除", description = "delete workgroup")
     @Operation(summary = "删除工作组", description = "删除指定的工作组")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @PreAuthorize("hasAuthority('WORKGROUP_DELETE')")
-    @ActionAnnotation(title = "工作组", action = "删除", description = "delete workgroup")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_DELETE_ANY_LEVEL)
+    @Override
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest request) {
 
         workgroupRestService.deleteByUid(request.getUid());
@@ -144,13 +155,21 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @ActionAnnotation(title = "工作组", action = "导出", description = "export workgroup")
     @Operation(summary = "导出工作组", description = "导出工作组数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
-    @PreAuthorize("hasAuthority('WORKGROUP_EXPORT')")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_EXPORT_ANY_LEVEL)
+    @GetMapping("/export")
     @Override
     public Object export(WorkgroupRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        return exportTemplate(
+            request,
+            response,
+            workgroupRestService,
+            WorkgroupExcel.class,
+            "工作组",
+            "workgroup"
+        );
     }
 
     

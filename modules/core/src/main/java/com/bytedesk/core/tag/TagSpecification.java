@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-09 22:19:21
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-18 15:44:34
+ * @LastEditTime: 2025-11-29 12:00:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -27,13 +27,17 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TagSpecification extends BaseSpecification<TagEntity, TagRequest> {
+
+    // 模块名称，用于权限检查
+    private static final String MODULE_NAME = "TAG";
     
     public static Specification<TagEntity> search(TagRequest request, AuthService authService) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
         //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+            // 使用带层级过滤的基础条件
+            predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, MODULE_NAME));
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
@@ -45,6 +49,10 @@ public class TagSpecification extends BaseSpecification<TagEntity, TagRequest> {
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            // level - 如果指定了level则精确过滤
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
             // 
             if (StringUtils.hasText(request.getUserUid())) {
