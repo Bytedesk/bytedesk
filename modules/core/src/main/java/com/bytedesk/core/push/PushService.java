@@ -35,18 +35,15 @@ public class PushService {
     
     private final PushRepository pushRepository;
     private final PushFilterService pushFilterService;
-    
-    // 业务服务组件
-    private final PushSendService codeSendService;
+    private final PushSendService pushSendService;
    
-
     // =============== REST接口方法 ===============
 
     /**
      * 发送验证码
      */
     public PushSendResult sendCode(AuthRequest authRequest, HttpServletRequest request) {
-        return codeSendService.sendCode(authRequest, request);
+        return pushSendService.sendCode(authRequest, request);
     }
 
     // =============== 业务逻辑方法 ===============

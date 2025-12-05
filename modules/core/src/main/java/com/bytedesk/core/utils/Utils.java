@@ -79,9 +79,9 @@ public class Utils {
      * @param mobile
      * @return
      */
-    public static boolean isTestMobile(String mobile) {
-        return mobile.startsWith("188");
-    }
+    // public static boolean isTestMobile(String mobile) {
+    //     return mobile.startsWith("188");
+    // }
 
     public static boolean isTestEmail(String email) {
         return email.endsWith("@email.com");

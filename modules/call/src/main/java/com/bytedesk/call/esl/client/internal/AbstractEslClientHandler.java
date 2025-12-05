@@ -25,13 +25,12 @@ import com.bytedesk.call.esl.client.transport.message.EslHeaders.Value;
 import com.bytedesk.call.esl.client.transport.message.EslMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Specialised {@link SimpleChannelInboundHandler} that implements the logic of an ESL connection that
@@ -172,8 +171,8 @@ public abstract class AbstractEslClientHandler extends SimpleChannelInboundHandl
 	 */
 	public CompletableFuture<EslMessage> sendSyncApiCommand(Channel channel, String command, String arg) {
 
-		checkArgument(!isNullOrEmpty(command), "command may not be null or empty");
-		checkArgument(!isNullOrEmpty(arg), "arg may not be null or empty");
+		Assert.isTrue(StringUtils.hasText(command), "command may not be null or empty");
+		Assert.isTrue(StringUtils.hasText(arg), "arg may not be null or empty");
 
 		return sendApiSingleLineCommand(channel, "api " + command + ' ' + arg);
 	}

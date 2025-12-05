@@ -120,7 +120,6 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
-
     
     @Operation(summary = "获取LLM提供商默认配置", description = "获取LLM提供商的默认配置信息")
     @ApiResponse(responseCode = "200", description = "获取成功",

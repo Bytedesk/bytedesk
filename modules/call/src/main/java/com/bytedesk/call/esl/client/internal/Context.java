@@ -5,12 +5,11 @@ import com.bytedesk.call.esl.client.transport.CommandResponse;
 import com.bytedesk.call.esl.client.transport.SendMsg;
 import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import com.bytedesk.call.esl.client.transport.message.EslMessage;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.google.common.base.Preconditions.*;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.util.concurrent.Futures.getUnchecked;
 import static com.bytedesk.call.esl.client.internal.IModEslApi.EventFormat.*;
 
 public class Context implements IModEslApi {
@@ -39,11 +38,11 @@ public class Context implements IModEslApi {
 	 */
 	public EslMessage sendCommand(String command) {
 
-		checkArgument(!isNullOrEmpty(command), "command cannot be null or empty");
+		Assert.isTrue(StringUtils.hasText(command), "command cannot be null or empty");
 
 		try {
 
-			return getUnchecked(handler.sendApiSingleLineCommand(channel, command.toLowerCase().trim()));
+			return handler.sendApiSingleLineCommand(channel, command.toLowerCase().trim()).get();
 
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
@@ -63,17 +62,17 @@ public class Context implements IModEslApi {
 	@Override
 	public EslMessage sendApiCommand(String command, String arg) {
 
-		checkArgument(!isNullOrEmpty(command), "command cannot be null or empty");
+		Assert.isTrue(StringUtils.hasText(command), "command cannot be null or empty");
 
 		try {
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append("api ").append(command);
-			if (!isNullOrEmpty(arg)) {
+			if (StringUtils.hasText(arg)) {
 				sb.append(' ').append(arg);
 			}
 
-			return getUnchecked(handler.sendApiSingleLineCommand(channel, sb.toString()));
+			return handler.sendApiSingleLineCommand(channel, sb.toString()).get();
 
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
@@ -94,11 +93,11 @@ public class Context implements IModEslApi {
 	@Override
 	public CompletableFuture<EslEvent> sendBackgroundApiCommand(String command, String arg) {
 
-		checkArgument(!isNullOrEmpty(command), "command cannot be null or empty");
+		Assert.isTrue(StringUtils.hasText(command), "command cannot be null or empty");
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append("bgapi ").append(command);
-		if (!isNullOrEmpty(arg)) {
+		if (StringUtils.hasText(arg)) {
 			sb.append(' ').append(arg);
 		}
 
@@ -126,17 +125,17 @@ public class Context implements IModEslApi {
 	public CommandResponse setEventSubscriptions(EventFormat format, String events) {
 
 		// temporary hack
-		checkState(format.equals(PLAIN), "Only 'plain' event format is supported at present");
+		Assert.state(format.equals(PLAIN), "Only 'plain' event format is supported at present");
 
 		try {
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append("event ").append(format.toString());
-			if (!isNullOrEmpty(events)) {
+			if (StringUtils.hasText(events)) {
 				sb.append(' ').append(events);
 			}
 
-			final EslMessage response = getUnchecked(handler.sendApiSingleLineCommand(channel, sb.toString()));
+			final EslMessage response = handler.sendApiSingleLineCommand(channel, sb.toString()).get();
 			return new CommandResponse(sb.toString(), response);
 
 		} catch (Throwable t) {
@@ -154,7 +153,7 @@ public class Context implements IModEslApi {
 	public CommandResponse cancelEventSubscriptions() {
 
 		try {
-			final EslMessage response = getUnchecked(handler.sendApiSingleLineCommand(channel, "noevents"));
+			final EslMessage response = handler.sendApiSingleLineCommand(channel, "noevents").get();
 			return new CommandResponse("noevents", response);
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
@@ -184,16 +183,16 @@ public class Context implements IModEslApi {
 	@Override
 	public CommandResponse addEventFilter(String eventHeader, String valueToFilter) {
 
-		checkArgument(!isNullOrEmpty(eventHeader), "eventHeader cannot be null or empty");
+		Assert.isTrue(StringUtils.hasText(eventHeader), "eventHeader cannot be null or empty");
 
 		try {
 			final StringBuilder sb = new StringBuilder();
 			sb.append("filter ").append(eventHeader);
-			if (!isNullOrEmpty(valueToFilter)) {
+			if (StringUtils.hasText(valueToFilter)) {
 				sb.append(' ').append(valueToFilter);
 			}
 
-			final EslMessage response = getUnchecked(handler.sendApiSingleLineCommand(channel, sb.toString()));
+			final EslMessage response = handler.sendApiSingleLineCommand(channel, sb.toString()).get();
 			return new CommandResponse(sb.toString(), response);
 
 		} catch (Throwable t) {
@@ -211,17 +210,17 @@ public class Context implements IModEslApi {
 	@Override
 	public CommandResponse deleteEventFilter(String eventHeader, String valueToFilter) {
 
-		checkArgument(!isNullOrEmpty(eventHeader), "eventHeader cannot be null or empty");
+		Assert.isTrue(StringUtils.hasText(eventHeader), "eventHeader cannot be null or empty");
 
 		try {
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append("filter delete ").append(eventHeader);
-			if (!isNullOrEmpty(valueToFilter)) {
+			if (StringUtils.hasText(valueToFilter)) {
 				sb.append(' ').append(valueToFilter);
 			}
 
-			final EslMessage response = getUnchecked(handler.sendApiSingleLineCommand(channel, sb.toString()));
+			final EslMessage response = handler.sendApiSingleLineCommand(channel, sb.toString()).get();
 			return new CommandResponse(sb.toString(), response);
 
 		} catch (Throwable t) {
@@ -239,10 +238,10 @@ public class Context implements IModEslApi {
 	@Override
 	public CommandResponse sendMessage(SendMsg sendMsg) {
 
-		checkNotNull(sendMsg, "sendMsg cannot be null");
+		Assert.notNull(sendMsg, "sendMsg cannot be null");
 
 		try {
-			final EslMessage response = getUnchecked(handler.sendApiMultiLineCommand(channel, sendMsg.getMsgLines()));
+			final EslMessage response = handler.sendApiMultiLineCommand(channel, sendMsg.getMsgLines()).get();
 			return new CommandResponse(sendMsg.toString(), response);
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
@@ -263,7 +262,7 @@ public class Context implements IModEslApi {
 			final StringBuilder sb = new StringBuilder();
 			sb.append("log ").append(level.toString());
 
-			final EslMessage response = getUnchecked(handler.sendApiSingleLineCommand(channel, sb.toString()));
+			final EslMessage response = handler.sendApiSingleLineCommand(channel, sb.toString()).get();
 			return new CommandResponse(sb.toString(), response);
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
@@ -280,7 +279,7 @@ public class Context implements IModEslApi {
 	public CommandResponse cancelLogging() {
 
 		try {
-			final EslMessage response = getUnchecked(handler.sendApiSingleLineCommand(channel, "nolog"));
+			final EslMessage response = handler.sendApiSingleLineCommand(channel, "nolog").get();
 			return new CommandResponse("nolog", response);
 		} catch (Throwable t) {
 			throw new RuntimeException(t);

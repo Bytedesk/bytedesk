@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-08 10:00:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-24 11:02:47
+ * @LastEditTime: 2025-12-05 10:00:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -20,6 +20,8 @@ import org.springframework.util.Assert;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.email.EmailSendResult;
+import com.bytedesk.core.email.EmailSendService;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.push.PushEntity;
@@ -31,6 +33,8 @@ import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.push.strategy.AuthValidationStrategyFactory;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
+import com.bytedesk.core.sms.SmsSendResult;
+import com.bytedesk.core.sms.SmsSendService;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.push.PushFilterService;
 
@@ -47,8 +51,8 @@ import lombok.extern.slf4j.Slf4j;
 public class PushSendService {
     
     private final AuthValidationStrategyFactory strategyFactory;
-    private final PushServiceEmail pushServiceEmail;
-    private final PushServiceSms pushServiceSms;
+    private final EmailSendService emailSendService;
+    private final SmsSendService smsSendService;
     private final BytedeskProperties bytedeskProperties;
     private final IpService ipService;
     private final PushFilterService pushFilterService;
@@ -66,7 +70,6 @@ public class PushSendService {
         String ip = IpUtils.getClientIp(request);
         String type = authRequest.getType();
         String receiver = authRequest.getReceiver();
-        // String country = authRequest.getCountry();
         String platform = authRequest.getPlatform();
         
         // 验证IP频率限制
@@ -108,25 +111,48 @@ public class PushSendService {
     private PushSendResult sendCodeByType(AuthRequest authRequest, String receiver, String country, 
                                   String code, HttpServletRequest request) {
         if (authRequest.isEmail()) {
-            return pushServiceEmail.sendEmailWithResult(receiver, code, request);
+            EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, code, request);
+            return convertEmailResult(emailResult);
         } else if (authRequest.isMobile()) {
-            return pushServiceSms.sendSmsWithResult(receiver, country, code, request);
+            SmsSendResult smsResult = smsSendService.sendSmsWithResult(receiver, country, code, request);
+            return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, I18Consts.I18N_CAPTCHA_UNSUPPORTED_TYPE);
+    }
+    
+    /**
+     * 将EmailSendResult转换为PushSendResult
+     */
+    private PushSendResult convertEmailResult(EmailSendResult emailResult) {
+        if (emailResult.isSuccess()) {
+            return PushSendResult.success();
+        }
+        return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, emailResult.getErrorMessage());
+    }
+    
+    /**
+     * 将SmsSendResult转换为PushSendResult
+     */
+    private PushSendResult convertSmsResult(SmsSendResult smsResult) {
+        if (smsResult.isSuccess()) {
+            return PushSendResult.success();
+        }
+        return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, smsResult.getErrorMessage());
     }
 
     private void saveCodeRecord(AuthRequest authRequest, String code, String ip, HttpServletRequest request) {
         String ipLocation = ipService.getIpLocation(ip);
+        String country = authRequest.getCountry();
+        String receiver = authRequest.getReceiver();
         
         // 重新发送并获取结果
-        PushSendResult sendResult = sendCodeByType(authRequest, authRequest.getReceiver(), 
-            authRequest.getCountry(), code, request);
+        PushSendResult sendResult = sendCodeByType(authRequest, receiver, country, code, request);
         
         PushRequest pushRequest = new PushRequest();
         // 复制必要的字段
         pushRequest.setType(authRequest.getType());
-        pushRequest.setCountry(authRequest.getCountry());
-        pushRequest.setReceiver(authRequest.getReceiver());
+        pushRequest.setCountry(country);
+        pushRequest.setReceiver(receiver);
         pushRequest.setPlatform(authRequest.getPlatform());
         pushRequest.setSender(TypeConsts.TYPE_SYSTEM);
         pushRequest.setContent(code);
@@ -196,9 +222,11 @@ public class PushSendService {
     private PushSendResult resendByType(String type, String receiver, String country, String content) {
         // 判断是邮箱还是手机号类型
         if (isEmailType(type)) {
-            return pushServiceEmail.sendEmailWithResult(receiver, content, null);
+            EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, content, null);
+            return convertEmailResult(emailResult);
         } else if (isMobileType(type)) {
-            return pushServiceSms.sendSmsWithResult(receiver, country, content, null);
+            SmsSendResult smsResult = smsSendService.sendSmsWithResult(receiver, country, content, null);
+            return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "不支持的推送类型");
     }
