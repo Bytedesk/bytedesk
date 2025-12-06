@@ -90,6 +90,8 @@ public class ThreadRestService
     private final TopicRestService topicRestService;
 
     private final StringRedisTemplate stringRedisTemplate;
+
+    private final ActiveThreadCacheService activeThreadCacheService;
     
     public Map<String, Long> reportClosedByCloseType(java.time.ZonedDateTime start, java.time.ZonedDateTime end) {
         List<Object[]> rows = threadRepository.countClosedGroupedByCloseType(start, end);
@@ -915,7 +917,12 @@ public class ThreadRestService
     })
     protected ThreadEntity doSave(ThreadEntity entity) {
         // log.info("doSave thread agent: {}, owner: {}", entity.getAgent(), entity.getOwner());
-        return threadRepository.save(entity);
+        ThreadEntity savedEntity = threadRepository.save(entity);
+        // 更新活跃会话缓存
+        if (savedEntity != null) {
+            activeThreadCacheService.addOrUpdateActiveThread(savedEntity);
+        }
+        return savedEntity;
     }
 
     @Override

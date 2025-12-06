@@ -38,11 +38,16 @@ public class ThreadEventListener {
 
     private final TopicRestService topicRestService;
 
+    private final ActiveThreadCacheService activeThreadCacheService;
+
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         ThreadEntity thread = event.getThread();
         UserEntity user = thread.getOwner();
         log.info("thread ThreadCreateEvent: {}", thread.getUid());
+
+        // 将服务类型会话添加到活跃会话缓存
+        activeThreadCacheService.addOrUpdateActiveThread(thread);
 
         // 机器人接待的会话存在user == null的情况，不需要订阅topic
         if (user == null) {

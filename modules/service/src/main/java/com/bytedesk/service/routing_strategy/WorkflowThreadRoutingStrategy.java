@@ -169,8 +169,8 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
      */
     private MessageProtobuf processNewWorkflowThread(VisitorRequest request, ThreadEntity thread,
             WorkflowEntity workflowEntity) {
-        // 1. 加入队列
-        UserProtobuf workflowProtobuf = convertToWorkflowProtobuf(workflowEntity);
+        // 1. 加入队列 - 使用统一的转换方法
+        UserProtobuf workflowProtobuf = ServiceConvertUtils.convertToUserProtobuf(workflowEntity);
         QueueMemberEntity queueMemberEntity = queueService.enqueueWorkflow(thread, workflowProtobuf, request);
         log.info("Workflow enqueued to queue: {}", queueMemberEntity.getUid());
 
@@ -179,8 +179,8 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         WelcomeContent welcomeContent = WelcomeContentUtils.buildWorkflowWelcomeContent(workflowEntity, tip);
         thread.setRoboting().setContent(welcomeContent != null ? welcomeContent.toJson() : null);
 
-        // 3. 设置工作流信息
-        String workflowString = workflowProtobuf.toJson();
+        // 3. 设置工作流信息 - 使用统一的转换方法
+        String workflowString = ServiceConvertUtils.convertToWorkflowProtobufString(workflowEntity);
         thread.setWorkflow(workflowString);
 
         // 4. 保存线程
@@ -194,17 +194,6 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
 
         // 7. 创建并保存欢迎消息
         return createAndSaveWelcomeMessage(welcomeContent, savedThread);
-    }
-
-    /**
-     * 转换工作流实体为用户协议对象
-     */
-    private UserProtobuf convertToWorkflowProtobuf(WorkflowEntity workflowEntity) {
-        return UserProtobuf.builder()
-                .uid(workflowEntity.getUid())
-                .nickname(workflowEntity.getNickname())
-                .avatar(workflowEntity.getAvatar())
-                .build();
     }
 
     /**

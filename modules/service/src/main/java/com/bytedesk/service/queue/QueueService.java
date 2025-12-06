@@ -55,8 +55,7 @@ public class QueueService {
 
     @Transactional
     public QueueMemberEntity enqueueWorkgroup(ThreadEntity threadEntity, UserProtobuf agent,
-            WorkgroupEntity workgroupEntity,
-            VisitorRequest visitorRequest) {
+            WorkgroupEntity workgroupEntity, VisitorRequest visitorRequest) {
         return enqueueToQueue(threadEntity, agent, workgroupEntity, QueueTypeEnum.WORKGROUP);
     }
 

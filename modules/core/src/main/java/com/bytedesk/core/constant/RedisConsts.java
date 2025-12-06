@@ -55,4 +55,8 @@ public class RedisConsts {
     // Redis 最近一次数据库写入时间Key
     public static final String REDIS_LAST_DB_WRITE_HASH_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX + "core:conn:hb:lastdb";
 
+    // 活跃会话缓存 - 使用 Hash 存储活跃服务会话的关键信息
+    // Key: ACTIVE_SERVICE_THREADS_KEY, Field: threadUid, Value: ActiveThreadCache JSON
+    public static final String ACTIVE_SERVICE_THREADS_KEY = BYTEDESK_REDIS_PREFIX + "thread:active:service";
+
 }

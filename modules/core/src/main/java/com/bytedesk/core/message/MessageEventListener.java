@@ -42,7 +42,7 @@ public class MessageEventListener {
     public void onMessageJsonEvent(MessageJsonEvent event) {
         // log.info("MessageJsonEvent {}", event.getJson());
         try {
-            String messageJson =  messageService.processMessageJson(event.getJson(), false);
+            String messageJson = messageService.processMessageJson(event.getJson(), false);
             if (messageJson == null) {
                 return;
             }

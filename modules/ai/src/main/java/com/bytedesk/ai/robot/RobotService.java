@@ -23,7 +23,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.segment.SegmentService;
+import com.bytedesk.ai.service.SseMessageHelper;
 import com.bytedesk.ai.service.SpringAIServiceRegistry;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -31,6 +33,7 @@ import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +50,7 @@ public class RobotService extends AbstractRobotService {
     private final MessageService messageService;
     private final RobotRestService robotRestService;
     private final SegmentService segmentService;
+    private final SseMessageHelper sseMessageHelper;
 
     @Override
     protected RobotRestService getRobotRestService() {
@@ -69,7 +73,8 @@ public class RobotService extends AbstractRobotService {
         log.info("robot processSseMessage {}", query);
 
         // 使用公共方法获取机器人
-        RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
+        RobotContext robotContext = resolveRobotContext(validationResult.getThreadTopic());
+        RobotProtobuf robot = robotContext.robot();
         log.info("processSseMemberMessage thread reply");
 
         // 创建机器人回复消息
@@ -94,14 +99,22 @@ public class RobotService extends AbstractRobotService {
         log.info("processSseVisitorMessage robot processSseMessage {}", query);
 
         // 使用公共方法获取机器人
-        RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
+        RobotContext robotContext = resolveRobotContext(validationResult.getThreadTopic());
+        ThreadEntity threadEntity = robotContext.thread();
+        RobotProtobuf robot = robotContext.robot();
         log.info("processSseVisitorMessage thread reply");
 
         // 机器人回复访客消息
         MessageProtobuf messageProtobufReply = RobotMessageUtils.createRobotMessage(
-                validationResult.getThreadProtobuf(),
-                robot,
-                validationResult.getMessageProtobuf());
+            validationResult.getThreadProtobuf(),
+            robot,
+            validationResult.getMessageProtobuf());
+
+        if (shouldBypassRobotReply(threadEntity)) {
+            log.info("Thread {} is transferring to agent, skip robot stream response", threadEntity.getUid());
+            sendTransferInterceptionResponse(validationResult, messageProtobufReply, emitter);
+            return;
+        }
 
         // TODO: 影响回答速度，待完善后开启
         // 查询重写 + 分词扩展查询（原 Pipeline 逻辑合并至访客接口）
@@ -136,7 +149,8 @@ public class RobotService extends AbstractRobotService {
         log.info("processSyncVisitorMessage robot processSyncMessage {}", query);
 
         // 使用公共方法获取机器人
-        RobotProtobuf robot = getRobotByThreadTopic(validationResult.getThreadTopic());
+        RobotContext robotContext = resolveRobotContext(validationResult.getThreadTopic());
+        RobotProtobuf robot = robotContext.robot();
         log.info("processSyncVisitorMessage thread reply");
 
         // 机器人回复访客消息
@@ -400,34 +414,31 @@ public class RobotService extends AbstractRobotService {
         return new MessageValidationResult(messageProtobuf, query, threadProtobuf, threadTopic);
     }
 
-    /**
-     * 获取机器人的公共方法
-     * 
-     * <p>从 thread.robot 中解析机器人基础信息（uid, nickname, avatar 等），
-     * 然后根据 uid 从数据库/缓存获取完整的机器人配置（包含 LLM 配置）。
-     * 
-     * <p>兼容性说明：
-     * - 新数据：thread.robot 只存储基础信息，LLM 配置从数据库获取
-     * - 旧数据：thread.robot 可能包含完整 LLM 配置，若数据库查询失败则使用旧数据
-     */
-    private RobotProtobuf getRobotByThreadTopic(String threadTopic) {
-        ThreadEntity thread = threadRestService.findFirstByTopic(threadTopic)
+    private RobotContext resolveRobotContext(String threadTopic) {
+        ThreadEntity thread = getThreadByTopic(threadTopic);
+        RobotProtobuf robot = buildRobotFromThread(thread, threadTopic);
+        return new RobotContext(thread, robot);
+    }
+
+    private ThreadEntity getThreadByTopic(String threadTopic) {
+        return threadRestService.findFirstByTopic(threadTopic)
                 .orElseThrow(() -> new RuntimeException("thread with topic " + threadTopic + " not found"));
+    }
+
+    /**
+     * 根据线程记录构建机器人信息
+     */
+    private RobotProtobuf buildRobotFromThread(ThreadEntity thread, String threadTopic) {
         Assert.notNull(thread.getRobot(), "thread robot is null, threadTopic:" + threadTopic);
 
-        // 首先解析 thread.robot 获取基础信息（兼容新旧数据格式）
         RobotProtobuf robotBasic = RobotProtobuf.fromJson(thread.getRobot());
         if (robotBasic == null || !StringUtils.hasText(robotBasic.getUid())) {
             throw new RuntimeException("robot uid is null, threadTopic:" + threadTopic);
         }
 
-        // 从数据库/缓存获取完整的机器人配置（RobotRestService.findByUid 已有 @Cacheable）
         try {
-            RobotEntity robotEntity = robotRestService.findByUid(robotBasic.getUid())
-                    .orElse(null);
-            
+            RobotEntity robotEntity = robotRestService.findByUid(robotBasic.getUid()).orElse(null);
             if (robotEntity != null) {
-                // 使用数据库中的最新配置构建完整的 RobotProtobuf
                 RobotProtobuf fullRobot = RobotProtobuf.fromEntity(robotEntity, robotBasic.getType());
                 log.debug("Got full robot config from database for uid: {}", robotEntity.getUid());
                 return fullRobot;
@@ -436,9 +447,60 @@ public class RobotService extends AbstractRobotService {
             log.warn("Failed to get robot from database, fallback to thread data: {}", e.getMessage());
         }
 
-        // 如果数据库查询失败，回退使用 thread.robot 中的数据（兼容旧数据）
         log.warn("Using robot data from thread for topic: {}", threadTopic);
         return robotBasic;
+    }
+
+    private boolean shouldBypassRobotReply(ThreadEntity thread) {
+        if (thread == null || !thread.isWorkgroupType()) {
+            return false;
+        }
+        if (hasAgentAssigned(thread)) {
+            return true;
+        }
+        String transferStatus = thread.getTransferStatus();
+        boolean transferActive = StringUtils.hasText(transferStatus)
+                && !ThreadTransferStatusEnum.NONE.name().equals(transferStatus);
+        return transferActive || !thread.isRoboting();
+    }
+
+    private boolean hasAgentAssigned(ThreadEntity thread) {
+        if (thread == null) {
+            return false;
+        }
+        String agentJson = thread.getAgent();
+        return StringUtils.hasText(agentJson) && !BytedeskConsts.EMPTY_JSON_STRING.equals(agentJson);
+    }
+
+    private void sendTransferInterceptionResponse(
+            MessageValidationResult validationResult,
+            MessageProtobuf messageProtobufReply,
+            SseEmitter emitter) {
+        // 发送机器人转人工拦截提示消息，告知访客当前正在转人工处理中，可能会显示到转接成功欢迎语后面，暂不启用
+        // sseMessageHelper.sendStreamMessage(
+        //         validationResult.getMessageProtobuf(),
+        //         messageProtobufReply,
+        //         emitter,
+        //         I18Consts.I18N_ROBOT_TO_AGENT_TIP,
+        //         null,
+        //         null,
+        //         true,
+        //         false,
+        //         false);
+        sseMessageHelper.sendStreamEndMessage(
+                validationResult.getMessageProtobuf(),
+                messageProtobufReply,
+                emitter,
+                0,
+                0,
+                0,
+                null,
+                LlmProviderConstants.ZHIPUAI,
+            "robot-transfer-guard",
+            false);
+    }
+
+    private record RobotContext(ThreadEntity thread, RobotProtobuf robot) {
     }
 
     /**

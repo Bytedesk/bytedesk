@@ -129,4 +129,12 @@ public class I18ServiceConsts {
     public static final String I18N_ALREADY_IN_INVITE_REJECTED_STATE = "已处于邀请已拒绝状态"; // 已处于邀请已拒绝状态
     public static final String I18N_ALREADY_IN_INVITE_TIMEOUT_STATE = "已处于邀请已超时状态"; // 已处于邀请已超时状态
     public static final String I18N_ALREADY_IN_INVITE_CANCELED_STATE = "已处于邀请已取消状态"; // 已处于邀请已取消状态
+
+    // 机器人转人工默认值
+    public static final String I18N_DEFAULT_MANUAL_TRANSFER_LABEL = "转人工客服";
+    public static final int I18N_DEFAULT_MIN_CONFIDENCE = 65;
+    public static final int I18N_DEFAULT_MAX_ROBOT_REPLIES = 3;
+    public static final int I18N_DEFAULT_AUTO_TRANSFER_DELAY_SECONDS = 0;
+    public static final int I18N_DEFAULT_COOLDOWN_SECONDS = 90;
+
 }

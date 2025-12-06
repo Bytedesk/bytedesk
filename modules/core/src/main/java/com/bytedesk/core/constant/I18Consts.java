@@ -267,7 +267,7 @@ public class I18Consts {
     public static final String I18N_ROBOT_DESCRIPTION = "默认机器人描述"; // 机器人描述
     public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = "客服助理机器人昵称"; // 客服助理机器人昵称
     public static final String I18N_ROBOT_DEFAULT_REPLY = "抱歉，我暂时无法回答这个问题。"; // 机器人回复
-    // public static final String I18N_ROBOT_NO_REPLY = "机器人无回复"; // 机器人无回复
+    public static final String I18N_ROBOT_TO_AGENT_TIP = "正在为您转接人工客服，请稍候..."; // 机器人转人工提示
     // 角色相关
     public static final String I18N_ADMIN = "管理员"; // 管理员
     public static final String I18N_ADMIN_DESCRIPTION = "管理员描述"; // 管理员描述

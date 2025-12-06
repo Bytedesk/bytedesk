@@ -167,10 +167,17 @@ public class SseMessageHelper {
     public void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens, Prompt prompt,
             String aiProvider, String aiModel) {
+        sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, promptTokens, completionTokens,
+                totalTokens, prompt, aiProvider, aiModel, true);
+    }
+
+    public void sendStreamEndMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
+            SseEmitter emitter, long promptTokens, long completionTokens, long totalTokens, Prompt prompt,
+            String aiProvider, String aiModel, boolean persistMessage) {
         log.info(
-                "SseMessageHelper sendStreamEndMessage query {}, reply {}, promptTokens {}, completionTokens {}, totalTokens {}, provider {}, model {}",
+                "SseMessageHelper sendStreamEndMessage query {}, reply {}, promptTokens {}, completionTokens {}, totalTokens {}, provider {}, model {}, persist {}",
                 messageProtobufQuery.getContent(), messageProtobufReply.getContent(), promptTokens, completionTokens,
-                totalTokens, aiProvider, aiModel);
+                totalTokens, aiProvider, aiModel, persistMessage);
         try {
             if (!isEmitterCompleted(emitter)) {
                 // 以 StreamContent JSON 作为 END 的消息体
@@ -182,8 +189,10 @@ public class SseMessageHelper {
 
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_END);
                 messageProtobufReply.setContent(endContent.toJson());
-                messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, false, promptTokens,
-                        completionTokens, totalTokens, prompt, aiProvider, aiModel);
+                if (persistMessage) {
+                    messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, false,
+                            promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
+                }
                 String messageJson = messageProtobufReply.toJson();
                 emitter.send(SseEmitter.event().data(messageJson).id(messageProtobufReply.getUid()).name("message"));
                 emitter.complete();

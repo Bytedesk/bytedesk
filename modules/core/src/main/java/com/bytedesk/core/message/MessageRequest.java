@@ -36,8 +36,6 @@ public class MessageRequest extends BaseRequest {
 
     private String threadType;
     
-    // private String userUid;
-
     private String nickname;
 
     // 客服端可以更加消息类型过滤消息

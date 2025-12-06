@@ -58,6 +58,7 @@ import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
+import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
@@ -317,10 +318,12 @@ public class VisitorThreadService
             return visitorRequest.getExtra();
         }
 
+        boolean debug = Boolean.TRUE.equals(visitorRequest.getDebug());
+
         // 默认使用实体上的 settings
         WorkgroupSettingsEntity settings = workgroup.getSettings();
         // debug 预览指定 settings
-        if (Boolean.TRUE.equals(visitorRequest.getDebug()) && StringUtils.hasText(visitorRequest.getSettingsUid())) {
+        if (debug && StringUtils.hasText(visitorRequest.getSettingsUid())) {
             try {
                 settings = workgroupSettingsRestService
                         .findByUid(visitorRequest.getSettingsUid())
@@ -330,8 +333,29 @@ public class VisitorThreadService
             }
         }
 
-        return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                settings, Boolean.TRUE.equals(visitorRequest.getDebug()));
+        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings, debug);
+
+        RobotToAgentSettingsEntity robotToAgentSettings = null;
+        if (settings != null) {
+            if (debug && settings.getDraftRobotToAgentSettings() != null) {
+                robotToAgentSettings = settings.getDraftRobotToAgentSettings();
+            } else {
+                robotToAgentSettings = settings.getRobotToAgentSettings();
+            }
+        }
+
+        boolean allowVisitorManualTransfer = robotToAgentSettings != null
+                && Boolean.TRUE.equals(robotToAgentSettings.getEnabled())
+                && Boolean.TRUE.equals(robotToAgentSettings.getAllowVisitorManualTransfer());
+        extra.setAllowVisitorManualTransfer(allowVisitorManualTransfer);
+        if (allowVisitorManualTransfer && robotToAgentSettings != null
+                && StringUtils.hasText(robotToAgentSettings.getManualTransferLabel())) {
+            extra.setManualTransferLabel(robotToAgentSettings.getManualTransferLabel());
+        } else {
+            extra.setManualTransferLabel(null);
+        }
+
+        return JSON.toJSONString(extra);
     }
 
     /**
@@ -398,9 +422,7 @@ public class VisitorThreadService
     }
 
     /**
-     * TODO: 频繁查库，待优化
-     * 1. 超时关闭会话
-     * 2. 超时未回复会话，发送会话超时提醒
+     * 自动提醒客服或关闭会话
      */
     @Async
     public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
@@ -412,7 +434,10 @@ public class VisitorThreadService
      * 处理单个Thread会话的超时逻辑
      */
     private void processThreadTimeout(ThreadEntity thread) {
-        handleQueueWaitTimeout(thread);
+        // 处理排队等待超时，如果已处理则直接返回，不再执行后续逻辑
+        if (handleQueueWaitTimeout(thread)) {
+            return;
+        }
 
         long diffInMinutes = calculateThreadTimeoutMinutes(thread);
         if (diffInMinutes < 0) {
@@ -564,34 +589,36 @@ public class VisitorThreadService
 
     /**
      * 处理排队等待超时逻辑
+     * @return true 如果会话已被处理（触发了离线留言），false 如果未处理
      */
-    private void handleQueueWaitTimeout(ThreadEntity thread) {
+    private boolean handleQueueWaitTimeout(ThreadEntity thread) {
         if (!thread.isQueuing()) {
-            return;
+            return false;
         }
 
         Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
         if (!queueMemberOpt.isPresent()) {
-            return;
+            return false;
         }
 
         QueueMemberEntity queueMember = queueMemberOpt.get();
         if (Boolean.TRUE.equals(queueMember.getMessageLeave()) || queueMember.getVisitorEnqueueAt() == null) {
-            return;
+            return false;
         }
 
         QueueSettingsEntity queueSettings = resolveQueueSettings(thread);
         int maxWaitSeconds = resolveQueueMaxWaitSeconds(queueSettings);
         if (maxWaitSeconds <= 0) {
-            return;
+            return false;
         }
 
         long waitedSeconds = Duration.between(queueMember.getVisitorEnqueueAt(), BdDateUtils.now()).getSeconds();
         if (waitedSeconds < maxWaitSeconds) {
-            return;
+            return false;
         }
 
         triggerQueueLeaveMessage(thread, queueMember);
+        return true;
     }
 
     public MessageProtobuf handleQueueOverflowLeaveMessage(ThreadEntity thread, QueueMemberEntity queueMember) {

@@ -27,6 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
@@ -35,6 +36,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.robot_to_agent_settings.event.VisitorRobotMessageEvent;
 import com.bytedesk.service.routing_strategy.ThreadRoutingContext;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
@@ -54,6 +56,8 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     private final UidUtils uidUtils;
 
     private final ThreadRoutingContext threadRoutingContext;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     protected Specification<VisitorEntity> createSpecification(VisitorRequest request) {
@@ -276,6 +280,16 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return excel;
     }
 
+    public void publishVisitorMessageEvent(String messageJson) {
+        if (!StringUtils.hasText(messageJson)) {
+            return;
+        }
+        try {
+            applicationEventPublisher.publishEvent(new VisitorRobotMessageEvent(this, messageJson));
+        } catch (Exception ex) {
+            log.warn("Failed to publish VisitorRobotMessageEvent for visitor SSE payload", ex);
+        }
+    }
     
 
 }

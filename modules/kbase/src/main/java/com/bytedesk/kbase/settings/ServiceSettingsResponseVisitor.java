@@ -103,6 +103,12 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private Boolean showLogo;
 
+    // 是否允许访客主动转人工
+    private Boolean allowVisitorManualTransfer;
+
+    // 访客端转人工按钮文案
+    private String manualTransferLabel;
+
     // 工具栏显示控制（固定字段，未设置则默认为显示）
     private ToolbarSettings toolbar;
 }

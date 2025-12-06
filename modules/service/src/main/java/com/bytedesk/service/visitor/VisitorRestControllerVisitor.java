@@ -80,7 +80,7 @@ public class VisitorRestControllerVisitor {
     private final IpService ipService;
 
     private final RobotService robotService;
-
+    
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @ApiRateLimiter(value = 1, timeout = 1)
@@ -324,6 +324,8 @@ public class VisitorRestControllerVisitor {
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
 
+        visitorRestService.publishVisitorMessageEvent(message);
+
         // 延长超时时间至10分钟
         SseEmitter emitter = new SseEmitter(600_000L);
         // 添加心跳机制，每30秒发送一个保活消息
@@ -399,5 +401,7 @@ public class VisitorRestControllerVisitor {
             executorService.shutdown();
         }
     }
+
+    
 
 }

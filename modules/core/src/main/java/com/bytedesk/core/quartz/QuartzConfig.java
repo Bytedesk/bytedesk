@@ -49,6 +49,9 @@ import static org.quartz.CronScheduleBuilder.*;
 // ? ("no specific value")
 
 /**
+ * 分布式定时任务配置类
+ * Distributed Quartz Job Configuration Class
+ * 
  * <a href=
  * "https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-quartz.html">SpringBoot官方说明</a&gt;
  * <a href=

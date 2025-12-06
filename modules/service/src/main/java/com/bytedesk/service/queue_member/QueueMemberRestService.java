@@ -57,105 +57,9 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final QueueMemberRepository queueMemberRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
-    // private final EntityManager entityManager;
-    // private static final int IDLE_QUEUE_TIMEOUT_MINUTES = 5; // 超过5分钟未发首条消息视为过期
-    // private static final String AGENT_QUEUE_THREAD_CACHE = "agent_queue_thread_uid";
     private final ThreadRestService threadRestService;
-    // private static final int MAX_ENQUEUE_RETRIES = 20;
-    // private static final long COLLISION_BACKOFF_MILLIS = 25L;
-    // private static final String QUEUE_MEMBER_TABLE_NAME = resolveQueueMemberTableName();
-    // private static final String QUEUE_NUMBER_UNIQUE_CONSTRAINT = "uk7aviqofcxw7ae3fped747qrl7";
-    // private final QueueAuditLogger queueAuditLogger;
-    // @Lazy
-    // private final QueueNotificationService queueNotificationService;
+
     
-
-    public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
-        return queueMemberRepository.findFirstAgentQueueMemberByThreadStatus(
-                agentQueueUid,
-                ThreadProcessStatusEnum.QUEUING.name());
-    }
-
-    public Optional<QueueMemberEntity> findEarliestAgentQueueMemberForUpdate(String agentQueueUid) {
-        if (!StringUtils.hasText(agentQueueUid)) {
-            return Optional.empty();
-        }
-        List<QueueMemberEntity> members = queueMemberRepository.findAgentQueueHeadForUpdate(
-            agentQueueUid,
-            ThreadProcessStatusEnum.QUEUING.name(),
-            PageRequest.of(0, 1));
-        return members.isEmpty() ? Optional.empty() : Optional.of(members.get(0));
-    }
-
-    public Optional<QueueMemberEntity> findEarliestWorkgroupQueueMember(String workgroupQueueUid) {
-        return queueMemberRepository.findFirstWorkgroupQueueMemberByThreadStatus(
-            workgroupQueueUid,
-            ThreadProcessStatusEnum.QUEUING.name());
-    }
-
-    public List<QueueMemberEntity> findQueuingMembersByWorkgroupQueueUid(String workgroupQueueUid) {
-        if (!StringUtils.hasText(workgroupQueueUid)) {
-            return Collections.emptyList();
-        }
-        return queueMemberRepository.findWorkgroupQueueMembersByThreadStatus(
-            workgroupQueueUid,
-            ThreadProcessStatusEnum.QUEUING.name());
-    }
-
-    public Optional<QueueMemberEntity> findEarliestRobotQueueMember(String robotQueueUid) {
-        return queueMemberRepository.findFirstRobotQueueMemberByThreadStatus(
-            robotQueueUid,
-            ThreadProcessStatusEnum.QUEUING.name());
-    }
-
-    public Page<QueueMemberResponse> findAgentQueueMembers(String agentQueueUid, Pageable pageable) {
-        if (!StringUtils.hasText(agentQueueUid)) {
-            return Page.empty(pageable);
-        }
-        Page<QueueMemberEntity> page = queueMemberRepository
-            .findAgentQueueMembersByThreadStatus(agentQueueUid,
-                ThreadProcessStatusEnum.QUEUING.name(), pageable);
-        return page.map(ServiceConvertUtils::convertToQueueMemberResponse);
-    }
-
-    /**
-     * 统计客服队列中处于排队状态的会话数
-     * 
-     * @param agentQueueUid 客服队列UID
-     * @return 排队中的会话数
-     */
-    public int countQueuingByAgentQueueUid(String agentQueueUid) {
-        if (!StringUtils.hasText(agentQueueUid)) {
-            return 0;
-        }
-        return queueMemberRepository.countQueuingByAgentQueueUid(
-            agentQueueUid,
-            ThreadProcessStatusEnum.QUEUING.name());
-    }
-
-    /**
-     * 统计工作组队列中未分配客服且处于排队状态的会话数
-     * 
-     * @param workgroupQueueUids 工作组队列UID列表
-     * @return 未分配客服的排队会话数
-     */
-    public int countUnassignedQueuingByWorkgroupQueueUids(List<String> workgroupQueueUids) {
-        if (workgroupQueueUids == null || workgroupQueueUids.isEmpty()) {
-            return 0;
-        }
-        return queueMemberRepository.countUnassignedQueuingByWorkgroupQueueUids(
-            workgroupQueueUids,
-            ThreadProcessStatusEnum.QUEUING.name());
-    }
-
-    /**
-     * Remove stale queue members before enqueuing new visitors so queue numbers remain dense.
-     */
-    // @Transactional
-    // public int cleanupBeforeEnqueue() {
-    //     return cleanupIdleQueueMembers();
-    // }
-
     @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {
@@ -166,6 +70,35 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
         return queueMemberRepository.findByThreadUid(threadUid);
     }
+    
+    @Override
+    public QueueMemberResponse create(QueueMemberRequest request) {
+        QueueMemberEntity counter = modelMapper.map(request, QueueMemberEntity.class);
+        counter.setUid(uidUtils.getUid());
+        
+        QueueMemberEntity savedQueueMember = save(counter);
+        if (savedQueueMember == null) {
+            throw new RuntimeException("save queue member failed");
+        }
+        return convertToResponse(savedQueueMember);
+    }
+
+    @Override
+    public QueueMemberResponse update(QueueMemberRequest request) {
+        Optional<QueueMemberEntity> optional = findByUid(request.getUid());
+        if (!optional.isPresent()) {
+            throw new RuntimeException("queue member not found");
+        }
+        QueueMemberEntity entity = optional.get();
+        // 更新实体属性
+        // entity.setQueueNumber(request.getQueueNumber());
+
+        QueueMemberEntity savedCounter = save(entity);
+        if (savedCounter == null) {
+            throw new RuntimeException("save queue member failed");
+        }
+        return convertToResponse(savedCounter);
+    }
 
     @CachePut(value = "queue_member", key = "#entity.uid")
     @Override
@@ -173,6 +106,27 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return queueMemberRepository.save(entity);
     }
 
+    @CacheEvict(value = "queue_member", key = "#uid")
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<QueueMemberEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("queue member not found");
+        }
+        QueueMemberEntity entity = optional.get();
+        entity.setDeleted(true);
+        save(entity);
+    }
+
+    @Override
+    public void delete(QueueMemberRequest entity) {
+        deleteByUid(entity.getUid());
+    }
+    public void deleteAll() {
+        queueMemberRepository.deleteAll();
+    }
+
+    
     @Override
     public QueueMemberEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             QueueMemberEntity entity) {
@@ -225,63 +179,6 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             // 抛出运行时异常以确保事务一致性，避免静默回滚
             throw new RuntimeException("处理乐观锁异常失败: " + ex.getMessage(), ex);
         }
-    }
-
-    @Override
-    public QueueMemberResponse create(QueueMemberRequest request) {
-        QueueMemberEntity counter = modelMapper.map(request, QueueMemberEntity.class);
-        counter.setUid(uidUtils.getUid());
-        
-        QueueMemberEntity savedQueueMember = save(counter);
-        if (savedQueueMember == null) {
-            throw new RuntimeException("save queue member failed");
-        }
-        return convertToResponse(savedQueueMember);
-    }
-
-    @Override
-    public QueueMemberResponse update(QueueMemberRequest request) {
-        Optional<QueueMemberEntity> optional = findByUid(request.getUid());
-        if (!optional.isPresent()) {
-            throw new RuntimeException("queue member not found");
-        }
-        QueueMemberEntity entity = optional.get();
-        // 更新实体属性
-        // entity.setQueueNumber(request.getQueueNumber());
-
-        QueueMemberEntity savedCounter = save(entity);
-        if (savedCounter == null) {
-            throw new RuntimeException("save queue member failed");
-        }
-        return convertToResponse(savedCounter);
-    }
-
-    @CacheEvict(value = "queue_member", key = "#uid")
-    @Override
-    public void deleteByUid(String uid) {
-        Optional<QueueMemberEntity> optional = findByUid(uid);
-        if (!optional.isPresent()) {
-            throw new RuntimeException("queue member not found");
-        }
-        QueueMemberEntity entity = optional.get();
-        entity.setDeleted(true);
-        save(entity);
-    }
-
-    @Override
-    public void delete(QueueMemberRequest entity) {
-        deleteByUid(entity.getUid());
-    }
-    public void deleteAll() {
-        queueMemberRepository.deleteAll();
-    }
-
-    public int nextQueueNumber(QueueEntity queue, QueueTypeEnum queueType) {
-        if (queue == null || queueType == null) {
-            return 1;
-        }
-        Integer max = queueMemberRepository.findMaxQueueNumberForQueue(queue, queueType.name());
-        return (max == null ? 0 : max) + 1;
     }
 
     @Override
@@ -362,54 +259,91 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return queueMemberRepository.findAll(spec, pageable);
     }
 
-    // @Cacheable(value = AGENT_QUEUE_THREAD_CACHE, key = "#agent.uid", unless = "#result == null")
-    // public String ensureAgentQueueThreadUid(AgentEntity agent) {
-    //     ThreadResponse response = createAgentQueueThread(agent);
-    //     return response != null ? response.getUid() : null;
-    // }
+    public int nextQueueNumber(QueueEntity queue, QueueTypeEnum queueType) {
+        if (queue == null || queueType == null) {
+            return 1;
+        }
+        Integer max = queueMemberRepository.findMaxQueueNumberForQueue(queue, queueType.name());
+        return (max == null ? 0 : max) + 1;
+    }
+
+    public Optional<QueueMemberEntity> findEarliestAgentQueueMember(String agentQueueUid) {
+        return queueMemberRepository.findFirstAgentQueueMemberByThreadStatus(
+                agentQueueUid,
+                ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    public Optional<QueueMemberEntity> findEarliestAgentQueueMemberForUpdate(String agentQueueUid) {
+        if (!StringUtils.hasText(agentQueueUid)) {
+            return Optional.empty();
+        }
+        List<QueueMemberEntity> members = queueMemberRepository.findAgentQueueHeadForUpdate(
+            agentQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name(),
+            PageRequest.of(0, 1));
+        return members.isEmpty() ? Optional.empty() : Optional.of(members.get(0));
+    }
+
+    public Optional<QueueMemberEntity> findEarliestWorkgroupQueueMember(String workgroupQueueUid) {
+        return queueMemberRepository.findFirstWorkgroupQueueMemberByThreadStatus(
+            workgroupQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    public List<QueueMemberEntity> findQueuingMembersByWorkgroupQueueUid(String workgroupQueueUid) {
+        if (!StringUtils.hasText(workgroupQueueUid)) {
+            return Collections.emptyList();
+        }
+        return queueMemberRepository.findWorkgroupQueueMembersByThreadStatus(
+            workgroupQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    public Optional<QueueMemberEntity> findEarliestRobotQueueMember(String robotQueueUid) {
+        return queueMemberRepository.findFirstRobotQueueMemberByThreadStatus(
+            robotQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    public Page<QueueMemberResponse> findAgentQueueMembers(String agentQueueUid, Pageable pageable) {
+        if (!StringUtils.hasText(agentQueueUid)) {
+            return Page.empty(pageable);
+        }
+        Page<QueueMemberEntity> page = queueMemberRepository
+            .findAgentQueueMembersByThreadStatus(agentQueueUid,
+                ThreadProcessStatusEnum.QUEUING.name(), pageable);
+        return page.map(ServiceConvertUtils::convertToQueueMemberResponse);
+    }
 
     /**
-     * 访客主动退出排队：标记离开时间并软删除队列成员记录
+     * 统计客服队列中处于排队状态的会话数
+     * 
+     * @param agentQueueUid 客服队列UID
+     * @return 排队中的会话数
      */
-    // public void visitorExitQueue(String threadUid) {
-    //     Optional<QueueMemberEntity> optional = findByThreadUid(threadUid);
-    //     if (!optional.isPresent()) {
-    //         return;
-    //     }
-    //     QueueMemberEntity entity = optional.get();
-    //     entity.setVisitorLeavedAt(BdDateUtils.now());
-    //     entity.setDeleted(true); // 不要删除，仅修改status状态
-    //     ThreadEntity thread = entity.getThread();
-    //     if (thread != null && ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
-    //         thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
-    //         threadRestService.save(thread);
-    //     }
-    //     QueueMemberEntity saved = save(entity);
-    //     queueNotificationService.publishQueueLeaveNotice(saved);
-    // }
+    public int countQueuingByAgentQueueUid(String agentQueueUid) {
+        if (!StringUtils.hasText(agentQueueUid)) {
+            return 0;
+        }
+        return queueMemberRepository.countQueuingByAgentQueueUid(
+            agentQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
 
     /**
-     * 扫描超时(未发送首条消息)的排队成员并标记删除
+     * 统计工作组队列中未分配客服且处于排队状态的会话数
+     * 
+     * @param workgroupQueueUids 工作组队列UID列表
+     * @return 未分配客服的排队会话数
      */
-    // public int cleanupIdleQueueMembers() {
-    //     java.time.ZonedDateTime threshold = BdDateUtils.now().minusMinutes(IDLE_QUEUE_TIMEOUT_MINUTES);
-    //     java.util.List<QueueMemberEntity> idleList = queueMemberRepository.findIdleBefore(threshold);
-    //     int removed = 0;
-    //     for (QueueMemberEntity qm : idleList) {
-    //         // 只处理仍处于排队状态的线程
-    //         ThreadEntity thread = qm.getThread();
-    //         if (thread != null && thread.isQueuing()) {
-    //             // qm.setDeleted(true); // 不要删除，仅修改status状态
-    //             qm.setVisitorLeavedAt(BdDateUtils.now());
-    //             thread.setStatus(ThreadProcessStatusEnum.TIMEOUT.name());
-    //             threadRestService.save(thread);
-    //             QueueMemberEntity saved = save(qm);
-    //             queueNotificationService.publishQueueTimeoutNotice(saved);
-    //             removed++;
-    //         }
-    //     }
-    //     return removed;
-    // }
+    public int countUnassignedQueuingByWorkgroupQueueUids(List<String> workgroupQueueUids) {
+        if (workgroupQueueUids == null || workgroupQueueUids.isEmpty()) {
+            return 0;
+        }
+        return queueMemberRepository.countUnassignedQueuingByWorkgroupQueueUids(
+            workgroupQueueUids,
+            ThreadProcessStatusEnum.QUEUING.name());
+    }
 
     /** 客服排队会话：org/queue/{agent_uid} */
     public ThreadEntity createAgentQueueThread(AgentEntity agent) {

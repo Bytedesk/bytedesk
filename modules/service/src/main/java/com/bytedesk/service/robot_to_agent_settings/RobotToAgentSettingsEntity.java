@@ -16,6 +16,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.utils.TransferKeywordUtil;
+import com.bytedesk.service.constant.I18ServiceConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -47,11 +48,10 @@ public class RobotToAgentSettingsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String DEFAULT_MANUAL_TRANSFER_LABEL = "转人工客服";
-    private static final int DEFAULT_MIN_CONFIDENCE = 65;
-    private static final int DEFAULT_MAX_ROBOT_REPLIES = 3;
-    private static final int DEFAULT_AUTO_TRANSFER_DELAY_SECONDS = 0;
-    private static final int DEFAULT_COOLDOWN_SECONDS = 90;
+    // private static final int DEFAULT_MIN_CONFIDENCE = 65;
+    // private static final int DEFAULT_MAX_ROBOT_REPLIES = 3;
+    // private static final int DEFAULT_AUTO_TRANSFER_DELAY_SECONDS = 0;
+    // private static final int DEFAULT_COOLDOWN_SECONDS = 90;
 
     @Builder.Default
     private Boolean enabled = Boolean.TRUE;
@@ -59,23 +59,23 @@ public class RobotToAgentSettingsEntity extends BaseEntity {
     @Builder.Default
     private Boolean keywordTriggerEnabled = Boolean.TRUE;
 
-    @Builder.Default
-    private Integer minConfidence = DEFAULT_MIN_CONFIDENCE;
+    // @Builder.Default
+    // private Integer minConfidence = DEFAULT_MIN_CONFIDENCE;
 
-    @Builder.Default
-    private Integer maxRobotRepliesBeforeTransfer = DEFAULT_MAX_ROBOT_REPLIES;
+    // @Builder.Default
+    // private Integer maxRobotRepliesBeforeTransfer = DEFAULT_MAX_ROBOT_REPLIES;
 
-    @Builder.Default
-    private Integer autoTransferDelaySeconds = DEFAULT_AUTO_TRANSFER_DELAY_SECONDS;
+    // @Builder.Default
+    // private Integer autoTransferDelaySeconds = DEFAULT_AUTO_TRANSFER_DELAY_SECONDS;
 
-    @Builder.Default
-    private Integer cooldownSeconds = DEFAULT_COOLDOWN_SECONDS;
+    // @Builder.Default
+    // private Integer cooldownSeconds = DEFAULT_COOLDOWN_SECONDS;
 
     @Builder.Default
     private Boolean allowVisitorManualTransfer = Boolean.TRUE;
 
     @Builder.Default
-    private String manualTransferLabel = DEFAULT_MANUAL_TRANSFER_LABEL;
+    private String manualTransferLabel = I18ServiceConsts.I18N_DEFAULT_MANUAL_TRANSFER_LABEL;
 
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -92,10 +92,10 @@ public class RobotToAgentSettingsEntity extends BaseEntity {
             entity = RobotToAgentSettingsEntity.builder()
                     .enabled(request.getEnabled())
                     .keywordTriggerEnabled(request.getKeywordTriggerEnabled())
-                    .minConfidence(request.getMinConfidence())
-                    .maxRobotRepliesBeforeTransfer(request.getMaxRobotRepliesBeforeTransfer())
-                    .autoTransferDelaySeconds(request.getAutoTransferDelaySeconds())
-                    .cooldownSeconds(request.getCooldownSeconds())
+                    // .minConfidence(request.getMinConfidence())
+                    // .maxRobotRepliesBeforeTransfer(request.getMaxRobotRepliesBeforeTransfer())
+                    // .autoTransferDelaySeconds(request.getAutoTransferDelaySeconds())
+                    // .cooldownSeconds(request.getCooldownSeconds())
                     .allowVisitorManualTransfer(request.getAllowVisitorManualTransfer())
                     .manualTransferLabel(request.getManualTransferLabel())
                     .triggerKeywords(request.getTriggerKeywords() != null
@@ -117,23 +117,23 @@ public class RobotToAgentSettingsEntity extends BaseEntity {
         if (entity.getKeywordTriggerEnabled() == null) {
             entity.setKeywordTriggerEnabled(Boolean.TRUE);
         }
-        if (entity.getMinConfidence() == null) {
-            entity.setMinConfidence(DEFAULT_MIN_CONFIDENCE);
-        }
-        if (entity.getMaxRobotRepliesBeforeTransfer() == null) {
-            entity.setMaxRobotRepliesBeforeTransfer(DEFAULT_MAX_ROBOT_REPLIES);
-        }
-        if (entity.getAutoTransferDelaySeconds() == null) {
-            entity.setAutoTransferDelaySeconds(DEFAULT_AUTO_TRANSFER_DELAY_SECONDS);
-        }
-        if (entity.getCooldownSeconds() == null) {
-            entity.setCooldownSeconds(DEFAULT_COOLDOWN_SECONDS);
-        }
+        // if (entity.getMinConfidence() == null) {
+        //     entity.setMinConfidence(DEFAULT_MIN_CONFIDENCE);
+        // }
+        // if (entity.getMaxRobotRepliesBeforeTransfer() == null) {
+        //     entity.setMaxRobotRepliesBeforeTransfer(DEFAULT_MAX_ROBOT_REPLIES);
+        // }
+        // if (entity.getAutoTransferDelaySeconds() == null) {
+        //     entity.setAutoTransferDelaySeconds(DEFAULT_AUTO_TRANSFER_DELAY_SECONDS);
+        // }
+        // if (entity.getCooldownSeconds() == null) {
+        //     entity.setCooldownSeconds(DEFAULT_COOLDOWN_SECONDS);
+        // }
         if (entity.getAllowVisitorManualTransfer() == null) {
             entity.setAllowVisitorManualTransfer(Boolean.TRUE);
         }
         if (!StringUtils.hasText(entity.getManualTransferLabel())) {
-            entity.setManualTransferLabel(DEFAULT_MANUAL_TRANSFER_LABEL);
+            entity.setManualTransferLabel(I18ServiceConsts.I18N_DEFAULT_MANUAL_TRANSFER_LABEL);
         }
         normalizeKeywords(entity);
     }

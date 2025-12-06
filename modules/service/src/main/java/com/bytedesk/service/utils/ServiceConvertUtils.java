@@ -247,11 +247,11 @@ public class ServiceConvertUtils {
     }
     
     /**
-     * Build ServiceSettingsResponseVisitor JSON from settings container.
+     * Build ServiceSettingsResponseVisitor object from settings container.
      * If debug=true and draft exists, prefer draft; otherwise use published.
      * Falls back to a new ServiceSettingsEntity when missing.
      */
-    public static String convertToServiceSettingsResponseVisitorJSONString(BaseSettingsEntity settingsContainer, boolean debug) {
+    public static ServiceSettingsResponseVisitor buildServiceSettingsResponseVisitor(BaseSettingsEntity settingsContainer, boolean debug) {
         ServiceSettingsEntity svc = null;
         if (settingsContainer != null) {
             if (debug && settingsContainer.getDraftServiceSettings() != null) {
@@ -263,7 +263,14 @@ public class ServiceConvertUtils {
         if (svc == null) {
             svc = ServiceSettingsEntity.builder().build();
         }
-        ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+        return getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+    }
+
+    /**
+     * Build ServiceSettingsResponseVisitor JSON from settings container.
+     */
+    public static String convertToServiceSettingsResponseVisitorJSONString(BaseSettingsEntity settingsContainer, boolean debug) {
+        ServiceSettingsResponseVisitor resp = buildServiceSettingsResponseVisitor(settingsContainer, debug);
         return JSON.toJSONString(resp);
     }
 
