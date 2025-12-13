@@ -336,6 +336,8 @@ services:
       SPRING_AI_MODEL_VISION: zhipuai
       # 默认语音模型
       SPRING_AI_MODEL_AUDIO: zhipuai
+      SPRING_AI_MODEL_AUDIO_SPEECH: none
+      SPRING_AI_MODEL_AUDIO_TRANSCRIPTION: none
       # 默认重排序模型
       SPRING_AI_MODEL_RERANK: zhipuai
       # ollama
