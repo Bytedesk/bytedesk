@@ -96,7 +96,7 @@ public class RobotToAgentKeywordListener {
         RobotToAgentSettingsEntity robotToAgentSettings = workgroup.getSettings() != null
                 ? workgroup.getSettings().getRobotToAgentSettings()
                 : null;
-        if (!isKeywordTriggerEnabled(robotToAgentSettings)) {
+        if (robotToAgentSettings == null || !isKeywordTriggerEnabled(robotToAgentSettings)) {
             log.debug("Robot keyword trigger disabled or empty for workgroup {}", workgroup.getUid());
             return;
         }

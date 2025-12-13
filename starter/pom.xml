@@ -287,6 +287,15 @@
 		<!--
 		//////////////////////////////////Plugin模块-如果报错找不到，直接删除依赖就好，不影响正常使用/////////////////////////////////////////// -->
 
+		<!-- property encryption support -->
+		<!-- https://github.com/jasypt/jasypt?tab=readme-ov-file -->
+		<!-- https://mvnrepository.com/artifact/com.github.ulisesbocchio/jasypt-spring-boot-starter -->
+		<dependency>
+			<groupId>com.github.ulisesbocchio</groupId>
+			<artifactId>jasypt-spring-boot-starter</artifactId>
+			<version>3.0.5</version>
+		</dependency>
+		
 		<!-- spring statemachine - 迁移到 cola statemachine -->
 		 <!-- https://github.com/spring-projects/spring-statemachine -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.statemachine/spring-statemachine-starter -->
@@ -491,15 +500,16 @@
 
 
 	<build>
-		<!-- <resources>
+		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
+					<exclude>application-kingbase.properties</exclude>
 					<exclude>application-prod.properties</exclude>
 					<exclude>application-local.properties</exclude>
 				</excludes>
 			</resource>
-		</resources> -->
+		</resources>
 		<!-- custom jar name, no version: bytedesk-starter.jar, default: ${project.artifactId}-${project.version} -->  
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
