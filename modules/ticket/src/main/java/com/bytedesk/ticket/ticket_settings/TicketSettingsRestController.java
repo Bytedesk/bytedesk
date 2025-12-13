@@ -29,6 +29,12 @@ import org.springframework.context.annotation.Description;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBatchBindRequest;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryVisitorItemResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryVisitorResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -147,7 +153,9 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
             @PathVariable("orgUid") String orgUid,
             @PathVariable("workgroupUid") String workgroupUid,
             @RequestBody TicketSettingsRequest request) {
+
         TicketSettingsResponse resp = ticketSettingsRestService.saveByWorkgroup(orgUid, workgroupUid, request);
+
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
@@ -168,7 +176,9 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     public ResponseEntity<?> publishByWorkgroup(
             @PathVariable("orgUid") String orgUid,
             @PathVariable("workgroupUid") String workgroupUid) {
+
         TicketSettingsResponse resp = ticketSettingsRestService.publishByWorkgroup(orgUid, workgroupUid);
+
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
@@ -179,7 +189,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     public ResponseEntity<?> bindWorkgroups(
             @PathVariable("uid") String uid,
             @PathVariable("orgUid") String orgUid,
-            @RequestBody com.bytedesk.ticket.ticket_settings.dto.TicketSettingsBatchBindRequest request) {
+            @RequestBody TicketSettingsBatchBindRequest request) {
         if (request == null || request.getWorkgroupUids() == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("workgroupUids are required"));
         }
@@ -209,7 +219,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         TicketSettingsResponse settings = StringUtils.hasText(type)
             ? ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid, type)
             : ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
-        com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse response = 
+        TicketCategoryVisitorResponse response = 
             toCategoryVisitorResponse(settings != null ? settings.getCategorySettings() : null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -217,22 +227,22 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     /**
      * 将分类设置转换为访客端响应格式
      */
-    private com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse toCategoryVisitorResponse(
-            com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse categorySettings) {
+    private TicketCategoryVisitorResponse toCategoryVisitorResponse(
+            TicketCategorySettingsResponse categorySettings) {
         if (categorySettings == null) {
-            return com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse.empty();
+            return TicketCategoryVisitorResponse.empty();
         }
 
-        java.util.List<com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse> items = 
+        java.util.List<TicketCategoryVisitorItemResponse> items = 
             categorySettings.getItems().stream()
                 .filter(item -> Boolean.TRUE.equals(item.getEnabled()))
                 .sorted(java.util.Comparator.comparing(
-                    (com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategoryItemResponse item) -> 
+                    (TicketCategoryItemResponse item) -> 
                         item.getOrderIndex() != null ? item.getOrderIndex() : Integer.MAX_VALUE)
                     .thenComparing(
-                        com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategoryItemResponse::getName, 
+                        TicketCategoryItemResponse::getName, 
                         java.util.Comparator.nullsLast(String::compareToIgnoreCase)))
-                .map(item -> com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse.builder()
+                .map(item -> TicketCategoryVisitorItemResponse.builder()
                         .uid(item.getUid())
                         .name(item.getName())
                         .description(item.getDescription())
@@ -245,10 +255,10 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         String effectiveDefaultUid = defaultAvailable
             ? configuredDefaultUid
             : items.stream().findFirst()
-                .map(com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse::getUid)
+                .map(TicketCategoryVisitorItemResponse::getUid)
                 .orElse(null);
 
-        return com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse.builder()
+        return TicketCategoryVisitorResponse.builder()
             .defaultCategoryUid(effectiveDefaultUid)
             .categories(items)
             .build();

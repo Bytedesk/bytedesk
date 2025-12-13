@@ -14,6 +14,8 @@
 package com.bytedesk.ai.robot;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +37,27 @@ public class RobotJsonLoader {
     private ResourceLoader resourceLoader;
 
     public RobotConfiguration loadRobots() {
-        try {
-            Resource resource = resourceLoader.getResource("classpath:ai/robots.json");
+        Resource resource = resourceLoader.getResource("classpath:ai/robots.json");
+        if (!resource.exists() || !resource.isReadable()) {
+            log.warn("robots.json not found on classpath, returning empty robot configuration");
+            return emptyConfiguration();
+        }
+
+        try (InputStream inputStream = resource.getInputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return objectMapper.readValue(resource.getInputStream(), RobotConfiguration.class);
+            RobotConfiguration configuration = objectMapper.readValue(inputStream, RobotConfiguration.class);
+            return configuration != null ? configuration : emptyConfiguration();
         } catch (IOException e) {
             log.error("Failed to load robots.json", e);
-            throw new RuntimeException("Failed to load robots.json", e);
+            return emptyConfiguration();
         }
+    }
+
+    private RobotConfiguration emptyConfiguration() {
+        RobotConfiguration configuration = new RobotConfiguration();
+        configuration.setRobots(Collections.emptyList());
+        return configuration;
     }
 
     @Data

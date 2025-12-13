@@ -14,7 +14,15 @@
 package com.bytedesk.ticket.process;
 
 public enum TicketProcessTypeEnum {
-    TICKET,
+    /**
+     * 内部工单流程 - 用于创建和处理客户服务工单
+     */
+    TICKET_INTERNAL,
+    /**
+     * 外部工单流程 - 用于访客提交的工单
+     */
+    TICKET_EXTERNAL,
+    // 会话流程
     THREAD,
     FLOW
 }

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.robot_settings;
 
+import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
 
@@ -42,4 +43,14 @@ public class RobotSettingsResponse extends BaseSettingsResponse {
      * Draft rating down settings (Robot-specific)
      */
     private RatedownSettingsResponse draftRateDownSettings;
+
+    /**
+     * Spring AI tools settings (published)
+     */
+    private RobotToolsSettingsResponse toolsSettings;
+
+    /**
+     * Spring AI tools settings draft
+     */
+    private RobotToolsSettingsResponse draftToolsSettings;
 }

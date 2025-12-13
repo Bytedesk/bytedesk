@@ -22,6 +22,8 @@ public class TicketConsts {
     public static final String TICKET_PROCESS_KEY = "ticketProcess";
 
     public static final String TICKET_PROCESS_PATH = "processes/ticket-process.bpmn20.xml";
+
+    public static final String TICKET_EXTERNAL_PROCESS_UID_SUFFIX = "_external";
     
     // task definition key
     public static final String TICKET_USER_TASK_CREATE_TICKET = "createTicket";

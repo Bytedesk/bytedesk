@@ -1,0 +1,474 @@
+services:
+  bytedesk-mysql:
+    image: mysql:latest
+    container_name: mysql-bytedesk
+    restart: always
+    environment:
+      MYSQL_DATABASE: bytedesk
+      MYSQL_ROOT_PASSWORD: r8FqfdbWUaN3
+      TZ: Asia/Shanghai  # 添加这一行
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # 初始化 SQL 目录：首次启动且数据卷为空时会执行其中的脚本
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  bytedesk-redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis-bytedesk
+    restart: always
+    ports:
+      - "16379:6379"
+    environment:
+      - REDIS_ARGS=--requirepass qfRxz3tVT8Nh
+    volumes:
+      - redis_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "qfRxz3tVT8Nh", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # http://127.0.0.1:21434
+  bytedesk-ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-bytedesk
+    restart: always
+    ports:
+      - "21434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=qwen3:0.6b
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ActiveMQ Artemis 消息队列
+  # http://localhost:18161/console，使用 admin/admin 作为登录凭据
+  bytedesk-artemis:
+    image: apache/activemq-artemis:latest
+    container_name: artemis-bytedesk
+    restart: always
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+      - ANONYMOUS_LOGIN=false
+      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia
+    ports:
+      - "16161:61616"   # JMS
+      - "16162:61617"   # AMQP
+      - "18161:8161"     # Web Console
+      - "15672:5672"     # AMQP
+      - "16163:61613"   # STOMP
+      - "11883:1883"     # MQTT
+    volumes:
+      - artemis_data:/var/lib/artemis/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "-u", "admin:admin", "http://localhost:8161/console/jolokia/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ElasticSearch 向量数据库
+  bytedesk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    container_name: elasticsearch-bytedesk
+    restart: always
+    environment:
+      - node.name=bytedesk-es01
+      - cluster.name=bytedesk-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=bytedesk123
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Zipkin 分布式追踪系统- Spring Ai Observability
+  bytedesk-zipkin:
+    image: 'openzipkin/zipkin:latest'
+    container_name: zipkin-bytedesk
+    restart: always
+    ports:
+      - '19411:9411'
+    volumes:
+      - zipkin_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # etcd 分布式键值存储
+  # http://localhost:12379 - etcd API
+  bytedesk-etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: etcd-bytedesk
+    restart: always
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+      - TZ=Asia/Shanghai
+    ports:
+      - "12379:2379"   # Client API
+      - "12380:2380"   # Peer communication
+    volumes:
+      - etcd_data:/etcd
+    command:
+      - /usr/local/bin/etcd
+      - --name=bytedesk-etcd-node
+      - --advertise-client-urls=http://bytedesk-etcd:2379
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --initial-advertise-peer-urls=http://bytedesk-etcd:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-cluster=bytedesk-etcd-node=http://bytedesk-etcd:2380
+      - --initial-cluster-state=new
+      - --data-dir=/etcd
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO Console
+  # http://localhost:19001 - MinIO API
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # FreeSwitch 语音通话服务
+  # https://hub.docker.com/r/bytedesk/freeswitch
+  # 使用自定义构建的 FreeSWITCH 镜像（支持 ARM64/AMD64）
+  bytedesk-freeswitch:
+    # image: bytedesk/freeswitch:latest
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
+    container_name: freeswitch-bytedesk
+    restart: always
+    # 使用 -nf (no fork) 参数在前台运行，避免容器退出
+    command: ["freeswitch", "-nf", "-nonat", "-nonatmap"]
+    environment:
+      # 时区设置
+      - TZ=Asia/Shanghai
+      # 设置 ESL 密码（必须设置，否则使用默认密码 ClueCon）
+      # - FREESWITCH_ESL_PASSWORD=bytedesk123
+      # 数据库配置
+      # - FREESWITCH_DB_HOST=bytedesk-mysql
+      # - FREESWITCH_DB_NAME=bytedesk
+      # - FREESWITCH_DB_USER=root
+      # - FREESWITCH_DB_PASSWORD=r8FqfdbWUaN3
+      # - FREESWITCH_DB_PORT=3306
+      # - FREESWITCH_DB_CHARSET=utf8mb4
+      # - FREESWITCH_DB_SCHEME=mariadb
+      # - FREESWITCH_DB_ODBC_DIALECT=mysql
+      # Baidu MRCP 配置（启用并在容器内随 FreeSWITCH 启动）
+      # - BAIDU_MRCP_ENABLE=1
+      # 避免与 FreeSWITCH 5060 冲突，默认使用 5070（无需对外暴露）
+      # - BAIDU_MRCP_SIP_PORT=5070
+      # 认证参数（请替换为真实值）
+      # - BAIDU_APPID=your_app_id
+      # - BAIDU_API_KEY=your_api_key
+      # - BAIDU_SECRET_KEY=your_secret_key
+      # 是否保存音频（1=保存，0=不保存）
+      # - BAIDU_MRCP_SAVE_AUDIO=1
+      # 完全禁用 IPv6
+      - DISABLE_IPV6=true
+    ports:
+      # SIP 端口
+      - "15060:5060/tcp"   # SIP 内部
+      - "15060:5060/udp"   # SIP 内部
+      - "15080:5080/tcp"   # SIP 外部
+      - "15080:5080/udp"   # SIP 外部
+      - "15061:5061/tcp"   # SIP 内部 TLS
+      - "15081:5081/tcp"   # SIP 外部 TLS
+      # WebRTC 端口
+      - "15066:5066/tcp"   # WebSocket 信令
+      - "17443:7443/tcp"   # WebRTC WSS
+      # ESL 管理端口
+      - "18021:8021/tcp"
+      # HTTP 服务端口
+      - "18081-18082:8081-8082/tcp"
+      # RTP 媒体端口范围
+      - "16000-16129:6000-6129/udp"
+    volumes:
+      # 配置文件目录 - 使用本地配置文件覆盖容器内的配置（经验证实际使用 /usr/local/freeswitch/etc/freeswitch）
+      - ../../../../deploy/freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
+      # 数据持久化目录
+      - freeswitch_data:/usr/local/freeswitch/db
+      # - ../../../../deploy/freeswitch/db:/usr/local/freeswitch/db
+      # 日志目录
+      # - freeswitch_logs:/usr/local/freeswitch/log
+      - ../../../../deploy/freeswitch/log:/usr/local/freeswitch/log
+      # 声音目录
+      - ../../../../deploy/freeswitch/sounds:/usr/local/freeswitch/sounds
+      # 录音目录
+      # - freeswitch_recordings:/usr/local/freeswitch/recordings
+      - ../../../../deploy/freeswitch/recordings:/usr/local/freeswitch/recordings
+      # 挂载 ODBC 配置（ARM64 MariaDB 驱动）
+      - ../../../../deploy/freeswitch/etc/odbc.ini:/etc/odbc.ini:ro
+      - ../../../../deploy/freeswitch/etc/odbcinst.ini:/etc/odbcinst.ini:ro
+    depends_on:
+      - bytedesk-mysql
+    networks:
+      - bytedesk-network
+    # 暂时禁用健康检查，因为 event_socket 模块启动问题
+    # healthcheck:
+    #   test: ["CMD", "fs_cli", "-p", "bytedesk123", "-x", "status"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+  
+  
+  # Janus WebRTC Gateway (sucwangsr image from pengjinning repo)
+  # bytedesk-janus:
+  #   image: 'sucwangsr/janus-webrtc-gateway-docker:1.3.2-muti'
+  #   container_name: janus-bytedesk
+  #   restart: always
+  #   # Using bridge network with explicit port mappings to support macOS/local testing
+  #   # (remove or change ports if you run on Linux and prefer host networking)
+  #   # network_mode: "host"
+  #   ports:
+  #     - "18086:80/tcp"    # nginx http (mapped to high port to avoid conflicts)
+  #     - "18089:8088/tcp"  # Janus admin HTTP (internal 8088)
+  #     - "18090:8089/tcp"  # Janus admin HTTPS (internal 8089)
+  #     - "18178:3478/udp"  # STUN/ICE (3478)
+  #     - "18179:3478/tcp"  # STUN/ICE TCP (if needed)
+  #     - "18180:80/tcp"    # optional web
+  #     - "18181:443/tcp"   # optional https
+  #     - "11000-11200:10000-10200/udp" # RTP/Media ports for WebRTC (mapped to 11000-11200 on host)
+  #   # Only start janus OR start nginx+janus together. Here we start nginx and janus like the README.
+  #   command: ["sh", "-c", "nginx && /usr/local/bin/janus -F /usr/local/etc/janus"]
+  #   environment:
+  #     - TZ=Asia/Shanghai
+  #   volumes:
+  #     # 挂载整个本地 janus 配置目录（相对于此 compose 文件）
+  #     - ../../../../deploy/janus/etc/janus:/usr/local/etc/janus:ro
+  #   depends_on:
+  #     - bytedesk-freeswitch
+  #   # no networks block since using host network_mode
+  #   healthcheck:
+  #     # Janus ping: POST {"janus":"ping"} to http admin (8088). Expect "PONG" in response
+  #     test: ["CMD-SHELL", "curl -sS -X POST -H 'Content-Type: application/json' --data '{\"janus\":\"ping\"}' http://127.0.0.1:8088/janus | grep -qi pong"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 20s
+
+  # https://hub.docker.com/r/safarov/freeswitch
+  # https://github.com/signalwire/freeswitch/tree/master/docker
+  # FreeSwitch 官方镜像 safarov/freeswitch (不支持 ARM64，已注释)
+  # 仅适用于 AMD64/x86_64 架构
+  # bytedesk-freeswitch-official:
+  #   image: safarov/freeswitch:latest
+  #   container_name: freeswitch-bytedesk-official
+  #   restart: always
+  #   command: ["freeswitch"]
+  #   environment:
+  #     - SOUND_RATES=8000:16000
+  #     - SOUND_TYPES=music:en-us-callie
+  #     - EPMD=false
+  #     - TZ=Asia/Shanghai
+  #   ports:
+  #     - "15060:5060/tcp"
+  #     - "15060:5060/udp"
+  #     - "15080:5080/tcp"
+  #     - "15080:5080/udp"
+  #     - "15061:5061/tcp"
+  #     - "15081:5081/tcp"
+  #     - "15066:5066/tcp"
+  #     - "17443:7443/tcp"
+  #     - "18021:8021/tcp"
+  #     - "16384-32768:16384-32768/udp"
+  #     - "64535-65535:64535-65535/udp"
+  #   volumes:
+  #     - freeswitch_config:/etc/freeswitch
+  #     - freeswitch_sounds:/usr/share/freeswitch/sounds
+  #     - freeswitch_data:/var/lib/freeswitch
+  #     - freeswitch_logs:/var/log/freeswitch
+  #     - freeswitch_tmp:/tmp
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "fs_cli", "-x", "status"]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 60s
+
+  # bytedesk-ldap:
+  #   image: osixia/openldap:latest
+  #   container_name: ldap-bytedesk
+  #   ports:
+  #     - "389:389"
+  #     - "636:636"
+  #   environment:
+  #     - LDAP_ORGANISATION=ByteDesk
+  #     - LDAP_DOMAIN=example.com
+  #     - LDAP_BASE_DN=dc=example,dc=com
+  #     - LDAP_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - ldap_data:/var/lib/ldap
+  #     - ldap_config:/etc/ldap/slapd.d
+  #   networks:
+  #     - bytedesk-network
+
+  # http://localhost:18080
+  # 登录凭据：
+  # - DN: cn=admin,dc=example,dc=com
+  # - 密码: admin
+  # bytedesk-phpldapadmin:
+  #   image: osixia/phpldapadmin:latest
+  #   container_name: phpldapadmin-bytedesk
+  #   ports:
+  #     - "18080:80"
+  #   environment:
+  #     - PHPLDAPADMIN_LDAP_HOSTS=bytedesk-ldap
+  #     - PHPLDAPADMIN_HTTPS=false
+  #   depends_on:
+  #     - bytedesk-ldap
+  #   networks:
+  #     - bytedesk-network
+
+  # http://127.0.0.1:19090/
+  # bytedesk-prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus-bytedesk
+  #   ports:
+  #     - "19090:9090"
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.enable-lifecycle'
+  #     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+  #     - '--web.console.templates=/usr/share/prometheus/consoles'
+  #     - '--storage.tsdb.retention.time=15d'
+  #     - '--web.enable-admin-api'
+  #     - '--web.external-url=http://localhost:19090'
+  #   volumes:
+  #     - prometheus_data:/prometheus
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   networks:
+  #     - bytedesk-network
+
+  # http://127.0.0.1:13000/
+  # bytedesk-grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana-bytedesk
+  #   ports:
+  #     - "13000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   networks:
+  #     - bytedesk-network
+  #   depends_on:
+  #     - bytedesk-prometheus
+
+
+volumes:
+  mysql_data:
+    name: bytedesk_mysql_data
+  kingbase_data:
+    name: bytedesk_kingbase_data
+  redis_data:
+    name: bytedesk_redis_data
+  ollama_models:
+    name: bytedesk_ollama_models
+  prometheus_data:
+    name: bytedesk_prometheus_data
+  grafana_data:
+    name: bytedesk_grafana_data
+  ldap_data:
+    name: bytedesk_ldap_data
+  ldap_config:
+    name: bytedesk_ldap_config
+  elasticsearch_data:
+    name: bytedesk_elasticsearch_data
+  zipkin_data:
+    name: bytedesk_zipkin_data
+  artemis_data:
+    name: bytedesk_artemis_data
+  etcd_data:
+    name: bytedesk_etcd_data
+  minio_data:
+    name: bytedesk_minio_data
+  freeswitch_config:
+    name: bytedesk_freeswitch_config
+  freeswitch_sounds:
+    name: bytedesk_freeswitch_sounds
+  freeswitch_data:
+    name: bytedesk_freeswitch_data
+  freeswitch_logs:
+    name: bytedesk_freeswitch_logs
+  freeswitch_tmp:
+    name: bytedesk_freeswitch_tmp
+  freeswitch_recordings:
+    name: bytedesk_freeswitch_recordings
+
+networks:
+  bytedesk-network:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.25.0.0/16
+        - subnet: fd12:3456:789a::/64

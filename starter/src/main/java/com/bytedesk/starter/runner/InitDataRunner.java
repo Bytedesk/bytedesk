@@ -30,33 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class InitDataRunner implements ApplicationRunner {
 
-    // @Autowired
-    // private RoleInitializer roleInitializer;
-
-    // @Autowired
-    // private UserInitializer userInitializer;
-
-    // @Autowired
-    // private OrganizationInitializer organizationInitializer;
-
-    // @Autowired
-    // private MemberInitializer memberInitializer;
-
-    // @Autowired
-    // private AgentInitializer agentInitializer;
-
-    // @Autowired
-    // private WorkgroupInitializer workgroupInitializer;
-
-    // @Autowired
-    // private FaqInitializer faqInitializer;
-
-    // @Autowired
-    // private RobotInitializer robotInitializer;
-
-    // @Autowired
-    // private LlmProviderInitializer llmProviderInitializer;
-
     @Value("${application.version}")
     private String version;
     
@@ -65,25 +38,6 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // 集中执行必要的初始化，方便管理和控制初始化顺序，避免分散执行因依赖关系导致初始化失败
-        // roleInitializer.init();
-
-        // userInitializer.init();
-
-        // organizationInitializer.init();
-
-        // memberInitializer.init();
-
-        // agentInitializer.init();
-
-        // workgroupInitializer.init();
-
-        // faqInitializer.init();
-
-        // robotInitializer.init();
-
-        // llmProviderInitializer.init();
-
         // 在应用的主类或配置类中
         // TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         // TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));

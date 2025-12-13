@@ -1,0 +1,762 @@
+{
+  "version": "6",
+  "id": "clon582of00031avnefkrpwrl",
+  "name": "Digital Marketing Quiz",
+  "events": [
+    {
+      "id": "cl1qz4lui00017w1a505z15p0",
+      "outgoingEdgeId": "cl1r17gv3006h2e6dc9e7xob7",
+      "graphCoordinates": { "x": -541.1926699141732, "y": -27.36367432150308 },
+      "type": "start"
+    }
+  ],
+  "groups": [
+    {
+      "id": "cl1r09bc6000h2e6dqml18p4p",
+      "title": "Q1",
+      "graphCoordinates": { "x": 3, "y": 180 },
+      "blocks": [
+        {
+          "id": "cl1r0bva2000y2e6d2g88vmjk",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vcl1r0bxdj000z2e6d65u7n41b",
+            "expressionToEvaluate": "0"
+          }
+        },
+        {
+          "id": "cl1r09bcc000i2e6dyyvskx75",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "What does SEO stand for?" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "cl1r09dl9000j2e6dhkc2h97y",
+          "outgoingEdgeId": "cl1r0cfjt00122e6dzwtamycl",
+          "type": "choice input",
+          "items": [
+            { "id": "cl1r09dl9000k2e6dvf7llzkd", "content": "Send Email Out" },
+            {
+              "id": "cl1r0a80k000l2e6dngppwyhm",
+              "content": "Serial Editorial Output"
+            },
+            {
+              "id": "cl1r0adei000m2e6dfc8w5y4k",
+              "outgoingEdgeId": "cl1r0dfip00152e6doo9duexn",
+              "content": "Search Engine Optimization"
+            },
+            {
+              "id": "cl1r0aiks000n2e6dc31e2db6",
+              "content": "Search Expectation Order"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cl1r0b3ww000q2e6d4aihat41",
+      "title": "Q2",
+      "graphCoordinates": { "x": 457.878775226166, "y": 159.8383669682208 },
+      "blocks": [
+        {
+          "id": "cl1r0e8gq00172e6dq0bpxqsc",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vcl1r0bxdj000z2e6d65u7n41b",
+            "expressionToEvaluate": "{{Score}} + 5"
+          }
+        },
+        {
+          "id": "cl1r0d8zi00142e6d4tl2yenk",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "Well done!" }] }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0bgit000x2e6dvdre9wsj",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "What is anchor text?" }] }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0b3x5000r2e6dqk8gzoim",
+          "outgoingEdgeId": "cl1r0f53y001q2e6dvuq434ru",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "cl1r0b3x5000s2e6dyq6bklbf",
+              "outgoingEdgeId": "cl1r0i4dj001r2e6dgb96tx9q",
+              "content": "The visible text that is hyperlinked to another page"
+            },
+            {
+              "id": "cl1r0b6jd000t2e6dkp3dxpp9",
+              "content": "The text in the top left of a webpage"
+            },
+            {
+              "id": "cl1r0b835000u2e6d22rw2gb5",
+              "content": "The most prominent text on a page, used by search engines to assign a title to the page"
+            },
+            {
+              "id": "cl1r0b9tl000v2e6dkligryj3",
+              "content": "A slogan that sticks in a consumer’s mind"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cl1r0erik00182e6dfzezujj0",
+      "title": "Q3",
+      "graphCoordinates": { "x": 876.6414289028069, "y": 165.4393876130828 },
+      "blocks": [
+        {
+          "id": "cl1r0eril00192e6d9yrtownz",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vcl1r0bxdj000z2e6d65u7n41b",
+            "expressionToEvaluate": "{{Score}} + 5"
+          }
+        },
+        {
+          "id": "cl1r0eril001b2e6dh43cqhv5",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "Well done!" }] }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0eril001d2e6d3gay9cls",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "What is a persona ?" }] }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0eril001f2e6dk0fd0qpw",
+          "outgoingEdgeId": "cl1r0khb6002c2e6ddssbpj9z",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "cl1r0erim001g2e6d5zzn8q22",
+              "content": "Your target audience"
+            },
+            {
+              "id": "cl1r0erim001h2e6dnwtiturl",
+              "content": "Someone who joins your mailing list"
+            },
+            {
+              "id": "cl1r0erim001i2e6dbfhck09o",
+              "content": "A repeat customer"
+            },
+            {
+              "id": "cl1r0erim001j2e6d2waa3374",
+              "outgoingEdgeId": "cl1r0k27y00262e6dflgcp3wa",
+              "content": "A fictional representation of a group of customers"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cl1r0j8u1001t2e6d42mjfcqo",
+      "title": "Q4",
+      "graphCoordinates": { "x": 1262.722245418697, "y": 156.2726513569937 },
+      "blocks": [
+        {
+          "id": "cl1r0j8u2001u2e6dgdpvrnz5",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vcl1r0bxdj000z2e6d65u7n41b",
+            "expressionToEvaluate": "{{Score}} + 5"
+          }
+        },
+        {
+          "id": "cl1r0j8u2001w2e6d3wnpzcj5",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "Well done!" }] }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0j8u2001y2e6dr24ieifw",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "What does CTA stand for?" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0j8u200202e6dun2d04gu",
+          "outgoingEdgeId": "cl1r0ktet002i2e6d5sh8gd2b",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "cl1r0j8u200212e6dov1xy5m4",
+              "content": "Consequence To Advert"
+            },
+            {
+              "id": "cl1r0j8u300222e6dnj0i5fm8",
+              "outgoingEdgeId": "cl1r0lm4e002m2e6d0g3h9pm7",
+              "content": "Call To Action"
+            },
+            {
+              "id": "cl1r0j8u300232e6dxd8abojt",
+              "content": "Computer Tracked Actions"
+            },
+            {
+              "id": "cl1r0j8u300242e6d0pki60w6",
+              "content": "Characteristic Tracking Advert"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cl1r0c85100102e6d7uohf0cu",
+      "title": "Q1 - Wrong",
+      "graphCoordinates": { "x": 79.08, "y": 821.49 },
+      "blocks": [
+        {
+          "id": "cl1r0c85i00112e6d8iwtrpvb",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "WRONG!" }] }]
+          }
+        },
+        {
+          "id": "cl1r0crx600132e6d0u54j506",
+          "outgoingEdgeId": "cl1r0dibf00162e6dwuvli71j",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "SEO stands for Search Engine Optimization" }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r0exdi001l2e6drdwj3u96",
+      "title": "Q2 - Wrong",
+      "graphCoordinates": { "x": 542.94, "y": 996.75 },
+      "blocks": [
+        {
+          "id": "cl1r0exdi001m2e6d7kge562x",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "WRONG!" }] }]
+          }
+        },
+        {
+          "id": "cl1r0exdi001o2e6d70s7si5y",
+          "outgoingEdgeId": "cl1r0ic5f001s2e6dw777scrq",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Anchor text is the visible text that is hyperlinked to another page"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r0k3tq00272e6d1fwyajjx",
+      "title": "Q3 - Wrong",
+      "graphCoordinates": { "x": 916.73, "y": 925.61 },
+      "blocks": [
+        {
+          "id": "cl1r0k3tq00282e6dl0av81kz",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "WRONG!" }] }]
+          }
+        },
+        {
+          "id": "cl1r0k3tq002a2e6dv3s1eb6d",
+          "outgoingEdgeId": "cl1r0l7oa002j2e6dgtx0y1gh",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "A persona is a fictional representation of a group of customers"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r0kqof002d2e6doqhpnuqy",
+      "title": "Q4 - Wrong",
+      "graphCoordinates": { "x": 1316.88, "y": 861.75 },
+      "blocks": [
+        {
+          "id": "cl1r0kqof002e2e6dzjcw0kvs",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "WRONG!" }] }]
+          }
+        },
+        {
+          "id": "cl1r0kqog002g2e6dizmxvz64",
+          "outgoingEdgeId": "cl1r0p4my00312e6d1wsgwohi",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Anchor text is the visible text that is hyperlinked to another page"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r0lfb5002k2e6dd6as5kj5",
+      "title": "Filter",
+      "graphCoordinates": { "x": 1647.16, "y": 167.69 },
+      "blocks": [
+        {
+          "id": "cl1r0lo97002n2e6dfx7fohju",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vcl1r0bxdj000z2e6d65u7n41b",
+            "expressionToEvaluate": "{{Score}} + 5"
+          }
+        },
+        {
+          "id": "cl1r0oqrr002y2e6dsg0sa64g",
+          "type": "condition",
+          "items": [
+            {
+              "id": "cl1r0oqrr002z2e6dl821aaow",
+              "outgoingEdgeId": "cl1r0rt88003a2e6dgq6beaq1",
+              "content": {
+                "logicalOperator": "AND",
+                "comparisons": [
+                  {
+                    "id": "cl1r0osjs00302e6dc60nuk4y",
+                    "variableId": "vcl1r0bxdj000z2e6d65u7n41b",
+                    "comparisonOperator": "Greater than",
+                    "value": "14"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "cl1r0qvwy00342e6d7ww0oqar",
+          "outgoingEdgeId": "cl1r0sg9m003i2e6dbsc4cqjn",
+          "type": "condition",
+          "items": [
+            {
+              "id": "cl1r0qvwy00352e6dui5itgd1",
+              "outgoingEdgeId": "cl1r0s6qt003d2e6d5tk2um7y",
+              "content": {
+                "logicalOperator": "AND",
+                "comparisons": [
+                  {
+                    "id": "cl1r0qx3k00362e6dg30jgpdt",
+                    "variableId": "vcl1r0bxdj000z2e6d65u7n41b",
+                    "comparisonOperator": "Greater than",
+                    "value": "9"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cl1r0mn2p002p2e6dijqbjzlh",
+      "title": "Result",
+      "graphCoordinates": { "x": 2508.594129051806, "y": 405.664166830421 },
+      "blocks": [
+        {
+          "id": "cl1r0mn3t002q2e6dcmv4bzth",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "Your score is {{Score}}/20." }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0nkdx002r2e6dwv0wclo0",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "Try again?" }] }
+            ]
+          }
+        },
+        {
+          "id": "cl1r0nt85002s2e6dloupnhdq",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "cl1r0nt85002t2e6dvb7si7ny",
+              "outgoingEdgeId": "cl1r15gko005i2e6dn6rhifwe",
+              "content": "Yes!"
+            },
+            { "id": "cl1r0nveb002u2e6dotjk6nuf", "content": "No, bye!" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cl1r0rgex00382e6dkayjbys6",
+      "title": "Great score",
+      "graphCoordinates": { "x": 1999.325745846056, "y": 159.3910979368924 },
+      "blocks": [
+        {
+          "id": "cl1r0rggf00392e6dcc941700",
+          "outgoingEdgeId": "cl1r0s9g8003e2e6d5if2ywz9",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "Well done 👏" }] }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r0rvak003b2e6dejcdrooq",
+      "title": "Medium score",
+      "graphCoordinates": { "x": 2008.44697061989, "y": 315.9721232210492 },
+      "blocks": [
+        {
+          "id": "cl1r0rvce003c2e6diusd3pxq",
+          "outgoingEdgeId": "cl1r0sarx003f2e6dbzmed9te",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "You could do better but that's alright!" }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r0seuj003h2e6dandwc43r",
+      "title": "Bad score",
+      "graphCoordinates": { "x": 2009.967174748862, "y": 499.9168228267089 },
+      "blocks": [
+        {
+          "id": "cl1r0pe0x00332e6dxg6xdt2f",
+          "outgoingEdgeId": "cl1r0sbzh003g2e6dsqs48aoz",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Aouch, you need to improve your Digital Marketing game."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r15f68005f2e6dvdtal7cp",
+      "title": "Restart",
+      "graphCoordinates": { "x": 2850.766985281865, "y": 609.1892251509271 },
+      "blocks": [
+        {
+          "id": "cl1r15f87005g2e6dp3srll8r",
+          "type": "typebot_link",
+          "options": {
+            "typebotId": "current",
+            "groupId": "cl1r09bc6000h2e6dqml18p4p",
+            "mergeResults": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "cl1r15w3o005s2e6dr5l7csao",
+      "title": "Welcome",
+      "graphCoordinates": { "x": -361.5512664480758, "y": 166.9921185817542 },
+      "blocks": [
+        {
+          "id": "cl1r16nes005z2e6d3aj23kfz",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "Hi there!" }] }]
+          }
+        },
+        {
+          "id": "cl1r15w5p005t2e6d670v9nbi",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "You're about to answer a Quiz about Digital Marketing"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "cl1r16rt400622e6d32uta7mi",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "It is composed of only 4 questions." }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "cl1r1708n00662e6dv8900ixk",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "bold": true, "text": "Ready?" }] }
+            ]
+          }
+        },
+        {
+          "id": "cl1r176e900692e6d8u3k6sdq",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "cl1r176e9006a2e6dpvp0974z",
+              "outgoingEdgeId": "cl1r17pzv006n2e6dpibxp9th",
+              "content": "Go!"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "cl1r17gv3006h2e6dc9e7xob7",
+      "from": { "eventId": "cl1qz4lui00017w1a505z15p0" },
+      "to": { "groupId": "cl1r15w3o005s2e6dr5l7csao" }
+    },
+    {
+      "id": "cl1r0cfjt00122e6dzwtamycl",
+      "from": { "blockId": "cl1r09dl9000j2e6dhkc2h97y" },
+      "to": { "groupId": "cl1r0c85100102e6d7uohf0cu" }
+    },
+    {
+      "id": "cl1r0dfip00152e6doo9duexn",
+      "from": {
+        "blockId": "cl1r09dl9000j2e6dhkc2h97y",
+        "itemId": "cl1r0adei000m2e6dfc8w5y4k"
+      },
+      "to": { "groupId": "cl1r0b3ww000q2e6d4aihat41" }
+    },
+    {
+      "id": "cl1r0dibf00162e6dwuvli71j",
+      "from": { "blockId": "cl1r0crx600132e6d0u54j506" },
+      "to": {
+        "groupId": "cl1r0b3ww000q2e6d4aihat41",
+        "blockId": "cl1r0bgit000x2e6dvdre9wsj"
+      }
+    },
+    {
+      "id": "cl1r0f53y001q2e6dvuq434ru",
+      "from": { "blockId": "cl1r0b3x5000r2e6dqk8gzoim" },
+      "to": { "groupId": "cl1r0exdi001l2e6drdwj3u96" }
+    },
+    {
+      "id": "cl1r0i4dj001r2e6dgb96tx9q",
+      "from": {
+        "blockId": "cl1r0b3x5000r2e6dqk8gzoim",
+        "itemId": "cl1r0b3x5000s2e6dyq6bklbf"
+      },
+      "to": { "groupId": "cl1r0erik00182e6dfzezujj0" }
+    },
+    {
+      "id": "cl1r0ic5f001s2e6dw777scrq",
+      "from": { "blockId": "cl1r0exdi001o2e6d70s7si5y" },
+      "to": {
+        "groupId": "cl1r0erik00182e6dfzezujj0",
+        "blockId": "cl1r0eril001d2e6d3gay9cls"
+      }
+    },
+    {
+      "id": "cl1r0k27y00262e6dflgcp3wa",
+      "from": {
+        "blockId": "cl1r0eril001f2e6dk0fd0qpw",
+        "itemId": "cl1r0erim001j2e6d2waa3374"
+      },
+      "to": { "groupId": "cl1r0j8u1001t2e6d42mjfcqo" }
+    },
+    {
+      "id": "cl1r0khb6002c2e6ddssbpj9z",
+      "from": { "blockId": "cl1r0eril001f2e6dk0fd0qpw" },
+      "to": { "groupId": "cl1r0k3tq00272e6d1fwyajjx" }
+    },
+    {
+      "id": "cl1r0ktet002i2e6d5sh8gd2b",
+      "from": { "blockId": "cl1r0j8u200202e6dun2d04gu" },
+      "to": { "groupId": "cl1r0kqof002d2e6doqhpnuqy" }
+    },
+    {
+      "id": "cl1r0l7oa002j2e6dgtx0y1gh",
+      "from": { "blockId": "cl1r0k3tq002a2e6dv3s1eb6d" },
+      "to": {
+        "groupId": "cl1r0j8u1001t2e6d42mjfcqo",
+        "blockId": "cl1r0j8u2001y2e6dr24ieifw"
+      }
+    },
+    {
+      "id": "cl1r0lm4e002m2e6d0g3h9pm7",
+      "from": {
+        "blockId": "cl1r0j8u200202e6dun2d04gu",
+        "itemId": "cl1r0j8u300222e6dnj0i5fm8"
+      },
+      "to": { "groupId": "cl1r0lfb5002k2e6dd6as5kj5" }
+    },
+    {
+      "id": "cl1r0p4my00312e6d1wsgwohi",
+      "from": { "blockId": "cl1r0kqog002g2e6dizmxvz64" },
+      "to": {
+        "groupId": "cl1r0lfb5002k2e6dd6as5kj5",
+        "blockId": "cl1r0oqrr002y2e6dsg0sa64g"
+      }
+    },
+    {
+      "id": "cl1r0rt88003a2e6dgq6beaq1",
+      "from": {
+        "blockId": "cl1r0oqrr002y2e6dsg0sa64g",
+        "itemId": "cl1r0oqrr002z2e6dl821aaow"
+      },
+      "to": { "groupId": "cl1r0rgex00382e6dkayjbys6" }
+    },
+    {
+      "id": "cl1r0s6qt003d2e6d5tk2um7y",
+      "from": {
+        "blockId": "cl1r0qvwy00342e6d7ww0oqar",
+        "itemId": "cl1r0qvwy00352e6dui5itgd1"
+      },
+      "to": { "groupId": "cl1r0rvak003b2e6dejcdrooq" }
+    },
+    {
+      "id": "cl1r0s9g8003e2e6d5if2ywz9",
+      "from": { "blockId": "cl1r0rggf00392e6dcc941700" },
+      "to": { "groupId": "cl1r0mn2p002p2e6dijqbjzlh" }
+    },
+    {
+      "id": "cl1r0sarx003f2e6dbzmed9te",
+      "from": { "blockId": "cl1r0rvce003c2e6diusd3pxq" },
+      "to": { "groupId": "cl1r0mn2p002p2e6dijqbjzlh" }
+    },
+    {
+      "id": "cl1r0sbzh003g2e6dsqs48aoz",
+      "from": { "blockId": "cl1r0pe0x00332e6dxg6xdt2f" },
+      "to": { "groupId": "cl1r0mn2p002p2e6dijqbjzlh" }
+    },
+    {
+      "id": "cl1r0sg9m003i2e6dbsc4cqjn",
+      "from": { "blockId": "cl1r0qvwy00342e6d7ww0oqar" },
+      "to": { "groupId": "cl1r0seuj003h2e6dandwc43r" }
+    },
+    {
+      "id": "cl1r15gko005i2e6dn6rhifwe",
+      "from": {
+        "blockId": "cl1r0nt85002s2e6dloupnhdq",
+        "itemId": "cl1r0nt85002t2e6dvb7si7ny"
+      },
+      "to": { "groupId": "cl1r15f68005f2e6dvdtal7cp" }
+    },
+    {
+      "id": "cl1r17pzv006n2e6dpibxp9th",
+      "from": {
+        "blockId": "cl1r176e900692e6d8u3k6sdq",
+        "itemId": "cl1r176e9006a2e6dpvp0974z"
+      },
+      "to": { "groupId": "cl1r09bc6000h2e6dqml18p4p" }
+    }
+  ],
+  "variables": [
+    {
+      "id": "vcl1r0bxdj000z2e6d65u7n41b",
+      "name": "Score",
+      "isSessionVariable": true
+    }
+  ],
+  "theme": {},
+  "selectedThemeTemplateId": null,
+  "settings": { "general": {} },
+  "createdAt": "2023-11-06T16:55:18.927Z",
+  "updatedAt": "2023-11-06T16:55:18.927Z",
+  "icon": "🕹️",
+  "folderId": null,
+  "publicId": null,
+  "customDomain": null,
+  "workspaceId": "proWorkspace",
+  "resultsTablePreferences": null,
+  "isArchived": false,
+  "isClosed": false,
+  "whatsAppCredentialsId": null
+}

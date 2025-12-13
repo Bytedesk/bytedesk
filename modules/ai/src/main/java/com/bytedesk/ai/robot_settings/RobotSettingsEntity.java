@@ -5,6 +5,7 @@
  */
 package com.bytedesk.ai.robot_settings;
 
+import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 
@@ -67,14 +68,24 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
      * Rating down settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity rateDownSettings;
 
     /**
      * Draft Rating down settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private RatedownSettingsEntity draftRateDownSettings;
+
+    /**
+     * Spring AI tools orchestration (published)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private RobotToolsSettingsEntity toolsSettings;
+
+    /**
+     * Spring AI tools orchestration draft
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private RobotToolsSettingsEntity draftToolsSettings;
     
 }

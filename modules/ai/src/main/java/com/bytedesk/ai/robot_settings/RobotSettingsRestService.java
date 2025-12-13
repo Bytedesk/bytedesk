@@ -1,5 +1,6 @@
 package com.bytedesk.ai.robot_settings;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -14,6 +15,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
@@ -85,13 +87,13 @@ public class RobotSettingsRestService
         rd.setUid(uidUtils.getUid());
         entity.setDraftRateDownSettings(rd);
 
-        // LLM: 统一使用 fromRequest（其内部已对 null 做处理），同时初始化发布与草稿
-        // RobotLlmEntity llm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
-        // llm.setUid(uidUtils.getUid());
-        // entity.setLlm(llm);
-        // RobotLlmEntity draftLlm = RobotLlmEntity.fromRequest(request.getLlm(), modelMapper);
-        // draftLlm.setUid(uidUtils.getUid());
-        // entity.setDraftLlm(draftLlm);
+        // 发布与草稿：Spring AI 工具配置
+        RobotToolsSettingsEntity tools = RobotToolsSettingsEntity.fromRequest(request.getToolsSettings(), modelMapper);
+        tools.setUid(uidUtils.getUid());
+        entity.setToolsSettings(tools);
+        RobotToolsSettingsEntity toolsDraft = RobotToolsSettingsEntity.fromRequest(request.getToolsSettings(), modelMapper);
+        toolsDraft.setUid(uidUtils.getUid());
+        entity.setDraftToolsSettings(toolsDraft);
 
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
@@ -160,6 +162,7 @@ public class RobotSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getIntentionSettings() != null) {
             IntentionSettingsEntity draft = entity.getDraftIntentionSettings();
             if (draft == null) {
@@ -181,6 +184,7 @@ public class RobotSettingsRestService
             }
             entity.setHasUnpublishedChanges(true);
         }
+
         if (request.getRateDownSettings() != null) {
             RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
             if (draft == null) {
@@ -203,28 +207,28 @@ public class RobotSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
-        // 更新 LLM(仅更新草稿;发布时再覆盖线上)
-        // if (request.getLlm() != null) {
-        //     RobotLlmEntity draft = entity.getDraftLlm();
-        //     if (draft == null) {
-        //         draft = new RobotLlmEntity();
-        //         entity.setDraftLlm(draft);
-        //     }
-        //     // 保存原有uid及实体id，避免被 modelMapper 覆盖
-        //     String originalUid = draft.getUid();
-        //     Long originalId = draft.getId();
-        //     modelMapper.map(request.getLlm(), draft);
-        //     // 恢复或设置 uid
-        //     if (originalUid != null) {
-        //         draft.setUid(originalUid);
-        //     } else {
-        //         draft.setUid(uidUtils.getUid());
-        //     }
-        //     if (originalId != null) {
-        //         draft.setId(originalId);
-        //     }
-        //     entity.setHasUnpublishedChanges(true);
-        // }
+        if (request.getToolsSettings() != null) {
+            RobotToolsSettingsEntity draft = entity.getDraftToolsSettings();
+            if (draft == null) {
+                draft = RobotToolsSettingsEntity.builder().build();
+                entity.setDraftToolsSettings(draft);
+            }
+            String originalUid = draft.getUid();
+            Long originalId = draft.getId();
+            modelMapper.map(request.getToolsSettings(), draft);
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            if (originalId != null) {
+                draft.setId(originalId);
+            }
+            if (draft.getToolConfigs() == null) {
+                draft.setToolConfigs(new ArrayList<>());
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
 
         // 若本次更新将其设为默认，需取消同 org 其他默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
@@ -336,6 +340,14 @@ public class RobotSettingsRestService
         rd.setUid(uidUtils.getUid());
         settings.setDraftRateDownSettings(rd);
 
+        // Spring AI 工具（发布 + 草稿）
+        RobotToolsSettingsEntity tools = RobotToolsSettingsEntity.fromRequest(null, modelMapper);
+        tools.setUid(uidUtils.getUid());
+        settings.setToolsSettings(tools);
+        RobotToolsSettingsEntity toolsDraft = RobotToolsSettingsEntity.fromRequest(null, modelMapper);
+        toolsDraft.setUid(uidUtils.getUid());
+        settings.setDraftToolsSettings(toolsDraft);
+
         // LLM settings（发布 + 草稿）
         // RobotLlmEntity llm = RobotLlmEntity.fromRequest(null, modelMapper);
         // llm.setUid(uidUtils.getUid());
@@ -415,6 +427,18 @@ public class RobotSettingsRestService
                 copyPropertiesExcludingIds(entity.getDraftIntentionSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
                 entity.setIntentionSettings(newPublished);
+            }
+        }
+
+        if (entity.getDraftToolsSettings() != null) {
+            RobotToolsSettingsEntity published = entity.getToolsSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftToolsSettings(), published);
+            } else {
+                RobotToolsSettingsEntity newPublished = RobotToolsSettingsEntity.builder().build();
+                copyPropertiesExcludingIds(entity.getDraftToolsSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setToolsSettings(newPublished);
             }
         }
         

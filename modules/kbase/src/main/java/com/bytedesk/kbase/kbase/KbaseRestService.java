@@ -325,6 +325,17 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .build();
         create(kbaseQuickReplyRequest);
 
+        // 初始化快捷按钮知识库
+        // KbaseRequest kbaseQuickButtonRequest = KbaseRequest.builder()
+        //         .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKBUTTON_UID))
+        //         .type(KbaseTypeEnum.QUICKBUTTON.name())
+        //         .name(KbaseConsts.KB_QUICKBUTTON_NAME)
+        //         .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
+        //         .language(LanguageEnum.ZH_CN.name())
+        //         .orgUid(orgUid)
+        //         .build();
+        // create(kbaseQuickButtonRequest);
+
         // 初始化敏感词/屏蔽词知识库
         KbaseRequest kbaseTabooRequest = KbaseRequest.builder()
                 .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_TABOO_UID))

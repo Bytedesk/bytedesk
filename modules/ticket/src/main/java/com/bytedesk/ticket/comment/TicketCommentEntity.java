@@ -12,45 +12,45 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 package com.bytedesk.ticket.comment;
-import java.util.List;
+// import java.util.List;
 
-import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
-import com.bytedesk.ticket.ticket.TicketEntity;
+// import com.bytedesk.core.base.BaseEntity;
+// import com.bytedesk.service.agent.AgentEntity;
+// import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
+// import com.bytedesk.ticket.ticket.TicketEntity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+// import jakarta.persistence.CascadeType;
+// import jakarta.persistence.Entity;
+// import jakarta.persistence.FetchType;
+// import jakarta.persistence.ManyToOne;
+// import jakarta.persistence.OneToMany;
+// import lombok.Data;
+// import lombok.EqualsAndHashCode;
+// import lombok.Builder;
+// import lombok.NoArgsConstructor;
+// import lombok.AllArgsConstructor;
 
-@Data
-@Builder
-@EqualsAndHashCode(callSuper = true)
-@Entity(name = "bytedesk_ticket_comment")
-@NoArgsConstructor
-@AllArgsConstructor
-public class TicketCommentEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
+// @Data
+// @Builder
+// @EqualsAndHashCode(callSuper = true)
+// @Entity(name = "bytedesk_ticket_comment")
+// @NoArgsConstructor
+// @AllArgsConstructor
+// public class TicketCommentEntity extends BaseEntity {
 
-    
-    @ManyToOne
-    private TicketEntity ticket;         // 关联的工单
+//     private static final long serialVersionUID = 1L;
 
-    // 评论内容
-    private String content;         // 评论内容
+//     @ManyToOne
+//     private TicketEntity ticket;         // 关联的工单
 
-    // 评论人
-    @ManyToOne
-    private AgentEntity author;          // 评论人
+//     // 评论内容
+//     private String content;         // 评论内容
 
-    // 评论附件
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TicketAttachmentEntity> attachments;
-} 
+//     // 评论人
+//     @ManyToOne
+//     private AgentEntity author;          // 评论人
+
+//     // 评论附件
+//     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//     private List<TicketAttachmentEntity> attachments;
+// } 

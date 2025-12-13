@@ -25,6 +25,8 @@ public interface TicketProcessRepository extends JpaRepository<TicketProcessEnti
 
     Optional<TicketProcessEntity> findByKeyAndOrgUid(String key, String orgUid);
 
+    Optional<TicketProcessEntity> findByKeyAndOrgUidAndType(String key, String orgUid, String type);
+
     List<TicketProcessEntity> findByOrgUidAndStatus(String orgUid, String status);
 
     // Boolean existsByPlatform(String platform);

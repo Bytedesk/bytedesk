@@ -14,7 +14,6 @@
 package com.bytedesk.core.announcement;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.announcement.event.AnnouncementCreateEvent;
 import com.bytedesk.core.announcement.event.AnnouncementUpdateEvent;
@@ -33,19 +32,17 @@ public class AnnouncementEntityListener {
     @PostPersist
     public void onPostPersist(AnnouncementEntity announcement) {
         log.info("onPostPersist: {}", announcement);
-        AnnouncementEntity cloneAnnouncement = SerializationUtils.clone(announcement);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new AnnouncementCreateEvent(cloneAnnouncement));
+        bytedeskEventPublisher.publishEvent(new AnnouncementCreateEvent(announcement));
     }
 
     @PostUpdate
     public void onPostUpdate(AnnouncementEntity announcement) {
         log.info("onPostUpdate: {}", announcement);
-        AnnouncementEntity cloneAnnouncement = SerializationUtils.clone(announcement);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new AnnouncementUpdateEvent(cloneAnnouncement));
+        bytedeskEventPublisher.publishEvent(new AnnouncementUpdateEvent(announcement));
     }
     
 }

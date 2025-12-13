@@ -50,14 +50,17 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
+import com.bytedesk.ticket.process.TicketProcessEntity;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
-import com.bytedesk.ticket.utils.TicketConvertUtils;
+import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.core.topic.TopicUtils;
 
 import lombok.AllArgsConstructor;
@@ -150,6 +153,8 @@ public class TicketRestService
             ticket.setStatus(TicketStatusEnum.NEW.name());
         }
         ticket.setReporter(request.getReporterJson());
+
+        applyTicketSettings(ticket, request);
 
         if (!skipLoginEnforce) {
             enforceRequireLoginRule(ticket, request);
@@ -561,6 +566,58 @@ public class TicketRestService
         throw new IllegalStateException("Unable to allocate unique ticket number for org " + orgUid);
     }
 
+    private void applyTicketSettings(TicketEntity ticket, TicketRequest request) {
+        if (ticket == null) {
+            return;
+        }
+        String orgUid = resolveOrgUid(ticket, request);
+        String workgroupUid = resolveWorkgroupUid(ticket, request);
+        TicketSettingsEntity settings = resolveTicketSettingsEntity(request, orgUid, workgroupUid, ticket.getType());
+        if (settings == null) {
+            ensureProcessDefinitionFallback(ticket);
+            return;
+        }
+        ticket.setTicketSettingsUid(settings.getUid());
+
+        TicketProcessEntity process = settings.getProcess();
+        if (process != null) {
+            ticket.setProcessEntityUid(process.getUid());
+            if (StringUtils.hasText(process.getKey())) {
+                ticket.setProcessDefinitionKey(process.getKey());
+            }
+        }
+
+        FormEntity form = settings.getForm();
+        if (form != null) {
+            ticket.setFormEntityUid(form.getUid());
+            if (!StringUtils.hasText(ticket.getSchema())) {
+                ticket.setSchema(form.getSchema());
+            }
+        }
+
+        ensureProcessDefinitionFallback(ticket);
+    }
+
+    private TicketSettingsEntity resolveTicketSettingsEntity(TicketRequest request, String orgUid,
+            String workgroupUid, String ticketType) {
+        if (!StringUtils.hasText(orgUid)) {
+            return null;
+        }
+        String normalizedType = resolveTicketType(ticketType);
+        if (request != null && StringUtils.hasText(request.getTicketSettingsUid())) {
+            return ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
+                    .orElseThrow(() -> new NotFoundException(
+                            "ticket settings not found: " + request.getTicketSettingsUid()));
+        }
+        return ticketSettingsRestService.resolveEntityByWorkgroup(orgUid, workgroupUid, normalizedType);
+    }
+
+    private void ensureProcessDefinitionFallback(TicketEntity ticket) {
+        if (ticket != null && !StringUtils.hasText(ticket.getProcessDefinitionKey())) {
+            ticket.setProcessDefinitionKey(TicketConsts.TICKET_PROCESS_KEY);
+        }
+    }
+
     private void enforceRequireLoginRule(TicketEntity ticket, TicketRequest request) {
         String orgUid = resolveOrgUid(ticket, request);
         String workgroupUid = resolveWorkgroupUid(ticket, request);
@@ -624,4 +681,5 @@ public class TicketRestService
         }
         return user;
     }
+
 }

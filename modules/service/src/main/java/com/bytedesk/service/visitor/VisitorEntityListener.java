@@ -14,7 +14,6 @@
 package com.bytedesk.service.visitor;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -32,19 +31,17 @@ public class VisitorEntityListener {
     @PostPersist
     public void onPostPersist(VisitorEntity visitor) {
         log.info("onPostPersist: {}", visitor);
-        VisitorEntity cloneVisitor = SerializationUtils.clone(visitor);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new VisitorCreateEvent(this, cloneVisitor));
+        bytedeskEventPublisher.publishEvent(new VisitorCreateEvent(this, visitor));
     }
 
     @PostUpdate
     public void onPostUpdate(VisitorEntity visitor) {
         log.info("onPostUpdate: {}", visitor);
-        VisitorEntity cloneVisitor = SerializationUtils.clone(visitor);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new VisitorUpdateEvent(this, cloneVisitor));
+        bytedeskEventPublisher.publishEvent(new VisitorUpdateEvent(this, visitor));
     }
     
 }

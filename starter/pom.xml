@@ -491,6 +491,15 @@
 
 
 	<build>
+		<!-- <resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>application-prod.properties</exclude>
+					<exclude>application-local.properties</exclude>
+				</excludes>
+			</resource>
+		</resources> -->
 		<!-- custom jar name, no version: bytedesk-starter.jar, default: ${project.artifactId}-${project.version} -->  
 		<finalName>${project.artifactId}</finalName>
 		<plugins>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Clean up role-authority relations before deleting the retired role -->
+    <changeSet id="251201-remove-member-role-associations" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_role_authority" />
+                <tableExists tableName="bytedesk_core_role" />
+            </and>
+        </preConditions>
+        <comment>
+            Remove role_authority associations that reference the retired df_role_member_uid role
+            to avoid foreign key violations before deleting the role record itself.
+        </comment>
+        <sql>
+            DELETE FROM bytedesk_core_role_authority
+            WHERE role_id IN (
+                SELECT id FROM bytedesk_core_role WHERE uuid = 'df_role_member_uid'
+            )
+        </sql>
+        <rollback>
+            <comment>No rollback required for retired system role associations</comment>
+        </rollback>
+    </changeSet>
+
+    <!-- Clean up user-role mappings that still point to the retired role -->
+    <changeSet id="251201-remove-member-role-user-relations" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_user_roles" />
+                <tableExists tableName="bytedesk_core_role" />
+            </and>
+        </preConditions>
+        <comment>Remove bytedesk_core_user_roles rows referencing the retired df_role_member_uid role.</comment>
+        <sql>
+            DELETE FROM bytedesk_core_user_roles
+            WHERE role_id IN (
+                SELECT id FROM bytedesk_core_role WHERE uuid = 'df_role_member_uid'
+            )
+        </sql>
+        <rollback>
+            <comment>No rollback required for retired system role mappings</comment>
+        </rollback>
+    </changeSet>
+
+    <!-- Clean up user-organization-role relations referencing the retired role -->
+    <changeSet id="251201-remove-member-role-org-relations" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_user_org_role_roles" />
+                <tableExists tableName="bytedesk_core_role" />
+            </and>
+        </preConditions>
+        <comment>
+            Remove bytedesk_core_user_org_role_roles rows that still point to df_role_member_uid
+            to satisfy FK constraints before deleting the role.
+        </comment>
+        <sql>
+            DELETE FROM bytedesk_core_user_org_role_roles
+            WHERE role_id IN (
+                SELECT id FROM bytedesk_core_role WHERE uuid = 'df_role_member_uid'
+            )
+        </sql>
+        <rollback>
+            <comment>No rollback required for retired system role org mappings</comment>
+        </rollback>
+    </changeSet>
+
+    <!-- Delete the retired default member role record -->
+    <changeSet id="251201-remove-member-role" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_role" />
+        </preConditions>
+        <comment>Delete the retired df_role_member_uid system role if it is still present.</comment>
+        <delete tableName="bytedesk_core_role">
+            <where>uuid = 'df_role_member_uid'</where>
+        </delete>
+        <rollback>
+            <comment>No rollback required - role has been retired</comment>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

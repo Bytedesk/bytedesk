@@ -14,7 +14,6 @@
 package com.bytedesk.core.tag;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.tag.event.TagCreateEvent;
@@ -33,19 +32,15 @@ public class TagEntityListener {
     @PostPersist
     public void onPostPersist(TagEntity tag) {
         log.info("onPostPersist: {}", tag);
-        TagEntity cloneTag = SerializationUtils.clone(tag);
-        // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TagCreateEvent(cloneTag));
+        bytedeskEventPublisher.publishEvent(new TagCreateEvent(tag));
     }
 
     @PostUpdate
     public void onPostUpdate(TagEntity tag) {
         log.info("onPostUpdate: {}", tag);
-        TagEntity cloneTag = SerializationUtils.clone(tag);
-        // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TagUpdateEvent(cloneTag));
+        bytedeskEventPublisher.publishEvent(new TagUpdateEvent(tag));
     }
     
 }

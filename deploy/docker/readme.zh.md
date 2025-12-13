@@ -52,6 +52,25 @@ docker compose -p bytedesk -f docker-compose.yaml down
 docker compose -p bytedesk -f docker-compose-ollama.yaml down
 # 
 docker compose -p bytedesk -f docker-compose-noai.yaml down
+
+## 密钥与 Jasypt（可选）
+
+如果在 docker compose 环境变量中把敏感信息写成 `ENC(...)`，则需要在容器启动时注入解密口令；未使用加密时可以忽略。
+
+```bash
+# 1. 将口令写入 .env（仅保留在本地，切勿提交）
+echo 'JASYPT_ENCRYPTOR_PASSWORD=请修改成强口令' >> .env
+
+# 2. 正常启动所需的 compose 文件，服务会自动读取变量
+docker compose -p bytedesk -f docker-compose.yaml up -d
+# 或
+docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
+# 或
+docker compose -p bytedesk -f docker-compose-noai.yaml up -d
+```
+
+- 当没有加密内容时，保持该变量为空即可，Jasypt 会自动降级为明文。
+- 需要调整算法或迭代次数时，可额外设置 `BYTEDESK_SECURITY_JASYPT_ALGORITHM`、`BYTEDESK_SECURITY_JASYPT_KEY_OBTENTION_ITERATIONS` 等环境变量。
 ```
 
 ## 停止和重启服务

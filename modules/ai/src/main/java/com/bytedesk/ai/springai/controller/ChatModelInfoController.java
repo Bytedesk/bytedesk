@@ -47,15 +47,15 @@ public class ChatModelInfoController {
      * 获取所有ChatModel信息
      * GET http://127.0.0.1:9003/spring/ai/api/v1/chat-models/info
      */
-    @GetMapping("/info")
-    public ResponseEntity<JsonResult<?>> getAllChatModelsInfo() {
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Service is not available"));
-        }
-        log.info("Getting all ChatModel information");
-        Map<String, Object> result = chatModelInfoService.getAllChatModelsInfo();
-        return ResponseEntity.ok(JsonResult.success(result));
-    }
+    // @GetMapping("/info")
+    // public ResponseEntity<JsonResult<?>> getAllChatModelsInfo() {
+    //     if (!bytedeskProperties.getDebug()) {
+    //         return ResponseEntity.ok(JsonResult.error("Service is not available"));
+    //     }
+    //     log.info("Getting all ChatModel information");
+    //     Map<String, Object> result = chatModelInfoService.getAllChatModelsInfo();
+    //     return ResponseEntity.ok(JsonResult.success(result));
+    // }
 
     /**
      * 获取Primary ChatModel信息

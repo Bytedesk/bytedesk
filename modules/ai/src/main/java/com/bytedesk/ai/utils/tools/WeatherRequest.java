@@ -15,5 +15,4 @@ package com.bytedesk.ai.utils.tools;
 
 import org.springframework.ai.tool.annotation.ToolParam;
 
-// public record WeatherRequest(String location, Unit unit) {}
 public record WeatherRequest(@ToolParam(description = "The name of a city or a country") String location, Unit unit) {}

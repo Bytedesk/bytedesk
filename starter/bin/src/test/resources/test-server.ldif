@@ -1,0 +1,30 @@
+dn: dc=bytedesk,dc=com
+objectclass: top
+objectclass: domain
+objectclass: extensibleObject
+dc: bytedesk
+
+dn: ou=people,dc=bytedesk,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+dn: uid=admin,ou=people,dc=bytedesk,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Admin
+sn: Admin
+uid: admin
+userPassword: admin123
+
+dn: uid=test,ou=people,dc=bytedesk,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Test User
+sn: User
+uid: test
+userPassword: test123 

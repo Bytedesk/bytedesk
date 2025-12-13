@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_faq.FaqResponseVisitor;
+import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -83,23 +84,21 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private List<FaqResponseVisitor> faqs;
     private String faqKbUid;
 
-    private Boolean showQuickFaqs;
-    // 快捷问题
-    private List<FaqResponseVisitor> quickFaqs;
-    // 快捷问题知识库
-    private String quickFaqKbUid;
+    private Boolean showQuickButtons;
+
+    private List<QuickButtonResponseVisitor> quickButtons;
     //
-    private Boolean showGuessFaqs;
-    // 猜你想问
-    private List<FaqResponseVisitor> guessFaqs;
-    //
-    private Boolean showHotFaqs;
-    // 热门问题
-    private List<FaqResponseVisitor> hotFaqs;
-    //
-    private Boolean showShortcutFaqs;
-    // 快捷功能
-    private List<FaqResponseVisitor> shortcutFaqs;
+    // private Boolean showGuessFaqs;
+    // // 猜你想问
+    // private List<FaqResponseVisitor> guessFaqs;
+    // //
+    // private Boolean showHotFaqs;
+    // // 热门问题
+    // private List<FaqResponseVisitor> hotFaqs;
+    // //
+    // private Boolean showShortcutFaqs;
+    // // 快捷功能
+    // private List<FaqResponseVisitor> shortcutFaqs;
 
     private Boolean showLogo;
 

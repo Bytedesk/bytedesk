@@ -49,4 +49,19 @@ docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 docker compose -p bytedesk -f docker-compose.yaml stop
 # stop ollama
 docker compose -p bytedesk -f docker-compose-ollama.yaml stop
+
+## Secrets & Jasypt (optional)
+
+Some docker compose entries may be stored as `ENC(...)`. Only when you actually use those encrypted values do you need to pass the Jasypt password into Docker:
+
+```bash
+# 1. Add the password to .env so compose picks it up (never commit real secrets).
+echo 'JASYPT_ENCRYPTOR_PASSWORD=please-change-me' >> .env
+
+# 2. Start any compose stack as usual. The Bytedesk service will read the env var.
+docker compose -p bytedesk -f docker-compose.yaml up -d
+```
+
+- Leave `JASYPT_ENCRYPTOR_PASSWORD` blank (or remove the line) when no encrypted values are in use—startup will fall back to plain text.
+- You can also override algorithms or iterations with additional variables (for example `BYTEDESK_SECURITY_JASYPT_ALGORITHM=PBEWITHHMACSHA512ANDAES_256`).
 ```

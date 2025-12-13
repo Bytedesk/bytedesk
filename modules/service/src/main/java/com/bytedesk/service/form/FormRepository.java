@@ -22,5 +22,7 @@ public interface FormRepository extends JpaRepository<FormEntity, Long>, JpaSpec
 
     Optional<FormEntity> findByUid(String uid);
 
+    Optional<FormEntity> findFirstByOrgUidAndTypeAndDeletedFalseOrderByCreatedAtAsc(String orgUid, String type);
+
     // Boolean existsByPlatform(String platform);
 }

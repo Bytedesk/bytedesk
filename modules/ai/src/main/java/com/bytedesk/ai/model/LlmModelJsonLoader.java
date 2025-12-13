@@ -14,6 +14,8 @@
 package com.bytedesk.ai.model;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,19 +39,24 @@ public class LlmModelJsonLoader {
 
     // 加载models.json，模型列表
     public Map<String, List<ModelJson>> loadModels() {
-        try {
-            Resource resource = resourceLoader.getResource("classpath:ai/models.json");
+        Resource resource = resourceLoader.getResource("classpath:ai/models.json");
+        if (!resource.exists() || !resource.isReadable()) {
+            log.warn("models.json not found on classpath, returning empty model list");
+            return Collections.emptyMap();
+        }
+
+        try (InputStream inputStream = resource.getInputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();
             MapType mapType = objectMapper.getTypeFactory().constructMapType(
-                    Map.class, // 或者使用具体的Map实现类，如LinkedHashMap.class
-                    objectMapper.getTypeFactory().constructType(String.class), // key的类型
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, ModelJson.class) // value的类型，即List<ModelJson>
+                    Map.class,
+                    objectMapper.getTypeFactory().constructType(String.class),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, ModelJson.class)
             );
-            // 使用getInputStream()而不是getFile()
-            Map<String, List<ModelJson>> models = objectMapper.readValue(resource.getInputStream(), mapType);
-            return models;
+            Map<String, List<ModelJson>> models = objectMapper.readValue(inputStream, mapType);
+            return models != null ? models : Collections.emptyMap();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load models.json", e);
+            log.error("Failed to load models.json", e);
+            return Collections.emptyMap();
         }
     }
 

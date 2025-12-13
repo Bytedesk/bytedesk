@@ -14,6 +14,8 @@
 package com.bytedesk.ai.provider;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,19 +37,24 @@ public class LlmProviderJsonLoader {
     private ResourceLoader resourceLoader;
 
     public Map<String, ProviderJson> loadProviders() {
-        try {
-            Resource resource = resourceLoader.getResource("classpath:ai/providers.json");
+        Resource resource = resourceLoader.getResource("classpath:ai/providers.json");
+        if (!resource.exists() || !resource.isReadable()) {
+            log.warn("providers.json not found on classpath, returning empty provider list");
+            return Collections.emptyMap();
+        }
+
+        try (InputStream inputStream = resource.getInputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();
             MapType mapType = objectMapper.getTypeFactory().constructMapType(
-                    Map.class, // 或者使用具体的Map实现类，如LinkedHashMap.class
-                    objectMapper.getTypeFactory().constructType(String.class), // key的类型
-                    objectMapper.getTypeFactory().constructType(ProviderJson.class) // value的类型
+                    Map.class,
+                    objectMapper.getTypeFactory().constructType(String.class),
+                    objectMapper.getTypeFactory().constructType(ProviderJson.class)
             );
-            // 使用getInputStream()而不是getFile()
-            Map<String, ProviderJson> providers = objectMapper.readValue(resource.getInputStream(), mapType);
-            return providers;
+            Map<String, ProviderJson> providers = objectMapper.readValue(inputStream, mapType);
+            return providers != null ? providers : Collections.emptyMap();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load providers.json", e);
+            log.error("Failed to load providers.json", e);
+            return Collections.emptyMap();
         }
     }
 

@@ -14,6 +14,8 @@
 package com.bytedesk.kbase.llm_faq;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,15 +49,27 @@ public class FaqJsonLoader {
      * @throws RuntimeException 如果加载失败
      */
     public FaqConfiguration loadFaqs() {
-        try {
-            Resource resource = resourceLoader.getResource("classpath:kbasedemo/faq.json");
+        Resource resource = resourceLoader.getResource("classpath:kbasedemo/faq.json");
+        if (!resource.exists() || !resource.isReadable()) {
+            log.warn("faq.json not found on classpath, returning empty FAQ configuration");
+            return emptyConfiguration();
+        }
+
+        try (InputStream inputStream = resource.getInputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return objectMapper.readValue(resource.getInputStream(), FaqConfiguration.class);
+            FaqConfiguration configuration = objectMapper.readValue(inputStream, FaqConfiguration.class);
+            return configuration != null ? configuration : emptyConfiguration();
         } catch (IOException e) {
             log.error("Failed to load faq.json", e);
-            throw new RuntimeException("Failed to load faq.json", e);
+            return emptyConfiguration();
         }
+    }
+
+    private FaqConfiguration emptyConfiguration() {
+        FaqConfiguration configuration = new FaqConfiguration();
+        configuration.setFaqs(Collections.emptyList());
+        return configuration;
     }
 
     /**

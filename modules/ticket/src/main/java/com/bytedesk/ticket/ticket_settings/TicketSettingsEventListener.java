@@ -21,7 +21,7 @@ import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
-import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
+import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketSettingsEventListener {
 
 	private final TicketSettingsRestService ticketSettingsRestService;
-	private final com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository bindingRepository;
+	private final com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingRepository bindingRepository;
 	private final com.bytedesk.core.uid.UidUtils uidUtils;
 
 	@EventListener

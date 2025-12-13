@@ -136,26 +136,24 @@ public class ServiceSettingsRequest  implements Serializable {
     private String faqKbUid;
 
     @Builder.Default
-    private Boolean showQuickFaqs = true;
+    private Boolean showQuickButtons = true;
     @Builder.Default
-    private List<String> quickFaqUids = new ArrayList<>();
-    // 快捷问题知识库
-    private String quickFaqKbUid;
+    private List<String> quickButtonUids = new ArrayList<>();
 
-    @Builder.Default
-    private Boolean showGuessFaqs = true;
-    @Builder.Default
-    private List<String> guessFaqUids = new ArrayList<>();
+    // @Builder.Default
+    // private Boolean showGuessFaqs = true;
+    // @Builder.Default
+    // private List<String> guessFaqUids = new ArrayList<>();
     
-    @Builder.Default
-    private Boolean showHotFaqs = true;
-    @Builder.Default
-    private List<String> hotFaqUids = new ArrayList<>();
+    // @Builder.Default
+    // private Boolean showHotFaqs = true;
+    // @Builder.Default
+    // private List<String> hotFaqUids = new ArrayList<>();
 
-    @Builder.Default
-    private Boolean showShortcutFaqs = true;
-    @Builder.Default
-    private List<String> shortcutFaqUids = new ArrayList<>();
+    // @Builder.Default
+    // private Boolean showShortcutFaqs = true;
+    // @Builder.Default
+    // private List<String> shortcutFaqUids = new ArrayList<>();
 
     // 可自定义设置相似问题、关联问题的引导语
     // @Builder.Default    

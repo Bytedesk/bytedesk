@@ -1,0 +1,183 @@
+// 
+// dropdowns.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Bootstrap Overrides
+//
+
+//Dropdown soft hover
+.dropdown-item.active, .dropdown-item:active,
+.dropdown-item:hover, .dropdown-item:focus{
+  border-radius: $border-radius;
+}
+.dropdown-menu{
+  padding-left: 10px;
+  padding-right: 10px;
+  z-index: 1100;
+  box-shadow: $box-shadow;
+}
+
+// Dropdown menu size
+.dropdown-menu-size-sm{
+  min-width: 13rem;
+}
+.dropdown-menu-size-md{
+  min-width: 22rem;
+}
+.dropdown-menu-size-lg{
+  min-width: 30rem;
+}
+
+@include media-breakpoint-down(sm) {
+  .dropdown-menu-size-md{
+    min-width: 16rem;
+    margin-right: -25px !important;
+  }
+  .dropdown-menu-size-sm{
+    min-width: 13rem;
+  }
+}
+
+//Dropdown custom icon
+.dropdown .dropdown-toggle:after {
+  content: "\f107";
+  font-family: $fa-font-family;
+  font-weight: 900;
+  vertical-align: middle;
+  border: none;
+}
+
+//Dropup custom icon
+.dropup .dropdown-toggle:after {
+  content: "\f106";
+  font-family: $fa-font-family;
+  font-weight: 900;
+  vertical-align: middle;
+  border: none;
+}
+
+//Dropstart custom icon
+.dropstart .dropdown-toggle:before {
+  content: "\f104";
+  font-family: $fa-font-family;
+  font-weight: 900;
+  vertical-align: middle;
+  border: none;
+}
+
+//Dropend custom icon
+.dropend .dropdown-toggle:after {
+  content: "\f105";
+  font-family: $fa-font-family;
+  font-weight: 900;
+  vertical-align: middle;
+  border: none;
+}
+
+// Dropdown custom size
+@include media-breakpoint-down(lg) {
+  .dropdown-width-lg{
+    width: 100%;
+    padding: 0;
+  }
+}
+
+@include media-breakpoint-up(xl) {
+  .dropdown-width-lg{
+    width: 40rem;
+    padding: 0;
+  }
+}
+
+@include media-breakpoint-up(xxl) {
+  .dropdown-width-lg{
+    width: 50rem;
+    padding: 0;
+  }
+}
+
+// Dropdown mega menu
+.dropdown-fullwidth {
+  .dropdown-menu {
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    padding: 1rem 0;
+  }
+}
+@include media-breakpoint-up(xl){
+  .dropdown-fullwidth {
+    position: static;
+  }
+}
+
+// Dropdown fullwidth menu width on responsive
+@each $breakpoint, $container-max-width in $container-max-widths {
+  @include media-breakpoint-up($breakpoint) {
+    .dropdown-fullwidth {
+      .dropdown-menu {
+        max-width: $container-max-width; 
+      }
+    }
+  }
+}
+
+// dropdown menu start end position
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+    .dropdown-menu#{$infix}-start {
+      left: 0;
+    }
+    .dropdown-menu#{$infix}-end {
+      right: 0;
+    }
+  }
+}
+
+@include media-breakpoint-down(xl) {
+  .dropdown-fullwidth .dropdown-menu .container{
+    max-width: 100%;
+  }
+}
+
+// Dropdown menu slide in animation on click
+.dropdown-menu.dropdown-animation.show {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+  animation-name: dropdownslideIn;
+  position: absolute !important;
+  top: 100% !important;
+}
+
+@keyframes dropdownslideIn {
+  0% {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+  100% {
+    transform:translateY(0rem);
+    opacity: 1;
+  }
+  0% {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes dropdownslideIn {
+  0% {
+    -webkit-transform: transform;
+    -webkit-opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(0);
+    -webkit-opacity: 1;
+  }
+  0% {
+    -webkit-transform: translateY(1rem);
+    -webkit-opacity: 0;
+  }
+}

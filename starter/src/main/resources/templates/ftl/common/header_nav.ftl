@@ -37,6 +37,15 @@
 			</a>
 			<!-- Logo END -->
 
+			<button class="navbar-toggler ms-auto d-lg-none" type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#navbarCollapse"
+				aria-controls="navbarCollapse"
+				aria-expanded="false"
+				aria-label="${(i18n['nav.toggle'])! '切换导航'}">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
 			<!-- Main navbar START -->
 			<div class="navbar-collapse collapse" id="navbarCollapse">
 

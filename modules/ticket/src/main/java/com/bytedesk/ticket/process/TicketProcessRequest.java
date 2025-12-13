@@ -37,8 +37,6 @@ public class TicketProcessRequest extends BaseRequest {
 
     private String description;
 
-    // private String type;
-
     private String status;
 
     private String schema;

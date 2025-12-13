@@ -13,24 +13,14 @@
  */
 package com.bytedesk.service.message_leave.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class MessageLeaveUpdateEvent extends ApplicationEvent {
+public class MessageLeaveUpdateEvent extends AbstractMessageLeaveEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private MessageLeaveEntity messageLeave;
-
     public MessageLeaveUpdateEvent(MessageLeaveEntity messageLeave) {
-        super(messageLeave);
-        this.messageLeave = messageLeave;
+        super(messageLeave, messageLeave);
     }
 
 }

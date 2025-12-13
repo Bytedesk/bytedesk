@@ -16,13 +16,12 @@ package com.bytedesk.ticket.ticket_settings;
 
 import com.bytedesk.core.base.BaseResponse;
 import java.time.ZonedDateTime;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsResponse;
+
+import com.bytedesk.service.form.FormResponse;
+import com.bytedesk.ticket.process.TicketProcessResponse;
+import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -58,6 +57,11 @@ public class TicketSettingsResponse extends BaseResponse {
     private Boolean enabled;
 
     /**
+     * 是否启用自定义表单
+     */
+    private Boolean customFormEnabled;
+
+    /**
      * 草稿是否存在未发布变更（由服务端维护）
      */
     private Boolean hasUnpublishedChanges;
@@ -71,20 +75,24 @@ public class TicketSettingsResponse extends BaseResponse {
 
     // ===== 发布版本（前端展示用） =====
     private TicketBasicSettingsResponse basicSettings;
-    private TicketStatusFlowSettingsResponse statusFlowSettings;
-    private TicketPrioritySettingsResponse prioritySettings;
-    private TicketAssignmentSettingsResponse assignmentSettings;
+    // private TicketStatusFlowSettingsResponse statusFlowSettings;
+    // private TicketPrioritySettingsResponse prioritySettings;
+    // private TicketAssignmentSettingsResponse assignmentSettings;
     private TicketNotificationSettingsResponse notificationSettings;
-    private TicketCustomFieldSettingsResponse customFieldSettings;
+    // private TicketCustomFieldSettingsResponse customFieldSettings;
     private TicketCategorySettingsResponse categorySettings;
+    private TicketProcessResponse process;
+    private FormResponse form;
 
     // ===== 草稿版本（编辑态用，使用同一响应结构便于统一渲染） =====
     private TicketBasicSettingsResponse draftBasicSettings;
-    private TicketStatusFlowSettingsResponse draftStatusFlowSettings;
-    private TicketPrioritySettingsResponse draftPrioritySettings;
-    private TicketAssignmentSettingsResponse draftAssignmentSettings;
+    // private TicketStatusFlowSettingsResponse draftStatusFlowSettings;
+    // private TicketPrioritySettingsResponse draftPrioritySettings;
+    // private TicketAssignmentSettingsResponse draftAssignmentSettings;
     private TicketNotificationSettingsResponse draftNotificationSettings;
-    private TicketCustomFieldSettingsResponse draftCustomFieldSettings;
+    // private TicketCustomFieldSettingsResponse draftCustomFieldSettings;
     private TicketCategorySettingsResponse draftCategorySettings;
+    private TicketProcessResponse draftProcess;
+    private FormResponse draftForm;
 
 }

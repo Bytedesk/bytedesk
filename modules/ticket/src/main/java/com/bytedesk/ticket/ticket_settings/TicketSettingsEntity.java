@@ -17,14 +17,17 @@ import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.service.form.FormEntity;
+import com.bytedesk.ticket.process.TicketProcessEntity;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
-import com.bytedesk.ticket.ticket_settings.sub.TicketBasicSettingsEntity;
-import com.bytedesk.ticket.ticket_settings.sub.TicketCategorySettingsEntity;
+import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -88,6 +91,13 @@ public class TicketSettingsEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
+    /**
+     * Whether custom ticket forms are enabled for this settings template
+     */
+    @lombok.Builder.Default
+    @Column(name = "custom_form_enabled")
+    private Boolean customFormEnabled = false;
+
     // 
     // ====== 发布版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
@@ -96,42 +106,12 @@ public class TicketSettingsEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketCategorySettingsEntity categorySettings;
 
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketStatusFlowSettingsEntity statusFlowSettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketPrioritySettingsEntity prioritySettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketAssignmentSettingsEntity assignmentSettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketNotificationSettingsEntity notificationSettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketCustomFieldSettingsEntity customFieldSettings;
-
     // ====== 草稿版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity draftBasicSettings;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketCategorySettingsEntity draftCategorySettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketStatusFlowSettingsEntity draftStatusFlowSettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketPrioritySettingsEntity draftPrioritySettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketAssignmentSettingsEntity draftAssignmentSettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketNotificationSettingsEntity draftNotificationSettings;
-
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // private TicketCustomFieldSettingsEntity draftCustomFieldSettings;
     
     /**
      * Whether there are unpublished changes in draft
@@ -143,5 +123,33 @@ public class TicketSettingsEntity extends BaseEntity {
      * Last published time
      */
     private ZonedDateTime publishedAt;
+
+    /**
+     * Published workflow process binding
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "process_uid")
+    private TicketProcessEntity process;
+
+    /**
+     * Draft workflow process binding
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "draft_process_uid")
+    private TicketProcessEntity draftProcess;
+
+    /**
+     * Published form binding
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "form_uid")
+    private FormEntity form;
+
+    /**
+     * Draft form binding
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "draft_form_uid")
+    private FormEntity draftForm;
 
 }

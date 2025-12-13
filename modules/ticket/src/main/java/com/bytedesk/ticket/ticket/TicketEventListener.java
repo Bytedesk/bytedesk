@@ -25,6 +25,7 @@ import org.flowable.task.api.Task;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
@@ -79,12 +80,15 @@ public class TicketEventListener {
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
         variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
         variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
-        
+        // 
+        String processKey = StringUtils.hasText(ticket.getProcessDefinitionKey())
+            ? ticket.getProcessDefinitionKey()
+            : TicketConsts.TICKET_PROCESS_KEY;
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey(TicketConsts.TICKET_PROCESS_KEY)
+            .processDefinitionKey(processKey)
                 .tenantId(ticket.getOrgUid())
-                // .name(ticket.getTitle())
+                .name(ticket.getTitle())
                 .businessKey(ticket.getUid())
                 .variables(variables)
                 .start();

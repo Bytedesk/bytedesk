@@ -1,0 +1,49 @@
+// 
+// form-check.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+//
+
+// Cursor pointer
+.form-check {
+  .form-check-input, .form-check-label  {
+    cursor: pointer;
+  }
+}
+
+// form check size
+.form-check {
+  &.form-check-md{
+    .form-check-input{
+      height: 1.3em;
+      width: 1.3em;
+      margin-top: 0.15em;
+    }
+    .form-check-input, 
+    .form-check-label{
+      padding-left: 0.6em;
+    }
+  }
+}
+
+// form switch size
+.form-switch {
+  &.form-check-md{
+    .form-check-input{
+      width: 2.4em;
+    }
+  }
+  &.form-check-lg{
+    .form-check-input{
+      height: 2em;
+      width: 4em;
+      margin-top: 0.15em;
+      .form-check-input{
+        width: 3.4em;
+      }
+    }
+  }
+}

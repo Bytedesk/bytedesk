@@ -427,16 +427,23 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
     }
 
     public FaqEntity convertExcelToFaq(FaqExcel excel, String kbType, String fileUid, String kbUid, String orgUid) {
-        // return modelMapper.map(excel, Faq.class); // String categoryUid,
+        String question = trimToNullable(excel.getQuestion());
+        String answer = trimToNullable(excel.getAnswer());
+
+        if (!StringUtils.hasText(question) || !StringUtils.hasText(answer)) {
+            log.warn("跳过FAQ导入，问题或答案为空: fileUid={}, data={}", fileUid, JSON.toJSONString(excel));
+            return null;
+        }
+
         // 检索问题+答案+kbUid+orgUid是否已经存在，如果存在则不创建新的问答对
-        if (existsByQuestionAndAnswerAndKbUidAndOrgUid(excel.getQuestion(), excel.getAnswer(), kbUid, orgUid)) {
+        if (existsByQuestionAndAnswerAndKbUidAndOrgUid(question, answer, kbUid, orgUid)) {
             return null;
         }
 
         FaqEntity faq = FaqEntity.builder().build();
         faq.setUid(uidUtils.getUid());
-        faq.setQuestion(excel.getQuestion());
-        faq.setAnswer(excel.getAnswer());
+        faq.setQuestion(question);
+        faq.setAnswer(answer);
         faq.setType(MessageTypeEnum.fromValue(excel.getType()).name());
         //
         Optional<CategoryEntity> categoryOptional = categoryRestService.findByNameAndKbUid(excel.getCategory(), kbUid);
@@ -579,7 +586,6 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             throw new RuntimeException("Failed to import FAQs", e);
         }
     }
-
     
     /**
      * 获取一个随机FAQ，用于测试
@@ -599,59 +605,12 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         return Optional.empty();
     }
 
-
-    // generateSimilarQuestions
-    // public List<String> generateSimilarQuestions(FaqRequest request) {
-    //     List<String> similarQuestions = new ArrayList<>();
-    //     // 使用OpenAI API生成相似问题
-    // }
-
-        // @Transactional
-    // public void initRelationFaqs(String orgUid, String kbUid) {
-    //     try {
-    //         // 加载JSON文件中的FAQ数据
-    //         FaqConfiguration config = faqJsonLoader.loadFaqs();
-    //         // 创建5个示例多答案数据
-    //         List<FaqAnswer> answerList = new ArrayList<>();
-    //         for (int i = 1; i <= 5; i++) {
-    //             FaqAnswer answer = new FaqAnswer();
-    //             answer.setVipLevel("" + i);
-    //             answer.setAnswer("VIP " + i + " 专属回答：这是针对不同会员等级的答案示例");
-    //             answerList.add(answer);
-    //         }
-    //         // 准备5个相关问题的UID列表
-    //         List<String> relatedFaqUids = new ArrayList<>();
-    //         for (int i = 5; i < 10; i++) {
-    //             String relatedUid = Utils.formatUid(orgUid, "faq_00" + i);
-    //             relatedFaqUids.add(relatedUid);
-    //         }
-    //         int count = 0;
-    //         // 遍历并保存每个FAQ
-    //         for (Faq faq : config.getFaqs()) {
-    //             String uid = Utils.formatUid(orgUid, faq.getUid());
-    //             // 构建FAQ请求
-    //             FaqRequest request = FaqRequest.builder()
-    //                     .uid(uid)
-    //                     .question(faq.getQuestion())
-    //                     .answer(faq.getAnswer())
-    //                     .type(MessageTypeEnum.TEXT.name())
-    //                     .enabled(true)
-    //                     .kbUid(kbUid)
-    //                     .orgUid(orgUid)
-    //                     .build();
-    //             // 为部分FAQ添加多答案和相关问题
-    //             if (count < 5) {
-    //                 request.setAnswerList(answerList);
-    //                 request.setRelatedFaqUids(relatedFaqUids);
-    //             }
-    //             update(request);
-    //             count++;
-    //         }
-    //         log.info("Successfully updated {} FAQs with related questions and multiple answers", count);
-    //     } catch (Exception e) {
-    //         log.error("Failed to initialize FAQ relations: {}", e.getMessage(), e);
-    //         throw new RuntimeException("Failed to initialize FAQ relations", e);
-    //     }
-    // }
+    private String trimToNullable(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
 
 }

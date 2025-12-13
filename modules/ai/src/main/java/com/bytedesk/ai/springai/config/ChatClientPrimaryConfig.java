@@ -18,7 +18,6 @@ import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.model.SpringAIModels;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,8 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class ChatClientPrimaryConfig {
 
-    @Value("${spring.ai.model.chat:none}")
-    private String chatModel;
+    // @Value("${spring.ai.model.chat:none}")
+    // private String chatModel;
 
     @Autowired(required = false)
     @Qualifier("bytedeskZhipuaiChatClient")
@@ -204,12 +203,4 @@ public class ChatClientPrimaryConfig {
         return giteeChatClient;
     }
 
-    // 当没有配置chat model时，不创建任何Primary bean，避免冲突
-    // @Bean
-    // @Primary
-    // @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = "none", matchIfMissing = true)
-    // public ChatClient noPrimaryChatClient() {
-    //     log.warn("No chat client configured as Primary. Set spring.ai.model.chat to 'zhipuai', 'ollama', 'dashscope', 'deepseek', 'baidu', 'tencent', 'volcengine', 'openai', 'openrouter', 'siliconflow', or 'gitee' to use chat features.");
-    //     throw new IllegalStateException("No chat client configured. Please set spring.ai.model.chat to 'zhipuai', 'ollama', 'dashscope', 'deepseek', 'baidu', 'tencent', 'volcengine', 'openai', 'openrouter', 'siliconflow', or 'gitee'");
-    // }
 } 

@@ -1,0 +1,35 @@
+// 
+// breadcrumb.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Bootstrap Overrides
+//
+.breadcrumb-item{
+  font-size: $font-size-xs;
+  a{
+    color: $body-color;
+    &:hover{
+      color: var(--bs-primary);
+    }
+  }
+}
+
+// 
+// Additional style for theme
+// 
+.breadcrumb.breadcrumb-dots{
+  .breadcrumb-item{
+    + .breadcrumb-item{
+      &::before{
+        content: "•";
+        font-size: 22px;
+        line-height: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+}

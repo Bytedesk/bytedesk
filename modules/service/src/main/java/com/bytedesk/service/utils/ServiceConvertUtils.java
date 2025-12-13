@@ -21,6 +21,7 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
@@ -263,7 +264,9 @@ public class ServiceConvertUtils {
         if (svc == null) {
             svc = ServiceSettingsEntity.builder().build();
         }
-        return getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+        ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+        resp.setQuickButtons(QuickButtonResponseVisitor.fromEntities(svc.getQuickButtons()));
+        return resp;
     }
 
     /**

@@ -1,0 +1,70 @@
+version: '3.5'
+
+services:
+    # SIP gateway (audio)
+    jigasi:
+        image: jitsi/jigasi:${JITSI_IMAGE_VERSION:-stable-10590}
+        restart: ${RESTART_POLICY:-unless-stopped}
+        ports:
+            - '${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}:${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}/udp'
+        volumes:
+            - ${CONFIG}/jigasi:/config:Z
+        environment:
+            - AUTOSCALER_SIDECAR_KEY_FILE
+            - AUTOSCALER_SIDECAR_KEY_ID
+            - AUTOSCALER_SIDECAR_GROUP_NAME
+            - AUTOSCALER_SIDECAR_HOST_ID
+            - AUTOSCALER_SIDECAR_INSTANCE_ID
+            - AUTOSCALER_SIDECAR_PORT
+            - AUTOSCALER_SIDECAR_REGION
+            - AUTOSCALER_SIDECAR_SHUTDOWN_POLLING_INTERVAL
+            - AUTOSCALER_SIDECAR_STATS_POLLING_INTERVAL
+            - AUTOSCALER_URL
+            - BOSH_URL_PATTERN
+            - ENABLE_AUTH
+            - ENABLE_GUESTS
+            - ENABLE_VISITORS
+            - XMPP_AUTH_DOMAIN
+            - XMPP_GUEST_DOMAIN
+            - XMPP_MUC_DOMAIN
+            - XMPP_INTERNAL_MUC_DOMAIN
+            - XMPP_SERVER
+            - XMPP_PORT
+            - XMPP_DOMAIN
+            - PUBLIC_URL
+            - JIGASI_CONFIGURATION
+            - JIGASI_DISABLE_SIP
+            - JIGASI_ENABLE_REST
+            - JIGASI_JVB_TIMEOUT
+            - JIGASI_LOCAL_REGION
+            - JIGASI_LOG_FILE
+            - JIGASI_MODE=sip
+            - JIGASI_SIP_URI
+            - JIGASI_SIP_PASSWORD
+            - JIGASI_SIP_SERVER
+            - JIGASI_SIP_PORT
+            - JIGASI_SIP_TRANSPORT
+            - JIGASI_SIP_DEFAULT_ROOM
+            - JIGASI_STATS_ID
+            - JIGASI_XMPP_USER
+            - JIGASI_XMPP_PASSWORD
+            - JIGASI_BREWERY_MUC
+            - JIGASI_PORT_MIN
+            - JIGASI_PORT_MAX
+            - JIGASI_HEALTH_CHECK_SIP_URI
+            - JIGASI_HEALTH_CHECK_INTERVAL
+            - JIGASI_SIP_KEEP_ALIVE_METHOD
+            - JIGASI_ENABLE_SDES_SRTP
+            - JIGASI_VISITORS_QUEUE_SERVICE_URL
+            - JIGASI_VISITORS_QUEUE_SERVICE_PRIVATE_KEY_PATH
+            - JIGASI_VISITORS_QUEUE_SERVICE_PRIVATE_KEY_ID
+            - SHUTDOWN_REST_ENABLED
+            - SENTRY_DSN="${JIGASI_SENTRY_DSN:-0}"
+            - SENTRY_ENVIRONMENT
+            - SENTRY_RELEASE
+            - TZ
+            - USE_TRANSLATOR_IN_CONFERENCE
+        depends_on:
+            - prosody
+        networks:
+            meet.jitsi:

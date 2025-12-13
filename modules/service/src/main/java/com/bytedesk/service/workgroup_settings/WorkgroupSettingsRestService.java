@@ -63,7 +63,6 @@ public class WorkgroupSettingsRestService
         entity.setUid(uidUtils.getUid());
 
         ServiceSettingsEntity service = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
-        // 创建时统一强制生成 uid
         service.setUid(uidUtils.getUid());
         entity.setServiceSettings(service);
         ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
@@ -82,26 +81,23 @@ public class WorkgroupSettingsRestService
         IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
         inte.setUid(uidUtils.getUid());
         entity.setIntentionSettings(inte);
-        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(),
-                modelMapper);
+        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
         inteDraft.setUid(uidUtils.getUid());
         entity.setDraftIntentionSettings(inteDraft);
 
-        MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
-                modelMapper);
+        // 发布与草稿：留言设置
+        MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
         mls.setUid(uidUtils.getUid());
         entity.setMessageLeaveSettings(mls);
-        MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
-                modelMapper);
+        MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
         mlsDraft.setUid(uidUtils.getUid());
         entity.setDraftMessageLeaveSettings(mlsDraft);
 
-        WorktimeSettingEntity worktimePublished = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(),
-            modelMapper);
+        // 发布与草稿：工作时间设置
+        WorktimeSettingEntity worktimePublished = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
         worktimePublished.setUid(uidUtils.getUid());
         entity.setWorktimeSettings(worktimePublished);
-        WorktimeSettingEntity worktimeDraft = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(),
-            modelMapper);
+        WorktimeSettingEntity worktimeDraft = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
         worktimeDraft.setUid(uidUtils.getUid());
         entity.setDraftWorktimeSettings(worktimeDraft);
 
@@ -109,11 +105,11 @@ public class WorkgroupSettingsRestService
         RobotRoutingSettingsEntity rrs = RobotRoutingSettingsEntity.fromRequest(request.getRobotRoutingSettings());
         rrs.setUid(uidUtils.getUid());
         entity.setRobotSettings(rrs);
-        RobotRoutingSettingsEntity rrsDraft = RobotRoutingSettingsEntity.fromRequest(
-                request.getRobotRoutingSettings());
+        RobotRoutingSettingsEntity rrsDraft = RobotRoutingSettingsEntity.fromRequest( request.getRobotRoutingSettings());
         rrsDraft.setUid(uidUtils.getUid());
         entity.setDraftRobotSettings(rrsDraft);
 
+        // 发布与草稿：排队设置
         QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
         qs.setUid(uidUtils.getUid());
         entity.setQueueSettings(qs);
@@ -121,12 +117,11 @@ public class WorkgroupSettingsRestService
         qsDraft.setUid(uidUtils.getUid());
         entity.setDraftQueueSettings(qsDraft);
 
-        RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(),
-            modelMapper);
+        // 发布与草稿：机器人转人工设置
+        RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(), modelMapper);
         rtas.setUid(uidUtils.getUid());
         entity.setRobotToAgentSettings(rtas);
-        RobotToAgentSettingsEntity rtasDraft = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(),
-            modelMapper);
+        RobotToAgentSettingsEntity rtasDraft = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(), modelMapper);
         rtasDraft.setUid(uidUtils.getUid());
         entity.setDraftRobotToAgentSettings(rtasDraft);
 

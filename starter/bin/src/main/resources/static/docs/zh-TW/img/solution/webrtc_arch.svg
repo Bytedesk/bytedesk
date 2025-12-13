@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="360" viewBox="0 0 980 360" fill="none">
+  <style>
+    .box{fill:#EEF2FF;stroke:#4F46E5;stroke-width:1.5}
+    .text{font-family:Arial, Helvetica, sans-serif;font-size:14px;fill:#111827}
+    .cap{font-size:12px;fill:#6B7280}
+    .arrow{stroke:#6B7280;stroke-width:2;marker-end:url(#m)}
+  </style>
+  <defs>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#6B7280" />
+    </marker>
+  </defs>
+  <!-- Clients -->
+  <rect class="box" x="20" y="20" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="120" y="50" text-anchor="middle">Clients</text>
+  <text class="cap" x="120" y="70" text-anchor="middle">Web / iOS / Android / Desktop</text>
+
+  <line class="arrow" x1="220" y1="55" x2="300" y2="55"/>
+
+  <!-- Edge -->
+  <rect class="box" x="300" y="20" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="400" y="50" text-anchor="middle">Signaling &amp; Session</text>
+  <text class="cap" x="400" y="70" text-anchor="middle">WebSocket / REST / Auth</text>
+
+  <line class="arrow" x1="500" y1="55" x2="580" y2="55"/>
+
+  <!-- Media -->
+  <rect class="box" x="580" y="20" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="680" y="45" text-anchor="middle">Media Routing</text>
+  <text class="cap" x="680" y="65" text-anchor="middle">SFU / TURN / ICE</text>
+
+  <line class="arrow" x1="680" y1="90" x2="680" y2="150"/>
+
+  <!-- Services -->
+  <rect class="box" x="300" y="150" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="400" y="180" text-anchor="middle">Recording &amp; VOD</text>
+  
+  <rect class="box" x="580" y="150" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="680" y="180" text-anchor="middle">AI Analysis</text>
+
+  <rect class="box" x="20" y="150" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="120" y="180" text-anchor="middle">Screen Share</text>
+
+  <line class="arrow" x1="680" y1="220" x2="680" y2="290"/>
+
+  <!-- Integrations -->
+  <rect class="box" x="300" y="280" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="400" y="310" text-anchor="middle">CRM / Ticket / QA</text>
+
+  <rect class="box" x="580" y="280" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="680" y="310" text-anchor="middle">Storage / CDN</text>
+
+  <rect class="box" x="20" y="280" width="200" height="70" rx="8" ry="8"/>
+  <text class="text" x="120" y="310" text-anchor="middle">Audit &amp; Compliance</text>
+</svg>

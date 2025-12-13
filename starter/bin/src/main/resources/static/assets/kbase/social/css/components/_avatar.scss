@@ -1,0 +1,229 @@
+// 
+// avatar.scss
+// Theme Component
+
+// Avatar status
+[class*=status-]:before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  border-radius: 100%;
+  border: 2px solid $white;
+  height: 12px;
+  width: 12px;
+  right: -2px;
+  top: -2px;
+}
+.status-online:before {
+  background-color: $success;
+}
+.status-away:before {
+  background-color: $warning;
+}
+.status-offline:before {
+  background-color: $danger;
+}
+.avatar.avatar-lg[class*=status-]:before { 
+  right: 2px;
+  top: 2px;
+}
+.avatar.avatar-xl[class*=status-]:before { 
+  right: 4px;
+  top: 4px;
+}
+.avatar.avatar-xxl[class*=status-]:before { 
+  right: 12px;
+  top: 12px;
+}
+.avatar.avatar-xxxl[class*=status-]:before { 
+  right: 18px;
+  top: 18px;
+}
+
+// Avatar
+.avatar {
+  height: $avatar-size-base;
+  width: $avatar-size-base;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0 !important;
+}
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// Avatar group
+.avatar-group{
+  padding: 0;
+  display: flex;
+  > li{
+    position: relative;
+    &:not(:last-child){
+      margin-right: -0.8rem;
+    }
+  }
+  .avatar-img{
+    border: 2px solid $white;
+  }
+}
+
+// Avatar 2 person
+.avatar-group-two {
+ display: inline-flex; 
+ padding: 0;
+  > li{
+    margin-top: 0.8rem;
+    position: relative;
+    &:not(:last-child){
+      margin-right: -1.2rem;
+      margin-top: 0;
+    }
+  }
+}
+
+// Avatar 3 person
+.avatar-group-three {
+  display: inline-flex; 
+  padding: 0;
+  padding-right: 1.2rem;
+  position: relative;
+   > li{
+     position: relative;
+     &:not(:last-child){
+       margin-right: -1.2rem;
+     }
+
+     &:last-child {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      top: 0;
+      transform: translate(-50%, 50%);
+     }
+
+   }
+ }
+
+// Avatar 4 person
+.avatar-group-four {
+  display: inline-grid; 
+  grid-template-columns: 1fr 1fr; 
+  grid-template-rows: 1fr 1fr; 
+  grid-template-columns: auto auto;
+  gap: 0px 0px; 
+    li  {
+      margin:0;
+      &:not(:last-child){
+        margin: 0;
+      }
+    }
+}
+
+// avatar Sizing
+.avatar-xxs {
+  height: $avatar-size-xxs;
+  width: $avatar-size-xxs;
+}
+.avatar-xs {
+  height: $avatar-size-xs;
+  width: $avatar-size-xs;
+}
+.avatar-sm {
+  height: $avatar-size-sm;
+  width: $avatar-size-sm;
+}
+.avatar-lg {
+  height: $avatar-size-lg;
+  width: $avatar-size-lg;
+}
+.avatar-xl {
+  height: $avatar-size-xl;
+  width: $avatar-size-xl;
+}
+.avatar-xxl {
+  height: $avatar-size-xl;
+  width: $avatar-size-xl;
+  @include media-breakpoint-up(md) {
+    width: $avatar-size-xxl;
+    height: $avatar-size-xxl;
+  }
+}
+.avatar-xxxl {
+  height: $avatar-size-xxl;
+  width: $avatar-size-xxl;
+  @include media-breakpoint-up(md) {
+    width: $avatar-size-xxxl;
+    height: $avatar-size-xxxl;
+  }
+}
+
+// avatar story
+.avatar-story {
+  position: relative;
+  padding: 4px;
+  z-index: 1;
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--#{$prefix}primary);
+    z-index: -1;
+  }
+}
+
+// avatar profile uploader
+.avatar-uploader {
+	position: relative;
+	.avatar-edit {
+		position: absolute;
+		right: 0;
+		z-index: 1;
+		top: 0;
+		input {
+			display: none;
+			& + label {
+				display: inline-block;
+				width: 34px;
+				height: 34px;
+				margin-bottom: 0;
+				border-radius: 100%;
+				background: $body-bg;
+				border: 1px solid transparent;
+				box-shadow: $box-shadow;
+				cursor: pointer;
+				font-weight: normal;
+				transition: $transition-base;
+				&:after {
+					content: '\f303';
+					font-family: $fa-font-family;
+					color: $secondary;
+					position: absolute;
+					top: 50%;
+					left: 0;
+					right: 0;
+					text-align: center;
+					font-weight: 900;
+					transform: translate(0,-56%);
+					margin: 0 auto;
+					transition: $transition-base;
+				}
+				&:hover {
+					background: var(--#{$prefix}primary);
+					border-color: var(--#{$prefix}primary);
+					&:after {
+						color: $white;
+					}
+				}
+			}
+		}
+	}
+	img#avatar-preview {
+		object-fit: cover;
+	}
+}

@@ -13,23 +13,13 @@
  */
 package com.bytedesk.service.form_result.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.form_result.FormResultEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class FormResultDeleteEvent extends ApplicationEvent {
+public class FormResultDeleteEvent extends AbstractFormResultEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private FormResultEntity tag;
-
     public FormResultDeleteEvent(FormResultEntity tag) {
-        super(tag);
-        this.tag = tag;
+        super(tag, tag);
     }
 }

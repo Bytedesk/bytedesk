@@ -13,24 +13,14 @@
  */
 package com.bytedesk.service.visitor.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.visitor.VisitorEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class VisitorCreateEvent extends ApplicationEvent {
+public class VisitorCreateEvent extends AbstractVisitorEvent {
     
     private static final long serialVersionUID = 1L;
 
-    private VisitorEntity visitor;
-
     public VisitorCreateEvent(Object source, VisitorEntity visitor) {
-        super(source);
-        this.visitor = visitor;
+        super(source, visitor);
     }
     
 }

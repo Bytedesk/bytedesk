@@ -69,6 +69,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIPromptController {
 
 	private final BytedeskProperties bytedeskProperties;
+	
 	private final ChatClient primaryChatClient;
 
 	@Qualifier("elasticsearchVectorStore")

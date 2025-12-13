@@ -15,11 +15,8 @@ package com.bytedesk.ai.robot;
 
 public enum RobotTypeEnum {
     SERVICE, // 客服机器人
-    MARKETING, // 营销机器人，售前营销获客机器人
-    LLM, // 问答机器人, 直接调用大模型
-    KB, // 知识库机器人, 跟某一个知识库对话
-    KBDOC, // 知识库机器人, 跟某一个文档对话
-;
+    LLM, // 大模型Agent
+    ;
 
     // 根据整型值查找对应的枚举常量
     public static RobotTypeEnum fromValue(String value) {

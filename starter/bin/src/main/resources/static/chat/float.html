@@ -1,0 +1,137 @@
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-06-18 17:56:09
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-02-26 10:42:19
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style type="text/css">
+        /* 白天模式样式 */
+        body.day-mode {
+            background-color: #ffffff;
+            /* 白色背景 */
+            color: #000000;
+            /* 黑色文本 */
+        }
+
+        /* 黑夜模式样式 */
+        body.night-mode {
+            background-color: #333333;
+            /* 深色背景 */
+            color: #ffffff;
+            /* 白色文本 */
+        }
+
+        /* 切换按钮样式（可选） */
+        #toggleModeBtn {
+            /* 添加您喜欢的样式 */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 切换白天/夜间模式按钮 -->
+    <!-- <button id="toggleModeBtn">切换模式</button> -->
+    <!-- TODO: 切换白天/夜间模式 -->
+    <script src="/chat/assets/js/float/index.js"></script>
+    <!-- <script src="/chat/assets/js/float/index.min.js"></script> -->
+    <script>
+         // 添加获取title的函数
+         async function initializeTitle() {
+            try {
+                const response = await fetch('/config/bytedesk/properties');
+                const config = await response.json();
+                console.log('config:', config?.data);
+                if (config?.data?.custom?.enabled) {
+                    document.title = config?.data?.custom?.name || '微语'
+                } else {
+                    document.title = '微语'
+                }
+                // 获取当前语言
+                // const lang = getUrlParam('lang') || 'zh-cn';
+                // 加载对应的国际化消息
+                // const i18nResponse = await fetch(`/chat/assets/i18n/${lang}.json`);
+                // const i18nMessages = await i18nResponse.json();
+                // document.title = config?.data?.name || i18nMessages['i18n.app.title'];
+            } catch (error) {
+                console.error('Failed to load title:', error);
+                document.title = 'ByteDesk'; // 使用一个基础默认值
+            }
+        }
+        
+        // 在其他初始化之前调用
+        initializeTitle();
+        
+        //
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg); //匹配目标参数
+            if (r != null) return decodeURIComponent(r[2]);
+            return null; //返回参数值
+        }
+        //
+        var org = getUrlParam('org')
+        var t = getUrlParam('t')
+        var sid = getUrlParam('sid')
+        var lang = getUrlParam('lang')
+        var theme = getUrlParam('theme')
+        var navbar = getUrlParam('navbar')
+        //
+        var src = '/chat/?org=' + org + '&t=' + t + '&sid=' + sid + '&'
+
+        if (lang) {
+            src += 'lang=' + lang
+        }
+
+        if (theme) {
+            src += '&theme=' + theme
+        }
+
+        if (navbar) {
+            src += '&navbar=' + navbar
+        }
+
+        // init chatfloat, and init params
+        window.ChatFloat({
+            chatUrl: src, // custom chat url
+            //buttonPosition: 'left', // botton position：left or right
+            //buttonBackgroundColor: 'red', // button background color
+            //iframeWidth: 400,
+            //iframeHeight: 600,
+            //iframeMargins: { right: 20, bottom: 20, left: 20 }, // iframe margins
+            //buttonMargins: { right: 20, bottom: 20, left: 20 }, // button margins
+            //showButton: true, // show button or not
+            //showIframe: true // show iframe or not
+        });
+        //
+        // 切换白天/夜间模式功能
+        document.getElementById('toggleModeBtn').addEventListener('click', function () {
+            var body = document.body;
+            if (body.classList.contains('day-mode')) {
+                body.classList.remove('day-mode');
+                body.classList.add('night-mode');
+            } else {
+                body.classList.remove('night-mode');
+                body.classList.add('day-mode');
+            }
+        });
+        // 初始设置为白天模式（可选）
+        document.body.classList.add('day-mode');
+    </script>
+</body>
+
+</html>

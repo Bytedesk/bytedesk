@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251208-agent-status-duration-seconds" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_status" />
+            <not>
+                <columnExists tableName="bytedesk_service_agent_status" columnName="status_duration_seconds" />
+            </not>
+        </preConditions>
+        <comment>
+            Track how long each agent stays in a status by storing the elapsed seconds between status switches.
+        </comment>
+        <addColumn tableName="bytedesk_service_agent_status">
+            <column name="status_duration_seconds" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_agent_status" columnName="status_duration_seconds" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

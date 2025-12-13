@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_faq.FaqResponse;
+import com.bytedesk.kbase.quick_button.QuickButtonResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -108,24 +109,17 @@ public class ServiceSettingsResponse implements Serializable {
     private List<FaqResponse> faqs;
     private String faqKbUid;
 
-    private Boolean showQuickFaqs;
-    private List<FaqResponse> quickFaqs;
-    // 快捷问题知识库
-    private String quickFaqKbUid;
+    private Boolean showQuickButtons;
+    private List<QuickButtonResponse> quickButtons;
 
-    private Boolean showGuessFaqs;
-    private List<FaqResponse> guessFaqs;
+    // private Boolean showGuessFaqs;
+    // private List<FaqResponse> guessFaqs;
 
-    private Boolean showHotFaqs;
-    private List<FaqResponse> hotFaqs;
+    // private Boolean showHotFaqs;
+    // private List<FaqResponse> hotFaqs;
 
-    private Boolean showShortcutFaqs;
-    private List<FaqResponse> shortcutFaqs;
-
-    // 未知答案固定回复
-    // private Boolean showUnknownAnswer;
-
-    // private String unknownAnswer;
+    // private Boolean showShortcutFaqs;
+    // private List<FaqResponse> shortcutFaqs;
 
     // 主动触发设置
     private Boolean enableProactiveTrigger;  // 是否启用主动触发
@@ -188,11 +182,11 @@ public class ServiceSettingsResponse implements Serializable {
                 .showPreSearch(settings.getShowPreSearch())
                 .showFaqs(settings.getShowFaqs())
                 .faqKbUid(settings.getFaqKbUid())
-                .showQuickFaqs(settings.getShowQuickFaqs())
-                .quickFaqKbUid(settings.getQuickFaqKbUid())
-                .showGuessFaqs(settings.getShowGuessFaqs())
-                .showHotFaqs(settings.getShowHotFaqs())
-                .showShortcutFaqs(settings.getShowShortcutFaqs())
+                .showQuickButtons(settings.getShowQuickButtons())
+                .quickButtons(QuickButtonResponse.fromEntities(settings.getQuickButtons()))
+                // .showGuessFaqs(settings.getShowGuessFaqs())
+                // .showHotFaqs(settings.getShowHotFaqs())
+                // .showShortcutFaqs(settings.getShowShortcutFaqs())
                 .enableProactiveTrigger(settings.getEnableProactiveTrigger())
                 .noResponseTimeout(settings.getNoResponseTimeout())
                 .proactiveMessage(settings.getProactiveMessage())

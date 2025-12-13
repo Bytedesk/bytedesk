@@ -13,6 +13,8 @@
  */
 package com.bytedesk.service.agent_status;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -22,8 +24,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 
@@ -58,6 +62,7 @@ public class AgentStatusRestService extends BaseRestService<AgentStatusEntity, A
 
         AgentStatusEntity agentStatus = modelMapper.map(request, AgentStatusEntity.class);
         agentStatus.setUid(uidUtils.getUid());
+        finalizePreviousStatusDuration(agentStatus);
 
         AgentStatusEntity savedAgentStatus = save(agentStatus);
         if (savedAgentStatus == null) {
@@ -127,6 +132,49 @@ public class AgentStatusRestService extends BaseRestService<AgentStatusEntity, A
         AgentStatusResponse response = modelMapper.map(entity, AgentStatusResponse.class);
         response.setAgent(entity.getAgent());
         return response;
+    }
+
+    private void finalizePreviousStatusDuration(AgentStatusEntity currentStatus) {
+        if (currentStatus == null) {
+            return;
+        }
+
+        currentStatus.setDurationSeconds(0L);
+        if (!StringUtils.hasText(currentStatus.getOrgUid())) {
+            return;
+        }
+
+        String agentPayload = currentStatus.getAgentString();
+        if (!StringUtils.hasText(agentPayload)) {
+            return;
+        }
+
+        UserProtobuf agentProto = currentStatus.getAgent();
+        if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
+            return;
+        }
+
+        Optional<AgentStatusEntity> latestStatusOptional = agentStatusRepository
+                .findFirstByAgentContainsAndOrgUidAndDeletedFalseOrderByCreatedAtDesc(agentProto.getUid(),
+                        currentStatus.getOrgUid());
+
+        if (latestStatusOptional.isEmpty()) {
+            return;
+        }
+
+        AgentStatusEntity previousStatus = latestStatusOptional.get();
+        if (previousStatus.getCreatedAt() == null) {
+            return;
+        }
+
+        ZonedDateTime now = ZonedDateTime.now();
+        long durationSeconds = ChronoUnit.SECONDS.between(previousStatus.getCreatedAt(), now);
+        if (durationSeconds < 0) {
+            durationSeconds = 0;
+        }
+
+        previousStatus.setDurationSeconds(durationSeconds);
+        agentStatusRepository.save(previousStatus);
     }
 
     

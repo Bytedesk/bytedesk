@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251213-assign-quickbutton-role-permissions" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_role_authority" />
+                <tableExists tableName="bytedesk_core_role" />
+                <tableExists tableName="bytedesk_core_authority" />
+            </and>
+        </preConditions>
+        <comment>
+            Ensure every default system role receives the newly introduced QuickButton authorities for the scope it manages,
+            so initRoles + initPermissions stay in sync for existing tenants.
+        </comment>
+        <sql>
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+                AND a.authority_value LIKE 'QUICKBUTTON\\_%' ESCAPE '\\'
+                AND INSTR(a.authority_value, '_PLATFORM_') &gt; 0
+            WHERE r.uuid = 'df_role_super_uid'
+              AND r.is_deleted = 0
+              AND NOT EXISTS (
+                  SELECT 1 FROM bytedesk_core_role_authority ra
+                  WHERE ra.role_id = r.id AND ra.authority_id = a.id
+              );
+
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+                AND a.authority_value LIKE 'QUICKBUTTON\\_%' ESCAPE '\\'
+                AND INSTR(a.authority_value, '_ORGANIZATION_') &gt; 0
+            WHERE r.uuid = 'df_role_admin_uid'
+              AND r.is_deleted = 0
+              AND NOT EXISTS (
+                  SELECT 1 FROM bytedesk_core_role_authority ra
+                  WHERE ra.role_id = r.id AND ra.authority_id = a.id
+              );
+
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+                AND a.authority_value LIKE 'QUICKBUTTON\\_%' ESCAPE '\\'
+                AND INSTR(a.authority_value, '_DEPARTMENT_') &gt; 0
+            WHERE r.uuid = 'df_role_dept_admin_uid'
+              AND r.is_deleted = 0
+              AND NOT EXISTS (
+                  SELECT 1 FROM bytedesk_core_role_authority ra
+                  WHERE ra.role_id = r.id AND ra.authority_id = a.id
+              );
+
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+                AND a.authority_value LIKE 'QUICKBUTTON\\_%' ESCAPE '\\'
+                AND INSTR(a.authority_value, '_WORKGROUP_') &gt; 0
+            WHERE r.uuid = 'df_role_wg_admin_uid'
+              AND r.is_deleted = 0
+              AND NOT EXISTS (
+                  SELECT 1 FROM bytedesk_core_role_authority ra
+                  WHERE ra.role_id = r.id AND ra.authority_id = a.id
+              );
+
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+                AND a.authority_value LIKE 'QUICKBUTTON\\_%' ESCAPE '\\'
+                AND INSTR(a.authority_value, '_AGENT_') &gt; 0
+            WHERE r.uuid = 'df_role_agent_uid'
+              AND r.is_deleted = 0
+              AND NOT EXISTS (
+                  SELECT 1 FROM bytedesk_core_role_authority ra
+                  WHERE ra.role_id = r.id AND ra.authority_id = a.id
+              );
+
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+                AND a.authority_value LIKE 'QUICKBUTTON\\_%' ESCAPE '\\'
+                AND INSTR(a.authority_value, '_USER_') &gt; 0
+            WHERE r.uuid = 'df_role_user_uid'
+              AND r.is_deleted = 0
+              AND NOT EXISTS (
+                  SELECT 1 FROM bytedesk_core_role_authority ra
+                  WHERE ra.role_id = r.id AND ra.authority_id = a.id
+              );
+        </sql>
+        <rollback>
+            <sql>
+                DELETE FROM bytedesk_core_role_authority
+                WHERE role_id IN (
+                    SELECT id FROM bytedesk_core_role WHERE uuid IN (
+                        'df_role_super_uid',
+                        'df_role_admin_uid',
+                        'df_role_dept_admin_uid',
+                        'df_role_wg_admin_uid',
+                        'df_role_agent_uid',
+                        'df_role_user_uid'
+                    ) AND is_deleted = 0
+                )
+                  AND authority_id IN (
+                    SELECT id FROM bytedesk_core_authority
+                                        WHERE is_deleted = 0
+                                            AND authority_value LIKE 'QUICKBUTTON\\_%' ESCAPE '\\'
+                  );
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

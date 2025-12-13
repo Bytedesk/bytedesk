@@ -218,7 +218,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
         //
         RobotEntity robot = robotOptional.get();
-        robot.setName(request.getName());
+        // robot.setName(request.getName());
         robot.setNickname(request.getNickname());
         robot.setAvatar(request.getAvatar());
         robot.setDescription(request.getDescription());
@@ -510,21 +510,27 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 // Use organization default settings (ignore per-robot custom prompt)
                 RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
 
+                String robotUid = uidUtils.getUid();
+                if ("airline_booking_assistant".equals(name)) {
+                    // External callers rely on a deterministic UID for airline booking tests
+                    robotUid = BytedeskConsts.DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID;
+                }
+
                 // Create robot entity
                 RobotEntity robot = RobotEntity.builder()
-                        .uid(uidUtils.getUid())
-                        .name(robotJson.getName())
-                        .nickname(localeData.getNickname())
-                        .avatar(AvatarConsts.getDefaultRobotAvatar())
-                        .description(localeData.getDescription())
-                        .type(robotJson.getType())
-                        .llm(robotLlm)
-                        .categoryUid(categoryUid)
-                        .level(level)
-                        .orgUid(orgUid)
-                        .settings(persistedSettings)
-                        .system(true)
-                        .build();
+                    .uid(robotUid)
+                    .name(robotJson.getName())
+                    .nickname(localeData.getNickname())
+                    .avatar(AvatarConsts.getDefaultRobotAvatar())
+                    .description(localeData.getDescription())
+                    .type(robotJson.getType())
+                    .llm(robotLlm)
+                    .categoryUid(categoryUid)
+                    .level(level)
+                    .orgUid(orgUid)
+                    .settings(persistedSettings)
+                    .system(true)
+                    .build();
                 //
                 save(robot);
             }

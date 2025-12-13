@@ -14,7 +14,6 @@
 package com.bytedesk.core.action;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.action.event.ActionCreateEvent;
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -30,10 +29,9 @@ public class ActionEntityListener {
     @PostPersist
     private void onPostPersist(ActionEntity action) {
         log.info("actionLog after: model {}, action {}", action.getTitle(), action.getAction());
-        ActionEntity clonedAction = SerializationUtils.clone(action);
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new ActionCreateEvent(this, clonedAction));
+        bytedeskEventPublisher.publishEvent(new ActionCreateEvent(this, action));
     }
 
 }

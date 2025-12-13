@@ -16,6 +16,7 @@ package com.bytedesk.ticket.process;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,6 +92,10 @@ public class TicketProcessRestService
 
     @Override
     public TicketProcessResponse create(TicketProcessRequest request) {
+        String normalizedType = StringUtils.hasText(request.getType())
+                ? request.getType()
+                : TicketProcessTypeEnum.TICKET_INTERNAL.name();
+        request.setType(normalizedType);
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid())) {
             Optional<TicketProcessEntity> optional = processRepository.findByUid(request.getUid());
@@ -102,11 +107,12 @@ public class TicketProcessRestService
             request.setUid(uidUtils.getUid());
         }
         // 流程key不能重复
-        Optional<TicketProcessEntity> optionalKey = processRepository.findByKeyAndOrgUid(request.getKey(),
-                request.getOrgUid());
+        Optional<TicketProcessEntity> optionalKey = processRepository.findByKeyAndOrgUidAndType(request.getKey(),
+                request.getOrgUid(), normalizedType);
         if (optionalKey.isPresent()) {
             throw new RuntimeException(
-                    "Process key " + request.getKey() + " in org " + request.getOrgUid() + " already exists");
+                    "Process key " + request.getKey() + " in org " + request.getOrgUid() + " with type "
+                            + normalizedType + " already exists");
         }
 
         UserEntity user = authService.getUser();
@@ -196,33 +202,26 @@ public class TicketProcessRestService
                 .deploymentName(TicketConsts.TICKET_PROCESS_NAME)
                 .list();
 
+        existingDeployments.sort(Comparator
+            .comparing(Deployment::getDeploymentTime, Comparator.nullsLast(Comparator.naturalOrder()))
+            .reversed());
+
+        Deployment latestDeployment = existingDeployments.isEmpty() ? null : existingDeployments.get(0);
+
         if (!existingDeployments.isEmpty()) {
-            // log.info("工单流程已存在，跳过部署: tenantId={}", orgUid);
+            ensureExternalTicketProcess(orgUid, latestDeployment);
             return;
         }
 
         // 读取并部署流程
         try {
-            Resource resource = resourceLoader
-                    .getResource("classpath:" + TicketConsts.TICKET_PROCESS_PATH);
-            String ticketBpmn20Xml = "";
+            String ticketBpmn20Xml = loadDefaultTicketProcessSchema();
 
-            try (InputStream inputStream = resource.getInputStream()) {
-                ticketBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            }
-
-            // 生成 processUid 并创建流程记录
             String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
-            TicketProcessRequest processRequest = TicketProcessRequest.builder()
-                    .uid(processUid)
-                    .name(TicketConsts.TICKET_PROCESS_NAME)
-                    .schema(ticketBpmn20Xml)
-                    .type(TicketProcessTypeEnum.TICKET.name())
-                    .key(TicketConsts.TICKET_PROCESS_KEY)
-                    .description(TicketConsts.TICKET_PROCESS_NAME)
-                    .orgUid(orgUid)
-                    .build();
-            create(processRequest);
+            String externalProcessUid = buildExternalProcessUid(orgUid);
+
+            create(buildDefaultProcessRequest(processUid, orgUid, ticketBpmn20Xml, TicketProcessTypeEnum.TICKET_INTERNAL));
+            create(buildDefaultProcessRequest(externalProcessUid, orgUid, ticketBpmn20Xml, TicketProcessTypeEnum.TICKET_EXTERNAL));
 
             // 部署流程
             Deployment deployment = repositoryService.createDeployment()
@@ -231,14 +230,8 @@ public class TicketProcessRestService
                     .tenantId(orgUid)
                     .deploy();
 
-            // 更新 TicketProcessEntity
-            Optional<TicketProcessEntity> processEntity = findByUid(processUid);
-            if (processEntity.isPresent()) {
-                processEntity.get().setDeploymentId(deployment.getId());
-                // processEntity.get().setDeployed(true);
-                processEntity.get().setStatus(TicketProcessStatusEnum.DEPLOYED.name());
-                save(processEntity.get());
-            }
+            markProcessAsDeployed(processUid, deployment.getId());
+            markProcessAsDeployed(externalProcessUid, deployment.getId());
 
             log.info("部署租户流程成功: deploymentId={}, tenantId={}",
                     deployment.getId(), deployment.getTenantId());
@@ -317,4 +310,69 @@ public class TicketProcessRestService
         return processRepository.findAll(specification, pageable);
     }
 
+    private TicketProcessRequest buildDefaultProcessRequest(String uid, String orgUid, String schema,
+            TicketProcessTypeEnum type) {
+        return TicketProcessRequest.builder()
+                .uid(uid)
+                .name(TicketConsts.TICKET_PROCESS_NAME)
+                .schema(schema)
+                .type(type.name())
+                .key(TicketConsts.TICKET_PROCESS_KEY)
+                .description(TicketConsts.TICKET_PROCESS_NAME)
+                .orgUid(orgUid)
+                .build();
+    }
+
+    private String buildExternalProcessUid(String orgUid) {
+        return Utils.formatUid(orgUid,
+                TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX);
+    }
+
+    private void ensureExternalTicketProcess(String orgUid, Deployment latestDeployment) {
+        String externalType = TicketProcessTypeEnum.TICKET_EXTERNAL.name();
+        Optional<TicketProcessEntity> externalProcess = processRepository
+                .findByKeyAndOrgUidAndType(TicketConsts.TICKET_PROCESS_KEY, orgUid, externalType);
+        if (externalProcess.isPresent()) {
+            return;
+        }
+
+        String schema = processRepository
+                .findByKeyAndOrgUidAndType(TicketConsts.TICKET_PROCESS_KEY, orgUid,
+                        TicketProcessTypeEnum.TICKET_INTERNAL.name())
+                .map(TicketProcessEntity::getSchema)
+                .orElseGet(() -> {
+                    try {
+                        return loadDefaultTicketProcessSchema();
+                    } catch (IOException e) {
+                        throw new RuntimeException("加载默认工单流程定义失败", e);
+                    }
+                });
+
+        String externalProcessUid = buildExternalProcessUid(orgUid);
+        create(buildDefaultProcessRequest(externalProcessUid, orgUid, schema, TicketProcessTypeEnum.TICKET_EXTERNAL));
+
+        if (latestDeployment != null) {
+            markProcessAsDeployed(externalProcessUid, latestDeployment.getId());
+        }
+
+        log.info("已为租户补充外部工单流程: tenantId={}, processUid={}", orgUid, externalProcessUid);
+    }
+
+    private void markProcessAsDeployed(String processUid, String deploymentId) {
+        if (!StringUtils.hasText(processUid) || !StringUtils.hasText(deploymentId)) {
+            return;
+        }
+        findByUid(processUid).ifPresent(entity -> {
+            entity.setDeploymentId(deploymentId);
+            entity.setStatus(TicketProcessStatusEnum.DEPLOYED.name());
+            save(entity);
+        });
+    }
+
+    private String loadDefaultTicketProcessSchema() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_PATH);
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
 }

@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-development/transfer" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.1">
+<title data-rh="true">客服端转接会话 | Bytedesk</title><meta data-rh="true" http-equiv="Content-Security-Policy" content=" default-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; https://www.weiyuai.cn *.weiyuai.cn cdn.npmmirror.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://www.weiyuai.cn *.weiyuai.cn fonts.googleapis.com cdn.npmmirror.com; img-src &#x27;self&#x27; data: https://www.weiyuai.cn *.weiyuai.cn *.npmmirror.com; font-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn fonts.gstatic.com data:; connect-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; frame-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; form-action &#x27;self&#x27;; "><meta data-rh="true" http-equiv="X-Content-Type-Options" content="nosniff"><meta data-rh="true" http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" property="og:image" content="https://www.weiyuai.cn/docs/zh-CN/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://www.weiyuai.cn/docs/zh-CN/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://www.weiyuai.cn/docs/zh-CN/docs/development/transfer"><meta data-rh="true" property="og:locale" content="zh_CN"><meta data-rh="true" property="og:locale:alternate" content="en"><meta data-rh="true" property="og:locale:alternate" content="zh_TW"><meta data-rh="true" name="docusaurus_locale" content="zh-CN"><meta data-rh="true" name="docsearch:language" content="zh-CN"><meta data-rh="true" name="keywords" content="bytedesk, 微语, 客服系统, AI客服, 智能客服"><meta data-rh="true" name="og:title" content="Bytedesk微语智能客服系统"><meta data-rh="true" name="og:description" content="微语智能客服系统官方文档，全面介绍系统功能、部署方案及集成指南"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="客服端转接会话 | Bytedesk"><meta data-rh="true" name="description" content="社区版不支持，请升级到企业版或平台版。请替换licenseKey"><meta data-rh="true" property="og:description" content="社区版不支持，请升级到企业版或平台版。请替换licenseKey"><link data-rh="true" rel="icon" href="/docs/zh-CN/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://www.weiyuai.cn/docs/zh-CN/docs/development/transfer"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/docs/development/transfer" hreflang="en"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/zh-CN/docs/development/transfer" hreflang="zh-CN"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/zh-TW/docs/development/transfer" hreflang="zh-TW"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/docs/development/transfer" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"开发指南","item":"https://www.weiyuai.cn/docs/zh-CN/docs/category/development"},{"@type":"ListItem","position":2,"name":"客服端转接会话","item":"https://www.weiyuai.cn/docs/zh-CN/docs/development/transfer"}]}</script><link rel="alternate" type="application/rss+xml" href="/docs/zh-CN/blog/rss.xml" title="Bytedesk RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/docs/zh-CN/blog/atom.xml" title="Bytedesk Atom Feed"><link rel="stylesheet" href="/docs/zh-CN/assets/css/styles.4ec1f2ed.css">
+<script src="/docs/zh-CN/assets/js/runtime~main.43bb8b70.js" defer="defer"></script>
+<script src="/docs/zh-CN/assets/js/main.7937c7c7.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div class="progressContainer_awPh"><div class="progressBar_CB9G" style="width:0%"></div></div><div role="region" aria-label="跳到主要内容"><a class="skipToContent_hDlh" href="#__docusaurus_skipToContent_fallback">跳到主要内容</a></div><nav aria-label="主导航" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="切换导航栏" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/docs/zh-CN/"><div class="navbar__logo"><img src="/docs/zh-CN/img/logo.png" alt="微语 Logo" class="themedComponent_nezP themedComponent--light_FLlG"><img src="/docs/zh-CN/img/logo.png" alt="微语 Logo" class="themedComponent_nezP themedComponent--dark_AjEN"></div><b class="navbar__title text--truncate">微语</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/docs/zh-CN/docs/intro">文档</a><a class="navbar__item navbar__link" href="/docs/zh-CN/blog">博客</a><a class="navbar__item navbar__link" href="/docs/zh-CN/docs/payment">价格</a><a href="https://api.weiyuai.cn/swagger-ui/index.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">SwaggerApis<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/apidocs/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">ApiDocs<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/javadocs/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">JavaDocs<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/architecture.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">架构图<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><div class="navbar__item dropdown dropdown--hoverable"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link">演示体验</a><ul class="dropdown__menu"><li><a href="https://www.weiyuai.cn/admin/" target="_blank" rel="noopener noreferrer" class="dropdown__link">管理后台<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li><a href="https://www.weiyuai.cn/agent/" target="_blank" rel="noopener noreferrer" class="dropdown__link">客服工作台<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li><a href="https://www.weiyuai.cn/reactdemo/" target="_blank" rel="noopener noreferrer" class="dropdown__link">访客端演示<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar-search-item navbarSearchContainer_S5Qv"><div class="navbar__search searchBarContainer_MFY3" dir="ltr"><input placeholder="搜索" aria-label="Search" class="navbar__search-input searchInput_rL4i" value=""><div class="loadingRing_cMvM searchBarLoadingRing_YKes"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/bytedesk/bytedesk" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/contact.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">联系我们<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_YYhs"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>简体中文</a><ul class="dropdown__menu"><li><a href="/docs/docs/development/transfer" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="en">English</a></li><li><a href="/docs/zh-CN/docs/development/transfer" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="zh-CN">简体中文</a></li><li><a href="/docs/zh-TW/docs/development/transfer" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="zh-TW">繁体中文</a></li></ul></div><div class="toggle_nwaj colorModeToggle_ed4a"><button class="clean-btn toggleButton_XDyZ toggleButtonDisabled_VoN_" type="button" disabled="" title="system mode" aria-label="切换浅色/暗黑模式（当前为system mode）"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv lightToggleIcon_GTAV"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv darkToggleIcon_FEmf"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv systemToggleIcon_wHAe"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_tuwg"><div class="docsWrapper_nvId"><button aria-label="回到顶部" class="clean-btn theme-back-to-top-button backToTopButton_LwBK" type="button"></button><div class="docRoot_WYpV"><aside class="theme-doc-sidebar-container docSidebarContainer_XCXD"><div class="sidebarViewport_UcBh"><div class="sidebar_jzvq"><nav aria-label="文档侧边栏" class="menu thin-scrollbar menu_RET8"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/intro"><span title="微语协同平台" class="linkLabel_J_DF">微语协同平台</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/user-manual"><span title="使用手册" class="categoryLinkLabel_fMPM">使用手册</span></a><button aria-label="展开侧边栏分类 &#x27;使用手册&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist menu__link--active" href="/docs/zh-CN/docs/category/development"><span title="开发指南" class="categoryLinkLabel_fMPM">开发指南</span></a><button aria-label="折叠侧边栏分类 &#x27;开发指南&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/chat"><span title="访客端" class="linkLabel_J_DF">访客端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/agent"><span title="客服端" class="linkLabel_J_DF">客服端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/admin"><span title="管理端" class="linkLabel_J_DF">管理端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/server"><span title="服务器" class="linkLabel_J_DF">服务器</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/mobile"><span title="手机端" class="linkLabel_J_DF">手机端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/login"><span title="客服端登录" class="linkLabel_J_DF">客服端登录</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/login_visitor"><span title="访客端登录" class="linkLabel_J_DF">访客端登录</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/user_system"><span title="客服端用户系统对接" class="linkLabel_J_DF">客服端用户系统对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/userinfo"><span title="访客端用户信息对接" class="linkLabel_J_DF">访客端用户信息对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/viplevel"><span title="千人千面" class="linkLabel_J_DF">千人千面</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/order_info"><span title="订单信息" class="linkLabel_J_DF">订单信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/order_select"><span title="订单对接" class="linkLabel_J_DF">订单对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/goodsinfo"><span title="商品信息" class="linkLabel_J_DF">商品信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/saas"><span title="SaaS" class="linkLabel_J_DF">SaaS</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/history"><span title="历史消息" class="linkLabel_J_DF">历史消息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message"><span title="消息结构" class="linkLabel_J_DF">消息结构</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_api"><span title="大模型AI对话" class="linkLabel_J_DF">大模型AI对话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_unread"><span title="客服端未读消息数" class="linkLabel_J_DF">客服端未读消息数</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_unread_visitor"><span title="访客端未读消息数" class="linkLabel_J_DF">访客端未读消息数</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/tts"><span title="文本转语音" class="linkLabel_J_DF">文本转语音</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/asr"><span title="语音识别" class="linkLabel_J_DF">语音识别</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/taboo"><span title="敏感词过滤" class="linkLabel_J_DF">敏感词过滤</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/statistic"><span title="数据统计" class="linkLabel_J_DF">数据统计</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/zh-CN/docs/development/transfer"><span title="客服端转接会话" class="linkLabel_J_DF">客服端转接会话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/transfer_bot"><span title="机器人转人工" class="linkLabel_J_DF">机器人转人工</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/invite"><span title="客服端邀请会话" class="linkLabel_J_DF">客服端邀请会话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/invite_visitor"><span title="访客端邀请对话框" class="linkLabel_J_DF">访客端邀请对话框</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/rating"><span title="满意度评价" class="linkLabel_J_DF">满意度评价</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/qualitycheck"><span title="智能质检" class="linkLabel_J_DF">智能质检</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/autoreply"><span title="自动回复" class="linkLabel_J_DF">自动回复</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/black"><span title="黑名单" class="linkLabel_J_DF">黑名单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/translate"><span title="消息翻译" class="linkLabel_J_DF">消息翻译</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/queue"><span title="排队逻辑" class="linkLabel_J_DF">排队逻辑</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/routing"><span title="路由分配" class="linkLabel_J_DF">路由分配</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_leave"><span title="留言处理" class="linkLabel_J_DF">留言处理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/license"><span title="License" class="linkLabel_J_DF">License</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sso"><span title="单点登录SSO" class="linkLabel_J_DF">单点登录SSO</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/token"><span title="Token" class="linkLabel_J_DF">Token</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/webhook"><span title="Webhook" class="linkLabel_J_DF">Webhook</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase"><span title="知识库-实现原理" class="linkLabel_J_DF">知识库-实现原理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_faq"><span title="知识库-常见问题FAQ" class="linkLabel_J_DF">知识库-常见问题FAQ</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_feishu"><span title="知识库-飞书文档对接" class="linkLabel_J_DF">知识库-飞书文档对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_file"><span title="知识库-文件上传" class="linkLabel_J_DF">知识库-文件上传</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_text"><span title="知识库-文本录入" class="linkLabel_J_DF">知识库-文本录入</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_webpage"><span title="知识库-网页抓取" class="linkLabel_J_DF">知识库-网页抓取</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_website"><span title="知识库-网站整站抓取" class="linkLabel_J_DF">知识库-网站整站抓取</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/thread"><span title="会话管理" class="linkLabel_J_DF">会话管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/thread_api"><span title="Thread Api" class="linkLabel_J_DF">Thread Api</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ticket"><span title="客服端工单" class="linkLabel_J_DF">客服端工单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ticket_visitor"><span title="访客端工单" class="linkLabel_J_DF">访客端工单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/offline"><span title="离线" class="linkLabel_J_DF">离线</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/robot"><span title="机器人" class="linkLabel_J_DF">机器人</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/i18n"><span title="国际化" class="linkLabel_J_DF">国际化</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/fileupload"><span title="文件上传" class="linkLabel_J_DF">文件上传</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/mqtt"><span title="客服端长连接" class="linkLabel_J_DF">客服端长连接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/stomp"><span title="访客端长连接" class="linkLabel_J_DF">访客端长连接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/assistant"><span title="客服助手" class="linkLabel_J_DF">客服助手</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/grpc"><span title="gRPC" class="linkLabel_J_DF">gRPC</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/screen"><span title="客服大屏" class="linkLabel_J_DF">客服大屏</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ip"><span title="IP管理" class="linkLabel_J_DF">IP管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_audio"><span title="语音通话" class="linkLabel_J_DF">语音通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_call"><span title="电话通话" class="linkLabel_J_DF">电话通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_video"><span title="视频通话" class="linkLabel_J_DF">视频通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sensitive"><span title="敏感信息" class="linkLabel_J_DF">敏感信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/crm"><span title="客户管理" class="linkLabel_J_DF">客户管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/summary"><span title="会话小结" class="linkLabel_J_DF">会话小结</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/private-deployment"><span title="私有部署" class="categoryLinkLabel_fMPM">私有部署</span></a><button aria-label="展开侧边栏分类 &#x27;私有部署&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/llm-provider"><span title="大模型对接" class="categoryLinkLabel_fMPM">大模型对接</span></a><button aria-label="展开侧边栏分类 &#x27;大模型对接&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/solutions"><span title="解决方案" class="categoryLinkLabel_fMPM">解决方案</span></a><button aria-label="展开侧边栏分类 &#x27;解决方案&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/channel"><span title="渠道对接" class="categoryLinkLabel_fMPM">渠道对接</span></a><button aria-label="展开侧边栏分类 &#x27;渠道对接&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/compare"><span title="同业对比" class="categoryLinkLabel_fMPM">同业对比</span></a><button aria-label="展开侧边栏分类 &#x27;同业对比&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/modules"><span title="功能模块" class="categoryLinkLabel_fMPM">功能模块</span></a><button aria-label="展开侧边栏 分类 &#x27;功能模块&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/plugins"><span title="插件扩展" class="categoryLinkLabel_fMPM">插件扩展</span></a><button aria-label="展开侧边栏分类 &#x27;插件扩展&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/performance"><span title="性能测试" class="categoryLinkLabel_fMPM">性能测试</span></a><button aria-label="展开侧边栏分类 &#x27;性能测试&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/faq"><span title="常见问题" class="linkLabel_J_DF">常见问题</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/payment"><span title="费用相关" class="linkLabel_J_DF">费用相关</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/xinchuang"><span title="等保信创" class="linkLabel_J_DF">等保信创</span></a></li></ul></nav><button type="button" title="收起侧边栏" aria-label="收起侧边栏" class="button button--secondary button--outline collapseSidebarButton_wLbt"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_v1u3"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></div></aside><main class="docMainContainer_BpG3"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_C0ya"><div class="docItemContainer_Pevi"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_GkpC" aria-label="页面路径"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="主页面" class="breadcrumbs__link" href="/docs/zh-CN/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_riqW"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/zh-CN/docs/category/development"><span>开发指南</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">客服端转接会话</span></li></ul></nav><div class="tocCollapsible_eHMb theme-doc-toc-mobile tocMobile_maSG"><button type="button" class="clean-btn tocCollapsibleButton_CW2T">本页总览</button></div><div class="theme-doc-markdown markdown"><div class="row"><div class="col col--12 markdown"><header><h1>客服端转接会话</h1></header>
+<div class="theme-admonition theme-admonition-tip admonition_LRQD alert alert--success"><div class="admonitionHeading_BUzK"><span class="admonitionIcon_xl5e"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>提示</div><div class="admonitionContent_Iox6"><p>社区版不支持，请升级到企业版或平台版。请替换<a href="/docs/zh-CN/docs/development/license">licenseKey</a></p></div></div>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="概述">概述<a href="#概述" class="hash-link" aria-label="概述的直接链接" title="概述的直接链接" translate="no">​</a></h2>
+<p>转接会话是微语客服系统的核心协作功能，专门用于客服人员将当前会话转接给更合适的客服或专家团队。通过智能转接机制，实现专业化分工协作，确保客户问题能够得到最专业的解答，提升服务质量和客户满意度。</p>
+<div class="theme-admonition theme-admonition-info admonition_LRQD alert alert--info"><div class="admonitionHeading_BUzK"><span class="admonitionIcon_xl5e"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>功能说明</div><div class="admonitionContent_Iox6"><p>本文档主要介绍<strong>客服间会话转接功能</strong>。如需了解机器人转人工功能，请参考：<a href="/docs/zh-CN/docs/development/transfer_bot">机器人转人工</a></p></div></div>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="预览">预览<a href="#预览" class="hash-link" aria-label="预览的直接链接" title="预览的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="会话转接入口">会话转接入口<a href="#会话转接入口" class="hash-link" aria-label="会话转接入口的直接链接" title="会话转接入口的直接链接" translate="no">​</a></h3>
+<p><img decoding="async" loading="lazy" alt="thread_transfer" src="/docs/zh-CN/assets/images/thread_transfer-c09f1a76664b4d4393c5b8d6a8146c91.png" width="3406" height="1538" class="img_Xq2y"></p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="创建会话转接">创建会话转接<a href="#创建会话转接" class="hash-link" aria-label="创建会话转接的直接链接" title="创建会话转接的直接链接" translate="no">​</a></h3>
+<p><img decoding="async" loading="lazy" alt="thread_transfer_create" src="/docs/zh-CN/assets/images/thread_transfer_create-7624801aac79ce6d8c7a91499e6ed9e9.png" width="3398" height="1524" class="img_Xq2y"></p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="核心价值">核心价值<a href="#核心价值" class="hash-link" aria-label="核心价值的直接链接" title="核心价值的直接链接" translate="no">​</a></h3>
+<ul>
+<li><strong>专业分工</strong>：将问题分配给最具专业能力的客服处理</li>
+<li><strong>负载均衡</strong>：平衡客服工作量，避免某个客服过载</li>
+<li><strong>服务连续性</strong>：确保会话无缝衔接，客户感受到连贯的服务体验</li>
+<li><strong>质量提升</strong>：专业对口处理提升问题解决率和客户满意度</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="转接场景">转接场景<a href="#转接场景" class="hash-link" aria-label="转接场景的直接链接" title="转接场景的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-专业技能转接">🎯 专业技能转接<a href="#-专业技能转接" class="hash-link" aria-label="🎯 专业技能转接的直接链接" title="🎯 专业技能转接的直接链接" translate="no">​</a></h3>
+<p>将会话  转接给拥有特定专业技能的客服。</p>
+<p><strong>典型场景：</strong></p>
+<ul>
+<li><strong>技术专家转接</strong>：复杂技术问题需要专业技术支持</li>
+<li><strong>语言服务转接</strong>：外语客户需要相应语言的客服</li>
+<li><strong>业务专员转接</strong>：特定业务领域的专业咨询</li>
+<li><strong>高级客服转接</strong>：疑难问题需要资深客服处理</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-部门间转接">🏢 部门间转接<a href="#-部门间转接" class="hash-link" aria-label="🏢 部门间转接的直接链接" title="🏢 部门间转接的直接链接" translate="no">​</a></h3>
+<p>跨部门的专业化服务转接。</p>
+<p><strong>转接方向：</strong></p>
+<ul>
+<li><strong>销售部门</strong>：产品咨询、价格方案、商务洽谈</li>
+<li><strong>技术部门</strong>：技术支持、故障排查、系统集成</li>
+<li><strong>售后部门</strong>：退换货处理、质量问题、保修服务</li>
+<li><strong>财务部门</strong>：账单查询、付款确认、发票处理</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="️-负载均衡转接">⚖️ 负载均衡转接<a href="#️-负载均衡转接" class="hash-link" aria-label="⚖️ 负载均衡转接的直接链接" title="⚖️ 负载均衡转接的直接链接" translate="no">​</a></h3>
+<p>优化客服工作量分配的转接。</p>
+<p><strong>转接时机：</strong></p>
+<ul>
+<li><strong>工作量过载</strong>：当前客服接待会话数量过多</li>
+<li><strong>换班交接</strong>：工作时间结束需要交接给接班客服</li>
+<li><strong>临时离开</strong>：客服临时有事需要其他同事代理</li>
+<li><strong>专注处理</strong>：需要专心处理某个复杂问题时转移其他会话</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="主要功能">主要功能<a href="#主要功能" class="hash-link" aria-label="主要功能的直接链接" title="主要功能的 直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-智能转接推荐">🎯 智能转接推荐<a href="#-智能转接推荐" class="hash-link" aria-label="🎯 智能转接推荐的直接链接" title="🎯 智能转接推荐的直接链接" translate="no">​</a></h3>
+<p>系统基于多个维度智能推荐最合适的转接目标。</p>
+<p><strong>推荐依据：</strong></p>
+<ul>
+<li><strong>技能匹配度</strong>：根据问题类型匹配具备相应技能的客服</li>
+<li><strong>工作负载</strong>：优先推荐当前接待会话较少的客服</li>
+<li><strong>在线状态</strong>：只推荐当前在线且可接待的客服</li>
+<li><strong>历史绩效</strong>：参考客服的历史服务评分和解决率</li>
+<li><strong>专业领域</strong>：根据客服的专业标签匹配问题领域</li>
+</ul>
+<p><strong>推荐界面：</strong></p>
+<ul>
+<li>按推荐度排序显示可转接的客服列表</li>
+<li>显示每个客服的当前状态和负载情况</li>
+<li>提供客服技能标签和专业领域信息</li>
+<li>支持按部门、技能、状态筛选客服</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-转接备注功能">📝 转接备注功能<a href="#-转接备注功能" class="hash-link" aria-label="📝 转接备注功能的直接链接" title="📝 转接备注功能的直接链接" translate="no">​</a></h3>
+<p>为转接提供详细的备注信息，确保接手客服快速了解情况。</p>
+<p><strong>备注内容建议：</strong></p>
+<ul>
+<li><strong>问题描述</strong>：客户遇到的具体问题</li>
+<li><strong>处理进展</strong>：已经采取的处理措施</li>
+<li><strong>客户情况</strong>：客户的基本信息和特殊要求</li>
+<li><strong>注意事项</strong>：需要特别关注的重点</li>
+<li><strong>紧急程度</strong>：问题的紧急等级</li>
+</ul>
+<p><strong>备注模板：</strong></p>
+<p>系统提供常用备注模板，提升转接效率：</p>
+<ul>
+<li>技术问题转接模 板</li>
+<li>投诉处理转接模板</li>
+<li>VIP客户转接模板</li>
+<li>售后服务转接模板</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-转接状态管理">⏰ 转接状态管理<a href="#-转接状态管理" class="hash-link" aria-label="⏰ 转接状态管理的直接链接" title="⏰ 转接状态管理的直接链接" translate="no">​</a></h3>
+<p>完整的转接状态流转，确保转接过程可追溯。</p>
+<p><strong>状态类型：</strong></p>
+<ul>
+<li><strong>待处理</strong>：转接请求已发送，等待目标客服响应</li>
+<li><strong>已接受</strong>：目标客服已接受转接，开始处理</li>
+<li><strong>已拒绝</strong>：目标客服拒绝转接，需要重新选择</li>
+<li><strong>已超时</strong>：转接请求超时未响应，自动取消</li>
+<li><strong>已取消</strong>：发起人主动取消转接请求</li>
+</ul>
+<p><strong>超时机制：</strong></p>
+<ul>
+<li>默认转接请求30秒后自动超时</li>
+<li>超时后自动推荐其他合适的客服</li>
+<li>支持自定义超时时间设置</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-无缝衔接机制">🔄 无缝衔接机制<a href="#-无缝衔接机制" class="hash-link" aria-label="🔄 无缝衔接机制的直接链接" title="🔄 无缝衔接机制的直接链接" translate="no">​</a></h3>
+<p>确保转接过程中客户体验的连续性。</p>
+<p><strong>客户端体验：</strong></p>
+<ul>
+<li>转接过程中客户可以继续发送消息</li>
+<li>显示转接状态提示，告知客户当前进展</li>
+<li>新客服接手后自动显示欢迎信息</li>
+<li>完整保留历史会话记录</li>
+</ul>
+<p><strong>客服端体验：</strong></p>
+<ul>
+<li>接手前可预览完整的会话历史</li>
+<li>显示转接备注和客户基本信息</li>
+<li>提供快速了解客户情况的总结</li>
+<li>支持拒绝转接并说明原因</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="使用指南">使用指南<a href="#使用指南" class="hash-link" aria-label="使用指南的直接链接" title="使用指南的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="发起转接">发起转接<a href="#发起转接" class="hash-link" aria-label="发起转接的直接链接" title="发起转接的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="从客服端发起">从客服端发起<a href="#从客服端发起" class="hash-link" aria-label="从客服端发起的直接链接" title="从客服端发起的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>选择转接功能</strong></p>
+<ul>
+<li>在会话界面点击&quot;转接&quot;按钮</li>
+<li>或使用快捷键 Ctrl+T</li>
+</ul>
+</li>
+<li>
+<p><strong>选择转接目标</strong></p>
+<ul>
+<li>查看系统推荐的客服列表</li>
+<li>使用搜索功能查找特定客服</li>
+<li>按部门或技能筛选客服</li>
+</ul>
+</li>
+<li>
+<p><strong>填写转接备注</strong></p>
+<ul>
+<li>简要描述客户问题</li>
+<li>说明已采取的处理措施</li>
+<li>标注特殊注意事项</li>
+</ul>
+</li>
+<li>
+<p><strong>发送转接请求</strong></p>
+<ul>
+<li>确认转接信息无误</li>
+<li>点击&quot;确认转接&quot;发送请求</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="系统智能转接">系统智能转接<a href="#系统智能转接" class="hash-link" aria-label="系统智能转接的直接链接" title="系统智能转接的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>规则触发转接</strong></p>
+<ul>
+<li>基于预设规则自动转接</li>
+<li>如VIP客户自动转接至专门团队</li>
+<li>特定关键词触发专业转接</li>
+<li>工作时间结束自动转接给值班客服</li>
+</ul>
+</li>
+<li>
+<p><strong>负载均衡转接</strong></p>
+<ul>
+<li>系统检测到客服负载过重时自动提示转接</li>
+<li>智能推荐当前空闲的合适客服</li>
+<li>支持批量转接功能</li>
+<li>紧急情况下的自动分流机制</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="接受转接">接受转接<a href="#接受转接" class="hash-link" aria-label="接受转接的直接链接" title="接受转接的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="接收转接通知">接收转接通知<a href="#接收转接通知" class="hash-link" aria-label="接收转接通知的直接链接" title="接收转接通知的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>实时通知</strong></p>
+<ul>
+<li>桌面通知提醒</li>
+<li>声音提醒（可配置）</li>
+<li>会话列表高亮显示</li>
+</ul>
+</li>
+<li>
+<p><strong>转接详情查看</strong></p>
+<ul>
+<li>查看转接发起人信息</li>
+<li>阅读转接备注内容</li>
+<li>预览客户会话历史</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="处理转接请求">处理转接请求<a href="#处理转接请求" class="hash-link" aria-label="处理转接请求的直接链接" title="处理转接请求的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>接受转接</strong></p>
+<ul>
+<li>点击&quot;接受&quot;按钮</li>
+<li>系统自动切换会话所有权</li>
+<li>开始为客户提供服务</li>
+</ul>
+</li>
+<li>
+<p><strong>拒绝转接</strong></p>
+<ul>
+<li>点击&quot;拒绝&quot;按钮</li>
+<li>填写拒绝原因（可选）</li>
+<li>系统自动寻找其他合适客服</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="转接管理">转接管理<a href="#转接管理" class="hash-link" aria-label="转接管理的直接链接" title="转接管理的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="转接记录查看">转接记录查看<a href="#转接记录查看" class="hash-link" aria-label="转接记录查看的直接链接" title="转接记录查看的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>转接历史</strong></p>
+<ul>
+<li>查看所有转接记录</li>
+<li>按时间、状态、参与人筛选</li>
+<li>导出转接数据报表</li>
+</ul>
+</li>
+<li>
+<p><strong>转接分析</strong></p>
+<ul>
+<li>统计转接成功率</li>
+<li>分析转接原因分布</li>
+<li>评估转接效率</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="转接设置配置">转接设置配置<a href="#转接设置配置" class="hash-link" aria-label="转接设置配置的直接链接" title="转接设置配置的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>个人设置</strong></p>
+<ul>
+<li>设置转接通知方式</li>
+<li>配置自动接受规则</li>
+<li>设置专业技能标签</li>
+</ul>
+</li>
+<li>
+<p><strong>团队设置</strong></p>
+<ul>
+<li>配置转接路由规则</li>
+<li>设置部门转接权限</li>
+<li>定制转接模板</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="最佳实践">最佳实践<a href="#最佳实践" class="hash-link" aria-label="最佳实践的直接链接" title="最佳实践的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="转接时机选择">转接时机选择<a href="#转接时机选择" class="hash-link" aria-label="转接时机选择的直接链接" title="转接时机选择的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="何时应该转接">何时应该转接<a href="#何时应该转接" class="hash-link" aria-label="何时应该转接的直接链接" title="何时应该转接的直接链接" translate="no">​</a></h4>
+<p><strong>DO - 建议转接的情况：</strong></p>
+<ul>
+<li>问题超出个人专业能力范围</li>
+<li>客户要求特定专家或部门服务</li>
+<li>当前工作负载过重影响服务质量</li>
+<li>客户情绪激动需要专业安抚</li>
+<li>涉及敏感问题需要上级处理</li>
+</ul>
+<p><strong>DON&#x27;T - 不建议转接的情况：</strong></p>
+<ul>
+<li>简单问题可以通过查询知识库解决</li>
+<li>已经与客户建立良好沟通关系</li>
+<li>问题接近解决只需要少量时间</li>
+<li>频繁转接影响客户体验</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="转接备注撰写">转接备注撰写<a href="#转接备注撰写" class="hash-link" aria-label="转接备注撰写的直接链接" title="转接备注撰写的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="高质量备注要素">高质量备注要素<a href="#高质量备注要素" class="hash-link" aria-label="高质量备注要素的直接链接" title="高质量备注要素的直接链接" translate="no">​</a></h4>
+<p><strong>DO - 良好的备注实践：</strong></p>
+<ul>
+<li>简洁明了地描述问题核心</li>
+<li>列出已尝试的解决方案</li>
+<li>标注客户的特殊需求或情况</li>
+<li>提及时间敏感性或紧急程度</li>
+<li>使用专业术语但保持通俗易懂</li>
+</ul>
+<p><strong>DON&#x27;T - 避免的备注问题：</strong></p>
+<ul>
+<li>备注过于简单或含糊不清</li>
+<li>遗漏重要的背景信息</li>
+<li>使用过多技术术语或缩写</li>
+<li>不说明转接的具体原因</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="备注模板示例">备注模板示例<a href="#备注模板示例" class="hash-link" aria-label="备注模板示例的直接链接" title="备注模板示例的直接链接" translate="no">​</a></h4>
+<div class="language-text codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-text codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token plain">技术问题转接：</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">客户反馈：[具体问题描述]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">已尝试：[处理措施]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">客户情况：[VIP等级/重要客户]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">紧急程度：[高/中/低]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">备注：[其他重要信息]</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="接手转接处理">接手转接处理<a href="#接手转接处理" class="hash-link" aria-label="接手转接处理的直接链接" title="接手转接处理的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="快速上手技巧">快速上手技巧<a href="#快速上手技巧" class="hash-link" aria-label="快速上手技巧的直接链接" title="快速上手技巧的直接链接" translate="no">​</a></h4>
+<p><strong>DO - 高效接手方法：</strong></p>
+<ul>
+<li>仔细阅读转接备注和会话历史</li>
+<li>向客户确认问题理解正确</li>
+<li>快速建立专业可信的第一印象</li>
+<li>基于已有信息制定解决方案</li>
+<li>适时感谢前一位客服的工作</li>
+</ul>
+<p><strong>DON&#x27;T - 接手时的错误：</strong></p>
+<ul>
+<li>忽略转接备注直接询问问题</li>
+<li>重复前客服已经确认的信息</li>
+<li>对转接过程表示不满或困惑</li>
+<li>承诺无法兑现的解决方案</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="消息类型">消息类型<a href="#消息类型" class="hash-link" aria-label="消息类型的直接链接" title="消息类型的直接链接" translate="no">​</a></h3>
+<p>转接过程中的消息类型定义：</p>
+<ul>
+<li><code>TRANSFER</code>: 转接发起消息</li>
+<li><code>TRANSFER_ACCEPT</code>: 转接接受消息</li>
+<li><code>TRANSFER_REJECT</code>: 转接拒绝消息</li>
+<li><code>TRANSFER_TIMEOUT</code>: 转接超时消息</li>
+<li><code>TRANSFER_CANCEL</code>: 转接取消消息</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="权限控制">权限控制<a href="#权限控制" class="hash-link" aria-label="权限控制的直接链接" title="权限控制的直接链接" translate="no">​</a></h3>
+<ul>
+<li><strong>转接权限</strong>：只有具备转接权限的客服才能发起转接</li>
+<li><strong>接收权限</strong>：可以设置哪些客服能够接收转接</li>
+<li><strong>部门限制</strong>：支持跨部门转接的权限控制</li>
+<li><strong>级别限制</strong>：上级可以接收下级转接，下级需要权限才能向上级转接</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="监控与分析">监控与分析<a href="#监控与分析" class="hash-link" aria-label="监控与分析的直接链接" title="监控与分析的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="转接数据统计">转接数据统计<a href="#转接数据统计" class="hash-link" aria-label="转接数据统计的直接链接" title="转接数据统计的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="关键指标">关键指标<a href="#关键指标" class="hash-link" aria-label="关键指标的直接链接" title="关键指标的直接链接" translate="no">​</a></h4>
+<ul>
+<li><strong>转接成功率</strong>：成功转接数量 / 总转接请求数量</li>
+<li><strong>平均响应时间</strong>：从转接发起到接受的平均时间</li>
+<li><strong>转接拒绝率</strong>：被拒绝的转接请求比例</li>
+<li><strong>客户满意度</strong>：转接后的客户评价分数</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="分析维度">分析维度<a href="#分析维度" class="hash-link" aria-label="分析维度的直接链接" title="分析维度的直接链接" translate="no">​</a></h4>
+<ul>
+<li><strong>时间维度</strong>：按小时、天、周、月统计转接数据</li>
+<li><strong>人员维度</strong>：各客服的转接发起和接受情况</li>
+<li><strong>部门维度</strong>： 部门内转接 vs 跨部门转接统计</li>
+<li><strong>原因维度</strong>：转接原因的分类统计</li>
+<li><strong>技能维度</strong>：技能匹配转接的成功率分析</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="转接优化建议">转接优化建议<a href="#转接优化建议" class="hash-link" aria-label="转接优化建议的直接链接" title="转接优化建议的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="系统优化">系统优化<a href="#系统优化" class="hash-link" aria-label="系统优化的直接链接" title="系统优化的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>智能推荐优化</strong></p>
+<ul>
+<li>基于历史数据改进推荐算法</li>
+<li>学习客服专业能力和偏好</li>
+<li>优化负载均衡策略</li>
+</ul>
+</li>
+<li>
+<p><strong>流程优化</strong></p>
+<ul>
+<li>简化转接操作步骤</li>
+<li>提供更丰富的快捷操作</li>
+<li>优化转接通知机制</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="人员培训">人员培训<a href="#人员培训" class="hash-link" aria-label="人员培训的直接链接" title="人员培训的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>转接技能培训</strong></p>
+<ul>
+<li>如何判断转接时机</li>
+<li>如何撰写有效备注</li>
+<li>如何快速接手转接会话</li>
+</ul>
+</li>
+<li>
+<p><strong>专业能力提升</strong></p>
+<ul>
+<li>扩展客服专业技能范围</li>
+<li>减少不必要的转接</li>
+<li>提升一次解决率</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="高级特性">高级特性<a href="#高级特性" class="hash-link" aria-label="高级特性的直接链接" title="高级特性的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="智能匹配">智能匹配<a href="#智能匹配" class="hash-link" aria-label="智能匹配的直接链接" title="智能匹配的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="技能匹配算法">技能匹配算法<a href="#技能匹配算法" class="hash-link" aria-label="技能匹配算法的直接链接" title="技能匹配算法的直接链接" translate="no">​</a></h4>
+<p>系统支持基于技能标签的智能匹配：</p>
+<ol>
+<li>
+<p><strong>技能权重计算</strong></p>
+<ul>
+<li>主要技能匹配度：80%</li>
+<li>次要技能匹配度：60%</li>
+<li>通用技能匹配度：40%</li>
+</ul>
+</li>
+<li>
+<p><strong>经验评分</strong></p>
+<ul>
+<li>处理类似问题的成功率</li>
+<li>客户满意度评分</li>
+<li>历史处理时长</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="工作负载均衡">工作负载均衡<a href="#工作负载均衡" class="hash-link" aria-label="工作负载均衡的直接链接" title="工作负载均衡的直接链接" translate="no">​</a></h4>
+<div class="language-typescript codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-typescript codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">interface</span><span class="token plain"> </span><span class="token class-name maybe-class-name">LoadBalanceConfig</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  maxConcurrentSessions</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">number</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  urgencyWeight</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">number</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  skillWeight</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">number</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  experienceWeight</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">number</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="转接队列管理">转接队列管理<a href="#转接队列管理" class="hash-link" aria-label="转接队列管理的直接链接" title="转接队列管理的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="优先级队列">优先级队列<a href="#优先级队列" class="hash-link" aria-label="优先级队列的直接链接" title="优先级队列的直接链接" translate="no">​</a></h4>
+<ul>
+<li><strong>紧急队列</strong>：VIP客户、投诉等高优先级</li>
+<li><strong>技能队列</strong>：按技能分类的专业队列</li>
+<li><strong>普通队列</strong>：常规业务咨询</li>
+<li><strong>溢出队列</strong>：超出处理能力的会话</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="排队策略">排队策略<a href="#排队策略" class="hash-link" aria-label="排队策略的直接 链接" title="排队策略的直接链接" translate="no">​</a></h4>
+<ol>
+<li><strong>FIFO（先进先出）</strong>：默认策略</li>
+<li><strong>优先级排序</strong>：按客户等级和问题紧急度</li>
+<li><strong>技能优先</strong>：优先匹配专业技能</li>
+<li><strong>负载均衡</strong>：平衡各客服工作量</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="转接历史链">转接历史链<a href="#转接历史链" class="hash-link" aria-label="转接历史链的直接链接" title="转接历史链的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="链路追踪">链路追踪<a href="#链路追踪" class="hash-link" aria-label="链路追踪的直接链接" title="链路追踪的直接链接" translate="no">​</a></h4>
+<p>记录完整的转接路径：</p>
+<div class="language-text codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-text codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token plain">客户 → 客服A（销售） → 客服B（技术） → 专家C（高级技术）</span><br></span></code></pre></div></div>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="上下文继承">上下文继承<a href="#上下文继承" class="hash-link" aria-label="上下文继承的直接链接" title="上下文继承的直接链接" translate="no">​</a></h4>
+<ul>
+<li><strong>对话历史</strong>：完整保留客户交流记录</li>
+<li><strong>客户信息</strong>：基础信息和标签数据</li>
+<li><strong>问题摘要</strong>：转接原因和核心问题</li>
+<li><strong>处理记录</strong>：各环节的处理情况</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="常见问题">常见问题<a href="#常见问题" class="hash-link" aria-label="常见问题的直接链接" title="常见问题的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-转接后客户是否能看到会话历史">Q: 转接后客户是否能看到会话历史？<a href="#q-转接后客户是否能看到会话历史" class="hash-link" aria-label="Q: 转接后客户是否能看到会话历史？的直接链接" title="Q: 转接后客户是否能看到会话历史？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 是的，客户端会保持完整的会话历史记录。转接只是改变服务的客服人员，客户看到的是连续的对话体验。新客服也能看到完整的历史记录，确保服务的连贯性。</p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-如果目标客服不在线怎么办">Q: 如果目标客服不在线怎么办？<a href="#q-如果目标客服不在线怎么办" class="hash-link" aria-label="Q: 如果目标客服不在线怎么办？的直接链接" title="Q: 如果目标客服不在线怎么办？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 系统只会向在线且可接待的客服发送转接请求。如果目标客服离线，系统会：</p>
+<ol>
+<li>自动从推荐列表中移除离线客服</li>
+<li>推荐其他在线的合适客服</li>
+<li>如果没有合适的在线客服，会提示稍后再试或留言</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-转接请求被拒绝后怎么处理">Q: 转接请求被拒绝后怎么处理？<a href="#q-转接请求被拒绝后怎么处理" class="hash-link" aria-label="Q: 转接请求被拒绝后怎么处理？的直接链接" title="Q: 转接请求被拒绝后怎么处理？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 当转接请求被拒绝时：</p>
+<ol>
+<li>系统会通知发起转接的客服</li>
+<li>显示拒绝原因（如果有）</li>
+<li>自动推荐其他合适的客服</li>
+<li>发起人可以选择其他客服重新发送转接请求</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-可以同时向多个客服发送转接请求吗">Q: 可以同时向多个客服发送转接请求吗？<a href="#q-可以同时向多个客服发送转接请求吗" class="hash-link" aria-label="Q: 可以同时向多个客服发送转接请求吗？的直接链接" title="Q: 可以同时向多个客服发送转接请求吗？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 为了避免冲突和混乱，系统不支持同时向多个客服发送转接请求。建议按优先级逐个尝试转接，或使用系统的智能推荐功能。</p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-转接过程中客户发送的消息会丢失吗">Q: 转接过程中客户发送的消息会丢失吗？<a href="#q-转接过程中客户发送的消息会丢失吗" class="hash-link" aria-label="Q: 转接过程中客户发送的消息会丢失吗？的直接链接" title="Q: 转接过程中客户发送的消息会丢失吗？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 不会丢失。转接过程中客户发送的所有消息都会被保存，新接手的客服能够看到转接期间的所有消息内容。</p>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-如何设置转接的超时时间">Q: 如何设置转接的超时时间？<a href="#q-如何设置转接的超时时间" class="hash-link" aria-label="Q: 如何设置转接的超时时间？的直接链接" title="Q: 如何设置转接的超时时间？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 管理员可以在系统设置中配置转接请求的超时时间，默认为30秒。超时后系统会自动取消转接请求并推荐其他客服。</p></div></div></div><div class="row"><div class="col col--12"><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col"><a href="https://github.com/bytedesk/bytedesk-docs/blob/main/i18n/zh-CN/docusaurus-plugin-content-docs/current/development/transfer.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_D3U9" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>编辑此页</a></div><div class="col lastUpdated_S4mo"><span class="theme-last-updated">最后<!-- -->由 <b>jack ning</b> <!-- -->于 <b><time datetime="2025-10-29T02:14:35.000Z" itemprop="dateModified">2025年10月29日</time></b> <!-- -->更新</span></div></div><div class="feedbackContainer_YCD2"><div class="feedbackQuestion_oWvU"><p>这页文档对您有帮助吗？</p><div class="buttonContainer_Zim_"><button class="feedbackButton_fT9j positive_qcHW">有帮助 👍</button><button class="feedbackButton_fT9j negative_CWIX">需改进 👎</button></div></div></div></footer></div></div></article><div class="row"><div class="col col--12"><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件选项卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/zh-CN/docs/development/statistic"><div class="pagination-nav__sublabel">上一页</div><div class="pagination-nav__label">数据统计</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/zh-CN/docs/development/transfer_bot"><div class="pagination-nav__sublabel">下一页</div><div class="pagination-nav__label">机器人转人工</div></a></nav></div></div></div></div><div class="col col--3"><div class="tableOfContents_XgtV thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#概述" class="table-of-contents__link toc-highlight">概述</a></li><li><a href="#预览" class="table-of-contents__link toc-highlight">预览</a><ul><li><a href="#会话转接入口" class="table-of-contents__link toc-highlight">会话转接入口</a></li><li><a href="#创建会话转接" class="table-of-contents__link toc-highlight">创建会话转接</a></li><li><a href="#核心价值" class="table-of-contents__link toc-highlight">核心价值</a></li></ul></li><li><a href="#转接场景" class="table-of-contents__link toc-highlight">转接场景</a><ul><li><a href="#-专业技能转接" class="table-of-contents__link toc-highlight">🎯 专业技能转接</a></li><li><a href="#-部门间转接" class="table-of-contents__link toc-highlight">🏢 部门间转接</a></li><li><a href="#️-负载均衡转接" class="table-of-contents__link toc-highlight">⚖️ 负载均衡转接</a></li></ul></li><li><a href="#主要功能" class="table-of-contents__link toc-highlight">主要功能</a><ul><li><a href="#-智能转接推荐" class="table-of-contents__link toc-highlight">🎯 智能转接推荐</a></li><li><a href="#-转接备注功能" class="table-of-contents__link toc-highlight">📝 转接备注功能</a></li><li><a href="#-转接状态管理" class="table-of-contents__link toc-highlight">⏰ 转接状态管理</a></li><li><a href="#-无缝衔接机制" class="table-of-contents__link toc-highlight">🔄 无缝衔接机制</a></li></ul></li><li><a href="#使用指南" class="table-of-contents__link toc-highlight">使用指南</a><ul><li><a href="#发起转接" class="table-of-contents__link toc-highlight">发起转接</a><ul><li><a href="#从客服端发起" class="table-of-contents__link toc-highlight">从客服端发起</a></li><li><a href="#系统智能转接" class="table-of-contents__link toc-highlight">系统智能转接</a></li></ul></li><li><a href="#接受转接" class="table-of-contents__link toc-highlight">接受转接</a><ul><li><a href="#接收转接通知" class="table-of-contents__link toc-highlight">接收转接通知</a></li><li><a href="#处理转接请求" class="table-of-contents__link toc-highlight">处理转接请求</a></li></ul></li><li><a href="#转接管理" class="table-of-contents__link toc-highlight">转接管理</a><ul><li><a href="#转接记录查看" class="table-of-contents__link toc-highlight">转接记录查看</a></li><li><a href="#转接设置配置" class="table-of-contents__link toc-highlight">转接设置配置</a></li></ul></li></ul></li><li><a href="#最佳实践" class="table-of-contents__link toc-highlight">最佳实践</a><ul><li><a href="#转接时机选择" class="table-of-contents__link toc-highlight">转接时机选择</a><ul><li><a href="#何时应该转接" class="table-of-contents__link toc-highlight">何时应该转接</a></li></ul></li><li><a href="#转接备注撰写" class="table-of-contents__link toc-highlight">转接备注撰写</a><ul><li><a href="#高质量备注要素" class="table-of-contents__link toc-highlight">高质量备注要素</a></li><li><a href="#备注模板示例" class="table-of-contents__link toc-highlight">备注模板示例</a></li></ul></li><li><a href="#接手转接处理" class="table-of-contents__link toc-highlight">接手转接处理</a><ul><li><a href="#快速上手技巧" class="table-of-contents__link toc-highlight">快速上手技巧</a></li></ul></li><li><a href="#消息类型" class="table-of-contents__link toc-highlight">消息类型</a></li><li><a href="#权限控制" class="table-of-contents__link toc-highlight">权限控制</a></li></ul></li><li><a href="#监控与分析" class="table-of-contents__link toc-highlight">监控与分析</a><ul><li><a href="#转接数据统计" class="table-of-contents__link toc-highlight">转接数据统计</a><ul><li><a href="#关键指标" class="table-of-contents__link toc-highlight">关键指标</a></li><li><a href="#分析维度" class="table-of-contents__link toc-highlight">分析维度</a></li></ul></li><li><a href="#转接优化建议" class="table-of-contents__link toc-highlight">转接优化建议</a><ul><li><a href="#系统优化" class="table-of-contents__link toc-highlight">系统优化</a></li><li><a href="#人员培训" class="table-of-contents__link toc-highlight">人员培训</a></li></ul></li></ul></li><li><a href="#高级特性" class="table-of-contents__link toc-highlight">高级特性</a><ul><li><a href="#智能匹配" class="table-of-contents__link toc-highlight">智能匹配</a><ul><li><a href="#技能匹配算法" class="table-of-contents__link toc-highlight">技能匹配算法</a></li><li><a href="#工作负载均衡" class="table-of-contents__link toc-highlight">工作负载均衡</a></li></ul></li><li><a href="#转接队列管理" class="table-of-contents__link toc-highlight">转接队列管理</a><ul><li><a href="#优先级队列" class="table-of-contents__link toc-highlight">优先级队列</a></li><li><a href="#排队策略" class="table-of-contents__link toc-highlight">排队策略</a></li></ul></li><li><a href="#转接历史链" class="table-of-contents__link toc-highlight">转接历史链</a><ul><li><a href="#链路追踪" class="table-of-contents__link toc-highlight">链路追踪</a></li><li><a href="#上下文继承" class="table-of-contents__link toc-highlight">上下文继承</a></li></ul></li></ul></li><li><a href="#常见问题" class="table-of-contents__link toc-highlight">常见问题</a><ul><li><a href="#q-转接后客户是否能看到会话历史" class="table-of-contents__link toc-highlight">Q: 转接后客户是否能看到会话历史？</a></li><li><a href="#q-如果目标客服不在线怎么办" class="table-of-contents__link toc-highlight">Q: 如果目标客服不在线怎么办？</a></li><li><a href="#q-转接请求被拒绝后怎么处理" class="table-of-contents__link toc-highlight">Q: 转接请求被拒绝后怎么处理？</a></li><li><a href="#q-可以同时向多个客服发送转接请求吗" class="table-of-contents__link toc-highlight">Q: 可以同时向多个客服发送转接请求吗？</a></li><li><a href="#q-转接过程中客户发送的消息会丢失吗" class="table-of-contents__link toc-highlight">Q: 转接过程中客户发送的消息会丢失吗？</a></li><li><a href="#q-如何设置转接的超时时间" class="table-of-contents__link toc-highlight">Q: 如何设置转接的超时时间？</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">文档</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/docs/intro">教程</a></li><li class="footer__item"><a href="https://www.weiyuai.cn/contact.html" target="_blank" rel="noopener noreferrer" class="footer__link-item">联系我们<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">社区</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://twitter.com/bytedeskai" target="_blank" rel="noopener noreferrer" class="footer__link-item">Twitter<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.weiyuai.cn" target="_blank" rel="noopener noreferrer" class="footer__link-item">微信公众号<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">更多</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/blog">博客</a></li><li class="footer__item"><a href="https://github.com/bytedesk/bytedesk" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/docs/payment">价格方案</a></li><li class="footer__item"><a href="https://www.weiyuai.cn/privacy.html" target="_blank" rel="noopener noreferrer" class="footer__link-item">隐私政策<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 weiyuai.cn, Inc. 京ICP备17041763号-20. 保留所有权利。</div></div></div></footer></div>
+</body>
+</html>

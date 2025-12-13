@@ -14,7 +14,6 @@
 package com.bytedesk.core.group;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -35,20 +34,18 @@ public class GroupEntityListener {
 
     @PostPersist
     public void postPersist(GroupEntity group) {
-        GroupEntity clonedGroup = SerializationUtils.clone(group);
-        log.info("GroupEntityListener postPersist {}", clonedGroup.getUid());
+        log.info("GroupEntityListener postPersist {}", group.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new GroupCreateEvent(this, clonedGroup));
+        bytedeskEventPublisher.publishEvent(new GroupCreateEvent(this, group));
     }
 
     @PostUpdate
     public void postUpdate(GroupEntity group) {
-        GroupEntity clonedGroup = SerializationUtils.clone(group);
-        log.info("GroupEntityListener postUpdate {}", clonedGroup.getUid());
+        log.info("GroupEntityListener postUpdate {}", group.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new GroupUpdateEvent(this, clonedGroup));
+        bytedeskEventPublisher.publishEvent(new GroupUpdateEvent(this, group));
     }
 
 }

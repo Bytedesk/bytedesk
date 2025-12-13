@@ -36,6 +36,7 @@ import java.util.Map;
 public class ChatClientTestController {
 
     private final ChatClient chatClient;
+    
     private final BytedeskProperties bytedeskProperties;
 
     /**

@@ -16,7 +16,6 @@ package com.bytedesk.service.agent;
 // import java.util.Objects;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -36,15 +35,14 @@ public class AgentEntityListener {
     @PostPersist
     public void postPersist(AgentEntity agent) {
         // topicService.create(agent.getUid(), agent.getUser().getUid());
-        AgentEntity cloneAgent = SerializationUtils.clone(agent);
-        UserEntity user = cloneAgent.getMember().getUser();
-        log.info("agent postPersist {} user {}", cloneAgent.getUid(), user.getUid());
+        UserEntity user = agent.getMember().getUser();
+        log.info("agent postPersist {} user {}", agent.getUid(), user.getUid());
         // 这里可以记录日志、发送通知等
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         // 默认订阅客服主题
-        bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getOrgAgentTopic(cloneAgent.getUid()), user.getUid());
-        bytedeskEventPublisher.publishEvent(new AgentCreateEvent(this, cloneAgent));
+        bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getOrgAgentTopic(agent.getUid()), user.getUid());
+        bytedeskEventPublisher.publishEvent(new AgentCreateEvent(this, agent));
     }
 
     @PostUpdate

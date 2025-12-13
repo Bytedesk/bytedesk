@@ -338,7 +338,6 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
     private static final String ZAI_FILE_URL = "file_url";
 
     // 保留：如需自定义解析辅助，可在此处添加
-
     private String extractFinalTextFromResponse(ChatCompletionResponse response) {
         try {
             if (response == null || response.getData() == null || response.getData().getChoices() == null

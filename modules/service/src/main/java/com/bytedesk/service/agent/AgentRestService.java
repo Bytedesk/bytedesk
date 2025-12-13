@@ -222,13 +222,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             }
         }
         //
-        // TODO: Settings should be managed through AgentSettingsEntity
-        // All configuration settings are now managed via agent.getSettings() reference
-        // MessageLeaveSettings messageLeaveSettings = serviceSettingsService.formatAgentMessageLeaveSettings(request);
-        // ServiceSettings serviceSettings = serviceSettingsService.formatAgentServiceSettings(request);
-        // AutoReplySettings autoReplySettings = serviceSettingsService.formatAgentAutoReplySettings(request);
-        // QueueSettings queueSettings = serviceSettingsService.formatAgentQueueSettings(request);
-        // These should be set on the AgentSettingsEntity, not directly on AgentEntity
         // 保存Agent，并检查返回值
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {

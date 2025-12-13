@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
-import com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorItemResponse;
-import com.bytedesk.ticket.ticket_settings.dto.visitor.TicketCategoryVisitorResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategoryItemResponse;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsResponse;
+import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryVisitorItemResponse;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryVisitorResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,9 @@ public class TicketSettingsRestControllerVisitor {
             @PathVariable("workgroupUid") String workgroupUid) {
 
         TicketSettingsResponse settings = ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+
         TicketCategoryVisitorResponse response = toVisitorResponse(settings != null ? settings.getCategorySettings() : null);
+
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -47,7 +49,9 @@ public class TicketSettingsRestControllerVisitor {
     public ResponseEntity<?> getBasicSettingsByWorkgroup(
             @PathVariable("orgUid") String orgUid,
             @PathVariable("workgroupUid") String workgroupUid) {
+
         TicketBasicSettingsResponse response = resolveBasicSettings(orgUid, workgroupUid);
+        
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

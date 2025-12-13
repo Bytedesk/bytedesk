@@ -14,13 +14,10 @@
 package com.bytedesk.ticket.ticket_settings;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketAssignmentSettingsRequest;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketBasicSettingsRequest;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCategorySettingsRequest;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketCustomFieldSettingsRequest;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketNotificationSettingsRequest;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketPrioritySettingsRequest;
-import com.bytedesk.ticket.ticket_settings.sub.dto.TicketStatusFlowSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsRequest;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsRequest;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -52,13 +49,24 @@ public class TicketSettingsRequest extends BaseRequest {
      */
     private Boolean enabled;
 
+    /**
+     * 是否启用自定义表单（默认为 false）
+     */
+    private Boolean customFormEnabled;
+
+    /**
+     * 绑定的流程 UID（若为空则沿用默认流程）
+     */
+    private String processUid;
+
+    /**
+     * 绑定的表单 UID（若为空则沿用默认表单）
+     */
+    private String formUid;
+
     // 子配置请求（仅提供非 draft 版本，服务端自动维护草稿）
     private TicketBasicSettingsRequest basicSettings;
-    private TicketStatusFlowSettingsRequest statusFlowSettings;
-    private TicketPrioritySettingsRequest prioritySettings;
-    private TicketAssignmentSettingsRequest assignmentSettings;
     private TicketNotificationSettingsRequest notificationSettings;
-    private TicketCustomFieldSettingsRequest customFieldSettings;
     private TicketCategorySettingsRequest categorySettings;
 
 }

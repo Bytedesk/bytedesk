@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 添加 show_queue_position 字段 -->
+    <changeSet id="251125-add-show-queue-position" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_settings" />
+            <not>
+                <columnExists tableName="bytedesk_service_queue_settings" columnName="show_queue_position" />
+            </not>
+        </preConditions>
+        <comment>Add show_queue_position field to control whether to display queue position.</comment>
+        <addColumn tableName="bytedesk_service_queue_settings">
+            <column name="show_queue_position" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_queue_settings" columnName="show_queue_position" />
+        </rollback>
+    </changeSet>
+
+    <!-- 添加 show_estimated_wait_time 字段 -->
+    <changeSet id="251125-add-show-estimated-wait-time" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_settings" />
+            <not>
+                <columnExists tableName="bytedesk_service_queue_settings" columnName="show_estimated_wait_time" />
+            </not>
+        </preConditions>
+        <comment>Add show_estimated_wait_time field to control whether to display estimated wait time.</comment>
+        <addColumn tableName="bytedesk_service_queue_settings">
+            <column name="show_estimated_wait_time" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_queue_settings" columnName="show_estimated_wait_time" />
+        </rollback>
+    </changeSet>
+
+    <!-- 添加 avg_wait_time_per_person 字段 -->
+    <changeSet id="251125-add-avg-wait-time-per-person" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_settings" />
+            <not>
+                <columnExists tableName="bytedesk_service_queue_settings" columnName="avg_wait_time_per_person" />
+            </not>
+        </preConditions>
+        <comment>Add avg_wait_time_per_person field for calculating estimated wait time (seconds).</comment>
+        <addColumn tableName="bytedesk_service_queue_settings">
+            <column name="avg_wait_time_per_person" type="INT" defaultValueNumeric="60">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_queue_settings" columnName="avg_wait_time_per_person" />
+        </rollback>
+    </changeSet>
+
+    <!-- 添加 queue_ready_tip 字段（即将接入提示语） -->
+    <changeSet id="251125-add-queue-ready-tip" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_settings" />
+            <not>
+                <columnExists tableName="bytedesk_service_queue_settings" columnName="queue_ready_tip" />
+            </not>
+        </preConditions>
+        <comment>Add queue_ready_tip field for displaying tip when queue position is 0 (about to be served).</comment>
+        <addColumn tableName="bytedesk_service_queue_settings">
+            <column name="queue_ready_tip" type="VARCHAR(500)" defaultValue="客服即将为您服务，请稍候...">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_queue_settings" columnName="queue_ready_tip" />
+        </rollback>
+    </changeSet>
+
+    <!-- 更新 queue_tip 字段的默认值（对于现有空值或旧格式数据） -->
+    <changeSet id="251125-update-queue-tip-default" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_settings" />
+            <columnExists tableName="bytedesk_service_queue_settings" columnName="queue_tip" />
+        </preConditions>
+        <comment>Update queue_tip to new template format for existing rows with null or old values.</comment>
+        <sql>
+            UPDATE bytedesk_service_queue_settings
+            SET queue_tip = '您前面还有 {position} 人排队，预计等待 {waitTime}，请耐心等候。'
+            WHERE queue_tip IS NULL 
+               OR queue_tip = '' 
+               OR queue_tip = '您好，客服繁忙，请稍后'
+               OR queue_tip NOT LIKE '%{position}%';
+        </sql>
+    </changeSet>
+
+    <!-- 回填新字段的默认值（对于现有数据） -->
+    <changeSet id="251125-backfill-queue-settings-fields" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_settings" />
+            <columnExists tableName="bytedesk_service_queue_settings" columnName="show_queue_position" />
+            <columnExists tableName="bytedesk_service_queue_settings" columnName="show_estimated_wait_time" />
+            <columnExists tableName="bytedesk_service_queue_settings" columnName="avg_wait_time_per_person" />
+            <columnExists tableName="bytedesk_service_queue_settings" columnName="queue_ready_tip" />
+        </preConditions>
+        <comment>Backfill default values for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_service_queue_settings
+            SET show_queue_position = true
+            WHERE show_queue_position IS NULL;
+            
+            UPDATE bytedesk_service_queue_settings
+            SET show_estimated_wait_time = true
+            WHERE show_estimated_wait_time IS NULL;
+            
+            UPDATE bytedesk_service_queue_settings
+            SET avg_wait_time_per_person = 60
+            WHERE avg_wait_time_per_person IS NULL;
+            
+            UPDATE bytedesk_service_queue_settings
+            SET queue_ready_tip = '客服即将为您服务，请稍候...'
+            WHERE queue_ready_tip IS NULL OR queue_ready_tip = '';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

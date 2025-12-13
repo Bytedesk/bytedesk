@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
-import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingEntity;
-import com.bytedesk.ticket.ticket_settings.binding.TicketSettingsBindingRepository;
+import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingEntity;
+import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingRepository;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;

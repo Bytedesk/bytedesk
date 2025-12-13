@@ -26,6 +26,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.quick_button.QuickButtonEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -208,60 +209,51 @@ public class ServiceSettingsEntity extends BaseEntity {
 
     // 快捷按钮
     @Builder.Default
-    private Boolean showQuickFaqs = false;
+    private Boolean showQuickButtons = false;
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "bytedesk_kbase_service_settings_quick_faqs",
+        name = "bytedesk_kbase_service_settings_quick_buttons",
         joinColumns = @JoinColumn(name = "service_settings_id"),
-        inverseJoinColumns = @JoinColumn(name = "quick_faqs_id")
+        inverseJoinColumns = @JoinColumn(name = "quick_button_id")
     )
-    private List<FaqEntity> quickFaqs = new ArrayList<>();
-    // 快捷问题知识库
-    private String quickFaqKbUid;
+    private List<QuickButtonEntity> quickButtons = new ArrayList<>();
 
     // 猜你想问
-    @Builder.Default
-    private Boolean showGuessFaqs = false;
-    @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "bytedesk_kbase_service_settings_guess_faqs",
-        joinColumns = @JoinColumn(name = "service_settings_id"),
-        inverseJoinColumns = @JoinColumn(name = "guess_faqs_id")
-    )
-    private List<FaqEntity> guessFaqs = new ArrayList<>();
+    // @Builder.Default
+    // private Boolean showGuessFaqs = false;
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // @JoinTable(
+    //     name = "bytedesk_kbase_service_settings_guess_faqs",
+    //     joinColumns = @JoinColumn(name = "service_settings_id"),
+    //     inverseJoinColumns = @JoinColumn(name = "guess_faqs_id")
+    // )
+    // private List<FaqEntity> guessFaqs = new ArrayList<>();
 
     // 热门问题
-    @Builder.Default
-    private Boolean showHotFaqs = false;
-    @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "bytedesk_kbase_service_settings_hot_faqs",
-        joinColumns = @JoinColumn(name = "service_settings_id"),
-        inverseJoinColumns = @JoinColumn(name = "hot_faqs_id")
-    )
-    private List<FaqEntity> hotFaqs = new ArrayList<>();
+    // @Builder.Default
+    // private Boolean showHotFaqs = false;
+    // @Builder.Default
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // @JoinTable(
+    //     name = "bytedesk_kbase_service_settings_hot_faqs",
+    //     joinColumns = @JoinColumn(name = "service_settings_id"),
+    //     inverseJoinColumns = @JoinColumn(name = "hot_faqs_id")
+    // )
+    // private List<FaqEntity> hotFaqs = new ArrayList<>();
 
     // 快捷功能
-    @Builder.Default
-    private Boolean showShortcutFaqs = false;
-    @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "bytedesk_kbase_service_settings_shortcut_faqs",
-        joinColumns = @JoinColumn(name = "service_settings_id"),
-        inverseJoinColumns = @JoinColumn(name = "shortcut_faqs_id")
-    )
-    private List<FaqEntity> shortcutFaqs = new ArrayList<>();
-
-    // 未知答案固定回复
     // @Builder.Default
-    // private Boolean showUnknownAnswer = false;
-
+    // private Boolean showShortcutFaqs = false;
     // @Builder.Default
-    // private String unknownAnswer = "抱歉，我暂时无法回答这个问题。";
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // @JoinTable(
+    //     name = "bytedesk_kbase_service_settings_shortcut_faqs",
+    //     joinColumns = @JoinColumn(name = "service_settings_id"),
+    //     inverseJoinColumns = @JoinColumn(name = "shortcut_faqs_id")
+    // )
+    // private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
     // 满足一定触发条件下，机器人支持主动触发某个任务或者回复某些话术。
     // 例如：1、长时间访客无消息，机器人主动发问或者触发任务，主动暖场；

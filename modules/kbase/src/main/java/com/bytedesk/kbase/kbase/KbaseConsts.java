@@ -66,6 +66,8 @@ public class KbaseConsts {
 
     public static final String KB_QUICKREPLY_NAME = "快捷回复";
 
+    // public static final String KB_QUICKBUTTON_NAME = "快捷按钮";
+
     public static final String KB_TABOO_NAME = "违禁词";
 
     public static final String KB_DESCRIPTION = "描述";

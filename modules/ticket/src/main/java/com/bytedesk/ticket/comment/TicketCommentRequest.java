@@ -13,16 +13,16 @@
  */
 package com.bytedesk.ticket.comment;
 
-import com.bytedesk.core.base.BaseRequest;
+// import com.bytedesk.core.base.BaseRequest;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+// import lombok.Data;
+// import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class TicketCommentRequest extends BaseRequest {
-    private static final long serialVersionUID = 1L;
+// @Data
+// @EqualsAndHashCode(callSuper = true)
+// public class TicketCommentRequest extends BaseRequest {
+//     private static final long serialVersionUID = 1L;
 
-    // private String content;
-    private String author;
-} 
+//     // private String content;
+//     private String author;
+// } 

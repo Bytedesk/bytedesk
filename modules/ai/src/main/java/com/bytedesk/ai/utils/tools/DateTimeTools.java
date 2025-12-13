@@ -36,9 +36,11 @@ public class DateTimeTools {
     public String getCurrentDateTime() {
         // 获取当前时区
         TimeZone timeZone = LocaleContextHolder.getTimeZone();
-        log.info("timeZone: {}", timeZone);
         // Convert the current time to the date and time of the specified time zone
-        return ZonedDateTime.now(ZoneId.of(timeZone.getID())).toString();
+        String currentDateTime = ZonedDateTime.now(ZoneId.of(timeZone.getID())).toString();
+        log.info("timeZone: {}, currentDateTime: {}", timeZone, currentDateTime);
+        return currentDateTime;
+        // return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }
 
     @Tool(description = "Set a user alarm for the given time")
@@ -48,7 +50,8 @@ public class DateTimeTools {
     }
 
     // MethodToolCallback
-    String getCurrentDateTimeMethodToolCallback() {
+    @Tool(description = "Get the current date and time using MethodToolCallback")
+    public String getCurrentDateTimeMethodToolCallback() {
         return BdDateUtils.now().withZoneSameInstant(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }
 

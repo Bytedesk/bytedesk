@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="600" fill="#f9f9f9"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Prompt驱动的智能文档生成流程</text>
+    
+    <!-- 主流程框架 -->
+    <!-- 步骤1: 提示词输入 -->
+    <rect x="100" y="100" width="180" height="100" rx="10" fill="#9575CD"/>
+    <text x="190" y="130" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">Prompt设计</text>
+    <rect x="120" y="140" width="140" height="50" fill="white" opacity="0.7"/>
+    <text x="190" y="165" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#673AB7">请生成一份关于企业数字化转型的...</text>
+    
+    <!-- 步骤2: 提示词优化 -->
+    <rect x="340" y="100" width="180" height="100" rx="10" fill="#7986CB"/>
+    <text x="430" y="130" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">提示词优化</text>
+    <text x="430" y="155" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">意图理解与提示词增强</text>
+    <text x="430" y="175" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">添加场景上下文</text>
+    
+    <!-- 步骤3: AI生成 -->
+    <rect x="580" y="100" width="180" height="100" rx="10" fill="#5C6BC0"/>
+    <text x="670" y="130" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">AI内容生成</text>
+    <text x="670" y="155" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">选择合适模型</text>
+    <text x="670" y="175" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">优化生成参数</text>
+    
+    <!-- 步骤4: 类型选择 -->
+    <rect x="100" y="250" width="180" height="80" rx="10" fill="#4DB6AC"/>
+    <text x="190" y="280" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">文档类型选择</text>
+    <text x="190" y="300" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">报告/方案/总结/通知...</text>
+    
+    <!-- 步骤5: 格式优化 -->
+    <rect x="340" y="250" width="180" height="80" rx="10" fill="#26A69A"/>
+    <text x="430" y="280" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">格式优化</text>
+    <text x="430" y="300" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">标题/段落/列表/表格...</text>
+    
+    <!-- 步骤6: 内容优化 -->
+    <rect x="580" y="250" width="180" height="80" rx="10" fill="#009688"/>
+    <text x="670" y="280" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">内容优化</text>
+    <text x="670" y="300" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">润色/校对/专业性调整</text>
+    
+    <!-- 输出文档 -->
+    <rect x="340" y="380" width="180" height="120" rx="10" fill="#FF8A65"/>
+    <text x="430" y="405" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">目标文档生成</text>
+    
+    <!-- 文档图标 -->
+    <rect x="390" y="420" width="80" height="60" fill="white" stroke="#E64A19" stroke-width="1"/>
+    <line x1="400" y1="435" x2="460" y2="435" stroke="#E64A19" stroke-width="1"/>
+    <line x1="400" y1="445" x2="440" y2="445" stroke="#E64A19" stroke-width="1"/>
+    <line x1="400" y1="455" x2="450" y2="455" stroke="#E64A19" stroke-width="1"/>
+    <line x1="400" y1="465" x2="430" y2="465" stroke="#E64A19" stroke-width="1"/>
+    
+    <!-- 箭头连接 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#666"/>
+        </marker>
+    </defs>
+    
+    <line x1="280" y1="150" x2="340" y2="150" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="520" y1="150" x2="580" y2="150" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="670" y1="200" x2="670" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="190" y1="200" x2="190" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="190" y1="330" x2="190" y2="440" stroke="#666" stroke-width="2"/>
+    <line x1="190" y1="440" x2="340" y2="440" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="430" y1="330" x2="430" y2="380" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="670" y1="330" x2="670" y2="440" stroke="#666" stroke-width="2"/>
+    <line x1="670" y1="440" x2="520" y2="440" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 底部说明框 -->
+    <rect x="100" y="520" width="660" height="60" rx="5" fill="#FFECB3" stroke="#FFD54F"/>
+    <text x="430" y="545" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Prompt驱动文档生成的主要优势</text>
+    <text x="200" y="565" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">定制化内容</text>
+    <text x="350" y="565" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">快速生成</text>
+    <text x="500" y="565" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">模板复用</text>
+    <text x="650" y="565" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">多种文档类型支持</text>
+    
+    <!-- 提示词库 -->
+    <rect x="100" y="370" width="180" height="120" rx="5" fill="#B39DDB" opacity="0.8"/>
+    <text x="190" y="390" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#4527A0">提示词模板库</text>
+    <text x="190" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#4527A0">- 工作报告模板</text>
+    <text x="190" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#4527A0">- 项目方案模板</text>
+    <text x="190" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#4527A0">- 通知公告模板</text>
+    <text x="190" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#4527A0">- 政策解读模板</text>
+    <text x="190" y="470" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#4527A0">- 培训材料模板</text>
+</svg>

@@ -14,13 +14,29 @@
 package com.bytedesk.ai.springai.controller;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.DefaultToolCallingManager;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.model.tool.ToolExecutionResult;
+import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.ai.tool.method.MethodToolCallback;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +45,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.ai.utils.tools.DateTimeTools;
+import com.bytedesk.ai.utils.tools.MathTools;
 import com.bytedesk.ai.utils.tools.WeatherRequest;
 import com.bytedesk.ai.utils.tools.WeatherService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -51,112 +67,154 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "zhipuai", matchIfMissing = false)
 public class SpringAIToolsController {
 
-    private final BytedeskProperties bytedeskProperties;
-    
-    private final ChatClient primaryChatClient;
-    
-    // http://127.0.0.1:9003/spring/ai/api/v1/tools/time?message=
-    // get current date and time
-    @GetMapping("/time")
-    public ResponseEntity<JsonResult<?>> time(
-            @RequestParam(value = "message", defaultValue = "What day is tomorrow?") String message) {
+        private final BytedeskProperties bytedeskProperties;
 
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        private final ChatModel chatModel;
+
+        private final ChatClient primaryChatClient;
+        // Spring AI requires an explicit schema even for parameterless tools.
+        private static final String EMPTY_OBJECT_SCHEMA = "{\"type\":\"object\",\"properties\":{}}";
+
+        // http://127.0.0.1:9003/spring/ai/api/v1/tools/time?message=
+        // get current date and time
+        @GetMapping(value = "/time", produces = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<JsonResult<?>> time(
+                        @RequestParam(value = "message", defaultValue = "What day is tomorrow?") String message) {
+
+                if (!bytedeskProperties.getDebug()) {
+                        return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                }
+
+                String response = primaryChatClient
+                                .prompt(message)
+                                .tools(new DateTimeTools())
+                                .call()
+                                .content();
+                log.info("response: {}", response);
+
+                return ResponseEntity.ok(JsonResult.success(response));
         }
 
-        String response = primaryChatClient
-                .prompt(message)
-                .tools(new DateTimeTools())
-                .call()
-                .content();
-        // FIXME: I can't provide the exact day for tomorrow without knowing your
-        // current timezone. If you provide your timezone, I can calculate and tell you
-        // what day tomorrow is.
-        log.info("response: {}", response);
-        log.info("currentDateTime: {}, ZonedDateTime: {}, ZoneId: {}",
-                BdDateUtils.getCurrentZonedDateTime(),
-                BdDateUtils.getCurrentZonedDateTime(),
-                BdDateUtils.getCurrentZoneId());
+        // set alarm
+        // http://127.0.0.1:9003/spring/ai/api/v1/tools/alarm?message=
+        @GetMapping("/alarm")
+        public ResponseEntity<JsonResult<?>> alarm(
+                        @RequestParam(value = "message", defaultValue = "Can you set an alarm 10 minutes from now?") String message) {
 
-        return ResponseEntity.ok(JsonResult.success(response));
-    }
+                if (!bytedeskProperties.getDebug()) {
+                        return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                }
 
-    // set alarm
-    // http://127.0.0.1:9003/spring/ai/api/v1/tools/alarm?message=
-    @GetMapping("/alarm")
-    public ResponseEntity<JsonResult<?>> alarm(
-            @RequestParam(value = "message", defaultValue = "Can you set an alarm 10 minutes from now?") String message) {
+                String response = primaryChatClient
+                                .prompt(message)
+                                .tools(new DateTimeTools())
+                                .call()
+                                .content();
+                // The alarm has been set for 10 minutes from now.
+                log.info("response: {}", response);
 
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                return ResponseEntity.ok(JsonResult.success(response));
         }
 
-        String response = primaryChatClient
-                .prompt(message)
-                .tools(new DateTimeTools())
-                .call()
-                .content();
-        // The alarm has been set for 10 minutes from now.
-        log.info("response: {}", response);
+        // http://127.0.0.1:9003/spring/ai/api/v1/tools/method-tool-callback?message=
+        @GetMapping("/method-tool-callback")
+        public ResponseEntity<JsonResult<?>> methodToolCallback(
+                        @RequestParam(value = "message", defaultValue = "What is the current date and time?") String message) {
 
-        return ResponseEntity.ok(JsonResult.success(response));
-    }
+                if (!bytedeskProperties.getDebug()) {
+                        return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                }
 
-    // http://127.0.0.1:9003/spring/ai/api/v1/tools/method-tool-callback?message=
-    @GetMapping("/method-tool-callback")
-    public ResponseEntity<JsonResult<?>> methodToolCallback(
-            @RequestParam(value = "message", defaultValue = "What is the current date and time?") String message) {
+                Method method = ReflectionUtils.findMethod(DateTimeTools.class, "getCurrentDateTimeMethodToolCallback");
+                ToolCallback toolCallback = MethodToolCallback.builder()
+                                .toolDefinition(ToolDefinition.builder()
+                                                .name("getCurrentDateTimeMethodToolCallback")
+                                                .description("Get the current date and time in the user's timezone")
+                                                .inputSchema(EMPTY_OBJECT_SCHEMA)
+                                                .build())
+                                .toolMethod(method)
+                                .toolObject(new DateTimeTools())
+                                .build();
 
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                String response = primaryChatClient
+                                .prompt(message)
+                                .tools(toolCallback)
+                                .call()
+                                .content();
+                log.info("methodToolCallback response: {}", response);
+
+                return ResponseEntity.ok(JsonResult.success(response));
         }
 
-        Method method = ReflectionUtils.findMethod(DateTimeTools.class, "getCurrentDateTimeMethodToolCallback");
-        ToolCallback toolCallback = MethodToolCallback.builder()
-                .toolDefinition(ToolDefinition.builder()
-                        .name("getCurrentDateTimeMethodToolCallback")
-                        .description("Get the current date and time in the user's timezone")
-                        .build())
-                .toolMethod(method)
-                .toolObject(new DateTimeTools())
-                .build();
+        // weather
+        // http://127.0.0.1:9003/spring/ai/api/v1/tools/weather?message=
+        // https://docs.spring.io/spring-ai/reference/api/tools.html#_programmatic_specification_functiontoolcallback
+        @GetMapping("/weather")
+        public ResponseEntity<JsonResult<?>> weather(
+                        @RequestParam(value = "message", defaultValue = "What is the weather in Beijing?") String message) {
 
-        String response = primaryChatClient
-                .prompt(message)
-                .tools(toolCallback)
-                .call()
-                .content();
-        log.info("methodToolCallback response: {}", response);
+                if (!bytedeskProperties.getDebug()) {
+                        return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                }
 
-        return ResponseEntity.ok(JsonResult.success(response));
-    }
+                ToolCallback toolCallback = FunctionToolCallback
+                                .builder("currentWeather", new WeatherService())
+                                .description("Get the weather in location")
+                                .inputType(WeatherRequest.class)
+                                .build();
 
-    // weather 
-    // http://127.0.0.1:9003/spring/ai/api/v1/tools/weather?message=
-    // https://docs.spring.io/spring-ai/reference/api/tools.html#_programmatic_specification_functiontoolcallback
-    @GetMapping("/weather")
-    public ResponseEntity<JsonResult<?>> weather(
-            @RequestParam(value = "message", defaultValue = "What is the weather in Beijing?") String message) {
+                String response = primaryChatClient
+                                .prompt(message)
+                                .tools(toolCallback)
+                                .call()
+                                .content();
+                log.info("weather response: {}", response);
 
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                return ResponseEntity.ok(JsonResult.success(response));
         }
 
-        ToolCallback toolCallback = FunctionToolCallback
-                .builder("currentWeather", new WeatherService())
-                .description("Get the weather in location")
-                .inputType(WeatherRequest.class)
-                .build();
+        // http://127.0.0.1:9003/spring/ai/api/v1/tools/user-controlled
+        @GetMapping("/user-controlled")
+        public ResponseEntity<JsonResult<?>> userControlled() {
 
-        String response = primaryChatClient
-                .prompt(message)
-                .tools(toolCallback)
-                // .tools("currentWeather")
-                .call()
-                .content();
-        log.info("weather response: {}", response);
+                if (!bytedeskProperties.getDebug()) {
+                        return ResponseEntity.ok(JsonResult.error("Service is not available"));
+                }
 
-        return ResponseEntity.ok(JsonResult.success(response));
-    }
+                ToolCallingManager toolCallingManager = DefaultToolCallingManager.builder().build();
+                ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
+                String conversationId = UUID.randomUUID().toString();
+
+                ChatOptions chatOptions = ToolCallingChatOptions.builder()
+                                .toolCallbacks(ToolCallbacks.from(new MathTools()))
+                                .internalToolExecutionEnabled(false)
+                                .build();
+                Prompt prompt = new Prompt(
+                                        List.of(new SystemMessage("You are a helpful assistant."),
+                                                new UserMessage("What is 6 * 8?")),
+                                chatOptions);
+                chatMemory.add(conversationId, prompt.getInstructions());
+
+                Prompt promptWithMemory = new Prompt(chatMemory.get(conversationId), chatOptions);
+                ChatResponse chatResponse = chatModel.call(promptWithMemory);
+                chatMemory.add(conversationId, chatResponse.getResult().getOutput());
+
+                while (chatResponse.hasToolCalls()) {
+                        ToolExecutionResult toolExecutionResult = toolCallingManager.executeToolCalls(promptWithMemory,
+                                        chatResponse);
+                        chatMemory.add(conversationId, toolExecutionResult.conversationHistory()
+                                        .get(toolExecutionResult.conversationHistory().size() - 1));
+                        promptWithMemory = new Prompt(chatMemory.get(conversationId), chatOptions);
+                        chatResponse = chatModel.call(promptWithMemory);
+                        chatMemory.add(conversationId, chatResponse.getResult().getOutput());
+                }
+
+                UserMessage newUserMessage = new UserMessage("What did I ask you earlier?");
+                chatMemory.add(conversationId, newUserMessage);
+
+                ChatResponse newResponse = chatModel.call(new Prompt(chatMemory.get(conversationId)));
+
+                return ResponseEntity.ok(JsonResult.success(newResponse.getResult().getOutput()));
+        }
+
 }

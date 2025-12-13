@@ -1,0 +1,56 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F3F4F6;stop-opacity:1" />
+    </linearGradient>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="400" height="300" fill="#F8FAFC"/>
+  
+  <!-- 主卡片 -->
+  <rect x="50" y="50" width="300" height="200" rx="12" fill="url(#cardGradient)" filter="url(#cardShadow)"/>
+  
+  <!-- 标题栏 -->
+  <rect x="50" y="50" width="300" height="40" rx="12" fill="#4F46E5"/>
+  <text x="200" y="75" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#FFFFFF">
+    智能外呼管理平台
+  </text>
+  
+  <!-- 任务管理模块 -->
+  <rect x="70" y="110" width="120" height="80" rx="8" fill="#E0E7FF" stroke="#4F46E5" stroke-width="2"/>
+  <text x="130" y="130" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#4F46E5">
+    任务管理
+  </text>
+  <circle cx="85" cy="145" r="3" fill="#4F46E5"/>
+  <text x="95" y="150" font-family="Arial, sans-serif" font-size="12" fill="#374151">批量创建</text>
+  <circle cx="85" cy="160" r="3" fill="#4F46E5"/>
+  <text x="95" y="165" font-family="Arial, sans-serif" font-size="12" fill="#374151">智能调度</text>
+  <circle cx="85" cy="175" r="3" fill="#4F46E5"/>
+  <text x="95" y="180" font-family="Arial, sans-serif" font-size="12" fill="#374151">状态监控</text>
+  
+  <!-- 策略配置模块 -->
+  <rect x="210" y="110" width="120" height="80" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+  <text x="270" y="130" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#F59E0B">
+    策略配置
+  </text>
+  <circle cx="225" cy="145" r="3" fill="#F59E0B"/>
+  <text x="235" y="150" font-family="Arial, sans-serif" font-size="12" fill="#374151">时间设置</text>
+  <circle cx="225" cy="160" r="3" fill="#F59E0B"/>
+  <text x="235" y="165" font-family="Arial, sans-serif" font-size="12" fill="#374151">频率控制</text>
+  <circle cx="225" cy="175" r="3" fill="#F59E0B"/>
+  <text x="235" y="180" font-family="Arial, sans-serif" font-size="12" fill="#374151">重试机制</text>
+  
+  <!-- 连接线 -->
+  <path d="M190 150 L210 150" stroke="#9CA3AF" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 监控指标 -->
+  <rect x="70" y="210" width="260" height="30" rx="6" fill="#ECFDF5" stroke="#10B981" stroke-width="1"/>
+  <text x="200" y="230" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#10B981">
+    实时监控: 接通率 85% | 完成率 92% | 响应时间 &lt;100ms
+  </text>
+</svg>

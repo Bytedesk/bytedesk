@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FaqExcelListener implements ReadListener<FaqExcel> {
 
-    private final FaqRestService faqService;
+    private final FaqRestService faqRestService;
 
     private final String kbType;
 
@@ -54,7 +54,7 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
     @Override
     public void invoke(FaqExcel data, AnalysisContext context) {
         log.info("FaqExcelListener invoke: {}", JSON.toJSONString(data));
-        FaqEntity faq = faqService.convertExcelToFaq(data, kbType, fileUid, kbUid, orgUid);
+        FaqEntity faq = faqRestService.convertExcelToFaq(data, kbType, fileUid, kbUid, orgUid);
         if (faq == null) {
             return;
         }
@@ -87,7 +87,7 @@ public class FaqExcelListener implements ReadListener<FaqExcel> {
         //     cachedDataList.remove(0);
         // }
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
-        faqService.save(cachedDataList);
+        faqRestService.save(cachedDataList);
         log.info("存储数据库成功！");
     }
 

@@ -1,0 +1,23 @@
+// 
+// toasts.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+//
+
+// toast chat
+.toast-chat{
+  position: fixed;
+  right: calc($offcanvas-horizontal-width + 1rem);
+  bottom: 0;
+  z-index: 11;
+}
+
+// toast breakpoint
+@include media-breakpoint-down(sm){
+  .toast{
+    width: 288px;
+  }
+ }

@@ -48,13 +48,12 @@ public class WorkgroupCacheEvictListener {
     public void handleAgentUpdateStatusEvent(AgentUpdateStatusEvent event) {
         AgentEntity agent = event.getAgent();
         String agentUid = agent.getUid();
-    boolean presenceOnline = presenceFacadeService.isAgentOnline(agent);
-    log.info("监测到客服状态变更，准备清除关联工作组缓存: {}, status: {}, presenceOnline: {}", 
-        agentUid, agent.getStatus(), presenceOnline);
+        boolean presenceOnline = presenceFacadeService.isAgentOnline(agent);
+        log.info("监测到客服状态变更，准备清除关联工作组缓存: {}, status: {}, presenceOnline: {}",
+                agentUid, agent.getStatus(), presenceOnline);
 
         // 查找包含该客服的所有工作组
         List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agentUid);
-        
         if (workgroups != null && !workgroups.isEmpty()) {
             log.info("客服 {} 关联工作组数量: {}", agentUid, workgroups.size());
             for (WorkgroupEntity workgroup : workgroups) {

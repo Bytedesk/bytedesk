@@ -37,6 +37,7 @@ public class FormSpecification extends BaseSpecification<FormEntity, FormRequest
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
+            // 
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }

@@ -13,24 +13,14 @@
  */
 package com.bytedesk.service.message_template.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.message_template.MessageTemplateEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class MessageTemplateUpdateEvent extends ApplicationEvent {
+public class MessageTemplateUpdateEvent extends AbstractMessageTemplateEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private MessageTemplateEntity template;
-
     public MessageTemplateUpdateEvent(MessageTemplateEntity template) {
-        super(template);
-        this.template = template;
+        super(template, template);
     }
 
 }

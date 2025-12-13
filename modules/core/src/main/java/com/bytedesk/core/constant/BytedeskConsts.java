@@ -46,10 +46,12 @@ public class BytedeskConsts {
     public static final String DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID = "df_ica_uid";
     public static final String DEFAULT_INTENT_REWRITE_ASSISTANT_UID = "df_ira_uid";
     public static final String DEFAULT_EMOTION_ASSISTANT_UID = "df_ea_uid";
+    public static final String DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID = "df_aba_uid";
     public static final String DEFAULT_CHANNEL_UID = "df_ch_uid";
     public static final String DEFAULT_AGENT_ASSISTANT_UID = "df_as_uid";
     public static final String DEFAULT_SYSTEM_UID = "df_sys_uid";
     public static final String DEFAULT_KB_QUICKREPLY_UID = "df_kb_qr_uid";
+    // public static final String DEFAULT_KB_QUICKBUTTON_UID = "df_kb_qb_uid";
     public static final String DEFAULT_KB_HELPCENTER_UID = "df_kb_hc_uid";
     public static final String DEFAULT_KB_NOTEBASE_UID = "df_kb_nb_uid";
     public static final String DEFAULT_KB_TABOO_UID = "df_kb_tb_uid";

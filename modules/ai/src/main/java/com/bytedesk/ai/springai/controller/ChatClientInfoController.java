@@ -47,15 +47,15 @@ public class ChatClientInfoController {
      * 获取所有ChatClient信息
      * GET http://127.0.0.1:9003/spring/ai/api/v1/chat-clients/info
      */
-    @GetMapping("/info")
-    public ResponseEntity<JsonResult<?>> getAllChatClientsInfo() {
-        if (!bytedeskProperties.getDebug()) {
-            return ResponseEntity.ok(JsonResult.error("Service is not available"));
-        }
-        log.info("Getting all ChatClient information");
-        Map<String, Object> result = chatClientInfoService.getAllChatClientsInfo();
-        return ResponseEntity.ok(JsonResult.success(result));
-    }
+    // @GetMapping("/info")
+    // public ResponseEntity<JsonResult<?>> getAllChatClientsInfo() {
+    //     if (!bytedeskProperties.getDebug()) {
+    //         return ResponseEntity.ok(JsonResult.error("Service is not available"));
+    //     }
+    //     log.info("Getting all ChatClient information");
+    //     Map<String, Object> result = chatClientInfoService.getAllChatClientsInfo();
+    //     return ResponseEntity.ok(JsonResult.success(result));
+    // }
 
     /**
      * 获取Primary ChatClient信息

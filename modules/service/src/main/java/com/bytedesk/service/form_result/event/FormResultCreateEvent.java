@@ -13,24 +13,14 @@
  */
 package com.bytedesk.service.form_result.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.form_result.FormResultEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class FormResultCreateEvent extends ApplicationEvent {
+public class FormResultCreateEvent extends AbstractFormResultEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private FormResultEntity tag;
-
     public FormResultCreateEvent(FormResultEntity tag) {
-        super(tag);
-        this.tag = tag;
+        super(tag, tag);
     }
 
 }

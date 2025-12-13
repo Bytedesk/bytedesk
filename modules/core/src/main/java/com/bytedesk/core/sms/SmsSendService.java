@@ -108,18 +108,18 @@ public class SmsSendService {
      * @return SmsSendResult 发送结果
      */
     public SmsSendResult sendSmsWithResult(String mobile, String country, String content, HttpServletRequest request) {
-        Assert.hasText(mobile, "手机号不能为空");
         Assert.hasText(content, "短信内容不能为空");
         
-        log.info("send sms to {}, country: {}, content: {}", mobile, country, content);
+        String normalizedMobile = normalizeAndValidateMobile(mobile);
+        log.info("send sms to {}, country: {}, content: {}", normalizedMobile, country, content);
 
         // 白名单手机号使用固定验证码，无需真正发送验证码
-        if (bytedeskProperties.isInWhitelist(mobile)) {
+        if (bytedeskProperties.isInWhitelist(normalizedMobile)) {
             return SmsSendResult.success(); // 白名单手机号认为发送成功
         }
 
         try {
-            return sendValidateCode(mobile, country, content);
+            return sendValidateCode(normalizedMobile, country, content);
         } catch (Exception e) {
             log.error("发送短信失败", e);
             return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "发送短信异常: " + e.getMessage());
@@ -134,13 +134,13 @@ public class SmsSendService {
      * @return SmsSendResult 发送结果
      */
     public SmsSendResult sendValidateCode(String mobile, String country, String code) {
-        Assert.hasText(mobile, "手机号不能为空");
         Assert.hasText(code, "验证码不能为空");
-        
-        log.info("sendValidateCode sms to {}, country: {}, code: {}", mobile, country, code);
+
+        String normalizedMobile = normalizeAndValidateMobile(mobile);
+        log.info("sendValidateCode sms to {}, country: {}, code: {}", normalizedMobile, country, code);
 
         // 处理国家代码：只保留数字，中国86可以不添加前缀
-        String phoneNumber = formatPhoneNumber(mobile, country);
+        String phoneNumber = formatPhoneNumber(normalizedMobile, country);
         log.debug("格式化后的手机号: {}", phoneNumber);
 
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
@@ -173,6 +173,15 @@ public class SmsSendService {
             log.error("阿里云短信发送失败 - ClientException", e);
             return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "阿里云客户端错误: " + e.getErrMsg());
         }
+    }
+
+    private String normalizeAndValidateMobile(String mobile) {
+        String normalized = mobile == null ? "" : mobile.trim();
+        Assert.hasText(normalized, "手机号不能为空");
+        if (!normalized.matches("^\\d+$")) {
+            throw new IllegalArgumentException("手机号必须为数字");
+        }
+        return normalized;
     }
     
     /**

@@ -63,7 +63,7 @@ public class FormEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "form_type")
-    private String type = FormTypeEnum.TICKET.name();
+    private String type = FormTypeEnum.TICKET_INTERNAL.name();
 
     /**
      * Current status of the form (DRAFT, PUBLISHED, ARCHIVED, DISABLED)

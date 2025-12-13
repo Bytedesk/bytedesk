@@ -51,7 +51,8 @@ public class RobotInitializer implements SmartInitializingSingleton {
         // 为初始组织创建一个机器人
         robotRestService.createDefaultRobot(orgUid, robotUid);
         // 
-        robotRestService.initRobotJson(LevelEnum.ORGANIZATION.name(), orgUid);
+        String level = LevelEnum.ORGANIZATION.name();
+        robotRestService.initRobotJson(level, orgUid);
     }
 
     private void initPermissions() {

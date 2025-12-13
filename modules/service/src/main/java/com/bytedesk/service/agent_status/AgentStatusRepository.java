@@ -31,4 +31,6 @@ public interface AgentStatusRepository extends JpaRepository<AgentStatusEntity, 
     // List<AgentStatusEntity> findByAgentUidAndCreatedAtBetween(String agentUid, ZonedDateTime startTime, ZonedDateTime endTime);
 
     List<AgentStatusEntity> findByOrgUid(String orgUid);
+
+    Optional<AgentStatusEntity> findFirstByAgentContainsAndOrgUidAndDeletedFalseOrderByCreatedAtDesc(String agentUid, String orgUid);
 }

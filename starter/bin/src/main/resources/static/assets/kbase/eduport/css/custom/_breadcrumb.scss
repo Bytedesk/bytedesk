@@ -1,0 +1,49 @@
+// 
+// breadcrumb.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Bootstrap Overrides
+//
+.breadcrumb-item {
+  a {
+    color: var(--#{$prefix}body-color);
+    &:hover {
+      color: var(--#{$prefix}primary);
+    }
+  }
+}
+
+// 
+// Additional style for theme
+// 
+.breadcrumb.breadcrumb-dark {
+  .breadcrumb-item {
+    a {
+      color: var(--#{$prefix}gray-400);
+      &:hover {
+        color: var(--#{$prefix}primary);
+      }
+    }
+    &.active{
+      color: var(--#{$prefix}gray-400);
+    }
+  }
+ 
+}
+
+.breadcrumb.breadcrumb-dots {
+  .breadcrumb-item {
+    + .breadcrumb-item {
+      &::before {
+        content: "•";
+        font-size: 22px;
+        line-height: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+}

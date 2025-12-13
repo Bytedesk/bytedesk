@@ -57,9 +57,7 @@ public class SegmentController {
     // http://127.0.0.1:9003/segment/api/v1/details?text=这是一个伸手不见五指的黑夜。
     @Operation(summary = "详细分词", description = "对文本进行详细分词，返回包含位置信息的分词结果")
     @GetMapping("/details")
-    public ResponseEntity<?> segmentDetails(
-            @Parameter(description = "待分词的文本", required = true)
-            @RequestParam String text) {
+    public ResponseEntity<?> segmentDetails(@Parameter(description = "待分词的文本", required = true) @RequestParam String text) {
         List<SegmentWordDetail> details = segmentService.segmentDetails(text);
         return ResponseEntity.ok(JsonResult.success("详细分词成功", details));
     }
@@ -67,9 +65,7 @@ public class SegmentController {
     // http://127.0.0.1:9003/segment/api/v1/count?text=这是一个伸手不见五指的黑夜。
     @Operation(summary = "词频统计", description = "对文本进行分词并统计词频")
     @GetMapping("/count")
-    public ResponseEntity<?> wordCount(
-            @Parameter(description = "待分词的文本", required = true)
-            @RequestParam String text) {
+    public ResponseEntity<?> wordCount(@Parameter(description = "待分词的文本", required = true) @RequestParam String text) {
         Map<String, Integer> wordCount = segmentService.wordCount(text);
         return ResponseEntity.ok(JsonResult.success("词频统计成功", wordCount));
     }
@@ -77,8 +73,7 @@ public class SegmentController {
     // http://127.0.0.1:9003/segment/api/v1/segment?text=这是一个伸手不见五指的黑夜。
     @Operation(summary = "高级分词", description = "支持多种分词类型和过滤选项的高级分词接口")
     @PostMapping("/segment")
-    public ResponseEntity<?> segment(
-            @Valid @RequestBody SegmentRequest request) {
+    public ResponseEntity<?> segment(@Valid @RequestBody SegmentRequest request) {
         SegmentResponse response = segmentService.segment(request);
         return ResponseEntity.ok(JsonResult.success("分词处理成功", response));
     }
@@ -87,7 +82,7 @@ public class SegmentController {
     @Operation(summary = "批量分词", description = "批量处理多个文本的分词")
     @GetMapping("/batch")
     public ResponseEntity<?> batchSegment(
-            @Parameter(description = "文本列表", required = true)
+            @Parameter(description = "文本列表", required = true) 
             @RequestBody List<String> texts,
             @Parameter(description = "分词类型：word(词语)、detail(详细)、count(词频)", required = false)
             @RequestParam(defaultValue = "word") String type) {

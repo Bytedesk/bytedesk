@@ -50,6 +50,12 @@ public class AgentStatusEntity extends BaseEntity {
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
+    /**
+     * Duration (in seconds) that the agent stayed in this status before switching.
+     */
+    @Builder.Default
+    @Column(name = "status_duration_seconds")
+    private Long durationSeconds = 0L;
 
     public UserProtobuf getAgent() {
         return JSON.parseObject(agent, UserProtobuf.class);
@@ -59,5 +65,4 @@ public class AgentStatusEntity extends BaseEntity {
         return agent;
     }
 
-    // private String agentUid;
 }

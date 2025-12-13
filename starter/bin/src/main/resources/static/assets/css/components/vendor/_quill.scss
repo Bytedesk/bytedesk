@@ -1,0 +1,16 @@
+// 
+// quill.scss
+// Vendor css override and new css added
+
+
+.ql-snow {
+  .ql-picker{
+    color: var(--#{$prefix}body-color);
+  }
+  .ql-fill, .ql-stroke.ql-fill{
+    fill: var(--#{$prefix}gray-800);
+  }
+  .ql-stroke{
+    stroke: var(--#{$prefix}body-color);
+  }
+}

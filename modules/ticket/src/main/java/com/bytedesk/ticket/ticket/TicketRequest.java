@@ -46,6 +46,7 @@ public class TicketRequest extends BaseRequest {
     private String email;
 
     private String ticketNumber;
+    private String ticketSettingsUid;
     // private String searchText;
     // 
     private String status;

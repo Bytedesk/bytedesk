@@ -43,6 +43,7 @@ public class TicketResponse extends BaseResponse {
     private String email;
 
     private String ticketNumber;
+    private String ticketSettingsUid;
     // 
     private String status;
     private String priority;
@@ -78,6 +79,8 @@ public class TicketResponse extends BaseResponse {
     private String processInstanceId;
     // 流程定义实体UID
     private String processEntityUid;
+    private String processDefinitionKey;
+    private String formEntityUid;
     // 流程定义实体
     // private TicketProcessResponse processEntity;
 

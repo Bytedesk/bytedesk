@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251212-ticket-settings-custom-form-enabled" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_ticket_settings" columnName="custom_form_enabled" />
+        </preConditions>
+        <comment>
+            Initialize the custom_form_enabled column to false for all existing ticket settings records so custom forms remain disabled by default.
+        </comment>
+        <update tableName="bytedesk_ticket_settings">
+            <column name="custom_form_enabled" valueBoolean="false" />
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

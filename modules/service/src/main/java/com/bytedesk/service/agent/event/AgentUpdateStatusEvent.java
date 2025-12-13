@@ -13,23 +13,13 @@
  */
 package com.bytedesk.service.agent.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.agent.AgentEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+public class AgentUpdateStatusEvent extends AbstractAgentEvent {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class AgentUpdateStatusEvent extends ApplicationEvent {
-
-    private final static long serialVersionUID = 1L;
-
-    private AgentEntity agent;
+    private static final long serialVersionUID = 1L;
 
     public AgentUpdateStatusEvent(Object source, AgentEntity agent) {
-        super(source);
-        this.agent = agent;
+        super(source, agent);
     }
 }

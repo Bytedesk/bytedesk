@@ -1,0 +1,62 @@
+// 
+// reboot.scss
+// Extended from Bootstrap
+// 
+
+body{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  overflow-x: hidden;
+  z-index: 0;
+  position: relative;
+}
+
+main{
+  background-color: var(--#{$prefix}body-bg);
+}
+
+header{
+  position: relative;
+  z-index: $zindex-header;
+}
+
+a{
+  transition: $transition-base;
+}
+
+*:focus{
+  outline: none !important;
+}
+
+%heading > a{
+  color: $headings-color;
+  &:hover{
+    color: var(--bs-primary);
+  }
+}
+
+img{
+  max-width: 100%;
+  height: auto;
+}
+
+video{
+  background-size: cover;
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+}
+
+// Section padding top and bottom
+section{
+  padding-top: ($spacer * 1.5);
+  padding-bottom: ($spacer * 1.5);
+}
+
+@include media-breakpoint-down(md) {
+  section{
+    padding-top: ($spacer * 4);
+    padding-bottom: ($spacer * 3);
+  }
+}

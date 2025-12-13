@@ -14,14 +14,15 @@
 package com.bytedesk.service.form_result;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.service.form_result.event.FormResultCreateEvent;
+import com.bytedesk.service.form_result.event.FormResultDeleteEvent;
 import com.bytedesk.service.form_result.event.FormResultUpdateEvent;
 
 import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,19 +34,22 @@ public class FormResultEntityListener {
     @PostPersist
     public void onPostPersist(FormResultEntity tag) {
         log.info("onPostPersist: {}", tag);
-        FormResultEntity cloneFormResult = SerializationUtils.clone(tag);
-        // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new FormResultCreateEvent(cloneFormResult));
+        bytedeskEventPublisher.publishEvent(new FormResultCreateEvent(tag));
     }
 
     @PostUpdate
     public void onPostUpdate(FormResultEntity tag) {
         log.info("onPostUpdate: {}", tag);
-        FormResultEntity cloneFormResult = SerializationUtils.clone(tag);
-        // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new FormResultUpdateEvent(cloneFormResult));
+        bytedeskEventPublisher.publishEvent(new FormResultUpdateEvent(tag));
+    }
+
+    @PostRemove
+    public void onPostRemove(FormResultEntity tag) {
+        log.info("onPostRemove: {}", tag);
+        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        bytedeskEventPublisher.publishEvent(new FormResultDeleteEvent(tag));
     }
     
 }

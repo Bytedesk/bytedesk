@@ -14,7 +14,6 @@
 package com.bytedesk.ticket.attachment;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.upload.UploadEntity;
-import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import jakarta.persistence.Entity;
@@ -29,19 +28,19 @@ import lombok.AllArgsConstructor;
 
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = true, exclude = { "ticket", "comment" })
+@EqualsAndHashCode(callSuper = true, exclude = { "ticket" })
 @Entity(name = "bytedesk_ticket_attachment")
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketAttachmentEntity extends BaseEntity {
+
     private static final long serialVersionUID = 1L;
 
-    
     @ManyToOne(cascade = CascadeType.PERSIST)
     private TicketEntity ticket; 
 
-    @ManyToOne
-    private TicketCommentEntity comment;
+    // @ManyToOne
+    // private TicketCommentEntity comment;
 
     @ManyToOne
     private UploadEntity upload;

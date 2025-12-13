@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.robot_settings;
 
+import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsRequest;
 
@@ -37,4 +38,9 @@ public class RobotSettingsRequest extends BaseSettingsRequest {
      * Rating down settings (Robot-specific)
      */
     private RatedownSettingsRequest rateDownSettings;
+
+    /**
+     * Spring AI tools settings (Robot-specific)
+     */
+    private RobotToolsSettingsRequest toolsSettings;
 }

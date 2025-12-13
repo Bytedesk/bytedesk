@@ -1,0 +1,233 @@
+// 
+// Sidebar-admin
+// Theme Component
+
+//Style for sidebar
+.sidebar{
+  position: relative;
+  padding: 0;
+  &.navbar-expand {
+    @each $breakpoint in map-keys($grid-breakpoints) {
+      $next: breakpoint-next($breakpoint, $grid-breakpoints);
+      $infix: breakpoint-infix($next, $grid-breakpoints);
+      
+      // Styling for navbar-expand
+      &#{$infix} {
+        
+        // Navbar styling for all screen sizes
+        
+        .sidebar-content {
+          padding: 0 1rem 1rem;
+          width: 16.25rem;
+          height: 100%;
+        }
+        .offcanvas {
+          width: auto;
+        }
+
+        // Sidebar menu item hover and active 
+        .sidebar-content .navbar-nav > .nav-item > .nav-link[data-bs-toggle=collapse][aria-expanded=true] {
+          background: rgba(var(--#{$prefix}primary-rgb), 0.1);
+          color: var(--#{$prefix}primary) !important;
+          border-radius: $border-radius;
+        }
+        .sidebar-content .navbar-nav .nav-link{
+          color: var(--#{$prefix}white);
+        }
+        .sidebar-content .navbar-nav .nav-link:focus{
+          color: var(--#{$prefix}white) !important;
+        }
+        .sidebar-content .navbar-nav .nav-link.active{
+          color: var(--#{$prefix}primary) !important;
+        }
+        .sidebar-content .navbar-nav .nav-link:hover{
+          color: var(--#{$prefix}primary) !important;
+        }
+
+        // Sidebar menu dropdown arrow
+        .sidebar-content .nav-item [data-bs-toggle=collapse] {
+          position: relative;
+
+          &:before, &:after {
+            content: "";
+            background: #ddd;
+            border-radius: 1px;
+            display: block;
+            position: absolute;
+            height: 2px;
+            width: 7px;
+            margin: auto 12px;
+            transition: transform 0.3s cubic-bezier(0.8, 0.2, 0.5, 0.1), background 0.2s ease-in-out;
+            top: 0;
+            bottom: 0;
+          }
+
+          &:before {
+            transform: rotate(-40deg);
+            right: 0px;
+          }
+
+          &:after {
+            transform: rotate(40deg);
+            right: 5px;
+          }
+
+          &[aria-expanded=true] {
+            &:before {
+              transform: rotate(40deg);
+              background: var(--#{$prefix}primary);
+            }
+
+            &:after {
+              transform: rotate(-40deg);
+              background: var(--#{$prefix}primary);
+            }
+          }
+        }
+
+        //Line height
+        .sidebar-content .navbar-nav .nav-link {
+          line-height: 40px;
+        }
+
+        // Submenu levels
+        .sidebar-content .nav.flex-column:not(.nav-pills) .nav-link {
+          padding-left: 2.5rem;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+
+        .sidebar-content .navbar-nav .nav {
+          -webkit-box-orient: vertical;
+          -webkit-box-direction: normal;
+          -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
+        }
+
+        // Navbar styling for navbar expand
+        @include media-breakpoint-up($next) {
+          position: fixed;
+          z-index: 1030;
+          top: 0;
+          left: 0;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+      
+          .offcanvas {
+            position: relative;
+          }
+      
+          .navbar-brand {
+            padding: 1.3rem;
+          }
+
+          .navbar-nav .nav-item {
+            position: relative;
+          }
+             
+        }
+        
+
+        // Navbar styling for navbar collapse
+        @include media-breakpoint-down($next) {
+          position: absolute;
+          left: -300px;
+          height: 100vh;
+          z-index: 9;
+
+          .navbar-brand {
+            display: none;
+          }
+
+          .sidebar-content {
+            padding: 1rem;
+          }
+
+          .navbar-nav > .nav-item > .nav-link {
+            padding: 0.2rem;
+            margin-bottom: 0;
+            font-size: 0.938rem;
+          }
+
+          .offcanvas .offcanvas-body .navbar-nav .nav-item {
+            border-bottom: 0;
+            padding: 0;
+          }
+          
+        }
+      }
+    }
+  }
+}
+
+//Sidebar menu icon
+.sidebar-offcanvas-menu{
+  background-color: rgba(var(--#{$prefix}primary-rgb), 0.1);
+  border-radius: $border-radius;
+}
+
+// Top bar style
+.top-bar {
+  position: relative;
+  padding: 1.6rem;
+  box-shadow: $box-shadow;
+}
+
+@include media-breakpoint-down(lg){
+  .top-bar .navbar-expand-lg .navbar-collapse{
+    padding: 0 10px;
+  }
+}
+
+//Page content style
+.page-content {
+  position: relative;
+  height: 100%;
+  display: block;
+
+  .page-content-wrapper {
+    min-height: 86vh;
+    margin: 1.5rem 1.5rem;
+    padding: 1.5rem;
+    background: var(--#{$prefix}body-bg);
+    box-shadow: $box-shadow;
+    border-radius: 6px;
+    height: 100%;
+    flex-direction: column !important;
+    display: flex !important;
+  }
+}
+@include media-breakpoint-up(xl){
+  .page-content{
+    margin-left: 16.25rem;
+  }
+}
+
+@include media-breakpoint-down(sm){
+  .page-content .page-content-wrapper {
+    margin: 1rem 0;
+    padding: 1rem;
+  }
+}
+
+// Notification dots blink
+.animation-blink {
+  animation: blink 2s infinite;
+}
+@keyframes blink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.notif-badge {
+  width: 10px;
+  height: 10px;
+  background: var(--#{$prefix}danger);
+  border-radius: 50%;
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  z-index: 1;
+}

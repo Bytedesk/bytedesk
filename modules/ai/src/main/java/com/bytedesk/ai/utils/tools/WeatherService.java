@@ -15,8 +15,14 @@ package com.bytedesk.ai.utils.tools;
 
 import java.util.function.Function;
 
+/**
+ * https://docs.spring.io/spring-ai/reference/api/tools.html#_functions_as_tools
+ */
 public class WeatherService implements Function<WeatherRequest, WeatherResponse> {
+
     public WeatherResponse apply(WeatherRequest request) {
+        // 
         return new WeatherResponse(30.0, Unit.C);
     }
 }
+

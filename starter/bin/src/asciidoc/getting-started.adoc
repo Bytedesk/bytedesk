@@ -1,0 +1,45 @@
+[introduction]
+= 部署
+
+Xiaper支持单机部署、分布式集群部署 和 微服务架构部署
+
+[getting-started]
+== 架构
+
+
+[prepare]
+== 准备工作
+
+nginx
+
+
+mysql
+
+ 注：支持oracle
+
+
+redis
+
+
+zookeeper
+
+
+
+[jar]
+== Jar
+
+[maven]
+== Maven
+
+[docker]
+== Docker
+
+
+[cloud]
+== Spring Cloud
+
+
+
+
+
+

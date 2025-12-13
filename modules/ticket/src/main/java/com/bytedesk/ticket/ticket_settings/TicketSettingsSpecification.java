@@ -52,7 +52,6 @@ public class TicketSettingsSpecification extends BaseSpecification<TicketSetting
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
-            // 2025-11: workgroupUid 过滤已废弃，如需按工作组筛选，请先由绑定表查出 settingsUid 列表，再在此处做 in 过滤
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

@@ -14,7 +14,6 @@
 package com.bytedesk.service.message_template;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -33,19 +32,17 @@ public class MessageTemplateEntityListener {
     @PostPersist
     public void onPostPersist(MessageTemplateEntity template) {
         log.info("onPostPersist: {}", template);
-        MessageTemplateEntity cloneMessageTemplate = SerializationUtils.clone(template);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new MessageTemplateCreateEvent(cloneMessageTemplate));
+        bytedeskEventPublisher.publishEvent(new MessageTemplateCreateEvent(template));
     }
 
     @PostUpdate
     public void onPostUpdate(MessageTemplateEntity template) {
         log.info("onPostUpdate: {}", template);
-        MessageTemplateEntity cloneMessageTemplate = SerializationUtils.clone(template);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new MessageTemplateUpdateEvent(cloneMessageTemplate));
+        bytedeskEventPublisher.publishEvent(new MessageTemplateUpdateEvent(template));
     }
     
 }

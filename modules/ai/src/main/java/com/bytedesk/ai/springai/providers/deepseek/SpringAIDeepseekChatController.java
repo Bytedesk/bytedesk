@@ -51,7 +51,8 @@ public class SpringAIDeepseekChatController {
     @Autowired(required = false)
     @Qualifier("deepseekChatModel")
     private ChatModel deepseekChatModel;
-    private final SpringAIDeepseekChatService springAIDeepseekService;
+    // 
+    private final SpringAIDeepseekChatService springAIDeepseekChatService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
@@ -60,7 +61,7 @@ public class SpringAIDeepseekChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIDeepseekService.processPromptSync(message, null);
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIDeepseekChatService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

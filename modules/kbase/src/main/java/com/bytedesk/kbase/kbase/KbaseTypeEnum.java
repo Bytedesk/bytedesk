@@ -21,6 +21,7 @@ public enum KbaseTypeEnum {
     KEYWORD, // 关键词
     // FAQ, // 常见问题，合并到LLM
     QUICKREPLY, // 快捷回复
+    // QUICKBUTTON, // 快捷按钮
     AUTOREPLY, // 自动回复
     BLOG, // 博客
     EMAIL, // 邮件

@@ -165,6 +165,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
      */
     @PostMapping("/unclaim")
     public ResponseEntity<?> unclaimTicket(@RequestBody TicketRequest request) {
+
         TicketResponse response = ticketService.unclaimTicket(request);
         
         return ResponseEntity.ok(JsonResult.success(response));
@@ -229,7 +230,6 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     /**
      * 升级工单
      */
-    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN')")
     @PostMapping("/escalate")
     public ResponseEntity<?> escalateTicket(@RequestBody TicketRequest request) {
         
@@ -287,7 +287,9 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
      */
     @GetMapping("/history/task")
     public ResponseEntity<?> queryTicketTaskHistory(TicketRequest request) {
+
         List<TicketHistoryTaskResponse> histories = ticketService.queryTicketTaskHistory(request);
+
         return ResponseEntity.ok(JsonResult.success(histories));
     }
 
@@ -296,7 +298,9 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
      */
     @GetMapping("/history/process")
     public ResponseEntity<?> queryTicketProcessHistory(TicketRequest request) {
+
         List<TicketHistoryProcessResponse> histories = ticketService.queryTicketProcessHistory(request);
+
         return ResponseEntity.ok(JsonResult.success(histories));
     }
 

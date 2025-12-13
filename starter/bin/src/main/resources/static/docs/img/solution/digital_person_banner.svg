@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI智能数字人客服方案">
+  <defs>
+    <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" rx="24" fill="url(#gd)"/>
+  <g fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial">
+    <text x="600" y="190" text-anchor="middle" font-size="44" font-weight="700">AI智能数字人客服解决方案</text>
+    <text x="600" y="240" text-anchor="middle" font-size="20" opacity="0.9">ASR + LLM + TTS · 口型同步 · 多模互动</text>
+  </g>
+</svg>

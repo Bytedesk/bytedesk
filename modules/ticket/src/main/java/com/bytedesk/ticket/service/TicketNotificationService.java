@@ -16,7 +16,6 @@ package com.bytedesk.ticket.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.ticket.comment.TicketCommentEntity;
 import com.bytedesk.ticket.ticket.TicketEntity;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +33,9 @@ public class TicketNotificationService {
         // 工单分配通知
     }
     
-    public void notifyTicketComment(TicketCommentEntity comment) {
-        // 工单评论通知
-    }
+    // public void notifyTicketComment(TicketCommentEntity comment) {
+    //     // 工单评论通知
+    // }
     
     public void notifySLABreach(TicketEntity ticket) {
         // SLA违规通知

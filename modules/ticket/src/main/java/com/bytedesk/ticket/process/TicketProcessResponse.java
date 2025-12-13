@@ -15,6 +15,8 @@ package com.bytedesk.ticket.process;
 
 import com.bytedesk.core.base.BaseResponse;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,12 +40,16 @@ public class TicketProcessResponse extends BaseResponse {
 
     private String description;
 
-    // private String type;
+    private String type;
 
     private String status;
 
     private String schema;
 
-    // 部署id
     private String deploymentId;
+
+    @JsonProperty("deployed")
+    public boolean isDeployed() {
+        return TicketProcessStatusEnum.DEPLOYED.name().equalsIgnoreCase(this.status);
+    }
 }

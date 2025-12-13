@@ -25,5 +25,10 @@
     <include file="db/changelog/migration/251202_grant_role_level_permissions.xml" />
     <include file="db/changelog/migration/251205_rename_ticket_summary_to_title.xml" />
     <include file="db/changelog/migration/251206_update_default_role_levels.xml" />
+    <!-- <include file="db/changelog/migration/251208_agent_status_duration_seconds.xml" /> -->
+    <include file="db/changelog/migration/251211_update_ticket_process_type.xml" />
+    <include file="db/changelog/migration/251212_ticket_settings_custom_form_enabled_reset.xml" />
+    <include file="db/changelog/migration/251213_assign_quickbutton_role_permissions.xml" />
+    <include file="db/changelog/migration/251214_remove_menu_color_column.xml" />
 
 </databaseChangeLog>

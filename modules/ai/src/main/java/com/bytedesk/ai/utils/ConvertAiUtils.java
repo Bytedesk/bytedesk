@@ -30,6 +30,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.kbase.settings.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
+import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
 
 @UtilityClass
 public class ConvertAiUtils {
@@ -75,7 +76,10 @@ public class ConvertAiUtils {
 
     public static ServiceSettingsResponseVisitor convertToServiceSettingsResponseVisitor(
             ServiceSettingsEntity serviceSettings) {
-        return getModelMapper().map(serviceSettings, ServiceSettingsResponseVisitor.class);
+        ServiceSettingsEntity source = serviceSettings != null ? serviceSettings : ServiceSettingsEntity.builder().build();
+        ServiceSettingsResponseVisitor resp = getModelMapper().map(source, ServiceSettingsResponseVisitor.class);
+        resp.setQuickButtons(QuickButtonResponseVisitor.fromEntities(source.getQuickButtons()));
+        return resp;
     }
 
     public static RobotMessageResponse convertToRobotMessageResponse(RobotMessageEntity message) {
