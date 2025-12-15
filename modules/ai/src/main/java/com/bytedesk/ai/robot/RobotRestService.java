@@ -516,6 +516,22 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                     robotUid = BytedeskConsts.DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID;
                 }
 
+                // Ensure the chosen UID is unique. If it already exists (including soft-deleted
+                // records), generate a new one to avoid unique constraint violations on `uuid`.
+                try {
+                    if (existsByUid(robotUid)) {
+                        log.warn("robotUid {} already exists, generating a new uid to avoid conflict", robotUid);
+                        // generate until unique (extremely unlikely to loop many times)
+                        do {
+                            robotUid = uidUtils.getUid();
+                        } while (existsByUid(robotUid));
+                    }
+                } catch (Exception ex) {
+                    // In rare cases the existence check may fail; fallback to generating a fresh uid
+                    log.warn("failed to check uid existence for {}: {}", robotUid, ex.getMessage());
+                    robotUid = uidUtils.getUid();
+                }
+
                 // Create robot entity
                 RobotEntity robot = RobotEntity.builder()
                     .uid(robotUid)
@@ -531,8 +547,14 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                     .settings(persistedSettings)
                     .system(true)
                     .build();
-                //
-                save(robot);
+                // Persist with defensive handling for unique constraint violations
+                try {
+                    save(robot);
+                } catch (org.springframework.dao.DataIntegrityViolationException dive) {
+                    log.warn("skipping robot creation due to DataIntegrityViolation for uid {}: {}", robotUid, dive.getMessage());
+                } catch (Exception ex) {
+                    log.error("failed to save robot {}: {}", robotUid, ex.getMessage(), ex);
+                }
             }
         }
     }
