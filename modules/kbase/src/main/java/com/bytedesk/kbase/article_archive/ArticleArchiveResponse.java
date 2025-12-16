@@ -64,8 +64,6 @@ public class ArticleArchiveResponse extends BaseResponse {
 
     private Boolean published;
 
-    private Boolean markdown;
-
     private Integer readCount;
 
     private Integer likeCount;

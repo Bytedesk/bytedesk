@@ -78,9 +78,6 @@ public class ArticleArchiveRequest extends BaseRequest {
     private Boolean published = false;
 
     @Builder.Default
-    private Boolean markdown = false;
-
-    @Builder.Default
     private Integer readCount = 0;
 
     @Builder.Default

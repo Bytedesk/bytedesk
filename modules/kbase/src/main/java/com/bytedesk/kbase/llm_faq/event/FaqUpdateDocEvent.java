@@ -13,24 +13,14 @@
  */
 package com.bytedesk.kbase.llm_faq.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class FaqUpdateDocEvent extends ApplicationEvent {
+public class FaqUpdateDocEvent extends AbstractFaqEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private FaqEntity faq;
-
     public FaqUpdateDocEvent(FaqEntity faq) {
-        super(faq);
-        this.faq = faq;
+        super(faq, faq);
     }
 
 }

@@ -13,23 +13,13 @@
  */
 package com.bytedesk.kbase.kbase_invite.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.kbase_invite.KbaseInviteEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class KbaseInviteDeleteEvent extends ApplicationEvent {
+public class KbaseInviteDeleteEvent extends AbstractKbaseInviteEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private KbaseInviteEntity tag;
-
-    public KbaseInviteDeleteEvent(KbaseInviteEntity tag) {
-        super(tag);
-        this.tag = tag;
+    public KbaseInviteDeleteEvent(Object source, KbaseInviteEntity kbaseInvite) {
+        super(source, kbaseInvite);
     }
 }

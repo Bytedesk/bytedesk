@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.llm_text;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -33,24 +32,18 @@ public class TextEntityListener {
     @PostPersist
     public void onPostPersist(TextEntity text) {
         log.info("TextEntityListener onPostPersist: {}", text.getTitle());
-        // 
-        TextEntity clonedText = SerializationUtils.clone(text);
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new TextCreateEvent(clonedText));
+        publisher.publishEvent(new TextCreateEvent(text));
     }
 
     @PostUpdate
     public void onPostUpdate(TextEntity text) {
         log.info("TextEntityListener onPostUpdate: {}", text.getTitle());
-        // 
-        TextEntity clonedText = SerializationUtils.clone(text);
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         if (text.isDeleted()) {
-            publisher.publishEvent(new TextDeleteEvent(clonedText));
+            publisher.publishEvent(new TextDeleteEvent(text));
         } else {
-            publisher.publishEvent(new TextUpdateEvent(clonedText));
+            publisher.publishEvent(new TextUpdateEvent(text));
         }
     }
     

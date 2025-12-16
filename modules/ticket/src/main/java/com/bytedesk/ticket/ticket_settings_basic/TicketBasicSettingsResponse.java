@@ -28,4 +28,14 @@ public class TicketBasicSettingsResponse extends BaseResponse {
     private Boolean enableAutoClose;
     private Boolean requireLogin;
     private String assignmentMode;
+
+    // 联系方式字段显示配置
+    private Boolean showContactName;
+    private Boolean requireContactName;
+    private Boolean showEmail;
+    private Boolean requireEmail;
+    private Boolean showPhone;
+    private Boolean requirePhone;
+    private Boolean showWechat;
+    private Boolean requireWechat;
 }

@@ -13,23 +13,13 @@
  */
 package com.bytedesk.kbase.llm_webpage.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class WebpageDeleteEvent extends ApplicationEvent {
+public class WebpageDeleteEvent extends AbstractWebpageEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private WebpageEntity webpage;
-
-    public WebpageDeleteEvent(WebpageEntity webpage) {
-        super(webpage);
-        this.webpage = webpage;
+    public WebpageDeleteEvent(Object source, WebpageEntity webpage) {
+        super(source, webpage);
     }
 }

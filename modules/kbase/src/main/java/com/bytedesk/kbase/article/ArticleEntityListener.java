@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.article;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -34,9 +33,8 @@ public class ArticleEntityListener {
     public void onPostPersist(ArticleEntity article) {
         log.info("ArticleEntityListener: onPostPersist");
         if (!article.isVectorIndexed()) {
-            ArticleEntity clonedArticle = SerializationUtils.clone(article);
             BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-            publisher.publishEvent(new ArticleCreateEvent(this, clonedArticle));
+            publisher.publishEvent(new ArticleCreateEvent(this, article));
         }
     }
 
@@ -44,14 +42,13 @@ public class ArticleEntityListener {
     public void onPostUpdate(ArticleEntity article) {
         log.info("ArticleEntityListener: onPostUpdate");
         if (!article.isVectorIndexed() && !article.isElasticStatusSuccess()) {
-            ArticleEntity clonedArticle = SerializationUtils.clone(article);
             //
             if (article.isDeleted()) {
                 BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-                publisher.publishEvent(new ArticleDeleteEvent(this, clonedArticle));
+                publisher.publishEvent(new ArticleDeleteEvent(this, article));
             } else {
                 BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-                publisher.publishEvent(new ArticleUpdateEvent(this, clonedArticle));
+                publisher.publishEvent(new ArticleUpdateEvent(this, article));
             }
         }
     }

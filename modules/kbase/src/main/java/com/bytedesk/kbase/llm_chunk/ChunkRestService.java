@@ -138,7 +138,7 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
             // 判断必要的内容是否有变化，如果内容发生变化，发布UpdateDocEvent事件
             if (entity.hasChanged(request)) {
                 // 发布事件，更新文档
-                ChunkUpdateDocEvent chunkUpdateDocEvent = new ChunkUpdateDocEvent(entity);
+                ChunkUpdateDocEvent chunkUpdateDocEvent = new ChunkUpdateDocEvent(this, entity);
                 bytedeskEventPublisher.publishEvent(chunkUpdateDocEvent);
             }
 

@@ -45,21 +45,15 @@ public class ArticleRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String title;
 
     private String summary;
-    // private String coverImageUrl;
+
+    private String coverImageUrl;
 
     private String contentMarkdown;
 
     private String contentHtml;
-
-    // search.html 搜索用
-    // private String content;
-
-    // @Builder.Default
-    // private MessageTypeEnum contentType = MessageTypeEnum.TEXT;
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
@@ -75,9 +69,6 @@ public class ArticleRequest extends BaseRequest {
 
     @Builder.Default
     private Boolean published = false;
-
-    @Builder.Default
-    private Boolean markdown = false;
 
     @Builder.Default
     private Integer readCount = 0;
@@ -117,11 +108,6 @@ public class ArticleRequest extends BaseRequest {
 
     private String kbUid;
 
-    // private String userUid;
-
-    // 
-    // private String searchText;
-    
     // used for client query
     private String componentType;
 }

@@ -799,6 +799,31 @@ public class TicketSettingsRestService extends
         if (request.getAssignmentMode() != null) {
             target.setAssignmentMode(request.getAssignmentMode());
         }
+        // 联系方式字段配置
+        if (request.getShowContactName() != null) {
+            target.setShowContactName(request.getShowContactName());
+        }
+        if (request.getRequireContactName() != null) {
+            target.setRequireContactName(request.getRequireContactName());
+        }
+        if (request.getShowEmail() != null) {
+            target.setShowEmail(request.getShowEmail());
+        }
+        if (request.getRequireEmail() != null) {
+            target.setRequireEmail(request.getRequireEmail());
+        }
+        if (request.getShowPhone() != null) {
+            target.setShowPhone(request.getShowPhone());
+        }
+        if (request.getRequirePhone() != null) {
+            target.setRequirePhone(request.getRequirePhone());
+        }
+        if (request.getShowWechat() != null) {
+            target.setShowWechat(request.getShowWechat());
+        }
+        if (request.getRequireWechat() != null) {
+            target.setRequireWechat(request.getRequireWechat());
+        }
     }
 
     private void copyBasicSettings(TicketBasicSettingsEntity source, TicketBasicSettingsEntity target) {
@@ -813,6 +838,15 @@ public class TicketSettingsRestService extends
         target.setEnableAutoClose(source.getEnableAutoClose());
         target.setRequireLogin(source.getRequireLogin());
         target.setAssignmentMode(source.getAssignmentMode());
+        // 联系方式字段配置
+        target.setShowContactName(source.getShowContactName());
+        target.setRequireContactName(source.getRequireContactName());
+        target.setShowEmail(source.getShowEmail());
+        target.setRequireEmail(source.getRequireEmail());
+        target.setShowPhone(source.getShowPhone());
+        target.setRequirePhone(source.getRequirePhone());
+        target.setShowWechat(source.getShowWechat());
+        target.setRequireWechat(source.getRequireWechat());
     }
 
     private TicketBasicSettingsResponse mapBasicSettings(TicketBasicSettingsEntity entity) {
@@ -829,6 +863,15 @@ public class TicketSettingsRestService extends
                 .enableAutoClose(entity.getEnableAutoClose())
                 .requireLogin(entity.getRequireLogin())
                 .assignmentMode(entity.getAssignmentMode())
+                // 联系方式字段配置
+                .showContactName(entity.getShowContactName())
+                .requireContactName(entity.getRequireContactName())
+                .showEmail(entity.getShowEmail())
+                .requireEmail(entity.getRequireEmail())
+                .showPhone(entity.getShowPhone())
+                .requirePhone(entity.getRequirePhone())
+                .showWechat(entity.getShowWechat())
+                .requireWechat(entity.getRequireWechat())
                 .build();
     }
 
@@ -909,8 +952,8 @@ public class TicketSettingsRestService extends
                 .type(entity.getType())
                 .status(entity.getStatus())
                 .schema(entity.getSchema())
-                .enabled(entity.getEnabled())
-                .categoryUid(entity.getCategoryUid())
+                // .enabled(entity.getEnabled())
+                // .categoryUid(entity.getCategoryUid())
                 .build();
     }
 

@@ -44,7 +44,7 @@ public class FormResponse extends BaseResponse {
 
     private String schema;
 
-    private Boolean enabled;
+    // private Boolean enabled;
 
-    private String categoryUid;
+    // private String categoryUid;
 }

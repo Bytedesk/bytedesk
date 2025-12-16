@@ -13,24 +13,14 @@
  */
 package com.bytedesk.kbase.llm_chunk.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ChunkCreateEvent extends ApplicationEvent {
+public class ChunkCreateEvent extends AbstractChunkEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private ChunkEntity chunk;
-
-    public ChunkCreateEvent(ChunkEntity chunk) {
-        super(chunk);
-        this.chunk = chunk;
+    public ChunkCreateEvent(Object source, ChunkEntity chunk) {
+        super(source, chunk);
     }
 
 }

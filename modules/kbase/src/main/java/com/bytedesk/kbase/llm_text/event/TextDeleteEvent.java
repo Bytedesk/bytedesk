@@ -13,23 +13,13 @@
  */
 package com.bytedesk.kbase.llm_text.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.llm_text.TextEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class TextDeleteEvent extends ApplicationEvent {
+public class TextDeleteEvent extends AbstractTextEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TextEntity text;
-
     public TextDeleteEvent(TextEntity text) {
-        super(text);
-        this.text = text;
+        super(text, text);
     }
 }

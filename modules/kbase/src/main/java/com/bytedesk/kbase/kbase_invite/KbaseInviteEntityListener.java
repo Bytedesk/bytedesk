@@ -15,6 +15,12 @@ package com.bytedesk.kbase.kbase_invite;
 
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.kbase.kbase_invite.event.KbaseInviteCreateEvent;
+import com.bytedesk.kbase.kbase_invite.event.KbaseInviteDeleteEvent;
+import com.bytedesk.kbase.kbase_invite.event.KbaseInviteUpdateEvent;
+
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 
@@ -25,13 +31,21 @@ import lombok.extern.slf4j.Slf4j;
 public class KbaseInviteEntityListener {
 
     @PostPersist
-    public void onPostPersist(KbaseInviteEntity tag) {
-        log.info("onPostPersist: {}", tag);
+    public void onPostPersist(KbaseInviteEntity kbaseInvite) {
+        log.info("onPostPersist: {}", kbaseInvite);
+        BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        publisher.publishEvent(new KbaseInviteCreateEvent(this, kbaseInvite));
     }
 
     @PostUpdate
-    public void onPostUpdate(KbaseInviteEntity tag) {
-        log.info("onPostUpdate: {}", tag);
+    public void onPostUpdate(KbaseInviteEntity kbaseInvite) {
+        log.info("onPostUpdate: {}", kbaseInvite);
+        BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        if (kbaseInvite.isDeleted()) {
+            publisher.publishEvent(new KbaseInviteDeleteEvent(this, kbaseInvite));
+        } else {
+            publisher.publishEvent(new KbaseInviteUpdateEvent(this, kbaseInvite));
+        }
     }
     
 }

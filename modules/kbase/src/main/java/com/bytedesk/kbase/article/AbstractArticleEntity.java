@@ -21,7 +21,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 
 import jakarta.persistence.Column;
@@ -55,6 +54,9 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     private String summary;
 
+    // 封面图
+    private String coverImageUrl;
+
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String contentMarkdown;
 
@@ -63,7 +65,7 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "article_type")
-    private String type = MessageTypeEnum.TEXT.name();
+    private String type = ArticleTypeEnum.TEXT.name();
 
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -77,10 +79,6 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Column(name = "is_published")
     @Builder.Default
     private Boolean published = false;
-
-    @Column(name = "is_markdown")
-    @Builder.Default
-    private Boolean markdown = false;
 
     @Builder.Default
     private Integer readCount = 0;

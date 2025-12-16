@@ -1,7 +1,6 @@
 package com.bytedesk.kbase.llm_file;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -20,24 +19,18 @@ public class FileEntityListener {
     @PostPersist
     public void onPostPersist(FileEntity file) {
         log.info("FileEntityListener: onPostPersist");
-        // 
-        FileEntity clonedFile = SerializationUtils.clone(file);
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new FileCreateEvent(clonedFile));
+        publisher.publishEvent(new FileCreateEvent(this, file));
     }
 
     @PostUpdate
     public void onPostUpdate(FileEntity file) {
         log.info("FileEntityListener: onPostUpdate");
-        // 
-        FileEntity clonedFile = SerializationUtils.clone(file);
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         if (file.isDeleted()) {
-            publisher.publishEvent(new FileDeleteEvent(clonedFile));
+            publisher.publishEvent(new FileDeleteEvent(this, file));
         } else {
-            publisher.publishEvent(new FileUpdateEvent(clonedFile));
+            publisher.publishEvent(new FileUpdateEvent(this, file));
         }
     }
 }

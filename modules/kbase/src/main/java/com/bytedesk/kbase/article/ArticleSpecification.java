@@ -32,7 +32,9 @@ public class ArticleSpecification extends BaseSpecification<ArticleEntity, Artic
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+            // 
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
@@ -48,6 +50,10 @@ public class ArticleSpecification extends BaseSpecification<ArticleEntity, Artic
             }
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("contentMarkdown"), "%" + request.getContent() + "%"));
+            }
+            // type
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));

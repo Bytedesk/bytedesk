@@ -68,7 +68,7 @@ public class ServiceSettingsResponse implements Serializable {
     private Boolean showHistory;
 
     // 输入联想开关
-    private Boolean showInputAssociation;
+    // private Boolean showInputAssociation;
 
     private Boolean showCaptcha;
 
@@ -102,8 +102,10 @@ public class ServiceSettingsResponse implements Serializable {
     // 桌面版聊天窗口右侧iframe地址
     private String rightIframeUrl;
 
-    // 是否显示预搜索
-    private Boolean showPreSearch;
+    // 是否启用输入联想
+    private Boolean inputAssociationEnabled;
+
+    private String inputAssociationKbUid;
 
     private Boolean showFaqs;
     private List<FaqResponse> faqs;
@@ -170,7 +172,7 @@ public class ServiceSettingsResponse implements Serializable {
                 .showPreForm(settings.getShowPreForm())
                 .preFormRequired(settings.getPreFormRequired())
                 .showHistory(settings.getShowHistory())
-                .showInputAssociation(settings.getShowInputAssociation())
+                // .showInputAssociation(settings.getShowInputAssociation())
                 .showCaptcha(settings.getShowCaptcha())
                 .welcomeTip(settings.getWelcomeTip())
                 .welcomeKbUid(settings.getWelcomeKbUid())
@@ -179,7 +181,7 @@ public class ServiceSettingsResponse implements Serializable {
                 .agentCloseTip(settings.getAgentCloseTip())
                 .showRightIframe(settings.getShowRightIframe())
                 .rightIframeUrl(settings.getRightIframeUrl())
-                .showPreSearch(settings.getShowPreSearch())
+                .inputAssociationEnabled(settings.getInputAssociationEnabled())
                 .showFaqs(settings.getShowFaqs())
                 .faqKbUid(settings.getFaqKbUid())
                 .showQuickButtons(settings.getShowQuickButtons())

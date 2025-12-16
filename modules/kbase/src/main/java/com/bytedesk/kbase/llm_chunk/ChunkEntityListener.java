@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.llm_chunk;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -33,24 +32,20 @@ public class ChunkEntityListener {
     @PostPersist
     public void onPostPersist(ChunkEntity chunk) {
         log.info("ChunkEntityListener onPostPersist: {}", chunk.getName());
-        ChunkEntity clonedChunk = SerializationUtils.clone(chunk);
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new ChunkCreateEvent(clonedChunk));
+        publisher.publishEvent(new ChunkCreateEvent(this, chunk));
     }
 
     @PostUpdate
     public void onPostUpdate(ChunkEntity chunk) {
         log.info("ChunkEntityListener onPostUpdate: {}", chunk.getName());
-        ChunkEntity clonedChunk = SerializationUtils.clone(chunk);
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         if (chunk.isDeleted()) {
             log.info("ChunkEntityListener onPostUpdate: Chunk is deleted");
-            publisher.publishEvent(new ChunkDeleteEvent(clonedChunk));
-        }else {
+            publisher.publishEvent(new ChunkDeleteEvent(this, chunk));
+        } else {
             log.info("ChunkEntityListener onPostUpdate: Chunk is update");
-            publisher.publishEvent(new ChunkUpdateEvent(clonedChunk));
-        }   
+            publisher.publishEvent(new ChunkUpdateEvent(this, chunk));
+        }
     }
 }

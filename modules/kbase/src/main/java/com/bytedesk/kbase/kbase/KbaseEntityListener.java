@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.kbase;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -32,20 +31,18 @@ public class KbaseEntityListener {
     @PostPersist
     void postPersist(KbaseEntity kbase) {
         // log.info("kbase postPersist: {}", kbase.getName());
-        KbaseEntity clonedKbase = SerializationUtils.clone(kbase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new KbaseCreateEvent(this, clonedKbase));
+        publisher.publishEvent(new KbaseCreateEvent(this, kbase));
     }
 
     // 
     @PostUpdate
     void postUpdate(KbaseEntity kbase) {
         // log.info("kbase postUpdate: {}", kbase.getName());
-        KbaseEntity clonedKbase = SerializationUtils.clone(kbase);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new KbaseUpdateEvent(this, clonedKbase));
+        publisher.publishEvent(new KbaseUpdateEvent(this, kbase));
     }
 
 

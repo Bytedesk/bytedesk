@@ -13,25 +13,13 @@
  */
 package com.bytedesk.kbase.material.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.material.MaterialEntity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.EqualsAndHashCode;
-
-@Getter
-@Setter
-@EqualsAndHashCode(callSuper = false)
-public class MaterialDeleteEvent extends ApplicationEvent {
+public class MaterialDeleteEvent extends AbstractMaterialEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private MaterialEntity material;
-
-    public MaterialDeleteEvent(MaterialEntity material) {
-        super(material);
-        this.material = material;
+    public MaterialDeleteEvent(Object source, MaterialEntity material) {
+        super(source, material);
     }
 }

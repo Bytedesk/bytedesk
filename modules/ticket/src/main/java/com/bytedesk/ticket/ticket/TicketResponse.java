@@ -41,6 +41,7 @@ public class TicketResponse extends BaseResponse {
     private String contactName;
     private String phone;
     private String email;
+    private String wechat;
 
     private String ticketNumber;
     private String ticketSettingsUid;

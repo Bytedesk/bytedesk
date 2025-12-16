@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.llm_website;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -31,28 +30,20 @@ import lombok.extern.slf4j.Slf4j;
 public class WebsiteEntityListener {
 
     @PostPersist
-    public void onPostPersist(WebsiteCreateEvent event) {
-        WebsiteEntity website = event.getWebsite();
-        log.info("WebsiteEntityListener onPostPersist: {}", website.toString());
-        // 
-        WebsiteEntity clonedWebsite = SerializationUtils.clone(website);
-        // 
+    public void onPostPersist(WebsiteEntity website) {
+        log.info("WebsiteEntityListener onPostPersist: {}", website);
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new WebsiteCreateEvent(clonedWebsite));
+        publisher.publishEvent(new WebsiteCreateEvent(this, website));
     }
 
     @PostUpdate 
-    public void onPostUpdate(WebsiteUpdateEvent event) {
-        WebsiteEntity website = event.getWebsite();
-        log.info("WebsiteEntityListener onPostUpdate: {}", website.toString());
-        // 
-        WebsiteEntity clonedWebsite = SerializationUtils.clone(website);
-        // 
+    public void onPostUpdate(WebsiteEntity website) {
+        log.info("WebsiteEntityListener onPostUpdate: {}", website);
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         if (website.isDeleted()) {
-            publisher.publishEvent(new WebsiteDeleteEvent(clonedWebsite));
+            publisher.publishEvent(new WebsiteDeleteEvent(this, website));
         } else {
-            publisher.publishEvent(new WebsiteUpdateEvent(clonedWebsite));
+            publisher.publishEvent(new WebsiteUpdateEvent(this, website));
         }
     }
     

@@ -76,8 +76,7 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
     @Override
     public ArticleResponse create(ArticleRequest request) {
         UserEntity user = authService.getUser();
-        
-
+        // 
         ArticleEntity entity = modelMapper.map(request, ArticleEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
@@ -109,9 +108,15 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
             entity.setSummary(request.getSummary());
+            entity.setCoverImageUrl(request.getCoverImageUrl());
+            entity.setType(request.getType());
             entity.setContentHtml(request.getContentHtml());
             entity.setContentMarkdown(request.getContentMarkdown());
             entity.setCategoryUid(request.getCategoryUid());
+            entity.setPublished(request.getPublished());
+            entity.setTop(request.getTop());
+            entity.setStartDate(request.getStartDate());
+            entity.setEndDate(request.getEndDate());
             //
             ArticleEntity savedArticle = save(entity);
             if (savedArticle == null) {
@@ -213,7 +218,7 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
                 .title(title)
                 .summary(summary)
                 .contentMarkdown(md)
-                .markdown(true)
+                .type(ArticleTypeEnum.MARKDOWN.name())
                 .published(true)
                 .kbase(kb)
                 .build();

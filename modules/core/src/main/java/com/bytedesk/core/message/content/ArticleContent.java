@@ -32,13 +32,26 @@ public class ArticleContent extends BaseContent {
     
     private String title;
 
-    private String url;
+    /** 知识库标识 */
+    private String kbUid;
 
-    private String imageUrl;
+    /** 文章唯一标识 */
+    private String uid;
 
-    private String description;
+    /** 摘要 */
+    private String summary;
 
-    private String content;
+    /** Markdown正文 */
+    private String contentMarkdown;
+
+    /** HTML正文 */
+    private String contentHtml;
+
+    /** 内容类型: TEXT/MARKDOWN/HTML 等 */
+    private String type;
+
+    /** 封面图 */
+    private String coverImageUrl;
 
     /**
      * 从JSON字符串反序列化为ArticleContent对象

@@ -14,12 +14,12 @@
 package com.bytedesk.kbase.material;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
-import com.bytedesk.kbase.material.event.MaterialCreateEvent;
-import com.bytedesk.kbase.material.event.MaterialUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.kbase.material.event.MaterialCreateEvent;
+import com.bytedesk.kbase.material.event.MaterialDeleteEvent;
+import com.bytedesk.kbase.material.event.MaterialUpdateEvent;
 
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
@@ -33,19 +33,19 @@ public class MaterialEntityListener {
     @PostPersist
     public void onPostPersist(MaterialEntity material) {
         log.info("onPostPersist: {}", material);
-        MaterialEntity cloneMaterial = SerializationUtils.clone(material);
-        // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new MaterialCreateEvent(cloneMaterial));
+        bytedeskEventPublisher.publishEvent(new MaterialCreateEvent(this, material));
     }
 
     @PostUpdate
     public void onPostUpdate(MaterialEntity material) {
         log.info("onPostUpdate: {}", material);
-        MaterialEntity cloneMaterial = SerializationUtils.clone(material);
-        // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new MaterialUpdateEvent(cloneMaterial));
+        if (material.isDeleted()) {
+            bytedeskEventPublisher.publishEvent(new MaterialDeleteEvent(this, material));
+        } else {
+            bytedeskEventPublisher.publishEvent(new MaterialUpdateEvent(this, material));
+        }
     }
     
 }

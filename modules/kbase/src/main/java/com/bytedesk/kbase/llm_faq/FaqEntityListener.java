@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.llm_faq;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -33,26 +32,24 @@ public class FaqEntityListener {
     @PostPersist
     public void onPostPersist(FaqEntity faq) {
         // log.info("FaqEntityListener onPostPersist: {}", faq.getUid());
-        FaqEntity clonedFaq = SerializationUtils.clone(faq);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new FaqCreateEvent(clonedFaq));
+        publisher.publishEvent(new FaqCreateEvent(faq));
     }
 
     @PostUpdate
     public void onPostUpdate(FaqEntity faq) {
         // log.info("FaqEntityListener onPostUpdate: {}", faq.getUid());
-        FaqEntity clonedFaq = SerializationUtils.clone(faq);
         // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         
         // 只有在实体被标记为删除且没有向量处理正在进行时才发送删除事件
         if (faq.isDeleted()) {
             log.info("FaqEntityListener FaqDeleteEvent: {}, 向量状态: {}",  faq.getQuestion(), faq.getVectorStatus());
-            publisher.publishEvent(new FaqDeleteEvent(clonedFaq));
+            publisher.publishEvent(new FaqDeleteEvent(faq));
         } else {
             // 如果是状态更新而不是删除操作
-            publisher.publishEvent(new FaqUpdateEvent(clonedFaq));
+            publisher.publishEvent(new FaqUpdateEvent(faq));
         }
     }
     

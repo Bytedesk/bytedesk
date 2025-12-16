@@ -13,24 +13,14 @@
  */
 package com.bytedesk.kbase.llm_text.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.llm_text.TextEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class TextCreateEvent extends ApplicationEvent {
+public class TextCreateEvent extends AbstractTextEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private TextEntity text;
-
     public TextCreateEvent(TextEntity text) {
-        super(text);
-        this.text = text;
+        super(text, text);
     }
 
 }

@@ -19,7 +19,6 @@ import java.util.List;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -48,7 +47,9 @@ public class ArticleResponse extends BaseResponse {
 
     private String contentHtml;
 
-    private KbaseTypeEnum type;
+    private String coverImageUrl;
+
+    private String type;
 
     private List<String> tagList;
 
@@ -61,8 +62,6 @@ public class ArticleResponse extends BaseResponse {
     private Boolean top;
 
     private Boolean published;
-
-    private Boolean markdown;
 
     private Integer readCount;
 

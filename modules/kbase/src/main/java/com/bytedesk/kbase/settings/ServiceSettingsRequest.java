@@ -80,8 +80,8 @@ public class ServiceSettingsRequest  implements Serializable {
     private Boolean showHistory = false;
 
     // 输入联想开关
-    @Builder.Default
-    private Boolean showInputAssociation = false;
+    // @Builder.Default
+    // private Boolean showInputAssociation = false;
 
     @Builder.Default
     private Boolean showCaptcha = false;
@@ -125,9 +125,11 @@ public class ServiceSettingsRequest  implements Serializable {
     // 桌面版聊天窗口右侧iframe地址
     private String rightIframeUrl;
 
-    // 是否显示预搜索
+    // 是否启用输入联想
     @Builder.Default
-    private Boolean showPreSearch = true;
+    private Boolean inputAssociationEnabled = false;
+
+    private String inputAssociationKbUid;
 
     @Builder.Default
     private Boolean showFaqs = true;

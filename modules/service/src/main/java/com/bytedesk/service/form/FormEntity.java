@@ -80,14 +80,14 @@ public class FormEntity extends BaseEntity {
     private String schema;
 
     /**
-     * Whether the server is enabled
+     * Whether is enabled
      */
-    @Builder.Default
-    private Boolean enabled = false;
+    // @Builder.Default
+    // private Boolean enabled = false;
 
     /**
      * Category UID for organizing servers (optional)
      */
-    private String categoryUid;
+    // private String categoryUid;
 
 }

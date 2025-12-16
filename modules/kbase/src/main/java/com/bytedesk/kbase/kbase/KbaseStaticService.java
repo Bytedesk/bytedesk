@@ -65,11 +65,8 @@ public class KbaseStaticService {
     }
 
     // 生成知识库首页
-    public void toHtmlKb(KbaseEntity kbase,
-            List<CategoryResponse> categories,
-            Page<ArticleResponse> articlesTop,
-            Page<ArticleResponse> articlesHot,
-            Page<ArticleResponse> articlesRecent) {
+    public void toHtmlKb(KbaseEntity kbase, List<CategoryResponse> categories,
+        Page<ArticleResponse> articlesTop, Page<ArticleResponse> articlesHot, Page<ArticleResponse> articlesRecent) {
         //
         try {
             // 设置模板路径: classpath:/templates/ftl/kbase

@@ -13,25 +13,13 @@
  */
 package com.bytedesk.kbase.article.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.article.ArticleEntity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.EqualsAndHashCode;
+public class ArticleUpdateEvent extends AbstractArticleEvent {
 
-@Getter
-@Setter
-@EqualsAndHashCode(callSuper = false)
-public class ArticleUpdateEvent extends ApplicationEvent {
-    
     private static final long serialVersionUID = 1L;
 
-    private ArticleEntity article;
-
     public ArticleUpdateEvent(Object source, ArticleEntity article) {
-        super(source);
-        this.article = article;
+        super(source, article);
     }
 }

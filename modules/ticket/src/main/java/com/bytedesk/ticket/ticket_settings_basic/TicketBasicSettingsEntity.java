@@ -57,7 +57,65 @@ public class TicketBasicSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "assignment_mode", length = 64)
-    private String assignmentMode = TicketAssignmentModeEnum.MANUAL.name();
+    private String assignmentMode = TicketAssignmentModeEnum.ROUND_ROBIN.name();
+
+    // ============ 联系方式字段显示配置 ============
+
+    /**
+     * 是否显示联系人姓名字段
+     */
+    @Builder.Default
+    @Column(name = "show_contact_name")
+    private Boolean showContactName = Boolean.TRUE;
+
+    /**
+     * 联系人姓名是否必填
+     */
+    @Builder.Default
+    @Column(name = "require_contact_name")
+    private Boolean requireContactName = Boolean.TRUE;
+
+    /**
+     * 是否显示邮箱字段
+     */
+    @Builder.Default
+    @Column(name = "show_email")
+    private Boolean showEmail = Boolean.TRUE;
+
+    /**
+     * 邮箱是否必填
+     */
+    @Builder.Default
+    @Column(name = "require_email")
+    private Boolean requireEmail = Boolean.FALSE;
+
+    /**
+     * 是否显示手机字段
+     */
+    @Builder.Default
+    @Column(name = "show_phone")
+    private Boolean showPhone = Boolean.TRUE;
+
+    /**
+     * 手机是否必填
+     */
+    @Builder.Default
+    @Column(name = "require_phone")
+    private Boolean requirePhone = Boolean.TRUE;
+
+    /**
+     * 是否显示微信字段
+     */
+    @Builder.Default
+    @Column(name = "show_wechat")
+    private Boolean showWechat = Boolean.FALSE;
+
+    /**
+     * 微信是否必填
+     */
+    @Builder.Default
+    @Column(name = "require_wechat")
+    private Boolean requireWechat = Boolean.FALSE;
 
     /**
      * 静态工厂：根据请求DTO与可选ModelMapper构建实体。

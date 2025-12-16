@@ -167,7 +167,11 @@ public class AgentSettingsRestService
 
         AgentSettingsEntity entity = optional.get();
         // 使用 ModelMapper 批量更新基础字段（非设置的通用元信息）
-        modelMapper.map(request, entity);
+        // modelMapper.map(request, entity);
+        entity.setName(request.getName());
+        entity.setDescription(request.getDescription());
+        entity.setIsDefault(request.getIsDefault());
+        entity.setEnabled(request.getEnabled());
 
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {

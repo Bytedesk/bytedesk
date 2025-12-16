@@ -140,10 +140,10 @@ public class ServiceSettingsEntity extends BaseEntity {
     @Builder.Default
     private Boolean showHistory = false;
 
-    // 输入联想开关
-    @NotNull
-    @Builder.Default
-    private Boolean showInputAssociation = false;
+    // // 输入联想开关
+    // @NotNull
+    // @Builder.Default
+    // private Boolean showInputAssociation = false;
 
     // 防骚扰验证开关，TODO: 自定义验证规则: 1. 访问频率 2. 发消息时间间隔
     @NotNull
@@ -189,9 +189,12 @@ public class ServiceSettingsEntity extends BaseEntity {
     // 桌面版聊天窗口右侧iframe地址
     private String rightIframeUrl;
 
-    // 是否显示预搜索
+    // 是否启用输入联想
     @Builder.Default
-    private Boolean showPreSearch = true;
+    private Boolean inputAssociationEnabled = false;
+
+    // 输入联想关联知识库
+    private String inputAssociationKbUid;
 
     // 常见问题
     @Builder.Default

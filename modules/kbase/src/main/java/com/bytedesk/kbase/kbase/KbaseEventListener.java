@@ -130,13 +130,6 @@ public class KbaseEventListener {
                         }
                         //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage =
-                        // kbaseService.getCategories(kbaseOptional.get());
-                        // Page<ArticleResponse> articlesPage =
-                        // kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
-                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(),
-                        // categoryService.convertToResponse(category), categoriesPage.getContent(),
-                        // articlesPage.getContent());
                 } else {
                         log.error("onCategoryCreateEvent kb not found {}", kbUid);
                 }
@@ -158,13 +151,6 @@ public class KbaseEventListener {
                         }
                         //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage =
-                        // kbaseService.getCategories(kbaseOptional.get());
-                        // Page<ArticleResponse> articlesPage =
-                        // kbaseService.getArticlesByCategory(kbaseOptional.get(), category.getUid());
-                        // kbaseStaticService.toHtmlCategory(kbaseOptional.get(),
-                        // categoryService.convertToResponse(category), categoriesPage.getContent(),
-                        // articlesPage.getContent());
                 } else {
                         log.error("onCategoryUpdateEvent kb not found {}", category.getKbUid());
                 }
@@ -186,11 +172,6 @@ public class KbaseEventListener {
                         }
                         //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage =
-                        // kbaseService.getCategories(kbaseOptional.get());
-                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(),
-                        // articleService.convertToResponse(article), categoriesPage.getContent(), new
-                        // ArrayList<>());
                 } else {
                         log.error("onArticleCreateEvent kb not found {}", article.getKbase().getUid());
                 }
@@ -212,11 +193,6 @@ public class KbaseEventListener {
                         }
                         //
                         kbaseStaticService.updateKbase(kbaseOptional.get());
-                        // Page<CategoryResponse> categoriesPage =
-                        // kbaseService.getCategories(kbaseOptional.get());
-                        // kbaseStaticService.toHtmlArticle(kbaseOptional.get(),
-                        // articleService.convertToResponse(article), categoriesPage.getContent(), new
-                        // ArrayList<>());
                 } else {
                         log.error("onArticleUpdateEvent kb not found {}", article.getKbase().getUid());
                 }

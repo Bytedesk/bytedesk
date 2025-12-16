@@ -33,7 +33,6 @@ import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -458,10 +457,11 @@ public class RobotService extends AbstractRobotService {
         if (hasAgentAssigned(thread)) {
             return true;
         }
-        String transferStatus = thread.getTransferStatus();
-        boolean transferActive = StringUtils.hasText(transferStatus)
-                && !ThreadTransferStatusEnum.NONE.name().equals(transferStatus);
-        return transferActive || !thread.isRoboting();
+        // String transferStatus = thread.getTransferStatus();
+        // boolean transferActive = StringUtils.hasText(transferStatus)
+        //         && !ThreadTransferStatusEnum.NONE.name().equals(transferStatus);
+        // return transferActive || !thread.isRoboting();
+        return !thread.isRoboting();
     }
 
     private boolean hasAgentAssigned(ThreadEntity thread) {

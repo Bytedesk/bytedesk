@@ -13,23 +13,13 @@
  */
 package com.bytedesk.kbase.kbase.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.kbase.KbaseEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class KbaseCreateEvent extends ApplicationEvent {
+public class KbaseCreateEvent extends AbstractKbaseEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private KbaseEntity kbase;
-
     public KbaseCreateEvent(Object source, KbaseEntity kbase) {
-        super(source);
-        this.kbase = kbase;
+        super(source, kbase);
     }
 }

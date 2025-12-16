@@ -13,24 +13,14 @@
  */
 package com.bytedesk.kbase.llm_website.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.llm_website.WebsiteEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class WebsiteCreateEvent extends ApplicationEvent {
+public class WebsiteCreateEvent extends AbstractWebsiteEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private WebsiteEntity website;
-
-    public WebsiteCreateEvent(WebsiteEntity website) {
-        super(website);
-        this.website = website;
+    public WebsiteCreateEvent(Object source, WebsiteEntity website) {
+        super(source, website);
     }
 
 }

@@ -45,6 +45,9 @@ public class KbaseConvertUtils {
     public static ArticleResponse convertToArticleResponse(ArticleEntity entity) {
         ArticleResponse articleResponse = getModelMapper().map(entity, ArticleResponse.class);
         articleResponse.setUser(UserProtobuf.fromJson(entity.getUser()));
+        if (entity.getKbase() != null) {
+            articleResponse.setKbUid(entity.getKbase().getUid());
+        }
         return articleResponse;
     }
 

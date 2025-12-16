@@ -44,6 +44,8 @@ public class TicketRequest extends BaseRequest {
     private String phone;
     // 联系邮箱
     private String email;
+    // 联系微信
+    private String wechat;
 
     private String ticketNumber;
     private String ticketSettingsUid;

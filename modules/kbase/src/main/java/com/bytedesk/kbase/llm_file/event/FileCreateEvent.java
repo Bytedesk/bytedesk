@@ -13,24 +13,14 @@
  */
 package com.bytedesk.kbase.llm_file.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.kbase.llm_file.FileEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class FileCreateEvent extends ApplicationEvent {
+public class FileCreateEvent extends AbstractFileEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private FileEntity file;
-
-    public FileCreateEvent(FileEntity file) {
-        super(file);
-        this.file = file;
+    public FileCreateEvent(Object source, FileEntity file) {
+        super(source, file);
     }
 
 }

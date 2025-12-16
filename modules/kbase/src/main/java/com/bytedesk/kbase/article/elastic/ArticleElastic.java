@@ -53,8 +53,8 @@ public class ArticleElastic {
     @Field(type = FieldType.Keyword)
     private List<String> tagList;
     
-    // @Field(type = FieldType.Keyword)
-    // private String type;
+    @Field(type = FieldType.Keyword)
+    private String type;
     
     @Field(type = FieldType.Keyword)
     private String status;
@@ -67,9 +67,6 @@ public class ArticleElastic {
     
     @Field(type = FieldType.Boolean)
     private Boolean published;
-    
-    @Field(type = FieldType.Boolean)
-    private Boolean markdown;
     
     @Field(type = FieldType.Keyword)
     private String orgUid;
@@ -103,12 +100,11 @@ public class ArticleElastic {
             .contentMarkdown(article.getContentMarkdown())
             .contentHtml(article.getContentHtml())
             .tagList(article.getTagList())
-            // .type(article.getType())
+            .type(article.getType())
             .status(article.getElasticStatus())
             .auditStatus(article.getAuditStatus())
             .top(article.getTop())
             .published(article.getPublished())
-            .markdown(article.getMarkdown())
             .orgUid(article.getOrgUid())
             .kbUid(kbUid)
             .categoryUid(article.getCategoryUid())

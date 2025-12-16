@@ -69,24 +69,24 @@ public class BytedeskProperties {
                         }
 
                         // 验证 licenseKey 解密状态
-                        if (StringUtils.hasText(this.licenseKey)) {
-                            if (this.licenseKey.startsWith("ENC(")) {
-                                log.warn("⚠️  licenseKey 未被正确解密，仍为加密格式！");
-                                log.warn("   请确保已设置环境变量: export JASYPT_ENCRYPTOR_PASSWORD=xxx");
-                                log.warn("   或在启动命令中添加: -Djasypt.encryptor.password=xxx");
-                            } else {
-                                String maskedKey = maskSensitiveValue(this.licenseKey);
-                                String firstPart = this.licenseKey.length() > 8 ? this.licenseKey.substring(0, 8) : this.licenseKey;
-                                String lastPart = this.licenseKey.length() > 8 ? this.licenseKey.substring(this.licenseKey.length() - 8) : this.licenseKey;
-                                log.info("✓ licenseKey 已被成功解密 (长度: {})", this.licenseKey.length());
-                                log.debug("  脱敏显示: {}", maskedKey);
-                                log.debug("  首部: {}, 末尾: {}", firstPart, lastPart);
-                                // Debug 模式下打印完整值用于验证
-                                if (this.debug != null && this.debug) {
-                                    log.debug("  [DEBUG] 完整解密值: {}", this.licenseKey);
-                                }
-                            }
-                        }
+                        // if (StringUtils.hasText(this.licenseKey)) {
+                        //     if (this.licenseKey.startsWith("ENC(")) {
+                        //         log.warn("⚠️  licenseKey 未被正确解密，仍为加密格式！");
+                        //         log.warn("   请确保已设置环境变量: export JASYPT_ENCRYPTOR_PASSWORD=xxx");
+                        //         log.warn("   或在启动命令中添加: -Djasypt.encryptor.password=xxx");
+                        //     } else {
+                        //         String maskedKey = maskSensitiveValue(this.licenseKey);
+                        //         String firstPart = this.licenseKey.length() > 8 ? this.licenseKey.substring(0, 8) : this.licenseKey;
+                        //         String lastPart = this.licenseKey.length() > 8 ? this.licenseKey.substring(this.licenseKey.length() - 8) : this.licenseKey;
+                        //         log.info("✓ licenseKey 已被成功解密 (长度: {})", this.licenseKey.length());
+                        //         log.debug("  脱敏显示: {}", maskedKey);
+                        //         log.debug("  首部: {}, 末尾: {}", firstPart, lastPart);
+                        //         // Debug 模式下打印完整值用于验证
+                        //         if (this.debug != null && this.debug) {
+                        //             log.debug("  [DEBUG] 完整解密值: {}", this.licenseKey);
+                        //         }
+                        //     }
+                        // }
 
                     } catch (Exception e) {
                         log.error("初始化 BytedeskProperties 时出错", e);
@@ -170,18 +170,18 @@ public class BytedeskProperties {
      * @param value 敏感信息
      * @return 脱敏后的字符串
      */
-    private static String maskSensitiveValue(String value) {
-        if (!StringUtils.hasText(value)) {
-            return value;
-        }
+    // private static String maskSensitiveValue(String value) {
+    //     if (!StringUtils.hasText(value)) {
+    //         return value;
+    //     }
         
-        if (value.length() <= 16) {
-            return "*".repeat(value.length());
-        }
+    //     if (value.length() <= 16) {
+    //         return "*".repeat(value.length());
+    //     }
         
-        // 显示前8个和后8个字符，便于对比验证
-        return value.substring(0, 8) + "***[" + (value.length() - 16) + " chars]***" + value.substring(value.length() - 8);
-    }
+    //     // 显示前8个和后8个字符，便于对比验证
+    //     return value.substring(0, 8) + "***[" + (value.length() - 16) + " chars]***" + value.substring(value.length() - 8);
+    // }
 
     public static BytedeskProperties getInstance() {
         return instance;

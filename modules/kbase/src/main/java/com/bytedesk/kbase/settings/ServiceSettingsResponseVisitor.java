@@ -60,7 +60,7 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private Boolean showHistory;
 
     // 输入联想开关
-    private Boolean showInputAssociation;
+    // private Boolean showInputAssociation;
 
     private Boolean showCaptcha;
 
@@ -73,8 +73,11 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     // 桌面版聊天窗口右侧iframe地址
     private String rightIframeUrl;
 
-    // 是否显示预搜索
-    private Boolean showPreSearch;
+    // 是否启用输入联想
+    private Boolean inputAssociationEnabled;
+
+    // 输入联想关联知识库
+    private String inputAssociationKbUid;
 
     // 欢迎问题
     private List<FaqResponseVisitor> welcomeFaqs;
