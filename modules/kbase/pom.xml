@@ -81,6 +81,7 @@
 
 		<!-- //////////////////////////////////////////////////////////////// -->
 
+		
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-core</artifactId>
@@ -96,6 +97,21 @@
 		</dependency>
 
 		<!-- //////////////////////////////////////////////////////////////// -->
+
+		<!-- Markdown -> HTML rendering for template pages (ftl) -->
+		<!-- https://mvnrepository.com/artifact/org.commonmark/commonmark -->
+		<dependency>
+			<groupId>org.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+			<version>0.27.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.commonmark/commonmark-ext-gfm-tables -->
+		<dependency>
+			<groupId>org.commonmark</groupId>
+			<artifactId>commonmark-ext-gfm-tables</artifactId>
+			<version>0.27.0</version>
+		</dependency>
+
 
 	</dependencies>
 

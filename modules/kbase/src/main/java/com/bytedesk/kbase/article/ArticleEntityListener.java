@@ -32,25 +32,24 @@ public class ArticleEntityListener {
     @PostPersist
     public void onPostPersist(ArticleEntity article) {
         log.info("ArticleEntityListener: onPostPersist");
-        if (!article.isVectorIndexed()) {
-            BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-            publisher.publishEvent(new ArticleCreateEvent(this, article));
-        }
+        // if (!article.isVectorIndexed()) {
+        BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+        publisher.publishEvent(new ArticleCreateEvent(this, article));
+        // }
     }
 
     @PostUpdate
     public void onPostUpdate(ArticleEntity article) {
         log.info("ArticleEntityListener: onPostUpdate");
-        if (!article.isVectorIndexed() && !article.isElasticStatusSuccess()) {
-            //
-            if (article.isDeleted()) {
-                BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-                publisher.publishEvent(new ArticleDeleteEvent(this, article));
-            } else {
-                BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-                publisher.publishEvent(new ArticleUpdateEvent(this, article));
-            }
+        // if (!article.isVectorIndexed() && !article.isElasticStatusSuccess()) {
+        if (article.isDeleted()) {
+            BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+            publisher.publishEvent(new ArticleDeleteEvent(this, article));
+        } else {
+            BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+            publisher.publishEvent(new ArticleUpdateEvent(this, article));
         }
+        // }
     }
 
 }

@@ -40,11 +40,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class KbaseController {
     
-    private final KbaseRestService kbaseService;
+    private final KbaseRestService kbaseRestService;
 
-    private final CategoryRestService categoryService;
+    private final CategoryRestService categoryRestService;
 
-    private final ArticleRestService articleService;
+    private final ArticleRestService articleRestService;
 
     private final KbaseProperties kbaseProperties;
 
@@ -55,15 +55,15 @@ public class KbaseController {
 	public String kbIndex(@PathVariable String kbUid, Model model) {
 		log.info("kbIndex path: {}", kbUid);
 
-        Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(kbUid);
+        Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(kbUid);
         if (kbaseOptional.isPresent()) {
             log.info("kbase found: {}, {}", kbaseOptional.get().getName(), kbaseOptional.get().getHeadline());
             model.addAttribute("kbase", kbaseOptional.get());
             // 
-            Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
+            Page<CategoryResponse> categoriesPage = kbaseRestService.getCategories(kbaseOptional.get());
             model.addAttribute("categories", categoriesPage.getContent());
             // 
-            Page<ArticleResponse> articlesPage = kbaseService.getArticles(kbaseOptional.get());
+            Page<ArticleResponse> articlesPage = kbaseRestService.getArticles(kbaseOptional.get());
             // 
             model.addAttribute("articlesTop", articlesPage);
             model.addAttribute("articlesHot", articlesPage);
@@ -103,7 +103,7 @@ public class KbaseController {
         // model.addAttribute("content", content);
         model.addAttribute("apiHost", kbaseProperties.getApiUrl());
         // 
-        Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(kbUid);
+        Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(kbUid);
         if (kbaseOptional.isPresent()) {
             model.addAttribute("kbase", kbaseOptional.get());
         }
@@ -111,18 +111,18 @@ public class KbaseController {
     }
 
     private String routeCategory(String categoryUid, Model model) {
-        Optional<CategoryEntity> categoryOptional = categoryService.findByUid(categoryUid);
+        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(categoryUid);
         if (categoryOptional.isPresent()) {
             model.addAttribute("category", categoryOptional.get());
             // 
-            Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(categoryOptional.get().getKbUid());
+            Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(categoryOptional.get().getKbUid());
             if (kbaseOptional.isPresent()) {
                 model.addAttribute("kbase", kbaseOptional.get());
                 // 
-                Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
+                Page<CategoryResponse> categoriesPage = kbaseRestService.getCategories(kbaseOptional.get());
                 model.addAttribute("categories", categoriesPage.getContent());
                 //
-                Page<ArticleResponse> articlesPage = kbaseService.getArticlesByCategory(kbaseOptional.get(), categoryOptional.get().getUid());
+                Page<ArticleResponse> articlesPage = kbaseRestService.getArticlesByCategory(kbaseOptional.get(), categoryOptional.get().getUid());
                 model.addAttribute("articles", articlesPage.getContent());
 
                 return "kbase/themes/" + kbaseOptional.get().getTheme() + "/category";
@@ -133,15 +133,15 @@ public class KbaseController {
     }
 
     private String routeArticle(String articleUid, Model model) {
-        Optional<ArticleEntity> articleOptional = articleService.findByUid(articleUid);
+        Optional<ArticleEntity> articleOptional = articleRestService.findByUid(articleUid);
         if (articleOptional.isPresent()) {
-            model.addAttribute("article", articleService.convertToResponse(articleOptional.get()));
+            model.addAttribute("article", articleRestService.convertToResponse(articleOptional.get()));
             // 
-            Optional<KbaseEntity> kbaseOptional = kbaseService.findByUid(articleOptional.get().getKbase().getUid());
+            Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(articleOptional.get().getKbase().getUid());
             if (kbaseOptional.isPresent()) {
                 model.addAttribute("kbase", kbaseOptional.get());
                 // 
-                Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbaseOptional.get());
+                Page<CategoryResponse> categoriesPage = kbaseRestService.getCategories(kbaseOptional.get());
                 model.addAttribute("categories", categoriesPage.getContent());
                 model.addAttribute("related", new ArrayList<>());
                 // 

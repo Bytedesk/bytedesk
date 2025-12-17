@@ -80,7 +80,7 @@ public class ArticleEntity extends AbstractArticleEntity {
 
     // elastic 索引状态
     public boolean isElasticStatusSuccess() {
-        return "SUCCESS".equals(getElasticStatus());
+        return ArticleStatusEnum.SUCCESS.name().equals(getElasticStatus());
     }
 
     /**
@@ -88,6 +88,6 @@ public class ArticleEntity extends AbstractArticleEntity {
      * @return true if vectorStatus is SUCCESS
      */
     public boolean isVectorIndexed() {
-        return "SUCCESS".equals(getVectorStatus());
+        return ArticleStatusEnum.SUCCESS.name().equals(getVectorStatus());
     }
 }

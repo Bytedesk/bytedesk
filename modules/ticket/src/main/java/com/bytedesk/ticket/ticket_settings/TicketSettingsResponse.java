@@ -18,7 +18,7 @@ import com.bytedesk.core.base.BaseResponse;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.service.form.FormResponse;
-import com.bytedesk.ticket.process.TicketProcessResponse;
+import com.bytedesk.ticket.process.ProcessResponse;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsResponse;
@@ -81,7 +81,7 @@ public class TicketSettingsResponse extends BaseResponse {
     private TicketNotificationSettingsResponse notificationSettings;
     // private TicketCustomFieldSettingsResponse customFieldSettings;
     private TicketCategorySettingsResponse categorySettings;
-    private TicketProcessResponse process;
+    private ProcessResponse process;
     private FormResponse form;
 
     // ===== 草稿版本（编辑态用，使用同一响应结构便于统一渲染） =====
@@ -92,7 +92,7 @@ public class TicketSettingsResponse extends BaseResponse {
     private TicketNotificationSettingsResponse draftNotificationSettings;
     // private TicketCustomFieldSettingsResponse draftCustomFieldSettings;
     private TicketCategorySettingsResponse draftCategorySettings;
-    private TicketProcessResponse draftProcess;
+    private ProcessResponse draftProcess;
     private FormResponse draftForm;
 
 }

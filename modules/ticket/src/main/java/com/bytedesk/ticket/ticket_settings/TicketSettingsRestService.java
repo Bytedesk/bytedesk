@@ -38,10 +38,10 @@ import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.service.form.FormRepository;
 import com.bytedesk.service.form.FormResponse;
 import com.bytedesk.service.form.FormTypeEnum;
-import com.bytedesk.ticket.process.TicketProcessEntity;
-import com.bytedesk.ticket.process.TicketProcessRepository;
-import com.bytedesk.ticket.process.TicketProcessResponse;
-import com.bytedesk.ticket.process.TicketProcessTypeEnum;
+import com.bytedesk.ticket.process.ProcessEntity;
+import com.bytedesk.ticket.process.ProcessRepository;
+import com.bytedesk.ticket.process.ProcessResponse;
+import com.bytedesk.ticket.process.ProcessTypeEnum;
 import com.bytedesk.ticket.ticket.TicketConsts;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
@@ -75,7 +75,7 @@ public class TicketSettingsRestService extends
 
     private final AuthService authService;
 
-    private final TicketProcessRepository ticketProcessRepository;
+    private final ProcessRepository ticketProcessRepository;
 
     private final FormRepository formRepository;
 
@@ -692,13 +692,13 @@ public class TicketSettingsRestService extends
         if (!StringUtils.hasText(orgUid)) {
             return null;
         }
-        TicketProcessTypeEnum processType = mapTicketTypeToProcessType(normalizedType);
+        ProcessTypeEnum processType = mapTicketTypeToProcessType(normalizedType);
         if (processType == null) {
             return null;
         }
         return ticketProcessRepository
                 .findByKeyAndOrgUidAndType(TicketConsts.TICKET_PROCESS_KEY, orgUid, processType.name())
-                .map(TicketProcessEntity::getUid)
+                .map(ProcessEntity::getUid)
                 .orElse(null);
     }
 
@@ -716,13 +716,13 @@ public class TicketSettingsRestService extends
                 .orElse(null);
     }
 
-    private TicketProcessTypeEnum mapTicketTypeToProcessType(String normalizedType) {
+    private ProcessTypeEnum mapTicketTypeToProcessType(String normalizedType) {
         TicketTypeEnum ticketType = TicketTypeEnum.fromValue(normalizedType);
         if (TicketTypeEnum.INTERNAL.equals(ticketType)) {
-            return TicketProcessTypeEnum.TICKET_INTERNAL;
+            return ProcessTypeEnum.TICKET_INTERNAL;
         }
         if (TicketTypeEnum.EXTERNAL.equals(ticketType)) {
-            return TicketProcessTypeEnum.TICKET_EXTERNAL;
+            return ProcessTypeEnum.TICKET_EXTERNAL;
         }
         return null;
     }
@@ -738,11 +738,11 @@ public class TicketSettingsRestService extends
         return null;
     }
 
-    private TicketProcessEntity resolveProcessReference(String processUid, String orgUid) {
+    private ProcessEntity resolveProcessReference(String processUid, String orgUid) {
         if (!StringUtils.hasText(processUid)) {
             return null;
         }
-        TicketProcessEntity process = ticketProcessRepository.findByUid(processUid)
+        ProcessEntity process = ticketProcessRepository.findByUid(processUid)
                 .orElseThrow(() -> new NotFoundException("Ticket process not found: " + processUid));
         if (StringUtils.hasText(orgUid) && StringUtils.hasText(process.getOrgUid())
                 && !Objects.equals(orgUid, process.getOrgUid())) {
@@ -926,11 +926,11 @@ public class TicketSettingsRestService extends
                 .build();
     }
 
-    private TicketProcessResponse mapProcess(TicketProcessEntity entity) {
+    private ProcessResponse mapProcess(ProcessEntity entity) {
         if (entity == null) {
             return null;
         }
-        return TicketProcessResponse.builder()
+        return ProcessResponse.builder()
                 .uid(entity.getUid())
                 .name(entity.getName())
                 .key(entity.getKey())

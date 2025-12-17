@@ -42,19 +42,19 @@ public class KbaseStaticService {
 
     private final KbaseProperties kbaseProperties;
 
-    private final KbaseRestService kbaseService;
+    private final KbaseRestService kbaseRestService;
 
     // 更新整个知识库
     public void updateKbase(KbaseEntity kbase) {
         // 静态化首页
-        Page<CategoryResponse> categoriesPage = kbaseService.getCategories(kbase);
-        Page<ArticleResponse> articlesPage = kbaseService.getArticles(kbase);
+        Page<CategoryResponse> categoriesPage = kbaseRestService.getCategories(kbase);
+        Page<ArticleResponse> articlesPage = kbaseRestService.getArticles(kbase);
         //
         toHtmlKb(kbase, categoriesPage.getContent(), articlesPage, articlesPage, articlesPage);
         toHtmlSearch(kbase);
         // 遍历categoriesPage
         for (CategoryResponse category : categoriesPage.getContent()) {
-            Page<ArticleResponse> articlesCategoryPage = kbaseService.getArticlesByCategory(kbase,
+            Page<ArticleResponse> articlesCategoryPage = kbaseRestService.getArticlesByCategory(kbase,
                     category.getUid());
             toHtmlCategory(kbase, category, categoriesPage.getContent(), articlesCategoryPage.getContent());
         }

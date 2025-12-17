@@ -11,13 +11,33 @@
     <#include "./template/header.ftl"/>
 
     <style>
+        <#--  只有在配置了 primaryColor 时才输出对应样式，避免生成空的 CSS 值  -->
+        <#if kbase.primaryColor?? && kbase.primaryColor?has_content>
         .uk-background-primary {
-            background-color: ${kbase.primaryColor!''};
+            background-color: ${kbase.primaryColor};
         }
         .uk-button-outline-primary {
-            color: ${kbase.primaryColor!''};
-            border: solid 1px ${kbase.primaryColor!''};
+            color: ${kbase.primaryColor};
+            border: solid 1px ${kbase.primaryColor};
         }
+        </#if>
+
+        /* 文章正文：表格默认无边框，编辑器里有样式但静态页/模板页没有，需要补齐 */
+        #supportArticleContent table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        #supportArticleContent th,
+        #supportArticleContent td {
+            border: 1px solid #e5e5e5;
+            padding: 6px 8px;
+            vertical-align: top;
+        }
+        #supportArticleContent table p {
+            margin: 0;
+        }
+
         /* https://www.runoob.com/try/try.php?filename=tryhtml_js_accordion */
         /* 打开和关闭手风琴面板的样式 */
         .accordion {
@@ -94,24 +114,26 @@
                 <div class="uk-width-1-4@m text-dark sidebar">
                     <h3>类别</h3>
                     <ul id="supportCategory" class="uk-list uk-list-large uk-margin-medium-bottom">
-                        <#list categories as category>
-                            <#--  <button class="accordion">  -->
-                                <#--  ${category.name!''}  -->
-                                <li>
-                                <a href="/helpcenter/${kbase.uid!''}/category/${category.uid}.html" target="_blank">${category.name!''}</a>
-                                </li>
-                            <#--  </button>  -->
-                            <#--  <div class="panel">  -->
-                                <#--  <#list articles as article>
-                                    <li><a href="article/${article.uid}.html" target="_blank">${article.title!''}</a></li>
-                                </#list>
-                                <#if (articles?size == 0)>
-                                    <div>
-                                        暂无文章
-                                    </div>
-                                </#if>  -->
-                            <#--  </div>  -->
-                        </#list>
+                        <#macro renderCategoryNodes nodes level>
+                            <#list nodes as node>
+                                <#if node.children?? && (node.children?size > 0)>
+                                    <li>
+                                        <button class="accordion" type="button">${node.name!''}</button>
+                                        <div class="panel">
+                                            <ul class="uk-list uk-list-divider uk-margin-small-top">
+                                                <@renderCategoryNodes nodes=node.children level=level + 1 />
+                                            </ul>
+                                        </div>
+                                    </li>
+                                <#else>
+                                    <li>
+                                        <a href="/helpcenter/${kbase.uid!''}/category/${node.uid}.html" target="_blank">${node.name!''}</a>
+                                    </li>
+                                </#if>
+                            </#list>
+                        </#macro>
+
+                        <@renderCategoryNodes nodes=categories level=0 />
                         <!-- <li><a href="#">Getting Started</a></li> -->
                         <!-- <li><a class="uk-text-bold" href="#">Account Management</a> <span uk-icon="icon: chevron-right"></span></li> -->
                     </ul>
@@ -144,7 +166,18 @@
                         <!-- 文章内容 -->
                         <div class="entry-content uk-margin-medium-top">
                             <p id="supportArticleSummary" class="uk-text-lead">${article.summary!''}</p>
-                            <div id="supportArticleContent">${article.contentHtml!''}</div>
+                            <#assign _articleType = (article.type!'')?upper_case>
+                            <#if _articleType == 'MARKDOWN'>
+                                <#-- 优先使用后端生成的 HTML（convertToResponse 会在缺失时从 Markdown 补齐） -->
+                                <#if article.contentHtml?? && article.contentHtml?has_content>
+                                    <div id="supportArticleContent">${article.contentHtml}</div>
+                                <#else>
+                                    <#-- 兜底：避免空白页，至少显示原始 Markdown 文本 -->
+                                    <pre id="supportArticleContent" style="white-space: pre-wrap;">${article.contentMarkdown!''?html}</pre>
+                                </#if>
+                            <#else>
+                                <div id="supportArticleContent">${article.contentHtml!''}</div>
+                            </#if>
                             <span class="uk-article-meta uk-margin-remove-top">最近更新：${article.updatedAt}</span>
                         </div>
 

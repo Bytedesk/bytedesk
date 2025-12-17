@@ -31,5 +31,6 @@
     <include file="db/changelog/migration/251213_assign_quickbutton_role_permissions.xml" />
     <include file="db/changelog/migration/251214_remove_menu_color_column.xml" />
     <include file="db/changelog/migration/251216_drop_is_markdown_from_articles.xml" />
+    <include file="db/changelog/migration/251217_drop_kbase_settings_flags.xml" />
 
 </databaseChangeLog>

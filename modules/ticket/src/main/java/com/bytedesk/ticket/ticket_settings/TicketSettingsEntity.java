@@ -18,7 +18,7 @@ import java.time.ZonedDateTime;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.form.FormEntity;
-import com.bytedesk.ticket.process.TicketProcessEntity;
+import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsEntity;
@@ -129,14 +129,14 @@ public class TicketSettingsEntity extends BaseEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "process_uid")
-    private TicketProcessEntity process;
+    private ProcessEntity process;
 
     /**
      * Draft workflow process binding
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "draft_process_uid")
-    private TicketProcessEntity draftProcess;
+    private ProcessEntity draftProcess;
 
     /**
      * Published form binding

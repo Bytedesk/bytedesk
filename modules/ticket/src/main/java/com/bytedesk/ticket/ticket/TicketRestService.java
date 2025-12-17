@@ -53,7 +53,7 @@ import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
-import com.bytedesk.ticket.process.TicketProcessEntity;
+import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
@@ -579,7 +579,7 @@ public class TicketRestService
         }
         ticket.setTicketSettingsUid(settings.getUid());
 
-        TicketProcessEntity process = settings.getProcess();
+        ProcessEntity process = settings.getProcess();
         if (process != null) {
             ticket.setProcessEntityUid(process.getUid());
             if (StringUtils.hasText(process.getKey())) {

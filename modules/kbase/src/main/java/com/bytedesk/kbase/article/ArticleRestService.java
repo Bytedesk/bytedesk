@@ -36,6 +36,7 @@ import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRepository;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
+import com.bytedesk.kbase.utils.MarkdownRenderUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -179,7 +180,17 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
 
     @Override
     public ArticleResponse convertToResponse(ArticleEntity entity) {
-        return KbaseConvertUtils.convertToArticleResponse(entity);
+        ArticleResponse response = KbaseConvertUtils.convertToArticleResponse(entity);
+
+        // For template rendering (ftl): ensure MARKDOWN articles have contentHtml available.
+        String type = response.getType();
+        boolean isMarkdown = type != null && ArticleTypeEnum.MARKDOWN.name().equalsIgnoreCase(type);
+        if (isMarkdown && (response.getContentHtml() == null || response.getContentHtml().isBlank())
+                && response.getContentMarkdown() != null && !response.getContentMarkdown().isBlank()) {
+            response.setContentHtml(MarkdownRenderUtils.toHtml(response.getContentMarkdown()));
+        }
+
+        return response;
     }
 
     @Override

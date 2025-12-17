@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251217-drop-show-input-association" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_input_association"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="show_input_association"/>
+    </changeSet>
+
+    <changeSet id="251217-drop-show-pre-search" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_pre_search"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="show_pre_search"/>
+    </changeSet>
+
+</databaseChangeLog>

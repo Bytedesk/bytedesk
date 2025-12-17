@@ -42,7 +42,7 @@ import org.springframework.context.annotation.Description;
 @Description("Knowledge Base Controller - Knowledge base content management and organization APIs")
 public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseRestService> {
 
-    private final KbaseRestService knowledgeService;
+    private final KbaseRestService kbaseRestService;
 
     @Operation(summary = "查询组织下的知识库", description = "根据组织ID查询知识库列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -53,7 +53,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> queryByOrg(KbaseRequest request) {
 
-        Page<KbaseResponse> page = knowledgeService.queryByOrg(request);
+        Page<KbaseResponse> page = kbaseRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -67,7 +67,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> queryByUser(KbaseRequest request) {
         
-        Page<KbaseResponse> page = knowledgeService.queryByUser(request);
+        Page<KbaseResponse> page = kbaseRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -81,7 +81,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
 
-        KbaseResponse kbase = knowledgeService.queryByUid(request);
+        KbaseResponse kbase = kbaseRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
@@ -95,7 +95,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
 
-        KbaseResponse kbase = knowledgeService.create(request);
+        KbaseResponse kbase = kbaseRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
@@ -109,7 +109,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
 
-        KbaseResponse kbase = knowledgeService.update(request);
+        KbaseResponse kbase = kbaseRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
@@ -121,7 +121,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @Override
     public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
 
-        knowledgeService.delete(request);
+        kbaseRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }

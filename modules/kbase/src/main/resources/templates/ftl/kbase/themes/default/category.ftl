@@ -25,6 +25,28 @@
             height: 35px;
             font-size: 17px;
         }
+
+        /* 手风琴交互样式（与 article.ftl 保持一致） */
+        .active, .accordion:hover {
+            background-color: #eee;
+        }
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+        .accordion:after {
+            content: '\002B';
+            color: #777;
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+        }
+        .active:after {
+            content: "\2212";
+        }
     </style>
 
 </head>
@@ -65,11 +87,26 @@
                 <div class="uk-width-1-4@m text-dark sidebar">
                     <h3>类别</h3>
                     <ul id="supportCategory" class="uk-list uk-list-large uk-margin-medium-bottom">
-                        <#list categories as category>
-                            <button class="accordion">
-                                <a href="/helpcenter/${kbase.uid!''}/category/${category.uid}.html" target="_blank">${category.name!''}</a>
-                            </button>
-                        </#list>
+                        <#macro renderCategoryNodes nodes level>
+                            <#list nodes as node>
+                                <#if node.children?? && (node.children?size > 0)>
+                                    <li>
+                                        <button class="accordion" type="button">${node.name!''}</button>
+                                        <div class="panel">
+                                            <ul class="uk-list uk-list-divider uk-margin-small-top">
+                                                <@renderCategoryNodes nodes=node.children level=level + 1 />
+                                            </ul>
+                                        </div>
+                                    </li>
+                                <#else>
+                                    <li>
+                                        <a href="/helpcenter/${kbase.uid!''}/category/${node.uid}.html" target="_blank">${node.name!''}</a>
+                                    </li>
+                                </#if>
+                            </#list>
+                        </#macro>
+
+                        <@renderCategoryNodes nodes=categories level=0 />
                         <!-- <li><a href="#">Getting Started</a></li> -->
                         <!-- <li><a class="uk-text-bold" href="#">Account Management</a> <span uk-icon="icon: chevron-right"></span></li> -->
                     </ul>
@@ -116,6 +153,26 @@
     <#include "./template/offcanvas.ftl"/>
 
     <#include "./template/bytedesk.ftl"/>
+
+    <script>
+        // 分类折叠（手风琴）
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (!panel) {
+                    return;
+                }
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+    </script>
 
 </body>
 

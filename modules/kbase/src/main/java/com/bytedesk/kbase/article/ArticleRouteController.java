@@ -13,56 +13,56 @@
  */
 package com.bytedesk.kbase.article;
 
-import java.util.Optional;
+// import java.util.Optional;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.stereotype.Controller;
+// import org.springframework.ui.Model;
+// import org.springframework.web.bind.annotation.PathVariable;
+// import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.bytedesk.kbase.kbase.KbaseEntity;
-import com.bytedesk.kbase.kbase.KbaseRestService;
+// import com.bytedesk.kbase.kbase.KbaseEntity;
+// import com.bytedesk.kbase.kbase.KbaseRestService;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
 
-/**
- * Controller for "/article".
- */
-@Slf4j
-@Controller
-@RequestMapping("/article")
-@RequiredArgsConstructor
-public class ArticleRouteController {
+// /**
+//  * Controller for "/article".
+//  */
+// @Slf4j
+// @Controller
+// @RequestMapping("/article")
+// @RequiredArgsConstructor
+// public class ArticleRouteController {
 
-    private final ArticleRestService articleService;
+//     private final ArticleRestService articleService;
 
-    private final KbaseRestService knowledgebaseService;
+//     private final KbaseRestService knowledgebaseService;
 
-    // 
-    @RequestMapping("/{kbUid:.+}/{articleUid:.+}")
-    public String index(Model model, @PathVariable("kbUid") String kbUid, @PathVariable("articleUid") String articleUid) {
-        log.info("kbUid {}, articleUid: {}", kbUid, articleUid);
-        // 
-        Optional<ArticleEntity> articleOptional = articleService.findByUid(articleUid);
-        if (articleOptional.isPresent()) {
-            model.addAttribute("article", articleOptional.get());
-        } else {
-            return "redirect:/404";
-        }
-        // 
-        Optional<KbaseEntity> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
-        if (knowledgebaseOptional.isPresent()) {
-            model.addAttribute("knowledgebase", knowledgebaseOptional.get());
-        } else {
-            return "redirect:/404";
-        }
+//     // 
+//     @RequestMapping("/{kbUid:.+}/{articleUid:.+}")
+//     public String index(Model model, @PathVariable("kbUid") String kbUid, @PathVariable("articleUid") String articleUid) {
+//         log.info("kbUid {}, articleUid: {}", kbUid, articleUid);
+//         // 
+//         Optional<ArticleEntity> articleOptional = articleService.findByUid(articleUid);
+//         if (articleOptional.isPresent()) {
+//             model.addAttribute("article", articleOptional.get());
+//         } else {
+//             return "redirect:/404";
+//         }
+//         // 
+//         Optional<KbaseEntity> knowledgebaseOptional = knowledgebaseService.findByUid(kbUid);
+//         if (knowledgebaseOptional.isPresent()) {
+//             model.addAttribute("knowledgebase", knowledgebaseOptional.get());
+//         } else {
+//             return "redirect:/404";
+//         }
         
-        // TODO: 生成静态页面，考虑语言切换
-        //
-        return "kbase/zh/article";
-    }
+//         // TODO: 生成静态页面，考虑语言切换
+//         //
+//         return "kbase/zh/article";
+//     }
 
     
     
-}
+// }

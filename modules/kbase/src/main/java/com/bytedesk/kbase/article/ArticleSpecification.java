@@ -35,9 +35,9 @@ public class ArticleSpecification extends BaseSpecification<ArticleEntity, Artic
             // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // 
-            if (StringUtils.hasText(request.getOrgUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-            }
+            // if (StringUtils.hasText(request.getOrgUid())) {
+            //     predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            // }
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
             }
