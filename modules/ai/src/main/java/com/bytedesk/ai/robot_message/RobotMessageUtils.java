@@ -18,7 +18,6 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -28,7 +27,6 @@ public class RobotMessageUtils {
         public static MessageProtobuf createRobotMessage(ThreadProtobuf thread, RobotProtobuf robot,
                         MessageProtobuf messageProtobuf) {
                 MessageExtra extra = MessageExtra.fromJson(messageProtobuf.getExtra());
-                MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
                 return MessageProtobuf.builder()
                         .uid(UidUtils.getInstance().getUid())

@@ -18,6 +18,7 @@ import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({ProcessEntityListener.class})
 @Table(name = "bytedesk_ticket_process")
 public class ProcessEntity extends BaseEntity {
 
@@ -45,9 +47,6 @@ public class ProcessEntity extends BaseEntity {
 
     @Column(name = "process_name")
     private String name;
-
-    @Column(name = "process_key")
-    private String key;
 
     private String description;
     
@@ -57,9 +56,9 @@ public class ProcessEntity extends BaseEntity {
      */
     @Column(name = "process_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String schema;
-
+    
     /**
-     * 
+     * Process type (TICKET_INTERNAL, TICKET_EXTERNAL)
      */
     @Builder.Default
     @Column(name = "process_type")

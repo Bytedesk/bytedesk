@@ -53,10 +53,18 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     @Override
     public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
 
-        // List<QuickReplyResponseAgent> quickReplyList = quickReplyRestService.query(request);
         Page<QuickReplyResponse> page = quickReplyRestService.queryByUser(request);
         
         return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    // @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_READ_ANY_LEVEL)
+    @Override
+    public ResponseEntity<?> queryByUid(QuickReplyRequest request) {
+        
+        QuickReplyResponse quickReply = quickReplyRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(quickReply));
     }
     
     @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_CREATE_ANY_LEVEL)
@@ -114,11 +122,6 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         );
     }
 
-    // @PreAuthorize(QuickReplyPermissions.HAS_QUICKREPLY_READ_ANY_LEVEL)
-    @Override
-    public ResponseEntity<?> queryByUid(QuickReplyRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
 
 }

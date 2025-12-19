@@ -117,7 +117,7 @@ public class VisitorRestControllerVisitor {
     }
 
     /**
-     * 访客发送消息前，先从服务端申请消息元信息，确保sequence由服务端分配
+     * 访客发送消息前，先从服务端申请消息元信息
      */
     @PostMapping("/thread/message/meta")
     public ResponseEntity<?> requestMessageMetadata(@RequestBody ThreadRequest request) {

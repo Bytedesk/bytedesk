@@ -32,5 +32,7 @@
     <include file="db/changelog/migration/251214_remove_menu_color_column.xml" />
     <include file="db/changelog/migration/251216_drop_is_markdown_from_articles.xml" />
     <include file="db/changelog/migration/251217_drop_kbase_settings_flags.xml" />
+    <include file="db/changelog/migration/251218_drop_process_key_and_ticket_process_definition_key.xml" />
+    <include file="db/changelog/migration/251218_drop_ticket_rated_and_rating.xml" />
 
 </databaseChangeLog>

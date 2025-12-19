@@ -6,7 +6,6 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -23,7 +22,6 @@ public class KbaseMessageUtils {
         FaqMessageExtra questionExtra = FaqMessageExtra.builder()
                 .faqUid(faqResponse.getUid())
                 .build();
-        MessageUtils.attachSequenceNumber(questionExtra, threadEntity.getUid());
         //
         String content = faqResponse.getQuestion();
         String extra = questionExtra.toJson();
@@ -55,7 +53,6 @@ public class KbaseMessageUtils {
                         .answerList(faqResponse.getAnswerList())
                         .relatedFaqs(faqResponse.getRelatedFaqs())
                         .build();
-        MessageUtils.attachSequenceNumber(answerExtra, threadEntity.getUid());
         // 
         String content = faqResponse.getAnswer();
         if (StringUtils.hasText(faqResponse.getAnswerHtml())) {

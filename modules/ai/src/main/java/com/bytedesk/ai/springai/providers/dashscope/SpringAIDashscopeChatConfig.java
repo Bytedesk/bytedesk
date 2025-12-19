@@ -57,8 +57,8 @@ public class SpringAIDashscopeChatConfig {
     @Bean("bytedeskDashscopeChatOptions")
     DashScopeChatOptions bytedeskDashscopeChatOptions() {
         return DashScopeChatOptions.builder()
-                .withModel(model)
-                .withTemperature(temperature)
+                .model(model)
+                .temperature(temperature)
                 .build();
     }
 

@@ -38,10 +38,6 @@ public class ProcessSpecification extends BaseSpecification<ProcessEntity, Proce
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             }
             //
-            if (StringUtils.hasText(request.getKey())) {
-                predicates.add(criteriaBuilder.equal(root.get("key"), request.getKey()));
-            }
-            //
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }

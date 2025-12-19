@@ -23,9 +23,7 @@ public interface ProcessRepository extends JpaRepository<ProcessEntity, Long>, J
 
     Optional<ProcessEntity> findByUid(String uid);
 
-    Optional<ProcessEntity> findByKeyAndOrgUid(String key, String orgUid);
-
-    Optional<ProcessEntity> findByKeyAndOrgUidAndType(String key, String orgUid, String type);
+    Optional<ProcessEntity> findByUidAndOrgUidAndType(String uid, String orgUid, String type);
 
     List<ProcessEntity> findByOrgUidAndStatus(String orgUid, String status);
 

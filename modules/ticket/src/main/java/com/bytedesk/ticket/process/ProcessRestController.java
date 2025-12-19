@@ -54,6 +54,14 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
     }
 
     @Override
+    public ResponseEntity<?> queryByUid(ProcessRequest request) {
+        
+        ProcessResponse process = processRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(process));
+    }
+
+    @Override
     public ResponseEntity<?> create(ProcessRequest request) {
         
         ProcessResponse process = processRestService.create(request);
@@ -104,16 +112,21 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         return ResponseEntity.ok(JsonResult.success(definitions));
     }
 
+    // 重置流程为默认内容
+    @PostMapping("/reset")
+    public ResponseEntity<?> resetProcess(@RequestBody ProcessRequest request) {
+
+        ProcessResponse process = processRestService.resetProcess(request);
+
+        return ResponseEntity.ok(JsonResult.success(process));
+    }
+
     @Override
     public Object export(ProcessRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Override
-    public ResponseEntity<?> queryByUid(ProcessRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
+    
     
 }

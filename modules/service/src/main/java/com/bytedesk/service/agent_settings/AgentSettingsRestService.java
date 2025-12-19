@@ -1,6 +1,8 @@
 package com.bytedesk.service.agent_settings;
 
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -153,6 +155,10 @@ public class AgentSettingsRestService
         AgentStatusSettingEntity stDraft = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
         stDraft.setUid(uidUtils.getUid());
         entity.setDraftAgentStatusSettings(stDraft);
+
+        // Desktop right panel dynamic tabs
+        entity.setRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
+        entity.setDraftRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
 
         AgentSettingsEntity saved = save(entity);
         return convertToResponse(saved);
@@ -338,6 +344,12 @@ public class AgentSettingsRestService
                 modelMapper.map(request.getAgentStatusSettings(), draft);
                 draft.setUid(originalUid);
             }
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        // Desktop right panel dynamic tabs (draft)
+        if (request.getRightPanelTabs() != null) {
+            entity.setDraftRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
             entity.setHasUnpublishedChanges(true);
         }
 
@@ -651,12 +663,41 @@ public class AgentSettingsRestService
                 entity.setAgentStatusSettings(newPublished);
             }
         }
+
+        // Publish desktop right panel tabs
+        if (entity.getDraftRightPanelTabs() != null) {
+            entity.setRightPanelTabs(new ArrayList<>(entity.getDraftRightPanelTabs()));
+        }
         
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         
         AgentSettingsEntity updated = save(entity);
         return convertToResponse(updated);
+    }
+
+    private List<AgentRightPanelTab> normalizeRightPanelTabs(List<AgentRightPanelTab> input) {
+        if (input == null || input.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<AgentRightPanelTab> out = new ArrayList<>();
+        for (AgentRightPanelTab tab : input) {
+            if (tab == null) {
+                continue;
+            }
+            String title = tab.getTitle();
+            String url = tab.getUrl();
+            boolean hasTitle = title != null && !title.trim().isEmpty();
+            boolean hasUrl = url != null && !url.trim().isEmpty();
+            if (!hasTitle && !hasUrl) {
+                continue;
+            }
+            out.add(AgentRightPanelTab.builder()
+                    .title(hasTitle ? title.trim() : null)
+                    .url(hasUrl ? url.trim() : null)
+                    .build());
+        }
+        return out;
     }
 
     @Override

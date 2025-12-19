@@ -229,6 +229,6 @@ public class RobotLlm {
     // true: 继续调用LLM会话生成回答；false: 返回 defaultReply（默认）
     @Builder.Default
     @Column(name = "llm_use_when_kb_empty")
-    private Boolean useLlmWhenKbEmpty = false;
+    private Boolean useLlmWhenKbEmpty = true;
     
 }

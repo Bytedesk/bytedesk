@@ -73,7 +73,7 @@ public class SpringAIDashscopeEmbeddingConfig {
     @Bean("bytedeskDashscopeEmbeddingOptions")
     DashScopeEmbeddingOptions bytedeskDashscopeEmbeddingOptions() {
         return DashScopeEmbeddingOptions.builder()
-                .withModel(dashscopeEmbeddingModel)
+                .model(dashscopeEmbeddingModel)
                 .build(); 
     }
 

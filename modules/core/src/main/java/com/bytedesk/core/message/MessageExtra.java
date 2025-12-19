@@ -42,10 +42,6 @@ public class MessageExtra extends BaseExtra {
     
     private String orgUid; // 组织UID
 
-    // Thread会话内消息排序序号，服务端分配的自增值
-    @Builder.Default
-    private Long sequenceNumber = 0L;
-
     public static MessageExtra fromJson(String json) {
         MessageExtra result = BaseExtra.fromJson(json, MessageExtra.class);
         return result != null ? result : MessageExtra.builder().build();

@@ -78,17 +78,12 @@ public class TicketResponse extends BaseResponse {
     private Set<TicketAttachmentResponse> attachments;
     // 流程实例ID
     private String processInstanceId;
-    // 流程定义实体UID
+    // 流程定义实体UID，同时作为 Flowable 的 processDefinitionKey
     private String processEntityUid;
-    private String processDefinitionKey;
     private String formEntityUid;
     // 流程定义实体
     // private TicketProcessResponse processEntity;
 
-    // 是否评价
-    private Boolean rated;
-    // 满意度评价
-    private Integer rating;
     // 客户验证
     private Boolean verified;
     // 自定义表单 json schema

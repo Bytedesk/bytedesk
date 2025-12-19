@@ -167,9 +167,9 @@ public class SpringAIDashscopeChatController {
                 new Prompt(
                     message,
                     DashScopeChatOptions.builder()
-                        .withModel("dashscope-chat")
-                        .withTemperature(0.7)
-                        .withTopP(0.9)
+                        .model("dashscope-chat")
+                        .temperature(0.7)
+                        .topP(0.9)
                         .build()
                 ));
             

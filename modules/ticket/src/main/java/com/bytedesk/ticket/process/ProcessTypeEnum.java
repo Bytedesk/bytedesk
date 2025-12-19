@@ -24,5 +24,5 @@ public enum ProcessTypeEnum {
     TICKET_EXTERNAL,
     // 会话流程
     THREAD,
-    FLOW
+    // FLOW
 }

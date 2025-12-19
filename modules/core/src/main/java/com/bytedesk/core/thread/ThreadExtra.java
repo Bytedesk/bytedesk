@@ -15,7 +15,6 @@ package com.bytedesk.core.thread;
 
 import com.bytedesk.core.base.BaseExtra;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,10 +28,6 @@ public class ThreadExtra extends BaseExtra {
 
     private static final long serialVersionUID = 1L;
 
-    // Thread会话内消息排序序号，服务端分配的自增值
-    @Builder.Default
-    private Long sequenceNumber = 0L;
-    
     public static ThreadExtra fromJson(String json) {
         ThreadExtra result = BaseExtra.fromJson(json, ThreadExtra.class);
         return result != null ? result : ThreadExtra.builder().build();

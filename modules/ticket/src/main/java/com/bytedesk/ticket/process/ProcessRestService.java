@@ -19,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
@@ -106,14 +108,6 @@ public class ProcessRestService
             // 生成uid
             request.setUid(uidUtils.getUid());
         }
-        // 流程key不能重复
-        Optional<ProcessEntity> optionalKey = processRepository.findByKeyAndOrgUidAndType(request.getKey(),
-                request.getOrgUid(), normalizedType);
-        if (optionalKey.isPresent()) {
-            throw new RuntimeException(
-                    "Process key " + request.getKey() + " in org " + request.getOrgUid() + " with type "
-                            + normalizedType + " already exists");
-        }
 
         UserEntity user = authService.getUser();
         if (user != null) {
@@ -137,10 +131,11 @@ public class ProcessRestService
         Optional<ProcessEntity> optional = processRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             ProcessEntity entity = optional.get();
-            entity.setKey(request.getKey());
             entity.setName(request.getName());
             entity.setSchema(request.getSchema());
             entity.setDescription(request.getDescription());
+            entity.setType(request.getType());
+            // entity.setStatus(request.getStatus()); // 不允许手动修改状态
             //
             ProcessEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -191,116 +186,6 @@ public class ProcessRestService
     }
 
     @Override
-    public ProcessResponse convertToResponse(ProcessEntity entity) {
-        return modelMapper.map(entity, ProcessResponse.class);
-    }
-
-    public void initProcess(String orgUid) {
-        // 检查是否已经部署
-        List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
-                .deploymentTenantId(orgUid)
-                .deploymentName(TicketConsts.TICKET_PROCESS_NAME)
-                .list();
-
-        existingDeployments.sort(Comparator
-            .comparing(Deployment::getDeploymentTime, Comparator.nullsLast(Comparator.naturalOrder()))
-            .reversed());
-
-        Deployment latestDeployment = existingDeployments.isEmpty() ? null : existingDeployments.get(0);
-
-        if (!existingDeployments.isEmpty()) {
-            ensureExternalProcess(orgUid, latestDeployment);
-            return;
-        }
-
-        // 读取并部署流程
-        try {
-            String ticketBpmn20Xml = loadDefaultProcessSchema();
-
-            String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
-            String externalProcessUid = buildExternalProcessUid(orgUid);
-
-            create(buildDefaultProcessRequest(processUid, orgUid, ticketBpmn20Xml, ProcessTypeEnum.TICKET_INTERNAL));
-            create(buildDefaultProcessRequest(externalProcessUid, orgUid, ticketBpmn20Xml, ProcessTypeEnum.TICKET_EXTERNAL));
-
-            // 部署流程
-            Deployment deployment = repositoryService.createDeployment()
-                    .name(TicketConsts.TICKET_PROCESS_NAME)
-                    .addClasspathResource(TicketConsts.TICKET_PROCESS_PATH)
-                    .tenantId(orgUid)
-                    .deploy();
-
-            markProcessAsDeployed(processUid, deployment.getId());
-            markProcessAsDeployed(externalProcessUid, deployment.getId());
-
-            log.info("部署租户流程成功: deploymentId={}, tenantId={}",
-                    deployment.getId(), deployment.getTenantId());
-
-        } catch (IOException e) {
-            log.error("部署工单流程失败: tenantId={}", orgUid, e);
-        }
-    }
-
-    public void initThreadProcess(String orgUid) {
-        // 检查是否已经部署
-        List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
-                .deploymentTenantId(orgUid)
-                .deploymentName(ThreadConsts.THREAD_PROCESS_NAME)
-                .list();
-
-        if (!existingDeployments.isEmpty()) {
-            // log.info("会话工单流程已存在，跳过部署: tenantId={}", orgUid);
-            return;
-        }
-
-        // 读取并部署流程
-        try {
-            Resource resource = resourceLoader
-                    .getResource("classpath:" + ThreadConsts.THREAD_PROCESS_PATH);
-            String groupThreadBpmn20Xml = "";
-
-            try (InputStream inputStream = resource.getInputStream()) {
-                groupThreadBpmn20Xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            }
-
-            // 生成 processUid 并创建流程记录
-            String processUid = Utils.formatUid(orgUid, ThreadConsts.THREAD_PROCESS_KEY);
-            ProcessRequest processRequest = ProcessRequest.builder()
-                    .uid(processUid)
-                    .name(ThreadConsts.THREAD_PROCESS_NAME)
-                    .schema(groupThreadBpmn20Xml)
-                    .type(ProcessTypeEnum.THREAD.name())
-                    .key(ThreadConsts.THREAD_PROCESS_KEY)
-                    .description(ThreadConsts.THREAD_PROCESS_NAME)
-                    .orgUid(orgUid)
-                    .build();
-            create(processRequest);
-
-            // 部署流程
-            Deployment deployment = repositoryService.createDeployment()
-                    .name(ThreadConsts.THREAD_PROCESS_NAME)
-                    .addClasspathResource(ThreadConsts.THREAD_PROCESS_PATH)
-                    .tenantId(orgUid)
-                    .deploy();
-
-            // 更新 ProcessEntity
-            Optional<ProcessEntity> processEntity = findByUid(processUid);
-            if (processEntity.isPresent()) {
-                processEntity.get().setDeploymentId(deployment.getId());
-                // processEntity.get().setDeployed(true);
-                processEntity.get().setStatus(ProcessStatusEnum.DEPLOYED.name());
-                save(processEntity.get());
-            }
-
-            log.info("部署租户流程成功: deploymentId={}, tenantId={}",
-                    deployment.getId(), deployment.getTenantId());
-
-        } catch (IOException e) {
-            log.error("部署工单流程失败: tenantId={}", orgUid, e);
-        }
-    }
-
-    @Override
     protected Specification<ProcessEntity> createSpecification(ProcessRequest request) {
         return ProcessSpecification.search(request, authService);
     }
@@ -310,52 +195,125 @@ public class ProcessRestService
         return processRepository.findAll(specification, pageable);
     }
 
-    private ProcessRequest buildDefaultProcessRequest(String uid, String orgUid, String schema,
-            ProcessTypeEnum type) {
-        return ProcessRequest.builder()
-                .uid(uid)
-                .name(TicketConsts.TICKET_PROCESS_NAME)
-                .schema(schema)
-                .type(type.name())
-                .key(TicketConsts.TICKET_PROCESS_KEY)
-                .description(TicketConsts.TICKET_PROCESS_NAME)
-                .orgUid(orgUid)
-                .build();
+    @Override
+    public ProcessResponse convertToResponse(ProcessEntity entity) {
+        return modelMapper.map(entity, ProcessResponse.class);
     }
 
-    private String buildExternalProcessUid(String orgUid) {
-        return Utils.formatUid(orgUid,
-                TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX);
+    public void initProcess(String orgUid) {
+        try {
+            // 第一步：在数据库中创建 ProcessEntity 记录（去重）
+            String ticketBpmn20Xml = loadDefaultProcessSchema();
+            String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
+            String externalProcessUid = Utils.formatUid(orgUid,
+                    TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX);
+
+            // 创建 TICKET_INTERNAL 流程记录（使用 processUid 作为 deploymentName）
+            create(buildDefaultProcessRequest(processUid, orgUid, ticketBpmn20Xml, ProcessTypeEnum.TICKET_INTERNAL, TicketConsts.TICKET_PROCESS_NAME));
+            log.info("创建内部工单流程记录成功: processUid={}, orgUid={}", processUid, orgUid);
+
+            // 创建 TICKET_EXTERNAL 流程记录（使用 externalProcessUid 作为 deploymentName）
+            create(buildDefaultProcessRequest(externalProcessUid, orgUid, ticketBpmn20Xml, ProcessTypeEnum.TICKET_EXTERNAL, TicketConsts.TICKET_PROCESS_NAME_EXTERNAL));
+            log.info("创建外部工单流程记录成功: processUid={}, orgUid={}", externalProcessUid, orgUid);
+
+            // 第二步：分别处理 TICKET_INTERNAL 和 TICKET_EXTERNAL 的 Deployment
+            // 直接使用 processUid 作为 deploymentName，确保唯一性
+            deployProcessByType(orgUid, processUid, TicketConsts.TICKET_PROCESS_PATH);
+            deployProcessByType(orgUid, externalProcessUid, TicketConsts.TICKET_PROCESS_PATH);
+
+        } catch (IOException e) {
+            log.error("部署工单流程失败: tenantId={}", orgUid, e);
+        }
     }
 
-    private void ensureExternalProcess(String orgUid, Deployment latestDeployment) {
-        String externalType = ProcessTypeEnum.TICKET_EXTERNAL.name();
-        Optional<ProcessEntity> externalProcess = processRepository
-                .findByKeyAndOrgUidAndType(TicketConsts.TICKET_PROCESS_KEY, orgUid, externalType);
-        if (externalProcess.isPresent()) {
+    public void initThreadProcess(String orgUid) {
+        try {
+            // 第一步：加载默认流程模板
+            String threadBpmn20Xml = loadDefaultThreadProcessSchema();
+            String processUid = Utils.formatUid(orgUid, ThreadConsts.THREAD_PROCESS_KEY);
+
+            // 第二步：在数据库中创建 ProcessEntity 记录（去重）
+            create(buildDefaultProcessRequest(processUid, orgUid, threadBpmn20Xml, ProcessTypeEnum.THREAD, ThreadConsts.THREAD_PROCESS_NAME));
+            log.info("创建会话流程记录成功: processUid={}, orgUid={}", processUid, orgUid);
+
+            // 第三步：部署流程（直接使用 processUid 作为 deploymentName）
+            deployProcessByType(orgUid, processUid, ThreadConsts.THREAD_PROCESS_PATH);
+
+        } catch (IOException e) {
+            log.error("部署会话流程失败: tenantId={}", orgUid, e);
+        }
+    }
+
+    /**
+     * 初始化部署流程（从模板文件加载）
+     * 直接使用 processUid 作为 deploymentName，确保唯一性
+     */
+    private void deployProcessByType(String orgUid, String processUid, String processPath)
+            throws IOException {
+        // 检查该 processUid 对应的 Deployment 是否已存在
+        List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
+                .deploymentTenantId(orgUid)
+                .deploymentName(processUid)  // 直接使用 processUid 作为 deploymentName
+                .list();
+
+        if (!existingDeployments.isEmpty()) {
+            // Deployment 已存在，仅更新 ProcessEntity 状态
+            existingDeployments.sort(Comparator
+                    .comparing(Deployment::getDeploymentTime, Comparator.nullsLast(Comparator.naturalOrder()))
+                    .reversed());
+            Deployment latestDeployment = existingDeployments.get(0);
+            markProcessAsDeployed(processUid, latestDeployment.getId());
+            log.info("使用现有部署: deploymentId={}, processUid={}, tenantId={}",
+                    latestDeployment.getId(), processUid, latestDeployment.getTenantId());
             return;
         }
 
-        String schema = processRepository
-                .findByKeyAndOrgUidAndType(TicketConsts.TICKET_PROCESS_KEY, orgUid,
-                        ProcessTypeEnum.TICKET_INTERNAL.name())
-                .map(ProcessEntity::getSchema)
-                .orElseGet(() -> {
-                    try {
-                        return loadDefaultProcessSchema();
-                    } catch (IOException e) {
-                        throw new RuntimeException("加载默认工单流程定义失败", e);
-                    }
-                });
-
-        String externalProcessUid = buildExternalProcessUid(orgUid);
-        create(buildDefaultProcessRequest(externalProcessUid, orgUid, schema, ProcessTypeEnum.TICKET_EXTERNAL));
-
-        if (latestDeployment != null) {
-            markProcessAsDeployed(externalProcessUid, latestDeployment.getId());
+        // 读取模板 BPMN 文件并替换 process id 为 processUid
+        Resource resource = resourceLoader.getResource("classpath:" + processPath);
+        String bpmnXml;
+        try (InputStream inputStream = resource.getInputStream()) {
+            bpmnXml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
+        // 替换 process id，使每个 ProcessEntity 有唯一的 processDefinitionKey
+        // 根据流程路径判断使用哪个 process key 进行替换
+        String originalProcessKey = processPath.contains("thread") 
+                ? ThreadConsts.THREAD_PROCESS_KEY 
+                : TicketConsts.TICKET_PROCESS_KEY;
+        bpmnXml = bpmnXml.replace("id=\"" + originalProcessKey + "\"", 
+                                   "id=\"" + processUid + "\"");
 
-        log.info("已为租户补充外部工单流程: tenantId={}, processUid={}", orgUid, externalProcessUid);
+        // 执行 Deployment 操作，直接使用 processUid 作为 deploymentName
+        Deployment deployment = repositoryService.createDeployment()
+                .name(processUid)
+                .addString(processUid + ".bpmn20.xml", bpmnXml)
+                .tenantId(orgUid)
+                .deploy();
+        log.info("执行流程部署成功: deploymentId={}, processUid={}, tenantId={}",
+                deployment.getId(), processUid, deployment.getTenantId());
+
+        // 更新 ProcessEntity 部署状态
+        markProcessAsDeployed(processUid, deployment.getId());
+        log.info("更新工单流程部署状态成功: processUid={}, deploymentId={}",
+                processUid, deployment.getId());
+    }
+
+    private String loadDefaultThreadProcessSchema() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:" + ThreadConsts.THREAD_PROCESS_PATH);
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    private ProcessRequest buildDefaultProcessRequest(String uid, String orgUid, String schema,
+            ProcessTypeEnum type, String processName) {
+        return ProcessRequest.builder()
+                .uid(uid)
+                .name(processName)
+                .schema(schema)
+                .type(type.name())
+                .description(processName)
+                .orgUid(orgUid)
+                .build();
     }
 
     private void markProcessAsDeployed(String processUid, String deploymentId) {
@@ -369,10 +327,260 @@ public class ProcessRestService
         });
     }
 
+    /**
+     * 部署流程 - 统一部署入口，供 ProcessService 和内部初始化使用
+     * 使用 ProcessEntity 中存储的 schema 进行部署
+     * 
+     * @param processUid 流程定义 UID
+     * @param checkExisting 是否检查已存在的部署（true: 初始化场景，false: 用户手动部署）
+     * @return ProcessDefinitionResponse 部署结果
+     */
+    public ProcessDefinitionResponse deployProcess(String processUid, boolean checkExisting) {
+        Optional<ProcessEntity> optional = processRepository.findByUid(processUid);
+        if (optional.isEmpty()) {
+            throw new RuntimeException("流程定义不存在: " + processUid);
+        }
+
+        ProcessEntity processEntity = optional.get();
+        String orgUid = processEntity.getOrgUid();
+        String bpmnXml = processEntity.getSchema();
+        // 直接使用 processUid 作为 deploymentName，确保唯一性且不受用户修改 name 影响
+        String deploymentName = processUid;
+
+        // 如果需要检查已存在的部署（初始化场景）
+        if (checkExisting) {
+            List<Deployment> existingDeployments = repositoryService.createDeploymentQuery()
+                    .deploymentTenantId(orgUid)
+                    .deploymentName(deploymentName)
+                    .list();
+
+            if (!existingDeployments.isEmpty()) {
+                existingDeployments.sort(Comparator
+                        .comparing(Deployment::getDeploymentTime, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed());
+                Deployment latestDeployment = existingDeployments.get(0);
+                markProcessAsDeployed(processUid, latestDeployment.getId());
+                log.info("使用现有部署: deploymentId={}, deploymentName={}, tenantId={}",
+                        latestDeployment.getId(), deploymentName, latestDeployment.getTenantId());
+
+                // 查询流程定义并返回
+                org.flowable.engine.repository.ProcessDefinition processDefinition = repositoryService
+                        .createProcessDefinitionQuery()
+                        .deploymentId(latestDeployment.getId())
+                        .singleResult();
+
+                return buildProcessDefinitionResponse(processDefinition);
+            }
+        }
+
+        // 执行部署操作
+        Deployment deployment = repositoryService.createDeployment()
+                .name(deploymentName)
+                .addString(processUid + ".bpmn20.xml", bpmnXml)
+                .tenantId(orgUid)
+                .deploy();
+
+        log.info("执行流程部署成功: deploymentId={}, deploymentName={}, processKey={}, tenantId={}",
+                deployment.getId(), deploymentName, processUid, deployment.getTenantId());
+
+        // 更新 ProcessEntity 部署状态
+        processEntity.setDeploymentId(deployment.getId());
+        processEntity.setStatus(ProcessStatusEnum.DEPLOYED.name());
+        save(processEntity);
+
+        // 验证部署结果
+        org.flowable.engine.repository.ProcessDefinition processDefinition = repositoryService
+                .createProcessDefinitionQuery()
+                .deploymentId(deployment.getId())
+                .singleResult();
+
+        log.info("部署流程成功: deploymentId={}, tenantId={}, processKey={}, version={}",
+                deployment.getId(), deployment.getTenantId(),
+                processDefinition.getKey(), processDefinition.getVersion());
+
+        return buildProcessDefinitionResponse(processDefinition);
+    }
+
+    /**
+     * 部署流程 - 用户手动触发（不检查已存在部署，会创建新版本）
+     */
+    public ProcessDefinitionResponse deployProcess(String processUid) {
+        return deployProcess(processUid, false);
+    }
+
+    /**
+     * 查询已部署的流程定义列表（Flowable ProcessDefinition）
+     */
+    public List<ProcessDefinitionResponse> queryDeployedProcessDefinitions(ProcessRequest request) {
+        String orgUid = request.getOrgUid();
+        if (orgUid == null) {
+            throw new RuntimeException("租户ID不能为空");
+        }
+        
+        // 先查询已部署的流程定义实体
+        List<ProcessEntity> deployedProcesses = processRepository.findByOrgUidAndStatus(
+                orgUid, ProcessStatusEnum.DEPLOYED.name());
+        
+        // 收集所有部署ID
+        Set<String> deploymentIds = deployedProcesses.stream()
+            .map(ProcessEntity::getDeploymentId)
+            .filter(id -> id != null)
+            .collect(Collectors.toSet());
+        
+        if (deploymentIds.isEmpty()) {
+            return List.of();
+        }
+
+        // 查询租户流程定义
+        List<org.flowable.engine.repository.ProcessDefinition> processList = repositoryService
+            .createProcessDefinitionQuery()
+            .deploymentIds(deploymentIds)
+            .processDefinitionTenantId(orgUid)
+            .latestVersion()
+            .active()
+            .orderByProcessDefinitionVersion().desc()
+            .list();
+
+        for (org.flowable.engine.repository.ProcessDefinition processDefinition : processList) {
+            log.info("租户流程定义 tenantId={}, name={}, key={}, version={}, deploymentId={}", 
+                processDefinition.getTenantId(),
+                processDefinition.getName(),
+                processDefinition.getKey(),
+                processDefinition.getVersion(),
+                processDefinition.getDeploymentId());
+        }
+
+        return processList.stream()
+            .map(this::buildProcessDefinitionResponse)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 取消部署流程
+     */
+    public List<ProcessDefinitionResponse> undeployProcess(String processUid) {
+        Optional<ProcessEntity> optional = processRepository.findByUid(processUid);
+        if (optional.isEmpty()) {
+            throw new RuntimeException("流程定义不存在: " + processUid);
+        }
+        
+        ProcessEntity processEntity = optional.get();
+        String deploymentId = processEntity.getDeploymentId();
+        
+        if (deploymentId == null) {
+            log.warn("流程未部署，无需取消部署: processUid={}", processUid);
+            return List.of();
+        }
+
+        // 先查询要删除的流程定义
+        List<org.flowable.engine.repository.ProcessDefinition> processes = repositoryService
+            .createProcessDefinitionQuery()
+            .deploymentId(deploymentId)
+            .list();
+        log.info("删除前流程版本数量: {}", processes.size());
+        
+        try {
+            // 删除部署
+            repositoryService.deleteDeployment(deploymentId, false);
+            log.info("成功删除流程部署: deploymentId={}", deploymentId);
+            
+            // 更新实体状态
+            processEntity.setStatus(ProcessStatusEnum.DRAFT.name());
+            processEntity.setDeploymentId(null);
+            save(processEntity);
+            
+        } catch (Exception e) {
+            log.error("删除流程部署失败: deploymentId={}, error={}", 
+                deploymentId, e.getMessage());
+            throw new RuntimeException("删除流程部署失败: " + e.getMessage());
+        }
+
+        // 验证删除结果
+        List<org.flowable.engine.repository.ProcessDefinition> remainingProcesses = repositoryService
+            .createProcessDefinitionQuery()
+            .deploymentId(deploymentId)
+            .list();
+        
+        log.info("删除后流程版本数量: {}", remainingProcesses.size());
+
+        return remainingProcesses.stream()
+            .map(this::buildProcessDefinitionResponse)
+            .collect(Collectors.toList());
+    }
+
+    private ProcessDefinitionResponse buildProcessDefinitionResponse(
+            org.flowable.engine.repository.ProcessDefinition processDefinition) {
+        return ProcessDefinitionResponse.builder()
+                .id(processDefinition.getId())
+                .key(processDefinition.getKey())
+                .name(processDefinition.getName())
+                .description(processDefinition.getDescription())
+                .version(processDefinition.getVersion())
+                .deploymentId(processDefinition.getDeploymentId())
+                .tenantId(processDefinition.getTenantId())
+                .build();
+    }
+
     private String loadDefaultProcessSchema() throws IOException {
         Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_PATH);
         try (InputStream inputStream = resource.getInputStream()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
+
+    /**
+     * 重置流程为默认初始化内容
+     */
+    public ProcessResponse resetProcess(ProcessRequest request) {
+        String processUid = request.getUid();
+        if (!StringUtils.hasText(processUid)) {
+            throw new RuntimeException("Process uid is required");
+        }
+
+        Optional<ProcessEntity> optional = processRepository.findByUid(processUid);
+        if (optional.isEmpty()) {
+            throw new RuntimeException("Process not found: " + processUid);
+        }
+
+        ProcessEntity entity = optional.get();
+        String type = entity.getType();
+
+        try {
+            // 根据类型加载默认流程模板
+            String defaultSchema;
+            // String deploymentName;
+            
+            if (ProcessTypeEnum.THREAD.name().equals(type)) {
+                // THREAD 类型使用会话流程模板
+                defaultSchema = loadDefaultThreadProcessSchema();
+                // deploymentName = ThreadConsts.THREAD_PROCESS_NAME;
+            } else {
+                // TICKET_INTERNAL 和 TICKET_EXTERNAL 类型使用工单流程模板
+                defaultSchema = loadDefaultProcessSchema();
+                // deploymentName = ProcessTypeEnum.TICKET_INTERNAL.name().equals(type)
+                // //         ? TicketConsts.TICKET_PROCESS_NAME
+                //         : TicketConsts.TICKET_PROCESS_NAME_EXTERNAL;
+            }
+
+            // 更新 ProcessEntity 的 schema、name 和 description
+            entity.setSchema(defaultSchema);
+            // entity.setName(deploymentName);
+            // entity.setDescription(deploymentName);
+            // 重置部署状态，需要重新部署
+            entity.setDeploymentId(null);
+            entity.setStatus(ProcessStatusEnum.DRAFT.name());
+            // 
+            ProcessEntity savedEntity = save(entity);
+            if (savedEntity == null) {
+                throw new RuntimeException("Failed to reset process: unable to save entity");
+            }
+            log.info("重置流程成功: processUid={}, type={}", processUid, type);
+            
+            return convertToResponse(savedEntity);
+        } catch (IOException e) {
+            log.error("重置流程失败: processUid={}", processUid, e);
+            throw new RuntimeException("Failed to reset process: " + e.getMessage());
+        }
+    }
+
 }

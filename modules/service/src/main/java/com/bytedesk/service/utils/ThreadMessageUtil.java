@@ -24,7 +24,6 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.content.WelcomeContent;
-import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -43,7 +42,6 @@ public class ThreadMessageUtil {
      */
     public static MessageEntity getThreadRobotWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
         String json = content != null ? content.toJson() : null;
 
         MessageEntity message = MessageEntity.builder()
@@ -67,7 +65,6 @@ public class ThreadMessageUtil {
      */
     public static MessageEntity getThreadWorkflowWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
         String json = content != null ? content.toJson() : null;
 
         MessageEntity message = MessageEntity.builder()
@@ -91,7 +88,6 @@ public class ThreadMessageUtil {
      */
     public static MessageProtobuf getThreadWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
         String json = content != null ? content.toJson() : null;
 
         MessageEntity message = MessageEntity.builder()
@@ -147,7 +143,6 @@ public class ThreadMessageUtil {
             ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
         String json = content != null ? content.toJson() : null;
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
@@ -169,7 +164,6 @@ public class ThreadMessageUtil {
             ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
         String json = payload != null ? payload.toJson() : null;
 
@@ -192,7 +186,6 @@ public class ThreadMessageUtil {
 
     public static MessageProtobuf getThreadContinueMessage(UserProtobuf user, ThreadEntity thread) {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
         MessageEntity message = MessageEntity.builder()
                 .uid(thread.getUid()) // 使用会话的UID作为消息的UID，使得continue消息只保存一条即可
@@ -214,7 +207,6 @@ public class ThreadMessageUtil {
     public static MessageEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
@@ -236,7 +228,6 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())

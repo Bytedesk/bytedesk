@@ -212,62 +212,17 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
 
     @Override
     public QuickReplyExcel convertToExcel(QuickReplyEntity quickReply) {
-        // categoryUid
-        Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(quickReply.getCategoryUid());
         QuickReplyExcel quickReplyExcel = modelMapper.map(quickReply, QuickReplyExcel.class);
-        if (categoryOptional.isPresent()) {
-            quickReplyExcel.setCategory(categoryOptional.get().getName());
+
+        // categoryUid 可能为空（历史数据/个人快捷回复等），导出时做容错
+        if (quickReply != null && StringUtils.hasText(quickReply.getCategoryUid())) {
+            Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(quickReply.getCategoryUid());
+            categoryOptional.ifPresent(category -> quickReplyExcel.setCategory(category.getName()));
+        } else {
+            quickReplyExcel.setCategory("-");
         }
         return quickReplyExcel;
     }
-
-    // private List<QuickReplyResponseAgent> transformToQuickReplyResponseAgent(List<KbaseEntity> kbList) {
-    //     List<QuickReplyResponseAgent> quickReplyList = new ArrayList<QuickReplyResponseAgent>();
-    //     //
-    //     Iterator<KbaseEntity> kbPlatformIterator = kbList.iterator();
-    //     while (kbPlatformIterator.hasNext()) {
-    //         KbaseEntity kb = kbPlatformIterator.next();
-    //         //
-    //         QuickReplyResponseAgent quickReplyKb = QuickReplyResponseAgent.builder()
-    //                 .key(kb.getUid())
-    //                 .title(kb.getName())
-    //                 .content(kb.getDescriptionHtml())
-    //                 .type(QuickReplyTypeEnum.KB.name())
-    //                 .level(kb.getLevel())
-    //                 .platform(kb.getPlatform())
-    //                 .build();
-    //         //
-    //         List<CategoryEntity> categoryList = categoryRestService.findByKbUid(kb.getUid());
-    //         Iterator<CategoryEntity> iterator = categoryList.iterator();
-    //         while (iterator.hasNext()) {
-    //             CategoryEntity category = iterator.next();
-    //             //
-    //             QuickReplyResponseAgent quickReplyCategory = QuickReplyResponseAgent.builder()
-    //                     .key(category.getUid())
-    //                     .title(category.getName())
-    //                     .type(QuickReplyTypeEnum.CATEGORY.name())
-    //                     .build();
-    //             //
-    //             List<QuickReplyEntity> quickReplies = quickReplyRepository.findByCategoryUid(category.getUid());
-    //             Iterator<QuickReplyEntity> quickRepliesIterator = quickReplies.iterator();
-    //             while (quickRepliesIterator.hasNext()) {
-    //                 QuickReplyEntity quickReply = quickRepliesIterator.next();
-    //                 //
-    //                 QuickReplyResponseAgent quickReplyAgent = QuickReplyResponseAgent.builder()
-    //                         .key(quickReply.getUid())
-    //                         .title(quickReply.getTitle())
-    //                         .content(quickReply.getContent())
-    //                         .type(quickReply.getType())
-    //                         .build();
-    //                 quickReplyCategory.getChildren().add(quickReplyAgent);
-    //             }
-    //             quickReplyKb.getChildren().add(quickReplyCategory);
-    //         }
-    //         quickReplyList.add(quickReplyKb);
-    //     }
-    //     //
-    //     return quickReplyList;
-    // }
 
     // 快捷回复分类
     public void initQuickReplyCategory(String orgUid) {

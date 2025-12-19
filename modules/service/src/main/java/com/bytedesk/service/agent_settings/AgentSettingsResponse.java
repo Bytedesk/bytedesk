@@ -21,6 +21,8 @@ import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 import com.bytedesk.service.worktime_settings.WorktimeSettingResponse;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -111,4 +113,14 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
      * Draft agent status settings (Agent-specific)
      */
     private AgentStatusSettingResponse draftAgentStatusSettings;
+
+    /**
+     * Desktop right panel dynamic tabs (published)
+     */
+    private List<AgentRightPanelTab> rightPanelTabs;
+
+    /**
+     * Desktop right panel dynamic tabs (draft)
+     */
+    private List<AgentRightPanelTab> draftRightPanelTabs;
 }

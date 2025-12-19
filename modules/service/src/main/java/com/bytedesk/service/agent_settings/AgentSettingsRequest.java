@@ -21,6 +21,8 @@ import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingRequest;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -87,4 +89,9 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
      * Agent status settings (Agent-specific)
      */
     private AgentStatusSettingRequest agentStatusSettings;
+
+    /**
+     * Desktop right panel dynamic tabs (draft updates)
+     */
+    private List<AgentRightPanelTab> rightPanelTabs;
 }

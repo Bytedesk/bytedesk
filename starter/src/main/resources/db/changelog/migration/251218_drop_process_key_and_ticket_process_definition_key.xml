@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 删除 ProcessEntity 中的 process_key 字段 -->
+    <changeSet id="251218-drop-process-key" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_ticket_process" columnName="process_key"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_ticket_process" columnName="process_key"/>
+    </changeSet>
+
+    <!-- 删除 TicketEntity 中的 process_definition_key 字段 -->
+    <changeSet id="251218-drop-ticket-process-definition-key" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_ticket" columnName="process_definition_key"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_ticket" columnName="process_definition_key"/>
+    </changeSet>
+
+</databaseChangeLog>

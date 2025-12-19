@@ -33,6 +33,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
@@ -81,9 +82,14 @@ public class TicketEventListener {
         variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
         variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
         // 
-        String processKey = StringUtils.hasText(ticket.getProcessDefinitionKey())
-            ? ticket.getProcessDefinitionKey()
-            : TicketConsts.TICKET_PROCESS_KEY;
+        // processEntityUid 同时作为 Flowable 的 processDefinitionKey
+        String processKey = ticket.getProcessEntityUid();
+        if (!StringUtils.hasText(processKey)) {
+            // 回退到默认的 processEntityUid（基于 orgUid 和 ticket type 计算）
+            processKey = ticket.getType().equals(TicketTypeEnum.EXTERNAL.name())
+                    ? Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
+                    : Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY);
+        }
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey(processKey)

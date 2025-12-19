@@ -19,6 +19,8 @@ public class TicketConsts {
 
     public static final String TICKET_PROCESS_NAME = I18Consts.I18N_PREFIX + "ticket.process.name";
 
+    public static final String TICKET_PROCESS_NAME_EXTERNAL = I18Consts.I18N_PREFIX + "ticket.process.name_external";
+
     public static final String TICKET_PROCESS_KEY = "ticketProcess";
 
     public static final String TICKET_PROCESS_PATH = "processes/ticket-process.bpmn20.xml";

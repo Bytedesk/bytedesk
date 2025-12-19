@@ -33,8 +33,6 @@ public class ProcessRequest extends BaseRequest {
 
     private String name;
 
-    private String key;
-
     private String description;
 
     private String status;

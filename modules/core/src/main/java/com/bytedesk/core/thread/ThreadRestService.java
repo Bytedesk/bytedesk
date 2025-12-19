@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.thread;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -46,8 +44,6 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
-import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -73,10 +69,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ThreadRestService
         extends BaseRestServiceWithExport<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
 
-    private static final Duration THREAD_SEQUENCE_CACHE_TTL = Duration.ofHours(12);
-    private static final long THREAD_SEQUENCE_SYNC_INTERVAL = 50L;
-    private static final int MAX_SEQUENCE_DB_RETRIES = 3;
-
     private final AuthService authService;
 
     private final ModelMapper modelMapper;
@@ -88,8 +80,6 @@ public class ThreadRestService
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final TopicRestService topicRestService;
-
-    private final StringRedisTemplate stringRedisTemplate;
 
     private final ActiveThreadCacheService activeThreadCacheService;
     
@@ -774,134 +764,11 @@ public class ThreadRestService
             throw new IllegalArgumentException("thread uid is required");
         }
 
-        long sequenceNumber;
-        boolean usedCache = false;
-        try {
-            sequenceNumber = allocateSequenceFromCache(threadUid);
-            usedCache = true;
-        } catch (Exception cacheException) {
-            log.warn("Falling back to database allocation for thread {} due to cache error", threadUid,
-                    cacheException);
-            sequenceNumber = allocateSequenceDirectly(threadUid);
-        }
-
-        if (usedCache && shouldSyncSequence(sequenceNumber)) {
-            syncSequenceToDatabase(threadUid, sequenceNumber);
-        }
-
         return ThreadSequenceResponse.builder()
                 .threadUid(threadUid)
                 .messageUid(uidUtils.getUid())
-                .sequenceNumber(sequenceNumber)
                 .timestamp(System.currentTimeMillis()) //
                 .build();
-    }
-
-    private long allocateSequenceFromCache(String threadUid) {
-        String cacheKey = buildSequenceCacheKey(threadUid);
-        ensureSequenceInitialized(cacheKey, threadUid);
-        Long nextSequence = stringRedisTemplate.opsForValue().increment(cacheKey);
-        if (nextSequence == null) {
-            throw new IllegalStateException("Failed to increment sequence for thread " + threadUid);
-        }
-        refreshSequenceKeyTtl(cacheKey);
-        return nextSequence;
-    }
-
-    private void ensureSequenceInitialized(String cacheKey, String threadUid) {
-        Boolean hasKey = stringRedisTemplate.hasKey(cacheKey);
-        if (Boolean.TRUE.equals(hasKey)) {
-            return;
-        }
-        long persistedSequence = loadPersistedSequence(threadUid);
-        Boolean initialized = stringRedisTemplate.opsForValue()
-                .setIfAbsent(cacheKey, Long.toString(persistedSequence), THREAD_SEQUENCE_CACHE_TTL);
-        if (!Boolean.TRUE.equals(initialized)) {
-            refreshSequenceKeyTtl(cacheKey);
-        }
-    }
-
-    private void refreshSequenceKeyTtl(String cacheKey) {
-        stringRedisTemplate.expire(cacheKey, THREAD_SEQUENCE_CACHE_TTL);
-    }
-
-    private long loadPersistedSequence(String threadUid) {
-        ThreadEntity thread = getThreadOrThrow(threadUid);
-        String extraJson = thread.getExtra();
-        if (!StringUtils.hasText(extraJson) || BytedeskConsts.EMPTY_JSON_STRING.equals(extraJson)) {
-            return 0L;
-        }
-        ThreadExtra threadExtra = ThreadExtra.fromJson(extraJson);
-        if (threadExtra == null || threadExtra.getSequenceNumber() == null) {
-            return 0L;
-        }
-        return threadExtra.getSequenceNumber();
-    }
-
-    private long allocateSequenceDirectly(String threadUid) {
-        int attempt = 0;
-        while (true) {
-            try {
-                ThreadEntity thread = getThreadOrThrow(threadUid);
-                ThreadExtra threadExtra = ThreadExtra.fromJson(thread.getExtra());
-                if (threadExtra == null) {
-                    threadExtra = ThreadExtra.builder().sequenceNumber(0L).build();
-                }
-
-                long currentSequence = threadExtra.getSequenceNumber() != null ? threadExtra.getSequenceNumber() : 0L;
-                if (!StringUtils.hasText(thread.getExtra()) || BytedeskConsts.EMPTY_JSON_STRING.equals(thread.getExtra())) {
-                    currentSequence = 0L;
-                }
-                long nextSequence = currentSequence + 1;
-
-                threadExtra.setSequenceNumber(nextSequence);
-                thread.setExtra(threadExtra.toJson());
-                save(thread);
-                return nextSequence;
-            } catch (ObjectOptimisticLockingFailureException ex) {
-                attempt++;
-                if (attempt >= MAX_SEQUENCE_DB_RETRIES) {
-                    log.error("Failed to allocate sequence for thread {} after {} attempts", threadUid, attempt, ex);
-                    throw ex;
-                }
-                log.warn("Optimistic lock conflict when allocating sequence for thread {}, retry {}", threadUid,
-                        attempt);
-            }
-        }
-    }
-
-    private boolean shouldSyncSequence(long sequenceNumber) {
-        return sequenceNumber > 0 && sequenceNumber % THREAD_SEQUENCE_SYNC_INTERVAL == 0;
-    }
-
-    private void syncSequenceToDatabase(String threadUid, long sequenceNumber) {
-        try {
-            ThreadEntity thread = getThreadOrThrow(threadUid);
-            ThreadExtra threadExtra = ThreadExtra.fromJson(thread.getExtra());
-            if (threadExtra == null) {
-                threadExtra = ThreadExtra.builder().build();
-            }
-            Long persisted = threadExtra.getSequenceNumber();
-            if (persisted != null && persisted >= sequenceNumber) {
-                return;
-            }
-            threadExtra.setSequenceNumber(sequenceNumber);
-            thread.setExtra(threadExtra.toJson());
-            save(thread);
-        } catch (ObjectOptimisticLockingFailureException ex) {
-            log.debug("Sequence sync hit optimistic lock for thread {}, skipping", threadUid, ex);
-        } catch (Exception ex) {
-            log.warn("Failed to sync thread {} sequence {} to database", threadUid, sequenceNumber, ex);
-        }
-    }
-
-    private ThreadEntity getThreadOrThrow(String threadUid) {
-        return findByUid(threadUid)
-                .orElseThrow(() -> new NotFoundException("thread " + threadUid + " not found"));
-    }
-
-    private String buildSequenceCacheKey(String threadUid) {
-        return RedisConsts.THREAD_SEQUENCE_PREFIX + threadUid;
     }
 
     public List<ThreadEntity> findServiceThreadStateStarted() {

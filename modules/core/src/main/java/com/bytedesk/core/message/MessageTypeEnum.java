@@ -67,16 +67,16 @@ public enum MessageTypeEnum {
     TICKET, // 工单消息
     TICKET_SUBMIT, // 工单提交
     // 
-    TYPING, // 正在输入
-    PROCESSING, // 正在处理，等待大模型回复中
-    // 
     STICKER, // 贴纸
     EMAIL, // 邮件
     // 
     BUTTON, // 按钮消息
     BUTTON_SUBMIT, // 按钮提交
     // 
-    PREVIEW, // 消息预知
+    TYPING, // 正在输入: 客服输入状态发送给访客
+    PREVIEW, // 消息预知：访客输入内容预览发送给客服
+    PROCESSING, // 正在处理，等待大模型回复中
+    // 
     RECALL, // 撤回
     DELIVERED, // 回执: 已送达
     READ, // 回执: 已读

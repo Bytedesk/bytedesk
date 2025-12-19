@@ -84,10 +84,6 @@ public class TicketRequest extends BaseRequest {
     // 流程定义实体UID
     private String processEntityUid;
 
-    // 是否评价
-    private Boolean rated;
-    // 满意度评价
-    private Integer rating;
     // 客户验证
     private Boolean verified;
     // 自定义表单 json schema

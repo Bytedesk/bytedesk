@@ -184,13 +184,17 @@ public class ServiceSettingsEntity extends BaseEntity {
     // 桌面版聊天窗口右侧iframe地址
     private String rightIframeUrl;
 
-    // 是否启用输入联想
+    // 是否启用访客输入联想
     @Builder.Default
     private Boolean inputAssociationEnabled = false;
 
     // 输入联想关联知识库
     private String inputAssociationKbUid;
 
+    // 访客输入预览：访客输入内容预览发送给客服（MESSAGE_TYPE_PREVIEW）
+    @Builder.Default
+    private Boolean inputPreviewEnabled = false;
+    
     // 常见问题
     @Builder.Default
     private Boolean showFaqs = false;

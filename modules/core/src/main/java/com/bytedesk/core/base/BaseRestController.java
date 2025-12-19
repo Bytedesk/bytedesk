@@ -17,9 +17,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author jackning 270580156@qq.com
  */
+@Slf4j
 public abstract class BaseRestController<T extends PageableRequest, S> {
 
     /**
@@ -216,11 +219,18 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
                     .doWrite(excelList);
 
         } catch (Exception e) {
+            log.error("exportTemplate failed: filePrefix={}, sheetName={}, excelClass={}, request={}",
+                    filePrefix,
+                    sheetName,
+                    excelClass != null ? excelClass.getName() : null,
+                    request,
+                    e);
             // 发生异常时重置响应
             response.reset();
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
-            return JsonResult.error(e.getMessage());
+            String message = e.getMessage() != null ? e.getMessage() : e.toString();
+            return JsonResult.error(message);
         }
         return "";
     }

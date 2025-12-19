@@ -13,7 +13,14 @@ import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bytedesk.core.constant.TypeConsts;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
@@ -90,6 +97,22 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
      */
     @lombok.Builder.Default
     private String timeoutRemindTip = com.bytedesk.core.constant.I18Consts.I18N_AGENT_TIMEOUT_TIP;
+
+    /**
+     * Desktop right panel dynamic tabs (published)
+     */
+    @lombok.Builder.Default
+    @Convert(converter = AgentRightPanelTabListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<AgentRightPanelTab> rightPanelTabs = new ArrayList<>();
+
+    /**
+     * Desktop right panel dynamic tabs (draft)
+     */
+    @lombok.Builder.Default
+    @Convert(converter = AgentRightPanelTabListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<AgentRightPanelTab> draftRightPanelTabs = new ArrayList<>();
 
     /**
      * Message leave settings

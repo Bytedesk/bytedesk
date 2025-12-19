@@ -127,11 +127,13 @@ public class TicketEntity extends BaseEntity {
 
     /**
      * Associated workgroup UID for ticket assignment
+     * 默认外部工单类型关联客服工作组
      */
     private String workgroupUid; // 客服工作组
 
     /**
      * Associated department UID for ticket routing
+     * 默认内部工单类型关联部门
      */
     private String departmentUid; // 内部部门
 
@@ -176,14 +178,9 @@ public class TicketEntity extends BaseEntity {
 
     /**
      * Process definition entity UID
+     * Also used as Flowable's processDefinitionKey
      */
     private String processEntityUid;
-
-    /**
-     * Process definition key used for this ticket's workflow
-     */
-    @Column(name = "process_definition_key")
-    private String processDefinitionKey;
 
     /**
      * Selected form definition UID
@@ -199,19 +196,6 @@ public class TicketEntity extends BaseEntity {
      */
     @Column(name = "form_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String schema;
-
-    /**
-     * Whether the ticket has been rated by the customer
-     */
-    @Builder.Default
-    @Column(name = "is_rated")
-    private Boolean rated = false;
-
-    /**
-     * Customer satisfaction rating for the ticket
-     */
-    @Builder.Default
-    private Integer rating = TicketRatingEnum.GOOD.getValue();
 
     /**
      * Whether the customer has been verified
@@ -234,7 +218,6 @@ public class TicketEntity extends BaseEntity {
      * Client platform from which the ticket was created
      */
     private String channel;
-
     
     /**
      * 当前工单处理人 使用 assignee 字段代替

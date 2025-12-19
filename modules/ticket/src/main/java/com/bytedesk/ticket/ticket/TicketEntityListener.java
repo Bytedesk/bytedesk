@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-23 14:53:23
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-23 14:56:27
+ * @LastEditTime: 2025-12-18 10:00:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,6 @@
 package com.bytedesk.ticket.ticket;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -30,21 +29,17 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketEntityListener {
 
     @PostPersist
-    public void postPersist(TicketEntity ticket) {
-        log.info("TicketEntityListener postPersist: {}", ticket);
-        TicketEntity cloneTicket = SerializationUtils.clone(ticket);
-        // 
+    public void onPostPersist(TicketEntity ticket) {
+        log.info("onPostPersist: {}", ticket);
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TicketCreateEvent(cloneTicket));
+        bytedeskEventPublisher.publishEvent(new TicketCreateEvent(ticket));
     }
 
     @PostUpdate
-    public void postUpdate(TicketEntity ticket) {
-        log.info("TicketEntityListener postUpdate: {}", ticket);
-        TicketEntity cloneTicket = SerializationUtils.clone(ticket);
-        // 
+    public void onPostUpdate(TicketEntity ticket) {
+        log.info("onPostUpdate: {}", ticket);
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TicketUpdateEvent(cloneTicket));
+        bytedeskEventPublisher.publishEvent(new TicketUpdateEvent(ticket));
     }
     
 }

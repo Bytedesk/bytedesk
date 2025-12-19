@@ -45,7 +45,6 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
 
     private final ThreadRestService threadRestService;
 
-
     /**
      * 根据组织查询会话
      * 
@@ -403,11 +402,11 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
      * 发送消息前申请服务端分配的消息元信息
      *
      * @param request 包含 threadUid 的请求
-     * @return 包含 messageUid、timestamp、sequenceNumber 的元信息
+        * @return 包含 messageUid、timestamp 的元信息
      */
     // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ_ANY_LEVEL)
     @ActionAnnotation(title = "会话管理", action = "申请消息元信息", description = "request message metadata")
-    @Operation(summary = "申请消息元信息", description = "发送消息前获取服务端分配的消息UID、时间戳与序号")
+    @Operation(summary = "申请消息元信息", description = "发送消息前获取服务端分配的消息UID与时间戳")
     @PostMapping("/message/meta")
     public ResponseEntity<?> requestMessageMetadata(@RequestBody ThreadRequest request) {
         if (request == null || !StringUtils.hasText(request.getUid())) {

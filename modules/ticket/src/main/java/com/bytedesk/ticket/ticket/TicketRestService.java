@@ -316,7 +316,6 @@ public class TicketRestService
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .type(ThreadTypeEnum.TICKET.name())
-                // .unreadCount(0)
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .topic(topic)
                 .hide(true) // 默认隐藏
@@ -366,7 +365,7 @@ public class TicketRestService
     public void deleteByUid(String uid) {
         Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(uid);
         if (!ticketOptional.isPresent()) {
-            throw new RuntimeException("ticket not found");
+            throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
         ticket.setDeleted(true);
@@ -581,10 +580,8 @@ public class TicketRestService
 
         ProcessEntity process = settings.getProcess();
         if (process != null) {
+            // processEntityUid 同时作为 Flowable 的 processDefinitionKey
             ticket.setProcessEntityUid(process.getUid());
-            if (StringUtils.hasText(process.getKey())) {
-                ticket.setProcessDefinitionKey(process.getKey());
-            }
         }
 
         FormEntity form = settings.getForm();
@@ -613,8 +610,12 @@ public class TicketRestService
     }
 
     private void ensureProcessDefinitionFallback(TicketEntity ticket) {
-        if (ticket != null && !StringUtils.hasText(ticket.getProcessDefinitionKey())) {
-            ticket.setProcessDefinitionKey(TicketConsts.TICKET_PROCESS_KEY);
+        if (ticket != null && !StringUtils.hasText(ticket.getProcessEntityUid())) {
+            // 根据工单类型计算默认的 processEntityUid
+            String defaultProcessUid = TicketTypeEnum.EXTERNAL.name().equals(ticket.getType())
+                    ? Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
+                    : Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY);
+            ticket.setProcessEntityUid(defaultProcessUid);
         }
     }
 

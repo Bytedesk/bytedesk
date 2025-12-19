@@ -67,9 +67,9 @@ public class SpringAIDashscopeChatService extends BaseSpringAIService {
         }
         try {
             return DashScopeChatOptions.builder()
-                    .withModel(llm.getTextModel())
-                    .withTemperature(llm.getTemperature())
-                    .withTopP(llm.getTopP())
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .topP(llm.getTopP())
                     .build();
         } catch (Exception e) {
             log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);

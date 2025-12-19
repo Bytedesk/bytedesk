@@ -16,9 +16,6 @@ public class ThreadSequenceResponse {
     /** Server generated unique identifier for the upcoming message. */
     private String messageUid;
 
-    /** Monotonically increasing sequence within the thread. */
-    private Long sequenceNumber;
-
     /** Server side timestamp (epoch millis) when the metadata is generated. */
     private Long timestamp;
 }

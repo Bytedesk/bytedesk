@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.message.utils;
 
-import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ChannelEnum;
@@ -25,8 +24,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.ThreadSequenceResponse;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -37,28 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 @Slf4j
 public class MessageUtils {
-    
-
-    public static void attachSequenceNumber(MessageExtra extra, String threadUid) {
-        if (extra == null || !StringUtils.hasText(threadUid)) {
-            return;
-        }
-        try {
-            ThreadRestService threadRestService = ApplicationContextHolder.getBean(ThreadRestService.class);
-            ThreadSequenceResponse response = threadRestService.allocateMessageMetadata(threadUid);
-            if (response != null && response.getSequenceNumber() != null) {
-                extra.setSequenceNumber(response.getSequenceNumber());
-            }
-        } catch (Exception ex) {
-            log.warn("attachSequenceNumber failed for thread {}", threadUid, ex);
-        }
-    }
 
     public static MessageProtobuf createLoginNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
         // 
         UserProtobuf system = UserUtils.getSystemUser();
         MessageExtra messageExtra = MessageExtra.fromOrgUid(orgUid);
-        MessageUtils.attachSequenceNumber(messageExtra, threadProtobuf.getUid());
         // 
         MessageProtobuf message = MessageProtobuf.builder()
                 .uid(messageUid)
@@ -78,7 +58,6 @@ public class MessageUtils {
         // 
         UserProtobuf system = UserUtils.getSystemUser();
         MessageExtra messageExtra = MessageExtra.fromOrgUid(orgUid);
-        MessageUtils.attachSequenceNumber(messageExtra, threadProtobuf.getUid());
         // 
         MessageProtobuf message = MessageProtobuf.builder()
                 .uid(messageUid)
@@ -99,7 +78,6 @@ public class MessageUtils {
         UserProtobuf sender = UserUtils.getSystemUser();
         ThreadProtobuf threadProtobuf = thread.toProtobuf();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        MessageUtils.attachSequenceNumber(extra, thread.getUid());
         //
         MessageProtobuf message = MessageProtobuf.builder()
                 .uid(messageUid)

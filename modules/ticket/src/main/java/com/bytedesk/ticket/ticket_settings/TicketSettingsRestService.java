@@ -34,6 +34,7 @@ import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.service.form.FormRepository;
 import com.bytedesk.service.form.FormResponse;
@@ -696,8 +697,12 @@ public class TicketSettingsRestService extends
         if (processType == null) {
             return null;
         }
+        // 通过 Utils.formatUid 生成默认的 processUid
+        String defaultProcessUid = processType == ProcessTypeEnum.TICKET_EXTERNAL
+                ? Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
+                : Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
         return ticketProcessRepository
-                .findByKeyAndOrgUidAndType(TicketConsts.TICKET_PROCESS_KEY, orgUid, processType.name())
+                .findByUidAndOrgUidAndType(defaultProcessUid, orgUid, processType.name())
                 .map(ProcessEntity::getUid)
                 .orElse(null);
     }
@@ -933,7 +938,6 @@ public class TicketSettingsRestService extends
         return ProcessResponse.builder()
                 .uid(entity.getUid())
                 .name(entity.getName())
-                .key(entity.getKey())
                 .description(entity.getDescription())
                 .status(entity.getStatus())
                 .schema(entity.getSchema())
