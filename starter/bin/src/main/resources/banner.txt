@@ -1,8 +1,0 @@
-,--.                ,--.              ,--.                 ,--.     
-|  |-.  ,--. ,--. ,-'  '-.  ,---.   ,-|  |  ,---.   ,---.  |  |,-.  
-| .-. '  \  '  /  '-.  .-' | .-. : ' .-. | | .-. : (  .-'  |     /  
-| `-' |   \   '     |  |   \   --. \ `-' | \   --. .-'  `) |  \  \  
- `---'  .-'  /      `--'    `----'  `---'   `----' `----'  `--'`--' 
-        `---'                                                       
-${application.title}, ${application.version} 
-${AnsiColor.BRIGHT_YELLOW} :: Based On Spring Boot :: ${spring-boot.formatted-version}
