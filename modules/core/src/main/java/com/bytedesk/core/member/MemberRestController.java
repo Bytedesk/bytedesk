@@ -52,7 +52,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberResponse.class)))
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
     @Override
     public ResponseEntity<?> queryByOrg(MemberRequest request) {
         //
@@ -66,7 +66,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberResponse.class)))
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
     @Override
     public ResponseEntity<?> queryByUser(MemberRequest request) {
         //
@@ -80,7 +80,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberResponse.class)))
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
     @GetMapping("/query/userUid")
     public ResponseEntity<?> queryByUserUid(MemberRequest request) {
         //
@@ -94,7 +94,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberResponse.class)))
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
     @Override
     public ResponseEntity<?> queryByUid(MemberRequest request) {
         
@@ -107,7 +107,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberResponse.class)))
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_CREATE_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_CREATE)
     @ActionAnnotation(title = "成员", action = "新建", description = "create member")
     @Override
     public ResponseEntity<?> create(@RequestBody MemberRequest request) {
@@ -121,7 +121,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberResponse.class)))
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_UPDATE)
     @ActionAnnotation(title = "成员", action = "更新", description = "update member")
     @Override
     public ResponseEntity<?> update(@RequestBody MemberRequest request) {
@@ -133,7 +133,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
 
     @Operation(summary = "删除成员", description = "删除指定的成员")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_DELETE_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_DELETE)
     @ActionAnnotation(title = "成员", action = "删除", description = "delete member")
     @Override
     public ResponseEntity<?> delete(@RequestBody MemberRequest request) {
@@ -145,7 +145,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
 
     @Operation(summary = "导出成员", description = "导出成员数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_EXPORT_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_EXPORT)
     @ActionAnnotation(title = "成员", action = "导出", description = "export member")
     @GetMapping("/export")
     public Object export(MemberRequest request, HttpServletResponse response) {
@@ -163,7 +163,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ApiResponse(responseCode = "200", description = "激活成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberResponse.class)))
-    @PreAuthorize(MemberPermissions.HAS_MEMBER_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_UPDATE)
     @PostMapping("/activate")
     @ActionAnnotation(title = "成员", action = "激活", description = "activate member")
     public ResponseEntity<?> activate(@RequestBody MemberRequest request) {

@@ -21,6 +21,7 @@ import com.bytedesk.call.esl.client.internal.Context;
 import com.bytedesk.call.esl.client.transport.CommandResponse;
 import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import com.bytedesk.call.esl.client.transport.message.EslHeaders;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * End users of the inbound {@link Client} should not need to use this class.
@@ -38,6 +39,7 @@ import com.bytedesk.call.esl.client.transport.message.EslHeaders;
  * pipeline prior to this handler. This will ensure that each incoming message is processed in its
  * own thread (although still guaranteed to be processed in the order of receipt).
  */
+@Slf4j
 class InboundClientHandler extends AbstractEslClientHandler {
 
 	private final String password;

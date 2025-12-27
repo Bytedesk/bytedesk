@@ -20,7 +20,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.bytedesk.core.quartz.service.QuartzEventPublisher;
+import com.bytedesk.core.quartz.QuartzEventPublisher;
 
 import java.io.Serializable;
 

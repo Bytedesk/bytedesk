@@ -26,15 +26,15 @@ public class WorkflowEdgeInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // workflow_edgeRestService.initWorkflowEdges(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = WorkflowEdgePermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = WorkflowEdgePermissions.WORKFLOW_EDGE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

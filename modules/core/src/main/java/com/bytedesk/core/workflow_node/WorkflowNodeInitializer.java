@@ -28,15 +28,15 @@ public class WorkflowNodeInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         workflow_nodeRestService.initWorkflowNodes(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = WorkflowNodePermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = WorkflowNodePermissions.WORKFLOW_NODE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

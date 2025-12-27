@@ -14,7 +14,6 @@
 package com.bytedesk.core.task_list;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.task_list.event.TaskListCreateEvent;
@@ -33,19 +32,19 @@ public class TaskListEntityListener {
     @PostPersist
     public void onPostPersist(TaskListEntity task_list) {
         log.info("onPostPersist: {}", task_list);
-        TaskListEntity cloneTaskList = SerializationUtils.clone(task_list);
+        // TaskListEntity cloneTaskList = SerializationUtils.clone(task_list);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TaskListCreateEvent(cloneTaskList));
+        bytedeskEventPublisher.publishEvent(new TaskListCreateEvent(task_list));
     }
 
     @PostUpdate
     public void onPostUpdate(TaskListEntity task_list) {
         log.info("onPostUpdate: {}", task_list);
-        TaskListEntity cloneTaskList = SerializationUtils.clone(task_list);
+        // TaskListEntity cloneTaskList = SerializationUtils.clone(task_list);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new TaskListUpdateEvent(cloneTaskList));
+        bytedeskEventPublisher.publishEvent(new TaskListUpdateEvent(task_list));
     }
     
 }

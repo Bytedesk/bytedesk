@@ -13,11 +13,12 @@
  */
 package com.bytedesk.core.rbac.organization;
 
-import com.bytedesk.core.base.BaseResponseNoOrg;
+import java.io.Serializable;
+
+import com.bytedesk.core.rbac.user.UserResponseSimple;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -25,12 +26,13 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrganizationResponseSimple extends BaseResponseNoOrg {
+public class OrganizationResponseSimple implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private String uid;
     
     private String name;
 
@@ -42,4 +44,10 @@ public class OrganizationResponseSimple extends BaseResponseNoOrg {
 
     // 认证状态：未认证、已认证、审核中、审核失败
     private String verifyStatus;
+
+    // 是否启用，状态：启用/禁用
+    private Boolean enabled;
+
+    // owner user
+    private UserResponseSimple user;
 }

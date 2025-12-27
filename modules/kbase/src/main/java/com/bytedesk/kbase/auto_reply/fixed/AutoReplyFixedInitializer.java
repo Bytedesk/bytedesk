@@ -35,7 +35,7 @@ public class AutoReplyFixedInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // init();
-        initPermissions();
+        initAuthority();
     }
 
     // 迁移到kbaseInitializer
@@ -45,7 +45,7 @@ public class AutoReplyFixedInitializer implements SmartInitializingSingleton {
         autoReplyFixedRestService.initData(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = AutoReplyFixedPermissions.AUTO_REPLY_FIXED_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-development/invite_visitor" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.1">
+<title data-rh="true">访客端邀请对话框 | Bytedesk</title><meta data-rh="true" http-equiv="Content-Security-Policy" content=" default-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; https://www.weiyuai.cn *.weiyuai.cn cdn.npmmirror.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://www.weiyuai.cn *.weiyuai.cn fonts.googleapis.com cdn.npmmirror.com; img-src &#x27;self&#x27; data: https://www.weiyuai.cn *.weiyuai.cn *.npmmirror.com; font-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn fonts.gstatic.com data:; connect-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; frame-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; form-action &#x27;self&#x27;; "><meta data-rh="true" http-equiv="X-Content-Type-Options" content="nosniff"><meta data-rh="true" http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" property="og:image" content="https://www.weiyuai.cn/docs/zh-CN/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://www.weiyuai.cn/docs/zh-CN/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://www.weiyuai.cn/docs/zh-CN/docs/development/invite_visitor"><meta data-rh="true" property="og:locale" content="zh_CN"><meta data-rh="true" property="og:locale:alternate" content="en"><meta data-rh="true" property="og:locale:alternate" content="zh_TW"><meta data-rh="true" name="docusaurus_locale" content="zh-CN"><meta data-rh="true" name="docsearch:language" content="zh-CN"><meta data-rh="true" name="keywords" content="bytedesk, 微语, 客服系统, AI客服, 智能客服"><meta data-rh="true" name="og:title" content="Bytedesk微语智能客服系统"><meta data-rh="true" name="og:description" content="微语智能客服系统官方文档，全面介绍系统功能、部署方案及集成指南"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="访客端邀请对话框 | Bytedesk"><meta data-rh="true" name="description" content="社区版不支持，请升级到企业版或平台版。请替换licenseKey"><meta data-rh="true" property="og:description" content="社区版不支持，请升级到企业版或平台版。请替换licenseKey"><link data-rh="true" rel="icon" href="/docs/zh-CN/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://www.weiyuai.cn/docs/zh-CN/docs/development/invite_visitor"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/docs/development/invite_visitor" hreflang="en"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/zh-CN/docs/development/invite_visitor" hreflang="zh-CN"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/zh-TW/docs/development/invite_visitor" hreflang="zh-TW"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/docs/development/invite_visitor" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"开发指南","item":"https://www.weiyuai.cn/docs/zh-CN/docs/category/development"},{"@type":"ListItem","position":2,"name":"访客端邀请对话框","item":"https://www.weiyuai.cn/docs/zh-CN/docs/development/invite_visitor"}]}</script><link rel="alternate" type="application/rss+xml" href="/docs/zh-CN/blog/rss.xml" title="Bytedesk RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/docs/zh-CN/blog/atom.xml" title="Bytedesk Atom Feed"><link rel="stylesheet" href="/docs/zh-CN/assets/css/styles.4ec1f2ed.css">
+<script src="/docs/zh-CN/assets/js/runtime~main.43bb8b70.js" defer="defer"></script>
+<script src="/docs/zh-CN/assets/js/main.7937c7c7.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div class="progressContainer_awPh"><div class="progressBar_CB9G" style="width:0%"></div></div><div role="region" aria-label="跳到主要内容"><a class="skipToContent_hDlh" href="#__docusaurus_skipToContent_fallback">跳到主要内容</a></div><nav aria-label="主导航" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="切换导航栏" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/docs/zh-CN/"><div class="navbar__logo"><img src="/docs/zh-CN/img/logo.png" alt="微语 Logo" class="themedComponent_nezP themedComponent--light_FLlG"><img src="/docs/zh-CN/img/logo.png" alt="微语 Logo" class="themedComponent_nezP themedComponent--dark_AjEN"></div><b class="navbar__title text--truncate">微语</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/docs/zh-CN/docs/intro">文档</a><a class="navbar__item navbar__link" href="/docs/zh-CN/blog">博客</a><a class="navbar__item navbar__link" href="/docs/zh-CN/docs/payment">价格</a><a href="https://api.weiyuai.cn/swagger-ui/index.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">SwaggerApis<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/apidocs/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">ApiDocs<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/javadocs/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">JavaDocs<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/architecture.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">架构图<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><div class="navbar__item dropdown dropdown--hoverable"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link">演示体验</a><ul class="dropdown__menu"><li><a href="https://www.weiyuai.cn/admin/" target="_blank" rel="noopener noreferrer" class="dropdown__link">管理后台<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li><a href="https://www.weiyuai.cn/agent/" target="_blank" rel="noopener noreferrer" class="dropdown__link">客服工作台<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li><a href="https://www.weiyuai.cn/reactdemo/" target="_blank" rel="noopener noreferrer" class="dropdown__link">访客端演示<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar-search-item navbarSearchContainer_S5Qv"><div class="navbar__search searchBarContainer_MFY3" dir="ltr"><input placeholder="搜索" aria-label="Search" class="navbar__search-input searchInput_rL4i" value=""><div class="loadingRing_cMvM searchBarLoadingRing_YKes"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/bytedesk/bytedesk" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/contact.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">联系我们<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_YYhs"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>简体中文</a><ul class="dropdown__menu"><li><a href="/docs/docs/development/invite_visitor" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="en">English</a></li><li><a href="/docs/zh-CN/docs/development/invite_visitor" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="zh-CN">简体中文</a></li><li><a href="/docs/zh-TW/docs/development/invite_visitor" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="zh-TW">繁体中文</a></li></ul></div><div class="toggle_nwaj colorModeToggle_ed4a"><button class="clean-btn toggleButton_XDyZ toggleButtonDisabled_VoN_" type="button" disabled="" title="system mode" aria-label="切换浅色/暗黑模式（当前为system mode）"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv lightToggleIcon_GTAV"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv darkToggleIcon_FEmf"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv systemToggleIcon_wHAe"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_tuwg"><div class="docsWrapper_nvId"><button aria-label="回到顶部" class="clean-btn theme-back-to-top-button backToTopButton_LwBK" type="button"></button><div class="docRoot_WYpV"><aside class="theme-doc-sidebar-container docSidebarContainer_XCXD"><div class="sidebarViewport_UcBh"><div class="sidebar_jzvq"><nav aria-label="文档侧边栏" class="menu thin-scrollbar menu_RET8"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/intro"><span title="微语协同平台" class="linkLabel_J_DF">微语协同平台</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/user-manual"><span title="使用手册" class="categoryLinkLabel_fMPM">使用手册</span></a><button aria-label="展开侧边栏分类 &#x27;使用手册&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist menu__link--active" href="/docs/zh-CN/docs/category/development"><span title="开发指南" class="categoryLinkLabel_fMPM">开发指南</span></a><button aria-label="折叠侧边栏分类 &#x27;开发指南&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/chat"><span title="访客端" class="linkLabel_J_DF">访客端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/agent"><span title="客服端" class="linkLabel_J_DF">客服端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/admin"><span title="管理端" class="linkLabel_J_DF">管理端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/server"><span title="服务器" class="linkLabel_J_DF">服务器</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/mobile"><span title="手机端" class="linkLabel_J_DF">手机端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/login"><span title="客服端登录" class="linkLabel_J_DF">客服端登录</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/login_visitor"><span title="访客端登录" class="linkLabel_J_DF">访客端登录</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/user_system"><span title="客服端用户系统对接" class="linkLabel_J_DF">客服端用户系统对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/userinfo"><span title="访客端用户信息对接" class="linkLabel_J_DF">访客端用户信息对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/viplevel"><span title="千人千面" class="linkLabel_J_DF">千人千面</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/order_info"><span title="订单信息" class="linkLabel_J_DF">订单信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/order_select"><span title="订单对接" class="linkLabel_J_DF">订单对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/goodsinfo"><span title="商品信息" class="linkLabel_J_DF">商品信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/saas"><span title="SaaS" class="linkLabel_J_DF">SaaS</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/history"><span title="历史消息" class="linkLabel_J_DF">历史消息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message"><span title="消息结构" class="linkLabel_J_DF">消息结构</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_api"><span title="大模型AI对话" class="linkLabel_J_DF">大模型AI对话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_unread"><span title="客服端未读消息数" class="linkLabel_J_DF">客服端未读消息数</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_unread_visitor"><span title="访客端未读消息数" class="linkLabel_J_DF">访客端未读消息数</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/tts"><span title="文本转语音" class="linkLabel_J_DF">文本转语音</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/asr"><span title="语音识别" class="linkLabel_J_DF">语音识别</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/taboo"><span title="敏感词过滤" class="linkLabel_J_DF">敏感词过滤</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/statistic"><span title="数据统计" class="linkLabel_J_DF">数据统计</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/transfer"><span title="客服端转接会话" class="linkLabel_J_DF">客服端转接会话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/transfer_bot"><span title="机器人转人工" class="linkLabel_J_DF">机器人转人工</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/invite"><span title="客服端邀请会话" class="linkLabel_J_DF">客服端邀请会话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/zh-CN/docs/development/invite_visitor"><span title="访客端邀请对话框" class="linkLabel_J_DF">访客端邀请对话框</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/rating"><span title="满意度评价" class="linkLabel_J_DF">满意度评价</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/qualitycheck"><span title="智能质检" class="linkLabel_J_DF">智能质检</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/autoreply"><span title="自动回复" class="linkLabel_J_DF">自动回复</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/black"><span title="黑名单" class="linkLabel_J_DF">黑名单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/translate"><span title="消息翻译" class="linkLabel_J_DF">消息翻译</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/queue"><span title="排队逻辑" class="linkLabel_J_DF">排队逻辑</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/routing"><span title="路由分配" class="linkLabel_J_DF">路由分配</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_leave"><span title="留言处理" class="linkLabel_J_DF">留言处理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/license"><span title="License" class="linkLabel_J_DF">License</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sso"><span title="单点登录SSO" class="linkLabel_J_DF">单点登录SSO</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/token"><span title="Token" class="linkLabel_J_DF">Token</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/webhook"><span title="Webhook" class="linkLabel_J_DF">Webhook</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase"><span title="知识库-实现原理" class="linkLabel_J_DF">知识库-实现原理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_faq"><span title="知识库-常见问题FAQ" class="linkLabel_J_DF">知识库-常见问题FAQ</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_feishu"><span title="知识库-飞书文档对接" class="linkLabel_J_DF">知识库-飞书文档对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_file"><span title="知识库-文件上传" class="linkLabel_J_DF">知识库-文件上传</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_text"><span title="知识库-文本录入" class="linkLabel_J_DF">知识库-文本录入</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_webpage"><span title="知识库-网页抓取" class="linkLabel_J_DF">知识库-网页抓取</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_website"><span title="知识库-网站整站抓取" class="linkLabel_J_DF">知识库-网站整站抓取</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/thread"><span title="会话管理" class="linkLabel_J_DF">会话管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/thread_api"><span title="Thread Api" class="linkLabel_J_DF">Thread Api</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ticket"><span title="客服端工单" class="linkLabel_J_DF">客服端工单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ticket_visitor"><span title="访客端工单" class="linkLabel_J_DF">访客端工单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/offline"><span title="离线" class="linkLabel_J_DF">离线</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/robot"><span title="机器人" class="linkLabel_J_DF">机器人</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/i18n"><span title="国际化" class="linkLabel_J_DF">国际化</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/fileupload"><span title="文件上传" class="linkLabel_J_DF">文件上传</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/mqtt"><span title="客服端长连接" class="linkLabel_J_DF">客服端长连接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/stomp"><span title="访客端长连接" class="linkLabel_J_DF">访客端长连接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/assistant"><span title="客服助手" class="linkLabel_J_DF">客服助手</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/grpc"><span title="gRPC" class="linkLabel_J_DF">gRPC</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/screen"><span title="客服大屏" class="linkLabel_J_DF">客服大屏</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ip"><span title="IP管理" class="linkLabel_J_DF">IP管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_audio"><span title="语音通话" class="linkLabel_J_DF">语音通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_call"><span title="电话通话" class="linkLabel_J_DF">电话通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_video"><span title="视频通话" class="linkLabel_J_DF">视频通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sensitive"><span title="敏感信息" class="linkLabel_J_DF">敏感信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/crm"><span title="客户管理" class="linkLabel_J_DF">客户管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/summary"><span title="会话小结" class="linkLabel_J_DF">会话小结</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/private-deployment"><span title="私有部署" class="categoryLinkLabel_fMPM">私有部署</span></a><button aria-label="展开侧边栏分类 &#x27;私有部署&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/llm-provider"><span title="大模型对接" class="categoryLinkLabel_fMPM">大模型对接</span></a><button aria-label="展开侧边栏分类 &#x27;大模型对接&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/solutions"><span title="解决方案" class="categoryLinkLabel_fMPM">解决方案</span></a><button aria-label="展开侧边栏分类 &#x27;解决方案&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/channel"><span title="渠道对接" class="categoryLinkLabel_fMPM">渠道对接</span></a><button aria-label="展开侧边栏分类 &#x27;渠道对接&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/compare"><span title="同业对比" class="categoryLinkLabel_fMPM">同业对比</span></a><button aria-label="展开侧边栏分类 &#x27;同业对比&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/modules"><span title="功能模块" class="categoryLinkLabel_fMPM">功能模块</span></a><button aria-label="展开侧边栏 分类 &#x27;功能模块&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/plugins"><span title="插件扩展" class="categoryLinkLabel_fMPM">插件扩展</span></a><button aria-label="展开侧边栏分类 &#x27;插件扩展&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/performance"><span title="性能测试" class="categoryLinkLabel_fMPM">性能测试</span></a><button aria-label="展开侧边栏分类 &#x27;性能测试&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/faq"><span title="常见问题" class="linkLabel_J_DF">常见问题</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/payment"><span title="费用相关" class="linkLabel_J_DF">费用相关</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/xinchuang"><span title="等保信创" class="linkLabel_J_DF">等保信创</span></a></li></ul></nav><button type="button" title="收起侧边栏" aria-label="收起侧边栏" class="button button--secondary button--outline collapseSidebarButton_wLbt"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_v1u3"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></div></aside><main class="docMainContainer_BpG3"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_C0ya"><div class="docItemContainer_Pevi"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_GkpC" aria-label="页面路径"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="主页面" class="breadcrumbs__link" href="/docs/zh-CN/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_riqW"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/zh-CN/docs/category/development"><span>开发指南</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">访客端邀请对话框</span></li></ul></nav><div class="tocCollapsible_eHMb theme-doc-toc-mobile tocMobile_maSG"><button type="button" class="clean-btn tocCollapsibleButton_CW2T">本页总览</button></div><div class="theme-doc-markdown markdown"><div class="row"><div class="col col--12 markdown"><header><h1>访客端邀请对话框</h1></header>
+<div class="theme-admonition theme-admonition-tip admonition_LRQD alert alert--success"><div class="admonitionHeading_BUzK"><span class="admonitionIcon_xl5e"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>提示</div><div class="admonitionContent_Iox6"><p>社区版不支持，请升级到企业版或平台版。请替换<a href="/docs/zh-CN/docs/development/license">licenseKey</a></p></div></div>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="概述">概述<a href="#概述" class="hash-link" aria-label="概述的直接链接" title="概述的直接链接" translate="no">​</a></h2>
+<p>访客邀请对话框是微语客服系统的主动营销功能，通过智能化的邀请策略主动邀请网站访客开始对话。系统可以根据访客行为、停留时间、浏览路径等因素，在合适的时机弹出友好的邀请对话框，显著提升客户转化率和服务覆盖面。</p>
+<div class="theme-admonition theme-admonition-info admonition_LRQD alert alert--info"><div class="admonitionHeading_BUzK"><span class="admonitionIcon_xl5e"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>功能说明</div><div class="admonitionContent_Iox6"><p>本文档主要介绍<strong>访客端邀请对话框功能</strong>。如需了解客服端协作邀请功能，请参考：<a href="/docs/zh-CN/docs/development/invite">邀请会话</a></p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="核心价值">核心价值<a href="#核心价值" class="hash-link" aria-label="核心价值的直接链接" title="核心价  值的直接链接" translate="no">​</a></h3>
+<ul>
+<li><strong>主动服务</strong>：变被动等待为主动邀请，提升服务触达率</li>
+<li><strong>智能触发</strong>：基于用户行为智能判断最佳邀请时机</li>
+<li><strong>转化提升</strong>：通过友好邀请显著提升访客咨询转化率</li>
+<li><strong>个性体验</strong>：定制化邀请内容，提供个性化服务体验</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="邀请类型">邀请类型<a href="#邀请类型" class="hash-link" aria-label="邀请类型的直接链接" title="邀请类型的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-弹窗邀请">💬 弹窗邀请<a href="#-弹窗邀请" class="hash-link" aria-label="💬 弹窗邀请的直接链接" title="💬 弹窗邀请的直接链接" translate="no">​</a></h3>
+<p>网页访客浏览时自动弹出的邀请对话框，是最常见的邀请形式。</p>
+<p><strong>特点优势：</strong></p>
+<ul>
+<li><strong>视觉突出</strong>：弹窗形式更容易引起访客注意</li>
+<li><strong>信息丰富</strong>：可以展示较多的邀请信息和服务说明</li>
+<li><strong>交互友好</strong>：支持接受、拒绝、稍后等多种响应选项</li>
+<li><strong>品牌展示</strong>：可以展示企业Logo、客服头像等品牌元素</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-气泡邀请">🔔 气泡邀请<a href="#-气泡邀请" class="hash-link" aria-label="🔔 气泡邀请的直接链接" title="🔔 气泡邀请的直接链接" translate="no">​</a></h3>
+<p>页面右下角显示的友好邀请气泡，相对温和不打扰的邀请方式。</p>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li><strong>轻量邀请</strong>：不希望过于打扰用户的温和邀请</li>
+<li><strong>持续展示</strong>：长时间停留在页面角落，持续提醒</li>
+<li><strong>移动友好</strong>：在移动端有更好的展示效果</li>
+<li><strong>品牌一致</strong>：与网站整体设计风格保持一致</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-定时邀请">⏰ 定时邀请<a href="#-定时邀请" class="hash-link" aria-label="⏰ 定时邀请的直接链接" title="⏰ 定时邀请的直接链接" translate="no">​</a></h3>
+<p>根据访客行为和停留时间智能触发的邀请机制。</p>
+<p><strong>触发条件：</strong></p>
+<ul>
+<li><strong>时间触发</strong>：页面停留时间超过设定阈值</li>
+<li><strong>行为触发</strong>：特定操作后触发邀请</li>
+<li><strong>路径触发</strong>：访问特定页面或路径后邀请</li>
+<li><strong>意图触发</strong>：检测到购买意图或困惑行为</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-个性化邀请">🎯 个性化邀请<a href="#-个性化邀请" class="hash-link" aria-label="🎯 个性化邀请的直接链接" title="🎯 个性化邀请的直接链接" translate="no">​</a></h3>
+<p>基于访客特征和历史行为定制的个性化邀请内容。</p>
+<p><strong>个性化维度：</strong></p>
+<ul>
+<li><strong>访客类型</strong>：新访客、回访客户、VIP客户</li>
+<li><strong>地理位置</strong>：不同地区的本地化邀请内容</li>
+<li><strong>设备类型</strong>：PC端、移动端的差异化展示</li>
+<li><strong>来源渠道</strong>：搜索引擎、广告、直接访问等不同来源</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="核心功能">核心功能<a href="#核心功能" class="hash-link" aria-label="核心功能的直接链接" title="核心功能的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-智能邀请策略">🎯 智能邀请策略<a href="#-智能邀请策略" class="hash-link" aria-label="🎯 智能邀请策略的直接链接" title="🎯 智能邀请策略的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="行为分析触发">行为分析触发<a href="#行为分析触发" class="hash-link" aria-label="行为分析触发的直接链接" title="行为分析触发的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>页面停留分析</strong></p>
+<ul>
+<li>设置不同页面的停留时间阈值</li>
+<li>分析用户浏览深度和专注度</li>
+<li>识别用户犹豫或困惑的行为模式</li>
+<li>在最佳时机触发邀请对话</li>
+</ul>
+</li>
+<li>
+<p><strong>交互行为监控</strong></p>
+<ul>
+<li>监控鼠标移动轨迹和点击行为</li>
+<li>检测页面滚动速度和停留区域</li>
+<li>识别表单填写中断等关键行为</li>
+<li>分析购物车操作和付款流程</li>
+</ul>
+</li>
+<li>
+<p><strong>意图识别系统</strong></p>
+<ul>
+<li>基于页面内容识别用户需求</li>
+<li>分析搜索关键词和来源信息</li>
+<li>检测价格比较和产品对比行为</li>
+<li>识别帮助文档和FAQ页面访问</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="时间策略控制">时间策略控制<a href="#时间策略控制" class="hash-link" aria-label="时间策略控制的直接链接" title="时间策略控制的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>首次邀请策略</strong></p>
+<ul>
+<li>设置首次弹出的延迟时间</li>
+<li>根据页面类型调整等待时长</li>
+<li>避免页面加载时立即弹出</li>
+<li>确保用户有足够时间浏览内容</li>
+</ul>
+</li>
+<li>
+<p><strong>循环邀请机制</strong></p>
+<ul>
+<li>设置邀请重复显示的间隔时间</li>
+<li>控制总的邀请次数上限</li>
+<li>智能调整邀请频率避免打扰</li>
+<li>支持无限循环或限定次数</li>
+</ul>
+</li>
+<li>
+<p><strong>时段控制功能</strong></p>
+<ul>
+<li>设置工作时间内的邀请策略</li>
+<li>非工作时间的留言邀请模式</li>
+<li>节假日期间的特殊邀请安排</li>
+<li>不同时区的本地化时间控制</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-邀请内容定制">🌟 邀请内容定制<a href="#-邀请内容定制" class="hash-link" aria-label="🌟 邀请内容定制的直接链接" title="🌟 邀请内容定制的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="视觉设计定制">视觉设计定制<a href="#视觉设计定制" class="hash-link" aria-label="视觉设计定制的直接链接" title="视觉设计定制的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>主题样式配置</strong></p>
+<ul>
+<li>现代简约、商务专业、温馨友好等多种主题</li>
+<li>自定义颜色方案和字体样式</li>
+<li>支持深色模式和浅色模式切换</li>
+<li>与网站整体设计风格保持一致</li>
+</ul>
+</li>
+<li>
+<p><strong>品牌元素展示</strong></p>
+<ul>
+<li>企业Logo和品牌标识展示</li>
+<li>客服人员头像和姓名信息</li>
+<li>品牌色彩和视觉识别应用</li>
+<li>企业认证标识和信任符号</li>
+</ul>
+</li>
+<li>
+<p><strong>动画效果配置</strong></p>
+<ul>
+<li>滑入、淡入、缩放等多种动画效果</li>
+<li>可调节动画速度和缓动函数</li>
+<li>支持禁用动画以适应性能需求</li>
+<li>无障碍访问的动画替代方案</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="文案内容个性化">文案内容个性化<a href="#文案内容个性化" class="hash-link" aria-label="文案内容个性化的直接链接" title="文案内容个性化的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>标题和正文定制</strong></p>
+<ul>
+<li>自定义邀请标题和主要内容</li>
+<li>支持HTML格式和富文本编辑</li>
+<li>多语言版本的文案管理</li>
+<li>动态变量插入（姓名、产品等）</li>
+</ul>
+</li>
+<li>
+<p><strong>按钮文字配置</strong></p>
+<ul>
+<li>自定义&quot;接受&quot;和&quot;拒绝&quot;按钮文字</li>
+<li>支持&quot;稍后提醒&quot;等第三选项</li>
+<li>不同情境下的按钮文案变化</li>
+<li>按钮颜色和样式的个性化设置</li>
+</ul>
+</li>
+<li>
+<p><strong>情境化内容适配</strong></p>
+<ul>
+<li>根据页面内容自动调整邀请文案</li>
+<li>产品页面突出产品相关服务</li>
+<li>价格页面强调咨询优惠信息</li>
+<li>技术页面提供专业技术支持</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="-效果分析优化">📊 效果分析优化<a href="#-效果分析优化" class="hash-link" aria-label="📊 效果分析优化的直接链接" title="📊 效果分析优化的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="ab测试支持">A/B测试支持<a href="#ab测试支持" class="hash-link" aria-label="A/B测试支持的直接链接" title="A/B测试支持的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>多版本对比测试</strong></p>
+<ul>
+<li>同时运行多个邀请版本进行对比</li>
+<li>自动分配流量进行测试</li>
+<li>实时收集转化数据和用户反馈</li>
+<li>基于数据自动优选最佳版本</li>
+</ul>
+</li>
+<li>
+<p><strong>测试维度配置</strong></p>
+<ul>
+<li>邀请文案内容的对比测试</li>
+<li>弹出时机和频率的效果测试</li>
+<li>视觉设计和交互方式的比较</li>
+<li>不同目标用户群体的差异化测试</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="数据分析报告">数据分析报告<a href="#数据分析报告" class="hash-link" aria-label="数据分析报告的直接链接" title="数据分析报告的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>核心指标监控</strong></p>
+<ul>
+<li>邀请展示次数和展示率统计</li>
+<li>邀请接受率和拒绝率分析</li>
+<li>会话转化率和最终成交率</li>
+<li>用户满意度和服务质量评分</li>
+</ul>
+</li>
+<li>
+<p><strong>深度分析洞察</strong></p>
+<ul>
+<li>不同时间段的邀请效果对比</li>
+<li>各页面邀请转化率的差异分析</li>
+<li>用户设备和渠道来源的影响</li>
+<li>长期趋势变化和季节性规律</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="配置指 南">配置指南<a href="#配置指南" class="hash-link" aria-label="配置指南的直接链接" title="配置指南的直接链接" translate="no">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="最佳实践">最佳实践<a href="#最佳实践" class="hash-link" aria-label="最佳实践的直接链接" title="最佳实践的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="邀请策略优化">邀请策略优化<a href="#邀请策略优化" class="hash-link" aria-label="邀请策略优化的直接链接" title="邀请策略优化的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="时机选择最佳实践">时机选择最佳实践<a href="#时机选择最佳实践" class="hash-link" aria-label="时机选择最佳实践的直接链接" title="时机选择最佳实践的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>页面停留时间设置</strong></p>
+<ul>
+<li><strong>首页/落地页</strong>：15-20秒后邀请，给用户足够浏览时间</li>
+<li><strong>产品详情页</strong>：30-45秒后邀请，用户可能产生疑问</li>
+<li><strong>价格页面</strong>：20-30秒后邀请，帮助解答价格疑虑</li>
+<li><strong>帮助文档页</strong>：10-15秒后邀请，用户可能需要进一步支持</li>
+</ul>
+</li>
+<li>
+<p><strong>行为触发优化</strong></p>
+<ul>
+<li><strong>滚动监控</strong>：页面滚动超过50%时触发，表明用户感兴趣</li>
+<li><strong>鼠标悬停</strong>：在重要按钮或链接悬停3秒以上时邀请</li>
+<li><strong>表单放弃</strong>：开始填写表单但中途停止时及时邀请</li>
+<li><strong>离开意图</strong>：检测到鼠标移向关闭按钮或地址栏时挽留</li>
+</ul>
+</li>
+<li>
+<p><strong>频率控制策略</strong></p>
+<ul>
+<li><strong>同一访客</strong>：24小时内最多显示3次邀请</li>
+<li><strong>会话间隔</strong>：两次邀请间隔至少15分钟</li>
+<li><strong>拒绝记忆</strong>：用 户拒绝后7天内不再显示</li>
+<li><strong>接受后控制</strong>：用户接受一次后，后续访问减少邀请频率</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="文案设计最佳实践">文案设计最佳实践<a href="#文案设计最佳实践" class="hash-link" aria-label="文案设计最佳实践的直接链接" title="文案设计最佳实践的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>标题设计原则</strong></p>
+<ul>
+<li><strong>简洁明了</strong>：标题控制在10字以内，直观表达</li>
+<li><strong>问题导向</strong>：使用疑问句激发用户互动欲望</li>
+<li><strong>价值突出</strong>：强调能为用户解决的问题或提供的价值</li>
+<li><strong>情感连接</strong>：使用温暖友好的语调建立情感连接</li>
+</ul>
+</li>
+<li>
+<p><strong>内容描述优化</strong></p>
+<ul>
+<li><strong>具体服务</strong>：明确说明能提供的具体帮助</li>
+<li><strong>专业表达</strong>：体现团队的专业性和可靠性</li>
+<li><strong>即时响应</strong>：强调快速响应和实时支持</li>
+<li><strong>无压力感</strong>：避免给用户造成销售压力</li>
+</ul>
+</li>
+<li>
+<p><strong>按钮文字选择</strong></p>
+<ul>
+<li><strong>积极行动</strong>：&quot;开始咨询&quot;、&quot;获取帮助&quot;、&quot;立即沟通&quot;</li>
+<li><strong>降低门槛</strong>：&quot;了解更多&quot;、&quot;快速咨询&quot;、&quot;免费咨询&quot;</li>
+<li><strong>拒绝友好</strong>：&quot;稍后再说&quot;、&quot;暂时不用&quot;避免&quot;不需要&quot;</li>
+<li><strong>第三选择</strong>：提供&quot;稍后提醒&quot;选项给犹豫用户</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="视觉设计优化">视觉设计优化<a href="#视觉设计优化" class="hash-link" aria-label="视觉设计优化的直接链接" title="视觉设计优化的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="界面设计原则">界面设计原则<a href="#界面设计原则" class="hash-link" aria-label="界面设计原则的直接链接" title="界面设计原则的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>品牌一致性</strong></p>
+<ul>
+<li>使用企业标准色彩和字体</li>
+<li>保持与网站整体设计风格统一</li>
+<li>展示企业Logo和品牌标识</li>
+<li>客服头像选择专业亲和的形象</li>
+</ul>
+</li>
+<li>
+<p><strong>用户体验优化</strong></p>
+<ul>
+<li>确保在不同设备上的良好显示效果</li>
+<li>避免遮挡重要页面内容</li>
+<li>提供清晰的关闭和操作按钮</li>
+<li>支持键盘导航和无障碍访问</li>
+</ul>
+</li>
+<li>
+<p><strong>视觉层次设计</strong></p>
+<ul>
+<li>使用对比色突出重要信息</li>
+<li>合理运用留白增强可读性</li>
+<li>图标和文字搭配清晰易懂</li>
+<li>动画效果自然不突兀</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="移动端适配">移动端适配<a href="#移动端适配" class="hash-link" aria-label="移动端适配的直接链接" title="移动端适配的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>响应式设计</strong></p>
+<ul>
+<li>自动适配不同屏幕尺寸</li>
+<li>触摸友好的按钮大小设计</li>
+<li>考虑横屏和竖屏模式切换</li>
+<li>避免与系统UI元素冲突</li>
+</ul>
+</li>
+<li>
+<p><strong>性能优化</strong></p>
+<ul>
+<li>控制图片和动画文件大小</li>
+<li>使用CSS3代替JavaScript动画</li>
+<li>延迟加载非必要资源</li>
+<li>支持弱网络环境下的降级展示</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="数据分析与优化">数据分析与优化<a href="#数据分析与优化" class="hash-link" aria-label="数据分析与优化的直接链接" title="数据分析与优化的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="关键指标监控">关键指标监控<a href="#关键指标监控" class="hash-link" aria-label="关键指标监控的直接链接" title="关键指标监控的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>展示相关指标</strong></p>
+<ul>
+<li><strong>展示率</strong>：邀请显示次数 / 符合条件的访问次数</li>
+<li><strong>触达率</strong>：实际看到邀请的用户比例</li>
+<li><strong>注意力指标</strong>：用户在邀请上的停留时间</li>
+<li><strong>设备分布</strong>：不同设备类型的展示效果差异</li>
+</ul>
+</li>
+<li>
+<p><strong>转化相关指标</strong></p>
+<ul>
+<li><strong>接受率</strong>：接受邀请次数 / 邀请展示次数</li>
+<li><strong>拒绝率</strong>：拒绝邀请次数 / 邀请展示次数</li>
+<li><strong>延迟率</strong>：选择稍后的次数 / 邀请展示次数</li>
+<li><strong>会话转化率</strong>：成功开始会话 / 接受邀请次数</li>
+</ul>
+</li>
+<li>
+<p><strong>质量相关指标</strong></p>
+<ul>
+<li><strong>会话时长</strong>：通过邀请开始的会话平均时长</li>
+<li><strong>问题解决率</strong>：邀请会话的问题解决比例</li>
+<li><strong>客户满意度</strong>：邀请用户的服务满意度评分</li>
+<li><strong>复购率</strong>：通过邀请转化客户的复购情况</li>
+</ul>
+</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="持续优化策略">持续优化策略<a href="#持续优化策略" class="hash-link" aria-label="持续优化策略的直接链接" title="持续优化策略的直接链接" translate="no">​</a></h4>
+<ol>
+<li>
+<p><strong>A/B测试规划</strong></p>
+<ul>
+<li><strong>文案测试</strong>：同时测试2-3个不同的邀请文案</li>
+<li><strong>时机测试</strong>：对比不同弹出时间的转化效果</li>
+<li><strong>设计测试</strong>：测试不同颜色、样式的视觉效果</li>
+<li><strong>策略测试</strong>：对比主动邀请和被动等待的效果</li>
+</ul>
+</li>
+<li>
+<p><strong>数据驱动优化</strong></p>
+<ul>
+<li><strong>周期性复盘</strong>：每周分析邀请数据和用户反馈</li>
+<li><strong>趋势分析</strong>：关注长期趋势变化和季节性规律</li>
+<li><strong>用户细分</strong>：分析不同用户群体的邀请偏好</li>
+<li><strong>竞品对比</strong>：学习行业内优秀的邀请设计案例</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="注意事项">注意事项<a href="#注意事项" class="hash-link" aria-label="注意事项的直接链接" title="注意事项的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="用户体验保障">用户体验保障<a href="#用户体验保障" class="hash-link" aria-label="用户体验保障的直接链接" title="用户体验保障的直接链接" translate="no">​</a></h3>
+<ol>
+<li>
+<p><strong>避免过度打扰</strong></p>
+<ul>
+<li>控制邀请频率，避免频繁弹出影响用户体验</li>
+<li>尊重用户的拒绝选择，不要在短时间内重复邀请</li>
+<li>提供清晰的关闭方式，不要强制用户与邀请互动</li>
+<li>在用户专注操作时（如填表、播放视频）避免弹出</li>
+</ul>
+</li>
+<li>
+<p><strong>性能影响控制</strong></p>
+<ul>
+<li>确保邀请功能不影响页面加载速度</li>
+<li>优化资源加载，采用延迟加载策略</li>
+<li>避免阻塞页面渲染和用户交互</li>
+<li>在网络条件差时提供降级方案</li>
+</ul>
+</li>
+<li>
+<p><strong>可访问性支持</strong></p>
+<ul>
+<li>支持屏幕阅读器等辅助技术</li>
+<li>提供键盘导航支持</li>
+<li>确保足够的颜色对比度</li>
+<li>支持放大镜等视觉辅助工具</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="隐私与合规">隐私与合规<a href="#隐私与合规" class="hash-link" aria-label="隐私与合规的直接链接" title="隐私与合规的直接链接" translate="no">​</a></h3>
+<ol>
+<li>
+<p><strong>数据保护</strong></p>
+<ul>
+<li>遵守GDPR、CCPA等数据保护法规</li>
+<li>明确告知用户数据收集和使用目的</li>
+<li>提供数据删除和修改选项</li>
+<li>加密传输和存储用户数据</li>
+</ul>
+</li>
+<li>
+<p><strong>Cookie策略</strong></p>
+<ul>
+<li>在必要时获取用户同意使用Cookie</li>
+<li>提供Cookie偏好设置选项</li>
+<li>支持拒绝非必要Cookie的用户</li>
+<li>定期清理过期的用户数据</li>
+</ul>
+</li>
+<li>
+<p><strong>内容合规</strong></p>
+<ul>
+<li>确保邀请内容符合广告法规要求</li>
+<li>避免夸大宣传和虚假承诺</li>
+<li>提供真实的服务信息</li>
+<li>遵守行业特定的合规要求</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="技术风险控制">技术风险控制<a href="#技术风险控制" class="hash-link" aria-label="技术风险控制的直接链接" title="技术风险控制的直接链接" translate="no">​</a></h3>
+<ol>
+<li>
+<p><strong>兼容性保障</strong></p>
+<ul>
+<li>测试主流浏览器的兼容性</li>
+<li>处理JavaScript被禁用的情况</li>
+<li>确保在不同网络环境下正常工作</li>
+<li>提供优雅的降级方案</li>
+</ul>
+</li>
+<li>
+<p><strong>安全防护</strong></p>
+<ul>
+<li>防止XSS和CSRF攻击</li>
+<li>验证所有用户输入</li>
+<li>使用HTTPS加密传输</li>
+<li>定期更新安全补丁</li>
+</ul>
+</li>
+</ol></div></div></div><div class="row"><div class="col col--12"><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col"><a href="https://github.com/bytedesk/bytedesk-docs/blob/main/i18n/zh-CN/docusaurus-plugin-content-docs/current/development/invite_visitor.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_D3U9" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>编辑此页</a></div><div class="col lastUpdated_S4mo"><span class="theme-last-updated">最后<!-- -->由 <b>jack ning</b> <!-- -->于 <b><time datetime="2025-10-24T04:15:39.000Z" itemprop="dateModified">2025年10月24日</time></b> <!-- -->更新</span></div></div><div class="feedbackContainer_YCD2"><div class="feedbackQuestion_oWvU"><p>这页文档对您有帮助吗？</p><div class="buttonContainer_Zim_"><button class="feedbackButton_fT9j positive_qcHW">有帮助 👍</button><button class="feedbackButton_fT9j negative_CWIX">需改进 👎</button></div></div></div></footer></div></div></article><div class="row"><div class="col col--12"><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件选项卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/zh-CN/docs/development/invite"><div class="pagination-nav__sublabel">上一页</div><div class="pagination-nav__label">客服端邀请会话</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/zh-CN/docs/development/rating"><div class="pagination-nav__sublabel">下一页</div><div class="pagination-nav__label">满意度评价</div></a></nav></div></div></div></div><div class="col col--3"><div class="tableOfContents_XgtV thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#概述" class="table-of-contents__link toc-highlight">概述</a><ul><li><a href="#核心价值" class="table-of-contents__link toc-highlight">核心价值</a></li></ul></li><li><a href="#邀请类型" class="table-of-contents__link toc-highlight">邀请类型</a><ul><li><a href="#-弹窗邀请" class="table-of-contents__link toc-highlight">💬 弹窗邀请</a></li><li><a href="#-气泡邀请" class="table-of-contents__link toc-highlight">🔔 气泡邀请</a></li><li><a href="#-定时邀请" class="table-of-contents__link toc-highlight">⏰ 定时邀请</a></li><li><a href="#-个性化邀请" class="table-of-contents__link toc-highlight">🎯 个性化邀请</a></li></ul></li><li><a href="#核心功能" class="table-of-contents__link toc-highlight">核心功能</a><ul><li><a href="#-智能邀请策略" class="table-of-contents__link toc-highlight">🎯 智能邀请策略</a><ul><li><a href="#行为分析触发" class="table-of-contents__link toc-highlight">行为分析触发</a></li><li><a href="#时间策略控制" class="table-of-contents__link toc-highlight">时间策略控制</a></li></ul></li><li><a href="#-邀请内容定制" class="table-of-contents__link toc-highlight">🌟 邀请内容定制</a><ul><li><a href="#视觉设计定制" class="table-of-contents__link toc-highlight">视觉设计定制</a></li><li><a href="#文案内容个性化" class="table-of-contents__link toc-highlight">文案内容个性化</a></li></ul></li><li><a href="#-效果分析优化" class="table-of-contents__link toc-highlight">📊 效果分析优化</a><ul><li><a href="#ab测试支持" class="table-of-contents__link toc-highlight">A/B测试支持</a></li><li><a href="#数据分析报告" class="table-of-contents__link toc-highlight">数据分析报告</a></li></ul></li></ul></li><li><a href="#配置指南" class="table-of-contents__link toc-highlight">配置指南</a></li><li><a href="#最佳实践" class="table-of-contents__link toc-highlight">最佳实践</a><ul><li><a href="#邀请策略优化" class="table-of-contents__link toc-highlight">邀请策略优化</a><ul><li><a href="#时机选择最佳实践" class="table-of-contents__link toc-highlight">时机选择最佳实践</a></li><li><a href="#文案设计最佳实践" class="table-of-contents__link toc-highlight">文案设计最佳实践</a></li></ul></li><li><a href="#视觉设计优化" class="table-of-contents__link toc-highlight">视觉设计优化</a><ul><li><a href="#界面设计原则" class="table-of-contents__link toc-highlight">界面设计原则</a></li><li><a href="#移动端适配" class="table-of-contents__link toc-highlight">移动端适配</a></li></ul></li><li><a href="#数据分析与优化" class="table-of-contents__link toc-highlight">数据分析与优化</a><ul><li><a href="#关键指标监控" class="table-of-contents__link toc-highlight">关键指标监控</a></li><li><a href="#持续优化策略" class="table-of-contents__link toc-highlight">持续优化策略</a></li></ul></li></ul></li><li><a href="#注意事项" class="table-of-contents__link toc-highlight">注意事项</a><ul><li><a href="#用户体验保障" class="table-of-contents__link toc-highlight">用户体验保障</a></li><li><a href="#隐私与合规" class="table-of-contents__link toc-highlight">隐私与合规</a></li><li><a href="#技术风险控制" class="table-of-contents__link toc-highlight">技术风险控制</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">文档</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/docs/intro">教程</a></li><li class="footer__item"><a href="https://www.weiyuai.cn/contact.html" target="_blank" rel="noopener noreferrer" class="footer__link-item">联系我们<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">社区</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://twitter.com/bytedeskai" target="_blank" rel="noopener noreferrer" class="footer__link-item">Twitter<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.weiyuai.cn" target="_blank" rel="noopener noreferrer" class="footer__link-item">微信公众号<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">更多</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/blog">博客</a></li><li class="footer__item"><a href="https://github.com/bytedesk/bytedesk" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/docs/payment">价格方案</a></li><li class="footer__item"><a href="https://www.weiyuai.cn/privacy.html" target="_blank" rel="noopener noreferrer" class="footer__link-item">隐私政策<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 weiyuai.cn, Inc. 京ICP备17041763号-20. 保留所有权利。</div></div></div></footer></div>
+</body>
+</html>

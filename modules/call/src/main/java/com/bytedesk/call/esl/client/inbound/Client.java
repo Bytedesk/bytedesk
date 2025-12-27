@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.bytedesk.call.esl.client.inbound;
+
+import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -27,8 +29,6 @@ import com.bytedesk.call.esl.client.transport.CommandResponse;
 import com.bytedesk.call.esl.client.transport.SendMsg;
 import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import com.bytedesk.call.esl.client.transport.message.EslMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.SocketAddress;
 import java.util.List;
@@ -45,9 +45,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p/>
  * See <a href="http://wiki.freeswitch.org/wiki/Mod_event_socket">http://wiki.freeswitch.org/wiki/Mod_event_socket</a>
  */
+@Slf4j
 public class Client implements IModEslApi {
-
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private final List<IEslEventListener> eventListeners = new CopyOnWriteArrayList<>();
 	private final AtomicBoolean authenticatorResponded = new AtomicBoolean(false);
     @SuppressWarnings("unused")

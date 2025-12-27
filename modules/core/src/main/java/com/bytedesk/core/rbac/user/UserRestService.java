@@ -43,6 +43,35 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
 
     private final BCryptPasswordEncoder passwordEncoder;
 
+    @Override
+    public Page<UserResponse> queryByOrg(UserRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<UserEntity> spec = createSpecification(request);
+        Page<UserEntity> page = executePageQuery(spec, pageable);
+        return page.map(this::convertToResponse);
+    }
+
+    @Override
+    public Page<UserResponse> queryByUser(UserRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("Login required");
+        }
+        request.setUserUid(user.getUid());
+        // 
+        return queryByOrg(request);
+    }
+
+    @Override
+    public UserResponse queryByUid(UserRequest request) {
+        Optional<UserEntity> optionalEntity = findByUid(request.getUid());
+        if (optionalEntity.isPresent()) {
+            return convertToResponse(optionalEntity.get());
+        } else {
+            throw new RuntimeException("Entity not found for UID: " + request.getUid());
+        }
+    }
+
     @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     @Override
     public Optional<UserEntity> findByUid(String uid) {
@@ -69,32 +98,97 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
 
     @Override
     public UserResponse update(UserRequest request) {
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new RuntimeException("Login required");
+        }
+
+        final String targetUid = StringUtils.hasText(request.getUid()) ? request.getUid() : authUser.getUid();
+
+        if (!authUser.isSuperUser() && !authUser.getUid().equals(targetUid)) {
+            throw new RuntimeException("Access denied");
+        }
+
         // 更新时候不使用缓存，直接查询
-        Optional<UserEntity> userOptional = userRepository.findByUid(request.getUid());
-        if (userOptional.isPresent()) {
-            UserEntity userEntity = userOptional.get();
-            userEntity.setUsername(request.getUsername());
-            userEntity.setNickname(request.getNickname());
-            userEntity.setAvatar(request.getAvatar());
-            userEntity.setDescription(request.getDescription());
-            userEntity.setMobile(request.getMobile());
-            userEntity.setMobileVerified(request.getMobileVerified());
-            userEntity.setEmail(request.getEmail());
-            userEntity.setEmailVerified(request.getEmailVerified());
-            userEntity.setEnabled(request.getEnabled());
-            //
+        Optional<UserEntity> userOptional = userRepository.findByUid(targetUid);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        UserEntity userEntity = userOptional.get();
+
+        // 非 super：仅允许修改自己的基础资料；敏感字段请走专用接口（changePassword/changeEmail/changeMobile）
+        if (!authUser.isSuperUser()) {
+            if (StringUtils.hasText(request.getNickname())) {
+                userEntity.setNickname(request.getNickname());
+            }
+            if (StringUtils.hasText(request.getAvatar())) {
+                userEntity.setAvatar(request.getAvatar());
+            }
+            if (request.getDescription() != null) {
+                userEntity.setDescription(request.getDescription());
+            }
+            if (StringUtils.hasText(request.getCountry())) {
+                userEntity.setCountry(request.getCountry());
+            }
+            if (request.getSex() != null) {
+                userEntity.setSex(request.getSex().name());
+            }
+        } else {
+            // super：保留原有能力（按需更新，避免 null 覆盖）
+            if (StringUtils.hasText(request.getUsername())) {
+                userEntity.setUsername(request.getUsername());
+            }
+            if (StringUtils.hasText(request.getNickname())) {
+                userEntity.setNickname(request.getNickname());
+            }
+            if (StringUtils.hasText(request.getAvatar())) {
+                userEntity.setAvatar(request.getAvatar());
+            }
+            if (request.getDescription() != null) {
+                userEntity.setDescription(request.getDescription());
+            }
+            if (StringUtils.hasText(request.getMobile())) {
+                userEntity.setMobile(request.getMobile());
+            }
+            if (request.getMobileVerified() != null) {
+                userEntity.setMobileVerified(request.getMobileVerified());
+            }
+            if (StringUtils.hasText(request.getEmail())) {
+                userEntity.setEmail(request.getEmail());
+            }
+            if (request.getEmailVerified() != null) {
+                userEntity.setEmailVerified(request.getEmailVerified());
+            }
+            if (request.getEnabled() != null) {
+                userEntity.setEnabled(request.getEnabled());
+            }
+            if (StringUtils.hasText(request.getCountry())) {
+                userEntity.setCountry(request.getCountry());
+            }
+            if (request.getSex() != null) {
+                userEntity.setSex(request.getSex().name());
+            }
+
             if (StringUtils.hasText(request.getPassword())) {
                 String encodedPassword = passwordEncoder.encode(request.getPassword());
                 userEntity.setPassword(encodedPassword);
-            }   
-            // 
-            UserEntity savedUserEntity = save(userEntity);
-            if (savedUserEntity == null) {
-                throw new RuntimeException("Failed to save user");
             }
-            return convertToResponse(savedUserEntity);
         }
-        return null;
+
+        UserEntity savedUserEntity = save(userEntity);
+        if (savedUserEntity == null) {
+            throw new RuntimeException("Failed to save user");
+        }
+
+        // superUser: 允许通过 roleUids 更新角色列表（当前组织维度）
+        if (authUser.isSuperUser() && request.getRoleUids() != null) {
+            savedUserEntity = userService.updateUserRoles(savedUserEntity, request.getRoleUids());
+        }
+
+        // Ensure all users have ROLE_USER (df_role_user_uid)
+        UserEntity ensured = userService.addRoleUser(savedUserEntity);
+        return convertToResponse(ensured);
     }
 
     @Override

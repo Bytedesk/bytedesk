@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251222-migrate-authorities-to-module-action" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_role_authority" />
+                <tableExists tableName="bytedesk_core_authority" />
+            </and>
+        </preConditions>
+        <comment>
+            Migrate leveled authorities (MODULE_LEVEL_ACTION) to unified authorities (MODULE_ACTION):
+            1) Rebuild role-authority mappings to point to PLATFORM level authorities (as canonical)
+            2) Normalize PLATFORM authorities' authority_value by stripping level segment
+            3) Delete remaining non-PLATFORM leveled authorities
+        </comment>
+        <sql>
+            -- 1) rebuild role-authority mappings to canonical PLATFORM authorities
+            DROP TABLE IF EXISTS bytedesk_core_role_authority_tmp;
+            CREATE TABLE bytedesk_core_role_authority_tmp (
+                role_id BIGINT NOT NULL,
+                authority_id BIGINT NOT NULL
+            );
+
+            INSERT INTO bytedesk_core_role_authority_tmp (role_id, authority_id)
+            SELECT DISTINCT
+                ra.role_id,
+                COALESCE(platform.id, olda.id)
+            FROM bytedesk_core_role_authority ra
+            JOIN bytedesk_core_authority olda ON ra.authority_id = olda.id AND olda.is_deleted = 0
+            LEFT JOIN bytedesk_core_authority platform ON platform.is_deleted = 0
+                AND INSTR(platform.authority_value, '_PLATFORM_') &gt; 0
+                AND REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(olda.authority_value,
+                    '_PLATFORM_', '_'),
+                    '_ORGANIZATION_', '_'),
+                    '_DEPARTMENT_', '_'),
+                    '_WORKGROUP_', '_'),
+                    '_AGENT_', '_'),
+                    '_USER_', '_')
+                = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(platform.authority_value,
+                    '_PLATFORM_', '_'),
+                    '_ORGANIZATION_', '_'),
+                    '_DEPARTMENT_', '_'),
+                    '_WORKGROUP_', '_'),
+                    '_AGENT_', '_'),
+                    '_USER_', '_');
+
+            DELETE FROM bytedesk_core_role_authority;
+
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT DISTINCT role_id, authority_id
+            FROM bytedesk_core_role_authority_tmp;
+
+            DROP TABLE IF EXISTS bytedesk_core_role_authority_tmp;
+
+                        -- 2) delete leveled authorities that are no longer referenced
+                        DELETE FROM bytedesk_core_authority
+                        WHERE is_deleted = 0
+                            AND (
+                                INSTR(authority_value, '_PLATFORM_') &gt; 0 OR
+                                INSTR(authority_value, '_ORGANIZATION_') &gt; 0 OR
+                                INSTR(authority_value, '_DEPARTMENT_') &gt; 0 OR
+                                INSTR(authority_value, '_WORKGROUP_') &gt; 0 OR
+                                INSTR(authority_value, '_AGENT_') &gt; 0 OR
+                                INSTR(authority_value, '_USER_') &gt; 0
+                            )
+                            AND id NOT IN (SELECT authority_id FROM bytedesk_core_role_authority);
+
+                        -- 3) normalize remaining leveled authorities to MODULE_ACTION
+                        UPDATE bytedesk_core_authority
+                        SET authority_value = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(authority_value,
+                                '_PLATFORM_', '_'),
+                                '_ORGANIZATION_', '_'),
+                                '_DEPARTMENT_', '_'),
+                                '_WORKGROUP_', '_'),
+                                '_AGENT_', '_'),
+                                '_USER_', '_')
+                        WHERE is_deleted = 0
+                            AND (
+                                INSTR(authority_value, '_PLATFORM_') &gt; 0 OR
+                                INSTR(authority_value, '_ORGANIZATION_') &gt; 0 OR
+                                INSTR(authority_value, '_DEPARTMENT_') &gt; 0 OR
+                                INSTR(authority_value, '_WORKGROUP_') &gt; 0 OR
+                                INSTR(authority_value, '_AGENT_') &gt; 0 OR
+                                INSTR(authority_value, '_USER_') &gt; 0
+                            );
+        </sql>
+        <rollback>
+            <comment>No rollback - irreversible authority normalization</comment>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -100,17 +100,17 @@
       "i18n": {
         "en": {
           "nickname": "Intent Classification",
-          "prompt": "Based on the user's question, identify the user's intent and return the type of intent.",
+          "prompt": "Identify the user's intent and strictly return a single JSON object. Allowed type values: CONSULT | COMPLAINT | SUGGESTION | OTHER. Output format: {\"type\":\"CONSULT\",\"confidence\":0.0,\"label\":\"\",\"reason\":\"\"}.",
           "description": "Create an intent classification bot"
         },
         "zh_cn": {
           "nickname": "意图识别",
-          "prompt": "根据用户的问题，识别用户的意图，并返回意图的类型。",
+          "prompt": "根据用户的消息识别意图，并且严格只输出一个JSON对象。允许的type取值：CONSULT | COMPLAINT | SUGGESTION | OTHER。输出格式：{\"type\":\"CONSULT\",\"confidence\":0.0,\"label\":\"\",\"reason\":\"\"}。",
           "description": "创建一个意图识别机器人"
         },
         "zh_tw": {
           "nickname": "意圖識別",
-          "prompt": "根據用戶的問題，識別用戶的意圖，並返回意圖的類型。",
+          "prompt": "根據用戶的消息識別意圖，並且嚴格只輸出一個JSON對象。允許的type取值：CONSULT | COMPLAINT | SUGGESTION | OTHER。輸出格式：{\"type\":\"CONSULT\",\"confidence\":0.0,\"label\":\"\",\"reason\":\"\"}。",
           "description": "創建一個意圖識別機器人"
         }
       }
@@ -123,17 +123,17 @@
       "i18n": {
         "en": {
           "nickname": "Emotion Analysis",
-          "prompt": "Based on the user's question, identify the user's emotion and return the type of emotion.",
+          "prompt": "Identify the user's emotion and strictly return a single JSON object. Allowed type values: HAPPY | ANGRY | SAD | OTHER. Output format: {\"type\":\"OTHER\",\"confidence\":0.0,\"label\":\"\",\"reason\":\"\"}.",
           "description": "Create an emotion analysis bot"
         },
         "zh_cn": {
           "nickname": "情绪分析",
-          "prompt": "根据用户的问题，识别用户的情绪，并返回情绪的类型。",
+          "prompt": "根据用户的消息识别情绪，并且严格只输出一个JSON对象。允许的type取值：HAPPY | ANGRY | SAD | OTHER。输出格式：{\"type\":\"OTHER\",\"confidence\":0.0,\"label\":\"\",\"reason\":\"\"}。",
           "description": "创建一个情绪分析机器人"
         },
         "zh_tw": {
           "nickname": "情緒分析",
-          "prompt": "根據用戶的問題，識別用戶的情緒，並返回情緒的類型。",
+          "prompt": "根據用戶的消息識別情緒，並且嚴格只輸出一個JSON對象。允許的type取值：HAPPY | ANGRY | SAD | OTHER。輸出格式：{\"type\":\"OTHER\",\"confidence\":0.0,\"label\":\"\",\"reason\":\"\"}。",
           "description": "創建一個情緒分析機器人"
         }
       }

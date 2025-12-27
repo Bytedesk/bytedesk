@@ -26,13 +26,13 @@ public class ConnectionInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // connectionRestService.initConnections(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
         //     String permissionValue = ConnectionPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);

@@ -28,13 +28,13 @@ public class ComplaintInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         complaintRestService.initComplaints(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
         //     String permissionValue = ComplaintPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);

@@ -20,61 +20,18 @@ public class EmailPermissions extends BasePermissions {
     // 模块前缀
     public static final String EMAIL_PREFIX = "EMAIL_";
 
-    // 平台级权限
-    public static final String EMAIL_PLATFORM_READ = "EMAIL_PLATFORM_READ";
-    public static final String EMAIL_PLATFORM_CREATE = "EMAIL_PLATFORM_CREATE";
-    public static final String EMAIL_PLATFORM_UPDATE = "EMAIL_PLATFORM_UPDATE";
-    public static final String EMAIL_PLATFORM_DELETE = "EMAIL_PLATFORM_DELETE";
-    public static final String EMAIL_PLATFORM_EXPORT = "EMAIL_PLATFORM_EXPORT";
+    // 统一权限（不区分层级）
+    public static final String EMAIL_READ = "EMAIL_READ";
+    public static final String EMAIL_CREATE = "EMAIL_CREATE";
+    public static final String EMAIL_UPDATE = "EMAIL_UPDATE";
+    public static final String EMAIL_DELETE = "EMAIL_DELETE";
+    public static final String EMAIL_EXPORT = "EMAIL_EXPORT";
 
-    // 组织级权限
-    public static final String EMAIL_ORGANIZATION_READ = "EMAIL_ORGANIZATION_READ";
-    public static final String EMAIL_ORGANIZATION_CREATE = "EMAIL_ORGANIZATION_CREATE";
-    public static final String EMAIL_ORGANIZATION_UPDATE = "EMAIL_ORGANIZATION_UPDATE";
-    public static final String EMAIL_ORGANIZATION_DELETE = "EMAIL_ORGANIZATION_DELETE";
-    public static final String EMAIL_ORGANIZATION_EXPORT = "EMAIL_ORGANIZATION_EXPORT";
-
-    // 部门级权限
-    public static final String EMAIL_DEPARTMENT_READ = "EMAIL_DEPARTMENT_READ";
-    public static final String EMAIL_DEPARTMENT_CREATE = "EMAIL_DEPARTMENT_CREATE";
-    public static final String EMAIL_DEPARTMENT_UPDATE = "EMAIL_DEPARTMENT_UPDATE";
-    public static final String EMAIL_DEPARTMENT_DELETE = "EMAIL_DEPARTMENT_DELETE";
-    public static final String EMAIL_DEPARTMENT_EXPORT = "EMAIL_DEPARTMENT_EXPORT";
-
-    // 工作组级权限
-    public static final String EMAIL_WORKGROUP_READ = "EMAIL_WORKGROUP_READ";
-    public static final String EMAIL_WORKGROUP_CREATE = "EMAIL_WORKGROUP_CREATE";
-    public static final String EMAIL_WORKGROUP_UPDATE = "EMAIL_WORKGROUP_UPDATE";
-    public static final String EMAIL_WORKGROUP_DELETE = "EMAIL_WORKGROUP_DELETE";
-    public static final String EMAIL_WORKGROUP_EXPORT = "EMAIL_WORKGROUP_EXPORT";
-
-    // 客服级权限
-    public static final String EMAIL_AGENT_READ = "EMAIL_AGENT_READ";
-    public static final String EMAIL_AGENT_CREATE = "EMAIL_AGENT_CREATE";
-    public static final String EMAIL_AGENT_UPDATE = "EMAIL_AGENT_UPDATE";
-    public static final String EMAIL_AGENT_DELETE = "EMAIL_AGENT_DELETE";
-    public static final String EMAIL_AGENT_EXPORT = "EMAIL_AGENT_EXPORT";
-    // 用户级权限
-    public static final String EMAIL_USER_READ = "EMAIL_USER_READ";
-    public static final String EMAIL_USER_CREATE = "EMAIL_USER_CREATE";
-    public static final String EMAIL_USER_UPDATE = "EMAIL_USER_UPDATE";
-    public static final String EMAIL_USER_DELETE = "EMAIL_USER_DELETE";
-    public static final String EMAIL_USER_EXPORT = "EMAIL_USER_EXPORT";
-
-
-    // PreAuthorize 表达式 - 读取权限（允许多层级访问）
-    public static final String HAS_EMAIL_READ_ANY_LEVEL = "hasAnyAuthority('EMAIL_PLATFORM_READ', 'EMAIL_ORGANIZATION_READ', 'EMAIL_DEPARTMENT_READ', 'EMAIL_WORKGROUP_READ', 'EMAIL_AGENT_READ', 'EMAIL_USER_READ')";
-    
-    // PreAuthorize 表达式 - 创建权限（允许多层级访问）
-    public static final String HAS_EMAIL_CREATE_ANY_LEVEL = "hasAnyAuthority('EMAIL_PLATFORM_CREATE', 'EMAIL_ORGANIZATION_CREATE', 'EMAIL_DEPARTMENT_CREATE', 'EMAIL_WORKGROUP_CREATE', 'EMAIL_AGENT_CREATE', 'EMAIL_USER_CREATE')";
-    
-    // PreAuthorize 表达式 - 更新权限（允许多层级访问）
-    public static final String HAS_EMAIL_UPDATE_ANY_LEVEL = "hasAnyAuthority('EMAIL_PLATFORM_UPDATE', 'EMAIL_ORGANIZATION_UPDATE', 'EMAIL_DEPARTMENT_UPDATE', 'EMAIL_WORKGROUP_UPDATE', 'EMAIL_AGENT_UPDATE', 'EMAIL_USER_UPDATE')";
-    
-    // PreAuthorize 表达式 - 删除权限（允许多层级访问）
-    public static final String HAS_EMAIL_DELETE_ANY_LEVEL = "hasAnyAuthority('EMAIL_PLATFORM_DELETE', 'EMAIL_ORGANIZATION_DELETE', 'EMAIL_DEPARTMENT_DELETE', 'EMAIL_WORKGROUP_DELETE', 'EMAIL_AGENT_DELETE', 'EMAIL_USER_DELETE')";
-    
-    // PreAuthorize 表达式 - 导出权限（允许多层级访问）
-    public static final String HAS_EMAIL_EXPORT_ANY_LEVEL = "hasAnyAuthority('EMAIL_PLATFORM_EXPORT', 'EMAIL_ORGANIZATION_EXPORT', 'EMAIL_DEPARTMENT_EXPORT', 'EMAIL_WORKGROUP_EXPORT', 'EMAIL_AGENT_EXPORT', 'EMAIL_USER_EXPORT')";
+    // PreAuthorize 表达式 - 统一权限（不区分层级）
+    public static final String HAS_EMAIL_READ = "hasAuthority('EMAIL_READ')";
+    public static final String HAS_EMAIL_CREATE = "hasAuthority('EMAIL_CREATE')";
+    public static final String HAS_EMAIL_UPDATE = "hasAuthority('EMAIL_UPDATE')";
+    public static final String HAS_EMAIL_DELETE = "hasAuthority('EMAIL_DELETE')";
+    public static final String HAS_EMAIL_EXPORT = "hasAuthority('EMAIL_EXPORT')";
 
 }

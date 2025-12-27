@@ -38,7 +38,7 @@ public class TextInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // init();
-        initPermissions();
+        initAuthority();
     }
 
     // 迁移到kbaseInitializer
@@ -48,7 +48,7 @@ public class TextInitializer implements SmartInitializingSingleton {
         textRestService.initText(kbUid, orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = TextPermissions.TEXT_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

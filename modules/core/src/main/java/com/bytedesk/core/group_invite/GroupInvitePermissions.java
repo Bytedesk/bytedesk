@@ -16,14 +16,19 @@ package com.bytedesk.core.group_invite;
 public class GroupInvitePermissions {
 
     public static final String GROUP_INVITE_PREFIX = "GROUP_INVITE_";
-    // GroupInvite permissions
-    public static final String GROUP_INVITE_CREATE = "hasAuthority('GROUP_INVITE_CREATE')";
-    public static final String GROUP_INVITE_READ = "hasAuthority('GROUP_INVITE_READ')";
-    public static final String GROUP_INVITE_UPDATE = "hasAuthority('GROUP_INVITE_UPDATE')";
-    public static final String GROUP_INVITE_DELETE = "hasAuthority('GROUP_INVITE_DELETE')";
-    public static final String GROUP_INVITE_EXPORT = "hasAuthority('GROUP_INVITE_EXPORT')";
 
-    // 
-    public static final String GROUP_INVITE_ANY = "hasAnyAuthority('GROUP_INVITE_CREATE', 'GROUP_INVITE_READ', 'GROUP_INVITE_UPDATE', 'GROUP_INVITE_EXPORT', 'GROUP_INVITE_DELETE')";
+    // 统一权限（不区分层级）
+    public static final String GROUP_INVITE_READ = "GROUP_INVITE_READ";
+    public static final String GROUP_INVITE_CREATE = "GROUP_INVITE_CREATE";
+    public static final String GROUP_INVITE_UPDATE = "GROUP_INVITE_UPDATE";
+    public static final String GROUP_INVITE_DELETE = "GROUP_INVITE_DELETE";
+    public static final String GROUP_INVITE_EXPORT = "GROUP_INVITE_EXPORT";
+
+    // PreAuthorize 表达式 - 统一权限（不区分层级）
+    public static final String HAS_GROUP_INVITE_READ = "hasAuthority('GROUP_INVITE_READ')";
+    public static final String HAS_GROUP_INVITE_CREATE = "hasAuthority('GROUP_INVITE_CREATE')";
+    public static final String HAS_GROUP_INVITE_UPDATE = "hasAuthority('GROUP_INVITE_UPDATE')";
+    public static final String HAS_GROUP_INVITE_DELETE = "hasAuthority('GROUP_INVITE_DELETE')";
+    public static final String HAS_GROUP_INVITE_EXPORT = "hasAuthority('GROUP_INVITE_EXPORT')";
     
 }

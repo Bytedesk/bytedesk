@@ -17,6 +17,9 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,9 +29,19 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class LlmModelInitializer implements SmartInitializingSingleton {
 
+    private final AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
+        initAuthority();
         init();
+    }
+
+    private void initAuthority() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = LlmModelPermissions.LLM_MODEL_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 
     // @PostConstruct

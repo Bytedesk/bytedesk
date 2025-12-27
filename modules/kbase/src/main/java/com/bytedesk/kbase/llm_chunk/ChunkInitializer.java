@@ -36,7 +36,7 @@ public class ChunkInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // init();
-        initPermissions();
+        initAuthority();
     }
 
     // 迁移到kbaseInitializer
@@ -46,7 +46,7 @@ public class ChunkInitializer implements SmartInitializingSingleton {
         chunkRestService.initChunk(kbUid, orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = ChunkPermissions.CHUNK_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

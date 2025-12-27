@@ -22,9 +22,12 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Handles handshakes and messages
  */
+@Slf4j
 public class BinaryWebSocketFrameHandler extends SimpleChannelInboundHandler<BinaryWebSocketFrame> {
 
     @Override
@@ -73,7 +76,7 @@ public class BinaryWebSocketFrameHandler extends SimpleChannelInboundHandler<Bin
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        log.error("BinaryWebSocketFrameHandler exceptionCaught", cause);
         ctx.close();
     }
 

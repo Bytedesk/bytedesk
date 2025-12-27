@@ -40,7 +40,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     private final DepartmentRestService departmentRestService;
 
     @ActionAnnotation(title = "部门", action = "组织查询", description = "query department by org")
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_ANY_LEVEL)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
     @Override
     public ResponseEntity<?> queryByOrg(DepartmentRequest request) {
 
@@ -50,7 +50,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @ActionAnnotation(title = "部门", action = "用户查询", description = "query department by user")
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_ANY_LEVEL)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
     @Override
     public ResponseEntity<?> queryByUser(DepartmentRequest request) {
         
@@ -60,14 +60,14 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @ActionAnnotation(title = "部门", action = "查询详情", description = "query department by uid")
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_ANY_LEVEL)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
     @Override
     public ResponseEntity<?> queryByUid(DepartmentRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_CREATE_ANY_LEVEL)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_CREATE)
     @ActionAnnotation(title = "部门", action = "新建", description = "create department")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest request) {
 
@@ -76,7 +76,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_UPDATE_ANY_LEVEL)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_UPDATE)
     @ActionAnnotation(title = "部门", action = "更新", description = "update department")
     public ResponseEntity<?> update(@RequestBody DepartmentRequest request) {
 
@@ -85,7 +85,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_DELETE_ANY_LEVEL)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_DELETE)
     @ActionAnnotation(title = "部门", action = "删除", description = "delete department")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest request) {
@@ -95,7 +95,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
     }
 
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_EXPORT_ANY_LEVEL)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_EXPORT)
     @ActionAnnotation(title = "部门", action = "导出", description = "export department")
     @GetMapping("/export")
     @Override

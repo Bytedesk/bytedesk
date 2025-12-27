@@ -15,7 +15,6 @@ package com.bytedesk.core.task;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +40,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
 
     @ActionAnnotation(title = "Task", action = "组织查询", description = "query task by org")
     @Operation(summary = "Query Tasks by Organization", description = "Retrieve tasks for the current organization")
-    @PreAuthorize(TaskPermissions.HAS_TASK_READ_ANY_LEVEL)
+    // @PreAuthorize(TaskPermissions.HAS_TASK_READ)
     @Override
     public ResponseEntity<?> queryByOrg(TaskRequest request) {
         
@@ -52,7 +51,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
 
     @ActionAnnotation(title = "Task", action = "用户查询", description = "query task by user")
     @Operation(summary = "Query Tasks by User", description = "Retrieve tasks for the current user")
-    @PreAuthorize(TaskPermissions.HAS_TASK_READ_ANY_LEVEL)
+    // @PreAuthorize(TaskPermissions.HAS_TASK_READ)
     @Override
     public ResponseEntity<?> queryByUser(TaskRequest request) {
         
@@ -63,7 +62,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
 
     @ActionAnnotation(title = "Task", action = "查询详情", description = "query task by uid")
     @Operation(summary = "Query Task by UID", description = "Retrieve a specific task by its unique identifier")
-    @PreAuthorize(TaskPermissions.HAS_TASK_READ_ANY_LEVEL)
+    // @PreAuthorize(TaskPermissions.HAS_TASK_READ)
     @Override
     public ResponseEntity<?> queryByUid(TaskRequest request) {
         
@@ -75,7 +74,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
     @ActionAnnotation(title = "Task", action = "新建", description = "create task")
     @Operation(summary = "Create Task", description = "Create a new task")
     @Override
-    @PreAuthorize(TaskPermissions.HAS_TASK_CREATE_ANY_LEVEL)
+    // @PreAuthorize(TaskPermissions.HAS_TASK_CREATE)
     public ResponseEntity<?> create(TaskRequest request) {
         
         TaskResponse task = taskRestService.create(request);
@@ -86,7 +85,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
     @ActionAnnotation(title = "Task", action = "更新", description = "update task")
     @Operation(summary = "Update Task", description = "Update an existing task")
     @Override
-    @PreAuthorize(TaskPermissions.HAS_TASK_UPDATE_ANY_LEVEL)
+    // @PreAuthorize(TaskPermissions.HAS_TASK_UPDATE)
     public ResponseEntity<?> update(TaskRequest request) {
         
         TaskResponse task = taskRestService.update(request);
@@ -97,7 +96,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
     @ActionAnnotation(title = "Task", action = "删除", description = "delete task")
     @Operation(summary = "Delete Task", description = "Delete a task")
     @Override
-    @PreAuthorize(TaskPermissions.HAS_TASK_DELETE_ANY_LEVEL)
+    // @PreAuthorize(TaskPermissions.HAS_TASK_DELETE)
     public ResponseEntity<?> delete(TaskRequest request) {
         
         taskRestService.delete(request);
@@ -108,7 +107,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
     @ActionAnnotation(title = "Task", action = "导出", description = "export task")
     @Operation(summary = "Export Tasks", description = "Export tasks to Excel format")
     @Override
-    @PreAuthorize(TaskPermissions.HAS_TASK_EXPORT_ANY_LEVEL)
+    // @PreAuthorize(TaskPermissions.HAS_TASK_EXPORT)
     @GetMapping("/export")
     public Object export(TaskRequest request, HttpServletResponse response) {
         return exportTemplate(

@@ -49,6 +49,7 @@ public class UserDetailsImpl implements UserDetails {
     private String sex;
     // 
     private Boolean enabled;
+    // private Boolean system;
     private Boolean superUser;
     private Boolean emailVerified;
     private Boolean mobileVerified;
@@ -79,6 +80,7 @@ public class UserDetailsImpl implements UserDetails {
             String sex,
             // 
             Boolean enabled,
+            // Boolean system,
             Boolean superUser,
             Boolean emailVerified,
             Boolean mobileVerified,
@@ -107,6 +109,7 @@ public class UserDetailsImpl implements UserDetails {
         this.sex = sex;
         // 
         this.enabled = enabled;
+        // this.system = system;
         this.superUser = superUser;
         this.emailVerified = emailVerified;
         this.mobileVerified = mobileVerified;
@@ -144,6 +147,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getSex(),
                 // 
                 user.isEnabled(),
+                // user.getSystem(),
                 user.isSuperUser(),
                 user.isEmailVerified(),
                 user.isMobileVerified(),

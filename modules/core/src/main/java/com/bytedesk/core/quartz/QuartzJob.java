@@ -49,11 +49,11 @@ public class QuartzJob extends QuartzJobBean implements Serializable {
             Method method = job.getClass().getMethod(methodName);
             method.invoke(job);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            log.error("QuartzJob 方法不存在: {}", methodName, e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.error("QuartzJob 方法不可访问: {}", methodName, e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.error("QuartzJob 方法调用异常: {}", methodName, e);
         }
     }
     

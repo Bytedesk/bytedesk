@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -138,6 +140,11 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Column(name = "is_enabled")
 	private boolean enabled = true;
 
+	// 是否是系统用户
+	// @Builder.Default
+	// @Column(name = "is_system")
+	// private Boolean system = false;
+
 	/**
 	 * Whether the user has super administrator privileges
 	 */
@@ -248,6 +255,7 @@ public class UserEntity extends BaseEntityNoOrg {
         }
     }
 
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	public Set<String> getRoleUids() {
 		OrganizationEntity organization = this.currentOrganization;
 		if (organization == null) {
@@ -386,8 +394,8 @@ public class UserEntity extends BaseEntityNoOrg {
 		OIDC,
 		OPENID,
 		CAS,
-		ADMIN,
-		IMPORT,
+		ADMIN, // 管理员创建
+		SUPER, // 超级管理员创建
 		UNKNOWN
 	}
 

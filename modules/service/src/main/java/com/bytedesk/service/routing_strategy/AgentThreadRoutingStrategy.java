@@ -74,7 +74,6 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final MessageRestService messageRestService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
-    // private final QueueAutoAssignService queueAutoAssignService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -224,7 +223,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agentEntity.toUserProtobuf(), visitorRequest);
         QueueEntity agentQueue = queueMemberEntity.getAgentQueue();
 
-        QueueSettingsEntity queueSettings = getAgentQueueSettings(agentEntity);
+        QueueSettingsEntity queueSettings = getAgentQueueSettings(visitorRequest, agentEntity);
         if (shouldForceLeaveMessage(agentQueue, queueSettings)) {
             int queuingCount = agentQueue != null ? agentQueue.getQueuingCount() : 0;
             int maxWaiting = resolveMaxWaiting(queueSettings);
@@ -237,17 +236,17 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("开始根据客服状态进行路由 - 可用状态: {}", agentEntity.isAvailable());
         if (presenceFacadeService.isAgentOnlineAndAvailable(agentEntity)) {
             log.info("客服在线且可用，路由到在线客服处理");
-            return routeOnlineAgent(thread, agentEntity, queueMemberEntity);
+            return routeOnlineAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
         } else {
             log.info("客服不可用，路由到离线处理 -  可用状态: {}", agentEntity.isAvailable());
-            return handleOfflineAgent(thread, agentEntity, queueMemberEntity);
+            return handleOfflineAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
         }
     }
 
     /**
      * 路由在线客服
      */
-    private MessageProtobuf routeOnlineAgent(ThreadEntity thread, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
+    private MessageProtobuf routeOnlineAgent(VisitorRequest visitorRequest, ThreadEntity thread, AgentEntity agentEntity, QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始在线客服路由处理 - threadUid: {}, agentUid: {}, agentNickname: {}",
                 thread.getUid(), agentEntity.getUid(), agentEntity.getNickname());
@@ -263,11 +262,11 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         if (currentChattingCount < maxThreadCount) {
             log.info("客服容量充足，直接分配给客服 - agentUid: {}, 剩余容量: {}",
                     agentEntity.getUid(), maxThreadCount - currentChattingCount);
-            result = handleAvailableAgent(thread, agentEntity, queueMemberEntity);
+            result = handleAvailableAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
         } else {
             log.info("客服已达最大接待数，线程进入排队 - agentUid: {}, 当前排队数: {}",
                     agentEntity.getUid(), queueMemberEntity.getAgentQueue().getQueuingCount());
-            result = handleQueuedAgent(thread, agentEntity, queueMemberEntity);
+            result = handleQueuedAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
         }
 
         log.info("在线客服路由处理完成 - threadUid: {}, agentUid: {}, 处理耗时: {}ms",
@@ -278,7 +277,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理可用客服（客服在线且未达到最大接待人数）
      */
-    private MessageProtobuf handleAvailableAgent(ThreadEntity threadFromRequest, AgentEntity agent,
+    private MessageProtobuf handleAvailableAgent(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始处理可用客服分配 - threadUid: {}, agentUid: {}, agentNickname: {}",
@@ -292,7 +291,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             // 获取并更新线程状态
             log.debug("获取最新线程状态并更新为聊天状态");
             ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
-            String tip = getAgentWelcomeMessage(agent);
+            String tip = getAgentWelcomeMessage(visitorRequest, agent);
             WelcomeContent welcomeContent = WelcomeContentUtils.buildAgentWelcomeContent(agent, tip);
             String jsonWelcome = welcomeContent != null ? welcomeContent.toJson() : null;
             thread.setChatting().setContent(jsonWelcome);
@@ -341,7 +340,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理排队客服（客服在线但已达到最大接待人数）
      */
-    private MessageProtobuf handleQueuedAgent(ThreadEntity threadFromRequest, AgentEntity agent,
+    private MessageProtobuf handleQueuedAgent(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始处理客服排队情况 - threadUid: {}, agentUid: {}, agentNickname: {}",
@@ -354,7 +353,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
 
         // 获取排队配置
-        QueueSettingsEntity queueSettings = getAgentQueueSettings(agent);
+        QueueSettingsEntity queueSettings = getAgentQueueSettings(visitorRequest, agent);
         int avgWaitTimePerPerson = queueSettings != null && queueSettings.getAvgWaitTimePerPerson() != null
                 ? queueSettings.getAvgWaitTimePerPerson()
                 : QueueTipTemplateUtils.DEFAULT_AVG_WAIT_TIME_PER_PERSON;
@@ -362,7 +361,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("生成排队消息内容");
         int queuingCount = queueMemberEntity.getAgentQueue().getQueuingCount();
         // 使用模板生成排队提示语
-        String queueContentText = generateAgentQueueMessage(agent, queuingCount, avgWaitTimePerPerson);
+        String queueContentText = generateAgentQueueMessage(visitorRequest, agent, queuingCount, avgWaitTimePerPerson);
         
         // 计算等待时间
         int waitSeconds = queuingCount * avgWaitTimePerPerson;
@@ -432,7 +431,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理离线客服
      */
-    private MessageProtobuf handleOfflineAgent(ThreadEntity threadFromRequest, AgentEntity agent,
+    private MessageProtobuf handleOfflineAgent(VisitorRequest visitorRequest, ThreadEntity threadFromRequest, AgentEntity agent,
             QueueMemberEntity queueMemberEntity) {
         long startTime = System.currentTimeMillis();
         log.info("开始处理离线客服情况 - threadUid: {}, agentUid: {}, agentNickname: {}, presenceOnline: {}",
@@ -446,7 +445,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
 
         log.debug("生成离线消息内容");
-        String offlineContent = getAgentOfflineMessage(agent);
+        String offlineContent = getAgentOfflineMessage(visitorRequest, agent);
         thread.setOffline().setContent(offlineContent);
         log.debug("线程状态设置为离线 - threadUid: {}, 离线消息长度: {}",
                 thread.getUid(), offlineContent != null ? offlineContent.length() : 0);
@@ -459,8 +458,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 更新队列状态
         log.debug("更新队列成员离线状态 - queueMemberUid: {}", queueMemberEntity.getUid());
         queueMemberEntity.setAgentOffline(true);
-        QueueMemberEntity savedQueueMember = queueMemberRestService.save(queueMemberEntity);
-        log.debug("队列成员离线状态更新完成 - queueMemberUid: {}", savedQueueMember.getUid());
+        queueMemberRestService.saveAsyncBestEffort(queueMemberEntity);
+        log.debug("队列成员离线状态更新完成(异步) - queueMemberUid: {}", queueMemberEntity.getUid());
 
         // 创建离线消息
         log.debug("创建离线消息实体");
@@ -526,14 +525,24 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取客服欢迎消息
      */
-    private String getAgentWelcomeMessage(AgentEntity agent) {
+    private boolean isDraftEnabled(VisitorRequest visitorRequest) {
+        return visitorRequest != null && Boolean.TRUE.equals(visitorRequest.getDraft());
+    }
+
+    private String getAgentWelcomeMessage(VisitorRequest visitorRequest, AgentEntity agent) {
         log.debug("获取客服欢迎消息 - agentUid: {}", agent.getUid());
 
         String customMessage = null;
         try {
-            customMessage = agent.getSettings() != null && agent.getSettings().getServiceSettings() != null
-                    ? agent.getSettings().getServiceSettings().getWelcomeTip()
-                    : null;
+            boolean useDraft = isDraftEnabled(visitorRequest);
+            if (agent.getSettings() != null) {
+                if (useDraft && agent.getSettings().getDraftServiceSettings() != null) {
+                    customMessage = agent.getSettings().getDraftServiceSettings().getWelcomeTip();
+                }
+                if (!StringUtils.hasText(customMessage) && agent.getSettings().getServiceSettings() != null) {
+                    customMessage = agent.getSettings().getServiceSettings().getWelcomeTip();
+                }
+            }
             log.debug("客服自定义欢迎消息 - agentUid: {}, 消息长度: {}",
                     agent.getUid(), customMessage != null ? customMessage.length() : 0);
         } catch (Exception e) {
@@ -549,14 +558,20 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取客服离线消息
      */
-    private String getAgentOfflineMessage(AgentEntity agent) {
+    private String getAgentOfflineMessage(VisitorRequest visitorRequest, AgentEntity agent) {
         log.debug("获取客服离线消息 - agentUid: {}", agent.getUid());
 
         String customMessage = null;
         try {
-            customMessage = agent.getSettings() != null && agent.getSettings().getMessageLeaveSettings() != null
-                    ? agent.getSettings().getMessageLeaveSettings().getMessageLeaveTip()
-                    : null;
+            boolean useDraft = isDraftEnabled(visitorRequest);
+            if (agent.getSettings() != null) {
+                if (useDraft && agent.getSettings().getDraftMessageLeaveSettings() != null) {
+                    customMessage = agent.getSettings().getDraftMessageLeaveSettings().getMessageLeaveTip();
+                }
+                if (!StringUtils.hasText(customMessage) && agent.getSettings().getMessageLeaveSettings() != null) {
+                    customMessage = agent.getSettings().getMessageLeaveSettings().getMessageLeaveTip();
+                }
+            }
             log.debug("客服自定义离线消息 - agentUid: {}, 消息长度: {}",
                     agent.getUid(), customMessage != null ? customMessage.length() : 0);
         } catch (Exception e) {
@@ -572,11 +587,14 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取客服排队配置
      */
-    private QueueSettingsEntity getAgentQueueSettings(AgentEntity agent) {
+    private QueueSettingsEntity getAgentQueueSettings(VisitorRequest visitorRequest, AgentEntity agent) {
         if (agent.getSettings() == null) {
             return null;
         }
-        // 优先使用已发布的配置，如果没有则使用草稿配置
+        boolean useDraft = isDraftEnabled(visitorRequest);
+        if (useDraft && agent.getSettings().getDraftQueueSettings() != null) {
+            return agent.getSettings().getDraftQueueSettings();
+        }
         QueueSettingsEntity settings = agent.getSettings().getQueueSettings();
         if (settings == null) {
             settings = agent.getSettings().getDraftQueueSettings();
@@ -607,10 +625,10 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * @param avgWaitTimePerPerson 每人平均等待时长（秒）
      * @return 替换模板变量后的排队提示语
      */
-    private String generateAgentQueueMessage(AgentEntity agent, int queuingCount, int avgWaitTimePerPerson) {
+    private String generateAgentQueueMessage(VisitorRequest visitorRequest, AgentEntity agent, int queuingCount, int avgWaitTimePerPerson) {
         log.debug("开始生成客服排队消息 - agentUid: {}, 排队数: {}", agent.getUid(), queuingCount);
 
-        QueueSettingsEntity queueSettings = getAgentQueueSettings(agent);
+        QueueSettingsEntity queueSettings = getAgentQueueSettings(visitorRequest, agent);
         if (queueSettings != null && StringUtils.hasText(queueSettings.getQueueTip())) {
             log.debug("使用自定义排队提示语模板 - agentUid: {}, 模板: {}", agent.getUid(), queueSettings.getQueueTip());
         }
@@ -643,9 +661,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("设置队列成员接受状态 - queueMemberUid: {}, 接受时间: {}, 接受类型: {}",
                 queueMemberEntity.getUid(), acceptTime, QueueMemberAcceptTypeEnum.AUTO.name());
 
-        queueMemberRestService.save(queueMemberEntity);
-        // log.info("队列成员接受状态更新完成 - queueMemberUid: {}, 更新耗时: {}ms",
-        // savedEntity.getUid(), System.currentTimeMillis() - startTime);
+        queueMemberRestService.saveAsyncBestEffort(queueMemberEntity);
     }
 
     /**

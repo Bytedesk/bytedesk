@@ -51,7 +51,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_READ_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_READ)
     @ActionAnnotation(title = "机器人", action = "组织查询", description = "query robot by org")
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
@@ -65,7 +65,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_READ_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_READ)
     @ActionAnnotation(title = "机器人", action = "用户查询", description = "query robot by user")
     @Override
     public ResponseEntity<?> queryByUser(RobotRequest request) {
@@ -79,7 +79,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_READ_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_READ)
     @ActionAnnotation(title = "机器人", action = "查询详情", description = "query robot by uid")
     @Override
     public ResponseEntity<?> queryByUid(RobotRequest request) {
@@ -93,7 +93,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE)
     @ActionAnnotation(title = "机器人", action = "新建", description = "create robot")
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
@@ -107,7 +107,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE)
     @ActionAnnotation(title = "机器人", action = "新建", description = "create robot thread")
     @PostMapping("/create/llm/thread")
     public ResponseEntity<?> createLlmThread(@RequestBody ThreadRequest request) {
@@ -121,7 +121,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
     @ActionAnnotation(title = "机器人", action = "更新", description = "update robot thread")
     @PostMapping("/update/llm/thread")
     public ResponseEntity<?> updateLlmThread(@RequestBody ThreadRequest request) {
@@ -135,7 +135,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE)
     @ActionAnnotation(title = "机器人", action = "新建", description = "create prompt robot")
     @PostMapping("/create/prompt")
     public ResponseEntity<?> createPromptRobot(@RequestBody RobotRequest request) {
@@ -149,7 +149,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
     @ActionAnnotation(title = "机器人", action = "更新", description = "update robot")
     @Override
     public ResponseEntity<?> update(@RequestBody RobotRequest request) {
@@ -163,7 +163,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
     @ActionAnnotation(title = "机器人", action = "更新", description = "update robot avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody RobotRequest request) {
@@ -177,7 +177,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
     @ActionAnnotation(title = "机器人", action = "更新", description = "update prompt robot")
     @PostMapping("/update/prompt")
     public ResponseEntity<?> updatePromptRobot(@RequestBody RobotRequest request) {
@@ -191,7 +191,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
     @ActionAnnotation(title = "机器人", action = "更新", description = "update robot prompt text")
     @PostMapping("/update/prompt/text")
     public ResponseEntity<?> updatePromptText(@RequestBody RobotRequest request) {
@@ -205,7 +205,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
     @ActionAnnotation(title = "机器人", action = "更新", description = "update robot kbUid")
     @PostMapping("/update/kbUid")
     public ResponseEntity<?> updateKbUid(@RequestBody RobotRequest request) {
@@ -217,7 +217,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
 
     @Operation(summary = "删除机器人", description = "删除指定的机器人")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_DELETE_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_DELETE)
     @ActionAnnotation(title = "机器人", action = "删除", description = "delete robot")
     @Override
     public ResponseEntity<?> delete(@RequestBody RobotRequest request) {
@@ -229,7 +229,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
 
     @Operation(summary = "导出机器人", description = "导出机器人数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
-    @PreAuthorize(RobotPermissions.HAS_ROBOT_EXPORT_ANY_LEVEL)
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_EXPORT)
     @ActionAnnotation(title = "机器人", action = "导出", description = "export robot")
     @GetMapping("/export")
     @Override

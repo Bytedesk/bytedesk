@@ -52,7 +52,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
     @Override
     public ResponseEntity<?> queryByOrg(VisitorRequest request) {
 
@@ -66,7 +66,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
     @Override
     public ResponseEntity<?> queryByUser(VisitorRequest visitorRequest) {
         //
@@ -80,7 +80,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
     @Override
     public ResponseEntity<?> queryByUid(VisitorRequest request) {
         
@@ -94,7 +94,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_CREATE_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_CREATE)
     @Override
     public ResponseEntity<?> create(VisitorRequest request) {
         
@@ -108,7 +108,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE)
     @Override
     public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
 
@@ -123,7 +123,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE)
     @PostMapping("/update/tagList")
     public ResponseEntity<?> updateTagList(@RequestBody VisitorRequest visitorRequest) {
 
@@ -135,7 +135,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ActionAnnotation(title = "访客", action = "删除", description = "delete visitor")
     @Operation(summary = "删除访客", description = "删除指定的访客")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_DELETE_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_DELETE)
     @Override
     public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
 
@@ -147,7 +147,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ActionAnnotation(title = "访客", action = "导出", description = "export visitor")
     @Operation(summary = "导出访客", description = "导出访客数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_EXPORT_ANY_LEVEL)
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_EXPORT)
     @GetMapping("/export")
     @Override
     public Object export(VisitorRequest request, HttpServletResponse response) {

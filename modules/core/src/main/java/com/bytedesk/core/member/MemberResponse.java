@@ -17,7 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.rbac.role.RoleResponseSimple;
+import com.bytedesk.core.rbac.user.UserResponseSimple;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +37,6 @@ import lombok.experimental.SuperBuilder;
 public class MemberResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
-
 
     private String nickname;
 
@@ -61,7 +61,7 @@ public class MemberResponse extends BaseResponse {
     private String deptUid;
 
     @Builder.Default
-	private Set<String> roleUids = new HashSet<>(); 
+	private Set<RoleResponseSimple> roles = new HashSet<>(); 
 
-    private UserResponse user;
+    private UserResponseSimple user;
 }

@@ -114,7 +114,7 @@ public class BytedeskProperties {
             byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("encryptString failed", e);
             return plainText; // 加密失败时返回原值
         }
     }

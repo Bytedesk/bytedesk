@@ -316,9 +316,9 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
         // 初始化快捷回复知识库
         KbaseRequest kbaseQuickReplyRequest = KbaseRequest.builder()
-                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKREPLY_UID))
+                .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICK_REPLY_UID))
                 .type(KbaseTypeEnum.QUICKREPLY.name())
-                .name(KbaseConsts.KB_QUICKREPLY_NAME)
+                .name(KbaseConsts.KB_QUICK_REPLY_NAME)
                 .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
                 .language(LanguageEnum.ZH_CN.name())
                 .orgUid(orgUid)
@@ -327,9 +327,9 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
         // 初始化快捷按钮知识库
         // KbaseRequest kbaseQuickButtonRequest = KbaseRequest.builder()
-        //         .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICKBUTTON_UID))
+        //         .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_QUICK_BUTTON_UID))
         //         .type(KbaseTypeEnum.QUICKBUTTON.name())
-        //         .name(KbaseConsts.KB_QUICKBUTTON_NAME)
+        //         .name(KbaseConsts.KB_QUICK_BUTTON_NAME)
         //         .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
         //         .language(LanguageEnum.ZH_CN.name())
         //         .orgUid(orgUid)

@@ -13,16 +13,23 @@
  */
 package com.bytedesk.core.rbac.role;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import jakarta.annotation.PreDestroy;
+
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.event.AuthorityCreateEvent;
 
@@ -39,93 +46,156 @@ public class RoleEventListener {
     // 存储收集到的权限
     private final ConcurrentHashMap<String, Set<String>> roleAuthorityMap = new ConcurrentHashMap<>();
 
-    // @EventListener
-    // public void onRoleCreateEvent(RoleCreateEvent event) {
-    //     // RoleEntity roleEntity = event.getRoleEntity();
-    //     // log.info("onRoleCreateEvent: {}", roleEntity.toString());
-    // }
+    // 启动阶段延迟绑定：避免 role 未创建就绑定导致失败
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "role-authority-binder");
+        t.setDaemon(true);
+        return t;
+    });
+    private final AtomicInteger startupAttempts = new AtomicInteger(0);
+    private final AtomicBoolean flushing = new AtomicBoolean(false);
+    private volatile boolean appReady = false;
+    private volatile ScheduledFuture<?> startupFuture;
 
     @EventListener
     public void onAuthorityCreateEvent(AuthorityCreateEvent event) {
         AuthorityEntity authorityEntity = event.getAuthority();
         // log.info("role AuthorityCreateEvent: {}", authorityEntity.getUid());
         
-        // 权限层级设计原则：高层级权限包含低层级权限的访问能力
-        // PLATFORM > ORGANIZATION > DEPARTMENT > WORKGROUP > AGENT > USER
-        // 因此只需要分配最高需要的层级权限即可，无需分配所有层级权限
-        
         String authorityUid = authorityEntity.getUid();
         if (!StringUtils.hasText(authorityUid)) {
             return;
         }
-        String authorityValue = StringUtils.hasText(authorityEntity.getValue())
-            ? authorityEntity.getValue()
-            : authorityUid;
-        String levelMarker = authorityValue.toUpperCase();
-        
-        // 权限层级设计：
-        // SUPER（超级管理员）: 平台级 PLATFORM 权限 - 管理整个平台
-        // ADMIN（组织管理员）: 组织级 ORGANIZATION 权限 - 管理某个组织
-        // DEPT_ADMIN（部门管理员）: 部门级 DEPARTMENT 权限 - 管理某个部门
-        // WORKGROUP_ADMIN（工作组管理员）: 工作组级 WORKGROUP 权限 - 管理某个工作组
-        // AGENT: 一线客服在限定模块内的操作权限
-        // USER: 终端用户在限定模块内的操作权限
-        
-        // 超级管理员: 只分配 PLATFORM 级别权限
-        if (levelMarker.contains("_PLATFORM_")) {
-            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_SUPER_UID, k -> new HashSet<>())
-                    .add(authorityUid);
-        }
-        
-        // 组织管理员: 只分配 ORGANIZATION 级别权限：组织属于平台下属，一个平台可以有多个组织
-        if (levelMarker.contains("_ORGANIZATION_")) {
-            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID, k -> new HashSet<>())
-                    .add(authorityUid);
-        }
-        
-        // 部门管理员: 只分配 DEPARTMENT 级别权限：部门属于组织下属，一个组织可以有多个部门
-        if (levelMarker.contains("_DEPARTMENT_")) {
-            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_DEPT_ADMIN_UID, k -> new HashSet<>())
-                    .add(authorityUid);
-        }
-        
-        // 工作组管理员: 只分配 WORKGROUP 级别权限：工作组属于客服部门下属，一个部门可以有多个工作组
-        if (levelMarker.contains("_WORKGROUP_")) {
-            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_WORKGROUP_ADMIN_UID, k -> new HashSet<>())
-                    .add(authorityUid);
-        }
-        
-        // 客服：仅接收允许模块的 AGENT 级别权限 && matchesPrefix(authorityUid, AGENT_MODULE_PREFIXES)
-        if (levelMarker.contains("_AGENT_")) {
-            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_AGENT_UID, k -> new HashSet<>())
-                .add(authorityUid);
+
+        String authorityValue = authorityEntity.getValue();
+
+        // SUPER: 永远拥有全部权限
+        roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_SUPER_UID, k -> ConcurrentHashMap.newKeySet()).add(authorityUid);
+
+        // ADMIN: 拥有除 Settings 写入/更新（CREATE/UPDATE）之外的所有权限
+        if (!RoleAuthorityRules.isAdminExcludedPermission(authorityValue)) {
+            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID, k -> ConcurrentHashMap.newKeySet()).add(authorityUid);
         }
 
-        // 终端用户：接收 USER 级别权限
-        if (levelMarker.contains("_USER_")) {
-            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_USER_UID, k -> new HashSet<>())
-                .add(authorityUid);
+        // AGENT: 知识库（kbase）模块所有 READ 权限
+        if (RoleAuthorityRules.isKbaseReadPermission(authorityValue)) {
+            roleAuthorityMap.computeIfAbsent(BytedeskConsts.DEFAULT_ROLE_AGENT_UID, k -> ConcurrentHashMap.newKeySet()).add(authorityUid);
+        }
+
+        // 启动完成后若角色已就绪，则直接尝试 flush（避免错过 ApplicationReady 之后才创建的权限）
+        if (appReady) {
+            tryFlushOnce();
         }
     }
 
     @EventListener
-    public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        // 处理收集的权限
+    public void onApplicationReadyEvent(ApplicationReadyEvent event) {
+        appReady = true;
+
+        // 仅在启动阶段短暂重试：避免长期定时任务。
+        // 2s 一次，最多 30 次（约 1 分钟），角色就绪后立即 flush 并停止。
+        if (startupFuture == null) {
+            startupFuture = scheduler.scheduleWithFixedDelay(this::tryFlushSafely, 0, 2, TimeUnit.SECONDS);
+        }
+    }
+
+    /**
+     * 权限创建主要发生在应用启动阶段（自动初始化，不走接口创建）。
+     * 这里在 ApplicationReady 统一处理一次即可：
+     * - 既能保证角色已创建
+     * - 也避免 Quartz 每分钟轮询带来的持续 DB 操作与噪音日志
+     */
+    private void flushCollectedAuthorities() {
         roleAuthorityMap.forEach((roleUid, authorityUids) -> {
-            if (!authorityUids.isEmpty()) {
-                // log.info("处理角色权限: {} - 权限数量: {}", roleUid, authorityUids.size());
+            if (authorityUids == null || authorityUids.isEmpty()) {
+                return;
+            }
+            try {
                 RoleRequest roleRequest = RoleRequest.builder()
                         .uid(roleUid)
                         .authorityUids(authorityUids)
                         .build();
-                roleRestService.addAuthorities(roleRequest);
-                // 清除已处理的权限，避免重复添加
+                roleRestService.addAuthoritiesSystem(roleRequest);
+            } catch (Exception e) {
+                // 启动阶段容错：不阻断应用启动
+                log.warn("Failed to bind collected authorities to role uid={} (size={}): {}",
+                        roleUid, authorityUids.size(), e.getMessage());
+            } finally {
                 authorityUids.clear();
             }
         });
+        roleAuthorityMap.clear();
     }
 
-    // private boolean matchesPrefix(String authorityUid, Set<String> prefixes) {
-    //     return prefixes.stream().anyMatch(authorityUid::startsWith);
-    // }
+    private void tryFlushSafely() {
+        try {
+            tryFlushOnce();
+        } catch (Exception e) {
+            log.warn("Role authority startup flush attempt failed: {}", e.getMessage());
+        }
+    }
+
+    private void tryFlushOnce() {
+        if (!appReady) {
+            return;
+        }
+        if (!flushing.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            int attempt = startupAttempts.incrementAndGet();
+
+            boolean rolesReady = areDefaultRolesReady();
+            boolean hasPending = roleAuthorityMap.values().stream().anyMatch(set -> set != null && !set.isEmpty());
+
+            if (rolesReady && hasPending) {
+                flushCollectedAuthorities();
+                stopStartupRetry();
+                return;
+            }
+
+            // 角色已就绪但没有待处理数据：再等几轮，避免极端情况下 ready 之后才触发 AuthorityCreateEvent
+            if (rolesReady && !hasPending && attempt >= 3) {
+                stopStartupRetry();
+                return;
+            }
+
+            if (attempt >= 30) {
+                if (hasPending) {
+                    log.warn("Role authority binding not completed after {} attempts; pending data remains.", attempt);
+                }
+                stopStartupRetry();
+            }
+        } finally {
+            flushing.set(false);
+        }
+    }
+
+    private boolean areDefaultRolesReady() {
+        try {
+            return Boolean.TRUE.equals(roleRestService.existsByUid(BytedeskConsts.DEFAULT_ROLE_SUPER_UID))
+                    && Boolean.TRUE.equals(roleRestService.existsByUid(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID))
+                    && Boolean.TRUE.equals(roleRestService.existsByUid(BytedeskConsts.DEFAULT_ROLE_AGENT_UID))
+                    && Boolean.TRUE.equals(roleRestService.existsByUid(BytedeskConsts.DEFAULT_ROLE_USER_UID));
+        } catch (Exception e) {
+            // 启动期容错：查库异常时认为未就绪，等待下一轮
+            log.warn("Failed to check default role readiness: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private void stopStartupRetry() {
+        ScheduledFuture<?> future = this.startupFuture;
+        if (future != null) {
+            future.cancel(false);
+            this.startupFuture = null;
+        }
+    }
+
+    @PreDestroy
+    public void shutdownScheduler() {
+        stopStartupRetry();
+        scheduler.shutdownNow();
+    }
+
 }

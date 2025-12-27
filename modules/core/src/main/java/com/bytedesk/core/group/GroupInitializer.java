@@ -30,12 +30,12 @@ public class GroupInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         init();
-        initPermissions();
+        initAuthority();
     }
 
     private void init() {}
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = GroupPermissions.GROUP_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

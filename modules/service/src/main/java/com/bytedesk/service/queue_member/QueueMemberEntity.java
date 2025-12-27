@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.time.Duration;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.thread.enums.ThreadIntentionTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
@@ -245,6 +246,24 @@ public class QueueMemberEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_summarized")
     private Boolean summarized = false;
+
+    /**
+     * 意图识别最近触发时间（用于冷却控制）
+     */
+    @Column(name = "intention_last_triggered_at")
+    private ZonedDateTime intentionLastTriggeredAt;
+
+    /**
+     * 情绪识别最近触发时间（用于冷却控制）
+     */
+    @Column(name = "emotion_last_triggered_at")
+    private ZonedDateTime emotionLastTriggeredAt;
+
+    /**
+     * 会话小结最近触发时间（用于冷却控制）
+     */
+    @Column(name = "summary_last_triggered_at")
+    private ZonedDateTime summaryLastTriggeredAt;
     
     // resolved status
     @Builder.Default
@@ -270,10 +289,25 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "thread_intention_type")
     private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
 
+    // 意图识别原始结果（JSON/文本），便于回溯与二次处理
+    @Builder.Default
+    @Column(name = "thread_intention_result", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String threadIntentionResult = "";
+
     // 情绪类型
     @Builder.Default
     @Column(name = "thread_emotion_type")
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
+
+    // 情绪识别原始结果（JSON/文本），便于回溯与二次处理
+    @Builder.Default
+    @Column(name = "thread_emotion_result", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String threadEmotionResult = "";
+
+    // 会话小结原始结果（JSON），便于后续人工审核/编辑
+    @Builder.Default
+    @Column(name = "thread_summary_result", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String threadSummaryResult = "";
 
     // 机器人转人工
     @Builder.Default

@@ -1,0 +1,448 @@
+{
+  "version": "6",
+  "id": "clon6cteb000i1avnrdaj92au",
+  "name": "Lead Gen with AI",
+  "events": [
+    {
+      "id": "i6xofskq0vdlnfyvf28hzcle",
+      "outgoingEdgeId": "dkgy7qanybx0d9zl2ke2aa03",
+      "graphCoordinates": { "x": 0, "y": 0 },
+      "type": "start"
+    }
+  ],
+  "groups": [
+    {
+      "id": "nmlij3lrk42cymsu1tj6b9nv",
+      "title": "Welcome",
+      "graphCoordinates": { "x": 1, "y": 148 },
+      "blocks": [
+        {
+          "id": "sc1y8VwDabNJgiVTBi4qtif",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "Hey 👋" }] }]
+          }
+        },
+        {
+          "id": "s7YqZTBeyCa4Hp3wN2j922c",
+          "type": "image",
+          "content": {
+            "url": "https://media0.giphy.com/media/2f7RQiiWMJc40/giphy.gif?cid=fe3852a34jqk83z51tbm8a1jxmqpuckxxwef79p5myafdlw5&rid=giphy.gif&ct=g"
+          }
+        },
+        {
+          "id": "z5tydv4qcam6xnh1ehm8hask",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Thank you for your interest in our marketing services."
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "ygo5cubnk50m5jt6ull3bn0i",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Let's have a quick chat about your current situation 🙏"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "vw9s76hgwu749gw15bqk4vd3",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "Ready?" }] }]
+          }
+        },
+        {
+          "id": "sbjZWLJGVkHAkDqS4JQeGow",
+          "outgoingEdgeId": "vgi4r3yjle17balwlhpas25t",
+          "type": "choice input",
+          "items": [{ "id": "hQw2zbp7FDX7XYK9cFpbgC", "content": "Yes!" }]
+        }
+      ]
+    },
+    {
+      "id": "vrv6xoriyl74wcz34gqlvc0q",
+      "title": "Email",
+      "graphCoordinates": { "x": 666.07421875, "y": 141 },
+      "blocks": [
+        {
+          "id": "scQ5kduafAtfP9T8SHUJnGi",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "What's the best email we can reach you at?" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "snbsad18Bgry8yZ8DZCfdFD",
+          "outgoingEdgeId": "piew4sf9dpafiweghqvucmax",
+          "type": "email_input",
+          "options": {
+            "variableId": "v3VFChNVSCXQ2rXv4DrJ8Ah"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wlcaalj5zej2sl1t9kkq55se",
+      "title": "Company",
+      "graphCoordinates": { "x": 325.22265625, "y": 144.37890625 },
+      "blocks": [
+        {
+          "id": "sgtE2Sy7cKykac9B223Kq9R",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "What company do you work for?" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "sqEsMo747LTDnY9FjQcEwUv",
+          "outgoingEdgeId": "wlzesf38jzeyf65i1aj6j517",
+          "type": "text_input",
+          "options": {
+            "labels": {
+              "placeholder": "Type your answer...",
+              "button": "Send"
+            },
+            "variableId": "giiLFGw5xXBCHzvp1qAbdX"
+          }
+        }
+      ]
+    },
+    {
+      "id": "trcslng32mdxkjmrw8zxpnpj",
+      "title": "Services",
+      "graphCoordinates": { "x": 999.90625, "y": 143.7578125 },
+      "blocks": [
+        {
+          "id": "su7HceVXWyTCzi2vv3m4QbK",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "What services are you interested in?" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": "s5VQGsVF4hQgziQsXVdwPDW",
+          "outgoingEdgeId": "wtw2lm86g46ehgvp43fcfks6",
+          "type": "choice input",
+          "items": [
+            { "id": "fnLCBF4NdraSwcubnBhk8H", "content": "Website dev" },
+            { "id": "a782h8ynMouY84QjH7XSnR", "content": "Content Marketing" },
+            { "id": "jGvh94zBByvVFpSS3w97zY", "content": "Social Media" },
+            { "id": "6PRLbKUezuFmwWtLVbvAQ7", "content": "UI / UX Design" }
+          ],
+          "options": {
+            "variableId": "vi0mmx9o2m4s8z9cccsjcvpj5",
+            "isMultipleChoice": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "m4oxxhg9wfv3wc6n8rhzy6ga",
+      "title": "[AI] Additional information",
+      "graphCoordinates": { "x": 1340.59, "y": 41.79 },
+      "blocks": [
+        {
+          "id": "px8ciz2nu2frvdqjporqpg95",
+          "type": "condition",
+          "items": [
+            {
+              "id": "w1cg5txczy2qmn4kbh1eybkk",
+              "outgoingEdgeId": "tfixdvay6mxj4g7z7bfmjthc",
+              "content": {
+                "comparisons": [
+                  {
+                    "id": "r9ju98p1i6tevti45tt6jwk8",
+                    "variableId": "vi5ta5lktses2h6skf5ky2zs0",
+                    "comparisonOperator": "Greater than",
+                    "value": "5"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "dc58mxvcstc2rdwnlg4yd2aa",
+          "type": "openai",
+          "options": {
+            "task": "Create chat completion",
+            "model": "gpt-3.5-turbo",
+            "messages": [
+              {
+                "id": "i522qy1dzn42qy7rkw79uk9n",
+                "role": "user",
+                "content": "You are a marketing agency, and I am a prospect.\n\nAsk simple questions to understand my needs."
+              },
+              {
+                "id": "d6a2qfsdo251q0iopi77gtpd",
+                "role": "assistant",
+                "content": "What company do you work for?"
+              },
+              {
+                "id": "ba3objkk8jp8piyxlbe9diu6",
+                "role": "user",
+                "content": "{{Company}}"
+              },
+              {
+                "id": "bqqgavh96n76l9ma987km87y",
+                "role": "assistant",
+                "content": "What services are you interested in?"
+              },
+              {
+                "id": "zdsbh8wrmhqop24kg3t9b08f",
+                "role": "user",
+                "content": "{{Services}}"
+              },
+              {
+                "id": "j1pgsjm0snn3pz034h8y91vg",
+                "role": "Dialogue",
+                "dialogueVariableId": "vi5ta5lktses2h6skf5ky2zs0",
+                "startsBy": "assistant"
+              }
+            ],
+            "responseMapping": [
+              {
+                "id": "krixyhr7qw5ow52yf3i11y3a",
+                "valueToExtract": "Message content",
+                "variableId": "vpvkbogoj3rmogz0ssh5odmnn"
+              }
+            ],
+            "credentialsId": "clocxtxlc00031an2uc59hdpb"
+          }
+        },
+        {
+          "id": "vssvfz99ain77sc5w07ci5a1",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vi5ta5lktses2h6skf5ky2zs0",
+            "type": "Append value(s)",
+            "item": "{{AI reply}}"
+          }
+        },
+        {
+          "id": "ieopf79666ug1tmld46ac1rw",
+          "type": "text",
+          "content": {
+            "richText": [
+              { "type": "p", "children": [{ "text": "{{AI reply}}" }] }
+            ]
+          }
+        },
+        {
+          "id": "sqFy2G3C1mh9p6s3QBdSS5x",
+          "type": "text_input",
+          "options": {
+            "labels": {
+              "placeholder": "Type your answer...",
+              "button": "Send"
+            },
+            "variableId": "vhp0ymgwq4id82l97g0kliglf"
+          }
+        },
+        {
+          "id": "t8s54i11vfebpp5cbc7xukn5",
+          "outgoingEdgeId": "buwcxt81dfrh6prteij8cvo8",
+          "type": "set_variable",
+          "options": {
+            "variableId": "vi5ta5lktses2h6skf5ky2zs0",
+            "type": "Append value(s)",
+            "item": "{{Additional information}}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "gjahzyusg4mlpvpaeov0awtm",
+      "title": "Bye",
+      "graphCoordinates": { "x": 1676.6171875, "y": 142.7109375 },
+      "blocks": [
+        {
+          "id": "seLegenCgUwMopRFeAefqZ7",
+          "type": "text",
+          "content": {
+            "richText": [{ "type": "p", "children": [{ "text": "Perfect!" }] }]
+          }
+        },
+        {
+          "id": "s779Q1y51aVaDUJVrFb16vv",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [{ "text": "We'll get back to you at {{Email}}" }]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "l0223zmqvndj1irhk68yh10v",
+      "title": "",
+      "graphCoordinates": { "x": 1342.76, "y": 692.3 },
+      "blocks": [
+        {
+          "id": "l7r996nrnqb937nzyrprcvs0",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "You need to add your OpenAI credentials to make this bot work. 🪄"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "jxrp7xdzmnqnfmzfvid2u4s1",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  {
+                    "text": "Once it's done, delete this group and connect the "
+                  },
+                  { "bold": true, "text": "Services" },
+                  { "text": " group with " },
+                  { "bold": true, "text": "[AI] Additional Information" },
+                  { "text": " 🚀" }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "dkgy7qanybx0d9zl2ke2aa03",
+      "from": { "eventId": "i6xofskq0vdlnfyvf28hzcle" },
+      "to": { "groupId": "nmlij3lrk42cymsu1tj6b9nv" }
+    },
+    {
+      "id": "vgi4r3yjle17balwlhpas25t",
+      "from": { "blockId": "sbjZWLJGVkHAkDqS4JQeGow" },
+      "to": { "groupId": "wlcaalj5zej2sl1t9kkq55se" }
+    },
+    {
+      "id": "wlzesf38jzeyf65i1aj6j517",
+      "from": { "blockId": "sqEsMo747LTDnY9FjQcEwUv" },
+      "to": { "groupId": "vrv6xoriyl74wcz34gqlvc0q" }
+    },
+    {
+      "id": "piew4sf9dpafiweghqvucmax",
+      "from": { "blockId": "snbsad18Bgry8yZ8DZCfdFD" },
+      "to": { "groupId": "trcslng32mdxkjmrw8zxpnpj" }
+    },
+    {
+      "id": "tfixdvay6mxj4g7z7bfmjthc",
+      "from": {
+        "blockId": "px8ciz2nu2frvdqjporqpg95",
+        "itemId": "w1cg5txczy2qmn4kbh1eybkk"
+      },
+      "to": { "groupId": "gjahzyusg4mlpvpaeov0awtm" }
+    },
+    {
+      "id": "buwcxt81dfrh6prteij8cvo8",
+      "from": { "blockId": "t8s54i11vfebpp5cbc7xukn5" },
+      "to": { "groupId": "m4oxxhg9wfv3wc6n8rhzy6ga" }
+    },
+    {
+      "from": {
+        "blockId": "s5VQGsVF4hQgziQsXVdwPDW",
+        "groupId": "trcslng32mdxkjmrw8zxpnpj"
+      },
+      "to": { "groupId": "l0223zmqvndj1irhk68yh10v" },
+      "id": "wtw2lm86g46ehgvp43fcfks6"
+    }
+  ],
+  "variables": [
+    {
+      "id": "giiLFGw5xXBCHzvp1qAbdX",
+      "name": "Company",
+      "isSessionVariable": true
+    },
+    {
+      "id": "v3VFChNVSCXQ2rXv4DrJ8Ah",
+      "name": "Email",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vi0mmx9o2m4s8z9cccsjcvpj5",
+      "name": "Services",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vpvkbogoj3rmogz0ssh5odmnn",
+      "name": "AI reply",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vhp0ymgwq4id82l97g0kliglf",
+      "name": "Additional information",
+      "isSessionVariable": true
+    },
+    {
+      "id": "vi5ta5lktses2h6skf5ky2zs0",
+      "name": "AI Dialogue",
+      "isSessionVariable": true
+    }
+  ],
+  "theme": {},
+  "selectedThemeTemplateId": null,
+  "settings": {},
+  "createdAt": "2023-11-06T17:26:59.795Z",
+  "updatedAt": "2023-11-07T06:50:56.154Z",
+  "icon": "🦾",
+  "folderId": null,
+  "publicId": null,
+  "customDomain": null,
+  "workspaceId": "proWorkspace",
+  "resultsTablePreferences": null,
+  "isArchived": false,
+  "isClosed": false,
+  "whatsAppCredentialsId": null
+}

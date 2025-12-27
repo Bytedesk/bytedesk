@@ -15,6 +15,7 @@ package com.bytedesk.core.action;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     private final ActionRestService actionRestService;
 
     @Operation(summary = "Query Action Logs by Organization", description = "Retrieve action logs for the current organization")
+    @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
     public ResponseEntity<?> queryByOrg(ActionRequest request) {
 
@@ -46,6 +48,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     }
 
     @Operation(summary = "Query Action Logs by User", description = "Retrieve action logs for the current user")
+    @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
     public ResponseEntity<?> queryByUser(ActionRequest request) {
         
@@ -55,6 +58,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     }
 
     @Operation(summary = "Query Action Log by UID", description = "Retrieve a specific action log by its unique identifier")
+    @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
     public ResponseEntity<?> queryByUid(ActionRequest request) {
         
@@ -64,6 +68,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     }
 
     @Operation(summary = "Create Action Log", description = "Create a new action log entry")
+    @PreAuthorize(ActionPermissions.HAS_ACTION_CREATE)
     @Override
     public ResponseEntity<?> create(@RequestBody ActionRequest request) {
         
@@ -73,6 +78,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     }
 
     @Operation(summary = "Update Action Log", description = "Update an existing action log entry")
+    @PreAuthorize(ActionPermissions.HAS_ACTION_UPDATE)
     @Override
     public ResponseEntity<?> update(@RequestBody ActionRequest request) {
         
@@ -82,6 +88,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     }
 
     @Operation(summary = "Delete Action Log", description = "Delete an action log entry")
+    @PreAuthorize(ActionPermissions.HAS_ACTION_DELETE)
     @Override
     public ResponseEntity<?> delete(@RequestBody ActionRequest request) {
         
@@ -94,6 +101,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     // https://easyexcel.opensource.alibaba.com/docs/current/
     // @ActionAnnotation(title = "action", action = "导出", description = "export action")
     @Operation(summary = "Export Action Logs", description = "Export action logs to Excel format")
+        @PreAuthorize(ActionPermissions.HAS_ACTION_EXPORT)
     @GetMapping("/export")
     public Object export(ActionRequest request, HttpServletResponse response) {
         return exportTemplate(

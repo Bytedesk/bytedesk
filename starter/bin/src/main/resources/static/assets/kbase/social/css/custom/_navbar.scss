@@ -1,0 +1,444 @@
+// 
+// navbar.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Bootstrap Overrides and Additional style for theme
+// 
+
+header {
+  height: $navbar-height;
+}
+
+.navbar-nav {
+  .nav-link {
+    font-size: $navbar-nav-link-font-size;
+    font-weight: $navbar-nav-link-font-weight;
+    text-transform: $navbar-nav-link-text-transform;
+    line-height: $nav-link-line-height;
+    padding-top: 0; 
+    padding-bottom: 0; 
+    .nav-icon {
+      margin-right: 0.3rem;
+    }
+  }
+  .nav-item:last-child .nav-link {
+    padding-right: 0;
+  }
+}
+
+// Navbar inside offcanvas
+.offcanvas {
+  .navbar-nav {
+    .nav-link {
+      line-height: inherit;
+      padding: $nav-link-padding-y $nav-link-padding-x;
+    }
+  }
+}
+
+// navbar toggler
+.navbar-toggler{ 
+  margin-bottom: 0; 
+  border: 0;
+  background-color: var(--#{$prefix}light);
+} 
+
+//
+// header Styles
+//
+
+// Navbar transparent
+.navbar-transparent {
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+// Navbar dark
+  .navbar-dark .navbar-top {
+    span:not(.dropdown-item-text){
+      color: $white;
+    }
+    a:not(.dropdown-item){
+      color: $white;
+      &:hover {
+        color: var(--bs-primary);
+      }
+    }
+  }
+  .navbar-dark .nav .nav-link{
+    color: $white;
+    &:hover {
+      color: var(--bs-primary);
+    }
+  }
+  @include media-breakpoint-down(lg) {
+    .navbar-dark .navbar-nav .nav-link {
+      color: $dropdown-link-color;
+    }
+  }
+
+// Navbar brand (Logo) 
+.navbar-brand {
+  padding-top: $navbar-brand-padding-y;
+  padding-bottom: $navbar-brand-padding-y;
+  .navbar-brand-item {
+    height: $navbar-brand-height;
+    display: block;
+    width: auto;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .navbar-brand {
+    padding-top: $mobile-navbar-brand-padding-y;
+    padding-bottom: $mobile-navbar-brand-padding-y;
+    .navbar-brand-item {
+      height: $mobile-navbar-brand-height;
+    }
+  }
+}
+
+// Toggle plus icon for navbar dropdown submenu only
+.navbar .dropdown-menu .dropdown-submenu.dropend .dropdown-toggle:after {
+  content: "\f00d";
+  font-family: $fa-font-family;
+  font-size: 10px;
+  top: 10px;
+  transform: rotate(45deg);
+  transition: $transition-base;
+  border: none !important;
+  margin: 0;
+}
+
+// Toggle plus icon position change in none touch devices on hover
+@media (hover: hover) {
+  .navbar .dropdown-menu .dropdown-submenu.dropend:hover > .dropdown-toggle:after {
+    transform: rotate(90deg);
+  }
+}
+
+// Toggle plus icon position change in touch devices on touch
+.navbar .dropdown-menu .dropdown-submenu.dropend .dropdown-opened.dropdown-toggle:after {
+  transform: rotate(90deg);
+}
+
+.navbar .dropdown-menu .dropdown-submenu.dropstart .dropdown-toggle:before {
+  content: "\f00d";
+  font-family: $fa-font-family;
+  font-size: 10px;
+  top: 8px;
+  transform: rotate(45deg);
+  transition: $transition-base;
+  border: none !important;
+  margin: 0;
+  font-weight: 900;
+}
+.navbar .dropdown-menu .dropdown-submenu.dropstart:hover > .dropdown-toggle:before {
+  transform: rotate(90deg);
+}
+
+// navbar expand xl 
+
+// `.navbar-expand-*` responsive classes for configuring
+// where your navbar collapses.
+.navbar-expand {
+  @each $breakpoint in map-keys($grid-breakpoints) {
+    $next: breakpoint-next($breakpoint, $grid-breakpoints);
+    $infix: breakpoint-infix($next, $grid-breakpoints);
+    
+    // Styling for navbar-expand
+    &#{$infix} {
+
+      // Navbar styling for navbar expand
+      @include media-breakpoint-up($next) {
+        .navbar-nav {
+          .dropdown-menu {
+            top: 120%;
+            visibility: hidden;
+            opacity: 0;
+            display: block;
+            transition: all 0.1s ease-in-out;
+          }
+          .dropdown {
+            &:hover {
+              >.dropdown-menu {
+                top: 100%;
+                visibility: visible;
+                opacity: 1;
+                transition: $transition-base;
+              }
+            }
+          }
+          .dropdown-submenu {
+            &:hover {
+              >.dropdown-menu {
+                top: 0;
+                visibility: visible;
+                opacity: 1;
+                transition: $transition-base;
+              }
+            }
+          }
+        }
+        .dropdown-submenu {
+          position: relative;
+        }
+      }
+
+      // Navbar styling for navbar collapse
+      @include media-breakpoint-down($next) {
+        .navbar-collapse{
+          box-shadow: 0px 10px 30px rgba(83, 88, 93, .2);
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 100%;
+          background: $white;
+          border-top: 1px solid var(--#{$prefix}border-color);
+          .navbar-nav {
+            // dropdown toggle down arrow position
+            .dropdown-toggle::after {
+              position: absolute;
+              right: 25px;
+            }
+            .dropdown-menu {
+              box-shadow: none;
+              &:before {
+                content: none;
+              }
+            }
+            .dropdown-submenu .dropdown-menu{
+              padding-left: 20px;  
+              padding-bottom: 0px;
+            }
+            > .nav-item{ 
+              border-bottom: 1px solid rgba($black, 0.1);
+              padding: 5px 30px; 
+              position: relative;
+              .nav-link{
+                line-height: 40px;
+              }
+            }
+          }
+        }
+        // Submenu open under submenu
+        .navbar-nav .dropdown-menu {
+          position: static;
+          float: none;
+        }
+      
+        // Menu 1st level dropdown bg color and padding in responsive
+        .navbar-nav .nav-item > .dropdown-menu{
+          background: rgba($body-color, 0.04);
+          padding: 20px 0px;
+          margin: 10px 0;
+        }
+        // Menu levels dropdown bg color and padding in responsive
+        .navbar-nav .nav-item > .dropdown-menu .dropdown-submenu .dropdown-menu {
+          background: rgba($body-color, 0.06);
+          padding: 10px 0px !important;
+        }
+      }
+    }
+  }
+}
+ 
+// navbar-icon
+.navbar.navbar-icon {
+  .navbar-nav {
+    .nav-item {
+      position: relative;
+      padding-top: 0;
+      padding-bottom: 0;
+      .nav-link {
+        font-size: 1.3rem;
+        color:  var(--bs-gray-700);
+        padding: 0 1.2rem;
+        margin-right: 0.5rem;
+        margin-left: 0.5rem;
+        position: relative;
+        &:hover {
+          color: var(--bs-primary);
+          box-shadow: inset 0px 4px 0px var(--bs-primary);
+        }
+        &.active {
+          color: var(--bs-primary);
+          box-shadow: inset 0px 4px 0px var(--bs-primary);
+
+          &:before {
+            position: absolute;
+            top: 100%;
+            width: 0;
+            height: 0;
+            content: "";
+            border-style: solid;
+            border-width: 10px 10px 0 10px;
+            border-color: var(--bs-white) transparent transparent transparent;
+          }
+        }
+        &:last-child {
+          padding-right: 1.2rem;
+        }
+      }
+      .notif-badge {
+        width: 6px;
+        height: 6px;
+        background: $danger;
+        border-radius: 50%;
+        position: absolute;
+        top: inherit;
+        bottom: 10px;
+        right: 0;
+        left: 0;
+        margin: 0 auto;
+        z-index: 1;
+      }
+
+      @include media-breakpoint-up(lg){ 
+        .nav-link {
+          .nav-text {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  @include media-breakpoint-down(lg){ 
+    .navbar-collapse  {
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+      .navbar-nav {
+        .nav-item {
+          padding: 0 10px;
+          .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            padding: 0.2rem 1.2rem;
+            &::before {
+              display: none;
+            }
+            .nav-text {
+              margin-left: 0.4rem;
+            }
+            .badge-notif.badge-notif-bottom {
+              position: static;
+              margin: inherit;
+            }
+          }
+          .notif-badge { 
+            bottom: inherit;
+            right: inherit;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Navbar vertical
+@include media-breakpoint-up(lg) {
+  .navbar-vertical {
+    bottom: 0;
+    display: block;
+    max-width: $navbar-width;
+    position: fixed;
+    z-index: 9;
+    height: 100vh;
+    top: $navbar-height;
+    width: 100%;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    
+    .offcanvas-start {
+      top: $grid-gutter-width;
+      left: inherit;
+      position: relative;
+      width: auto;
+      border: none !important;
+      transform: none;
+      height: calc(100% - $grid-gutter-width * 4);
+      visibility: visible !important;
+    }
+  }
+  .navbar-vertical + .page-content {
+    margin-left: calc($navbar-width + 1.5rem);
+  }
+  .page-content {
+    position: relative;
+    height: 100%;
+    display: block;
+    padding: 0 0.7rem 0 0;
+  }
+}
+
+// Header fixed top
+header.fixed-top + main {
+  padding-top: calc($grid-gutter-width + $navbar-height);
+  margin-bottom: $grid-gutter-width;
+}
+
+// Navbar toggler icon animation
+.navbar-toggler .navbar-toggler-animation {
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  background-image: none;
+  position: relative;
+  height: 18px;
+  width: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+}
+.navbar-toggler .navbar-toggler-animation span {
+  transition: all 0.3s ease-in-out;
+  -webkit-transform: rotateZ(0deg);
+          transform: rotateZ(0deg);
+  height: 2px;
+  background: var(--#{$prefix}gray-600);
+  display: block;
+  position: absolute;
+  width: 100%;
+  border-radius: 30px;
+}
+.navbar-toggler .navbar-toggler-animation span:nth-child(1) {
+  top: 10%;
+}
+.navbar-toggler .navbar-toggler-animation span:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.navbar-toggler .navbar-toggler-animation span:nth-child(3) {
+  bottom: 10%;
+}
+.navbar-toggler[data-bs-toggle=collapse][aria-expanded=true] .navbar-toggler-animation span:nth-child(1) {
+  transform: rotateZ(45deg) translateY(-50%);
+  top: 47%;
+  transform-origin: 47% 0;
+  width: 100%;
+}
+.navbar-toggler[data-bs-toggle=collapse][aria-expanded=true] .navbar-toggler-animation span:nth-child(2) {
+  visibility: hidden;
+  transition: all 0s ease-in-out;
+}
+.navbar-toggler[data-bs-toggle=collapse][aria-expanded=true] .navbar-toggler-animation span:nth-child(3) {
+  transform: rotateZ(-45deg) translateY(-50%);
+  bottom: 42%;
+  transform-origin: 50% 0;
+  width: 100%;
+}
+ 

@@ -43,6 +43,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.thread.ThreadConsts;
 import com.bytedesk.ticket.ticket.TicketConsts;
+import com.bytedesk.ticket.utils.FlowableIdUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -268,7 +269,7 @@ public class ProcessRestService
             return;
         }
 
-        // 读取模板 BPMN 文件并替换 process id 为 processUid
+        // 读取模板 BPMN 文件并替换 process id 为 Flowable 可接受的 key（NCName）
         Resource resource = resourceLoader.getResource("classpath:" + processPath);
         String bpmnXml;
         try (InputStream inputStream = resource.getInputStream()) {
@@ -279,8 +280,9 @@ public class ProcessRestService
         String originalProcessKey = processPath.contains("thread") 
                 ? ThreadConsts.THREAD_PROCESS_KEY 
                 : TicketConsts.TICKET_PROCESS_KEY;
-        bpmnXml = bpmnXml.replace("id=\"" + originalProcessKey + "\"", 
-                                   "id=\"" + processUid + "\"");
+
+        String processDefinitionKey = FlowableIdUtils.toProcessDefinitionKey(processUid);
+        bpmnXml = rewriteBpmnProcessId(bpmnXml, originalProcessKey, processDefinitionKey);
 
         // 执行 Deployment 操作，直接使用 processUid 作为 deploymentName
         Deployment deployment = repositoryService.createDeployment()
@@ -295,6 +297,36 @@ public class ProcessRestService
         markProcessAsDeployed(processUid, deployment.getId());
         log.info("更新工单流程部署状态成功: processUid={}, deploymentId={}",
                 processUid, deployment.getId());
+    }
+
+    private String rewriteBpmnProcessId(String bpmnXml, String originalProcessKey, String newProcessKey) {
+        if (!StringUtils.hasText(bpmnXml) || !StringUtils.hasText(newProcessKey)) {
+            return bpmnXml;
+        }
+
+        // 优先按模板 key 定位替换（最精确）
+        if (StringUtils.hasText(originalProcessKey)) {
+            bpmnXml = bpmnXml.replace("id=\"" + originalProcessKey + "\"",
+                    "id=\"" + newProcessKey + "\"");
+            // 同步 DI 平面引用，避免 bpmnElement 指向旧 process id
+            bpmnXml = bpmnXml.replace("bpmnElement=\"" + originalProcessKey + "\"",
+                    "bpmnElement=\"" + newProcessKey + "\"");
+        }
+
+        // 如果不是模板（或模板替换未生效），兜底把 <process id="..."> 改成目标 key
+        java.util.regex.Pattern p = java.util.regex.Pattern
+                .compile("(<process\\b[^>]*\\bid=\\\")([^\\\"]+)(\\\")");
+        java.util.regex.Matcher m = p.matcher(bpmnXml);
+        if (m.find()) {
+            String oldId = m.group(2);
+            if (!newProcessKey.equals(oldId)) {
+                bpmnXml = m.replaceFirst("$1" + java.util.regex.Matcher.quoteReplacement(newProcessKey) + "$3");
+                bpmnXml = bpmnXml.replace("bpmnElement=\"" + oldId + "\"",
+                        "bpmnElement=\"" + newProcessKey + "\"");
+            }
+        }
+
+        return bpmnXml;
     }
 
     private String loadDefaultThreadProcessSchema() throws IOException {
@@ -344,6 +376,12 @@ public class ProcessRestService
         ProcessEntity processEntity = optional.get();
         String orgUid = processEntity.getOrgUid();
         String bpmnXml = processEntity.getSchema();
+        // 统一：部署时将 BPMN <process id> 归一为可运行的 processDefinitionKey
+        String processDefinitionKey = FlowableIdUtils.toProcessDefinitionKey(processUid);
+        String originalProcessKey = ProcessTypeEnum.THREAD.name().equalsIgnoreCase(processEntity.getType())
+            ? ThreadConsts.THREAD_PROCESS_KEY
+            : TicketConsts.TICKET_PROCESS_KEY;
+        bpmnXml = rewriteBpmnProcessId(bpmnXml, originalProcessKey, processDefinitionKey);
         // 直接使用 processUid 作为 deploymentName，确保唯一性且不受用户修改 name 影响
         String deploymentName = processUid;
 

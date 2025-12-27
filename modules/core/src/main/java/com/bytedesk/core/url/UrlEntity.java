@@ -35,7 +35,6 @@ import lombok.experimental.SuperBuilder;
 public class UrlEntity extends BaseEntity {
     
     private static final long serialVersionUID = 1L;
-
     
     private String url;
 

@@ -42,7 +42,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
     
     @ActionAnnotation(title = "Category", action = "组织查询", description = "query category by org")
     @Operation(summary = "Query Categories by Organization", description = "Retrieve categories for the current organization")
-    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ_ANY_LEVEL)
+    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ)
     @Override
     public ResponseEntity<?> queryByOrg(CategoryRequest request) {
         
@@ -53,7 +53,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
 
     @ActionAnnotation(title = "Category", action = "用户查询", description = "query category by user")
     @Operation(summary = "Query Categories by User", description = "Retrieve categories for the current user")
-    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ_ANY_LEVEL)
+    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ)
     @Override
     public ResponseEntity<?> queryByUser(CategoryRequest request) {
         
@@ -62,9 +62,19 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = "Category", action = "查询详情", description = "query category by uid")
+    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ)
+    @Override
+    public ResponseEntity<?> queryByUid(CategoryRequest request) {
+        
+        CategoryResponse response = categoryRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
     @ActionAnnotation(title = "Category", action = "新建", description = "create category")
     @Operation(summary = "Create Category", description = "Create a new category")
-    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_CREATE_ANY_LEVEL)
+    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_CREATE)
     @Override
     public ResponseEntity<?> create(@RequestBody CategoryRequest request) {
         
@@ -75,7 +85,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
 
     @ActionAnnotation(title = "Category", action = "更新", description = "update category")
     @Operation(summary = "Update Category", description = "Update an existing category")
-    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_UPDATE_ANY_LEVEL)
+    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_UPDATE)
     @Override
     public ResponseEntity<?> update(@RequestBody CategoryRequest request) {
         
@@ -86,7 +96,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
 
     @ActionAnnotation(title = "Category", action = "删除", description = "delete category")
     @Operation(summary = "Delete Category", description = "Delete a category")
-    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_DELETE_ANY_LEVEL)
+    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_DELETE)
     @Override
     public ResponseEntity<?> delete(@RequestBody CategoryRequest request) {
         
@@ -96,7 +106,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
     }
 
     @ActionAnnotation(title = "Category", action = "导出", description = "export category")
-    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_EXPORT_ANY_LEVEL)
+    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_EXPORT)
     @GetMapping("/export")
     @Override
     public Object export(CategoryRequest request, HttpServletResponse response) {
@@ -104,13 +114,6 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @ActionAnnotation(title = "Category", action = "查询详情", description = "query category by uid")
-    @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ_ANY_LEVEL)
-    @Override
-    public ResponseEntity<?> queryByUid(CategoryRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
+    
 
 }

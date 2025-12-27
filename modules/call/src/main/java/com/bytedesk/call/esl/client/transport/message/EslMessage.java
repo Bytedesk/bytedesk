@@ -16,8 +16,7 @@
 package com.bytedesk.call.esl.client.transport.message;
 
 import com.bytedesk.call.esl.client.transport.message.EslHeaders.Name;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,8 +37,8 @@ import java.util.StringJoiner;
  *
  * @see EslHeaders.Name
  */
+@Slf4j
 public class EslMessage {
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private final Map<Name, String> headers = new HashMap<>();
 	private final List<String> body = new ArrayList<>();

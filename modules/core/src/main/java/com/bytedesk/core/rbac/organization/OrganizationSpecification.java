@@ -34,6 +34,11 @@ public class OrganizationSpecification extends BaseSpecification<OrganizationEnt
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+
+            // userUid: 组织创建者/管理员过滤（queryByUser 会自动注入 userUid）
+            if (StringUtils.hasText(request.getUserUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("user").get("uid"), request.getUserUid()));
+            }
             //
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

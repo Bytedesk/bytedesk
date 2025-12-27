@@ -1,0 +1,47 @@
+// 
+// form-control.scss
+// Extended from Bootstrap
+// 
+
+//
+// Additional style for theme
+//
+
+//Input background light
+.bg-light-input {
+  .form-control {
+    background-color: var(--#{$prefix}light) !important;
+    border: 1px solid var(--#{$prefix}light) !important;
+    border-radius: $input-border-radius;
+
+    &:focus {
+      border: 1px solid var(--#{$prefix}primary) !important;
+    }
+  }
+}
+
+// Select form background light
+.bg-light-input .choices .choices__inner{
+  background-color: var(--#{$prefix}light) !important;
+  border:1px solid var(--#{$prefix}light) !important;
+  border-radius: $border-radius !important;
+}
+
+.bg-light-input  .choices[aria-expanded=true] .choices__inner {
+  border:1px solid var(--#{$prefix}primary) !important;
+}
+
+
+// Select form background dark
+.bg-dark-input {
+  .form-control {
+    background-color: rgba(var(--bs-white-rgb), 0.1) !important;
+    border: 1px solid rgba(var(--bs-white-rgb), 0.1) !important;
+    border-radius: $input-border-radius;
+    color: $white;
+
+    &:focus {
+      border: 1px solid rgba(var(--bs-white-rgb), 0.4) !important;
+    }
+  }
+}

@@ -67,7 +67,7 @@ public class Ollama4jChatController {
 
             return ResponseEntity.ok(JsonResult.success(result.getResponse()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         return ResponseEntity.ok(JsonResult.error());
     }
@@ -90,7 +90,7 @@ public class Ollama4jChatController {
             log.info("getSyncAnswerStream result: {}", result);
             return ResponseEntity.ok(JsonResult.success(result.getResponse()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         return ResponseEntity.ok(JsonResult.error());
     }
@@ -213,7 +213,7 @@ public class Ollama4jChatController {
             return ResponseEntity.ok(JsonResult.success(chatResult.toString()));
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
 
         return null;

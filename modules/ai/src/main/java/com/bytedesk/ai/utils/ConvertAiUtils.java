@@ -28,9 +28,9 @@ import com.bytedesk.core.utils.ApplicationContextHolder;
 // import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.kbase.settings.ServiceSettingsEntity;
-import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
+import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
+import com.bytedesk.kbase.settings_service.ServiceSettingsResponseVisitor;
 
 @UtilityClass
 public class ConvertAiUtils {

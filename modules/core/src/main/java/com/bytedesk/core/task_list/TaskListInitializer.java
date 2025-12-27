@@ -28,15 +28,15 @@ public class TaskListInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         task_listRestService.initTaskLists(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = TaskListPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = TaskListPermissions.TASK_LIST_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

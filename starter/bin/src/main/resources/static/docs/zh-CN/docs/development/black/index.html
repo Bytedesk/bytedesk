@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-development/black" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.1">
+<title data-rh="true">黑名单 | Bytedesk</title><meta data-rh="true" http-equiv="Content-Security-Policy" content=" default-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; https://www.weiyuai.cn *.weiyuai.cn cdn.npmmirror.com; style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; https://www.weiyuai.cn *.weiyuai.cn fonts.googleapis.com cdn.npmmirror.com; img-src &#x27;self&#x27; data: https://www.weiyuai.cn *.weiyuai.cn *.npmmirror.com; font-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn fonts.gstatic.com data:; connect-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; frame-src &#x27;self&#x27; https://www.weiyuai.cn *.weiyuai.cn; object-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; form-action &#x27;self&#x27;; "><meta data-rh="true" http-equiv="X-Content-Type-Options" content="nosniff"><meta data-rh="true" http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" property="og:image" content="https://www.weiyuai.cn/docs/zh-CN/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://www.weiyuai.cn/docs/zh-CN/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://www.weiyuai.cn/docs/zh-CN/docs/development/black"><meta data-rh="true" property="og:locale" content="zh_CN"><meta data-rh="true" property="og:locale:alternate" content="en"><meta data-rh="true" property="og:locale:alternate" content="zh_TW"><meta data-rh="true" name="docusaurus_locale" content="zh-CN"><meta data-rh="true" name="docsearch:language" content="zh-CN"><meta data-rh="true" name="keywords" content="bytedesk, 微语, 客服系统, AI客服, 智能客服"><meta data-rh="true" name="og:title" content="Bytedesk微语智能客服系统"><meta data-rh="true" name="og:description" content="微语智能客服系统官方文档，全面介绍系统功能、部署方案及集成指南"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="黑名单 | Bytedesk"><meta data-rh="true" name="description" content="黑名单是微语客服系统的安全防护功能，通过识别和拦截恶意用户，保护客服人员免受骚扰，维护良好的服务环境，提升整体服务质量。"><meta data-rh="true" property="og:description" content="黑名单是微语客服系统的安全防护功能，通过识别和拦截恶意用户，保护客服人员免受骚扰，维护良好的服务环境，提升整体服务质量。"><link data-rh="true" rel="icon" href="/docs/zh-CN/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://www.weiyuai.cn/docs/zh-CN/docs/development/black"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/docs/development/black" hreflang="en"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/zh-CN/docs/development/black" hreflang="zh-CN"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/zh-TW/docs/development/black" hreflang="zh-TW"><link data-rh="true" rel="alternate" href="https://www.weiyuai.cn/docs/docs/development/black" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"开发指南","item":"https://www.weiyuai.cn/docs/zh-CN/docs/category/development"},{"@type":"ListItem","position":2,"name":"黑名单","item":"https://www.weiyuai.cn/docs/zh-CN/docs/development/black"}]}</script><link rel="alternate" type="application/rss+xml" href="/docs/zh-CN/blog/rss.xml" title="Bytedesk RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/docs/zh-CN/blog/atom.xml" title="Bytedesk Atom Feed"><link rel="stylesheet" href="/docs/zh-CN/assets/css/styles.4ec1f2ed.css">
+<script src="/docs/zh-CN/assets/js/runtime~main.43bb8b70.js" defer="defer"></script>
+<script src="/docs/zh-CN/assets/js/main.7937c7c7.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div class="progressContainer_awPh"><div class="progressBar_CB9G" style="width:0%"></div></div><div role="region" aria-label="跳到主要内容"><a class="skipToContent_hDlh" href="#__docusaurus_skipToContent_fallback">跳到主要内容</a></div><nav aria-label="主导航" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="切换导航栏" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/docs/zh-CN/"><div class="navbar__logo"><img src="/docs/zh-CN/img/logo.png" alt="微语 Logo" class="themedComponent_nezP themedComponent--light_FLlG"><img src="/docs/zh-CN/img/logo.png" alt="微语 Logo" class="themedComponent_nezP themedComponent--dark_AjEN"></div><b class="navbar__title text--truncate">微语</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/docs/zh-CN/docs/intro">文档</a><a class="navbar__item navbar__link" href="/docs/zh-CN/blog">博客</a><a class="navbar__item navbar__link" href="/docs/zh-CN/docs/payment">价格</a><a href="https://api.weiyuai.cn/swagger-ui/index.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">SwaggerApis<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/apidocs/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">ApiDocs<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/javadocs/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">JavaDocs<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/architecture.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">架构图<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><div class="navbar__item dropdown dropdown--hoverable"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link">演示体验</a><ul class="dropdown__menu"><li><a href="https://www.weiyuai.cn/admin/" target="_blank" rel="noopener noreferrer" class="dropdown__link">管理后台<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li><a href="https://www.weiyuai.cn/agent/" target="_blank" rel="noopener noreferrer" class="dropdown__link">客服工作台<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li><a href="https://www.weiyuai.cn/reactdemo/" target="_blank" rel="noopener noreferrer" class="dropdown__link">访客端演示<svg width="12" height="12" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><div class="navbar-search-item navbarSearchContainer_S5Qv"><div class="navbar__search searchBarContainer_MFY3" dir="ltr"><input placeholder="搜索" aria-label="Search" class="navbar__search-input searchInput_rL4i" value=""><div class="loadingRing_cMvM searchBarLoadingRing_YKes"><div></div><div></div><div></div><div></div></div></div></div><a href="https://github.com/bytedesk/bytedesk" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><a href="https://www.weiyuai.cn/contact.html" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">联系我们<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_YYhs"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>简体中文</a><ul class="dropdown__menu"><li><a href="/docs/docs/development/black" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="en">English</a></li><li><a href="/docs/zh-CN/docs/development/black" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="zh-CN">简体中文</a></li><li><a href="/docs/zh-TW/docs/development/black" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="zh-TW">繁体中文</a></li></ul></div><div class="toggle_nwaj colorModeToggle_ed4a"><button class="clean-btn toggleButton_XDyZ toggleButtonDisabled_VoN_" type="button" disabled="" title="system mode" aria-label="切换浅色/暗黑模式（当前为system mode）"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv lightToggleIcon_GTAV"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv darkToggleIcon_FEmf"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_UGZv systemToggleIcon_wHAe"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_tuwg"><div class="docsWrapper_nvId"><button aria-label="回到顶部" class="clean-btn theme-back-to-top-button backToTopButton_LwBK" type="button"></button><div class="docRoot_WYpV"><aside class="theme-doc-sidebar-container docSidebarContainer_XCXD"><div class="sidebarViewport_UcBh"><div class="sidebar_jzvq"><nav aria-label="文档侧边栏" class="menu thin-scrollbar menu_RET8"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/intro"><span title="微语协同平台" class="linkLabel_J_DF">微语协同平台</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/user-manual"><span title="使用手册" class="categoryLinkLabel_fMPM">使用手册</span></a><button aria-label="展开侧边栏分类 &#x27;使用手册&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist menu__link--active" href="/docs/zh-CN/docs/category/development"><span title="开发指南" class="categoryLinkLabel_fMPM">开发指南</span></a><button aria-label="折叠侧边栏分类 &#x27;开发指南&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/chat"><span title="访客端" class="linkLabel_J_DF">访客端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/agent"><span title="客服端" class="linkLabel_J_DF">客服端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/admin"><span title="管理端" class="linkLabel_J_DF">管理端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/server"><span title="服务器" class="linkLabel_J_DF">服务器</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/mobile"><span title="手机端" class="linkLabel_J_DF">手机端</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/login"><span title="客服端登录" class="linkLabel_J_DF">客服端登录</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/login_visitor"><span title="访客端登录" class="linkLabel_J_DF">访客端登录</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/user_system"><span title="客服端用户系统对接" class="linkLabel_J_DF">客服端用户系统对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/userinfo"><span title="访客端用户信息对接" class="linkLabel_J_DF">访客端用户信息对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/viplevel"><span title="千人千面" class="linkLabel_J_DF">千人千面</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/order_info"><span title="订单信息" class="linkLabel_J_DF">订单信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/order_select"><span title="订单对接" class="linkLabel_J_DF">订单对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/goodsinfo"><span title="商品信息" class="linkLabel_J_DF">商品信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/saas"><span title="SaaS" class="linkLabel_J_DF">SaaS</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/history"><span title="历史消息" class="linkLabel_J_DF">历史消息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message"><span title="消息结构" class="linkLabel_J_DF">消息结构</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_api"><span title="大模型AI对话" class="linkLabel_J_DF">大模型AI对话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_unread"><span title="客服端未读消息数" class="linkLabel_J_DF">客服端未读消息数</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_unread_visitor"><span title="访客端未读消息数" class="linkLabel_J_DF">访客端未读消息数</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/tts"><span title="文本转语音" class="linkLabel_J_DF">文本转语音</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/asr"><span title="语音识别" class="linkLabel_J_DF">语音识别</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/taboo"><span title="敏感词过滤" class="linkLabel_J_DF">敏感词过滤</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/statistic"><span title="数据统计" class="linkLabel_J_DF">数据统计</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/transfer"><span title="客服端转接会话" class="linkLabel_J_DF">客服端转接会话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/transfer_bot"><span title="机器人转人工" class="linkLabel_J_DF">机器人转人工</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/invite"><span title="客服端邀请会话" class="linkLabel_J_DF">客服端邀请会话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/invite_visitor"><span title="访客端邀请对话框" class="linkLabel_J_DF">访客端邀请对话框</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/rating"><span title="满意度评价" class="linkLabel_J_DF">满意度评价</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/qualitycheck"><span title="智能质检" class="linkLabel_J_DF">智能质检</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/autoreply"><span title="自动回复" class="linkLabel_J_DF">自动回复</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/zh-CN/docs/development/black"><span title="黑名单" class="linkLabel_J_DF">黑名单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/translate"><span title="消息翻译" class="linkLabel_J_DF">消息翻译</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/queue"><span title="排队逻辑" class="linkLabel_J_DF">排队逻辑</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/routing"><span title="路由分配" class="linkLabel_J_DF">路由分配</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/message_leave"><span title="留言处理" class="linkLabel_J_DF">留言处理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/license"><span title="License" class="linkLabel_J_DF">License</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sso"><span title="单点登录SSO" class="linkLabel_J_DF">单点登录SSO</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/token"><span title="Token" class="linkLabel_J_DF">Token</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/webhook"><span title="Webhook" class="linkLabel_J_DF">Webhook</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase"><span title="知识库-实现原理" class="linkLabel_J_DF">知识库-实现原理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_faq"><span title="知识库-常见问题FAQ" class="linkLabel_J_DF">知识库-常见问题FAQ</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_feishu"><span title="知识库-飞书文档对接" class="linkLabel_J_DF">知识库-飞书文档对接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_file"><span title="知识库-文件上传" class="linkLabel_J_DF">知识库-文件上传</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_text"><span title="知识库-文本录入" class="linkLabel_J_DF">知识库-文本录入</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_webpage"><span title="知识库-网页抓取" class="linkLabel_J_DF">知识库-网页抓取</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/kbase_website"><span title="知识库-网站整站抓取" class="linkLabel_J_DF">知识库-网站整站抓取</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/thread"><span title="会话管理" class="linkLabel_J_DF">会话管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/thread_api"><span title="Thread Api" class="linkLabel_J_DF">Thread Api</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ticket"><span title="客服端工单" class="linkLabel_J_DF">客服端工单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ticket_visitor"><span title="访客端工单" class="linkLabel_J_DF">访客端工单</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/offline"><span title="离线" class="linkLabel_J_DF">离线</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/robot"><span title="机器人" class="linkLabel_J_DF">机器人</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/i18n"><span title="国际化" class="linkLabel_J_DF">国际化</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/fileupload"><span title="文件上传" class="linkLabel_J_DF">文件上传</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/mqtt"><span title="客服端长连接" class="linkLabel_J_DF">客服端长连接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/stomp"><span title="访客端长连接" class="linkLabel_J_DF">访客端长连接</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/assistant"><span title="客服助手" class="linkLabel_J_DF">客服助手</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/grpc"><span title="gRPC" class="linkLabel_J_DF">gRPC</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/screen"><span title="客服大屏" class="linkLabel_J_DF">客服大屏</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/ip"><span title="IP管理" class="linkLabel_J_DF">IP管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_audio"><span title="语音通话" class="linkLabel_J_DF">语音通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_call"><span title="电话通话" class="linkLabel_J_DF">电话通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sip_video"><span title="视频通话" class="linkLabel_J_DF">视频通话</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/sensitive"><span title="敏感信息" class="linkLabel_J_DF">敏感信息</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/crm"><span title="客户管理" class="linkLabel_J_DF">客户管理</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/zh-CN/docs/development/summary"><span title="会话小结" class="linkLabel_J_DF">会话小结</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/private-deployment"><span title="私有部署" class="categoryLinkLabel_fMPM">私有部署</span></a><button aria-label="展开侧边栏分类 &#x27;私有部署&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/llm-provider"><span title="大模型对接" class="categoryLinkLabel_fMPM">大模型对接</span></a><button aria-label="展开侧边栏分类 &#x27;大模型对接&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/solutions"><span title="解决方案" class="categoryLinkLabel_fMPM">解决方案</span></a><button aria-label="展开侧边栏分类 &#x27;解决方案&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/channel"><span title="渠道对接" class="categoryLinkLabel_fMPM">渠道对接</span></a><button aria-label="展开侧边栏分类 &#x27;渠道对接&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/compare"><span title="同业对比" class="categoryLinkLabel_fMPM">同业对比</span></a><button aria-label="展开侧边栏分类 &#x27;同业对比&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/modules"><span title="功能模块" class="categoryLinkLabel_fMPM">功能模块</span></a><button aria-label="展开侧边栏 分类 &#x27;功能模块&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/plugins"><span title="插件扩展" class="categoryLinkLabel_fMPM">插件扩展</span></a><button aria-label="展开侧边栏分类 &#x27;插件扩展&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_aJVM menu__link menu__link--sublist" href="/docs/zh-CN/docs/category/performance"><span title="性能测试" class="categoryLinkLabel_fMPM">性能测试</span></a><button aria-label="展开侧边栏分类 &#x27;性能测试&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/faq"><span title="常见问题" class="linkLabel_J_DF">常见问题</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/payment"><span title="费用相关" class="linkLabel_J_DF">费用相关</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/zh-CN/docs/xinchuang"><span title="等保信创" class="linkLabel_J_DF">等保信创</span></a></li></ul></nav><button type="button" title="收起侧边栏" aria-label="收起侧边栏" class="button button--secondary button--outline collapseSidebarButton_wLbt"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_v1u3"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></div></aside><main class="docMainContainer_BpG3"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_C0ya"><div class="docItemContainer_Pevi"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_GkpC" aria-label="页面路径"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="主页面" class="breadcrumbs__link" href="/docs/zh-CN/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_riqW"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/docs/zh-CN/docs/category/development"><span>开发指南</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">黑名单</span></li></ul></nav><div class="tocCollapsible_eHMb theme-doc-toc-mobile tocMobile_maSG"><button type="button" class="clean-btn tocCollapsibleButton_CW2T">本页总览</button></div><div class="theme-doc-markdown markdown"><div class="row"><div class="col col--12 markdown"><header><h1>黑名单</h1></header>
+<p>黑名单是微语客服系统的安全防护功能，通过识别和拦截恶意用户，保护客服人员免受骚扰，维护良好的服务环境，提升整体服务质量。</p>
+<div class="theme-admonition theme-admonition-info admonition_LRQD alert alert--info"><div class="admonitionHeading_BUzK"><span class="admonitionIcon_xl5e"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>相关文档</div><div class="admonitionContent_Iox6"><ul>
+<li><a href="/docs/zh-CN/docs/development/taboo">敏感词过滤</a>：内容安全过滤</li>
+<li><a href="/docs/zh-CN/docs/development/thread">会话管理</a>：会话基础功能</li>
+<li><a href="/docs/zh-CN/docs/development/agent">客服管理</a>：客服人员管理</li>
+</ul></div></div>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="功能概述">功能概述<a href="#功能概述" class="hash-link" aria-label="功能概述的直接链接" title="功能概述的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="核心价值">核心价值<a href="#核心价值" class="hash-link" aria-label="核心价值的直接链接" title="核心价值的直接链接" translate="no">​</a></h3>
+<ol>
+<li>
+<p><strong>保护客服人员</strong></p>
+<ul>
+<li>避免客服受到恶意骚扰和攻击</li>
+<li>减少不必要的情绪压力</li>
+<li>提升工作环境的安全性</li>
+</ul>
+</li>
+<li>
+<p><strong>提升服务效率</strong></p>
+<ul>
+<li>过滤无效和恶意咨询</li>
+<li>节省客服时间和精力</li>
+<li>专注于真正需要帮助的客户</li>
+</ul>
+</li>
+<li>
+<p><strong>维护平台秩序</strong></p>
+<ul>
+<li>建立良好的沟通环境</li>
+<li>防范各类违规行为</li>
+<li>保护其他正常用户的权益</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="适用场景">适用场景<a href="#适用场景" class="hash-link" aria-label="适用场景的直接链接" title="适用场景的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-恶意骚扰防  护">1. 恶意骚扰防护<a href="#1-恶意骚扰防护" class="hash-link" aria-label="1. 恶意骚扰防护的直接链接" title="1. 恶意骚扰防护的直接链接" translate="no">​</a></h4>
+<p><strong>场景描述</strong>：</p>
+<ul>
+<li>用户反复发送无意义消息</li>
+<li>使用辱骂或威胁性语言</li>
+<li>持续进行无效咨询</li>
+</ul>
+<p><strong>防护效果</strong>：</p>
+<ul>
+<li>自动识别和拦截骚扰行为</li>
+<li>保护客服人员心理健康</li>
+<li>维护专业服务形象</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-垃圾信息过滤">2. 垃圾信息过滤<a href="#2-垃圾信息过滤" class="hash-link" aria-label="2. 垃圾信息过滤的直接链接" title="2. 垃圾信息过滤的直接链接" translate="no">​</a></h4>
+<p><strong>场景描述</strong>：</p>
+<ul>
+<li>发送垃圾广告信息</li>
+<li>传播不当内容链接</li>
+<li>进行恶意营销推广</li>
+</ul>
+<p><strong>防护效果</strong>：</p>
+<ul>
+<li>有效过滤垃圾信息</li>
+<li>减少客服处理负担</li>
+<li>保持咨询渠道纯净</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="3-违规行为管控">3. 违规行为管控<a href="#3-违规行为管控" class="hash-link" aria-label="3. 违规行为管控的直接链接" title="3. 违规行为管控的直接链接" translate="no">​</a></h4>
+<p><strong>场景描述</strong>：</p>
+<ul>
+<li>违反平台使用规则</li>
+<li>进行欺诈或诈骗行为</li>
+<li>恶意刷单或套利行为</li>
+</ul>
+<p><strong>防护效果</strong>：</p>
+<ul>
+<li>及时阻止违规行为</li>
+<li>保护平台和用户利益</li>
+<li>维护公平竞争环境</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="黑名单类型">黑名单类型<a href="#黑名单类型" class="hash-link" aria-label="黑名单类型的直接链接" title="黑名单类型的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="按识别方式分类">按识别方式分类<a href="#按识别方  式分类" class="hash-link" aria-label="按识别方式分类的直接链接" title="按识别方式分类的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-用户黑名单">1. 用户黑名单<a href="#1-用户黑名单" class="hash-link" aria-label="1. 用户黑名单的直接链接" title="1. 用户黑名单的直接链接" translate="no">​</a></h4>
+<p><strong>识别标识</strong>：</p>
+<ul>
+<li><strong>用户ID</strong>：系统内部唯一用户标识</li>
+<li><strong>手机号</strong>：用户注册或验证的手机号码</li>
+<li><strong>邮箱地址</strong>：用户绑定的邮箱账号</li>
+<li><strong>设备标识</strong>：设备MAC地址、IMEI等硬件标识</li>
+</ul>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>明确的恶意用户账户</li>
+<li>需要精准拦截的特定用户</li>
+<li>跨平台的用户行为管控</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-ip地址黑名单">2. IP地址黑名单<a href="#2-ip地址黑名单" class="hash-link" aria-label="2. IP地址黑名单的直接链接" title="2. IP地址黑名单的直接链接" translate="no">​</a></h4>
+<p><strong>识别范围</strong>：</p>
+<ul>
+<li><strong>单个IP</strong>：针对特定IP地址的精确拦截</li>
+<li><strong>IP段</strong>：针对某个网段的批量拦截</li>
+<li><strong>地理区域</strong>：基于地理位置的区域性拦截</li>
+<li><strong>代理检测</strong>：识别和拦截代理服务器访问</li>
+</ul>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>来自特定地区的恶意攻击</li>
+<li>批量注册的虚假账户</li>
+<li>使用代理进行的异常行为</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="3-关键词黑名单">3. 关键词黑名单<a href="#3-关键词黑名单" class="hash-link" aria-label="3. 关键词黑名单的直接链接" title="3. 关键词黑名单的直接链接" translate="no">​</a></h4>
+<p><strong>匹配类型</strong>：</p>
+<ul>
+<li><strong>精确匹配</strong>  ：完全相同的词汇或短语</li>
+<li><strong>模糊匹配</strong>：包含特定关键词的内容</li>
+<li><strong>正则表达式</strong>：复杂模式的灵活匹配</li>
+<li><strong>语义识别</strong>：基于语义理解的智能识别</li>
+</ul>
+<p><strong>内容类别</strong>：</p>
+<ul>
+<li>辱骂和攻击性语言</li>
+<li>垃圾广告关键词</li>
+<li>违法违规内容词汇</li>
+<li>平台禁止的特定用词</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="按管理方式分类">按管理方式分类<a href="#按管理方式分类" class="hash-link" aria-label="按管理方式分类的直接链接" title="按管理方式分类的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-自动黑名单">1. 自动黑名单<a href="#1-自动黑名单" class="hash-link" aria-label="1. 自动黑名单的直接链接" title="1. 自动黑名单的直接链接" translate="no">​</a></h4>
+<p><strong>触发机制</strong>：</p>
+<ul>
+<li><strong>行为检测</strong>：基于用户行为模式自动识别</li>
+<li><strong>频率监控</strong>：超过阈值的异常行为自动拦截</li>
+<li><strong>内容分析</strong>：智能分析消息内容自动判断</li>
+<li><strong>关联分析</strong>：基于关联账户的批量识别</li>
+</ul>
+<p><strong>自动规则</strong>：</p>
+<ul>
+<li>短时间内大量发送消息</li>
+<li>重复发送相同或相似内容</li>
+<li>使用大量违禁词汇</li>
+<li>多账户关联的异常行为</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-手动黑名单">2. 手动黑名单<a href="#2-手动黑名单" class="hash-link" aria-label="2. 手动黑名单的直接链接" title="2. 手动黑名单的直接链接" translate="no">​</a></h4>
+<p><strong>添加方式</strong>：</p>
+<ul>
+<li><strong>客服举报</strong>：客服人员主动举报恶意用户</li>
+<li><strong>管理员添加</strong>：管理员基于投诉或审查添加</li>
+<li><strong>批量导入</strong>：通过文件 批量导入黑名单</li>
+<li><strong>API接口</strong>：通过系统接口程序化添加</li>
+</ul>
+<p><strong>审核流程</strong>：</p>
+<ul>
+<li>举报信息收集和整理</li>
+<li>证据材料的保存和审查</li>
+<li>多级审核确认机制</li>
+<li>决定执行和记录归档</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="拦截策略">拦截策略<a href="#拦截策略" class="hash-link" aria-label="拦截策略的直接链接" title="拦截策略的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="拦截级别">拦截级别<a href="#拦截级别" class="hash-link" aria-label="拦截级别的直接链接" title="拦截级别的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-完全拦截">1. 完全拦截<a href="#1-完全拦截" class="hash-link" aria-label="1. 完全拦截的直接链接" title="1. 完全拦截的直接链接" translate="no">​</a></h4>
+<p><strong>拦截效果</strong>：</p>
+<ul>
+<li>禁止发起任何形式的会话</li>
+<li>阻止发送任何消息内容</li>
+<li>无法访问客服相关功能</li>
+<li>显示明确的拦截提示信息</li>
+</ul>
+<p><strong>适用对象</strong>：</p>
+<ul>
+<li>严重违规的恶意用户</li>
+<li>多次违规且屡教不改的用户</li>
+<li>涉及违法犯罪的危险用户</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-限制拦截">2. 限制拦截<a href="#2-限制拦截" class="hash-link" aria-label="2. 限制拦截的直接链接" title="2. 限制拦截的直接链接" translate="no">​</a></h4>
+<p><strong>限制内容</strong>：</p>
+<ul>
+<li><strong>消息频率限制</strong>：限制单位时间内发送消息数量</li>
+<li><strong>功能权限限制</strong>：禁用特定功能如文件传输</li>
+<li><strong>时段访问限制</strong>：仅在特定时间段允许访问</li>
+<li><strong>人工审核</strong>：所有消息需经过人工审核</li>
+</ul>
+<p><strong>适用对象</strong>：</p>
+<ul>
+<li>轻 微违规的一般用户</li>
+<li>首次违规的新用户</li>
+<li>需要观察期的可疑用户</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="3-静默拦截">3. 静默拦截<a href="#3-静默拦截" class="hash-link" aria-label="3. 静默拦截的直接链接" title="3. 静默拦截的直接链接" translate="no">​</a></h4>
+<p><strong>拦截特点</strong>：</p>
+<ul>
+<li>用户感觉正常发送消息</li>
+<li>实际消息不会到达客服</li>
+<li>可能收到自动回复</li>
+<li>避免激化矛盾冲突</li>
+</ul>
+<p><strong>适用场景</strong>：</p>
+<ul>
+<li>避免恶意用户察觉被拦截</li>
+<li>减少用户情绪激化</li>
+<li>逐步引导用户离开平台</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="拦截提示">拦截提示<a href="#拦截提示" class="hash-link" aria-label="拦截提示的直接链接" title="拦截提示的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-明确提示">1. 明确提示<a href="#1-明确提示" class="hash-link" aria-label="1. 明确提示的直接链接" title="1. 明确提示的直接链接" translate="no">​</a></h4>
+<p><strong>提示内容</strong>：</p>
+<ul>
+<li>清楚说明拦截原因</li>
+<li>提供申诉渠道和方式</li>
+<li>告知可能的解除条件</li>
+<li>给出相关政策链接</li>
+</ul>
+<p><strong>提示示例</strong>：</p>
+<blockquote>
+<p>很抱歉，您的账户因违反平台使用规则已被限制使用客服功能。</p>
+<p>限制原因：发送不当内容<br>
+<!-- -->如有异议，请通过邮件 <a href="mailto:appeal@company.com" target="_blank" rel="noopener noreferrer">appeal@company.com</a> 申请复审<br>
+<!-- -->详细规则请查看：[用户服务协议]</p>
+</blockquote>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-温和提示">2. 温和提示<a href="#2-温和提示" class="hash-link" aria-label="2. 温和提示的直接链接" title="2. 温和提示的直接链接" translate="no">​</a></h4>
+<p><strong>提示特点</strong>：</p>
+<ul>
+<li>使用较为委婉的表达</li>
+<li>不直接说明拦截原因</li>
+<li>提供其他解决方案</li>
+<li>避免激发用户不满</li>
+</ul>
+<p><strong>提示示例</strong>：</p>
+<blockquote>
+<p>当前咨询量较大，建议您：</p>
+<ul>
+<li>查看帮助文档获取答案</li>
+<li>稍后再次尝试联系客服</li>
+<li>通过其他渠道获取帮助</li>
+</ul>
+</blockquote>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="3-无提示">3. 无提示<a href="#3-无提示" class="hash-link" aria-label="3. 无提示的直接链接" title="3. 无提示的直接链接" translate="no">​</a></h4>
+<p><strong>使用场景</strong>：</p>
+<ul>
+<li>静默拦截策略</li>
+<li>避免用户察觉</li>
+<li>特殊安全考虑</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="管理功能">管理功能<a href="#管理功能" class="hash-link" aria-label="管理功能的直接链接" title="管理功能的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="黑名单维护">黑名单维护<a href="#黑名单维护" class="hash-link" aria-label="黑名单维护的直接链接" title="黑名单维护的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-添加管理">1. 添加管理<a href="#1-添加管理" class="hash-link" aria-label="1. 添加管理的直接链接" title="1. 添加管理的直接链接" translate="no">​</a></h4>
+<p><strong>添加方式</strong>：</p>
+<ul>
+<li><strong>单个添加</strong>：手动输入用户信息添加</li>
+<li><strong>批量添加</strong>：通过Excel文件批量导入</li>
+<li><strong>规则添加</strong>：基于特定规则自动添加</li>
+<li><strong>关联添加</strong>：基于关联关系批量添加</li>
+</ul>
+<p><strong>必填信息</strong>：</p>
+<ul>
+<li>黑名单标识（用户ID、手机号等）</li>
+<li>添加原因和详细说明</li>
+<li>拦截级别和策略设置</li>
+<li>有效期限和审核状态</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-查询检索">2. 查询检索<a href="#2-查询检索" class="hash-link" aria-label="2. 查询检索的直接链接" title="2. 查询检索的直接链接" translate="no">​</a></h4>
+<p><strong>检索条件</strong>：</p>
+<ul>
+<li><strong>基础信息</strong>：用户ID、手机号、邮箱</li>
+<li><strong>时间范围</strong>：添加时间、生效时间、到期时间</li>
+<li><strong>状态筛选</strong>：生效中、已到期、已解除</li>
+<li><strong>来源分类</strong>：手动添加、自动识别、批量导入</li>
+</ul>
+<p><strong>检索功能</strong>：</p>
+<ul>
+<li>支持模糊搜索和精确匹配</li>
+<li>多条件组合查询</li>
+<li>结果排序和分页显示</li>
+<li>快速筛选和高级过滤</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="3-编辑修改">3. 编辑修改<a href="#3-编辑修改" class="hash-link" aria-label="3. 编辑修改的直接链接" title="3. 编辑修改的直接链接" translate="no">​</a></h4>
+<p><strong>可修改内容</strong>：</p>
+<ul>
+<li>拦截级别和策略调整</li>
+<li>有效期限的延长或缩短</li>
+<li>备注信息的补充更新</li>
+<li>关联信息的添加删除</li>
+</ul>
+<p><strong>权限控制</strong>：</p>
+<ul>
+<li>不同角色的编辑权限</li>
+<li>重要修改需要审批</li>
+<li>修改历史的完整记录</li>
+<li>敏感操作的二次确认</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="4-删除解除">4. 删除解除<a href="#4-删除解除" class="hash-link" aria-label="4. 删除解除的直接链接" title="4. 删除解除的直接链接" translate="no">​</a></h4>
+<p><strong>解除方式</strong>：</p>
+<ul>
+<li><strong>手动解除</strong>：管理员主动删除</li>
+<li><strong>自动到期</strong>：达到有效期自动解除</li>
+<li><strong>申诉成功</strong>：通过申诉流程解除</li>
+<li><strong>批量清理</strong>：定期批量清理过期记录</li>
+</ul>
+<p><strong>解除条件</strong>：</p>
+<ul>
+<li>违规行为已得到改正</li>
+<li>处罚期限已满</li>
+<li>申诉理由充分合理</li>
+<li>特殊情况的人工审批</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="申诉处理">申诉处理<a href="#申诉处理" class="hash-link" aria-label="申诉处理的直接链接" title="申诉处理的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-申诉渠道">1. 申诉渠道<a href="#1-申诉渠道" class="hash-link" aria-label="1. 申诉渠道的直接链接" title="1. 申诉渠道的直接链接" translate="no">​</a></h4>
+<p><strong>申诉方式</strong>：</p>
+<ul>
+<li><strong>表单问卷</strong>：网站或APP内的申诉表单</li>
+<li><strong>邮件申诉</strong>：发送邮件到指定申诉邮箱</li>
+<li><strong>电话申诉</strong>：拨打客服热线进行申诉</li>
+<li><strong>线下申诉</strong>：通过线下渠道提交申诉材料</li>
+</ul>
+<p><strong>申诉信息</strong>：</p>
+<ul>
+<li>用户基本信息和联系方式</li>
+<li>被拉黑的具体时间和原因</li>
+<li>申诉理由和相关证据</li>
+<li>期望的处理结果</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-申诉流程">2. 申诉流程<a href="#2-申诉流程" class="hash-link" aria-label="2. 申诉流程的直接链接" title="2. 申诉流程的直接链接" translate="no">​</a></h4>
+<p><strong>处理步骤</strong>：</p>
+<ol>
+<li><strong>申诉受理</strong>：收到申诉后确认并登记</li>
+<li><strong>初步审查</strong>：核实申诉信息的真实性</li>
+<li><strong>深入调查</strong>：调取相关记录和证据</li>
+<li><strong>集体评议</strong>：多人参与的申诉评议</li>
+<li><strong>结果反馈</strong>：将处理结果及时告知用户</li>
+</ol>
+<p><strong>时效要求</strong>：</p>
+<ul>
+<li>申诉受理：24小时内</li>
+<li>初步审查：3个工作日内</li>
+<li>深入调查：7个工作日内</li>
+<li>最终结果：10个工作日内</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="3-结果处理">3.  结果处理<a href="#3-结果处理" class="hash-link" aria-label="3. 结果处理的直接链接" title="3. 结果处理的直接链接" translate="no">​</a></h4>
+<p><strong>处理结果</strong>：</p>
+<ul>
+<li><strong>申诉成功</strong>：解除黑名单并道歉</li>
+<li><strong>申诉失败</strong>：维持原决定并说明理由</li>
+<li><strong>部分接受</strong>：调整拦截级别或期限</li>
+<li><strong>需要补充</strong>：要求提供更多证据材料</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="统计分析">统计分析<a href="#统计分析" class="hash-link" aria-label="统计分析的直接链接" title="统计分析的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-数据统计">1. 数据统计<a href="#1-数据统计" class="hash-link" aria-label="1. 数据统计的直接链接" title="1. 数据统计的直接链接" translate="no">​</a></h4>
+<p><strong>统计维度</strong>：</p>
+<ul>
+<li><strong>数量统计</strong>：总数、新增、解除、有效数量</li>
+<li><strong>类型分布</strong>：按拦截类型、来源方式统计</li>
+<li><strong>时间趋势</strong>：按日、周、月的变化趋势</li>
+<li><strong>效果评估</strong>：拦截成功率、误判率等</li>
+</ul>
+<p><strong>统计报表</strong>：</p>
+<ul>
+<li>日报：每日黑名单变化情况</li>
+<li>周报：每周拦截效果总结</li>
+<li>月报：每月数据分析和趋势</li>
+<li>年报：年度安全防护总结</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-效果分析">2. 效果分析<a href="#2-效果分析" class="hash-link" aria-label="2. 效果分析的直接链接" title="2. 效果分析的直接链接" translate="no">​</a></h4>
+<p><strong>分析指标</strong>：</p>
+<ul>
+<li><strong>拦截效果</strong>：成功拦截的恶意行为数量</li>
+<li><strong>误判率</strong>：错误拦截正常用户的比例</li>
+<li><strong>申诉成功率</strong>：申诉成功的案例比例</li>
+<li><strong>系统稳定性</strong>：黑名单系统的运行稳定性</li>
+</ul>
+<p><strong>优化建议</strong>：</p>
+<ul>
+<li>基于数据分析的规则优化</li>
+<li>误判案例的原因分析和改进</li>
+<li>拦截策略的效果评估和调整</li>
+<li>系统性能的监控和优化</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="技术实现">技术实现<a href="#技术实现" class="hash-link" aria-label="技术实现的直接链接" title="技术实现的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="识别算法">识别算法<a href="#识别算法" class="hash-link" aria-label="识别算法的直接链接" title="识别算法的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-行为分析">1. 行为分析<a href="#1-行为分析" class="hash-link" aria-label="1. 行为分析的直接链接" title="1. 行为分析的直接链接" translate="no">​</a></h4>
+<p><strong>分析维度</strong>：</p>
+<ul>
+<li><strong>消息频率</strong>：单位时间内消息发送频率</li>
+<li><strong>内容重复度</strong>：消息内容的重复程度</li>
+<li><strong>会话模式</strong>：会话的开始、进行、结束模式</li>
+<li><strong>时间规律</strong>：活动时间的规律性分析</li>
+</ul>
+<p><strong>异常检测</strong>：</p>
+<ul>
+<li>基于统计模型的异常检测</li>
+<li>机器学习的行为模式识别</li>
+<li>规则引擎的多维度判断</li>
+<li>实时监控的快速响应</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-内容识别">2. 内容识别<a href="#2-内容识别" class="hash-link" aria-label="2. 内容识别的直接链接" title="2. 内容识别的直接链接" translate="no">​</a></h4>
+<p><strong>识别技术</strong>：</p>
+<ul>
+<li><strong>关键词匹配</strong>：基于词典的快速匹配</li>
+<li><strong>语义分析</strong>：基于自然语言处理的语义理解</li>
+<li><strong>情感分析</strong>：识别消息的情  感倾向</li>
+<li><strong>图像识别</strong>：对图片内容的智能识别</li>
+</ul>
+<p><strong>识别精度</strong>：</p>
+<ul>
+<li>多种技术的组合使用</li>
+<li>机器学习模型的持续训练</li>
+<li>人工标注数据的质量保证</li>
+<li>错误反馈的快速修正</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="存储设计">存储设计<a href="#存储设计" class="hash-link" aria-label="存储设计的直接链接" title="存储设计的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-数据结构">1. 数据结构<a href="#1-数据结构" class="hash-link" aria-label="1. 数据结构的直接链接" title="1. 数据结构的直接链接" translate="no">​</a></h4>
+<p><strong>黑名单记录</strong>：</p>
+<div class="language-json codeBlockContainer_u6CE theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_V9BA"><pre tabindex="0" class="prism-code language-json codeBlock_snH3 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_Trvh"><span class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;id&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;唯一标识&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;type&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;类型（用户/IP/ 关键词）&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;identifier&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;标识符&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;level&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;拦截级别&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;reason&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;添加原因&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;evidence&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;证据材料&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;create_time&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;创建时间&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;expire_time&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;到期时间&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;status&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;状态&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;operator&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;操作员&quot;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre></div></div>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-索引优化">2. 索引优化<a href="#2-索引优化" class="hash-link" aria-label="2. 索引优化的直接链接" title="2. 索引优化的直接链接" translate="no">​</a></h4>
+<p><strong>查询优化</strong>：</p>
+<ul>
+<li>标识符的唯一索引</li>
+<li>时间范围的  复合索引</li>
+<li>状态字段的筛选索引</li>
+<li>全文搜索的倒排索引</li>
+</ul>
+<p><strong>性能保证</strong>：</p>
+<ul>
+<li>分库分表的水平扩展</li>
+<li>缓存机制的查询加速</li>
+<li>异步处理的响应优化</li>
+<li>定期清理的存储优化</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="最佳实践">最佳实践<a href="#最佳实践" class="hash-link" aria-label="最佳实践的直接链接" title="最佳实践的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="管理策略">管理策略<a href="#管理策略" class="hash-link" aria-label="管理策略的直接链接" title="管理策略的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="do---推荐做法">DO - 推荐做法<a href="#do---推荐做法" class="hash-link" aria-label="DO - 推荐做法的直接链接" title="DO - 推荐做法的直接链接" translate="no">​</a></h4>
+<p><strong>准确识别恶意行为</strong>：</p>
+<ul>
+<li>建立清晰的违规行为定义</li>
+<li>收集充分的证据材料</li>
+<li>多维度分析用户行为</li>
+<li>避免主观判断的偏差</li>
+</ul>
+<p><strong>公平透明的处理流程</strong>：</p>
+<ul>
+<li>制定明确的处理标准</li>
+<li>提供完善的申诉渠道</li>
+<li>保证处理流程的透明度</li>
+<li>及时反馈处理结果</li>
+</ul>
+<p><strong>持续优化拦截策略</strong>：</p>
+<ul>
+<li>定期分析拦截效果</li>
+<li>根据新情况调整规则</li>
+<li>平衡安全性和用户体验</li>
+<li>学习行业最佳实践</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="dont---避免的问题">DON&#x27;T - 避免的问题<a href="#dont---避免的问题" class="hash-link" aria-label="DON&#x27;T - 避免的问题的直接链接" title="DON&#x27;T - 避免的问题的直接链接" translate="no">​</a></h4>
+<p><strong>避免过度拦截</strong>：</p>
+<ul>
+<li>不要设置过于严格的规则</li>
+<li>避免批量误判正常 用户</li>
+<li>不要忽视用户的合理申诉</li>
+<li>避免一刀切的处理方式</li>
+</ul>
+<p><strong>避免处理不当</strong>：</p>
+<ul>
+<li>不要延迟处理用户申诉</li>
+<li>避免缺乏证据的随意拉黑</li>
+<li>不要忽视系统的技术问题</li>
+<li>避免客服人员的主观偏见</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="用户体验">用户体验<a href="#用户体验" class="hash-link" aria-label="用户体验的直接链接" title="用户体验的直接链接" translate="no">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="1-友好的提示信息">1. 友好的提示信息<a href="#1-友好的提示信息" class="hash-link" aria-label="1. 友好的提示信息的直接链接" title="1. 友好的提示信息的直接链接" translate="no">​</a></h4>
+<p><strong>提示原则</strong>：</p>
+<ul>
+<li>使用礼貌和专业的语言</li>
+<li>清楚说明限制的原因</li>
+<li>提供明确的解决方案</li>
+<li>避免激化用户情绪</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="2-便捷的申诉流程">2. 便捷的申诉流程<a href="#2-便捷的申诉流程" class="hash-link" aria-label="2. 便捷的申诉流程的直接链接" title="2. 便捷的申诉流程的直接链接" translate="no">​</a></h4>
+<p><strong>流程优化</strong>：</p>
+<ul>
+<li>简化申诉的操作步骤</li>
+<li>提供多种申诉方式选择</li>
+<li>及时反馈申诉处理进度</li>
+<li>确保申诉结果的公正性</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_jrcE" id="3-差异化的处理策略">3. 差异化的处理策略<a href="#3-差异化的处理策略" class="hash-link" aria-label="3. 差异化的处理策略的直接链接" title="3. 差异化的处理策略的直接链接" translate="no">​</a></h4>
+<p><strong>策略设计</strong>：</p>
+<ul>
+<li>区分恶意程度采用不同策略</li>
+<li>考虑用户历史行为记录</li>
+<li>提供改正机会和引导</li>
+<li>平衡惩罚和教育的效果</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_jrcE" id="常见问题">常见问题<a href="#常见问题" class="hash-link" aria-label="常见问题的直接链接" title="常见问题的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-如何避免误判正常用户">Q: 如何避免误判正常用户？<a href="#q-如何避免误判正常用户" class="hash-link" aria-label="Q: 如何避免误判正常用户？的直接链接" title="Q: 如何避免误判正常用户？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 误判防范策略：</p>
+<ol>
+<li><strong>多维度验证</strong>：结合行为、内容、时间等多个维度判断</li>
+<li><strong>人工复核</strong>：对系统自动识别的结果进行人工审查</li>
+<li><strong>白名单保护</strong>：为VIP客户和重要用户设置白名单</li>
+<li><strong>阈值调优</strong>：根据实际情况调整识别阈值</li>
+<li><strong>快速申诉</strong>：提供便捷的申诉通道和快速处理机制</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-黑名单的有效期应该如何设置">Q: 黑名单的有效期应该如何设置？<a href="#q-黑名单的有效期应该如何设置" class="hash-link" aria-label="Q: 黑名单的有效期应该如何设置？的直接链接" title="Q: 黑名单的有效期应该如何设置？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 有效期设置建议：</p>
+<ol>
+<li><strong>按违规程度</strong>：轻微违规1-7天，严重违规30-365天</li>
+<li><strong>按违规类型</strong>：垃圾信息短期，恶意攻击长期</li>
+<li><strong>按用户历史</strong>：首次违规从轻，累犯从重</li>
+<li><strong>可调整原则</strong>：支持根据申诉和表现调整期限</li>
+<li><strong>自动清理</strong>：到期自动解除，避免永久限制</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-如何处理用户的申诉">Q: 如何处理用户的申诉？<a href="#q-如何处理用  户的申诉" class="hash-link" aria-label="Q: 如何处理用户的申诉？的直接链接" title="Q: 如何处理用户的申诉？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 申诉处理流程：</p>
+<ol>
+<li><strong>及时受理</strong>：在24小时内确认收到申诉</li>
+<li><strong>客观调查</strong>：基于事实和证据进行调查</li>
+<li><strong>公正判断</strong>：多人参与确保判断的公正性</li>
+<li><strong>及时反馈</strong>：在规定时间内反馈处理结果</li>
+<li><strong>跟踪服务</strong>：持续关注用户的后续表现</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-黑名单系统如何与其他安全系统配合">Q: 黑名单系统如何与其他安全系统配合？<a href="#q-黑名单系统如何与其他安全系统配合" class="hash-link" aria-label="Q: 黑名单系统如何与其他安全系统配合？的直接链接" title="Q: 黑名单系统如何与其他安全系统配合？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 系统协同方案：</p>
+<ol>
+<li><strong>数据共享</strong>：与风控、反欺诈等系统共享黑名单数据</li>
+<li><strong>联动拦截</strong>：多系统协同实现全方位拦截</li>
+<li><strong>统一管理</strong>：建立统一的安全管理平台</li>
+<li><strong>信息同步</strong>：实时同步拦截状态和处理结果</li>
+<li><strong>策略协调</strong>：确保各系统策略的一致性和协调性</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_jrcE" id="q-如何评估黑名单系统的效果">Q: 如何评估黑名单系统的效果？<a href="#q-如何评估黑名单系统的效果" class="hash-link" aria-label="Q: 如何评估黑名单系统的效果？的直接链接" title="Q: 如何评估黑名单系统的效果？的直接链接" translate="no">​</a></h3>
+<p><strong>A</strong>: 效果评估指标：</p>
+<ol>
+<li><strong>拦截准确率</strong>：正确识别恶意行为的比例</li>
+<li><strong>误判率</strong> ：错误拦截正常用户的比例</li>
+<li><strong>覆盖率</strong>：系统能够识别的恶意行为类型范围</li>
+<li><strong>响应时间</strong>：从检测到拦截的时间延迟</li>
+<li><strong>用户满意度</strong>：客服和正常用户的满意度评价</li>
+</ol></div></div></div><div class="row"><div class="col col--12"><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col"><a href="https://github.com/bytedesk/bytedesk-docs/blob/main/i18n/zh-CN/docusaurus-plugin-content-docs/current/development/black.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_D3U9" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>编辑此页</a></div><div class="col lastUpdated_S4mo"><span class="theme-last-updated">最后<!-- -->由 <b>jack ning</b> <!-- -->于 <b><time datetime="2025-10-24T04:15:39.000Z" itemprop="dateModified">2025年10月24日</time></b> <!-- -->更新</span></div></div><div class="feedbackContainer_YCD2"><div class="feedbackQuestion_oWvU"><p>这页文档对您有帮助吗？</p><div class="buttonContainer_Zim_"><button class="feedbackButton_fT9j positive_qcHW">有帮助 👍</button><button class="feedbackButton_fT9j negative_CWIX">需改进 👎</button></div></div></div></footer></div></div></article><div class="row"><div class="col col--12"><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件选项卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/zh-CN/docs/development/autoreply"><div class="pagination-nav__sublabel">上一页</div><div class="pagination-nav__label">自动回复</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/zh-CN/docs/development/translate"><div class="pagination-nav__sublabel">下一页</div><div class="pagination-nav__label">消息翻译</div></a></nav></div></div></div></div><div class="col col--3"><div class="tableOfContents_XgtV thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#功能概述" class="table-of-contents__link toc-highlight">功能概述</a><ul><li><a href="#核心价值" class="table-of-contents__link toc-highlight">核心价值</a></li><li><a href="#适用场景" class="table-of-contents__link toc-highlight">适用场景</a><ul><li><a href="#1-恶意骚扰防护" class="table-of-contents__link toc-highlight">1. 恶意骚扰防护</a></li><li><a href="#2-垃圾信息过滤" class="table-of-contents__link toc-highlight">2. 垃圾信息过滤</a></li><li><a href="#3-违规行为管控" class="table-of-contents__link toc-highlight">3. 违规行为管控</a></li></ul></li></ul></li><li><a href="#黑名单类型" class="table-of-contents__link toc-highlight">黑名单类型</a><ul><li><a href="#按识别方式分类" class="table-of-contents__link toc-highlight">按识别方式分类</a><ul><li><a href="#1-用户黑名单" class="table-of-contents__link toc-highlight">1. 用户黑名单</a></li><li><a href="#2-ip地址黑名单" class="table-of-contents__link toc-highlight">2. IP地址黑名单</a></li><li><a href="#3-关键词黑名单" class="table-of-contents__link toc-highlight">3. 关键词黑名单</a></li></ul></li><li><a href="#按管理方式分类" class="table-of-contents__link toc-highlight">按管理方式分类</a><ul><li><a href="#1-自动黑名单" class="table-of-contents__link toc-highlight">1. 自动黑名单</a></li><li><a href="#2-手动黑名单" class="table-of-contents__link toc-highlight">2. 手动黑名单</a></li></ul></li></ul></li><li><a href="#拦截策略" class="table-of-contents__link toc-highlight">拦截策略</a><ul><li><a href="#拦截级别" class="table-of-contents__link toc-highlight">拦截级别</a><ul><li><a href="#1-完全拦截" class="table-of-contents__link toc-highlight">1. 完全拦截</a></li><li><a href="#2-限制拦截" class="table-of-contents__link toc-highlight">2. 限制拦截</a></li><li><a href="#3-静默拦截" class="table-of-contents__link toc-highlight">3. 静默拦截</a></li></ul></li><li><a href="#拦截提示" class="table-of-contents__link toc-highlight">拦截提示</a><ul><li><a href="#1-明确提示" class="table-of-contents__link toc-highlight">1. 明确提示</a></li><li><a href="#2-温和提示" class="table-of-contents__link toc-highlight">2. 温和提示</a></li><li><a href="#3-无提示" class="table-of-contents__link toc-highlight">3. 无提示</a></li></ul></li></ul></li><li><a href="#管理功能" class="table-of-contents__link toc-highlight">管理功能</a><ul><li><a href="#黑名单维护" class="table-of-contents__link toc-highlight">黑名单维护</a><ul><li><a href="#1-添加管理" class="table-of-contents__link toc-highlight">1. 添加管理</a></li><li><a href="#2-查询检索" class="table-of-contents__link toc-highlight">2. 查询检索</a></li><li><a href="#3-编辑修改" class="table-of-contents__link toc-highlight">3. 编辑修改</a></li><li><a href="#4-删除解除" class="table-of-contents__link toc-highlight">4. 删除解除</a></li></ul></li><li><a href="#申诉处理" class="table-of-contents__link toc-highlight">申诉处理</a><ul><li><a href="#1-申诉渠道" class="table-of-contents__link toc-highlight">1. 申诉渠道</a></li><li><a href="#2-申诉流程" class="table-of-contents__link toc-highlight">2. 申诉流程</a></li><li><a href="#3-结果处理" class="table-of-contents__link toc-highlight">3. 结果处理</a></li></ul></li><li><a href="#统计分析" class="table-of-contents__link toc-highlight">统计分析</a><ul><li><a href="#1-数据统计" class="table-of-contents__link toc-highlight">1. 数据统计</a></li><li><a href="#2-效果分析" class="table-of-contents__link toc-highlight">2. 效果分析</a></li></ul></li></ul></li><li><a href="#技术实现" class="table-of-contents__link toc-highlight">技术实现</a><ul><li><a href="#识别算法" class="table-of-contents__link toc-highlight">识别算法</a><ul><li><a href="#1-行为分析" class="table-of-contents__link toc-highlight">1. 行为分析</a></li><li><a href="#2-内容识别" class="table-of-contents__link toc-highlight">2. 内容识别</a></li></ul></li><li><a href="#存储设计" class="table-of-contents__link toc-highlight">存储设计</a><ul><li><a href="#1-数据结构" class="table-of-contents__link toc-highlight">1. 数据结构</a></li><li><a href="#2-索引优化" class="table-of-contents__link toc-highlight">2. 索引优化</a></li></ul></li></ul></li><li><a href="#最佳实践" class="table-of-contents__link toc-highlight">最佳实践</a><ul><li><a href="#管理策略" class="table-of-contents__link toc-highlight">管理策略</a><ul><li><a href="#do---推荐做法" class="table-of-contents__link toc-highlight">DO - 推荐做法</a></li><li><a href="#dont---避免的问题" class="table-of-contents__link toc-highlight">DON&#39;T - 避免的问题</a></li></ul></li><li><a href="#用户体验" class="table-of-contents__link toc-highlight">用户体验</a><ul><li><a href="#1-友好的提示信息" class="table-of-contents__link toc-highlight">1. 友好的提示信息</a></li><li><a href="#2-便捷的申诉流程" class="table-of-contents__link toc-highlight">2. 便捷的申诉流程</a></li><li><a href="#3-差异化的处理策略" class="table-of-contents__link toc-highlight">3. 差异化的处理策略</a></li></ul></li></ul></li><li><a href="#常见问题" class="table-of-contents__link toc-highlight">常见问题</a><ul><li><a href="#q-如何避免误判正常用户" class="table-of-contents__link toc-highlight">Q: 如何避免误判正常用户？</a></li><li><a href="#q-黑名单的有效期应该如何设置" class="table-of-contents__link toc-highlight">Q: 黑名单的有效期应该如何设置？</a></li><li><a href="#q-如何处理用户的申诉" class="table-of-contents__link toc-highlight">Q: 如何处理用户的申诉？</a></li><li><a href="#q-黑名单系统如何与其他安全系统配合" class="table-of-contents__link toc-highlight">Q: 黑名单系统如何与其他安全系统配合？</a></li><li><a href="#q-如何评估黑名单系统的效果" class="table-of-contents__link toc-highlight">Q: 如何评估黑名单系统的效果？</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">文档</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/docs/intro">教程</a></li><li class="footer__item"><a href="https://www.weiyuai.cn/contact.html" target="_blank" rel="noopener noreferrer" class="footer__link-item">联系我们<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">社区</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://twitter.com/bytedeskai" target="_blank" rel="noopener noreferrer" class="footer__link-item">Twitter<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.weiyuai.cn" target="_blank" rel="noopener noreferrer" class="footer__link-item">微信公众号<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">更多</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/blog">博客</a></li><li class="footer__item"><a href="https://github.com/bytedesk/bytedesk" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a class="footer__link-item" href="/docs/zh-CN/docs/payment">价格方案</a></li><li class="footer__item"><a href="https://www.weiyuai.cn/privacy.html" target="_blank" rel="noopener noreferrer" class="footer__link-item">隐私政策<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_FmOW"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 weiyuai.cn, Inc. 京ICP备17041763号-20. 保留所有权利。</div></div></div></footer></div>
+</body>
+</html>

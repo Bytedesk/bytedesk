@@ -1,5 +1,5 @@
 import "../../node_modules/.pnpm/axios@1.10.0/node_modules/axios/index/index.js";
-import { ACCESS_TOKEN as c, ANONYMOUS as a, EVENT_BUS_HTTP_ERROR as s, EVENT_BUS_SERVER_ERROR_500 as m } from "../../utils/constants/index.js";
+import { ACCESS_TOKEN as c, ANONYMOUS as n, EVENT_BUS_HTTP_ERROR as s, EVENT_BUS_SERVER_ERROR_500 as m } from "../../utils/constants/index.js";
 import t from "../../utils/eventsEmitter/index.js";
 import r from "../../utils/logger/index.js";
 import l from "../../node_modules/.pnpm/axios@1.10.0/node_modules/axios/lib/axios/index.js";
@@ -8,7 +8,7 @@ function u() {
   return o || "https://api.weiyuai.cn";
 }
 function d(e) {
-  return e && e.trim() !== "" ? (o = e, r.info("API URL已设置为:", o)) : r.warn("尝试设置无效的API URL"), o;
+  return e && e.trim() !== "" ? (o = e, r.debug("API URL已设置为:", o)) : r.warn("尝试设置无效的API URL"), o;
 }
 const p = l.create({
   timeout: 2e4,
@@ -44,12 +44,12 @@ p.interceptors.response.use(
     return "return axios interception error";
   }
 );
-const n = {
+const a = {
   data: null,
   // 通常错误时不会有数据
   status: 601,
   // 自定义HTTP状态码，用于表示匿名状态
-  statusText: a,
+  statusText: n,
   // HTTP 状态文本
   headers: {},
   // 响应头
@@ -62,15 +62,15 @@ const n = {
 }, h = {
   message: "匿名用户，无需访问服务器接口",
   // 错误消息
-  name: a,
+  name: n,
   // 错误名称
   code: "601",
   // 自定义的错误代码
-  config: n.config,
+  config: a.config,
   // 请求配置
-  request: n.request,
+  request: a.request,
   // 原始请求对象
-  response: n,
+  response: a,
   // 响应对象
   isAxiosError: !0,
   // 标记这是一个 AxiosError 对象

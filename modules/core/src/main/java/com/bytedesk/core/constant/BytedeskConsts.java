@@ -38,20 +38,20 @@ public class BytedeskConsts {
     public static final String DEFAULT_WORKGROUP_UID_PRESALES = "df_wg_presales"; // 售前
     public static final String DEFAULT_WORKGROUP_UID_AFTERSALES = "df_wg_aftersales"; // 售后
     public static final String DEFAULT_DEPARTMENT_UID = "df_dp_uid";
-    public static final String DEFAULT_MEMBER_UID = "df_mb_uid";
-    public static final String DEFAULT_ROBOT_UID = "df_rt_uid";
-    public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid";
-    public static final String DEFAULT_QUEUE_ASSISTANT_UID = "df_qa_uid";
-    public static final String DEFAULT_CLIPBOARD_ASSISTANT_UID = "df_ca_uid";
-    public static final String DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID = "df_ica_uid";
-    public static final String DEFAULT_INTENT_REWRITE_ASSISTANT_UID = "df_ira_uid";
-    public static final String DEFAULT_EMOTION_ASSISTANT_UID = "df_ea_uid";
-    public static final String DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID = "df_aba_uid";
-    public static final String DEFAULT_CHANNEL_UID = "df_ch_uid";
-    public static final String DEFAULT_AGENT_ASSISTANT_UID = "df_as_uid";
-    public static final String DEFAULT_SYSTEM_UID = "df_sys_uid";
-    public static final String DEFAULT_KB_QUICKREPLY_UID = "df_kb_qr_uid";
-    // public static final String DEFAULT_KB_QUICKBUTTON_UID = "df_kb_qb_uid";
+    public static final String DEFAULT_MEMBER_UID = "df_mb_uid"; // 默认团队成员uid
+    public static final String DEFAULT_ROBOT_UID = "df_rt_uid"; // 默认机器人uid
+    public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid"; // 默认文件助手uid
+    public static final String DEFAULT_QUEUE_ASSISTANT_UID = "df_qa_uid"; // 默认排队助手uid
+    public static final String DEFAULT_CLIPBOARD_ASSISTANT_UID = "df_ca_uid"; // 默认剪贴板助手uid
+    public static final String DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID = "df_ica_uid"; // 默认意图分类助手uid
+    public static final String DEFAULT_INTENT_REWRITE_ASSISTANT_UID = "df_ira_uid"; // 默认意图改写助手uid
+    public static final String DEFAULT_EMOTION_ASSISTANT_UID = "df_ea_uid"; // 默认情绪助手uid
+    public static final String DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID = "df_aba_uid"; // 默认航班预订助手uid
+    public static final String DEFAULT_CHANNEL_UID = "df_ch_uid"; // 默认渠道uid
+    public static final String DEFAULT_AGENT_ASSISTANT_UID = "df_as_uid"; // 默认客服助手uid
+    public static final String DEFAULT_SYSTEM_UID = "df_sys_uid"; // 默认系统用户uid
+    public static final String DEFAULT_KB_QUICK_REPLY_UID = "df_kb_qr_uid"; // 默认知识库快捷回复uid
+    // public static final String DEFAULT_KB_QUICK_BUTTON_UID = "df_kb_qb_uid";
     public static final String DEFAULT_KB_HELPCENTER_UID = "df_kb_hc_uid";
     public static final String DEFAULT_KB_NOTEBASE_UID = "df_kb_nb_uid";
     public static final String DEFAULT_KB_TABOO_UID = "df_kb_tb_uid";
@@ -68,6 +68,10 @@ public class BytedeskConsts {
     public static final String DEFAULT_ROLE_WORKGROUP_ADMIN_UID = "df_role_wg_admin_uid"; // 工作组管理员
     public static final String DEFAULT_ROLE_AGENT_UID = "df_role_agent_uid";
     public static final String DEFAULT_ROLE_USER_UID = "df_role_user_uid";
+
+    // Legacy / deprecated role uid kept for backward compatibility.
+    // Older members may still carry this role uid in persisted roleUids.
+    public static final String DEPRECATED_ROLE_MEMBER_UID = "df_role_member_uid";
     // 
     public static final String ACTION_LOGIN_USERNAME = "密码登录";
     public static final String ACTION_LOGIN_MOBILE = "手机号登录";
@@ -78,11 +82,9 @@ public class BytedeskConsts {
     public static final int COLUMN_EXTRA_LENGTH = 2048;
     // 
     public static final String DEFAULT_SORT_BY = "updatedAt";
-    public static final String DEFAULT_SORT_DIRECTION = "descend"; // 默认降序
     public static final String SORT_DIRECTION_ASC = "ascend";
     public static final String SORT_DIRECTION_DESC = "descend";
-
-    
+    public static final String DEFAULT_SORT_DIRECTION = SORT_DIRECTION_DESC; // 默认降序
 
 
 }

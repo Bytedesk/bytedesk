@@ -17,12 +17,12 @@ public class QuickButtonInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // 
-        initPermissions();
+        initAuthority();
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
-            String permissionValue = QuickButtonPermissions.QUICKBUTTON_PREFIX + permission.name();
+            String permissionValue = QuickButtonPermissions.QUICK_BUTTON_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);
         }
     }

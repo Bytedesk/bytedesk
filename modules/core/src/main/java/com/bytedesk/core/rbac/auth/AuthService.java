@@ -36,6 +36,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.utils.PasswordCryptoUtils;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -59,24 +60,35 @@ public class AuthService {
 
     private final BCryptPasswordEncoder passwordEncoder;
 
+    private final BytedeskProperties bytedeskProperties;
+
     public UserEntity getUser() {
-        // not logged in
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
             return null;
         }
-        //
-        try {
-            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-                    .getPrincipal();
-            return modelMapper.map(userDetails, UserEntity.class);
-        } catch (Exception e) {
-            // TODO: handle exception
-            // FIXME: 验证码错误时会报错：java.lang.ClassCastException: class java.lang.String cannot be cast to
-            // class com.bytedesk.core.rbac.user.UserDetailsImpl (java.lang.String is in
-            // module java.base of loader 'bootstrap';
-            // com.bytedesk.core.rbac.user.UserDetailsImpl is in unnamed module of loader 'app')
-            // e.printStackTrace();
+
+        Object principal = authentication.getPrincipal();
+        if (principal == null) {
+            return null;
         }
+
+        // 常见情况：未登录/匿名访问时 principal 可能是 String（例如 anonymousUser）
+        if (principal instanceof UserDetailsImpl userDetails) {
+            return modelMapper.map(userDetails, UserEntity.class);
+        }
+        if (principal instanceof UserDetails userDetails) {
+            // 兼容其它实现的 UserDetails
+            return modelMapper.map(userDetails, UserEntity.class);
+        }
+
+        // 未登录/匿名访问：principal 可能是 String（例如 anonymousUser）
+        if (principal instanceof String) {
+            return null;
+        }
+
+        // 其它类型（例如 String）视为未登录，避免刷 ClassCastException 日志
+        log.debug("Unexpected principal type: {}", principal.getClass().getName());
         return null;
     }
 
@@ -126,6 +138,14 @@ public class AuthService {
         }
 
         String accessToken = JwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getPlatform(), channel);
+
+        // 性能测试模式：避免每次登录都写token表，减少DB写压力
+        if (bytedeskProperties.isDisableIpFilter()) {
+            return AuthResponse.builder()
+                .accessToken(accessToken)
+                .user(userResponse)
+                .build();
+        }
         
         String device = authRequest.getDevice();
         if (!StringUtils.hasText(device)) {
@@ -212,7 +232,7 @@ public class AuthService {
      */
     public Authentication authenticateWithPasswordHash(AuthRequest authRequest) {
         // 1. 查询用户
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(authRequest.getUsername());
+        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsernameAndPlatform(authRequest.getUsername(), authRequest.getPlatform());
         if (userDetails == null) {
             log.warn("User not found: {}", authRequest.getUsername());
             return null;

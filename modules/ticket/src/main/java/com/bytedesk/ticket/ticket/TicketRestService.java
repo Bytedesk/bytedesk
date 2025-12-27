@@ -124,12 +124,13 @@ public class TicketRestService
     }
 
     private TicketResponse createInternal(TicketRequest request, boolean skipLoginEnforce) {
-        ensurePlatformTicketRequestDefaults(request);
+        boolean platformTicketCenterRequest = ensurePlatformTicketRequestDefaults(request);
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setType(resolveTicketType(request.getType()));
         ticket.setUid(uidUtils.getUid());
-        if (isPlatformTicketCenterRequest(request)) {
+        // 
+        if (platformTicketCenterRequest) {
             ticket.setLevel(LevelEnum.PLATFORM.name());
             ticket.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
@@ -139,11 +140,9 @@ public class TicketRestService
                 ticket.setUserUid(reporterUid);
             }
         }
-        // ticket.setUserUid(userUid); // 创建人
-        // 默认是工作组工单，暂不启用一对一
-        // ticket.setType(TicketTypeEnum.DEPARTMENT.name());
-        // ticket.setOwner(owner); // 创建人
+        // 工单处理人
         ticket.setAssignee(request.getAssigneeJson());
+        // 工单创建人
         ticket.setReporter(request.getReporterJson());
         //
         if (StringUtils.hasText(request.getAssigneeJson())
@@ -646,9 +645,10 @@ public class TicketRestService
         return null;
     }
 
-    private void ensurePlatformTicketRequestDefaults(TicketRequest request) {
-        if (!isPlatformTicketCenterRequest(request)) {
-            return;
+    private boolean ensurePlatformTicketRequestDefaults(TicketRequest request) {
+        boolean platformTicketCenterRequest = isPlatformTicketCenterRequest(request);
+        if (!platformTicketCenterRequest) {
+            return false;
         }
         UserEntity currentUser = requireLoginUser();
         request.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
@@ -662,6 +662,7 @@ public class TicketRestService
         if (request.getReporter() == null) {
             request.setReporter(ConvertUtils.convertToUserProtobuf(currentUser));
         }
+        return true;
     }
 
     private boolean isPlatformTicketCenterRequest(TicketRequest request) {

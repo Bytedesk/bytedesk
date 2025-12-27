@@ -24,12 +24,12 @@ public class WorkflowLogInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = WorkflowLogPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = WorkflowLogPermissions.WORKFLOW_LOG_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

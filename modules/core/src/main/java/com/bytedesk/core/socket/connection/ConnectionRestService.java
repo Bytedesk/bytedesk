@@ -16,10 +16,14 @@ package com.bytedesk.core.socket.connection;
 import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -57,6 +61,8 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     private final ConnectionMetrics connectionMetrics;
 
     private final StringRedisTemplate stringRedisTemplate;
+
+    private final CacheManager cacheManager;
 
     // 最小数据库写入间隔（毫秒）
     private static final long MIN_INTERVAL_MS = 5000L;
@@ -163,6 +169,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
+            evictPresenceCaches(optional.get().getUserUid());
             // connectionRepository.delete(optional.get());
         }
         else {
@@ -207,6 +214,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             .build());
         applyConnectedState(entity, protocol, ttlSeconds, now);
         save(entity);
+        evictPresenceCaches(userUid);
     }
 
     /** Update heartbeat for a client connection */
@@ -326,6 +334,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                 entity.setStatus(DISCONNECTED.name())
                       .setDisconnectedAt(System.currentTimeMillis());
                 save(entity);
+                evictPresenceCaches(entity.getUserUid());
             }
         });
     }
@@ -338,6 +347,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         List<ConnectionEntity> all = connectionRepository.findAll();
         int scanned = 0;
         int changed = 0;
+        Set<String> changedUsers = new HashSet<>();
         for (ConnectionEntity c : all) {
             scanned++;
             if (c.isDeleted()) continue;
@@ -348,8 +358,14 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                      .setDisconnectedAt(now);
                     save(c);
                     changed++;
+                    if (StringUtils.hasText(c.getUserUid())) {
+                        changedUsers.add(c.getUserUid());
+                    }
                 }
             }
+        }
+        for (String userUid : changedUsers) {
+            evictPresenceCaches(userUid);
         }
         long cost = System.currentTimeMillis() - start;
         log.info("expireStaleSessions scanned={}, expired={}, costMs={}", scanned, changed, cost);
@@ -394,12 +410,14 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "presence", key = "#userUid", unless = "#result == null")
     public PresenceResponse getPresence(String userUid) {
         int active = countActiveConnections(userUid);
         return PresenceResponse.builder().online(active > 0).activeCount(active).build();
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "activeConnections", key = "#userUid", unless = "#result == null")
     public List<ConnectionResponse> listActiveConnections(String userUid) {
         List<ConnectionEntity> list = connectionRepository.findByUserUidAndDeletedFalse(userUid);
         long now = System.currentTimeMillis();
@@ -416,5 +434,18 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         return result;
     }
 
+    private void evictPresenceCaches(String userUid) {
+        if (!StringUtils.hasText(userUid) || cacheManager == null) {
+            return;
+        }
+        Cache presence = cacheManager.getCache("presence");
+        if (presence != null) {
+            presence.evict(userUid);
+        }
+        Cache activeConnections = cacheManager.getCache("activeConnections");
+        if (activeConnections != null) {
+            activeConnections.evict(userUid);
+        }
+    }
     
 }

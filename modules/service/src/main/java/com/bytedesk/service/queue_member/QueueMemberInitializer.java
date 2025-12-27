@@ -16,16 +16,32 @@ package com.bytedesk.service.queue_member;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
+import lombok.AllArgsConstructor;
+
 @Component
+@AllArgsConstructor
 public class QueueMemberInitializer implements SmartInitializingSingleton {
+
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         init();
+        initAuthority();
     }
 
     private void init() {
         // 
+    }
+
+    private void initAuthority() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = QueueMemberPermissions.QUEUE_MEMBER_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
     
 }

@@ -26,10 +26,10 @@ public class IntentionSettingsInitializer implements SmartInitializingSingleton 
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
         //     String permissionValue = IntentionSettingsPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);

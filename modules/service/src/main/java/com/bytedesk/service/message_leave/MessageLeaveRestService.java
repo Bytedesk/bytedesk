@@ -195,7 +195,7 @@ public class MessageLeaveRestService extends
             QueueMemberEntity queueMember = queueMemberOptional.get();
             queueMember.setMessageLeave(true);
             queueMember.setMessageLeaveAt(savedMessageLeave.getCreatedAt());
-            queueMemberRestService.save(queueMember);
+            queueMemberRestService.saveAsyncBestEffort(queueMember);
         }
 
         return convertToResponse(savedMessageLeave);

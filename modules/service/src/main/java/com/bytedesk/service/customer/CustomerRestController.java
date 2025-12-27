@@ -15,14 +15,12 @@ package com.bytedesk.service.customer;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,17 +39,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Description("Customer Management Controller - Customer information and relationship management APIs")
 public class CustomerRestController extends BaseRestController<CustomerRequest, CustomerRestService> {
 
-    private final CustomerRestService customerService;
+    private final CustomerRestService customerRestService;
 
     @Operation(summary = "查询组织下的客户", description = "根据组织ID查询客户列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(CustomerRequest request) {
         
-        Page<CustomerResponse> response = customerService.queryByOrg(request);
+        Page<CustomerResponse> response = customerRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -63,7 +61,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
     @Override
     public ResponseEntity<?> queryByUser(CustomerRequest request) {
         
-        Page<CustomerResponse> response = customerService.queryByUser(request);
+        Page<CustomerResponse> response = customerRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -75,7 +73,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
     @Override
     public ResponseEntity<?> queryByUid(CustomerRequest request) {
         
-        CustomerResponse response = customerService.queryByUid(request);
+        CustomerResponse response = customerRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -88,11 +86,10 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
     @GetMapping("/query/visitorUid")
     public ResponseEntity<?> queryByVisitorUid(CustomerRequest request) {
         
-        CustomerResponse response = customerService.queryByVisitorUid(request);
+        CustomerResponse response = customerRestService.queryByVisitorUid(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
-
 
     @Operation(summary = "创建客户", description = "创建新的客户")
     @ApiResponse(responseCode = "200", description = "创建成功",
@@ -101,7 +98,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
     @Override
     public ResponseEntity<?> create(CustomerRequest request) {
         
-        CustomerResponse response = customerService.create(request);
+        CustomerResponse response = customerRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -113,7 +110,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
     @Override
     public ResponseEntity<?> update(CustomerRequest request) {
         
-        CustomerResponse response = customerService.update(request);
+        CustomerResponse response = customerRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
@@ -123,7 +120,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
     @Override
     public ResponseEntity<?> delete(CustomerRequest request) {
         
-        customerService.delete(request);
+        customerRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }
@@ -135,14 +132,12 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return exportTemplate(
             request,
             response,
-            customerService,
+            customerRestService,
             CustomerExcel.class,
             "客户信息",
             "customer"
         );
     }
-
-    
     
     
 }

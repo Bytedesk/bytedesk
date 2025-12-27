@@ -43,7 +43,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
 
     private final FormRestService formRestService;
 
-    @PreAuthorize(FormPermissions.HAS_FORM_READ_ANY_LEVEL)
+    @PreAuthorize(FormPermissions.HAS_FORM_READ)
     @ActionAnnotation(title = "表单管理", action = "查询组织表单", description = "queryByOrg form")
     @Operation(summary = "查询组织下的表单", description = "根据组织ID查询表单列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -57,7 +57,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
         return ResponseEntity.ok(JsonResult.success(form));
     }
 
-    @PreAuthorize(FormPermissions.HAS_FORM_READ_ANY_LEVEL)
+    @PreAuthorize(FormPermissions.HAS_FORM_READ)
     @ActionAnnotation(title = "表单管理", action = "查询用户表单", description = "queryByUser form")
     @Operation(summary = "查询用户下的表单", description = "根据用户ID查询表单列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -71,7 +71,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
         return ResponseEntity.ok(JsonResult.success(form));
     }
 
-    @PreAuthorize(FormPermissions.HAS_FORM_READ_ANY_LEVEL)
+    @PreAuthorize(FormPermissions.HAS_FORM_READ)
     @ActionAnnotation(title = "表单管理", action = "查询表单详情", description = "queryByUid form")
     @Operation(summary = "查询指定表单", description = "根据UID查询表单详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -85,7 +85,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
         return ResponseEntity.ok(JsonResult.success(form));
     }
 
-    @PreAuthorize(FormPermissions.HAS_FORM_CREATE_ANY_LEVEL)
+    @PreAuthorize(FormPermissions.HAS_FORM_CREATE)
     @ActionAnnotation(title = "表单管理", action = "创建表单", description = "create form")
     @Operation(summary = "创建表单", description = "创建新的表单")
     @ApiResponse(responseCode = "200", description = "创建成功",
@@ -99,7 +99,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
         return ResponseEntity.ok(JsonResult.success(form));
     }
 
-    @PreAuthorize(FormPermissions.HAS_FORM_UPDATE_ANY_LEVEL)
+    @PreAuthorize(FormPermissions.HAS_FORM_UPDATE)
     @ActionAnnotation(title = "表单管理", action = "更新表单", description = "update form")
     @Operation(summary = "更新表单", description = "更新表单信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
@@ -113,7 +113,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
         return ResponseEntity.ok(JsonResult.success(form));
     }
 
-    @PreAuthorize(FormPermissions.HAS_FORM_DELETE_ANY_LEVEL)
+    @PreAuthorize(FormPermissions.HAS_FORM_DELETE)
     @ActionAnnotation(title = "表单管理", action = "删除表单", description = "delete form")
     @Operation(summary = "删除表单", description = "删除指定的表单")
     @ApiResponse(responseCode = "200", description = "删除成功")
@@ -126,7 +126,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     }
 
     @GetMapping("/export")
-    @PreAuthorize(FormPermissions.HAS_FORM_EXPORT_ANY_LEVEL)
+    @PreAuthorize(FormPermissions.HAS_FORM_EXPORT)
     @ActionAnnotation(title = "表单管理", action = "导出表单", description = "export form")
     @Operation(summary = "导出表单", description = "导出表单数据")
     @ApiResponse(responseCode = "200", description = "导出成功")

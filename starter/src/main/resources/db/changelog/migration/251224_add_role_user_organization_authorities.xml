@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251224-add-role-user-organization-authorities" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_role" />
+                <tableExists tableName="bytedesk_core_authority" />
+                <tableExists tableName="bytedesk_core_role_authority" />
+            </and>
+        </preConditions>
+        <comment>
+            Grant ROLE_USER default authorities for organization module (MODULE_ACTION model):
+            - ORGANIZATION_CREATE
+            - ORGANIZATION_READ
+            - ORGANIZATION_UPDATE
+
+            Also grant additional ROLE_USER defaults aligned with RoleInitializer:
+            - TICKET_UPDATE
+            - TICKET_DELETE
+            - THREAD_UPDATE
+            - THREAD_DELETE
+
+            Ownership constraints are enforced in business layer; this change only backfills persisted role-authority mapping.
+        </comment>
+        <sql>
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+            WHERE r.is_deleted = 0
+              AND r.uuid = 'df_role_user_uid'
+                            AND a.authority_value IN (
+                                    'ORGANIZATION_CREATE',
+                                    'ORGANIZATION_READ',
+                                    'ORGANIZATION_UPDATE',
+                                    'TICKET_UPDATE',
+                                    'TICKET_DELETE',
+                                    'THREAD_UPDATE',
+                                    'THREAD_DELETE'
+                            )
+              AND NOT EXISTS (
+                  SELECT 1 FROM bytedesk_core_role_authority ra
+                  WHERE ra.role_id = r.id AND ra.authority_id = a.id
+              );
+        </sql>
+        <rollback>
+            <sql>
+                DELETE ra
+                FROM bytedesk_core_role_authority ra
+                JOIN bytedesk_core_role r ON ra.role_id = r.id
+                JOIN bytedesk_core_authority a ON ra.authority_id = a.id
+                WHERE r.uuid = 'df_role_user_uid'
+                                    AND a.authority_value IN (
+                                            'ORGANIZATION_CREATE',
+                                            'ORGANIZATION_READ',
+                                            'ORGANIZATION_UPDATE',
+                                            'TICKET_UPDATE',
+                                            'TICKET_DELETE',
+                                            'THREAD_UPDATE',
+                                            'THREAD_DELETE'
+                                    );
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,73 @@
+// 
+// dropdowns.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Bootstrap Overrides
+//
+.dropdown-menu {
+  box-shadow: $dropdown-box-shadow;
+}
+
+// dropdown item active
+.dropdown-item.active {
+  color: var(--bs-primary);
+}
+
+// Dropdown arrows
+// Replace original arrows with Custom icons
+// 
+.dropdown-toggle {
+  &:after {
+    content: "\f078";
+    font-family: $fa-font-family;
+    font-size: 0.5rem;
+    margin-left: 0.35rem;
+    font-weight: 900;
+    vertical-align: middle;
+    border: none;
+  }
+}
+
+.dropup .dropdown-toggle {
+  &:after {
+    content: "\f077";
+    font-family: $fa-font-family;
+    font-size: 0.7rem;
+    margin-left: 0.35rem;
+    font-weight: 900;
+    vertical-align: middle;
+    border: none;
+  }
+}
+
+// Dropdown overrides for navbar only
+.dropdown-menu .dropdown-toggle {
+  &:after {
+    position: absolute;
+    right: 25px;
+    top: 10px
+  }
+  &:before {
+    position: absolute;
+    right: 25px;
+    top: 10px
+  }
+}
+
+// 
+// Additional style for theme
+// 
+
+// dropdown menu md size
+.dropdown-menu-size-md{
+  min-width: 22rem;
+}
+
+// dropdown breakpoint
+@include media-breakpoint-down(sm) {
+  .dropdown-menu-size-md{
+    min-width: 16rem;
+  }
+}

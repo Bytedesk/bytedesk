@@ -20,7 +20,9 @@ import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @UtilityClass
 public class IpUtils {
     
@@ -97,7 +99,7 @@ public class IpUtils {
                     try {
                         inet = InetAddress.getLocalHost();
                     } catch (UnknownHostException e) {
-                        e.printStackTrace();
+                        log.error("获取本机 IP 失败", e);
                     }
                     ipAddress = inet.getHostAddress();
                 }
@@ -139,7 +141,7 @@ public class IpUtils {
         try {
             return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.error("获取本机 hostname 失败", e);
         }
         return "hostname";
     }
@@ -153,7 +155,7 @@ public class IpUtils {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.error("获取本机 server ip 失败", e);
         }
         return "0.0.0.0";
     }
@@ -191,7 +193,7 @@ public class IpUtils {
             }
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("IP range 示例解析失败", e);
         }
         return false;
     }

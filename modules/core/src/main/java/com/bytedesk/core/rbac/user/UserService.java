@@ -15,6 +15,7 @@ package com.bytedesk.core.rbac.user;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -32,6 +33,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
@@ -45,6 +47,7 @@ import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleRestService;
 import com.bytedesk.core.rbac.token.TokenRestService;
+import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -84,8 +87,20 @@ public class UserService {
     private final TokenRestService tokenRestService;
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "user:exists", key = "#request.username + '-' + #request.platform", condition = "#request.username != null"),
+            @CacheEvict(value = "user:exists", key = "#request.mobile + '-' + #request.platform", condition = "#request.mobile != null"),
+            @CacheEvict(value = "user:exists", key = "#request.email + '-' + #request.platform", condition = "#request.email != null"),
+    })
     public UserResponse register(UserRequest request) {
-        log.info("register {}", request.toString());
+        // log.info("register {}", request.toString());
+
+        // platform 不能为空；管理员后台创建用户时可能未传该字段，默认使用 BYTEDESK
+        String platform = request.getPlatform();
+        if (!StringUtils.hasText(platform)) {
+            platform = PlatformEnum.BYTEDESK.name();
+            request.setPlatform(platform);
+        }
 
         if (!StringUtils.hasText(request.getEmail())
                 && !StringUtils.hasText(request.getMobile())) {
@@ -93,18 +108,18 @@ public class UserService {
         }
 
         if (StringUtils.hasText(request.getEmail())
-                && existsByEmailAndPlatform(request.getEmail(), request.getPlatform())) {
+                && existsByEmailAndPlatform(request.getEmail(), platform)) {
             throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
         }
 
         if (StringUtils.hasText(request.getMobile())
-                && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
+                && existsByMobileAndPlatform(request.getMobile(), platform)) {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         //
         UserEntity user = modelMapper.map(request, UserEntity.class);
         user.setUid(uidUtils.getUid());
-        user.setPlatform(request.getPlatform());
+        user.setPlatform(platform);
         // 设置注册来源：优先取请求值，否则根据提供的信息进行推断
         String rs = request.getRegisterSource();
         if (!StringUtils.hasText(rs)) {
@@ -374,6 +389,7 @@ public class UserService {
                 .superUser(false)
                 .emailVerified(false)
                 .mobileVerified(false)
+                .registerSource(RegisterSource.ADMIN.name())
                 .build();
         user.setUid(uidUtils.getUid());
 
@@ -403,47 +419,116 @@ public class UserService {
         }
         //
         user = addRoleUser(user);
-        return addRoleAgent(user);
+        return user;
     }
 
-    public UserEntity updateUserFromMember(UserEntity user, MemberRequest request) {
-        Set<String> roleUids = request.getRoleUids();
-
-        // 首先判断是否有变化，如果无变化则不更新
-        if (user.getRoleUids() != null && user.getRoleUids().equals(roleUids)) {
+    /**
+     * 确保 user 的 currentOrganization 指向 orgUid。
+     * updateUserRoles 依赖 currentOrganization 来写入“组织维度”的角色关联。
+     */
+    public UserEntity ensureCurrentOrganization(UserEntity user, String orgUid) {
+        if (user == null) {
+            return null;
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            return user;
+        }
+        if (user.getCurrentOrganization() != null && orgUid.equals(user.getCurrentOrganization().getUid())) {
             return user;
         }
 
-        // 删除所有角色
-        user.removeOrganizationRoles();
+        Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
+        if (!orgOptional.isPresent()) {
+            throw new RuntimeException("Organization not found..!!");
+        }
+        user.setCurrentOrganization(orgOptional.get());
+        return user;
+    }
+
+    public UserEntity updateUserFromMember(UserEntity user, MemberRequest request) {
+        return updateUserRoles(user, request.getRoleUids());
+    }
+
+    /**
+     * 更新用户在“当前组织(currentOrganization)”下的角色列表。
+     * - 忽略空值
+     * - 将废弃的 member 角色 uid 归一为 user 角色 uid
+     * - 强制确保包含 ROLE_USER
+     */
+    @Transactional
+    public UserEntity updateUserRoles(UserEntity user, Set<String> roleUids) {
+        if (user == null) {
+            return null;
+        }
+        if (user.getId() == null) {
+            throw new RuntimeException("User id is required for role update");
+        }
+
+        // Always operate on a managed entity to avoid merge side-effects on join tables
+        UserEntity managedUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("User not found: " + user.getUid()));
+
+        // Ensure currentOrganization is set on the managed instance
+        String orgUid = null;
+        if (user.getCurrentOrganization() != null && StringUtils.hasText(user.getCurrentOrganization().getUid())) {
+            orgUid = user.getCurrentOrganization().getUid();
+        }
+        ensureCurrentOrganization(managedUser, orgUid);
+
+        Set<String> incomingRoleUids = roleUids;
+        if (incomingRoleUids == null) {
+            incomingRoleUids = new LinkedHashSet<>();
+        }
+
+        // Backward compatibility:
+        // - Older payloads may still contain deprecated role uid: df_role_member_uid
+        // - Ignore blank role uid values
+        Set<String> normalizedRoleUids = new LinkedHashSet<>();
+        for (String roleUid : incomingRoleUids) {
+            if (!StringUtils.hasText(roleUid)) {
+                continue;
+            }
+            if (BytedeskConsts.DEPRECATED_ROLE_MEMBER_UID.equals(roleUid)) {
+                normalizedRoleUids.add(BytedeskConsts.DEFAULT_ROLE_USER_UID);
+            } else {
+                normalizedRoleUids.add(roleUid);
+            }
+        }
+
+        // All users must have ROLE_USER (df_role_user_uid)
+        normalizedRoleUids.add(BytedeskConsts.DEFAULT_ROLE_USER_UID);
+
+        // 首先判断是否有变化，如果无变化则不更新
+        if (managedUser.getRoleUids() != null && managedUser.getRoleUids().equals(normalizedRoleUids)) {
+            return managedUser;
+        }
+
+        // 删除当前组织下的非平台角色
+        managedUser.removeOrganizationRoles();
 
         // 增加角色，遍历roleUids，逐个添加
-        for (String roleUid : roleUids) {
+        for (String roleUid : normalizedRoleUids) {
             Optional<RoleEntity> optional = roleRestService.findByUid(roleUid);
             if (optional.isPresent()) {
                 RoleEntity role = optional.get();
-                // 处理乐观锁冲突：使用重试机制或重新获取最新实体
-                RoleEntity managedRole;
-                try {
-                    // 尝试合并实体状态
-                    managedRole = entityManager.merge(role);
-                } catch (jakarta.persistence.OptimisticLockException e) {
-                    log.warn("乐观锁冲突，重新获取角色实体: {}", roleUid);
-                    // 重新从数据库获取最新的角色实体
-                    Optional<RoleEntity> freshRoleOptional = roleRestService.findByUid(roleUid);
-                    if (freshRoleOptional.isPresent()) {
-                        managedRole = freshRoleOptional.get();
-                    } else {
-                        throw new RuntimeException("重新获取角色失败: " + roleUid);
-                    }
+                // Avoid entityManager.merge(detachedRole) which may trigger OptimisticLockException
+                // and mark the surrounding transaction rollback-only.
+                Long roleId = role.getId();
+                if (roleId == null) {
+                    throw new RuntimeException("Role id is null for uid: " + roleUid);
                 }
-                user.addOrganizationRole(managedRole);
+                RoleEntity managedRole = entityManager.find(RoleEntity.class, roleId);
+                if (managedRole == null) {
+                    throw new RuntimeException("Role not found by id: " + roleId + ", uid: " + roleUid);
+                }
+                managedUser.addOrganizationRole(managedRole);
             } else {
                 throw new RuntimeException("Role not found: " + roleUid);
             }
         }
 
-        return save(user);
+        // managedUser is tracked by JPA; changes will flush on transaction commit
+        return managedUser;
     }
 
     public UserEntity addRoleAgent(UserEntity user) {
@@ -454,6 +539,7 @@ public class UserService {
         return removeRole(user, RoleConsts.ROLE_AGENT);
     }
 
+    @Transactional
     public UserEntity addRoleUser(UserEntity user) {
         return addRole(user, RoleConsts.ROLE_USER);
     }
@@ -531,7 +617,7 @@ public class UserService {
                 try {
                     return userRepository.save(user);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("User add role failed..!!", e);
                     throw new RuntimeException("User add role failed..!!", e);
                 }
             }
@@ -542,7 +628,7 @@ public class UserService {
             try {
                 return userRepository.save(user);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("User add role failed..!!", e);
                 throw new RuntimeException("User add role failed..!!", e);
             }
         } else {
@@ -558,7 +644,7 @@ public class UserService {
             try {
                 return userRepository.save(user);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("User remove role failed..!!", e);
                 throw new RuntimeException("User remove role failed..!!", e);
             }
         } else {
@@ -566,17 +652,17 @@ public class UserService {
         }
     }
 
-    @Cacheable(value = "user", key = "#email", unless = "#result == null")
+    @Cacheable(value = "user", key = "#email + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
         return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
-    @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
+    @Cacheable(value = "user", key = "#mobile + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
         return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
     }
 
-    @Cacheable(value = "user", key = "#username", unless = "#result == null")
+    @Cacheable(value = "user", key = "#username + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByUsernameAndPlatform(String username, String platform) {
         return userRepository.findByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
@@ -592,17 +678,17 @@ public class UserService {
                 PlatformEnum.BYTEDESK.name());
     }
 
-    @Cacheable(value = "user:exists", key = "#username", unless = "#result == null")
+    @Cacheable(value = "user:exists", key = "#username + '-' + #platform", unless = "#result == null")
     public Boolean existsByUsernameAndPlatform(@NonNull String username, @NonNull String platform) {
         return userRepository.existsByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
-    @Cacheable(value = "user:exists", key = "#mobile", unless = "#result == null")
+    @Cacheable(value = "user:exists", key = "#mobile + '-' + #platform", unless = "#result == null")
     public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull String platform) {
         return userRepository.existsByMobileAndPlatformAndDeletedFalse(mobile, platform);
     }
 
-    @Cacheable(value = "user:exists", key = "#email", unless = "#result == null")
+    @Cacheable(value = "user:exists", key = "#email + '-' + #platform", unless = "#result == null")
     public Boolean existsByEmailAndPlatform(@NonNull String email, @NonNull String platform) {
         return userRepository.existsByEmailAndPlatformAndDeletedFalse(email, platform);
     }
@@ -619,14 +705,14 @@ public class UserService {
 
     @Transactional
     @Caching(put = {
-            @CachePut(value = "user", key = "#user.username", unless = "#user.username == null"),
-            @CachePut(value = "user", key = "#user.mobile", unless = "#user.mobile == null"),
-            @CachePut(value = "user", key = "#user.email", unless = "#user.email == null"),
+            @CachePut(value = "user", key = "#user.username + '-' + #user.platform", unless = "#user.username == null"),
+            @CachePut(value = "user", key = "#user.mobile + '-' + #user.platform", unless = "#user.mobile == null"),
+            @CachePut(value = "user", key = "#user.email + '-' + #user.platform", unless = "#user.email == null"),
             @CachePut(value = "user", key = "#user.uid", unless = "#user.uid == null"),
-    // TODO: 此处put的exists内容跟缓存时内容类型是否一致？
-    // @CachePut(value = "user:exists", key = "#user.username"),
-    // @CachePut(value = "user:exists", key = "#user.mobile"),
-    // @CachePut(value = "user:exists", key = "#user.email"),
+        }, evict = {
+            @CacheEvict(value = "user:exists", key = "#user.username + '-' + #user.platform", condition = "#user.username != null"),
+            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + #user.platform", condition = "#user.mobile != null"),
+            @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform", condition = "#user.email != null"),
     })
     public UserEntity save(@NonNull UserEntity user) {
         try {
@@ -635,19 +721,19 @@ public class UserService {
             log.error("User save failed..!!", optimisticLockingFailureException);
             return userRepository.save(user);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("User save failed..!!", e);
             throw new RuntimeException("User save failed..!!", e);
         }
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "user", key = "#user.username"),
-            @CacheEvict(value = "user", key = "#user.mobile"),
-            @CacheEvict(value = "user", key = "#user.email"),
+            @CacheEvict(value = "user", key = "#user.username + '-' + #user.platform"),
+            @CacheEvict(value = "user", key = "#user.mobile + '-' + #user.platform"),
+            @CacheEvict(value = "user", key = "#user.email + '-' + #user.platform"),
             @CacheEvict(value = "user", key = "#user.uid"),
-            @CacheEvict(value = "user:exists", key = "#user.username"),
-            @CacheEvict(value = "user:exists", key = "#user.mobile"),
-            @CacheEvict(value = "user:exists", key = "#user.email"),
+            @CacheEvict(value = "user:exists", key = "#user.username + '-' + #user.platform"),
+            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + #user.platform"),
+            @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform"),
     })
     public void delete(@NonNull UserEntity user) {
         user.setDeleted(true);

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251224-add-role-value-column-to-core-role" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_role" />
+            <not>
+                <columnExists tableName="bytedesk_core_role" columnName="role_value" />
+            </not>
+        </preConditions>
+        <comment>
+            Add role_value column for RoleEntity.value (@Column(name = "role_value")).
+        </comment>
+        <addColumn tableName="bytedesk_core_role">
+            <column name="role_value" type="varchar(255)" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_core_role" columnName="role_value" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251224-backfill-default-system-roles-role-value" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_role" />
+            <columnExists tableName="bytedesk_core_role" columnName="role_value" />
+        </preConditions>
+        <comment>
+            Backfill default system roles role_value based on current initRoles():
+            value(RoleConsts.ROLE_*) for the persisted default role uuids.
+        </comment>
+        <sql>
+            UPDATE bytedesk_core_role SET role_value = 'ROLE_SUPER'
+            WHERE is_deleted = 0 AND uuid = 'df_role_super_uid'
+              AND (role_value IS NULL OR role_value = '');
+
+            UPDATE bytedesk_core_role SET role_value = 'ROLE_ADMIN'
+            WHERE is_deleted = 0 AND uuid = 'df_role_admin_uid'
+              AND (role_value IS NULL OR role_value = '');
+
+            UPDATE bytedesk_core_role SET role_value = 'ROLE_DEPT_ADMIN'
+            WHERE is_deleted = 0 AND uuid = 'df_role_dept_admin_uid'
+              AND (role_value IS NULL OR role_value = '');
+
+            UPDATE bytedesk_core_role SET role_value = 'ROLE_WORKGROUP_ADMIN'
+            WHERE is_deleted = 0 AND uuid = 'df_role_wg_admin_uid'
+              AND (role_value IS NULL OR role_value = '');
+
+            UPDATE bytedesk_core_role SET role_value = 'ROLE_AGENT'
+            WHERE is_deleted = 0 AND uuid = 'df_role_agent_uid'
+              AND (role_value IS NULL OR role_value = '');
+
+            UPDATE bytedesk_core_role SET role_value = 'ROLE_USER'
+            WHERE is_deleted = 0 AND uuid = 'df_role_user_uid'
+              AND (role_value IS NULL OR role_value = '');
+        </sql>
+        <rollback>
+            <comment>No rollback - role_value backfill for default system roles</comment>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

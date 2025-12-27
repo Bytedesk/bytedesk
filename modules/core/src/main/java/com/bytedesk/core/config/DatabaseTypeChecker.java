@@ -81,7 +81,7 @@ public class DatabaseTypeChecker {
                 return "Unknown";
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("获取数据库类型失败", e);
             return "Error";
         }
     }

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251223-sync-default-role-authorities" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_role" />
+                <tableExists tableName="bytedesk_core_authority" />
+                <tableExists tableName="bytedesk_core_role_authority" />
+            </and>
+        </preConditions>
+        <comment>
+            Sync persisted default role-authority mappings to match current RoleInitializer rules (MODULE_ACTION model):
+            - SUPER: all active authorities
+            - ADMIN: all active authorities except SETTINGS_CREATE/SETTINGS_UPDATE
+            - AGENT: all KBASE-related *_READ authorities
+            - USER: base authorities (USER/MESSAGE/THREAD/TICKET)
+        </comment>
+        <sql>
+            -- 1) clear existing mappings for default roles
+            DELETE FROM bytedesk_core_role_authority
+            WHERE role_id IN (
+                SELECT id FROM bytedesk_core_role
+                WHERE is_deleted = 0 AND uuid IN (
+                    'df_role_super_uid',
+                    'df_role_admin_uid',
+                    'df_role_agent_uid',
+                    'df_role_user_uid'
+                )
+            );
+
+            -- 2) SUPER -> all active authorities
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+            WHERE r.is_deleted = 0 AND r.uuid = 'df_role_super_uid';
+
+            -- 3) ADMIN -> all active authorities except SETTINGS_CREATE/SETTINGS_UPDATE
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+            WHERE r.is_deleted = 0 AND r.uuid = 'df_role_admin_uid'
+                AND a.authority_value NOT IN ('SETTINGS_CREATE', 'SETTINGS_UPDATE');
+
+            -- 4) AGENT -> KBASE-related *_READ authorities
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+            WHERE r.is_deleted = 0 AND r.uuid = 'df_role_agent_uid'
+                AND UPPER(a.authority_value) LIKE '%\\_READ' ESCAPE '\\'
+                AND (
+                    UPPER(a.authority_value) LIKE 'KBASE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'ARTICLE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'ARTICLEARCHIVE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'MATERIAL\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'TABOO\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'TABOOMESSAGE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'QUICKREPLY\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'QUICKBUTTON\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'AUTOREPLYKEYWORD\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'AUTOREPLYFIXED\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'WEBSITE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'FILE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'CHUNK\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'TEXT\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'FAQ\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'WEBPAGE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'KBASEINVITE\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'KBASECOMMENT\\_%' ESCAPE '\\' OR
+                    UPPER(a.authority_value) LIKE 'KBASESTATISTIC\\_%' ESCAPE '\\'
+                );
+
+            -- 5) USER -> base authorities
+            INSERT INTO bytedesk_core_role_authority (role_id, authority_id)
+            SELECT r.id, a.id
+            FROM bytedesk_core_role r
+            JOIN bytedesk_core_authority a ON a.is_deleted = 0
+            WHERE r.is_deleted = 0 AND r.uuid = 'df_role_user_uid'
+                AND a.authority_value IN (
+                    'USER_READ',
+                    'USER_UPDATE',
+                    'MESSAGE_READ',
+                    'MESSAGE_CREATE',
+                    'THREAD_READ',
+                    'THREAD_CREATE',
+                    'TICKET_READ',
+                    'TICKET_CREATE'
+                );
+        </sql>
+        <rollback>
+            <comment>No rollback - data sync for default roles</comment>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

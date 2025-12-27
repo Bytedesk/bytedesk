@@ -54,13 +54,4 @@ public class AuthorityEntity extends BaseEntityNoOrg {
     
     private String description;
 
-    // platform: 只有超级管理员才有权限
-    // organization: 管理员才有权限
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // // 默认bytedesk平台
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
-
 }

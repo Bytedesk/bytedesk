@@ -6,8 +6,12 @@
 package com.bytedesk.kbase.settings;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.kbase.settings_emotion.EmotionSettingResponse;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsResponse;
 import com.bytedesk.kbase.settings_invite.InviteSettingsResponse;
+import com.bytedesk.kbase.settings_service.ServiceSettingsResponse;
+import com.bytedesk.kbase.settings_summary.SummarySettingsResponse;
+import com.bytedesk.kbase.settings_trigger.TriggerSettingsResponse;
 
 import java.time.ZonedDateTime;
 
@@ -77,6 +81,11 @@ public abstract class BaseSettingsResponse extends BaseResponse {
     private ServiceSettingsResponse serviceSettings;
 
     /**
+     * Trigger settings (common to all settings)
+     */
+    private TriggerSettingsResponse triggerSettings;
+
+    /**
      * Invitation settings (common to all settings)
      */
     private InviteSettingsResponse inviteSettings;
@@ -87,9 +96,24 @@ public abstract class BaseSettingsResponse extends BaseResponse {
     private IntentionSettingsResponse intentionSettings;
 
     /**
+     * Emotion recognition settings (common to all settings)
+     */
+    private EmotionSettingResponse emotionSettings;
+
+    /**
+     * Conversation summary settings (common to all settings)
+     */
+    private SummarySettingsResponse summarySettings;
+
+    /**
      * Draft service settings (admin editing/testing only)
      */
     private ServiceSettingsResponse draftServiceSettings;
+
+    /**
+     * Draft trigger settings (admin editing/testing only)
+     */
+    private TriggerSettingsResponse draftTriggerSettings;
 
     /**
      * Draft invitation settings (admin editing/testing only)
@@ -100,6 +124,16 @@ public abstract class BaseSettingsResponse extends BaseResponse {
      * Draft intention recognition settings (admin editing/testing only)
      */
     private IntentionSettingsResponse draftIntentionSettings;
+
+    /**
+     * Draft emotion recognition settings (admin editing/testing only)
+     */
+    private EmotionSettingResponse draftEmotionSettings;
+
+    /**
+     * Draft conversation summary settings (admin editing/testing only)
+     */
+    private SummarySettingsResponse draftSummarySettings;
 
     /**
      * Whether there are unpublished changes in draft

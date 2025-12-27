@@ -14,13 +14,13 @@
 package com.bytedesk.core.enums;
 
 public enum LevelEnum {
-    PLATFORM,
-    ORGANIZATION,
-    DEPARTMENT,
-    WORKGROUP,
-    AGENT,
-    ROBOT,
-    USER;
+    PLATFORM, // 平台级别
+    ORGANIZATION, // 组织级别
+    DEPARTMENT, // 部门级别
+    WORKGROUP, // 工作组级别
+    AGENT, // 座席级别
+    ROBOT, // 机器人级别
+    USER; // 用户级别
 
     // 根据字符串查找对应的枚举常量
     public static LevelEnum fromValue(String value) {

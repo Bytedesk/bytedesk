@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -47,6 +48,8 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final BytedeskProperties bytedeskProperties;
 
     @Override
     protected Specification<TokenEntity> createSpecification(TokenRequest request) {
@@ -202,6 +205,13 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
                 log.debug("accessToken is invalid");
                 return false;
             }
+
+            // 性能测试模式：token 可能未落库（AuthService.formatResponse 会跳过 tokenRepository.save），
+            // 因此这里允许仅通过 JWT 校验。
+            if (bytedeskProperties.isDisableIpFilter()) {
+                return true;
+            }
+
             // 从数据库验证token是否有效（未被撤销且未过期）
             Optional<TokenEntity> tokenOpt = findByAccessToken(accessToken);
             if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {

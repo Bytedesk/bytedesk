@@ -15,16 +15,21 @@ package com.bytedesk.core.rbac.authority;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/authority")
@@ -32,22 +37,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Authority Management", description = "Authority management APIs")
 public class AuthorityRestController extends BaseRestController<AuthorityRequest, AuthorityRestService> {
 
-    private final AuthorityRestService authorityService;
+    private final AuthorityRestService authorityRestService;
 
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_READ)
+    // @PreAuthorize(AuthorityPermissions.HAS_AUTHORITY_READ)
     @Override
     public ResponseEntity<?> queryByOrg(AuthorityRequest request) {
 
-        Page<AuthorityResponse> authorities = authorityService.queryByOrg(request);
+        Page<AuthorityResponse> authorities = authorityRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(authorities));
     }
 
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_READ)
     @Override
     public ResponseEntity<?> queryByUser(AuthorityRequest request) {
 
-        Page<AuthorityResponse> authorities = authorityService.queryByUser(request);
+        Page<AuthorityResponse> authorities = authorityRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(authorities));
     }
@@ -55,34 +59,35 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
     @Override
     public ResponseEntity<?> queryByUid(AuthorityRequest request) {
         
-        AuthorityResponse authority = authorityService.queryByUid(request);
+        AuthorityResponse authority = authorityRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(authority));
     }
 
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_CREATE)
+    // 都是自动创建，不需要此接口
+    // @Override
+    // @PreAuthorize(RolePermissions.ROLE_SUPER)
+    // public ResponseEntity<?> create(AuthorityRequest request) {
+
+    //     AuthorityResponse authority = authorityRestService.create(request);
+
+    //     return ResponseEntity.ok(JsonResult.success(authority));
+    // }
+
     @Override
-    public ResponseEntity<?> create(AuthorityRequest request) {
-
-        AuthorityResponse authority = authorityService.create(request);
-
-        return ResponseEntity.ok(JsonResult.success(authority));
-    }
-
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_UPDATE)
-    @Override
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> update(AuthorityRequest request) {
 
-        AuthorityResponse authority = authorityService.update(request);
+        AuthorityResponse authority = authorityRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(authority));
     }
 
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_DELETE)
     @Override
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> delete(AuthorityRequest request) {
 
-        authorityService.delete(request);
+        authorityRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -91,6 +96,15 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
     public Object export(AuthorityRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
+    }
+
+    @PostMapping("/reset/level")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    public ResponseEntity<?> resetAuthorityLevels(@RequestBody(required = false) AuthorityRequest request) {
+
+        Map<String, Integer> result = authorityRestService.resetAuthorityLevels();
+
+        return ResponseEntity.ok(JsonResult.success(result));
     }
 
     

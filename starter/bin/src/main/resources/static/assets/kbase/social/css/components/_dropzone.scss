@@ -1,0 +1,97 @@
+// 
+// dropzone.scss
+// Vendor css override and new css added
+
+// dropzone 
+.dropzone {
+	min-height: auto;
+	border-radius: $border-radius;
+	position: relative;
+	z-index: 0;
+	border: 2px dashed $gray-300;
+	.dz-preview {
+		&.dz-image-preview {
+			background: transparent;
+		}
+	}
+}
+// Dropzone custom
+.dropzone-custom {
+	position: relative;
+	.dz-cover-preview {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		.dz-cover-preview-wrap {
+			position: absolute;
+			height: 100%;
+			width: 100%;
+			border: 0!important;
+			overflow: hidden;
+		}
+	}
+	.dz-preview {
+		min-height: auto;
+		margin: 0;
+		width: 100%;
+		&.dz-cover-preview {
+			.dz-cover-preview-img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: 0.375rem;
+			}
+		}
+	}
+	&.dropzone-cover {
+		.dz-message {
+			padding: 6rem 2rem;
+		}
+		&.dz-file-processing {
+			.dz-message {
+				display: none;
+			}
+			&.dz-file-complete {
+				.dz-message {
+					display: block;
+				}
+			}
+		}
+		&.dz-max-files-reached {
+			.dz-message {
+				background-color: rgba($black, 0.5);
+				color: $white;
+				opacity: 0;
+				transition: all .2s ease-in-out;
+				border-color: transparent;
+			}
+		}
+		.dz-preview {
+			&.dz-cover-preview {
+				.dz-cover-preview-img {
+					width: 100%;
+					height: 100%;
+				}
+			}
+		}
+	}
+	.dz-message {
+		position: relative;
+		padding: 2rem;
+		margin: 0;
+	}
+	&.dropzone {
+		.dz-preview {
+			display: inline-flex;
+		}
+	}
+}
+.dropzone-custom.dz-clickable .dz-message, .dropzone.dz-clickable .dz-message * {
+	cursor: pointer;
+}
+.dropzone-custom.dropzone-cover.dz-max-files-reached:focus .dz-message, .dropzone.dropzone-cover.dz-max-files-reached:hover .dz-message {
+	opacity: 1;
+}

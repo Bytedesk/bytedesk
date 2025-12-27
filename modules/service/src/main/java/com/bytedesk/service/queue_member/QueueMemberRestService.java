@@ -19,14 +19,17 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.CachePut;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
@@ -46,6 +49,7 @@ import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueTypeEnum;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,14 +63,14 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
 
-    
-    @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
+    // 后续严格测试之后再启用缓存
+    // @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
     @Override
     public Optional<QueueMemberEntity> findByUid(String uid) {
         return queueMemberRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
+    // @Cacheable(value = "queue_member", key = "#threadUid", unless = "#result == null")
     public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
         return queueMemberRepository.findByThreadUid(threadUid);
     }
@@ -100,10 +104,32 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return convertToResponse(savedCounter);
     }
 
-    @CachePut(value = "queue_member", key = "#entity.uid")
+    // @CachePut(value = "queue_member", key = "#entity.uid")
     @Override
     protected QueueMemberEntity doSave(QueueMemberEntity entity) {
         return queueMemberRepository.save(entity);
+    }
+
+    /**
+     * QueueMember 的部分更新并不要求强一致（例如：acceptedAt、offline 标记、计数等）。
+     *
+     * 将这些更新放到异步 + 新事务中 best-effort 执行：
+     * - 避免乐观锁冲突把主流程事务标记为 rollback-only
+     * - 冲突时仅记录日志，不影响主流程
+     */
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void saveAsyncBestEffort(QueueMemberEntity entity) {
+        if (entity == null || !StringUtils.hasText(entity.getUid())) {
+            return;
+        }
+        try {
+            queueMemberRepository.saveAndFlush(entity);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn("QueueMember async update optimistic lock ignored: uid={}, msg={}", entity.getUid(), e.getMessage());
+        } catch (Exception e) {
+            log.error("QueueMember async update failed: uid={}, msg={}", entity.getUid(), e.getMessage(), e);
+        }
     }
 
     @CacheEvict(value = "queue_member", key = "#uid")

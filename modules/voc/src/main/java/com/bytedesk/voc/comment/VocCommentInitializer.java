@@ -28,13 +28,13 @@ public class VocCommentInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         commentRestService.initVocComments(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
         //     String permissionValue = VocCommentPermissions.ARTICLE_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);

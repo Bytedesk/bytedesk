@@ -91,7 +91,8 @@ public class MemberEventListener {
         DepartmentResponse departmentResponse = departmentRestService.create(departmentRequest);
         //
         if (departmentResponse != null) {
-            Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_MEMBER_UID));
+            // DEFAULT_MEMBER_UID 是 member uid，不是 role uid；这里需要授予默认管理员角色
+            Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID));
             // 创建团队成员
             MemberRequest memberRequest = modelMapper.map(user, MemberRequest.class);
             memberRequest.setJobNo("001");

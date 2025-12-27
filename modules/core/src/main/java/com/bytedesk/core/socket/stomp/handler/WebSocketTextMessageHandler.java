@@ -70,7 +70,6 @@ public class WebSocketTextMessageHandler extends TextWebSocketHandler {
         // String reverseContent = new StringBuffer(content).reverse().toString();
         // session.sendMessage(new TextMessage(reverseContent));
         // } catch (IOException e) {
-        // e.printStackTrace();
         // }
     }
 

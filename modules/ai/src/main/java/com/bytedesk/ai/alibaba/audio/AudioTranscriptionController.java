@@ -40,7 +40,6 @@ public class AudioTranscriptionController {
 
 	// private final AudioTranscriptionModel transcriptionModel;
 
-	// private static final Logger log = LoggerFactory.getLogger(AudioTranscriptionController.class);
 
 	// 模型列表：https://help.aliyun.com/zh/model-studio/sambert-websocket-api
 	// private static final String DEFAULT_MODEL = DashScopeAudioTranscriptionApi.AudioTranscriptionModel.PARAFORMER_REALTIME_V2.getValue();

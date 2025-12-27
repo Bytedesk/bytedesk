@@ -36,8 +36,8 @@ public class TicketRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
 
     private String title;
+    // 问题描述
     private String description;
-
     // 联系称呼
     private String contactName;
     // 联系手机号
@@ -46,10 +46,9 @@ public class TicketRequest extends BaseRequest {
     private String email;
     // 联系微信
     private String wechat;
-
+    // 
     private String ticketNumber;
     private String ticketSettingsUid;
-    // private String searchText;
     // 
     private String status;
     private String priority;

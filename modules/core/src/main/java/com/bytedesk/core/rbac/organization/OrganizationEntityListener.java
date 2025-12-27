@@ -13,8 +13,11 @@
  */
 package com.bytedesk.core.rbac.organization;
 
+import java.util.Optional;
+
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -33,7 +36,6 @@ public class OrganizationEntityListener {
     @PostPersist
     public void onPostCreate(OrganizationEntity organization) {
         log.info("onPostCreate: {}", organization);
-        OrganizationEntity clonedOrg = SerializationUtils.clone(organization);
 
         if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid())) {
             return;
@@ -47,9 +49,27 @@ public class OrganizationEntityListener {
         // 5. robot, 
         // 6. agent, 
         // 7. workgroup,
-        // 放在此处会报错，直接放到service Create中
+        // NOTE: 组织创建发生在事务内；如果异步发布事件，监听器可能在提交前查询不到组织记录。
+        // 因此这里注册 afterCommit 回调，在提交后再发布事件。
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishOrganizationCreateEvent(clonedOrg);
+        OrganizationRepository organizationRepository = ApplicationContextHolder.getBean(OrganizationRepository.class);
+        String orgUid = organization.getUid();
+
+        Runnable publish = () -> {
+            Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
+            orgOptional.ifPresent(bytedeskEventPublisher::publishOrganizationCreateEvent);
+        };
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    publish.run();
+                }
+            });
+        } else {
+            publish.run();
+        }
     }
 
 }

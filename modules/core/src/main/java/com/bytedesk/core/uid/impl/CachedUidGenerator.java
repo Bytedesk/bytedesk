@@ -20,8 +20,7 @@ import java.util.List;
 
 import com.bytedesk.core.uid.UidGeneratorService;
 import com.bytedesk.core.uid.exception.UidGenerateException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -50,8 +49,8 @@ import com.bytedesk.core.uid.buffer.RingBuffer;
  * @author wujun
  */
 @ConfigurationProperties(prefix = "bytedesk.uid.cached-uid-generator")
+@Slf4j
 public class CachedUidGenerator extends DefaultUidGenerator implements DisposableBean {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CachedUidGenerator.class);
     private static final int DEFAULT_BOOST_POWER = 3;
 
     // --------------------- 配置属性 begin ---------------------
@@ -108,7 +107,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
         try {
             return ringBuffer.take();
         } catch (Exception e) {
-            LOGGER.error("Generate unique id exception. ", e);
+            log.error("Generate unique id exception. ", e);
             throw new UidGenerateException(e);
         }
     }

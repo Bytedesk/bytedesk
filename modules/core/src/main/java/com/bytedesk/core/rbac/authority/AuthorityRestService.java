@@ -30,10 +30,12 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import io.jsonwebtoken.lang.Assert;
 
+import java.util.Map;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -57,8 +59,13 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
 
     @Override
     public Page<AuthorityResponse> queryByUser(AuthorityRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUser'");
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            // Authority 为全局（无组织）数据：允许未登录情况下查询
+            return queryByOrg(request);
+        }
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Cacheable(value = "authority", key = "#uid", unless = "#result==null")
@@ -77,61 +84,47 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     }
 
     /**
-     * 为平台创建各层级的权限
-     * 例如：传入 "TAG_READ" 会创建：
-    * - TAG_PLATFORM_READ (平台级)
-    * - TAG_ORGANIZATION_READ (组织级)
-    * - TAG_DEPARTMENT_READ (部门级)
-    * - TAG_WORKGROUP_READ (工作组级)
-    * - TAG_AGENT_READ (客服级)
+     * 创建权限（不再在权限字符串中编码层级）
+     * 约定：
+     * - SETTINGS_* 为平台级（PLATFORM）
+     * - 其余 MODULE_ACTION 默认为组织级（ORGANIZATION）
+     * 
+     * 例如：传入 "TAG_READ" 只会创建：
+     * - TAG_READ
      * 
      * @param permissionValue 权限值，格式为 "MODULE_ACTION"，如 "TAG_READ", "TAG_CREATE"
      * @return 平台级权限的响应
      */
     public AuthorityResponse createForPlatform(String permissionValue) {
         Assert.hasText(permissionValue, "permissionValue must not be empty");
-        
-        AuthorityResponse firstResponse = null;
-        
-        // 解析权限值，提取模块前缀和操作类型
-        // 例如：TAG_READ -> prefix=TAG_, action=READ
-        // 例如：TICKET_CREATE -> prefix=TICKET_, action=CREATE
-        int lastUnderscoreIndex = permissionValue.lastIndexOf('_');
-        if (lastUnderscoreIndex > 0) {
-            String modulePrefix = permissionValue.substring(0, lastUnderscoreIndex + 1); // 包含下划线，如 "TAG_"
-            String action = permissionValue.substring(lastUnderscoreIndex + 1); // 如 "READ"
-            
-            // 创建各层级权限
-            String[] levels = {
-                LevelEnum.PLATFORM.name(),
-                LevelEnum.ORGANIZATION.name(),
-                LevelEnum.DEPARTMENT.name(),
-                LevelEnum.WORKGROUP.name(),
-                LevelEnum.AGENT.name(),
-                LevelEnum.USER.name()
-            };
-            
-            for (String level : levels) {
-                // 构建层级权限值，如 TAG_PLATFORM_READ, TAG_ORGANIZATION_READ
-                String levelPermissionValue = modulePrefix + level + "_" + action;
-                
-                AuthorityRequest levelRequest = AuthorityRequest.builder()
-                        .uid(levelPermissionValue.toLowerCase())
-                        .name(I18Consts.I18N_PREFIX + levelPermissionValue)
-                        .value(levelPermissionValue)
-                        .description("Permission for " + levelPermissionValue + " at " + level + " level")
-                        .level(LevelEnum.PLATFORM.name()) // 权限本身都是平台级的
-                        .build();
-                AuthorityResponse response = create(levelRequest);
-                
-                // 返回第一个创建的权限（平台级）作为响应
-                if (firstResponse == null) {
-                    firstResponse = response;
-                }
-            }
-        }
-        
-        return firstResponse;
+
+        LevelEnum level = permissionValue.startsWith("SETTINGS_")
+                ? LevelEnum.PLATFORM // 平台级权限
+                : LevelEnum.ORGANIZATION; // 组织级权限
+
+        AuthorityRequest request = AuthorityRequest.builder()
+            .uid(permissionValue.toLowerCase())
+            // name: i18n.<PERM>
+            .name(I18Consts.I18N_PREFIX + permissionValue)
+            .value(permissionValue)
+            // description: i18n.description.<PERM>（与 name 区分）
+            .description(I18Consts.I18N_DESCRIPTION_PREFIX + permissionValue)
+            .level(level.name())
+            .build();
+
+        return create(request);
+    }
+
+    @CacheEvict(value = "authority", allEntries = true)
+    @Transactional
+    public Map<String, Integer> resetAuthorityLevels() {
+        int settingsUpdated = authorityRepository.resetSettingsAuthoritiesLevelToPlatform();
+        int nonSettingsUpdated = authorityRepository.resetNonSettingsAuthoritiesLevelToOrganization();
+        int descriptionUpdated = authorityRepository.resetAuthoritiesDescriptionToI18nDescriptionKey();
+        return Map.of(
+                "settingsUpdated", settingsUpdated,
+            "nonSettingsUpdated", nonSettingsUpdated,
+            "descriptionUpdated", descriptionUpdated);
     }
 
     @Override
@@ -155,7 +148,7 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
         return convertToResponse(authorityEntitySaved);
     }
 
-    // @PreAuthorize(AuthorityPermissions.AUTHORITY_UPDATE)
+    // @PreAuthorize(AuthorityPermissions.HAS_AUTHORITY_UPDATE)
    @Override
    @Transactional
     public AuthorityResponse update(AuthorityRequest request) {
@@ -246,6 +239,10 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
         List<AuthorityEntity> authorities = authorityRepository
             .findByValueContainingIgnoreCaseAndDeletedFalse(levelMarker);
         return new HashSet<>(authorities);
+    }
+
+    public Set<AuthorityEntity> findAllActive() {
+        return new HashSet<>(authorityRepository.findByDeletedFalse());
     }
 
 }

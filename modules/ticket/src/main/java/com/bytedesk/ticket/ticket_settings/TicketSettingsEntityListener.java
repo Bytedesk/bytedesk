@@ -31,14 +31,14 @@ public class TicketSettingsEntityListener {
 
     @PostPersist
     public void onPostPersist(TicketSettingsEntity ticketSettings) {
-        log.info("onPostPersist: {}", ticketSettings);
+        log.info("onPostPersist: {}", ticketSettings.getName());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishEvent(new TicketSettingsCreateEvent(ticketSettings));
     }
 
     @PostUpdate
     public void onPostUpdate(TicketSettingsEntity ticketSettings) {
-        log.info("onPostUpdate: {}", ticketSettings);
+        log.info("onPostUpdate: {}", ticketSettings.getName());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishEvent(new TicketSettingsUpdateEvent(ticketSettings));
     }

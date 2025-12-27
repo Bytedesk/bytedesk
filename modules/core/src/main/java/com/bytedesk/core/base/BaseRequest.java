@@ -21,8 +21,8 @@ import org.springframework.data.domain.Sort;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
+// import com.bytedesk.core.enums.LevelEnum;
+// import com.bytedesk.core.enums.PlatformEnum;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -93,12 +93,12 @@ public abstract class BaseRequest implements Serializable, PageableRequest {
 
     // platform: 只有超级管理员才有权限
     // organization: 管理员才有权限
-    @Builder.Default
-    private String level = LevelEnum.ORGANIZATION.name();
+    // @Builder.Default
+    private String level;// = LevelEnum.ORGANIZATION.name();
 
     // 默认bytedesk平台
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    private String platform;// = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
     private Boolean superUser = false;

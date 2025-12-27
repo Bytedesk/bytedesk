@@ -48,7 +48,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize(KbasePermissions.HAS_KBASE_READ_ANY_LEVEL)
+    @PreAuthorize(KbasePermissions.HAS_KBASE_READ)
     @ActionAnnotation(title = "知识库", action = "组织查询", description = "query kbase by org")
     @Override
     public ResponseEntity<?> queryByOrg(KbaseRequest request) {
@@ -62,7 +62,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize(KbasePermissions.HAS_KBASE_READ_ANY_LEVEL)
+    @PreAuthorize(KbasePermissions.HAS_KBASE_READ)
     @ActionAnnotation(title = "知识库", action = "用户查询", description = "query kbase by user")
     @Override
     public ResponseEntity<?> queryByUser(KbaseRequest request) {
@@ -76,7 +76,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize(KbasePermissions.HAS_KBASE_READ_ANY_LEVEL)
+    @PreAuthorize(KbasePermissions.HAS_KBASE_READ)
     @ActionAnnotation(title = "知识库", action = "查询详情", description = "query kbase by uid")
     @Override
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
@@ -90,7 +90,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize(KbasePermissions.HAS_KBASE_CREATE_ANY_LEVEL)
+    @PreAuthorize(KbasePermissions.HAS_KBASE_CREATE)
     @ActionAnnotation(title = "知识库", action = "新建", description = "create kbase")
     @Override
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
@@ -104,7 +104,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
-    @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE_ANY_LEVEL)
+    @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE)
     @ActionAnnotation(title = "知识库", action = "更新", description = "update kbase")
     @Override
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
@@ -116,7 +116,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
 
     @Operation(summary = "删除知识库", description = "删除指定的知识库")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @PreAuthorize(KbasePermissions.HAS_KBASE_DELETE_ANY_LEVEL)
+    @PreAuthorize(KbasePermissions.HAS_KBASE_DELETE)
     @ActionAnnotation(title = "知识库", action = "删除", description = "delete kbase")
     @Override
     public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
@@ -128,7 +128,7 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
 
     @Operation(summary = "导出知识库", description = "导出知识库数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
-    @PreAuthorize(KbasePermissions.HAS_KBASE_EXPORT_ANY_LEVEL)
+    @PreAuthorize(KbasePermissions.HAS_KBASE_EXPORT)
     @ActionAnnotation(title = "知识库", action = "导出", description = "export kbase")
     @GetMapping("/export")
     @Override

@@ -118,14 +118,12 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
      * Message leave settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private MessageLeaveSettingsEntity messageLeaveSettings;
 
     /**
      * Draft Message leave settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    // @NotFound(action = NotFoundAction.IGNORE)
     private MessageLeaveSettingsEntity draftMessageLeaveSettings;
 
     /**

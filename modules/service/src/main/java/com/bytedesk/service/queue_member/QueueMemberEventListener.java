@@ -80,7 +80,7 @@ public class QueueMemberEventListener {
         if (memberOptional.isPresent()) {
             QueueMemberEntity member = memberOptional.get();
             member.manualAcceptThread();
-            queueMemberRestService.save(member);
+            queueMemberRestService.saveAsyncBestEffort(member);
             // 
             handleQueueAcceptBroadcast(thread, member);
         } else {
@@ -247,7 +247,7 @@ public class QueueMemberEventListener {
             queueMember.setAgentQueue(agentQueue);
         }
         queueMember.agentAutoAcceptThread();
-        queueMemberRestService.save(queueMember);
+        queueMemberRestService.saveAsyncBestEffort(queueMember);
 
         publishThreadAcceptedEvents(savedThread);
         return true;
@@ -517,7 +517,7 @@ public class QueueMemberEventListener {
             queueMember.setVisitorMessageCount(queueMember.getVisitorMessageCount() + 1);
 
             // 保存更新 - 支持重试机制
-            queueMemberRestService.save(queueMember);
+            queueMemberRestService.saveAsyncBestEffort(queueMember);
             log.debug("已更新队列成员访客消息统计: threadUid={}, visitorMsgCount={}",
                     thread.getUid(), queueMember.getVisitorMessageCount());
         } catch (Exception e) {
@@ -584,7 +584,7 @@ public class QueueMemberEventListener {
             queueMember.setAgentLastResponseAt(now);
 
             // 保存更新
-            queueMemberRestService.save(queueMember);
+            queueMemberRestService.saveAsyncBestEffort(queueMember);
             log.debug("已更新队列成员客服消息统计: threadUid={}, agentMsgCount={}, avgResponseTime={}s, maxResponseTime={}s",
                     thread.getUid(), queueMember.getAgentMessageCount(),
                     queueMember.getAgentAvgResponseLength(), queueMember.getAgentMaxResponseLength());
@@ -650,7 +650,7 @@ public class QueueMemberEventListener {
             }
 
             // 保存更新
-            queueMemberRestService.save(queueMember);
+            queueMemberRestService.saveAsyncBestEffort(queueMember);
             log.debug("已更新队列成员机器人消息统计: threadUid={}, robotMsgCount={}, avgResponseTime={}s, maxResponseTime={}s",
                     thread.getUid(), queueMember.getRobotMessageCount(),
                     queueMember.getRobotAvgResponseLength(), queueMember.getRobotMaxResponseLength());
@@ -696,7 +696,7 @@ public class QueueMemberEventListener {
             queueMember.setSystemLastResponseAt(now);
 
             // 保存更新
-            queueMemberRestService.save(queueMember);
+            queueMemberRestService.saveAsyncBestEffort(queueMember);
             log.debug("已更新队列成员系统消息统计: threadUid={}, systemMsgCount={}",
                     thread.getUid(), queueMember.getSystemMessageCount());
         } catch (Exception e) {

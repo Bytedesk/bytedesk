@@ -31,24 +31,22 @@ public class RoleSpecification extends BaseSpecification<RoleEntity, RoleRequest
     public static Specification<RoleEntity> search(RoleRequest request, AuthService authService) {
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            List<Predicate> predicates = getBasicPredicates(root, criteriaBuilder, request, authService);
 
             if (request.getSystem() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("system"), request.getSystem()));
-                if (Boolean.FALSE.equals(request.getSystem()) && StringUtils.hasText(request.getOrgUid())) {
-                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-                }
-            } else {
-                //
-                if (StringUtils.hasText(request.getLevel())) {
-                    predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
-                }
-                // 过滤 orgUid
-                if (StringUtils.hasText(request.getOrgUid())) {
+
+                // 系统角色查询时，如果请求携带 orgUid，则显式按 orgUid 过滤。
+                // 注意：BaseSpecification 在 PLATFORM level 下不会自动附加 orgUid 过滤条件。
+                if (Boolean.TRUE.equals(request.getSystem()) && StringUtils.hasText(request.getOrgUid())) {
                     predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
                 }
             }
+
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
+            }
+
             // searchText
             if (StringUtils.hasText(request.getSearchText())) {
                 List<Predicate> orPredicates = new ArrayList<>();

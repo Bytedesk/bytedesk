@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import java.util.Set;
+
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -35,8 +37,6 @@ import lombok.experimental.SuperBuilder;
 public class UserRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
-
-    // private String uid;
 
 	private String num;
 
@@ -69,15 +69,12 @@ public class UserRequest extends BaseRequest {
 	private Sex sex = Sex.UNKNOWN;
 
 	private Boolean enabled;
+
+	// private Boolean system;
 	
 	private Boolean emailVerified;
 
 	private Boolean mobileVerified;
-
-	// 需要前端传递字符串的情况下，使用string类型
-	// @NotBlank(message = "platform required")
-	// @Builder.Default
-	// private String platform = PlatformEnum.BYTEDESK.name();
 
 	// 注册来源（例如：USERNAME、EMAIL、MOBILE、GITHUB、WECHAT、GOOGLE、DINGTALK、FEISHU、FACEBOOK、DOUYIN、LDAP、OIDC、OPENID、CAS、ADMIN、IMPORT、UNKNOWN）
 	@Builder.Default
@@ -89,5 +86,8 @@ public class UserRequest extends BaseRequest {
 
 	// 组织名称搜索
 	private String currentOrganization;
+
+	// 角色 uid 列表（用于管理员更新用户在当前组织下的角色）
+	private Set<String> roleUids;
 
 }

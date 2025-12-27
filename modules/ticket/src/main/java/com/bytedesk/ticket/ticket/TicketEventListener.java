@@ -38,6 +38,7 @@ import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
+import com.bytedesk.ticket.utils.FlowableIdUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +91,8 @@ public class TicketEventListener {
                     ? Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
                     : Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY);
         }
+            // Flowable 要求 processDefinitionKey 为 NCName（不能以数字开头）
+            processKey = FlowableIdUtils.toProcessDefinitionKey(processKey);
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey(processKey)

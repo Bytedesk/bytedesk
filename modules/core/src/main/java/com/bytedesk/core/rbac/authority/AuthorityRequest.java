@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.rbac.authority;
 
-import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.base.BaseRequestNoOrg;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,10 +28,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthorityRequest extends BaseRequest {
+public class AuthorityRequest extends BaseRequestNoOrg {
 
     private static final long serialVersionUID = 1L;
-
 
     private String name;
     

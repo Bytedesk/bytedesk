@@ -38,7 +38,7 @@ public class KbaseConsts {
 
     // public static final String KB_AUTOREPLY_NAME = I18Consts.I18N_PREFIX + "kb.autoreply.name";
 
-    // public static final String KB_QUICKREPLY_NAME = I18Consts.I18N_PREFIX + "kb.quickreply.name";
+    // public static final String KB_QUICK_REPLY_NAME = I18Consts.I18N_PREFIX + "kb.quickreply.name";
 
     // public static final String KB_TABOO_NAME = I18Consts.I18N_PREFIX + "kb.taboo.name";
 
@@ -64,9 +64,9 @@ public class KbaseConsts {
 
     public static final String KB_AUTOREPLY_NAME = "自动回复";
 
-    public static final String KB_QUICKREPLY_NAME = "快捷回复";
+    public static final String KB_QUICK_REPLY_NAME = "快捷回复";
 
-    // public static final String KB_QUICKBUTTON_NAME = "快捷按钮";
+    // public static final String KB_QUICK_BUTTON_NAME = "快捷按钮";
 
     public static final String KB_TABOO_NAME = "违禁词";
 

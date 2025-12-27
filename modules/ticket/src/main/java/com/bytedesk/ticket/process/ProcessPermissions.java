@@ -13,13 +13,24 @@
  */
 package com.bytedesk.ticket.process;
 
-public class ProcessPermissions {
+import com.bytedesk.core.base.BasePermissions;
 
-//     public static final String PROCESS_PREFIX = "PROCESS_";
-//     // Process permissions
-//     public static final String PROCESS_CREATE = "hasAuthority('PROCESS_CREATE')";
-//     public static final String PROCESS_READ = "hasAuthority('PROCESS_READ')";
-//     public static final String PROCESS_UPDATE = "hasAuthority('PROCESS_UPDATE')";
-//     public static final String PROCESS_DELETE = "hasAuthority('PROCESS_DELETE')";
-//     public static final String PROCESS_EXPORT = "hasAuthority('PROCESS_EXPORT')";
+public class ProcessPermissions extends BasePermissions {
+
+	// 模块前缀
+	public static final String PROCESS_PREFIX = "PROCESS_";
+
+	// 统一权限（不区分层级）
+	public static final String PROCESS_READ = "PROCESS_READ";
+	public static final String PROCESS_CREATE = "PROCESS_CREATE";
+	public static final String PROCESS_UPDATE = "PROCESS_UPDATE";
+	public static final String PROCESS_DELETE = "PROCESS_DELETE";
+	public static final String PROCESS_EXPORT = "PROCESS_EXPORT";
+
+	// PreAuthorize 表达式 - 统一权限（不区分层级）
+	public static final String HAS_PROCESS_READ = "hasAuthority('PROCESS_READ')";
+	public static final String HAS_PROCESS_CREATE = "hasAuthority('PROCESS_CREATE')";
+	public static final String HAS_PROCESS_UPDATE = "hasAuthority('PROCESS_UPDATE')";
+	public static final String HAS_PROCESS_DELETE = "hasAuthority('PROCESS_DELETE')";
+	public static final String HAS_PROCESS_EXPORT = "hasAuthority('PROCESS_EXPORT')";
 }

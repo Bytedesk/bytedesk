@@ -21,7 +21,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.bytedesk.core.quartz.service.QuartzEventPublisher;
+import com.bytedesk.core.quartz.QuartzEventPublisher;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;

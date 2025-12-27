@@ -21,8 +21,7 @@ import io.netty.handler.codec.ReplayingDecoder;
 import io.netty.handler.codec.TooLongFrameException;
 import com.bytedesk.call.esl.client.transport.HeaderParser;
 import com.bytedesk.call.esl.client.transport.message.EslHeaders.Name;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -45,6 +44,7 @@ import java.util.List;
  *    Extract content-length bytes from buffer and process
  * </pre>
  */
+@Slf4j
 public class EslFrameDecoder extends ReplayingDecoder<EslFrameDecoder.State> {
 	/**
 	 * Line feed character
@@ -56,7 +56,6 @@ public class EslFrameDecoder extends ReplayingDecoder<EslFrameDecoder.State> {
 		READ_BODY,
 	}
 
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private final int maxHeaderSize;
 	private EslMessage currentMessage;
 	private boolean treatUnknownHeadersAsBody = false;

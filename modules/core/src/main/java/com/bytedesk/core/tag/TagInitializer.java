@@ -32,13 +32,13 @@ public class TagInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         tagRestService.initTags(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = TagPermissions.TAG_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

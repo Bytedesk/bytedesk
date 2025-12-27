@@ -1,0 +1,311 @@
+// 
+// nav.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+// 
+
+
+// Nav link active color
+.nav {
+  .nav-item{ 
+    .nav-link{
+      &.active{
+        color: var(--#{$prefix}primary);
+      }
+    }
+  }
+}
+
+// Pills
+.nav-pills{
+  .nav-link{
+    cursor: pointer;
+    margin-bottom: 15px;
+    padding: 0.5rem 1rem;
+  }
+}
+.nav-pills.nav-pills-light{
+  .nav-link{
+    &:hover{
+      background-color: var(--#{$prefix}light);
+    }
+    &.active{
+      background-color: var(--#{$prefix}light);
+    }
+  }
+}
+
+
+//Nav pills primary soft
+.nav-pills-soft .nav-link.active,
+.nav-pills-soft .show > .nav-link {
+  background-color: rgba(var(--#{$prefix}primary-rgb), 0.1);
+}
+
+// tab line
+.nav.nav-bottom-line{ 
+  border-bottom: solid 1px var(--#{$prefix}border-color);
+  .nav-link{
+    border: transparent;
+    font-weight: 600;
+    padding: ($nav-link-padding-y * 3) ($nav-link-padding-x * 1.3);
+  }
+  .nav-item:first-child .nav-link{
+    padding-left: 0;
+  }
+  .nav-link{
+    background: transparent;
+    border-bottom: 3px solid transparent;
+    &.active {
+      background: transparent;
+      color: var(--bs-primary);
+      border-bottom: 3px solid var(--bs-primary);
+    }
+  }
+  .nav-item{
+    margin-bottom: -2px;
+  }
+}
+
+// nav
+.nav.flex-column:not(.nav-pills) .nav-link{
+  padding-left: 0;
+  padding-top: 0.30rem;
+  padding-bottom: 0.30rem;
+}
+
+// Tab content
+.tab-content{
+  padding: 25px 0;
+  margin-bottom: 20px;
+}
+.nav-tabs{
+  .nav-link{
+    padding: 0.5rem 1rem;
+    // border: none;
+  }
+  .nav-link.active{
+    // border: none;
+  }
+}
+
+// nav tabs white
+.nav-tabs-white{
+  border-radius: $border-radius;
+  .nav-item{
+    .nav-link{
+      transition: $transition-base;
+      border: 0;
+      border-radius: $border-radius;
+      margin-right: 4px;
+      font-weight: 600;
+    }
+    &:last-child{
+      .nav-link{
+        margin-right: 0;
+      }
+    }
+    .nav-link.active, .nav-link:hover{
+      background: $white;
+      color: var(--#{$prefix}primary);
+    }
+  }
+}
+
+// nav divider
+.nav.nav-divider{
+  .nav-item+.nav-item:before{
+    content: "\2022";
+    color: inherit;
+    padding-left: .6rem;
+    padding-right: .6rem;
+    opacity: 0.8;
+  }
+  .nav-item{
+    display: flex;
+    align-items: center;
+  }
+  .nav-link{
+    padding: 0;
+  }
+}
+
+// nav link secondary
+.nav-link-secondary {
+  .nav-item{ 
+    .nav-link{
+      color: $headings-color;
+      &:hover, &.active{
+        color: var(--bs-primary);
+      }
+    }
+  }
+}
+
+// nav stack 
+.nav-stack{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: stretch;
+  gap: 0.7rem;
+  .nav-link{
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+// nav icon
+.nav{
+  .nav-item{
+    .nav-link{
+      .nav-icon{
+        background: var(--bs-light);
+        height: 2.1rem;
+        width: 2.1rem;
+        font-size: 1.1em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: $transition-base;
+      } 
+      &:hover{
+        .nav-icon{
+          background:  var(--bs-primary);
+          color:  var(--bs-white);
+        }
+      }
+    } 
+  }
+}
+
+// nav sidenav breakpoint up for nav sidenav
+@include media-breakpoint-up(lg){
+  // nav sidenav
+  .nav-sidenav{
+    width: 5rem;
+    transition: width 0.3s;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9;
+    margin-top: $navbar-height;
+    .nav-link{
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      padding-left: 0;
+    }
+    .nav-text{
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease-in-out;
+    }
+  }
+  
+  // sidebar start enabled
+  .sidebar-start-enabled{
+    .nav-sidenav {
+      width: 270px;
+      .nav-text{
+        display: flex;
+        opacity: 1;
+        visibility: visible;
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
+// nav sidenav breakpoint down for nav sidenav
+@include media-breakpoint-down(lg){
+  // nav sidenav
+  .nav-sidenav{
+    width: 270px;
+    left: 0;
+    transition: transform .3s ease-in-out;
+    position: fixed;
+    top: 0;
+    z-index: 9;
+    margin-top: $navbar-height;
+    transform: translateX(-100%);
+    .nav-text{
+      padding-left: 10px;
+    }
+  }
+  .sidebar-start-enabled{
+    .nav-sidenav{
+      transform: none;
+    }
+  }
+}
+
+
+// Nav breakpoint up for sidebar end
+@include media-breakpoint-up(lg){
+  
+  // sidebar end
+  .sidebar-end{
+    width: 5rem;
+    transition: width 0.3s;
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin-top: $navbar-height;
+    z-index: 9;
+    .sidebar-end-alignment{
+      align-items: center;
+    }
+    .nav-link{
+      display: flex;
+      align-items: center;
+    }
+    .contact-name, .contact-search, .contact-title, .contact-status{
+      opacity: 0;
+      display: none;
+      visibility: hidden;
+      transition: all 0.5s ease-in-out;
+      white-space: nowrap;
+    }
+  }
+  
+  // sidebar end enabled
+  .sidebar-end-enabled{
+    .sidebar-end{
+      width: 270px;
+      .sidebar-end-alignment{
+        align-items: inherit;
+      }
+      .contact-name, .contact-search, .contact-title, .contact-status{
+        display: flex;
+        opacity: 1;
+        visibility: visible;
+        transition: all 0.2s ease-in-out;
+      }
+    }
+  }
+}
+
+// sidebar end breakpoint down for sidebar end
+@include media-breakpoint-down(lg){ 
+  
+  // sidebar-end
+  .sidebar-end{
+    width: 270px;
+    right: 0;
+    transition: transform .3s ease-in-out;
+    position: fixed;
+    top: 0;
+    z-index: 9;
+    transform: translateX(100%);
+  }
+  .sidebar-end-enabled{
+    .sidebar-end{
+      transform: none;
+    }
+  }
+}

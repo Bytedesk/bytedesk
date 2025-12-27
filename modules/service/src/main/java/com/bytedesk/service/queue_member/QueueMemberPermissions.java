@@ -13,6 +13,25 @@
  */
 package com.bytedesk.service.queue_member;
 
-public class QueueMemberPermissions {
+import com.bytedesk.core.base.BasePermissions;
+
+public class QueueMemberPermissions extends BasePermissions {
+
+	// 模块前缀
+	public static final String QUEUE_MEMBER_PREFIX = "QUEUE_MEMBER_";
+
+	// 统一权限（不区分层级）
+	public static final String QUEUE_MEMBER_READ = "QUEUE_MEMBER_READ";
+	public static final String QUEUE_MEMBER_CREATE = "QUEUE_MEMBER_CREATE";
+	public static final String QUEUE_MEMBER_UPDATE = "QUEUE_MEMBER_UPDATE";
+	public static final String QUEUE_MEMBER_DELETE = "QUEUE_MEMBER_DELETE";
+	public static final String QUEUE_MEMBER_EXPORT = "QUEUE_MEMBER_EXPORT";
+
+	// PreAuthorize 表达式 - 统一权限（不区分层级）
+	public static final String HAS_QUEUE_MEMBER_READ = "hasAuthority('QUEUE_MEMBER_READ')";
+	public static final String HAS_QUEUE_MEMBER_CREATE = "hasAuthority('QUEUE_MEMBER_CREATE')";
+	public static final String HAS_QUEUE_MEMBER_UPDATE = "hasAuthority('QUEUE_MEMBER_UPDATE')";
+	public static final String HAS_QUEUE_MEMBER_DELETE = "hasAuthority('QUEUE_MEMBER_DELETE')";
+	public static final String HAS_QUEUE_MEMBER_EXPORT = "hasAuthority('QUEUE_MEMBER_EXPORT')";
 
 }

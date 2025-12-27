@@ -44,7 +44,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
         // 迁移到 WorkgroupInitializer 执行
         // init();
         //
-        initPermissions();
+        initAuthority();
     }
 
     // @PostConstruct
@@ -77,7 +77,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
 
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = MemberPermissions.MEMBER_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

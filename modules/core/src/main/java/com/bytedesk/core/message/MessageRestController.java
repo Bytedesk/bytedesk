@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 分页消息列表
      */
     @Operation(summary = "根据组织查询消息", description = "返回当前组织的消息列表")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     @Override
     public ResponseEntity<?> queryByOrg(MessageRequest request) {
 
@@ -75,6 +77,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 分页消息列表
      */
     @Operation(summary = "根据用户查询消息", description = "返回当前用户的消息列表")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     public ResponseEntity<?> queryByUser(MessageRequest request) {
 
         Page<MessageResponse> response = messageRestService.queryByUser(request);
@@ -89,6 +92,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 消息详情
      */
     @Operation(summary = "根据UID查询消息", description = "通过唯一标识符查询消息")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     @Override
     public ResponseEntity<?> queryByUid(MessageRequest request) {
         
@@ -120,6 +124,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      */
     @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
     @GetMapping("/thread/topic")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
@@ -135,6 +140,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      */
     @Operation(summary = "根据会话UID查询消息", description = "通过会话唯一标识符查询相关消息")
     @GetMapping("/thread/uid")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
@@ -149,6 +155,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 创建的消息
      */
     @Operation(summary = "创建消息", description = "创建新的消息记录")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_CREATE)
     @Override
     public ResponseEntity<?> create(MessageRequest request) {
         
@@ -164,6 +171,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 更新后的消息
      */
     @Operation(summary = "更新消息", description = "更新已存在的消息记录")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_UPDATE)
     @Override
     public ResponseEntity<?> update(MessageRequest request) {
         
@@ -179,6 +187,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 删除结果
      */
     @Operation(summary = "删除消息", description = "删除指定的消息记录")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_DELETE)
     @Override
     public ResponseEntity<?> delete(MessageRequest request) {
         
@@ -196,6 +205,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      */
     @Operation(summary = "发送离线消息", description = "当客户端长连接断开时，通过REST接口发送消息")
     @PostMapping("/rest/send")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_CREATE)
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
         String json = (String) map.get("json");
         log.debug("json {}", json);
@@ -214,6 +224,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
     @Operation(summary = "导出消息数据", description = "将消息数据导出为Excel格式")
     @ActionAnnotation(title = "消息", action = "导出", description = "export message")
     @GetMapping("/export")
+    // @PreAuthorize(MessagePermissions.HAS_MESSAGE_EXPORT)
     public Object export(MessageRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,

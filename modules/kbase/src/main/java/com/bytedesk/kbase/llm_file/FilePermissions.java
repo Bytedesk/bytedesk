@@ -20,61 +20,18 @@ public class FilePermissions extends BasePermissions {
     // 模块前缀
     public static final String FILE_PREFIX = "FILE_";
 
-    // 平台级权限
-    public static final String FILE_PLATFORM_READ = "FILE_PLATFORM_READ";
-    public static final String FILE_PLATFORM_CREATE = "FILE_PLATFORM_CREATE";
-    public static final String FILE_PLATFORM_UPDATE = "FILE_PLATFORM_UPDATE";
-    public static final String FILE_PLATFORM_DELETE = "FILE_PLATFORM_DELETE";
-    public static final String FILE_PLATFORM_EXPORT = "FILE_PLATFORM_EXPORT";
+    // 统一权限（不区分层级）
+    public static final String FILE_READ = "FILE_READ";
+    public static final String FILE_CREATE = "FILE_CREATE";
+    public static final String FILE_UPDATE = "FILE_UPDATE";
+    public static final String FILE_DELETE = "FILE_DELETE";
+    public static final String FILE_EXPORT = "FILE_EXPORT";
 
-    // 组织级权限
-    public static final String FILE_ORGANIZATION_READ = "FILE_ORGANIZATION_READ";
-    public static final String FILE_ORGANIZATION_CREATE = "FILE_ORGANIZATION_CREATE";
-    public static final String FILE_ORGANIZATION_UPDATE = "FILE_ORGANIZATION_UPDATE";
-    public static final String FILE_ORGANIZATION_DELETE = "FILE_ORGANIZATION_DELETE";
-    public static final String FILE_ORGANIZATION_EXPORT = "FILE_ORGANIZATION_EXPORT";
-
-    // 部门级权限
-    public static final String FILE_DEPARTMENT_READ = "FILE_DEPARTMENT_READ";
-    public static final String FILE_DEPARTMENT_CREATE = "FILE_DEPARTMENT_CREATE";
-    public static final String FILE_DEPARTMENT_UPDATE = "FILE_DEPARTMENT_UPDATE";
-    public static final String FILE_DEPARTMENT_DELETE = "FILE_DEPARTMENT_DELETE";
-    public static final String FILE_DEPARTMENT_EXPORT = "FILE_DEPARTMENT_EXPORT";
-
-    // 工作组级权限
-    public static final String FILE_WORKGROUP_READ = "FILE_WORKGROUP_READ";
-    public static final String FILE_WORKGROUP_CREATE = "FILE_WORKGROUP_CREATE";
-    public static final String FILE_WORKGROUP_UPDATE = "FILE_WORKGROUP_UPDATE";
-    public static final String FILE_WORKGROUP_DELETE = "FILE_WORKGROUP_DELETE";
-    public static final String FILE_WORKGROUP_EXPORT = "FILE_WORKGROUP_EXPORT";
-
-    // 客服级权限
-    public static final String FILE_AGENT_READ = "FILE_AGENT_READ";
-    public static final String FILE_AGENT_CREATE = "FILE_AGENT_CREATE";
-    public static final String FILE_AGENT_UPDATE = "FILE_AGENT_UPDATE";
-    public static final String FILE_AGENT_DELETE = "FILE_AGENT_DELETE";
-    public static final String FILE_AGENT_EXPORT = "FILE_AGENT_EXPORT";
-    // 用户级权限
-    public static final String FILE_USER_READ = "FILE_USER_READ";
-    public static final String FILE_USER_CREATE = "FILE_USER_CREATE";
-    public static final String FILE_USER_UPDATE = "FILE_USER_UPDATE";
-    public static final String FILE_USER_DELETE = "FILE_USER_DELETE";
-    public static final String FILE_USER_EXPORT = "FILE_USER_EXPORT";
-
-
-    // PreAuthorize 表达式 - 读取权限（允许多层级访问）
-    public static final String HAS_FILE_READ_ANY_LEVEL = "hasAnyAuthority('FILE_PLATFORM_READ', 'FILE_ORGANIZATION_READ', 'FILE_DEPARTMENT_READ', 'FILE_WORKGROUP_READ', 'FILE_AGENT_READ', 'FILE_USER_READ')";
-    
-    // PreAuthorize 表达式 - 创建权限（允许多层级访问）
-    public static final String HAS_FILE_CREATE_ANY_LEVEL = "hasAnyAuthority('FILE_PLATFORM_CREATE', 'FILE_ORGANIZATION_CREATE', 'FILE_DEPARTMENT_CREATE', 'FILE_WORKGROUP_CREATE', 'FILE_AGENT_CREATE', 'FILE_USER_CREATE')";
-    
-    // PreAuthorize 表达式 - 更新权限（允许多层级访问）
-    public static final String HAS_FILE_UPDATE_ANY_LEVEL = "hasAnyAuthority('FILE_PLATFORM_UPDATE', 'FILE_ORGANIZATION_UPDATE', 'FILE_DEPARTMENT_UPDATE', 'FILE_WORKGROUP_UPDATE', 'FILE_AGENT_UPDATE', 'FILE_USER_UPDATE')";
-    
-    // PreAuthorize 表达式 - 删除权限（允许多层级访问）
-    public static final String HAS_FILE_DELETE_ANY_LEVEL = "hasAnyAuthority('FILE_PLATFORM_DELETE', 'FILE_ORGANIZATION_DELETE', 'FILE_DEPARTMENT_DELETE', 'FILE_WORKGROUP_DELETE', 'FILE_AGENT_DELETE', 'FILE_USER_DELETE')";
-    
-    // PreAuthorize 表达式 - 导出权限（允许多层级访问）
-    public static final String HAS_FILE_EXPORT_ANY_LEVEL = "hasAnyAuthority('FILE_PLATFORM_EXPORT', 'FILE_ORGANIZATION_EXPORT', 'FILE_DEPARTMENT_EXPORT', 'FILE_WORKGROUP_EXPORT', 'FILE_AGENT_EXPORT', 'FILE_USER_EXPORT')";
+    // PreAuthorize 表达式 - 统一权限（不区分层级）
+    public static final String HAS_FILE_READ = "hasAuthority('FILE_READ')";
+    public static final String HAS_FILE_CREATE = "hasAuthority('FILE_CREATE')";
+    public static final String HAS_FILE_UPDATE = "hasAuthority('FILE_UPDATE')";
+    public static final String HAS_FILE_DELETE = "hasAuthority('FILE_DELETE')";
+    public static final String HAS_FILE_EXPORT = "hasAuthority('FILE_EXPORT')";
 
 }

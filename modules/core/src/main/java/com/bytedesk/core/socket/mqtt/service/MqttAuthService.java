@@ -48,6 +48,11 @@ public class MqttAuthService {
         // log.debug("mqtt auth username {}, accessToken {}", username, accessToken);
         // return true;
         if (accessToken != null && validateJwtToken(accessToken)) {
+            // 性能测试模式：AuthService.formatResponse 会跳过 token 表落库。
+            // MQTT 鉴权链路不能再强依赖 token 表，否则会导致连接失败。
+            if (bytedeskProperties.isDisableIpFilter()) {
+                return true;
+            }
             // 从数据库验证token是否有效（未被撤销且未过期）
             Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
             if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {

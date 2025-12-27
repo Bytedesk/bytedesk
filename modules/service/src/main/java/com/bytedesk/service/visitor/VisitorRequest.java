@@ -27,10 +27,12 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.SuperBuilder;
 import lombok.experimental.Accessors;
 
 
+@Slf4j
 @Data
 @SuperBuilder
 @Accessors(chain = true)
@@ -117,6 +119,10 @@ public class VisitorRequest extends BaseRequest {
 	// 用于区分本地测试还是线上环境
 	@Builder.Default
 	private Boolean debug = false;
+
+	// 灰度/草稿配置预览：为 true 时优先使用 draft 版本 settings
+	@Builder.Default
+	private Boolean draft = false;
 	private String settingsUid;
 	// 强制创建新会话，每次都创建新会话，主要用于测试
 	@Builder.Default
@@ -184,9 +190,7 @@ public class VisitorRequest extends BaseRequest {
 		try {
 			typeInt = Integer.parseInt(super.type);
 		} catch (NumberFormatException e) {
-			// 处理异常，比如记录日志、返回默认值等
-			e.printStackTrace();
-			// 假设有一个默认值
+			log.error("VisitorRequest formatType parse failed: {}", super.type, e);
 			typeInt = 0;
 		}
 		return ThreadTypeEnum.fromValue(typeInt);

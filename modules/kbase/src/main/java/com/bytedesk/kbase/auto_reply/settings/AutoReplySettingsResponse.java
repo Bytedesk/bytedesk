@@ -60,6 +60,14 @@ public class AutoReplySettingsResponse implements Serializable {
     // 大模型回复类型所需要字段
     private String kbUid;
 
+    // 是否启用大模型接管会话
+    @Builder.Default
+    private Boolean takeoverEnabled = false;
+
+    // 接管会话的机器人 uid（RobotEntity.uid）
+    @Builder.Default
+    private String robotUid = BytedeskConsts.EMPTY_STRING;
+
     /**
      * 从 AutoReplySettings 实体创建 AutoReplySettingsResponse
      * @param settings AutoReplySettings 实体
@@ -76,6 +84,8 @@ public class AutoReplySettingsResponse implements Serializable {
                 .autoReplyContentType(settings.getAutoReplyContentType())
                 .autoReplyContent(settings.getAutoReplyContent())
                 .kbUid(settings.getKbUid())
+                .takeoverEnabled(settings.getTakeoverEnabled())
+                .robotUid(settings.getRobotUid())
                 .build();
     }
 

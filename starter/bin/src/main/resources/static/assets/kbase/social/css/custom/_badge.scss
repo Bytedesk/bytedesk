@@ -1,0 +1,52 @@
+// 
+// badge.scss
+// Extended from Bootstrap
+// 
+
+// 
+// Additional style for theme
+//
+a.badge{
+  &:hover{
+    color: $white;
+  }
+}
+
+// unread notification
+.badge-unread{
+  background: var(--#{$prefix}light);
+  &:hover{
+    background: var(--#{$prefix}light);
+  }
+  &:before{
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: var(--#{$prefix}primary);
+    border-radius: 50%;
+    position: absolute;
+    top: 40px;
+    left: 4px;
+  }
+}
+
+// notification badge
+.badge-notif{
+  width: 8px;
+  height: 8px;
+  background: $danger;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: -3px;
+  z-index: 1;
+  &.badge-notif-bottom {
+    width: 6px;
+    height: 6px;
+    top: inherit;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+  }
+}

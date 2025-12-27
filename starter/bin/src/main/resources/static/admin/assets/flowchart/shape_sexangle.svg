@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24mm"
+   height="24mm"
+   viewBox="0 0 24 24"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="shape_sexangle.svg"
+   inkscape:version="1.1-rc (52f87abb86, 2021-05-02)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     objecttolerance="10.0"
+     gridtolerance="10.0"
+     guidetolerance="10.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2"
+     inkscape:cx="26.5"
+     inkscape:cy="39"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="图层 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       sodipodi:type="star"
+       style="fill:#ffffff;stroke:#000000;stroke-width:6.60004;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path3309"
+       inkscape:flatsided="true"
+       sodipodi:sides="6"
+       sodipodi:cx="18"
+       sodipodi:cy="24"
+       sodipodi:r1="65.048058"
+       sodipodi:r2="32.524029"
+       sodipodi:arg1="0.6819437"
+       sodipodi:arg2="1.2055425"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 68.499999,64.999999 7.7429586,88.234281 -42.75704,47.234282 -32.499999,-16.999999 28.257041,-40.234281 78.75704,0.76571775 Z"
+       transform="matrix(0.14470039,-0.02563397,0.02402471,0.15439294,9.0336872,9.0582798)"
+       inkscape:transform-center-x="1.0211975"
+       inkscape:transform-center-y="-1.66214" />
+  </g>
+</svg>

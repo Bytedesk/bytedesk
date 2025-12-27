@@ -57,6 +57,26 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     private final ModelMapper modelMapper;
 
+    private boolean isPlatformSuper(UserEntity user) {
+        if (user == null) {
+            return false;
+        }
+        return user.isSuperUser();
+    }
+
+    private void assertOwnerOrPrivileged(OrganizationEntity organization) {
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new NotLoginException("login required");
+        }
+        if (isPlatformSuper(authUser)) {
+            return;
+        }
+        if (organization.getUser() == null || !authUser.getUid().equals(organization.getUser().getUid())) {
+            throw new ForbiddenException("no permission to access this organization");
+        }
+    }
+
     @Override
     protected Specification<OrganizationEntity> createSpecification(OrganizationRequest request) {
         return OrganizationSpecification.search(request, authService);
@@ -65,6 +85,44 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     @Override
     protected Page<OrganizationEntity> executePageQuery(Specification<OrganizationEntity> spec, Pageable pageable) {
         return organizationRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<OrganizationResponse> queryByOrg(OrganizationRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<OrganizationEntity> spec = createSpecification(request);
+        Page<OrganizationEntity> page = executePageQuery(spec, pageable);
+        return page.map(this::convertToResponse);
+    }
+
+    /**
+     * 覆盖基类默认实现：超级管理员查询组织列表时不应强制注入 userUid。
+     *
+     * 说明：前端超级管理员列表页调用的是 /api/v1/org/query（即 queryByUser 链路），
+     * BaseRestService#queryByUser 会默认 request.setUserUid(currentUser.uid)，
+     * 导致最终只返回“自己创建的组织”。
+     */
+    @Override
+    public Page<OrganizationResponse> queryByUser(OrganizationRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("请先登录");
+        }
+
+        // 防止前端伪造 isSuperUser 标志：只有真正的超级管理员才能生效
+        if (Boolean.TRUE.equals(request.getSuperUser()) && !user.isSuperUser()) {
+            request.setSuperUser(false);
+        }
+
+        // 超级管理员：分页返回全部组织
+        if (user.isSuperUser() || Boolean.TRUE.equals(request.getSuperUser())) {
+            request.setUserUid(null);
+            return queryByOrg(request);
+        }
+
+        // 普通用户：只查询自己创建/管理的组织
+        request.setUserUid(user.getUid());
+        return queryByOrg(request);
     }
 
     @Transactional
@@ -157,6 +215,9 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
         // 获取要更新的组织实体
         OrganizationEntity organization = organizationOptional.get();
+
+        // 非平台管理员/超级管理员：只能更新自己创建的组织
+        assertOwnerOrPrivileged(organization);
         
         // 检查 name 唯一性（排除当前组织）
         if (!organization.getName().equals(request.getName())) {
@@ -187,6 +248,19 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         
         // 转换为响应对象
         return convertToResponse(updatedOrganization);
+    }
+
+    @Override
+    public OrganizationResponse queryByUid(OrganizationRequest request) {
+        Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
+        if (!organizationOptional.isPresent()) {
+            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
+        }
+        OrganizationEntity organization = organizationOptional.get();
+
+        // 非平台管理员/超级管理员：只能查询自己创建的组织
+        assertOwnerOrPrivileged(organization);
+        return convertToResponse(organization);
     }
 
     // update by super

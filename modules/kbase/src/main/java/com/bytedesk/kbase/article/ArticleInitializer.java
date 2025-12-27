@@ -30,10 +30,10 @@ public class ArticleInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // 文章初始化逻辑已迁移至 KbaseInitializer 和 KbaseEventListener，避免与 Kbase 创建时序冲突与重复创建。
-        initPermissions();
+        initAuthority();
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = ArticlePermissions.ARTICLE_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

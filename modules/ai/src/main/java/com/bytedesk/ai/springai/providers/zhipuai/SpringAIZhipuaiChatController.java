@@ -191,7 +191,7 @@ public class SpringAIZhipuaiChatController {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Unhandled exception", e);
             }
         }
         writer.close();

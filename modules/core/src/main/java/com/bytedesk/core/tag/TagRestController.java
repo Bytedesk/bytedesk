@@ -41,7 +41,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
 
     @ActionAnnotation(title = "Tag", action = "组织查询", description = "query tag by org")
     @Operation(summary = "Query Tags by Organization", description = "Retrieve tags for the current organization")
-    @PreAuthorize(TagPermissions.HAS_TAG_READ_ANY_LEVEL)
+    @PreAuthorize(TagPermissions.HAS_TAG_READ)
     @Override
     public ResponseEntity<?> queryByOrg(TagRequest request) {
         
@@ -52,7 +52,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
 
     @ActionAnnotation(title = "Tag", action = "用户查询", description = "query tag by user")
     @Operation(summary = "Query Tags by User", description = "Retrieve tags for the current user")
-    @PreAuthorize(TagPermissions.HAS_TAG_READ_ANY_LEVEL)
+    @PreAuthorize(TagPermissions.HAS_TAG_READ)
     @Override
     public ResponseEntity<?> queryByUser(TagRequest request) {
         
@@ -63,7 +63,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
 
     @ActionAnnotation(title = "Tag", action = "查询详情", description = "query tag by uid")
     @Operation(summary = "Query Tag by UID", description = "Retrieve a specific tag by its unique identifier")
-    @PreAuthorize(TagPermissions.HAS_TAG_READ_ANY_LEVEL)
+    @PreAuthorize(TagPermissions.HAS_TAG_READ)
     @Override
     public ResponseEntity<?> queryByUid(TagRequest request) {
         
@@ -75,7 +75,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
     @ActionAnnotation(title = "Tag", action = "新建", description = "create tag")
     @Operation(summary = "Create Tag", description = "Create a new tag")
     @Override
-    @PreAuthorize(TagPermissions.HAS_TAG_CREATE_ANY_LEVEL)
+    @PreAuthorize(TagPermissions.HAS_TAG_CREATE)
     public ResponseEntity<?> create(TagRequest request) {
         
         TagResponse tag = tagRestService.create(request);
@@ -86,7 +86,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
     @ActionAnnotation(title = "Tag", action = "更新", description = "update tag")
     @Operation(summary = "Update Tag", description = "Update an existing tag")
     @Override
-    @PreAuthorize(TagPermissions.HAS_TAG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(TagPermissions.HAS_TAG_UPDATE)
     public ResponseEntity<?> update(TagRequest request) {
         
         TagResponse tag = tagRestService.update(request);
@@ -97,7 +97,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
     @ActionAnnotation(title = "Tag", action = "删除", description = "delete tag")
     @Operation(summary = "Delete Tag", description = "Delete a tag")
     @Override
-    @PreAuthorize(TagPermissions.HAS_TAG_DELETE_ANY_LEVEL)
+    @PreAuthorize(TagPermissions.HAS_TAG_DELETE)
     public ResponseEntity<?> delete(TagRequest request) {
         
         tagRestService.delete(request);
@@ -108,7 +108,7 @@ public class TagRestController extends BaseRestController<TagRequest, TagRestSer
     @ActionAnnotation(title = "Tag", action = "导出", description = "export tag")
     @Operation(summary = "Export Tags", description = "Export tags to Excel format")
     @Override
-    @PreAuthorize(TagPermissions.HAS_TAG_EXPORT_ANY_LEVEL)
+    @PreAuthorize(TagPermissions.HAS_TAG_EXPORT)
     @GetMapping("/export")
     public Object export(TagRequest request, HttpServletResponse response) {
         return exportTemplate(

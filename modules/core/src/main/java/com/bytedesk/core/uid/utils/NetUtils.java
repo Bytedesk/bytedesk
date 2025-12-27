@@ -34,11 +34,14 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * NetUtils
  * 
  * @author yutianbao
  */
+@Slf4j
 public abstract class NetUtils {
 
     /**
@@ -88,7 +91,7 @@ public abstract class NetUtils {
             return InetAddress.getByName("127.0.0.1");
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("fail to get 127.0.0.1", e);
         }
 
         return null;

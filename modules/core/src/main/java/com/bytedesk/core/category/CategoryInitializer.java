@@ -33,7 +33,7 @@ public class CategoryInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // init();
-        initPermissions();
+        initAuthority();
         // 创建默认的工单分类
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         categoryRestService.initCategories(orgUid);
@@ -43,7 +43,7 @@ public class CategoryInitializer implements SmartInitializingSingleton {
     // public void init() {
     // }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = CategoryPermissions.CATEGORY_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

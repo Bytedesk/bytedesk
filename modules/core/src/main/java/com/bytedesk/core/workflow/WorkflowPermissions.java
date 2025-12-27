@@ -20,61 +20,18 @@ public class WorkflowPermissions extends BasePermissions {
     // 模块前缀
     public static final String WORKFLOW_PREFIX = "WORKFLOW_";
 
-    // 平台级权限
-    public static final String WORKFLOW_PLATFORM_READ = "WORKFLOW_PLATFORM_READ";
-    public static final String WORKFLOW_PLATFORM_CREATE = "WORKFLOW_PLATFORM_CREATE";
-    public static final String WORKFLOW_PLATFORM_UPDATE = "WORKFLOW_PLATFORM_UPDATE";
-    public static final String WORKFLOW_PLATFORM_DELETE = "WORKFLOW_PLATFORM_DELETE";
-    public static final String WORKFLOW_PLATFORM_EXPORT = "WORKFLOW_PLATFORM_EXPORT";
+    // 统一权限（不再在权限字符串中编码层级）
+    public static final String WORKFLOW_READ = "WORKFLOW_READ";
+    public static final String WORKFLOW_CREATE = "WORKFLOW_CREATE";
+    public static final String WORKFLOW_UPDATE = "WORKFLOW_UPDATE";
+    public static final String WORKFLOW_DELETE = "WORKFLOW_DELETE";
+    public static final String WORKFLOW_EXPORT = "WORKFLOW_EXPORT";
 
-    // 组织级权限
-    public static final String WORKFLOW_ORGANIZATION_READ = "WORKFLOW_ORGANIZATION_READ";
-    public static final String WORKFLOW_ORGANIZATION_CREATE = "WORKFLOW_ORGANIZATION_CREATE";
-    public static final String WORKFLOW_ORGANIZATION_UPDATE = "WORKFLOW_ORGANIZATION_UPDATE";
-    public static final String WORKFLOW_ORGANIZATION_DELETE = "WORKFLOW_ORGANIZATION_DELETE";
-    public static final String WORKFLOW_ORGANIZATION_EXPORT = "WORKFLOW_ORGANIZATION_EXPORT";
-
-    // 部门级权限
-    public static final String WORKFLOW_DEPARTMENT_READ = "WORKFLOW_DEPARTMENT_READ";
-    public static final String WORKFLOW_DEPARTMENT_CREATE = "WORKFLOW_DEPARTMENT_CREATE";
-    public static final String WORKFLOW_DEPARTMENT_UPDATE = "WORKFLOW_DEPARTMENT_UPDATE";
-    public static final String WORKFLOW_DEPARTMENT_DELETE = "WORKFLOW_DEPARTMENT_DELETE";
-    public static final String WORKFLOW_DEPARTMENT_EXPORT = "WORKFLOW_DEPARTMENT_EXPORT";
-
-    // 工作组级权限
-    public static final String WORKFLOW_WORKGROUP_READ = "WORKFLOW_WORKGROUP_READ";
-    public static final String WORKFLOW_WORKGROUP_CREATE = "WORKFLOW_WORKGROUP_CREATE";
-    public static final String WORKFLOW_WORKGROUP_UPDATE = "WORKFLOW_WORKGROUP_UPDATE";
-    public static final String WORKFLOW_WORKGROUP_DELETE = "WORKFLOW_WORKGROUP_DELETE";
-    public static final String WORKFLOW_WORKGROUP_EXPORT = "WORKFLOW_WORKGROUP_EXPORT";
-
-    // 客服级权限
-    public static final String WORKFLOW_AGENT_READ = "WORKFLOW_AGENT_READ";
-    public static final String WORKFLOW_AGENT_CREATE = "WORKFLOW_AGENT_CREATE";
-    public static final String WORKFLOW_AGENT_UPDATE = "WORKFLOW_AGENT_UPDATE";
-    public static final String WORKFLOW_AGENT_DELETE = "WORKFLOW_AGENT_DELETE";
-    public static final String WORKFLOW_AGENT_EXPORT = "WORKFLOW_AGENT_EXPORT";
-    // 用户级权限
-    public static final String WORKFLOW_USER_READ = "WORKFLOW_USER_READ";
-    public static final String WORKFLOW_USER_CREATE = "WORKFLOW_USER_CREATE";
-    public static final String WORKFLOW_USER_UPDATE = "WORKFLOW_USER_UPDATE";
-    public static final String WORKFLOW_USER_DELETE = "WORKFLOW_USER_DELETE";
-    public static final String WORKFLOW_USER_EXPORT = "WORKFLOW_USER_EXPORT";
-
-
-    // PreAuthorize 表达式 - 读取权限（允许多层级访问）
-    public static final String HAS_WORKFLOW_READ_ANY_LEVEL = "hasAnyAuthority('WORKFLOW_PLATFORM_READ', 'WORKFLOW_ORGANIZATION_READ', 'WORKFLOW_DEPARTMENT_READ', 'WORKFLOW_WORKGROUP_READ', 'WORKFLOW_AGENT_READ', 'WORKFLOW_USER_READ')";
-    
-    // PreAuthorize 表达式 - 创建权限（允许多层级访问）
-    public static final String HAS_WORKFLOW_CREATE_ANY_LEVEL = "hasAnyAuthority('WORKFLOW_PLATFORM_CREATE', 'WORKFLOW_ORGANIZATION_CREATE', 'WORKFLOW_DEPARTMENT_CREATE', 'WORKFLOW_WORKGROUP_CREATE', 'WORKFLOW_AGENT_CREATE', 'WORKFLOW_USER_CREATE')";
-    
-    // PreAuthorize 表达式 - 更新权限（允许多层级访问）
-    public static final String HAS_WORKFLOW_UPDATE_ANY_LEVEL = "hasAnyAuthority('WORKFLOW_PLATFORM_UPDATE', 'WORKFLOW_ORGANIZATION_UPDATE', 'WORKFLOW_DEPARTMENT_UPDATE', 'WORKFLOW_WORKGROUP_UPDATE', 'WORKFLOW_AGENT_UPDATE', 'WORKFLOW_USER_UPDATE')";
-    
-    // PreAuthorize 表达式 - 删除权限（允许多层级访问）
-    public static final String HAS_WORKFLOW_DELETE_ANY_LEVEL = "hasAnyAuthority('WORKFLOW_PLATFORM_DELETE', 'WORKFLOW_ORGANIZATION_DELETE', 'WORKFLOW_DEPARTMENT_DELETE', 'WORKFLOW_WORKGROUP_DELETE', 'WORKFLOW_AGENT_DELETE', 'WORKFLOW_USER_DELETE')";
-    
-    // PreAuthorize 表达式 - 导出权限（允许多层级访问）
-    public static final String HAS_WORKFLOW_EXPORT_ANY_LEVEL = "hasAnyAuthority('WORKFLOW_PLATFORM_EXPORT', 'WORKFLOW_ORGANIZATION_EXPORT', 'WORKFLOW_DEPARTMENT_EXPORT', 'WORKFLOW_WORKGROUP_EXPORT', 'WORKFLOW_AGENT_EXPORT', 'WORKFLOW_USER_EXPORT')";
+    // PreAuthorize 表达式
+    public static final String HAS_WORKFLOW_READ = "hasAuthority('WORKFLOW_READ')";
+    public static final String HAS_WORKFLOW_CREATE = "hasAuthority('WORKFLOW_CREATE')";
+    public static final String HAS_WORKFLOW_UPDATE = "hasAuthority('WORKFLOW_UPDATE')";
+    public static final String HAS_WORKFLOW_DELETE = "hasAuthority('WORKFLOW_DELETE')";
+    public static final String HAS_WORKFLOW_EXPORT = "hasAuthority('WORKFLOW_EXPORT')";
 
 }

@@ -258,7 +258,6 @@ package com.bytedesk.ticket;
 //         try {
 //             Thread.sleep(2000);
 //         } catch (InterruptedException e) {
-//             e.printStackTrace();
 //         }
 
 //         // 验证是否触发了SLA通知

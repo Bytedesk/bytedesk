@@ -16,30 +16,27 @@ package com.bytedesk.ai.robot_thread;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.enums.PermissionEnum;
-import com.bytedesk.core.rbac.authority.AuthorityRestService;
-
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class RobotThreadInitializer implements SmartInitializingSingleton {
 
-    private final AuthorityRestService authorityRestService;
+    // private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         init();
-        initPermissions();
+        initAuthority();
     }
 
     private void init() {}
 
-    private void initPermissions() {
-        for (PermissionEnum permission : PermissionEnum.values()) {
-            String permissionValue = RobotThreadPermissions.ROBOTTHREAD_PREFIX + permission.name();
-            authorityRestService.createForPlatform(permissionValue);
-        }
+    private void initAuthority() {
+        // for (PermissionEnum permission : PermissionEnum.values()) {
+        //     String permissionValue = RobotThreadPermissions.ROBOTTHREAD_PREFIX + permission.name();
+        //     authorityRestService.createForPlatform(permissionValue);
+        // }
     }
     
 }

@@ -1,0 +1,494 @@
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2025-06-26 16:44:16
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-06-26 17:15:55
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微语系统状态监控</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .status-up {
+            background-color: #4CAF50;
+        }
+
+        .status-down {
+            background-color: #f44336;
+        }
+
+        .status-warning {
+            background-color: #ff9800;
+        }
+
+        .status-unknown {
+            background-color: #9e9e9e;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ff9800, #f57c00);
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px;
+            border-left: 4px solid #f44336;
+        }
+
+        .timestamp {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .status-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .refresh-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>微语系统状态监控</h1>
+            <p>实时监控系统各个组件的运行状态（已去除敏感信息）</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <h3>正在加载系统状态...</h3>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <h3>加载失败</h3>
+            <p id="error-message"></p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="status-grid">
+                <!-- 系统负载信息 -->
+                <div class="status-card">
+                    <h3>
+                        <span class="status-indicator status-up"></span>
+                        系统负载
+                    </h3>
+                    <div id="load-info">
+                        <div class="status-item">
+                            <span class="status-label">运行时间</span>
+                            <span class="status-value" id="uptime">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">系统负载</span>
+                            <span class="status-value" id="load-average">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">CPU核心数</span>
+                            <span class="status-value" id="processors">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 内存使用情况 -->
+                <div class="status-card">
+                    <h3>
+                        <span class="status-indicator status-up" id="memory-status-indicator"></span>
+                        内存使用
+                    </h3>
+                    <div id="memory-info">
+                        <div class="status-item">
+                            <span class="status-label">堆内存使用</span>
+                            <span class="status-value" id="heap-used">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">堆内存最大值</span>
+                            <span class="status-value" id="heap-max">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">使用率</span>
+                            <span class="status-value" id="heap-usage">-</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="memory-progress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 线程信息 -->
+                <div class="status-card">
+                    <h3>
+                        <span class="status-indicator status-up"></span>
+                        线程信息
+                    </h3>
+                    <div id="thread-info">
+                        <div class="status-item">
+                            <span class="status-label">当前线程数</span>
+                            <span class="status-value" id="thread-total">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">峰值线程数</span>
+                            <span class="status-value" id="thread-peak">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">守护线程数</span>
+                            <span class="status-value" id="thread-daemon">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 服务状态 -->
+                <div class="status-card">
+                    <h3>
+                        <span class="status-indicator status-up"></span>
+                        服务状态
+                    </h3>
+                    <div id="services-info">
+                        <div class="status-item">
+                            <span class="status-label">Web服务</span>
+                            <span class="status-value" id="web-status">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">WebSocket服务</span>
+                            <span class="status-value" id="websocket-status">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">消息队列</span>
+                            <span class="status-value" id="mq-status">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timestamp">
+                最后更新时间: <span id="last-update">-</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="refreshStatus()" title="刷新状态">
+        ↻
+    </button>
+
+    <script>
+        let refreshInterval;
+
+        // 页面加载完成后开始监控
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStatus();
+            // 每30秒自动刷新一次
+            refreshInterval = setInterval(loadSystemStatus, 30000);
+        });
+
+        // 页面卸载时清除定时器
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+
+        async function loadSystemStatus() {
+            try {
+                showLoading();
+                
+                const response = await fetch('/system/status');
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    updateUI(result.data);
+                    hideError();
+                } else {
+                    throw new Error(result.message || '获取系统状态失败');
+                }
+            } catch (error) {
+                console.error('加载系统状态失败:', error);
+                showError(error.message);
+            }
+        }
+
+        function updateUI(data) {
+            // 更新时间戳
+            document.getElementById('last-update').textContent = data.timestamp;
+            
+            // 更新负载信息
+            if (data.load) {
+                document.getElementById('load-average').textContent = data.load.loadAverage;
+                document.getElementById('processors').textContent = data.load.processors;
+            }
+            
+            // 更新运行时间
+            if (data.uptime) {
+                document.getElementById('uptime').textContent = data.uptime;
+            }
+            
+            // 更新内存信息
+            if (data.memory) {
+                document.getElementById('heap-used').textContent = data.memory.heapUsed;
+                document.getElementById('heap-max').textContent = data.memory.heapMax;
+                document.getElementById('heap-usage').textContent = data.memory.heapUsage;
+                
+                // 更新内存使用率进度条
+                const usagePercent = parseFloat(data.memory.heapUsage);
+                const progressBar = document.getElementById('memory-progress');
+                progressBar.style.width = usagePercent + '%';
+                
+                // 根据使用率设置颜色
+                progressBar.className = 'progress-fill';
+                if (usagePercent > 80) {
+                    progressBar.classList.add('danger');
+                } else if (usagePercent > 60) {
+                    progressBar.classList.add('warning');
+                }
+                
+                // 更新内存状态指示器
+                updateStatusIndicator('memory-status-indicator', data.memory.status);
+            }
+            
+            // 更新线程信息
+            if (data.threads) {
+                document.getElementById('thread-total').textContent = data.threads.total;
+                document.getElementById('thread-peak').textContent = data.threads.peak;
+                document.getElementById('thread-daemon').textContent = data.threads.daemon;
+            }
+            
+            // 更新服务状态
+            if (data.services) {
+                if (data.services.web) {
+                    document.getElementById('web-status').textContent = data.services.web.status;
+                }
+                if (data.services.websocket) {
+                    document.getElementById('websocket-status').textContent = data.services.websocket.status;
+                }
+                if (data.services.messageQueue) {
+                    document.getElementById('mq-status').textContent = data.services.messageQueue.status;
+                }
+            }
+            
+            showContent();
+        }
+
+        function updateStatusIndicator(elementId, status) {
+            const indicator = document.getElementById(elementId);
+            indicator.className = 'status-indicator';
+            
+            switch (status) {
+                case 'UP':
+                    indicator.classList.add('status-up');
+                    break;
+                case 'DOWN':
+                    indicator.classList.add('status-down');
+                    break;
+                case 'WARNING':
+                    indicator.classList.add('status-warning');
+                    break;
+                default:
+                    indicator.classList.add('status-unknown');
+                    break;
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function showContent() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function refreshStatus() {
+            loadSystemStatus();
+        }
+    </script>
+</body>
+</html>

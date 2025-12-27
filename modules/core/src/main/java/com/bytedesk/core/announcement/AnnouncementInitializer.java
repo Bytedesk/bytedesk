@@ -28,15 +28,15 @@ public class AnnouncementInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         announcementRestService.initAnnouncements(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = AnnouncementPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = AnnouncementPermissions.ANNOUNCEMENT_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

@@ -1,0 +1,111 @@
+// 
+// list-group.scss
+// Extended from Bootstrap
+// 
+
+
+// 
+// Additional style for theme
+// 
+.list-group .list-group-item i, .list-group .list-group-item span{
+  margin-right: 5px;
+}
+
+// list group borderless
+// .list-group-borderless .list-group-item:last-child{
+//   margin-bottom: 0 !important;
+// }
+.list-group-borderless {
+  .list-group-item {
+    border: none !important;
+    padding: 0.425rem 0;
+  }
+}
+
+// List group dark 
+.list-group-dark .list-group-item{
+  color: var(--#{$prefix}white);
+  margin-bottom: 10px;
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+  border-radius: $border-radius;
+  
+}
+.list-group-dark .list-group-item:not(.bg-danger-soft-hover){
+  &:hover, &.active {
+    color: var(--#{$prefix}dark) !important;
+    background-color: var(--#{$prefix}white) !important;
+  }
+}
+
+// Collapse item
+.collapse-list {
+  .list-group-item {
+    &[data-bs-toggle=collapse] {
+      position: relative;
+    
+      &:before, &:after {
+        content: "";
+        background: var(--#{$prefix}gray-600);
+        border-radius: 1px;
+        display: block;
+        position: absolute;
+        height: 2px;
+        width: 7px;
+        margin: auto 12px;
+        transition: transform 0.3s cubic-bezier(0.8, 0.2, 0.5, 0.1), background 0.2s ease-in-out;
+        top: 0;
+        bottom: 0;
+      }
+    
+      &:hover{
+        &:before, &:after {
+          background: $dark;
+        }
+      }
+    
+      &:before {
+        transform: rotate(-40deg);
+        right: 0px;
+      }
+    
+      &:after {
+        transform: rotate(40deg);
+        right: 5px;
+      }
+    
+      &[aria-expanded=true] {
+        &:before {
+          transform: rotate(40deg);
+          background: $dark;
+        }
+    
+        &:after {
+          transform: rotate(-40deg);
+          background: $dark;
+        }
+      }
+    }
+
+    &[aria-expanded=true]{
+      background-color: $white;
+      color: $dark;
+    }
+  }
+  a.list-group-item {
+    &:hover {
+      background-color: transparent;
+      color: var(--#{$prefix}primary);
+    }
+  }
+  .nav{
+    flex-flow:column nowrap;
+    margin-left: 2rem;
+    .nav-link{
+      color: $white;
+      &:hover, &:focus{
+        color:$link-hover-color;
+      }
+    }
+  }
+}

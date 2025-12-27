@@ -34,20 +34,17 @@ public class FaqInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // init();
-        initPermissions();
+        initAuthority();
     }
 
     // 迁移到kbaseInitializer
     public void init() {
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_FAQ_UID); // 替换到LLM_FAQ_UID
         String kbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID); // 替换到LLM_FAQ_UID, 合并faq和qa
-        // 
         faqRestService.importFaqs(orgUid, kbUid);
-        // faqService.initRelationFaqs(orgUid, kbUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = FaqPermissions.FAQ_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

@@ -23,8 +23,7 @@ import com.bytedesk.call.esl.client.transport.event.EslEventHeaderNames;
 import com.bytedesk.call.esl.client.transport.message.EslHeaders.Name;
 import com.bytedesk.call.esl.client.transport.message.EslHeaders.Value;
 import com.bytedesk.call.esl.client.transport.message.EslMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -51,12 +50,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * pipeline prior to this handler. This will ensure that each incoming message is processed in its
  * own thread (although still guaranteed to be processed in the order of receipt).
  */
+@Slf4j
 public abstract class AbstractEslClientHandler extends SimpleChannelInboundHandler<EslMessage> {
 
 	public static final String MESSAGE_TERMINATOR = "\n\n";
 	public static final String LINE_TERMINATOR = "\n";
 
-	protected final Logger log = LoggerFactory.getLogger(this.getClass());
 	// used to preserve association between adding future to queue and sending message on channel
 	private final ReentrantLock syncLock = new ReentrantLock();
 	private final ConcurrentLinkedQueue<CompletableFuture<EslMessage>> apiCalls =

@@ -65,14 +65,22 @@ public abstract class BaseSpecification<T, TRequest> {
         
         UserEntity user = authService.getUser();
         boolean platformDefaultOrgRequest = isPlatformDefaultOrgRequest(request);
-        // 非超级管理员必须提供 orgUid
-        if (user != null && !Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
-            throw new IllegalArgumentException("orgUid should not be null (org uid must be provided for non-super admin users)");
+        boolean platformLevelRequest = LevelEnum.PLATFORM.name().equalsIgnoreCase(request.getLevel());
+
+        // 非超级管理员一般必须提供 orgUid；但平台级数据允许任何登录用户在不传 orgUid 的情况下查询
+        if (user != null
+                && !Boolean.TRUE.equals(request.getSuperUser())
+                && !StringUtils.hasText(request.getOrgUid())
+                && !platformLevelRequest) {
+            throw new IllegalArgumentException("orgUid should not be null (org uid must be provided for non-super request)");
         }
         
         // 验证请求的 orgUid 是否与当前用户的 orgUid 相同
         if (StringUtils.hasText(request.getOrgUid())) {
-            if (user != null && !Boolean.TRUE.equals(request.getSuperUser()) && !platformDefaultOrgRequest) {
+            if (user != null
+                    && !Boolean.TRUE.equals(request.getSuperUser())
+                    && !platformDefaultOrgRequest
+                    && !platformLevelRequest) {
                 String userOrgUid = user.getOrgUid();
                 if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
                     throw new IllegalArgumentException("No permission to access data of other organizations");
@@ -84,10 +92,39 @@ public abstract class BaseSpecification<T, TRequest> {
         predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
         
         // 只有非超级管理员且有 orgUid 时才加 orgUid 条件
-        if (!Boolean.TRUE.equals(request.getSuperUser()) && StringUtils.hasText(request.getOrgUid())) {
-            predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+        if (!Boolean.TRUE.equals(request.getSuperUser())
+                && StringUtils.hasText(request.getOrgUid())
+                && !platformLevelRequest) {
+            // 部分实体（如 BaseEntityNoOrg）没有 orgUid 字段，避免 Criteria 构建时报错
+            boolean hasOrgUidAttribute = true;
+            try {
+                root.get("orgUid");
+            } catch (IllegalArgumentException ex) {
+                hasOrgUidAttribute = false;
+            }
+
+            if (hasOrgUidAttribute) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
         }
         
+        return predicates;
+    }
+
+    /**
+     * 无组织实体（BaseEntityNoOrg）使用的基础查询条件：仅过滤 deleted。
+     * 允许不传 orgUid，避免 org 维度校验导致的查询失败。
+     */
+    protected static List<Predicate> getBasicPredicatesNoOrg(
+            Root<?> root,
+            CriteriaBuilder criteriaBuilder,
+            BaseRequestNoOrg request,
+            AuthService authService) {
+
+        validateIsSuperUserPermission(request, authService);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
         return predicates;
     }
 
@@ -175,6 +212,18 @@ public abstract class BaseSpecification<T, TRequest> {
             }
             if (!user.isSuperUser()) {
                 // 如果不是超级管理员，则设置为false
+                request.setSuperUser(false);
+            }
+        }
+    }
+
+    protected static void validateIsSuperUserPermission(BaseRequestNoOrg request, AuthService authService) {
+        if (Boolean.TRUE.equals(request.getSuperUser())) {
+            UserEntity user = authService.getUser();
+            if (user == null) {
+                throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+            }
+            if (!user.isSuperUser()) {
                 request.setSuperUser(false);
             }
         }

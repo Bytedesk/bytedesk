@@ -14,12 +14,10 @@
 package com.bytedesk.core.rbac.role;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -33,17 +31,13 @@ import com.bytedesk.core.rbac.authority.AuthorityEntity;
 @Data
 @Entity
 @SuperBuilder
-@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ RoleEntityListener.class })
-@Table(
-    name = "bytedesk_core_role",
-    indexes = {
-        @Index(name = "idx_role_uid", columnList = "uuid")
-    }
-)
+@Table(name = "bytedesk_core_role", indexes = {
+		@Index(name = "idx_role_uid", columnList = "uuid")
+})
 public class RoleEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
@@ -51,6 +45,9 @@ public class RoleEntity extends BaseEntity {
 	@NotBlank
 	@Column(nullable = false)
 	private String name;
+
+	@Column(name = "role_value")
+	private String value;
 
 	private String description;
 
@@ -70,6 +67,36 @@ public class RoleEntity extends BaseEntity {
 
 	public void removeAuthority(AuthorityEntity authority) {
 		this.authorities.remove(authority);
+	}
+
+	@Override
+	public final boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof RoleEntity other)) {
+			return false;
+		}
+		// Prefer DB identity when available
+		if (this.getId() != null && other.getId() != null) {
+			return this.getId().equals(other.getId());
+		}
+		// Fallback to stable business uid
+		if (this.getUid() != null && other.getUid() != null) {
+			return this.getUid().equals(other.getUid());
+		}
+		return false;
+	}
+
+	@Override
+	public final int hashCode() {
+		if (this.getId() != null) {
+			return this.getId().hashCode();
+		}
+		if (this.getUid() != null) {
+			return this.getUid().hashCode();
+		}
+		return System.identityHashCode(this);
 	}
 
 }

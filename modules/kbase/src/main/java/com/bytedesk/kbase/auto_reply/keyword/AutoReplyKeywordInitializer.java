@@ -33,7 +33,7 @@ public class AutoReplyKeywordInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // init();
-        initPermissions();
+        initAuthority();
     }
 
     // 迁移到kbaseInitializer
@@ -44,7 +44,7 @@ public class AutoReplyKeywordInitializer implements SmartInitializingSingleton {
         autoReplyKeywordRestService.initData(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = AutoReplyKeywordPermissions.AUTO_REPLY_KEYWORD_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

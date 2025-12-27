@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.workflow;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -270,7 +269,18 @@ public class WorkflowService {
             return null;
         }
         StringWriter sw = new StringWriter();
-        e.printStackTrace(new PrintWriter(sw));
+        sw.append(e.toString()).append('\n');
+        for (StackTraceElement element : e.getStackTrace()) {
+            sw.append("\tat ").append(element.toString()).append('\n');
+        }
+        Throwable cause = e.getCause();
+        while (cause != null && cause != e) {
+            sw.append("Caused by: ").append(cause.toString()).append('\n');
+            for (StackTraceElement element : cause.getStackTrace()) {
+                sw.append("\tat ").append(element.toString()).append('\n');
+            }
+            cause = cause.getCause();
+        }
         return sw.toString();
     }
 

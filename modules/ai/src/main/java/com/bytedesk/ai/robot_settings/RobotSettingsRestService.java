@@ -18,11 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.settings.ServiceSettingsEntity;
-import com.bytedesk.kbase.settings.ServiceSettingsHelper;
+import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
+import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
+import com.bytedesk.kbase.settings_service.ServiceSettingsHelper;
+import com.bytedesk.kbase.settings_summary.SummarySettingsEntity;
+import com.bytedesk.kbase.settings_trigger.TriggerSettingsEntity;
+import com.bytedesk.kbase.settings_trigger.TriggerSettingsHelper;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +44,8 @@ public class RobotSettingsRestService
     private final UidUtils uidUtils;
 
     private final ServiceSettingsHelper serviceSettingsHelper;
+
+    private final TriggerSettingsHelper triggerSettingsHelper;
 
     @Cacheable(value = "robotSettings", key = "#uid", unless = "#result == null")
     @Override
@@ -62,6 +68,19 @@ public class RobotSettingsRestService
         draft.setUid(uidUtils.getUid());
         entity.setDraftServiceSettings(draft);
 
+        TriggerSettingsEntity trigger = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
+        trigger.setUid(uidUtils.getUid());
+        if (request.getTriggerSettings() != null) {
+            triggerSettingsHelper.updateTriggerAssociationsIfPresent(trigger, request.getTriggerSettings());
+        }
+        entity.setTriggerSettings(trigger);
+        TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
+        triggerDraft.setUid(uidUtils.getUid());
+        if (request.getTriggerSettings() != null) {
+            triggerSettingsHelper.updateTriggerAssociationsIfPresent(triggerDraft, request.getTriggerSettings());
+        }
+        entity.setDraftTriggerSettings(triggerDraft);
+
         // 发布与草稿：邀请配置（统一使用 fromRequest，内部已处理 null）
         InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
         inv.setUid(uidUtils.getUid());
@@ -78,6 +97,22 @@ public class RobotSettingsRestService
                 modelMapper);
         inteDraft.setUid(uidUtils.getUid());
         entity.setDraftIntentionSettings(inteDraft);
+
+        // 发布与草稿：情绪配置（统一使用 fromRequest，内部已处理 null）
+        EmotionSettingEntity emo = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
+        emo.setUid(uidUtils.getUid());
+        entity.setEmotionSettings(emo);
+        EmotionSettingEntity emoDraft = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
+        emoDraft.setUid(uidUtils.getUid());
+        entity.setDraftEmotionSettings(emoDraft);
+
+        // 发布与草稿：会话小结配置（统一使用 fromRequest，内部已处理 null）
+        SummarySettingsEntity sum = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
+        sum.setUid(uidUtils.getUid());
+        entity.setSummarySettings(sum);
+        SummarySettingsEntity sumDraft = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
+        sumDraft.setUid(uidUtils.getUid());
+        entity.setDraftSummarySettings(sumDraft);
 
         // 发布与草稿：差评配置（统一使用 fromRequest，内部已处理 null）
         RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
@@ -144,6 +179,26 @@ public class RobotSettingsRestService
             serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
             entity.setHasUnpublishedChanges(true);
         }
+
+        if (request.getTriggerSettings() != null) {
+            TriggerSettingsEntity draft = entity.getDraftTriggerSettings();
+            if (draft == null) {
+                draft = new TriggerSettingsEntity();
+                entity.setDraftTriggerSettings(draft);
+            }
+            String originalUid = draft.getUid();
+            Long originalId = draft.getId();
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            if (originalId != null) {
+                draft.setId(originalId);
+            }
+            triggerSettingsHelper.updateTriggerAssociationsIfPresent(draft, request.getTriggerSettings());
+            entity.setHasUnpublishedChanges(true);
+        }
         // 更新草稿:邀请/意图
         if (request.getInviteSettings() != null) {
             InviteSettingsEntity draft = entity.getDraftInviteSettings();
@@ -177,6 +232,50 @@ public class RobotSettingsRestService
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getIntentionSettings(), draft);
+            // 恢复或设置 uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            if (originalId != null) {
+                draft.setId(originalId);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        if (request.getEmotionSettings() != null) {
+            EmotionSettingEntity draft = entity.getDraftEmotionSettings();
+            if (draft == null) {
+                draft = new EmotionSettingEntity();
+                entity.setDraftEmotionSettings(draft);
+            }
+            // 保存原有uid及实体id，避免被 modelMapper 覆盖
+            String originalUid = draft.getUid();
+            Long originalId = draft.getId();
+            modelMapper.map(request.getEmotionSettings(), draft);
+            // 恢复或设置 uid
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            if (originalId != null) {
+                draft.setId(originalId);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        if (request.getSummarySettings() != null) {
+            SummarySettingsEntity draft = entity.getDraftSummarySettings();
+            if (draft == null) {
+                draft = new SummarySettingsEntity();
+                entity.setDraftSummarySettings(draft);
+            }
+            // 保存原有uid及实体id，避免被 modelMapper 覆盖
+            String originalUid = draft.getUid();
+            Long originalId = draft.getId();
+            modelMapper.map(request.getSummarySettings(), draft);
             // 恢复或设置 uid
             if (originalUid != null) {
                 draft.setUid(originalUid);
@@ -320,6 +419,14 @@ public class RobotSettingsRestService
         settings.setServiceSettings(published);
         settings.setDraftServiceSettings(draft);
 
+        // Trigger settings（发布 + 草稿）
+        TriggerSettingsEntity triggerPublished = TriggerSettingsEntity.fromRequest(null, modelMapper);
+        triggerPublished.setUid(uidUtils.getUid());
+        TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(null, modelMapper);
+        triggerDraft.setUid(uidUtils.getUid());
+        settings.setTriggerSettings(triggerPublished);
+        settings.setDraftTriggerSettings(triggerDraft);
+
         // Invite settings（发布 + 草稿）
         InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
         inv.setUid(uidUtils.getUid());
@@ -398,6 +505,18 @@ public class RobotSettingsRestService
             }
         }
 
+        if (entity.getDraftTriggerSettings() != null) {
+            TriggerSettingsEntity published = entity.getTriggerSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftTriggerSettings(), published);
+            } else {
+                TriggerSettingsEntity newPublished = new TriggerSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftTriggerSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setTriggerSettings(newPublished);
+            }
+        }
+
         if (entity.getDraftRateDownSettings() != null) {
             RatedownSettingsEntity published = entity.getRateDownSettings();
             if (published != null) {
@@ -434,6 +553,30 @@ public class RobotSettingsRestService
             }
         }
 
+        if (entity.getDraftEmotionSettings() != null) {
+            EmotionSettingEntity published = entity.getEmotionSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftEmotionSettings(), published);
+            } else {
+                EmotionSettingEntity newPublished = new EmotionSettingEntity();
+                copyPropertiesExcludingIds(entity.getDraftEmotionSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setEmotionSettings(newPublished);
+            }
+        }
+
+        if (entity.getDraftSummarySettings() != null) {
+            SummarySettingsEntity published = entity.getSummarySettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftSummarySettings(), published);
+            } else {
+                SummarySettingsEntity newPublished = new SummarySettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftSummarySettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setSummarySettings(newPublished);
+            }
+        }
+
         if (entity.getDraftToolsSettings() != null) {
             RobotToolsSettingsEntity published = entity.getToolsSettings();
             if (published != null) {
@@ -457,6 +600,8 @@ public class RobotSettingsRestService
     private void copyPropertiesExcludingIds(Object source, Object target) {
         if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
             serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source, (ServiceSettingsEntity) target);
+        } else if (source instanceof TriggerSettingsEntity && target instanceof TriggerSettingsEntity) {
+            // triggerSettingsHelper.copyTriggerSettingsProperties((TriggerSettingsEntity) source, (TriggerSettingsEntity) target);
         } else {
             BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
         }

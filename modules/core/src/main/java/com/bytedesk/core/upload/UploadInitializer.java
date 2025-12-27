@@ -35,7 +35,11 @@ public class UploadInitializer {
         try {
 			Files.createDirectories(uploadDir);
 		} catch (IOException e) {
-			throw new UploadStorageException("Could not initialize storage", e);
+            throw new UploadStorageException(
+                "初始化上传目录失败（请检查磁盘权限/路径配置）: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
+                503,
+                e
+            );
 		}
     }
     

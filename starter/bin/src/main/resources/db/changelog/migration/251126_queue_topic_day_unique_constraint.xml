@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251126-add-queue-topic-day-unique-constraint" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue" />
+            <not>
+                <uniqueConstraintExists tableName="bytedesk_service_queue" constraintName="uk_queue_topic_day" />
+            </not>
+        </preConditions>
+        <comment>Ensure queue_topic is unique per queue_day.</comment>
+        <addUniqueConstraint
+            tableName="bytedesk_service_queue"
+            columnNames="queue_topic, queue_day"
+            constraintName="uk_queue_topic_day" />
+        <rollback>
+            <dropUniqueConstraint tableName="bytedesk_service_queue" constraintName="uk_queue_topic_day" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

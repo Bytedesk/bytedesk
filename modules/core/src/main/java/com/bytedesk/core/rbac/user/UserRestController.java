@@ -84,6 +84,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @ActionAnnotation(title = "user", action = "更新", description = "update user info")
+    @PreAuthorize(UserPermissions.HAS_USER_UPDATE + " or " + RolePermissions.ROLE_SUPER)
     @Override
     public ResponseEntity<?> update(UserRequest request) {
 
@@ -116,6 +117,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @GetMapping("/profile")
+    @PreAuthorize(UserPermissions.HAS_USER_READ + " or " + RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> getProfile() {
 
         UserResponse userResponse = userRestService.getProfile();
@@ -176,7 +178,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String accessToken = JwtUtils.parseAccessToken(request);
-        log.debug("logout {}", accessToken);
+        // log.debug("logout {}", accessToken);
 
         if (!StringUtils.hasText(accessToken)) {
             return ResponseEntity.ok().body(JsonResult.error("accessToken is empty", -1, false));

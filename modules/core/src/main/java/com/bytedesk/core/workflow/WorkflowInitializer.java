@@ -32,11 +32,11 @@ public class WorkflowInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         initDefaultWorkflow();
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = WorkflowPermissions.WORKFLOW_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

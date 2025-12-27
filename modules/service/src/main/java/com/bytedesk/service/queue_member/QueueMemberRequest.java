@@ -158,9 +158,21 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
 
+    // 意图识别原始结果（JSON/文本）
+    @Builder.Default
+    private String threadIntentionResult = "";
+
     // 情绪类型
     @Builder.Default
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
+
+    // 情绪识别原始结果（JSON/文本）
+    @Builder.Default
+    private String threadEmotionResult = "";
+
+    // 会话小结原始结果（JSON）
+    @Builder.Default
+    private String threadSummaryResult = "";
 
     // 处理状态（待处理、已处理、已关闭等）
     @Builder.Default

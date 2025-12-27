@@ -1,0 +1,170 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251120-add-queue-number" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_member" />
+            <not>
+                <columnExists tableName="bytedesk_service_queue_member" columnName="queue_number" />
+            </not>
+        </preConditions>
+        <comment>Add queue_number for FIFO ordering</comment>
+        <addColumn tableName="bytedesk_service_queue_member">
+            <column name="queue_number" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_queue_member" columnName="queue_number" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251120-add-last-notified" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_member" />
+            <not>
+                <columnExists tableName="bytedesk_service_queue_member" columnName="last_notified_at" />
+            </not>
+        </preConditions>
+        <comment>Add last_notified_at timestamp</comment>
+        <addColumn tableName="bytedesk_service_queue_member">
+            <column name="last_notified_at" type="DATETIME(6)" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_queue_member" columnName="last_notified_at" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251120-add-status" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_member" />
+            <not>
+                <columnExists tableName="bytedesk_service_queue_member" columnName="status" />
+            </not>
+        </preConditions>
+        <comment>Add queue member status</comment>
+        <addColumn tableName="bytedesk_service_queue_member">
+            <column name="status" type="VARCHAR(32)" defaultValue="QUEUING">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_queue_member" columnName="status" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251120-backfill-visitor-enqueue" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_service_queue_member" columnName="visitor_enqueue_at" />
+        </preConditions>
+        <comment>Ensure visitor enqueue timestamps are populated</comment>
+        <sql>
+            UPDATE bytedesk_service_queue_member
+            SET visitor_enqueue_at = COALESCE(visitor_enqueue_at, created_at)
+            WHERE visitor_enqueue_at IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="251120-backfill-status" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_service_queue_member" columnName="status" />
+        </preConditions>
+        <comment>Derive initial status for existing rows</comment>
+        <sql>
+            UPDATE bytedesk_service_queue_member
+            SET status = 'ASSIGNED'
+            WHERE status = 'QUEUING' AND agent_accepted_at IS NOT NULL;
+        </sql>
+        <sql>
+            UPDATE bytedesk_service_queue_member
+            SET status = 'TIMEOUT'
+            WHERE status = 'QUEUING' AND is_agent_timeout = 1;
+        </sql>
+        <sql>
+            UPDATE bytedesk_service_queue_member
+            SET status = 'CANCELLED'
+            WHERE status = 'QUEUING' AND is_deleted = 1;
+        </sql>
+    </changeSet>
+
+    <changeSet id="251120-backfill-queue-number" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_service_queue_member" columnName="queue_number" />
+        </preConditions>
+        <comment>Assign queue numbers based on enqueue time</comment>
+        <sql>
+            UPDATE bytedesk_service_queue_member qm
+            JOIN (
+                SELECT id,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY CASE
+                               WHEN agent_queue_id IS NOT NULL THEN CONCAT('AGENT-', agent_queue_id)
+                               WHEN workgroup_queue_id IS NOT NULL THEN CONCAT('WORKGROUP-', workgroup_queue_id)
+                               WHEN robot_queue_id IS NOT NULL THEN CONCAT('ROBOT-', robot_queue_id)
+                               ELSE CONCAT('THREAD-', thread_id)
+                           END
+                           ORDER BY COALESCE(visitor_enqueue_at, created_at)
+                       ) AS calculated_queue_number
+                FROM bytedesk_service_queue_member
+                WHERE is_deleted = 0
+            ) ranked ON qm.id = ranked.id
+            SET qm.queue_number = ranked.calculated_queue_number
+            WHERE qm.is_deleted = 0;
+        </sql>
+    </changeSet>
+
+    <changeSet id="251120-add-agent-queue-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_service_queue_member" columnName="queue_number" />
+            <not>
+                <indexExists tableName="bytedesk_service_queue_member" indexName="idx_queue_member_agent_queue_number" />
+            </not>
+        </preConditions>
+        <comment>Create agent queue lookup index</comment>
+        <createIndex tableName="bytedesk_service_queue_member" indexName="idx_queue_member_agent_queue_number">
+            <column name="agent_queue_id" />
+            <column name="queue_number" />
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_queue_member_agent_queue_number" tableName="bytedesk_service_queue_member" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251120-add-workgroup-queue-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_service_queue_member" columnName="queue_number" />
+            <not>
+                <indexExists tableName="bytedesk_service_queue_member" indexName="idx_queue_member_workgroup_queue_number" />
+            </not>
+        </preConditions>
+        <comment>Create workgroup queue lookup index</comment>
+        <createIndex tableName="bytedesk_service_queue_member" indexName="idx_queue_member_workgroup_queue_number">
+            <column name="workgroup_queue_id" />
+            <column name="queue_number" />
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_queue_member_workgroup_queue_number" tableName="bytedesk_service_queue_member" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251120-add-robot-queue-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_service_queue_member" columnName="queue_number" />
+            <not>
+                <indexExists tableName="bytedesk_service_queue_member" indexName="idx_queue_member_robot_queue_number" />
+            </not>
+        </preConditions>
+        <comment>Create robot queue lookup index</comment>
+        <createIndex tableName="bytedesk_service_queue_member" indexName="idx_queue_member_robot_queue_number">
+            <column name="robot_queue_id" />
+            <column name="queue_number" />
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_queue_member_robot_queue_number" tableName="bytedesk_service_queue_member" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog> -->

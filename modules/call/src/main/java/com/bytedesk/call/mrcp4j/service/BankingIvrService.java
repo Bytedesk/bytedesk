@@ -6,6 +6,8 @@ import com.bytedesk.call.mrcp4j.message.MrcpResponse;
 import com.bytedesk.call.mrcp4j.message.header.MrcpHeaderName;
 import com.bytedesk.call.mrcp4j.message.request.MrcpRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.InetAddress;
 
 /**
@@ -14,6 +16,7 @@ import java.net.InetAddress;
  * 
  * @author bytedesk.com
  */
+@Slf4j
 public class BankingIvrService {
 
     private MrcpProvider asrProvider;
@@ -265,7 +268,7 @@ public class BankingIvrService {
             System.out.println("IVR流程执行完成");
             
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("BankingIvrService 执行异常", e);
         }
     }
 }

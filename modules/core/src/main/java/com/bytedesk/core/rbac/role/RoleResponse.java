@@ -40,6 +40,8 @@ public class RoleResponse extends BaseResponse {
     
     private String name;
 
+    private String value;
+
     private String description;
 
     private Boolean system;

@@ -32,7 +32,7 @@ public class UploadConfig {
     @Bean
     public Path uploadDir() {
         if (properties.getUploadDir().trim().length() == 0) {
-        throw new UploadStorageException("File upload location can not be Empty.");
+        throw new UploadStorageException("上传目录未配置（bytedesk.uploadDir 不能为空）", 500);
         }
         return Paths.get(properties.getUploadDir());
     }

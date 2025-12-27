@@ -131,7 +131,7 @@
             <div class="col-md-4">
                 <div class="feature-box h-100">
                     <div class="feature-icon">🤖</div>
-                    <h3>机器人助手</h3>
+                    <h3>智能助手</h3>
                     <ul class="list-unstyled">
                         <li>欢迎机器人</li>
                         <li>管理机器人</li>

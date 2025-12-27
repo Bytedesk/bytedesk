@@ -252,7 +252,7 @@ public class GroupTicketProcessTests {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("SLA timeout test sleep interrupted", e);
         }
 
         // 验证是否触发了SLA通知

@@ -109,7 +109,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		//
 		UploadEntity savedUpload = save(upload);
 		if (savedUpload == null) {
-			throw new RuntimeException("Failed to store file " + upload.getFileName());
+			throw new UploadStorageException("保存上传记录失败: " + upload.getFileName(), 500);
 		}
 
 		return convertToResponse(savedUpload);
@@ -172,7 +172,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
             if (!destinationFile.getParent().equals(dateFolderPath.toAbsolutePath())) {
                 // 这是一个安全检查
-                throw new UploadStorageException("Cannot store file outside current directory.");
+				throw new UploadStorageException("非法文件路径（疑似路径穿越攻击）", 400);
             }
 
             // 下载并保存图片
@@ -186,7 +186,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			String fileUrl = String.format("%s/file/%s", bytedeskProperties.getUploadUrl(), uploadPath);
 			return fileUrl;
         } catch (IOException e) {
-            throw new UploadStorageException("Failed to store file from URL.", e);
+			throw new UploadStorageException(
+				"从URL下载并保存文件失败: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
+				400,
+				e
+			);
         }
     }
 
@@ -202,27 +206,30 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		String currentDateFolder = LocalDate.now().format(formatter);
 
 		try {
-			if (file.isEmpty()) {
-				throw new UploadStorageException("Failed to store empty file.");
+			if (file == null || file.isEmpty()) {
+				throw new UploadStorageException("空文件，无法上传", 400);
 			}
 
 			// 文件类型白名单校验
 			String contentType = file.getContentType();
 			if (!isAllowedFileType(fileName, contentType)) {
-				throw new UploadStorageException("不支持的文件类型");
+				String ext = getFileExt(fileName);
+				String reason = (ext == null || ext.isEmpty()) ? "不支持的文件类型" : ("不支持的文件类型: ." + ext);
+				throw new UploadStorageException(reason, 415);
 			}
-		// 文件大小限制
-		if (!isFileSizeValid(file.getSize())) {
-			throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription());
-		}
-		// 图片内容校验
-		if (uploadSecurityConfig.isEnableImageValidation() && isImageFile(fileName, contentType)) {
-			try {
-				ImageIO.read(file.getInputStream());
-			} catch (Exception e) {
-				throw new UploadStorageException("图片内容校验失败");
+			// 文件大小限制
+			if (!isFileSizeValid(file.getSize())) {
+				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription(), 413);
 			}
-		}			// 构建包含日期文件夹的文件路径
+			// 图片内容校验
+			if (uploadSecurityConfig.isEnableImageValidation() && isImageFile(fileName, contentType)) {
+				try {
+					ImageIO.read(file.getInputStream());
+				} catch (Exception e) {
+					throw new UploadStorageException("图片内容校验失败（文件可能已损坏或伪造扩展名）", 422);
+				}
+			}
+			// 构建包含日期文件夹的文件路径
 			Path dateFolderPath = this.uploadDir.resolve(currentDateFolder);
 			Files.createDirectories(dateFolderPath); // 创建日期文件夹（如果不存在）
 
@@ -230,7 +237,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 			if (!destinationFile.getParent().equals(dateFolderPath.toAbsolutePath())) {
 				// 这是一个安全检查
-				throw new UploadStorageException("Cannot store file outside current directory.");
+				throw new UploadStorageException("非法文件路径（疑似路径穿越攻击）", 400);
 			}
 
 			// 检查是否需要添加水印（水印服务可能未启用）
@@ -250,7 +257,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			return fileUrl;
 
 		} catch (IOException e) {
-			throw new UploadStorageException("Failed to store file.", e);
+			throw new UploadStorageException(
+				"保存文件失败: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
+				503,
+				e
+			);
 		}
 	}
 
@@ -416,7 +427,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		try {
 			Files.createDirectories(uploadDir);
 		} catch (IOException e) {
-			throw new UploadStorageException("Could not initialize storage", e);
+			throw new UploadStorageException(
+				"初始化上传目录失败（请检查磁盘权限/路径配置）: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
+				503,
+				e
+			);
 		}
 	}
 
@@ -468,21 +483,32 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			request.getFileName(), request.getFileType(), request.getKbType(), request.getExtra());
 
 		try {
+			if (file == null || file.isEmpty()) {
+				uploadSecurityLogger.logUploadFailure(file, request, "空文件", httpRequest);
+				throw new UploadStorageException("空文件，无法上传", 400);
+			}
+
 			// 1. 文件类型白名单校验
 			String originalFileName = file.getOriginalFilename();
+			if (originalFileName == null || originalFileName.trim().isEmpty()) {
+				uploadSecurityLogger.logUploadFailure(file, request, "文件名为空", httpRequest);
+				throw new UploadStorageException("文件名为空，无法上传", 400);
+			}
 			String safeFileName = filterAndRenameFileName(originalFileName);
 			String contentType = file.getContentType();
 			if (!isAllowedFileType(safeFileName, contentType)) {
+				String ext = getFileExt(safeFileName);
 				uploadSecurityLogger.logSecurityThreat(file, request, "ILLEGAL_FILE_TYPE", 
-					"不支持的文件类型: " + contentType, httpRequest);
-				throw new UploadStorageException("不支持的文件类型");
+					(ext == null || ext.isEmpty()) ? "不支持的文件类型" : ("不支持的文件类型: ." + ext), httpRequest);
+				String reason = (ext == null || ext.isEmpty()) ? "不支持的文件类型" : ("不支持的文件类型: ." + ext);
+				throw new UploadStorageException(reason, 415);
 			}
 
 			// 2. 文件大小限制
 			if (!isFileSizeValid(file.getSize())) {
 				uploadSecurityLogger.logUploadFailure(file, request, 
 					"文件过大，最大支持" + getFileSizeDescription(), httpRequest);
-				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription());
+				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription(), 413);
 			}
 
 			// 3. 图片内容校验（防止伪造扩展名）
@@ -492,7 +518,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				} catch (Exception e) {
 					uploadSecurityLogger.logSecurityThreat(file, request, "FAKE_IMAGE", 
 						"图片内容校验失败", httpRequest);
-					throw new UploadStorageException("图片内容校验失败");
+					throw new UploadStorageException("图片内容校验失败（文件可能已损坏或伪造扩展名）", 422);
 				}
 			}
 
@@ -519,6 +545,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				log.info("MinIO 未启用，使用本地文件系统存储文件");
 				fileUrl = store(file, safeFileName, request);
 			}
+			if (fileUrl == null || fileUrl.trim().isEmpty()) {
+				throw new UploadStorageException("文件上传失败：未获取到文件地址", 503);
+			}
 
 			// 5. 从fileUrl中提取实际存储的文件名（用于日志记录）
 			String actualStoredFileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
@@ -544,7 +573,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		} catch (Exception e) {
 			// 记录失败日志
 			uploadSecurityLogger.logUploadFailure(file, request, "系统内部错误: " + e.getMessage(), httpRequest);
-			throw new UploadStorageException("文件上传失败: " + e.getMessage(), e);
+			throw new UploadStorageException("文件上传失败: " + (e.getMessage() == null ? "系统内部错误" : e.getMessage()), 500, e);
 		}
 	}
 
@@ -561,17 +590,17 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	public String storeToMinio(MultipartFile file, String fileName, UploadRequest request) {
 		// 检查 MinIO 是否启用
 		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
 		if (uploadMinioService == null) {
-			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
 		}
 
 		try {
-			if (file.isEmpty()) {
-				throw new UploadStorageException("Failed to store empty file.");
+			if (file == null || file.isEmpty()) {
+				throw new UploadStorageException("空文件，无法上传", 400);
 			}
 
 			// 文件名再次过滤，防止绕过
@@ -580,12 +609,14 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			// 文件类型白名单校验
 			String contentType = file.getContentType();
 			if (!isAllowedFileType(fileName, contentType)) {
-				throw new UploadStorageException("不支持的文件类型");
+				String ext = getFileExt(fileName);
+				String reason = (ext == null || ext.isEmpty()) ? "不支持的文件类型" : ("不支持的文件类型: ." + ext);
+				throw new UploadStorageException(reason, 415);
 			}
 			
 			// 文件大小限制
 			if (!isFileSizeValid(file.getSize())) {
-				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription());
+				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription(), 413);
 			}
 			
 			// 图片内容校验
@@ -593,7 +624,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				try {
 					ImageIO.read(file.getInputStream());
 				} catch (Exception e) {
-					throw new UploadStorageException("图片内容校验失败");
+					throw new UploadStorageException("图片内容校验失败（文件可能已损坏或伪造扩展名）", 422);
 				}
 			}
 
@@ -606,9 +637,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			log.info("文件已成功上传到 MinIO: {}", fileUrl);
 			return fileUrl;
 
+		} catch (UploadStorageException e) {
+			log.error("上传文件到 MinIO 失败: {}", e.getMessage(), e);
+			throw e;
 		} catch (Exception e) {
 			log.error("上传文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw new UploadStorageException("Failed to store file to MinIO.", e);
+			throw new UploadStorageException("存储服务异常（MinIO）: " + (e.getMessage() == null ? "未知错误" : e.getMessage()), 503, e);
 		}
 	}
 
@@ -623,18 +657,18 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	public String storeLocalFileToMinio(String localFilePath, String fileName, UploadRequest request) {
 		// 检查 MinIO 是否启用
 		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
 		if (uploadMinioService == null) {
-			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
 		}
 
 		try {
 			File localFile = new File(localFilePath);
 			if (!localFile.exists()) {
-				throw new UploadStorageException("Local file not found: " + localFilePath);
+				throw new UploadStorageException("本地文件不存在: " + localFilePath, 404);
 			}
 
 			// 根据文件类型选择存储文件夹
@@ -646,9 +680,16 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			log.info("本地文件已成功上传到 MinIO: {}", fileUrl);
 			return fileUrl;
 
+		} catch (UploadStorageException e) {
+			log.error("上传本地文件到 MinIO 失败: {}", e.getMessage(), e);
+			throw e;
 		} catch (Exception e) {
 			log.error("上传本地文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw new UploadStorageException("Failed to store local file to MinIO.", e);
+			throw new UploadStorageException(
+				"存储服务异常（MinIO）: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
+				503,
+				e
+			);
 		}
 	}
 
@@ -663,12 +704,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	public String storeUrlToMinio(String url, String fileName, UploadRequest request) {
 		// 检查 MinIO 是否启用
 		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new RuntimeException("MinIO 存储未启用，请在配置中启用 bytedesk.minio.enabled=true");
+			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
 		if (uploadMinioService == null) {
-			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
 		}
 
 		try {
@@ -681,9 +722,16 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			log.info("URL 文件已成功上传到 MinIO: {}", fileUrl);
 			return fileUrl;
 
+		} catch (UploadStorageException e) {
+			log.error("从 URL 上传文件到 MinIO 失败: {}", e.getMessage(), e);
+			throw e;
 		} catch (Exception e) {
 			log.error("从 URL 上传文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw new UploadStorageException("Failed to store URL file to MinIO.", e);
+			throw new UploadStorageException(
+				"从URL下载并上传失败: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
+				400,
+				e
+			);
 		}
 	}
 
@@ -757,12 +805,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	public void deleteFromMinio(String objectPath) {
 		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new RuntimeException("MinIO 存储未启用");
+			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
 		if (uploadMinioService == null) {
-			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
 		}
 		
 		try {
@@ -770,7 +818,11 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			log.info("成功删除 MinIO 文件: {}", objectPath);
 		} catch (Exception e) {
 			log.error("删除 MinIO 文件失败: {}", e.getMessage(), e);
-			throw new RuntimeException("删除 MinIO 文件失败: " + e.getMessage(), e);
+			throw new UploadStorageException(
+				"删除 MinIO 文件失败: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
+				503,
+				e
+			);
 		}
 	}
 
@@ -802,12 +854,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	public String getMinioDownloadUrl(String objectPath, int expiry) {
 		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new RuntimeException("MinIO 存储未启用");
+			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
 		if (uploadMinioService == null) {
-			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
 		}
 		
 		return uploadMinioService.getDownloadUrl(objectPath, expiry);
@@ -822,12 +874,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	public String getMinioUploadUrl(String objectPath, int expiry) {
 		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new RuntimeException("MinIO 存储未启用");
+			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
 		if (uploadMinioService == null) {
-			throw new RuntimeException("MinIO 服务未初始化，请检查配置");
+			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
 		}
 		
 		return uploadMinioService.getUploadUrl(objectPath, expiry);

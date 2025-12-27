@@ -93,6 +93,27 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(agentOptional.get());
     }
 
+    /**
+     * 根据指定 userUid 查询单个客服信息
+     *
+     * - 若传入 orgUid：按 userUid + orgUid 精确查询
+     * - 未传 orgUid：仅按 userUid 查询
+     */
+    public AgentResponse queryByUserUid(AgentRequest request) {
+        if (!StringUtils.hasText(request.getUserUid())) {
+            throw new RuntimeException("userUid is required");
+        }
+
+        Optional<AgentEntity> agentOptional = StringUtils.hasText(request.getOrgUid())
+                ? findByUserUidAndOrgUid(request.getUserUid(), request.getOrgUid())
+                : findByUserUid(request.getUserUid());
+
+        if (!agentOptional.isPresent()) {
+            return null;
+        }
+        return convertToResponse(agentOptional.get());
+    }
+
     @Transactional
     public AgentResponse create(AgentRequest request) {
         //
@@ -140,10 +161,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             agent.setSettings(agentSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
         //
-        // Set<String> userIds = mqttConnectionService.getConnectedUserUids();
-        // if (userIds.contains(agent.getUserUid())) {
-        //     agent.setConnected(true);
-        // }
         // 保存Agent并检查返回值
         AgentEntity savedAgent = save(agent);
         if (savedAgent == null) {
@@ -376,6 +393,27 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agentOptional.ifPresent(agent -> {
             if (agent.getMember() != null) {
                 agent.getMember().getUser(); // 触发加载
+            }
+            if (agent.getSettings() != null) {
+                agent.getSettings().getQueueSettings();
+                agent.getSettings().getDraftQueueSettings();
+            }
+        });
+        return agentOptional;
+    }
+
+    /**
+     * 强制从数据库加载（绕过 Spring Cache）。
+     *
+     * 说明：
+     * - {@link #findByUid(String)} 带有 @Cacheable，可能直接命中缓存
+     * - 该方法直接走 Repository 查询，用于在缓存对象缺失关联(member/user)时兜底
+     */
+    public Optional<AgentEntity> findByUidFromDatabase(String uid) {
+        Optional<AgentEntity> agentOptional = agentRepository.findByUid(uid);
+        agentOptional.ifPresent(agent -> {
+            if (agent.getMember() != null) {
+                agent.getMember().getUser();
             }
             if (agent.getSettings() != null) {
                 agent.getSettings().getQueueSettings();

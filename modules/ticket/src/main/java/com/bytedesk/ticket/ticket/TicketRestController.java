@@ -42,7 +42,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     private final TicketService ticketService;
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = "工单", action = "组织查询", description = "query ticket by org")
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {
@@ -52,7 +52,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = "工单", action = "用户查询", description = "query ticket by user")
     @Override
     public ResponseEntity<?> queryByUser(TicketRequest request) {
@@ -62,7 +62,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = "工单", action = "查询详情", description = "query ticket by uid")
     @Override
     public ResponseEntity<?> queryByUid(TicketRequest request) {
@@ -72,7 +72,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = "工单", action = "按主题查询", description = "query ticket by topic")
     @GetMapping("/query/topic")
     public ResponseEntity<?> queryByTopic(TicketRequest request) {
@@ -82,7 +82,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_READ_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = "工单", action = "按会话查询", description = "query ticket by thread uid")
     @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
@@ -92,7 +92,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_CREATE_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_CREATE)
     @ActionAnnotation(title = "工单", action = "新建", description = "create ticket")
     @Override
     public ResponseEntity<?> create(TicketRequest request) {
@@ -102,7 +102,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
     @ActionAnnotation(title = "工单", action = "更新", description = "update ticket")
     @Override
     public ResponseEntity<?> update(TicketRequest request) {
@@ -112,7 +112,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(TicketPermissions.HAS_TICKET_DELETE_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_DELETE)
     @ActionAnnotation(title = "工单", action = "删除", description = "delete ticket")
     @Override
     public ResponseEntity<?> delete(TicketRequest request) {
@@ -124,7 +124,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @PreAuthorize(TicketPermissions.HAS_TICKET_EXPORT_ANY_LEVEL)
+    @PreAuthorize(TicketPermissions.HAS_TICKET_EXPORT)
     @ActionAnnotation(title = "工单", action = "导出", description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {

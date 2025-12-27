@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f8f9fa"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#2c3e50">医疗服务流程</text>
+    
+    <!-- 医疗服务流程图 -->
+    <rect x="50" y="80" width="700" height="380" rx="10" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+    
+    <!-- 流程箭头连接 -->
+    <path d="M200 200 L300 200" stroke="#3498db" stroke-width="2" fill="none"/>
+    <path d="M300 200 L310 195 L310 205 Z" fill="#3498db"/>
+    
+    <path d="M400 200 L500 200" stroke="#3498db" stroke-width="2" fill="none"/>
+    <path d="M500 200 L510 195 L510 205 Z" fill="#3498db"/>
+    
+    <path d="M600 200 L700 200" stroke="#3498db" stroke-width="2" fill="none"/>
+    <path d="M700 200 L710 195 L710 205 Z" fill="#3498db"/>
+    
+    <!-- 流程节点：预约挂号 -->
+    <circle cx="150" cy="200" r="60" fill="#3498db" fill-opacity="0.1" stroke="#3498db" stroke-width="2"/>
+    <text x="150" y="180" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">预约挂号</text>
+    <text x="150" y="205" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">AI导诊助手</text>
+    <text x="150" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">智能预约系统</text>
+    
+    <!-- 流程节点：就诊前准备 -->
+    <circle cx="350" cy="200" r="60" fill="#e74c3c" fill-opacity="0.1" stroke="#e74c3c" stroke-width="2"/>
+    <text x="350" y="180" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">就诊前准备</text>
+    <text x="350" y="205" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">候诊时间预估</text>
+    <text x="350" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">就诊指南推送</text>
+    
+    <!-- 流程节点：诊疗服务 -->
+    <circle cx="550" cy="200" r="60" fill="#2ecc71" fill-opacity="0.1" stroke="#2ecc71" stroke-width="2"/>
+    <text x="550" y="180" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">诊疗服务</text>
+    <text x="550" y="205" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">智能问诊辅助</text>
+    <text x="550" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">检查报告解读</text>
+    
+    <!-- 流程节点：随访管理 -->
+    <circle cx="750" cy="200" r="60" fill="#9b59b6" fill-opacity="0.1" stroke="#9b59b6" stroke-width="2"/>
+    <text x="750" y="180" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">随访管理</text>
+    <text x="750" y="205" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">康复指导跟进</text>
+    <text x="750" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">健康教育推送</text>
+    
+    <!-- 功能模块说明 -->
+    <rect x="100" y="300" width="600" height="130" rx="8" fill="#f1c40f" fill-opacity="0.1" stroke="#f1c40f" stroke-width="1"/>
+    <text x="400" y="330" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#2c3e50">微语AI医疗服务智能功能</text>
+    
+    <!-- 功能模块 -->
+    <rect x="120" y="350" width="130" height="60" rx="5" fill="#ffffff" stroke="#3498db" stroke-width="1"/>
+    <text x="185" y="375" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#3498db">多渠道整合</text>
+    <text x="185" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#7f8c8d">官网、APP、微信等</text>
+    
+    <rect x="270" y="350" width="130" height="60" rx="5" fill="#ffffff" stroke="#e74c3c" stroke-width="1"/>
+    <text x="335" y="375" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#e74c3c">智能分诊分配</text>
+    <text x="335" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#7f8c8d">根据症状智能匹配</text>
+    
+    <rect x="420" y="350" width="130" height="60" rx="5" fill="#ffffff" stroke="#2ecc71" stroke-width="1"/>
+    <text x="485" y="375" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2ecc71">医疗知识库</text>
+    <text x="485" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#7f8c8d">专业医疗知识支持</text>
+    
+    <rect x="570" y="350" width="130" height="60" rx="5" fill="#ffffff" stroke="#9b59b6" stroke-width="1"/>
+    <text x="635" y="375" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#9b59b6">患者关系管理</text>
+    <text x="635" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#7f8c8d">全周期患者关系维护</text>
+    
+    <!-- 底部说明 -->
+    <text x="400" y="470" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">微语AI医疗服务流程 - 打造智能化医疗服务全流程体验</text>
+</svg>

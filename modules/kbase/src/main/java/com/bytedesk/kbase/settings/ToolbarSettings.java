@@ -7,17 +7,21 @@ package com.bytedesk.kbase.settings;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.bytedesk.core.converter.StringListConverter;
 
@@ -36,10 +40,19 @@ public class ToolbarSettings implements Serializable {
     @Builder.Default
     private Boolean smile = true;
 
+    // 合并 image/file 为 upload
+    // - 新版本统一使用 upload
+    // - 兼容旧数据/旧请求：image/file 仍可写入，但不会输出到响应
+    @Getter(AccessLevel.NONE)
     @Builder.Default
+    private Boolean upload = null;
+
+    @Builder.Default
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Boolean image = true;
 
     @Builder.Default
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Boolean file = true;
 
     @Builder.Default
@@ -71,8 +84,69 @@ public class ToolbarSettings implements Serializable {
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(name = "toolbar_order", length = 1024)
+
+    @Getter(AccessLevel.NONE)
     private List<String> order = Arrays.asList(
-        "smile", "image", "file", "rate", "leavemsg",
+        "smile", "upload", "rate", "leavemsg",
         "orderSelector", "ticket", "audio", "video", "tel"
     );
+
+    public Boolean getUpload() {
+        if (upload != null) {
+            return upload;
+        }
+        if (image == null && file == null) {
+            return true;
+        }
+        return Boolean.TRUE.equals(image) || Boolean.TRUE.equals(file);
+    }
+
+    public void setUpload(Boolean upload) {
+        this.upload = upload;
+        if (upload != null) {
+            this.image = upload;
+            this.file = upload;
+        }
+    }
+
+    public void setImage(Boolean image) {
+        this.image = image;
+        this.upload = (Boolean.TRUE.equals(this.image) || Boolean.TRUE.equals(this.file));
+    }
+
+    public void setFile(Boolean file) {
+        this.file = file;
+        this.upload = (Boolean.TRUE.equals(this.image) || Boolean.TRUE.equals(this.file));
+    }
+
+    public List<String> getOrder() {
+        return normalizeOrder(this.order);
+    }
+
+    public void setOrder(List<String> order) {
+        this.order = normalizeOrder(order);
+    }
+
+    private List<String> normalizeOrder(List<String> raw) {
+        if (raw == null || raw.isEmpty()) {
+            return Arrays.asList(
+                "smile", "upload", "rate", "leavemsg",
+                "orderSelector", "ticket", "audio", "video", "tel"
+            );
+        }
+        final List<String> out = new ArrayList<>();
+        for (String k : raw) {
+            if (k == null || k.isBlank()) {
+                continue;
+            }
+            String key = k.trim();
+            if ("image".equals(key) || "file".equals(key)) {
+                key = "upload";
+            }
+            if (!out.contains(key)) {
+                out.add(key);
+            }
+        }
+        return out;
+    }
 }

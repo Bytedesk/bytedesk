@@ -75,7 +75,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     @ActionAnnotation(title = "Connection", action = "新建", description = "create connection")
     @Operation(summary = "Create Connection", description = "Create a new connection")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    // @PreAuthorize("hasAuthority('CONNECTION_CREATE')")
     public ResponseEntity<?> create(ConnectionRequest request) {
         
         ConnectionResponse connection = connectionRestService.create(request);
@@ -86,7 +86,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     @ActionAnnotation(title = "Connection", action = "更新", description = "update connection")
     @Operation(summary = "Update Connection", description = "Update an existing connection")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    // @PreAuthorize("hasAuthority('CONNECTION_UPDATE')")
     public ResponseEntity<?> update(ConnectionRequest request) {
         
         ConnectionResponse connection = connectionRestService.update(request);
@@ -97,7 +97,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     @ActionAnnotation(title = "Connection", action = "删除", description = "delete connection")
     @Operation(summary = "Delete Connection", description = "Delete a connection")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    // @PreAuthorize("hasAuthority('CONNECTION_DELETE')")
     public ResponseEntity<?> delete(ConnectionRequest request) {
         
         connectionRestService.delete(request);
@@ -108,7 +108,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     @ActionAnnotation(title = "Connection", action = "导出", description = "export connection")
     @Operation(summary = "Export Connections", description = "Export connections to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    // @PreAuthorize("hasAuthority('CONNECTION_EXPORT')")
     @GetMapping("/export")
     public Object export(ConnectionRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -125,7 +125,9 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     @Operation(summary = "Get Presence", description = "Get user's online presence and active connection count")
     @GetMapping("/presence/{userUid}")
     public ResponseEntity<?> getPresence(@PathVariable("userUid") String userUid) {
+
         PresenceResponse presence = connectionRestService.getPresence(userUid);
+
         return ResponseEntity.ok(JsonResult.success(presence));
     }
 
@@ -133,7 +135,9 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     @Operation(summary = "List Active Connections", description = "List user's active (non-expired) connections")
     @GetMapping("/presence/{userUid}/list")
     public ResponseEntity<?> listActiveConnections(@PathVariable("userUid") String userUid) {
+
         List<ConnectionResponse> list = connectionRestService.listActiveConnections(userUid);
+
         return ResponseEntity.ok(JsonResult.success(list));
     }
 

@@ -18,7 +18,7 @@ import java.util.List;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.excel.util.ListUtils;
-import com.alibaba.fastjson2.JSON;
+// import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.member.mq.MemberBatchMessageService;
 
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class MemberExcelListener implements ReadListener<MemberExcelImport> {
      */
     @Override
     public void invoke(MemberExcelImport data, AnalysisContext context) {
-        log.info("MemberExcelListener invoke: {}", JSON.toJSONString(data));
+        // log.info("MemberExcelListener invoke: {}", JSON.toJSONString(data));
         // 直接缓存Excel数据，不再进行转换
         cachedDataList.add(data);
         // 达到BATCH_COUNT了，需要发送到消息队列，防止数据几万条数据在内存，容易OOM

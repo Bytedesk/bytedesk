@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="260" viewBox="0 0 980 260" fill="none">
+  <style>
+    .box{fill:#F4FBF6;stroke:#2DA44E;stroke-width:1.5;rx:8}
+    .text{font-family:Arial, Helvetica, sans-serif;font-size:14px;fill:#1F2328}
+    .arrow{stroke:#6E7781;stroke-width:2;marker-end:url(#m)}
+  </style>
+  <defs>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#6E7781" />
+    </marker>
+  </defs>
+  <rect class="box" x="20" y="30" width="140" height="60"/>
+  <text class="text" x="90" y="65" text-anchor="middle">SIP/Trunk</text>
+  <line class="arrow" x1="160" y1="60" x2="210" y2="60"/>
+
+  <rect class="box" x="210" y="15" width="160" height="90"/>
+  <text class="text" x="290" y="50" text-anchor="middle">IVR/Steering</text>
+  <line class="arrow" x1="370" y1="60" x2="420" y2="60"/>
+
+  <rect class="box" x="420" y="15" width="160" height="90"/>
+  <text class="text" x="500" y="45" text-anchor="middle">ASR/TTS</text>
+  <text class="text" x="500" y="65" text-anchor="middle">Dialog</text>
+  <line class="arrow" x1="580" y1="60" x2="630" y2="60"/>
+
+  <rect class="box" x="630" y="15" width="160" height="90"/>
+  <text class="text" x="710" y="45" text-anchor="middle">Routing/Queue</text>
+  <line class="arrow" x1="790" y1="60" x2="840" y2="60"/>
+
+  <rect class="box" x="840" y="15" width="120" height="90"/>
+  <text class="text" x="900" y="45" text-anchor="middle">Agents</text>
+
+  <rect class="box" x="210" y="140" width="160" height="90"/>
+  <text class="text" x="290" y="175" text-anchor="middle">RAG/KB</text>
+  <rect class="box" x="420" y="140" width="160" height="90"/>
+  <text class="text" x="500" y="175" text-anchor="middle">CRM/Ticket</text>
+  <rect class="box" x="630" y="140" width="160" height="90"/>
+  <text class="text" x="710" y="175" text-anchor="middle">Order/API</text>
+  <line class="arrow" x1="500" y1="105" x2="500" y2="140"/>
+</svg>

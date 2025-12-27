@@ -20,61 +20,18 @@ public class WorkgroupPermissions extends BasePermissions {
     // 模块前缀
     public static final String WORKGROUP_PREFIX = "WORKGROUP_";
 
-    // 平台级权限
-    public static final String WORKGROUP_PLATFORM_READ = "WORKGROUP_PLATFORM_READ";
-    public static final String WORKGROUP_PLATFORM_CREATE = "WORKGROUP_PLATFORM_CREATE";
-    public static final String WORKGROUP_PLATFORM_UPDATE = "WORKGROUP_PLATFORM_UPDATE";
-    public static final String WORKGROUP_PLATFORM_DELETE = "WORKGROUP_PLATFORM_DELETE";
-    public static final String WORKGROUP_PLATFORM_EXPORT = "WORKGROUP_PLATFORM_EXPORT";
+    // 统一权限（不区分层级）
+    public static final String WORKGROUP_READ = "WORKGROUP_READ";
+    public static final String WORKGROUP_CREATE = "WORKGROUP_CREATE";
+    public static final String WORKGROUP_UPDATE = "WORKGROUP_UPDATE";
+    public static final String WORKGROUP_DELETE = "WORKGROUP_DELETE";
+    public static final String WORKGROUP_EXPORT = "WORKGROUP_EXPORT";
 
-    // 组织级权限
-    public static final String WORKGROUP_ORGANIZATION_READ = "WORKGROUP_ORGANIZATION_READ";
-    public static final String WORKGROUP_ORGANIZATION_CREATE = "WORKGROUP_ORGANIZATION_CREATE";
-    public static final String WORKGROUP_ORGANIZATION_UPDATE = "WORKGROUP_ORGANIZATION_UPDATE";
-    public static final String WORKGROUP_ORGANIZATION_DELETE = "WORKGROUP_ORGANIZATION_DELETE";
-    public static final String WORKGROUP_ORGANIZATION_EXPORT = "WORKGROUP_ORGANIZATION_EXPORT";
-
-    // 部门级权限
-    public static final String WORKGROUP_DEPARTMENT_READ = "WORKGROUP_DEPARTMENT_READ";
-    public static final String WORKGROUP_DEPARTMENT_CREATE = "WORKGROUP_DEPARTMENT_CREATE";
-    public static final String WORKGROUP_DEPARTMENT_UPDATE = "WORKGROUP_DEPARTMENT_UPDATE";
-    public static final String WORKGROUP_DEPARTMENT_DELETE = "WORKGROUP_DEPARTMENT_DELETE";
-    public static final String WORKGROUP_DEPARTMENT_EXPORT = "WORKGROUP_DEPARTMENT_EXPORT";
-
-    // 工作组级权限
-    public static final String WORKGROUP_WORKGROUP_READ = "WORKGROUP_WORKGROUP_READ";
-    public static final String WORKGROUP_WORKGROUP_CREATE = "WORKGROUP_WORKGROUP_CREATE";
-    public static final String WORKGROUP_WORKGROUP_UPDATE = "WORKGROUP_WORKGROUP_UPDATE";
-    public static final String WORKGROUP_WORKGROUP_DELETE = "WORKGROUP_WORKGROUP_DELETE";
-    public static final String WORKGROUP_WORKGROUP_EXPORT = "WORKGROUP_WORKGROUP_EXPORT";
-
-    // 客服级权限
-    public static final String WORKGROUP_AGENT_READ = "WORKGROUP_AGENT_READ";
-    public static final String WORKGROUP_AGENT_CREATE = "WORKGROUP_AGENT_CREATE";
-    public static final String WORKGROUP_AGENT_UPDATE = "WORKGROUP_AGENT_UPDATE";
-    public static final String WORKGROUP_AGENT_DELETE = "WORKGROUP_AGENT_DELETE";
-    public static final String WORKGROUP_AGENT_EXPORT = "WORKGROUP_AGENT_EXPORT";
-    // 用户级权限
-    public static final String WORKGROUP_USER_READ = "WORKGROUP_USER_READ";
-    public static final String WORKGROUP_USER_CREATE = "WORKGROUP_USER_CREATE";
-    public static final String WORKGROUP_USER_UPDATE = "WORKGROUP_USER_UPDATE";
-    public static final String WORKGROUP_USER_DELETE = "WORKGROUP_USER_DELETE";
-    public static final String WORKGROUP_USER_EXPORT = "WORKGROUP_USER_EXPORT";
-
-
-    // PreAuthorize 表达式 - 读取权限（允许多层级访问）
-    public static final String HAS_WORKGROUP_READ_ANY_LEVEL = "hasAnyAuthority('WORKGROUP_PLATFORM_READ', 'WORKGROUP_ORGANIZATION_READ', 'WORKGROUP_DEPARTMENT_READ', 'WORKGROUP_WORKGROUP_READ', 'WORKGROUP_AGENT_READ', 'WORKGROUP_USER_READ')";
-    
-    // PreAuthorize 表达式 - 创建权限（允许多层级访问）
-    public static final String HAS_WORKGROUP_CREATE_ANY_LEVEL = "hasAnyAuthority('WORKGROUP_PLATFORM_CREATE', 'WORKGROUP_ORGANIZATION_CREATE', 'WORKGROUP_DEPARTMENT_CREATE', 'WORKGROUP_WORKGROUP_CREATE', 'WORKGROUP_AGENT_CREATE', 'WORKGROUP_USER_CREATE')";
-    
-    // PreAuthorize 表达式 - 更新权限（允许多层级访问）
-    public static final String HAS_WORKGROUP_UPDATE_ANY_LEVEL = "hasAnyAuthority('WORKGROUP_PLATFORM_UPDATE', 'WORKGROUP_ORGANIZATION_UPDATE', 'WORKGROUP_DEPARTMENT_UPDATE', 'WORKGROUP_WORKGROUP_UPDATE', 'WORKGROUP_AGENT_UPDATE', 'WORKGROUP_USER_UPDATE')";
-    
-    // PreAuthorize 表达式 - 删除权限（允许多层级访问）
-    public static final String HAS_WORKGROUP_DELETE_ANY_LEVEL = "hasAnyAuthority('WORKGROUP_PLATFORM_DELETE', 'WORKGROUP_ORGANIZATION_DELETE', 'WORKGROUP_DEPARTMENT_DELETE', 'WORKGROUP_WORKGROUP_DELETE', 'WORKGROUP_AGENT_DELETE', 'WORKGROUP_USER_DELETE')";
-    
-    // PreAuthorize 表达式 - 导出权限（允许多层级访问）
-    public static final String HAS_WORKGROUP_EXPORT_ANY_LEVEL = "hasAnyAuthority('WORKGROUP_PLATFORM_EXPORT', 'WORKGROUP_ORGANIZATION_EXPORT', 'WORKGROUP_DEPARTMENT_EXPORT', 'WORKGROUP_WORKGROUP_EXPORT', 'WORKGROUP_AGENT_EXPORT', 'WORKGROUP_USER_EXPORT')";
+    // PreAuthorize 表达式 - 统一权限（不区分层级）
+    public static final String HAS_WORKGROUP_READ = "hasAuthority('WORKGROUP_READ')";
+    public static final String HAS_WORKGROUP_CREATE = "hasAuthority('WORKGROUP_CREATE')";
+    public static final String HAS_WORKGROUP_UPDATE = "hasAuthority('WORKGROUP_UPDATE')";
+    public static final String HAS_WORKGROUP_DELETE = "hasAuthority('WORKGROUP_DELETE')";
+    public static final String HAS_WORKGROUP_EXPORT = "hasAuthority('WORKGROUP_EXPORT')";
 
 }

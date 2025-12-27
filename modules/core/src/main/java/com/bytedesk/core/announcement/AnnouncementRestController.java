@@ -72,7 +72,7 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
     @ActionAnnotation(title = "标签", action = "新建", description = "create announcement")
     @Operation(summary = "Create Announcement", description = "Create a new announcement")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_CREATE)
     public ResponseEntity<?> create(AnnouncementRequest request) {
         
         AnnouncementResponse announcement = announcementRestService.create(request);
@@ -83,7 +83,7 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
     @ActionAnnotation(title = "标签", action = "更新", description = "update announcement")
     @Operation(summary = "Update Announcement", description = "Update an existing announcement")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_UPDATE)
     public ResponseEntity<?> update(AnnouncementRequest request) {
         
         AnnouncementResponse announcement = announcementRestService.update(request);
@@ -94,7 +94,7 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
     @ActionAnnotation(title = "标签", action = "删除", description = "delete announcement")
     @Operation(summary = "Delete Announcement", description = "Delete a announcement")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_DELETE)
     public ResponseEntity<?> delete(AnnouncementRequest request) {
         
         announcementRestService.delete(request);
@@ -105,7 +105,7 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
     @ActionAnnotation(title = "标签", action = "导出", description = "export announcement")
     @Operation(summary = "Export Announcements", description = "Export announcements to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_EXPORT)
     @GetMapping("/export")
     public Object export(AnnouncementRequest request, HttpServletResponse response) {
         return exportTemplate(

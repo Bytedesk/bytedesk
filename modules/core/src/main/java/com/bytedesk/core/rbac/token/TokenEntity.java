@@ -24,6 +24,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +50,7 @@ import com.bytedesk.core.utils.BdDateUtils;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners({TokenEntityListener.class})
 @Table(name = "bytedesk_core_token")
 public class TokenEntity extends BaseEntity {
 

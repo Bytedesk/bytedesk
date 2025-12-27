@@ -20,61 +20,18 @@ public class VocCommentPermissions extends BasePermissions {
     // 模块前缀
     public static final String VOC_COMMENT_PREFIX = "VOC_COMMENT_";
 
-    // 平台级权限
-    public static final String VOC_COMMENT_PLATFORM_READ = "VOC_COMMENT_PLATFORM_READ";
-    public static final String VOC_COMMENT_PLATFORM_CREATE = "VOC_COMMENT_PLATFORM_CREATE";
-    public static final String VOC_COMMENT_PLATFORM_UPDATE = "VOC_COMMENT_PLATFORM_UPDATE";
-    public static final String VOC_COMMENT_PLATFORM_DELETE = "VOC_COMMENT_PLATFORM_DELETE";
-    public static final String VOC_COMMENT_PLATFORM_EXPORT = "VOC_COMMENT_PLATFORM_EXPORT";
+    // 统一权限（不再在权限字符串中编码层级）
+    public static final String VOC_COMMENT_READ = "VOC_COMMENT_READ";
+    public static final String VOC_COMMENT_CREATE = "VOC_COMMENT_CREATE";
+    public static final String VOC_COMMENT_UPDATE = "VOC_COMMENT_UPDATE";
+    public static final String VOC_COMMENT_DELETE = "VOC_COMMENT_DELETE";
+    public static final String VOC_COMMENT_EXPORT = "VOC_COMMENT_EXPORT";
 
-    // 组织级权限
-    public static final String VOC_COMMENT_ORGANIZATION_READ = "VOC_COMMENT_ORGANIZATION_READ";
-    public static final String VOC_COMMENT_ORGANIZATION_CREATE = "VOC_COMMENT_ORGANIZATION_CREATE";
-    public static final String VOC_COMMENT_ORGANIZATION_UPDATE = "VOC_COMMENT_ORGANIZATION_UPDATE";
-    public static final String VOC_COMMENT_ORGANIZATION_DELETE = "VOC_COMMENT_ORGANIZATION_DELETE";
-    public static final String VOC_COMMENT_ORGANIZATION_EXPORT = "VOC_COMMENT_ORGANIZATION_EXPORT";
-
-    // 部门级权限
-    public static final String VOC_COMMENT_DEPARTMENT_READ = "VOC_COMMENT_DEPARTMENT_READ";
-    public static final String VOC_COMMENT_DEPARTMENT_CREATE = "VOC_COMMENT_DEPARTMENT_CREATE";
-    public static final String VOC_COMMENT_DEPARTMENT_UPDATE = "VOC_COMMENT_DEPARTMENT_UPDATE";
-    public static final String VOC_COMMENT_DEPARTMENT_DELETE = "VOC_COMMENT_DEPARTMENT_DELETE";
-    public static final String VOC_COMMENT_DEPARTMENT_EXPORT = "VOC_COMMENT_DEPARTMENT_EXPORT";
-
-    // 工作组级权限
-    public static final String VOC_COMMENT_WORKGROUP_READ = "VOC_COMMENT_WORKGROUP_READ";
-    public static final String VOC_COMMENT_WORKGROUP_CREATE = "VOC_COMMENT_WORKGROUP_CREATE";
-    public static final String VOC_COMMENT_WORKGROUP_UPDATE = "VOC_COMMENT_WORKGROUP_UPDATE";
-    public static final String VOC_COMMENT_WORKGROUP_DELETE = "VOC_COMMENT_WORKGROUP_DELETE";
-    public static final String VOC_COMMENT_WORKGROUP_EXPORT = "VOC_COMMENT_WORKGROUP_EXPORT";
-
-    // 客服级权限
-    public static final String VOC_COMMENT_AGENT_READ = "VOC_COMMENT_AGENT_READ";
-    public static final String VOC_COMMENT_AGENT_CREATE = "VOC_COMMENT_AGENT_CREATE";
-    public static final String VOC_COMMENT_AGENT_UPDATE = "VOC_COMMENT_AGENT_UPDATE";
-    public static final String VOC_COMMENT_AGENT_DELETE = "VOC_COMMENT_AGENT_DELETE";
-    public static final String VOC_COMMENT_AGENT_EXPORT = "VOC_COMMENT_AGENT_EXPORT";
-    // 用户级权限
-    public static final String VOC_COMMENT_USER_READ = "VOC_COMMENT_USER_READ";
-    public static final String VOC_COMMENT_USER_CREATE = "VOC_COMMENT_USER_CREATE";
-    public static final String VOC_COMMENT_USER_UPDATE = "VOC_COMMENT_USER_UPDATE";
-    public static final String VOC_COMMENT_USER_DELETE = "VOC_COMMENT_USER_DELETE";
-    public static final String VOC_COMMENT_USER_EXPORT = "VOC_COMMENT_USER_EXPORT";
-
-
-    // PreAuthorize 表达式 - 读取权限（允许多层级访问）
-    public static final String HAS_VOC_COMMENT_READ_ANY_LEVEL = "hasAnyAuthority('VOC_COMMENT_PLATFORM_READ', 'VOC_COMMENT_ORGANIZATION_READ', 'VOC_COMMENT_DEPARTMENT_READ', 'VOC_COMMENT_WORKGROUP_READ', 'VOC_COMMENT_AGENT_READ', 'VOC_COMMENT_USER_READ')";
-    
-    // PreAuthorize 表达式 - 创建权限（允许多层级访问）
-    public static final String HAS_VOC_COMMENT_CREATE_ANY_LEVEL = "hasAnyAuthority('VOC_COMMENT_PLATFORM_CREATE', 'VOC_COMMENT_ORGANIZATION_CREATE', 'VOC_COMMENT_DEPARTMENT_CREATE', 'VOC_COMMENT_WORKGROUP_CREATE', 'VOC_COMMENT_AGENT_CREATE', 'VOC_COMMENT_USER_CREATE')";
-    
-    // PreAuthorize 表达式 - 更新权限（允许多层级访问）
-    public static final String HAS_VOC_COMMENT_UPDATE_ANY_LEVEL = "hasAnyAuthority('VOC_COMMENT_PLATFORM_UPDATE', 'VOC_COMMENT_ORGANIZATION_UPDATE', 'VOC_COMMENT_DEPARTMENT_UPDATE', 'VOC_COMMENT_WORKGROUP_UPDATE', 'VOC_COMMENT_AGENT_UPDATE', 'VOC_COMMENT_USER_UPDATE')";
-    
-    // PreAuthorize 表达式 - 删除权限（允许多层级访问）
-    public static final String HAS_VOC_COMMENT_DELETE_ANY_LEVEL = "hasAnyAuthority('VOC_COMMENT_PLATFORM_DELETE', 'VOC_COMMENT_ORGANIZATION_DELETE', 'VOC_COMMENT_DEPARTMENT_DELETE', 'VOC_COMMENT_WORKGROUP_DELETE', 'VOC_COMMENT_AGENT_DELETE', 'VOC_COMMENT_USER_DELETE')";
-    
-    // PreAuthorize 表达式 - 导出权限（允许多层级访问）
-    public static final String HAS_VOC_COMMENT_EXPORT_ANY_LEVEL = "hasAnyAuthority('VOC_COMMENT_PLATFORM_EXPORT', 'VOC_COMMENT_ORGANIZATION_EXPORT', 'VOC_COMMENT_DEPARTMENT_EXPORT', 'VOC_COMMENT_WORKGROUP_EXPORT', 'VOC_COMMENT_AGENT_EXPORT', 'VOC_COMMENT_USER_EXPORT')";
+    // PreAuthorize 表达式
+    public static final String HAS_VOC_COMMENT_READ = "hasAuthority('VOC_COMMENT_READ')";
+    public static final String HAS_VOC_COMMENT_CREATE = "hasAuthority('VOC_COMMENT_CREATE')";
+    public static final String HAS_VOC_COMMENT_UPDATE = "hasAuthority('VOC_COMMENT_UPDATE')";
+    public static final String HAS_VOC_COMMENT_DELETE = "hasAuthority('VOC_COMMENT_DELETE')";
+    public static final String HAS_VOC_COMMENT_EXPORT = "hasAuthority('VOC_COMMENT_EXPORT')";
 
 }

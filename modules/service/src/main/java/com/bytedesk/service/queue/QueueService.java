@@ -88,11 +88,16 @@ public class QueueService {
     private QueueMemberEntity handleExistingMember(QueueMemberEntity member, UserProtobuf agent,
             ThreadEntity threadEntity, QueueTypeEnum queueType) {
 
+        // 非 WORKGROUP 队列：已存在成员通常无需更新，直接复用，避免无意义 save 引发乐观锁冲突
+        if (queueType != QueueTypeEnum.WORKGROUP) {
+            return member;
+        }
+
         if (queueType == QueueTypeEnum.WORKGROUP) {
             // 更新工作组队列的 agent/robot 队列
             if (agent == null) {
                 log.debug("Existing workgroup queue member stays unassigned - threadUid: {}", threadEntity.getUid());
-                return saveQueueMember(member);
+                return member;
             }
 
             QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
@@ -103,9 +108,13 @@ public class QueueService {
             } else {
                 member.setRobotQueue(agentOrRobotQueue);
             }
+
+            // 这里的更新不要求强一致：异步 best-effort 保存，避免影响主流程事务
+            queueMemberRestService.saveAsyncBestEffort(member);
+            return member;
         }
 
-        return saveQueueMember(member);
+        return member;
     }
 
     /**

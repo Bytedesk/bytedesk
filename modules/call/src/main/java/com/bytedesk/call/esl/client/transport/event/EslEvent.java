@@ -20,8 +20,7 @@ import com.bytedesk.call.esl.client.transport.message.EslHeaders;
 import com.bytedesk.call.esl.client.transport.message.EslHeaders.Name;
 import com.bytedesk.call.esl.client.transport.message.EslHeaders.Value;
 import com.bytedesk.call.esl.client.transport.message.EslMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -48,8 +47,8 @@ import java.util.StringJoiner;
  *
  * @see EslEventHeaderNames
  */
+@Slf4j
 public class EslEvent {
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private final Map<Name, String> messageHeaders;
 	private final Map<String, String> eventHeaders;

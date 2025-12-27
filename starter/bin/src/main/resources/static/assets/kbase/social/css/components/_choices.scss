@@ -1,0 +1,103 @@
+// 
+// Data table.scss
+// Vendor css override and new css added
+
+// choices
+.choices{
+
+  .choices__inner{
+    background-color: $input-bg;
+    color: $input-color;
+    border: $input-border-width solid $input-border-color;
+    line-height: $input-line-height;  
+    border-radius: $border-radius;
+    min-height: auto;
+    padding: $input-padding-y $input-padding-x !important;
+    @include font-size($input-font-size);
+  }
+  .choices__list--multiple .choices__item{
+    background-color: var(--#{$prefix}light);
+    border: 1px solid var(--#{$prefix}light);
+    border-radius: $border-radius;
+    color: $input-color;
+  }
+  .choices__list--dropdown{
+    background: $input-bg;
+    border: $input-border-width solid $input-border-color;
+    visibility: visible !important;
+    .choices__item--selectable.is-highlighted{
+      background-color: var(--#{$prefix}light);
+    }
+  }
+  .choices__list--dropdown .choices__item{
+    color: var(--#{$prefix}gray-600);
+  }
+  .choices__input{
+    background: transparent;
+    padding: 0; 
+    color: $input-color;
+  }
+  .choices__list--dropdown,
+  .choices__list[aria-expanded]{
+    margin-top: 0px;
+  }
+  &.is-open .choices__list--dropdown, 
+  &.is-open .choices__list[aria-expanded]{
+    margin-top: -1px;
+  }
+}
+.choices[data-type*=select-one] .choices__input{
+  background: var(--bs-white);
+  color:  var(--#{$prefix}body-color);
+  border-color: $input-border-color !important;
+}
+.choices__list--single {
+  padding: 0;
+}
+.choices[data-type*=select-multiple] .choices__button, .choices[data-type*=text] .choices__button {
+	border-left: 1px solid $secondary;
+	background-image: escape-svg($btn-close-bg);
+}
+.choices[data-type*=select-one]:after {
+  content: "";
+  height: 10px;
+  width: 10px;
+  border: none;
+  border-width: 5px;
+  position: absolute;
+  right: 11.5px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 0;
+  background-image: escape-svg($form-select-indicator);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 16px 12px;
+}
+.choices[data-type*=select-one].is-open {
+	&:after {
+		margin-top: 0;
+	}
+}
+.choices[data-type*=select-one] {
+	.choices__input {
+		background: $input-bg;
+		border-color: $input-bg;
+	}
+}
+.choices {
+	&.is-focused {
+		.choices__inner {
+			border-color: var(--#{$prefix}primary);
+		}
+	}
+}
+
+
+// To remove itemSelectText on hover
+.choices[data-type*=select-one] .choices__list > .choices__list > .choices__item--selectable, .choices[data-type*=select-multiple] .choices__list > .choices__list > .choices__item--selectable{
+	padding-right: 0px;
+}
+.choices[data-type*=select-one] .choices__list > .choices__list > .choices__item--selectable::after, .choices[data-type*=select-multiple] .choices__list > .choices__list > .choices__item--selectable::after{
+	display: none;
+}

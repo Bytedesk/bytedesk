@@ -24,6 +24,8 @@ import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.ai.model.LlmModelRestService;
 import com.bytedesk.ai.provider.LlmProviderJsonLoader.ProviderJson;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
 
@@ -45,9 +47,19 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
 
     private final OrganizationRestService organizationRestService;
 
+    private final AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
+        initAuthority();
         init();
+    }
+
+    private void initAuthority() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = LlmProviderPermissions.LLM_PROVIDER_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
     /**
      * 初始化 LLM 提供商和模型

@@ -20,61 +20,18 @@ public class GroupPermissions extends BasePermissions {
     // 模块前缀
     public static final String GROUP_PREFIX = "GROUP_";
 
-    // 平台级权限
-    public static final String GROUP_PLATFORM_READ = "GROUP_PLATFORM_READ";
-    public static final String GROUP_PLATFORM_CREATE = "GROUP_PLATFORM_CREATE";
-    public static final String GROUP_PLATFORM_UPDATE = "GROUP_PLATFORM_UPDATE";
-    public static final String GROUP_PLATFORM_DELETE = "GROUP_PLATFORM_DELETE";
-    public static final String GROUP_PLATFORM_EXPORT = "GROUP_PLATFORM_EXPORT";
+    // 统一权限（不再在权限字符串中编码层级）
+    public static final String GROUP_READ = "GROUP_READ";
+    public static final String GROUP_CREATE = "GROUP_CREATE";
+    public static final String GROUP_UPDATE = "GROUP_UPDATE";
+    public static final String GROUP_DELETE = "GROUP_DELETE";
+    public static final String GROUP_EXPORT = "GROUP_EXPORT";
 
-    // 组织级权限
-    public static final String GROUP_ORGANIZATION_READ = "GROUP_ORGANIZATION_READ";
-    public static final String GROUP_ORGANIZATION_CREATE = "GROUP_ORGANIZATION_CREATE";
-    public static final String GROUP_ORGANIZATION_UPDATE = "GROUP_ORGANIZATION_UPDATE";
-    public static final String GROUP_ORGANIZATION_DELETE = "GROUP_ORGANIZATION_DELETE";
-    public static final String GROUP_ORGANIZATION_EXPORT = "GROUP_ORGANIZATION_EXPORT";
-
-    // 部门级权限
-    public static final String GROUP_DEPARTMENT_READ = "GROUP_DEPARTMENT_READ";
-    public static final String GROUP_DEPARTMENT_CREATE = "GROUP_DEPARTMENT_CREATE";
-    public static final String GROUP_DEPARTMENT_UPDATE = "GROUP_DEPARTMENT_UPDATE";
-    public static final String GROUP_DEPARTMENT_DELETE = "GROUP_DEPARTMENT_DELETE";
-    public static final String GROUP_DEPARTMENT_EXPORT = "GROUP_DEPARTMENT_EXPORT";
-
-    // 工作组级权限
-    public static final String GROUP_WORKGROUP_READ = "GROUP_WORKGROUP_READ";
-    public static final String GROUP_WORKGROUP_CREATE = "GROUP_WORKGROUP_CREATE";
-    public static final String GROUP_WORKGROUP_UPDATE = "GROUP_WORKGROUP_UPDATE";
-    public static final String GROUP_WORKGROUP_DELETE = "GROUP_WORKGROUP_DELETE";
-    public static final String GROUP_WORKGROUP_EXPORT = "GROUP_WORKGROUP_EXPORT";
-
-    // 客服级权限
-    public static final String GROUP_AGENT_READ = "GROUP_AGENT_READ";
-    public static final String GROUP_AGENT_CREATE = "GROUP_AGENT_CREATE";
-    public static final String GROUP_AGENT_UPDATE = "GROUP_AGENT_UPDATE";
-    public static final String GROUP_AGENT_DELETE = "GROUP_AGENT_DELETE";
-    public static final String GROUP_AGENT_EXPORT = "GROUP_AGENT_EXPORT";
-    // 用户级权限
-    public static final String GROUP_USER_READ = "GROUP_USER_READ";
-    public static final String GROUP_USER_CREATE = "GROUP_USER_CREATE";
-    public static final String GROUP_USER_UPDATE = "GROUP_USER_UPDATE";
-    public static final String GROUP_USER_DELETE = "GROUP_USER_DELETE";
-    public static final String GROUP_USER_EXPORT = "GROUP_USER_EXPORT";
-
-
-    // PreAuthorize 表达式 - 读取权限（允许多层级访问）
-    public static final String HAS_GROUP_READ_ANY_LEVEL = "hasAnyAuthority('GROUP_PLATFORM_READ', 'GROUP_ORGANIZATION_READ', 'GROUP_DEPARTMENT_READ', 'GROUP_WORKGROUP_READ', 'GROUP_AGENT_READ', 'GROUP_USER_READ')";
-    
-    // PreAuthorize 表达式 - 创建权限（允许多层级访问）
-    public static final String HAS_GROUP_CREATE_ANY_LEVEL = "hasAnyAuthority('GROUP_PLATFORM_CREATE', 'GROUP_ORGANIZATION_CREATE', 'GROUP_DEPARTMENT_CREATE', 'GROUP_WORKGROUP_CREATE', 'GROUP_AGENT_CREATE', 'GROUP_USER_CREATE')";
-    
-    // PreAuthorize 表达式 - 更新权限（允许多层级访问）
-    public static final String HAS_GROUP_UPDATE_ANY_LEVEL = "hasAnyAuthority('GROUP_PLATFORM_UPDATE', 'GROUP_ORGANIZATION_UPDATE', 'GROUP_DEPARTMENT_UPDATE', 'GROUP_WORKGROUP_UPDATE', 'GROUP_AGENT_UPDATE', 'GROUP_USER_UPDATE')";
-    
-    // PreAuthorize 表达式 - 删除权限（允许多层级访问）
-    public static final String HAS_GROUP_DELETE_ANY_LEVEL = "hasAnyAuthority('GROUP_PLATFORM_DELETE', 'GROUP_ORGANIZATION_DELETE', 'GROUP_DEPARTMENT_DELETE', 'GROUP_WORKGROUP_DELETE', 'GROUP_AGENT_DELETE', 'GROUP_USER_DELETE')";
-    
-    // PreAuthorize 表达式 - 导出权限（允许多层级访问）
-    public static final String HAS_GROUP_EXPORT_ANY_LEVEL = "hasAnyAuthority('GROUP_PLATFORM_EXPORT', 'GROUP_ORGANIZATION_EXPORT', 'GROUP_DEPARTMENT_EXPORT', 'GROUP_WORKGROUP_EXPORT', 'GROUP_AGENT_EXPORT', 'GROUP_USER_EXPORT')";
+    // PreAuthorize 表达式 - 统一权限（不区分层级）
+    public static final String HAS_GROUP_READ = "hasAuthority('GROUP_READ')";
+    public static final String HAS_GROUP_CREATE = "hasAuthority('GROUP_CREATE')";
+    public static final String HAS_GROUP_UPDATE = "hasAuthority('GROUP_UPDATE')";
+    public static final String HAS_GROUP_DELETE = "hasAuthority('GROUP_DELETE')";
+    public static final String HAS_GROUP_EXPORT = "hasAuthority('GROUP_EXPORT')";
 
 }

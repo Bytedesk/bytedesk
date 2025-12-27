@@ -30,6 +30,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRequest;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,6 +62,8 @@ public class AuthController {
 
     private final AuthLoginRetryHelper authLoginRetryHelper;
 
+    private final BytedeskProperties bytedeskProperties;
+
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
@@ -84,13 +87,19 @@ public class AuthController {
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login {}", authRequest.toString());
 
-        if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
-                authRequest.getChannel())) {
-            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
+        // 性能测试模式：参考 IpAccessInterceptor，开启 disableIpFilter 后仅保留最基本登录验证流程
+        boolean performanceTestingEnabled = bytedeskProperties.isDisableIpFilter();
+
+        // 非性能测试模式才校验验证码；是否启用验证码由 checkKaptcha 内部统一控制
+        if (!performanceTestingEnabled) {
+            if (!kaptchaRedisService.checkKaptcha(authRequest.getCaptchaUid(), authRequest.getCaptchaCode(),
+                    authRequest.getChannel())) {
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_ERROR, -1, false));
+            }
         }
 
         // validate two-factor code if enabled 双重验证
-        if (authRequest.getTwoFactorEnabled() != null && authRequest.getTwoFactorEnabled()) {
+        if (!performanceTestingEnabled && authRequest.getTwoFactorEnabled() != null && authRequest.getTwoFactorEnabled()) {
             log.debug("Two-factor authentication is enabled for user: {}", authRequest.getUsername());
             if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
                 return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
@@ -108,8 +117,10 @@ public class AuthController {
         }
 
         try {
-            // 预登录检查
-            authLoginRetryHelper.performPreLoginChecks(authRequest.getUsername());
+            // 非性能测试模式才做预登录检查（失败次数/锁定等）
+            if (!performanceTestingEnabled) {
+                authLoginRetryHelper.performPreLoginChecks(authRequest.getUsername());
+            }
 
             Authentication authentication;
             // 判断是否使用密码哈希登录
@@ -132,8 +143,10 @@ public class AuthController {
                 return ResponseEntity.ok().body(JsonResult.error("Password or password hash is required", -1, false));
             }
          
-            // 登录成功，重置失败次数
-            authLoginRetryHelper.resetLoginFailedCount(authRequest.getUsername());
+            // 登录成功，重置失败次数（性能测试模式跳过）
+            if (!performanceTestingEnabled) {
+                authLoginRetryHelper.resetLoginFailedCount(authRequest.getUsername());
+            }
             
             // 格式化并返回成功响应
             AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
@@ -143,6 +156,10 @@ public class AuthController {
             log.error("Authentication failed for user: {}: {}", authRequest.getUsername(), e.getMessage());
             if (StringUtils.hasText(authRequest.getPasswordHash())) {
                 return ResponseEntity.ok().body(JsonResult.error("密码解密失败，请检查密码格式", -1, false));
+            }
+            // 性能测试模式下，避免额外的失败次数写入/锁定逻辑
+            if (performanceTestingEnabled) {
+                return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
             }
             return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
         }

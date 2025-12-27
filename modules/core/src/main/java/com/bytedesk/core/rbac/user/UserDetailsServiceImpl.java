@@ -28,6 +28,8 @@ import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailNotFoundException;
 import com.bytedesk.core.exception.MobileNotFoundException;
 import com.bytedesk.core.exception.UserDisabledException;
+// import com.bytedesk.core.config.properties.BytedeskProperties;
+// import com.bytedesk.core.rbac.user.cache.UserEntityRedisCacheService;
 import com.bytedesk.core.utils.JwtSubject;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,19 +44,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Cacheable(value = "user", key = "#email", unless = "#result == null")
+    @Cacheable(value = "user", key = "#email + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
-        return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
+		return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
-    @Cacheable(value = "user", key = "#mobile", unless = "#result == null")
+    @Cacheable(value = "user", key = "#mobile + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
-        return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
+		return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
     }
 
-    @Cacheable(value = "user", key = "#username", unless = "#result == null")
+    @Cacheable(value = "user", key = "#username + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByUsernameAndPlatform(String username, String platform) {
-        return userRepository.findByUsernameAndPlatformAndDeletedFalse(username, platform);
+		return userRepository.findByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
 	@Override

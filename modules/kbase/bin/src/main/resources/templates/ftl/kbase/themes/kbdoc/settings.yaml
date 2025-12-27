@@ -1,0 +1,9 @@
+# 配置详情请参考：https://docs.halo.run/zh/developer-guide/theme/config-files
+genernal:
+  label: 基本设置
+  items:
+    index_notice:
+      name: index_notice
+      label: 首页公告
+      type: textarea
+      default: '欢迎来到我的博客'

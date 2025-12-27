@@ -13,13 +13,14 @@
  */
 package com.bytedesk.core.utils;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.config.properties.BytedeskPropertiesResponse;
@@ -30,14 +31,16 @@ import com.bytedesk.core.message_unread.MessageUnreadEntity;
 import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleResponse;
+import com.bytedesk.core.rbac.role.RoleResponseSimple;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.rbac.user.UserOrganizationRoleResponse;
-import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -50,38 +53,9 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ConvertUtils {
 
-    // private static final AtomicBoolean THREAD_RESPONSE_TYPEMAP_CONFIGURED = new AtomicBoolean(false);
-
     private static ModelMapper getModelMapper() {
         return ApplicationContextHolder.getBean(ModelMapper.class);
     }
-
-    // private static void ensureThreadResponseTypeMapConfigured(ModelMapper modelMapper) {
-    //     if (THREAD_RESPONSE_TYPEMAP_CONFIGURED.get()) {
-    //         return;
-    //     }
-    //     synchronized (THREAD_RESPONSE_TYPEMAP_CONFIGURED) {
-    //         if (THREAD_RESPONSE_TYPEMAP_CONFIGURED.get()) {
-    //             return;
-    //         }
-    //         TypeMap<ThreadEntity, ThreadResponse> typeMap = modelMapper.getTypeMap(ThreadEntity.class, ThreadResponse.class);
-    //         if (typeMap == null) {
-    //             typeMap = modelMapper.createTypeMap(ThreadEntity.class, ThreadResponse.class);
-    //         }
-    //         typeMap.addMappings(mapper -> {
-    //             mapper.skip(ThreadResponse::setAllMessageCount);
-    //             mapper.skip(ThreadResponse::setVisitorMessageCount);
-    //             mapper.skip(ThreadResponse::setAgentMessageCount);
-    //             mapper.skip(ThreadResponse::setSystemMessageCount);
-    //             mapper.skip(ThreadResponse::setRobotMessageCount);
-    //             mapper.skip(ThreadResponse::setUnreadCount);
-    //             mapper.skip(ThreadResponse::setVisitorUnreadCount);
-    //             mapper.skip(ThreadResponse::setValid);
-    //             mapper.skip(ThreadResponse::setOwner);
-    //         });
-    //         THREAD_RESPONSE_TYPEMAP_CONFIGURED.set(true);
-    //     }
-    // }
 
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
         // 无需进行authorities转换，因为UserDetailsImpl中已经包含了authorities
@@ -89,86 +63,260 @@ public class ConvertUtils {
     }
 
     public static UserResponse convertToUserResponse(UserEntity user) {
-        UserResponse userResponse = getModelMapper().map(user, UserResponse.class);
-        
-        // 手动处理 userOrganizationRoles 映射
-        if (user.getUserOrganizationRoles() != null) {
-            Set<UserOrganizationRoleResponse> userOrgRoleResponses = user.getUserOrganizationRoles().stream()
-                .map(uor -> {
-                    UserOrganizationRoleResponse response = new UserOrganizationRoleResponse();
-                    // 映射组织信息
-                    if (uor.getOrganization() != null) {
-                        OrganizationResponseSimple orgResponse = new OrganizationResponseSimple();
-                        orgResponse.setUid(uor.getOrganization().getUid());
-                        orgResponse.setName(uor.getOrganization().getName());
-                        orgResponse.setLogo(uor.getOrganization().getLogo());
-                        orgResponse.setCode(uor.getOrganization().getCode());
-                        orgResponse.setDescription(uor.getOrganization().getDescription());
-                        orgResponse.setVerifyStatus(uor.getOrganization().getVerifyStatus());
-                        response.setOrganization(orgResponse);
-                    }
-                    // 映射角色信息
-                    if (uor.getRoles() != null) {
-                        Set<RoleResponse> roleResponses = uor.getRoles().stream()
-                            .map(role -> {
-                                RoleResponse roleResponse = new RoleResponse();
-                                roleResponse.setUid(role.getUid());
-                                roleResponse.setName(role.getName());
-                                roleResponse.setDescription(role.getDescription());
-                                roleResponse.setLevel(role.getLevel());
-                                return roleResponse;
-                            })
-                            .collect(Collectors.toSet());
-                        response.setRoles(roleResponses);
-                    }
-                    return response;
-                })
-                .collect(Collectors.toSet());
-            userResponse.setUserOrganizationRoles(userOrgRoleResponses);
+        if (user == null) {
+            return null;
         }
-        
-        Set<GrantedAuthority> authorities = filterUserGrantedAuthorities(user);
-        userResponse.setAuthorities(authorities);
-        
+
+        UserResponse userResponse = new UserResponse();
+
+        // BaseResponse / BaseEntityNoOrg fields
+        userResponse.setUid(user.getUid());
+        userResponse.setUserUid(user.getUserUid());
+        // 对于 User，orgUid 语义上等同于当前组织
+        userResponse.setOrgUid(user.getOrgUid());
+        userResponse.setLevel(user.getLevel());
+        userResponse.setPlatform(user.getPlatform());
+        userResponse.setCreatedAt(user.getCreatedAt());
+        userResponse.setUpdatedAt(user.getUpdatedAt());
+
+        // UserResponse fields
+        userResponse.setNum(user.getNum());
+        userResponse.setUsername(user.getUsername());
+        userResponse.setNickname(user.getNickname());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setMobile(user.getMobile());
+        userResponse.setCountry(user.getCountry());
+        userResponse.setAvatar(user.getAvatar());
+        userResponse.setDescription(user.getDescription());
+        userResponse.setSex(parseUserSex(user.getSex()));
+        userResponse.setEnabled(user.isEnabled());
+        userResponse.setSuperUser(user.isSuperUser());
+        userResponse.setEmailVerified(user.isEmailVerified());
+        userResponse.setMobileVerified(user.isMobileVerified());
+        userResponse.setRegisterSource(user.getRegisterSource());
+
+        // 特别注意：currentOrganization 必须手动转换，避免 ModelMapper / 懒加载导致字段缺失或循环引用
+        userResponse.setCurrentOrganization(convertToOrganizationResponseSimple(user.getCurrentOrganization()));
+
+        // currentRoles 手动映射（避免间接使用 getModelMapper）
+        userResponse.setCurrentRoles(convertToRoleResponseSimples(user.getCurrentRoles()));
+
+        // authorities
+        userResponse.setAuthorities(filterUserGrantedAuthorities(user));
+
         // 设置密码修改时间
         userResponse.setPasswordModifiedAt(user.getPasswordModifiedAtString());
-        
+
         return userResponse;
+    }
+
+    private static UserEntity.Sex parseUserSex(String sexValue) {
+        if (sexValue == null || sexValue.isBlank()) {
+            return UserEntity.Sex.UNKNOWN;
+        }
+        try {
+            return UserEntity.Sex.valueOf(sexValue.trim().toUpperCase());
+        } catch (Exception e) {
+            return UserEntity.Sex.UNKNOWN;
+        }
+    }
+
+    private static OrganizationResponseSimple convertToOrganizationResponseSimple(OrganizationEntity organization) {
+        if (organization == null) {
+            return null;
+        }
+        OrganizationResponseSimple response = OrganizationResponseSimple.builder()
+                .uid(organization.getUid())
+                .name(organization.getName())
+                .logo(organization.getLogo())
+                .code(organization.getCode())
+                .description(organization.getDescription())
+                .verifyStatus(organization.getVerifyStatus())
+                .enabled(organization.getEnabled())
+                .build();
+
+        // owner user（OrganizationEntity.user 默认为 LAZY，未初始化时不强行触发加载）
+        if (organization.getUser() != null && Hibernate.isInitialized(organization.getUser())) {
+            response.setUser(convertToUserResponseSimpleManual(organization.getUser()));
+        }
+
+        return response;
+    }
+
+    private static UserResponseSimple convertToUserResponseSimpleManual(UserEntity user) {
+        if (user == null) {
+            return null;
+        }
+        return UserResponseSimple.builder()
+                .uid(user.getUid())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
+                .description(user.getDescription())
+                .enabled(user.isEnabled())
+                .superUser(user.isSuperUser())
+                .build();
+    }
+
+    private static Set<RoleResponseSimple> convertToRoleResponseSimples(Set<RoleEntity> roles) {
+        if (roles == null) {
+            return null;
+        }
+        return roles.stream().map(ConvertUtils::convertToRoleResponseSimpleManual).collect(Collectors.toSet());
+    }
+
+    private static RoleResponseSimple convertToRoleResponseSimpleManual(RoleEntity role) {
+        if (role == null) {
+            return null;
+        }
+        RoleResponseSimple roleResponse = new RoleResponseSimple();
+        roleResponse.setUid(role.getUid());
+        roleResponse.setOrgUid(role.getOrgUid());
+        roleResponse.setUserUid(role.getUserUid());
+        roleResponse.setLevel(role.getLevel());
+        roleResponse.setPlatform(role.getPlatform());
+        roleResponse.setCreatedAt(role.getCreatedAt());
+        roleResponse.setUpdatedAt(role.getUpdatedAt());
+
+        roleResponse.setName(role.getName());
+        roleResponse.setValue(role.getValue());
+        roleResponse.setDescription(role.getDescription());
+        roleResponse.setSystem(role.getSystem());
+        return roleResponse;
     }
 
     public static Set<GrantedAuthority> filterUserGrantedAuthorities(UserEntity user) {
         // 添加用户的权限，使用方式，如：@PreAuthorize("hasAnyAuthority('SUPER', 'ADMIN')")
-        Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
-                .filter(uor -> uor.getOrganization().equals(user.getCurrentOrganization())) // 过滤步骤
-                .flatMap(uor -> uor.getRoles().stream()
-                        .flatMap(role -> role.getAuthorities().stream()
-                                .map(authority -> new SimpleGrantedAuthority(authority.getValue()))))
-                .collect(Collectors.toSet());
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        // Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
+        //         .filter(uor -> uor.getOrganization().equals(user.getCurrentOrganization())) // 过滤步骤
+        //         .flatMap(uor -> uor.getRoles().stream()
+        //                 .flatMap(role -> role.getAuthorities().stream()
+        //                         .map(authority -> new SimpleGrantedAuthority(authority.getValue()))))
+        //         .collect(Collectors.toSet());
         // log.info("authorities only: {}", authorities);
 
-        // 添加用户的角色，使用方式，在Controller或Service方法配置注解：@PreAuthorize("hasAnyRole('ADMIN',
-        // 'SUPER', 'CS')")，
+        // 添加用户的角色，使用方式，在Controller或Service方法配置注解：@PreAuthorize("hasAnyRole('ADMIN', 'SUPER', 'CS')")，
         // 无需加角色前缀ROLE_，因为已经在RoleEntity的name中配置了
-        authorities.addAll(user.getUserOrganizationRoles().stream()
-                .filter(uor -> uor.getOrganization().equals(user.getCurrentOrganization())) // 过滤步骤
-                .flatMap(uor -> uor.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getName())))
-                .collect(Collectors.toSet()));
+        // authorities.addAll(user.getUserOrganizationRoles().stream()
+        //         .filter(uor -> uor.getOrganization().equals(user.getCurrentOrganization())) // 过滤步骤
+        //         .flatMap(uor -> uor.getRoles().stream()
+        //                 .map(role -> new SimpleGrantedAuthority(role.getName())))
+        //         .collect(Collectors.toSet()));
         // log.info("authorities with roles: {}", authorities);
 
         // currentRoles already reflects the active organization; merge their authorities and role names
         if (user.getCurrentRoles() != null) {
             user.getCurrentRoles().forEach(role -> {
-            if (role.getAuthorities() != null) {
-                role.getAuthorities().forEach(authority ->
-                    authorities.add(new SimpleGrantedAuthority(authority.getValue())));
-            }
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
+                if (role.getAuthorities() != null) {
+                    role.getAuthorities().forEach(authority ->
+                        authorities.add(new SimpleGrantedAuthority(authority.getValue())));
+                }
+                authorities.add(new SimpleGrantedAuthority(role.getValue()));
             });
         }
 
+        // 兼容处理：
+        // - 旧格式：MODULE_LEVEL_ACTION（例如 TAG_PLATFORM_READ）
+        // - 新格式：MODULE_ACTION（例如 TAG_READ）
+        //
+        // 目标：系统内部不再依赖权限字符串中的层级，但要保证旧数据/旧 @PreAuthorize 仍可临时工作。
+        // 策略：
+        // 1) 如果存在旧格式权限，归一化出 MODULE_ACTION 追加进去。
+        // 2) 如果存在新格式权限，派生出旧格式 MODULE_LEVEL_ACTION 追加进去（仅作为别名）。
+        // expandAndNormalizePermissionAuthorities(authorities);
+
         return authorities;
     }
+
+
+    // private static void expandAndNormalizePermissionAuthorities(Set<GrantedAuthority> authorities) {
+    //     if (authorities == null || authorities.isEmpty()) {
+    //         return;
+    //     }
+
+    //     Set<String> rawValues = authorities.stream()
+    //             .map(GrantedAuthority::getAuthority)
+    //             .filter(StringUtils::hasText)
+    //             .collect(Collectors.toSet());
+
+    //     Set<String> derived = new HashSet<>();
+
+    //     for (String value : rawValues) {
+    //         // 跳过角色名（例如 SUPER/ADMIN/AGENT 等），只处理权限值。
+    //         if (!value.contains("_")) {
+    //             continue;
+    //         }
+
+    //         // 旧 -> 新：MODULE_LEVEL_ACTION => MODULE_ACTION
+    //         String normalized = normalizeLevelPermission(value);
+    //         if (StringUtils.hasText(normalized) && !normalized.equals(value)) {
+    //             derived.add(normalized);
+    //         }
+
+    //         // 新 -> 旧：MODULE_ACTION => MODULE_LEVEL_ACTION（仅用于兼容老的 hasAnyAuthority('..._PLATFORM_...')）
+    //         if (isModuleActionPermission(value)) {
+    //             derived.addAll(expandToLegacyLevels(value));
+    //         }
+    //     }
+
+    //     for (String v : derived) {
+    //         authorities.add(new SimpleGrantedAuthority(v));
+    //     }
+    // }
+
+    // private static boolean isModuleActionPermission(String value) {
+    //     // 期望格式：<MODULE>_<ACTION>
+    //     // MODULE 可能包含下划线（例如 WORKFLOW_LOG_READ），但 ACTION 一般是最后一个 token。
+    //     int lastUnderscore = value.lastIndexOf('_');
+    //     if (lastUnderscore <= 0 || lastUnderscore >= value.length() - 1) {
+    //         return false;
+    //     }
+    //     String action = value.substring(lastUnderscore + 1);
+    //     // 常见动作集合（项目里普遍使用）
+    //     return Set.of("READ", "CREATE", "UPDATE", "DELETE", "EXPORT").contains(action.toUpperCase());
+    // }
+
+    // private static String normalizeLevelPermission(String value) {
+    //     // 将：<MODULE>_<LEVEL>_<ACTION> 归一化为：<MODULE>_<ACTION>
+    //     int lastUnderscore = value.lastIndexOf('_');
+    //     if (lastUnderscore <= 0 || lastUnderscore >= value.length() - 1) {
+    //         return value;
+    //     }
+    //     String action = value.substring(lastUnderscore + 1);
+    //     String prefix = value.substring(0, lastUnderscore); // 去掉 _ACTION
+
+    //     int secondLastUnderscore = prefix.lastIndexOf('_');
+    //     if (secondLastUnderscore <= 0 || secondLastUnderscore >= prefix.length() - 1) {
+    //         return value;
+    //     }
+
+    //     String levelCandidate = prefix.substring(secondLastUnderscore + 1).toUpperCase();
+    //     if (!Set.of("PLATFORM", "ORGANIZATION", "DEPARTMENT", "WORKGROUP", "AGENT", "USER").contains(levelCandidate)) {
+    //         return value;
+    //     }
+
+    //     String modulePrefix = prefix.substring(0, secondLastUnderscore + 1); // 保留末尾 _
+    //     return modulePrefix + action;
+    // }
+
+    // private static Set<String> expandToLegacyLevels(String basePermission) {
+    //     int lastUnderscore = basePermission.lastIndexOf('_');
+    //     if (lastUnderscore <= 0 || lastUnderscore >= basePermission.length() - 1) {
+    //         return Set.of();
+    //     }
+    //     String action = basePermission.substring(lastUnderscore + 1);
+    //     String modulePrefix = basePermission.substring(0, lastUnderscore + 1);
+
+    //     Set<String> expanded = new HashSet<>();
+    //     expanded.add(modulePrefix + "PLATFORM_" + action);
+    //     expanded.add(modulePrefix + "ORGANIZATION_" + action);
+    //     expanded.add(modulePrefix + "DEPARTMENT_" + action);
+    //     expanded.add(modulePrefix + "WORKGROUP_" + action);
+    //     expanded.add(modulePrefix + "AGENT_" + action);
+    //     expanded.add(modulePrefix + "USER_" + action);
+    //     return expanded;
+    // }
 
     public static UserProtobuf convertToUserProtobuf(UserEntity user) {
         return getModelMapper().map(user, UserProtobuf.class);
@@ -196,9 +344,8 @@ public class ConvertUtils {
     }
 
     public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
-        ModelMapper modelMapper = getModelMapper();
         // ensureThreadResponseTypeMapConfigured(modelMapper);
-        ThreadResponse threadResponse = modelMapper.map(thread, ThreadResponse.class);
+        ThreadResponse threadResponse = getModelMapper().map(thread, ThreadResponse.class);
         // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,
         // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
         // if (thread.getAgent() != null) {
@@ -296,7 +443,6 @@ public class ConvertUtils {
         return threadResponse;
     }
     
-
     public static RoleResponse convertToRoleResponse(RoleEntity entity) {
         // return modelMapper.map(role, RoleResponse.class);
         RoleResponse roleResponse = getModelMapper().map(entity, RoleResponse.class);

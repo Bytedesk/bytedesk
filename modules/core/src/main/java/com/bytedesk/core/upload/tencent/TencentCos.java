@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +28,7 @@ import java.net.URL;
  */
 @Component
 @ConditionalOnProperty(name = "bytedesk.tencent.enabled", havingValue = "true", matchIfMissing = false)
+@Slf4j
 public class TencentCos {
     
 
@@ -153,7 +156,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);
@@ -176,7 +179,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);
@@ -197,7 +200,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);
@@ -218,7 +221,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);
@@ -239,7 +242,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);
@@ -253,7 +256,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);
@@ -290,7 +293,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);
@@ -304,7 +307,7 @@ public class TencentCos {
         try {
             inputStream = new URL(url).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
         ObjectMetadata metadata = new ObjectMetadata();
         cosClient.putObject(tencentProperties.getBucketName(), folder + fileName, inputStream, metadata);

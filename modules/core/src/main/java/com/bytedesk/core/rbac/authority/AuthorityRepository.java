@@ -14,8 +14,10 @@
  */
 package com.bytedesk.core.rbac.authority;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,5 +46,46 @@ public interface AuthorityRepository extends JpaRepository<AuthorityEntity, Long
     void deleteById(@NonNull Long id);
 
     List<AuthorityEntity> findByValueContainingIgnoreCaseAndDeletedFalse(String value);
+
+    List<AuthorityEntity> findByDeletedFalse();
+
+        @Modifying
+        @Transactional
+        @Query(value = "UPDATE bytedesk_core_authority "
+            + "SET level_type = 'PLATFORM' "
+            + "WHERE is_deleted = 0 "
+            + "  AND authority_value IS NOT NULL "
+            + "  AND authority_value <> '' "
+            + "  AND authority_value LIKE 'SETTINGS_%' "
+            + "  AND (level_type IS NULL OR level_type <> 'PLATFORM')",
+            nativeQuery = true)
+        int resetSettingsAuthoritiesLevelToPlatform();
+
+        @Modifying
+        @Transactional
+        @Query(value = "UPDATE bytedesk_core_authority "
+            + "SET level_type = 'ORGANIZATION' "
+            + "WHERE is_deleted = 0 "
+            + "  AND authority_value IS NOT NULL "
+            + "  AND authority_value <> '' "
+            + "  AND authority_value NOT LIKE 'SETTINGS_%' "
+            + "  AND (level_type IS NULL OR level_type <> 'ORGANIZATION')",
+            nativeQuery = true)
+        int resetNonSettingsAuthoritiesLevelToOrganization();
+
+        @Modifying
+        @Transactional
+        @Query(value = "UPDATE bytedesk_core_authority "
+            + "SET description = CONCAT('i18n.description.', authority_value) "
+            + "WHERE is_deleted = 0 "
+            + "  AND authority_value IS NOT NULL "
+            + "  AND authority_value <> '' "
+            + "  AND (description IS NULL "
+            + "       OR description = '' "
+            + "       OR description LIKE 'Permission for %' "
+            + "       OR description = CONCAT('i18n.', authority_value)) "
+            + "  AND (description IS NULL OR description NOT LIKE 'i18n.description.%')",
+            nativeQuery = true)
+        int resetAuthoritiesDescriptionToI18nDescriptionKey();
 
 }

@@ -39,7 +39,7 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
 
     private final MessageTemplateRestService templateRestService;
 
-    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ_ANY_LEVEL)
+    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ)
     @ActionAnnotation(title = "模板管理", action = "查询组织模板", description = "queryByOrg template")
     @Operation(summary = "根据组织查询模板", description = "查询组织的模板列表")
     @Override
@@ -50,7 +50,7 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
         return ResponseEntity.ok(JsonResult.success(templates));
     }
 
-    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ_ANY_LEVEL)
+    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ)
     @ActionAnnotation(title = "模板管理", action = "查询用户模板", description = "queryByUser template")
     @Operation(summary = "根据用户查询模板", description = "查询用户的模板列表")
     @Override
@@ -61,7 +61,7 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
         return ResponseEntity.ok(JsonResult.success(templates));
     }
 
-    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ_ANY_LEVEL)
+    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ)
     @ActionAnnotation(title = "模板管理", action = "查询模板详情", description = "queryByUid template")
     @Operation(summary = "根据UID查询模板", description = "通过UID查询具体的模板")
     @Override
@@ -72,7 +72,7 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
         return ResponseEntity.ok(JsonResult.success(template));
     }
 
-    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_CREATE_ANY_LEVEL)
+    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_CREATE)
     @ActionAnnotation(title = "模板管理", action = "创建模板", description = "create template")
     @Operation(summary = "创建模板", description = "创建新的模板")
     @Override
@@ -83,7 +83,7 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
         return ResponseEntity.ok(JsonResult.success(template));
     }
 
-    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_UPDATE)
     @ActionAnnotation(title = "模板管理", action = "更新模板", description = "update template")
     @Operation(summary = "更新模板", description = "更新现有的模板")
     @Override
@@ -94,7 +94,7 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
         return ResponseEntity.ok(JsonResult.success(template));
     }
 
-    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_DELETE_ANY_LEVEL)
+    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_DELETE)
     @ActionAnnotation(title = "模板管理", action = "删除模板", description = "delete template")
     @Operation(summary = "删除模板", description = "删除指定的模板")
     @Override
@@ -106,7 +106,7 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
     }
 
     @GetMapping("/export")
-    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_EXPORT_ANY_LEVEL)
+    @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_EXPORT)
     @ActionAnnotation(title = "模板管理", action = "导出模板", description = "export template")
     @Operation(summary = "导出模板", description = "导出模板数据")
     @Override

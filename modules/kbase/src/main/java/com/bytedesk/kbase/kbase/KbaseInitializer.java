@@ -62,7 +62,7 @@ public class KbaseInitializer implements SmartInitializingSingleton {
         log.info("KbaseInitializer initialization started...");
 
         // 初始化权限
-        initPermissions();
+        initAuthority();
         // 初始化知识库
         initKbase();
         // 初始化FAQ
@@ -98,7 +98,7 @@ public class KbaseInitializer implements SmartInitializingSingleton {
         }
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = KbasePermissions.KBASE_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

@@ -37,7 +37,7 @@ public class AgentInitializer implements SmartInitializingSingleton {
     public void afterSingletonsInstantiated() {
         // 迁移到 WorkgroupInitializer执行
         // init();
-        initPermissions();
+        initAuthority();
     }
 
     public void init() {
@@ -60,7 +60,7 @@ public class AgentInitializer implements SmartInitializingSingleton {
         agentRestService.create(agentRequest);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = AgentPermissions.AGENT_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

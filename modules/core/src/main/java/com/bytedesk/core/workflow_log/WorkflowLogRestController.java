@@ -64,7 +64,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
 
     @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_CREATE)
     public ResponseEntity<?> create(WorkflowLogRequest request) {
         
         WorkflowLogResponse tag = workflowResultRestService.create(request);
@@ -74,7 +74,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
 
     @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_UPDATE)
     public ResponseEntity<?> update(WorkflowLogRequest request) {
         
         WorkflowLogResponse tag = workflowResultRestService.update(request);
@@ -84,7 +84,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
 
     @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_DELETE)
     public ResponseEntity<?> delete(WorkflowLogRequest request) {
         
         workflowResultRestService.delete(request);
@@ -94,7 +94,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
 
     @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_EXPORT)
     @GetMapping("/export")
     public Object export(WorkflowLogRequest request, HttpServletResponse response) {
         return exportTemplate(

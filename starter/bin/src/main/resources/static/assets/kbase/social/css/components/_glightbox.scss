@@ -1,0 +1,48 @@
+// 
+// glightbox.scss
+// Theme component for utility classes (helper classes)
+
+// gslide
+.gslide-description.description-left, 
+.gslide-description.description-right{
+  max-width: 360px;
+}
+.gdesc-inner{
+  width: 100%;
+}
+.glightbox-container .gslide{
+  user-select: inherit;
+}
+.glightbox-clean .gslide-desc{
+  font-family: $font-family-base;
+}
+
+// glightbox mobile
+.glightbox-mobile {
+	.glightbox-container {
+		.gslide-desc {
+			.bg-light {
+				background: $dark !important;
+			}
+			.form-control {
+				border-color: $border-color;
+			}
+			.text-secondary {
+				color: $white !important;
+			}
+			.dropdown-menu {
+				background: $dark !important;
+			}
+			a {
+				font-weight: normal;
+			}
+			.nav {
+				&.nav-divider {
+					.nav-item {
+						color: $white !important;
+					}
+				}
+			}
+		}
+	}
+}

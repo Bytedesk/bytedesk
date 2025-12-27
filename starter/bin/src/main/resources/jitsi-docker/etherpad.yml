@@ -1,0 +1,17 @@
+version: '3.5'
+
+services:
+    # Etherpad: real-time collaborative document editing
+    etherpad:
+        image: etherpad/etherpad:2.0.3
+        restart: ${RESTART_POLICY:-unless-stopped}
+        environment:
+            - TITLE=${ETHERPAD_TITLE:-""}
+            - DEFAULT_PAD_TEXT=${ETHERPAD_DEFAULT_PAD_TEXT:-""}
+            - SKIN_NAME=${ETHERPAD_SKIN_NAME:-colibris}
+            - SKIN_VARIANTS=${ETHERPAD_SKIN_VARIANTS:-"super-light-toolbar super-light-editor light-background full-width-editor"}
+            - SUPPRESS_ERRORS_IN_PAD_TEXT=true
+        networks:
+            meet.jitsi:
+                aliases:
+                    - etherpad.meet.jitsi

@@ -72,7 +72,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
     @ActionAnnotation(title = "Workflow Node", action = "新建", description = "create workflow_node")
     @Operation(summary = "Create WorkflowNode", description = "Create a new workflow_node")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_CREATE)
     public ResponseEntity<?> create(WorkflowNodeRequest request) {
         
         WorkflowNodeResponse workflow_node = workflow_nodeRestService.create(request);
@@ -83,7 +83,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
     @ActionAnnotation(title = "Workflow Node", action = "更新", description = "update workflow_node")
     @Operation(summary = "Update WorkflowNode", description = "Update an existing workflow_node")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_UPDATE)
     public ResponseEntity<?> update(WorkflowNodeRequest request) {
         
         WorkflowNodeResponse workflow_node = workflow_nodeRestService.update(request);
@@ -94,7 +94,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
     @ActionAnnotation(title = "Workflow Node", action = "删除", description = "delete workflow_node")
     @Operation(summary = "Delete WorkflowNode", description = "Delete a workflow_node")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_DELETE)
     public ResponseEntity<?> delete(WorkflowNodeRequest request) {
         
         workflow_nodeRestService.delete(request);
@@ -105,7 +105,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
     @ActionAnnotation(title = "Workflow Node", action = "导出", description = "export workflow_node")
     @Operation(summary = "Export WorkflowNodes", description = "Export workflow_nodes to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_EXPORT)
     @GetMapping("/export")
     public Object export(WorkflowNodeRequest request, HttpServletResponse response) {
         return exportTemplate(

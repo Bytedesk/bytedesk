@@ -8,6 +8,8 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingRepository;
@@ -22,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TicketSettingsInitializer implements SmartInitializingSingleton {
 
+    private final AuthorityRestService authorityService;
     private final TicketSettingsRestService ticketSettingsRestService;
     private final TicketSettingsBindingRepository bindingRepository;
     private final UidUtils uidUtils;
@@ -29,9 +32,17 @@ public class TicketSettingsInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         try {
+            initAuthority();
             initDefaults();
         } catch (Exception e) {
             log.error("TicketSettingsInitializer failed: {}", e.getMessage(), e);
+        }
+    }
+
+    private void initAuthority() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = TicketSettingsPermissions.TICKET_SETTINGS_PREFIX + permission.name();
+            authorityService.createForPlatform(permissionValue);
         }
     }
 

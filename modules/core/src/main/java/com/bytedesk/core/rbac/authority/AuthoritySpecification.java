@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -28,18 +29,37 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthoritySpecification extends BaseSpecification<AuthorityEntity, AuthorityRequest> {
     
     public static Specification<AuthorityEntity> search(AuthorityRequest request, AuthService authService) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // 
+            predicates.addAll(getBasicPredicatesNoOrg(root, criteriaBuilder, request, authService));
+            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // name
+            if (StringUtils.hasText(request.getName())) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            }
+            // value
+            if (StringUtils.hasText(request.getValue())) {
+                predicates.add(criteriaBuilder.like(root.get("value"), "%" + request.getValue() + "%"));
+            }
+            // description
+            if (StringUtils.hasText(request.getDescription())) {
+                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
+            // level
             if (request.getLevel()!= null) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
-            // if (StringUtils.hasText(request.getOrgUid())) {
-            //     predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-            // }
+            // searchText
+            if (StringUtils.hasText(request.getSearchText())) {
+                List<Predicate> orPredicates = new ArrayList<>();
+                String searchText = request.getSearchText();
+                
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

@@ -1,0 +1,94 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-05-11 18:14:28
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-06-04 15:35:31
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.core.quartz_task;
+
+import com.bytedesk.core.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+// import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
+
+/**
+ * Quartz 调度任务（quartz_task）
+ */
+@Entity
+@Data
+@SuperBuilder
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+// @EntityListeners({QuartzTaskEntityListener.class})
+@Table(name = "bytedesk_core_quartz_task")
+public class QuartzTaskEntity extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    /** 任务名称 */
+    @Column(nullable = false)
+    private String jobName;
+
+    /** 任务组名 */
+    @Column(nullable = false)
+    private String jobGroup;
+
+    /** 描述 */
+    private String description;
+
+    /** job class */
+    @Column(nullable = false)
+    private String jobClassName;
+
+    /** job method */
+    @Column(nullable = false)
+    private String jobMethodName;
+
+    /** cron */
+    private String cronExpression;
+
+    @Builder.Default
+    @Column(name = "is_durable")
+    private Boolean durable = true;
+
+    @Builder.Default
+    @Column(name = "is_nonconcurrent")
+    private Boolean nonconcurrent = true;
+
+    @Builder.Default
+    @Column(name = "is_update_data")
+    private Boolean updateData = false;
+
+    /** trigger */
+    @Column(nullable = false)
+    private String triggerName;
+
+    @Column(nullable = false)
+    private String triggerGroup;
+
+    private String triggerType;
+
+    private String triggerState;
+
+    /** misfire policy */
+    @Builder.Default
+    private String misfirePolicy = com.bytedesk.core.quartz.QuartzConsts.MISFIRE_DEFAULT;
+
+}

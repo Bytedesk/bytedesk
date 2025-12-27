@@ -17,7 +17,6 @@
 
 // import org.apache.commons.lang.StringUtils;
 // import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
 
 // /**
 //  * DockerUtils
@@ -25,7 +24,6 @@
 //  * @author yutianbao
 //  */
 // public abstract class DockerUtils {
-//     private static final Logger LOGGER = LoggerFactory.getLogger(DockerUtils.class);
 
 //     /** Environment param keys */
 //     private static final String ENV_KEY_HOST = "JPAAS_HOST";

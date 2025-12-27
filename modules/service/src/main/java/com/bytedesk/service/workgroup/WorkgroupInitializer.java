@@ -48,7 +48,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         // 
         init();
         // 
-        initPermissions();
+        initAuthority();
     }
 
     public void init() {
@@ -85,7 +85,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
         workgroupRestService.create(workgroupAfterRequest);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = WorkgroupPermissions.WORKGROUP_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

@@ -23,6 +23,8 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.kbase.settings_trigger.ExecutionTimingConsts;
+import com.bytedesk.kbase.settings_trigger.TriggerScopeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -64,11 +66,65 @@ public class IntentionSettingsEntity extends BaseEntity {
     private String description;
 
     /**
+     * 关联robot entity uid
+     */
+    @Column(name = "robot_uid")
+    private String robotUid;
+
+    /**
      * 是否为默认设置模板
      */
     @Builder.Default
     @Column(name = "is_default_template")
     private Boolean defaultTemplate = false;
+
+    /**
+     * 是否启用意图识别
+     */
+    @Builder.Default
+    @Column(name = "is_enabled")
+    private Boolean enabled = false;
+
+    /**
+     * 执行时机
+     * - ON_MESSAGE: 收到新消息时
+     * - THREAD_END: 会话结束时
+     */
+    @Builder.Default
+    @Column(name = "execution_timing")
+    private String executionTiming = ExecutionTimingConsts.ON_MESSAGE;
+
+    /**
+     * 触发范围
+     * - VISITOR_ONLY: 仅访客消息
+     * - AGENT_ONLY: 仅客服消息
+     * - ALL: 所有非系统消息
+     */
+    @Builder.Default
+    @Column(name = "trigger_scope")
+    private String triggerScope = TriggerScopeConsts.VISITOR_ONLY;
+
+    /**
+     * 触发频率：每隔 N 条消息触发一次
+     * - 1 表示每条消息都触发
+     */
+    @Builder.Default
+    @Column(name = "trigger_every_n_messages")
+    private Integer triggerEveryNMessages = 1;
+
+    /**
+     * 触发冷却时间（秒）：上次触发后，冷却未结束则跳过
+     */
+    @Builder.Default
+    @Column(name = "trigger_cooldown_seconds")
+    private Integer triggerCooldownSeconds = 0;
+
+    /**
+     * 是否仅按时间冷却触发（忽略 triggerEveryNMessages）
+     */
+    @Builder.Default
+    @Column(name = "is_trigger_cooldown_only")
+    private Boolean triggerCooldownOnly = false;
 
     /**
      * 意图分类选项

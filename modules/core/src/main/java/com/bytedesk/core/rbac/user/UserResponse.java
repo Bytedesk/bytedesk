@@ -20,13 +20,15 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
-import com.bytedesk.core.rbac.role.RoleResponse;
+import com.bytedesk.core.rbac.role.RoleResponseSimple;
 import com.bytedesk.core.rbac.user.UserEntity.Sex;
 
 @Data
@@ -35,10 +37,12 @@ import com.bytedesk.core.rbac.user.UserEntity.Sex;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties({ "userUid" })
 public class UserResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
     // 
+    private String num;
     private String username;
     private String nickname;
     private String email;
@@ -50,6 +54,7 @@ public class UserResponse extends BaseResponse {
     //
     private Sex sex;
     private Boolean enabled;
+    // private Boolean system;
     private Boolean superUser;
     private Boolean emailVerified;
     private Boolean mobileVerified;
@@ -60,7 +65,7 @@ public class UserResponse extends BaseResponse {
     private String passwordModifiedAt;
     //
     private OrganizationResponseSimple currentOrganization;
-    private Set<RoleResponse> currentRoles;
-    private Set<UserOrganizationRoleResponse> userOrganizationRoles;
+    private Set<RoleResponseSimple> currentRoles;
+    // private Set<UserOrganizationRoleResponse> userOrganizationRoles; // 多组织角色关系-暂不支持多组织，先行隐藏，后期扩展
     private Set<GrantedAuthority> authorities;
 }

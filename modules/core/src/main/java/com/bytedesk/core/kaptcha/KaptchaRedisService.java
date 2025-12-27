@@ -51,12 +51,12 @@ public class KaptchaRedisService {
     }
 
     public Boolean checkKaptcha(String key, String value, @NonNull String channel) {
-        // flutter手机端验证码暂时不做校验
-        if (channel != null && channel.toLowerCase().contains(ChannelEnum.FLUTTER.name().toLowerCase())) {
-            return true;
-        }
         // 如果禁用验证码，则直接返回true
         if (bytedeskProperties.isDisableCaptcha()) {
+            return true;
+        }
+        // flutter手机端验证码暂时不做校验
+        if (channel != null && channel.toLowerCase().contains(ChannelEnum.FLUTTER.name().toLowerCase())) {
             return true;
         }
         // log.info("checkKaptcha key: " + key + ", value: " + value);

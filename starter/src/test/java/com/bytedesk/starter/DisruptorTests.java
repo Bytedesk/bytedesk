@@ -39,7 +39,6 @@ public class DisruptorTests {
         // // 这里停止2000ms是为了确定是处理消息是异步的
         // Thread.sleep(2000);
         // } catch (InterruptedException e) {
-        // e.printStackTrace();
         // }
     }
 

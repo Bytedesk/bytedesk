@@ -52,9 +52,14 @@ public class UploadSecurityConfig {
     private List<String> allowedMimeTypes = getDefaultAllowedMimeTypes();
 
     /**
+     * 是否启用 MIME 类型过滤校验（默认关闭：仅拦截危险后缀黑名单）
+     */
+    private boolean enableMimeTypeValidation = false;
+
+    /**
      * 是否启用图片内容验证
      */
-    private boolean enableImageValidation = true;
+    private boolean enableImageValidation = false;
 
     /**
      * 是否启用文件名过滤
@@ -74,7 +79,7 @@ public class UploadSecurityConfig {
     /**
      * 是否记录上传日志
      */
-    private boolean enableUploadLog = true;
+    private boolean enableUploadLog = false;
 
     /**
      * 是否启用病毒扫描（预留接口）
@@ -111,15 +116,19 @@ public class UploadSecurityConfig {
         if (dangerousExtensions.contains(ext)) {
             return false;
         }
-        
-        // 再检查白名单
-        return allowedExtensions.contains(ext);
+
+        // 只要未命中黑名单，默认允许
+        return true;
     }
 
     /**
      * 检查MIME类型是否被允许
      */
     public boolean isMimeTypeAllowed(String mimeType) {
+        // 默认不启用 MIME 过滤，仅依赖危险后缀黑名单。
+        if (!enableMimeTypeValidation) {
+            return true;
+        }
         if (mimeType == null || mimeType.trim().isEmpty()) {
             return false;
         }
@@ -203,6 +212,8 @@ public class UploadSecurityConfig {
      */
     private static List<String> getDefaultAllowedMimeTypes() {
         return Arrays.asList(
+            // 通用二进制流（很多浏览器对未知类型会使用该值）
+            "application/octet-stream",
             // 图片类型
             "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp", "image/svg+xml",
             "image/x-icon", "image/tiff", "image/vnd.adobe.photoshop",

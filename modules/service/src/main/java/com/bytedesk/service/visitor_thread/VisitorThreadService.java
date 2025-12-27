@@ -14,6 +14,7 @@
 package com.bytedesk.service.visitor_thread;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -46,7 +47,6 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.settings.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -67,6 +67,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.workflow.WorkflowEntity;
+import com.bytedesk.kbase.settings_service.ServiceSettingsResponseVisitor;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 
 import lombok.AllArgsConstructor;
@@ -115,6 +116,56 @@ public class VisitorThreadService
         return visitorThreadRepository.findFirstByTopic(topic);
     }
 
+    /**
+     * 主动触发：判断“访客长时间未发送消息”是否达到阈值，并用 QueueMember.lastNotifiedAt 做节流。
+     *
+     * 规则：
+     * - 优先使用 QueueMember.visitorLastMessageAt 作为基准时间
+     * - 若为空，则使用 visitorEnqueueAt 作为兜底
+     * - 达到 noResponseTimeoutSeconds 才允许触发
+     * - 触发后写入 lastNotifiedAt，避免每分钟重复触发
+     */
+    public boolean consumeVisitorNoResponseTriggerPermit(String threadUid, int noResponseTimeoutSeconds) {
+        if (!StringUtils.hasText(threadUid) || noResponseTimeoutSeconds <= 0) {
+            return false;
+        }
+
+        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(threadUid);
+        if (!queueMemberOpt.isPresent()) {
+            return false;
+        }
+
+        QueueMemberEntity queueMember = queueMemberOpt.get();
+        ZonedDateTime now = BdDateUtils.now();
+
+        ZonedDateTime baseTime = queueMember.getVisitorLastMessageAt();
+        if (baseTime == null) {
+            baseTime = queueMember.getVisitorEnqueueAt();
+        }
+        if (baseTime == null) {
+            return false;
+        }
+
+        long silentSeconds = Duration.between(baseTime, now).getSeconds();
+        if (silentSeconds < 0) {
+            return false;
+        }
+        if (silentSeconds < noResponseTimeoutSeconds) {
+            return false;
+        }
+
+        if (queueMember.getLastNotifiedAt() != null) {
+            long sinceNotifySeconds = Duration.between(queueMember.getLastNotifiedAt(), now).getSeconds();
+            if (sinceNotifySeconds >= 0 && sinceNotifySeconds < noResponseTimeoutSeconds) {
+                return false;
+            }
+        }
+
+        queueMember.setLastNotifiedAt(now);
+        queueMemberRestService.saveAsyncBestEffort(queueMember);
+        return true;
+    }
+
     public ThreadEntity createWorkgroupThread(VisitorRequest visitorRequest, WorkgroupEntity workgroup, String topic) {
         //
         String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
@@ -154,30 +205,42 @@ public class VisitorThreadService
     
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
+        // 为避免从缓存加载导致 member/user 为空，这里需要保证 owner 永不为 null
+        // 如果发现关联为空，则从数据库重新加载一次
+        AgentEntity effectiveAgent = agent;
+        if (effectiveAgent == null || !StringUtils.hasText(effectiveAgent.getUid())) {
+            throw new IllegalArgumentException("agent and agent.uid must not be null");
+        }
+
+        if (effectiveAgent.getMember() == null || effectiveAgent.getMember().getUser() == null) {
+            Optional<AgentEntity> refreshedOpt = agentRestService.findByUidFromDatabase(effectiveAgent.getUid());
+            if (refreshedOpt.isPresent()) {
+                effectiveAgent = refreshedOpt.get();
+            }
+        }
+
+        UserEntity owner = (effectiveAgent.getMember() != null) ? effectiveAgent.getMember().getUser() : null;
+        if (owner == null) {
+            throw new IllegalStateException(
+                    "Agent owner must not be null (agent.uid=" + effectiveAgent.getUid() + ")");
+        }
+
         // 考虑到客服信息发生变化，更新客服信息
-        UserProtobuf agentProtobuf = agent.toUserProtobuf();
+        UserProtobuf agentProtobuf = effectiveAgent.toUserProtobuf();
         // 访客信息
         String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
-        String extra = buildAgentExtra(visitorRequest, agent);
+        String extra = buildAgentExtra(visitorRequest, effectiveAgent);
         //
-        String orgUid = agent.getOrgUid();
-        //
-        // 为避免空指针异常，先检查agent.getMember()是否为空
-        UserEntity owner = null;
-        if (agent.getMember() != null) {
-            owner = agent.getMember().getUser();
-        } else {
-            log.warn("Agent member is null for agent uid: {}", agent.getUid());
-        }
+        String orgUid = effectiveAgent.getOrgUid();
 
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
                 .topic(topic)
                 .type(ThreadTypeEnum.AGENT.name())
                 .agent(agentProtobuf.toJson())
-                .userUid(agent.getUid()) // 客服uid
-                .owner(owner) // 使用安全获取的owner值
+                .userUid(effectiveAgent.getUid()) // 客服uid
+                .owner(owner)
                 .user(visitor)
                 .extra(extra)
                 .channel(visitorRequest.getChannel())
@@ -319,6 +382,8 @@ public class VisitorThreadService
         }
 
         boolean debug = Boolean.TRUE.equals(visitorRequest.getDebug());
+        boolean draft = Boolean.TRUE.equals(visitorRequest.getDraft());
+        boolean preview = debug || draft;
 
         // 默认使用实体上的 settings
         WorkgroupSettingsEntity settings = workgroup.getSettings();
@@ -333,11 +398,11 @@ public class VisitorThreadService
             }
         }
 
-        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings, debug);
+        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings, preview);
 
         RobotToAgentSettingsEntity robotToAgentSettings = null;
         if (settings != null) {
-            if (debug && settings.getDraftRobotToAgentSettings() != null) {
+            if (preview && settings.getDraftRobotToAgentSettings() != null) {
                 robotToAgentSettings = settings.getDraftRobotToAgentSettings();
             } else {
                 robotToAgentSettings = settings.getRobotToAgentSettings();
@@ -374,8 +439,9 @@ public class VisitorThreadService
                 log.warn("Debug preview: agent settingsUid not found: {}", visitorRequest.getSettingsUid());
             }
         }
+        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug()) || Boolean.TRUE.equals(visitorRequest.getDraft());
         return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                settings, Boolean.TRUE.equals(visitorRequest.getDebug()));
+            settings, preview);
     }
 
     /**
@@ -394,8 +460,9 @@ public class VisitorThreadService
                 log.warn("Debug preview: robot settingsUid not found: {}", visitorRequest.getSettingsUid());
             }
         }
+        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug()) || Boolean.TRUE.equals(visitorRequest.getDraft());
         return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                settings, Boolean.TRUE.equals(visitorRequest.getDebug()));
+            settings, preview);
     }
 
     public VisitorThreadEntity update(ThreadEntity thread) {
@@ -580,7 +647,7 @@ public class VisitorThreadService
         // 更新超时次数
         queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
         // 保存队列成员信息
-        queueMemberRestService.save(queueMember);
+        queueMemberRestService.saveAsyncBestEffort(queueMember);
         // 发送会话超时提醒
         MessageProtobuf messageProtobuf = MessageUtils.createAgentReplyTimeoutMessage(thread,
                 agent.getTimeoutRemindTip());
@@ -684,7 +751,7 @@ public class VisitorThreadService
         queueMember.setMessageLeave(true);
         queueMember.setMessageLeaveAt(BdDateUtils.now());
         queueMember.setVisitorLeavedAt(BdDateUtils.now());
-        queueMemberRestService.save(queueMember);
+        queueMemberRestService.saveAsyncBestEffort(queueMember);
 
         MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(leaveMessageTip, savedThread);
         messageRestService.save(message);
@@ -699,17 +766,17 @@ public class VisitorThreadService
                 String agentUid = TopicUtils.getAgentUidFromThreadTopic(thread.getTopic());
                 return agentRestService.findByUid(agentUid)
                         .map(this::resolveLeaveMessageTip)
-                        .orElse(I18Consts.I18N_LEAVEMSG_TIP);
+                        .orElse(I18Consts.I18N_MESSAGE_LEAVE_TIP);
             } else if (thread.isWorkgroupType()) {
                 String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(thread.getTopic());
                 return workgroupRestService.findByUid(workgroupUid)
                         .map(this::resolveLeaveMessageTip)
-                        .orElse(I18Consts.I18N_LEAVEMSG_TIP);
+                        .orElse(I18Consts.I18N_MESSAGE_LEAVE_TIP);
             }
         } catch (Exception e) {
             log.debug("Failed to resolve leave message tip for thread {}: {}", thread.getUid(), e.getMessage());
         }
-        return I18Consts.I18N_LEAVEMSG_TIP;
+        return I18Consts.I18N_MESSAGE_LEAVE_TIP;
     }
 
     private String resolveLeaveMessageTip(AgentEntity agent) {
@@ -718,7 +785,7 @@ public class VisitorThreadService
                 && StringUtils.hasText(agent.getSettings().getMessageLeaveSettings().getMessageLeaveTip())) {
             return agent.getSettings().getMessageLeaveSettings().getMessageLeaveTip();
         }
-        return I18Consts.I18N_LEAVEMSG_TIP;
+        return I18Consts.I18N_MESSAGE_LEAVE_TIP;
     }
 
     private String resolveLeaveMessageTip(WorkgroupEntity workgroup) {
@@ -727,7 +794,7 @@ public class VisitorThreadService
                 && StringUtils.hasText(workgroup.getSettings().getMessageLeaveSettings().getMessageLeaveTip())) {
             return workgroup.getSettings().getMessageLeaveSettings().getMessageLeaveTip();
         }
-        return I18Consts.I18N_LEAVEMSG_TIP;
+        return I18Consts.I18N_MESSAGE_LEAVE_TIP;
     }
 
     @Override

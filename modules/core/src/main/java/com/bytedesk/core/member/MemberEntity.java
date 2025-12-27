@@ -13,13 +13,9 @@
  */
 package com.bytedesk.core.member;
 
-import java.util.Set;
-import java.util.HashSet;
-
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.converter.StringSetConverter;
 import com.bytedesk.core.rbac.user.UserEntity;
 
 import jakarta.persistence.*;
@@ -106,14 +102,6 @@ public class MemberEntity extends BaseEntity {
      */
     @Builder.Default
     private String status = MemberStatusEnum.INVITING.name();
-
-    /**
-     * Role UIDs assigned to this member
-     */
-    @Builder.Default
-    @Convert(converter = StringSetConverter.class)
-    @Column(length = 512)
-	private Set<String> roleUids = new HashSet<>(); 
 
     /**
      * Department UID that this member belongs to

@@ -37,7 +37,6 @@ public class FaqResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String question;
 
     private List<String> similarQuestions;

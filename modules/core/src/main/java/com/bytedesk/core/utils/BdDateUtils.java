@@ -16,10 +16,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.StringUtils;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 时间常用函数
  */
+@Slf4j
 @UtilityClass
 public class BdDateUtils {
 
@@ -93,7 +95,7 @@ public class BdDateUtils {
         try {
             return dateFormatter.parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("解析日期时间失败: {}", date, e);
         }
         return null;
     }
@@ -114,7 +116,7 @@ public class BdDateUtils {
         try {
             return formatter.parse(time);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("解析时间失败: {}", time, e);
         }
         return null;
     }
@@ -143,7 +145,7 @@ public class BdDateUtils {
         try {
             return simpleDateFormat.parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("解析日期失败: {}", date, e);
         }
         return null;
     }
@@ -170,7 +172,7 @@ public class BdDateUtils {
         try {
             parse = fromFormat.parse(enDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("解析英文日期失败: {}", enDate, e);
         }
         return cnFormat.format(parse);
     }

@@ -13,12 +13,28 @@
  */
 package com.bytedesk.core.rbac.authority;
 
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.core.enums.PermissionEnum;
 
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
-public class AuthorityInitializer {
-    // 迁移到 RoleInitializer 中
+public class AuthorityInitializer implements SmartInitializingSingleton {
+
+    private final AuthorityRestService authorityRestService;
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        initAuthority();
+    }
+
+    private void initAuthority() {
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = AuthorityPermissions.AUTHORITY_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
+    }
 }

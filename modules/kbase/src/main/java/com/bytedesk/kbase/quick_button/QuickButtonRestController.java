@@ -26,7 +26,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
 
     private final QuickButtonRestService quickButtonRestService;
 
-    @PreAuthorize(QuickButtonPermissions.HAS_QUICKBUTTON_READ_ANY_LEVEL)
+    @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_READ)
     @ActionAnnotation(title = "快捷按钮", action = "组织查询", description = "query quick button by org")
     @Override
     public ResponseEntity<?> queryByOrg(QuickButtonRequest request) {
@@ -34,7 +34,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(QuickButtonPermissions.HAS_QUICKBUTTON_READ_ANY_LEVEL)
+    @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_READ)
     @ActionAnnotation(title = "快捷按钮", action = "用户查询", description = "query quick button by user")
     @Override
     public ResponseEntity<?> queryByUser(QuickButtonRequest request) {
@@ -42,7 +42,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(QuickButtonPermissions.HAS_QUICKBUTTON_CREATE_ANY_LEVEL)
+    @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_CREATE)
     @ActionAnnotation(title = "快捷按钮", action = "新建", description = "create quick button")
     @Override
     public ResponseEntity<?> create(@RequestBody QuickButtonRequest request) {
@@ -50,7 +50,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(QuickButtonPermissions.HAS_QUICKBUTTON_UPDATE_ANY_LEVEL)
+    @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_UPDATE)
     @ActionAnnotation(title = "快捷按钮", action = "更新", description = "update quick button")
     @Override
     public ResponseEntity<?> update(@RequestBody QuickButtonRequest request) {
@@ -58,7 +58,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(QuickButtonPermissions.HAS_QUICKBUTTON_DELETE_ANY_LEVEL)
+    @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_DELETE)
     @ActionAnnotation(title = "快捷按钮", action = "删除", description = "delete quick button")
     @Override
     public ResponseEntity<?> delete(@RequestBody QuickButtonRequest request) {
@@ -66,7 +66,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
-    @PreAuthorize(QuickButtonPermissions.HAS_QUICKBUTTON_UPDATE_ANY_LEVEL)
+    @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_UPDATE)
     @ActionAnnotation(title = "快捷按钮", action = "启用", description = "enable quick button")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody QuickButtonRequest request) {

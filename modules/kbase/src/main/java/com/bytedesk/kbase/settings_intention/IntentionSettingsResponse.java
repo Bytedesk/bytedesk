@@ -35,16 +35,46 @@ public class IntentionSettingsResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
 
+    /**
+     * 绑定用于意图识别的机器人（RobotEntity.uid）
+     */
+    private String robotUid;
+
+    /**
+     * 是否启用意图识别
+     */
+    private Boolean enabled;
+
+    /**
+     * 执行时机
+     * - ON_MESSAGE: 收到新消息时
+     * - THREAD_END: 会话结束时
+     */
+    private String executionTiming;
+
+    /**
+     * 触发范围
+     */
+    private String triggerScope;
+
+    /**
+     * 触发频率：每隔 N 条消息触发一次
+     */
+    private Integer triggerEveryNMessages;
+
+    /**
+     * 触发冷却时间（秒）
+     */
+    private Integer triggerCooldownSeconds;
+
+    /**
+     * 是否仅按时间冷却触发（忽略 triggerEveryNMessages）
+     */
+    private Boolean triggerCooldownOnly;
+
     private String type;
-
-    private String color;
-
-    private Integer order;
-
-    // private ZonedDateTime createdAt;
 }

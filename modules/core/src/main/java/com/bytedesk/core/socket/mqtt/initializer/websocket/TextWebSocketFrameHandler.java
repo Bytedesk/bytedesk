@@ -18,10 +18,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Handles handshakes and messages
  */
-// @Slf4j
+@Slf4j
 public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     @Override
@@ -64,7 +66,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        log.error("TextWebSocketFrameHandler exceptionCaught", cause);
         ctx.close();
     }
 

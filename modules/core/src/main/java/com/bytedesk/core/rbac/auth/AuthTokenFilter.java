@@ -29,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.rbac.token.TokenEntity;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.utils.JwtUtils;
@@ -43,6 +44,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   @Autowired
   private TokenRestService tokenRestService;
 
+  @Autowired
+  private BytedeskProperties bytedeskProperties;
+
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
@@ -52,15 +56,22 @@ public class AuthTokenFilter extends OncePerRequestFilter {
       String accessToken = JwtUtils.parseAccessToken(request);
       // log.debug("accessToken {}", accessToken);
       if (accessToken != null && JwtUtils.validateJwtToken(accessToken)) {
-        // 从数据库验证token是否有效（未被撤销且未过期）
-        Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
-        if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
+        // 性能测试模式：AuthService.formatResponse 会跳过 token 表落库。
+        // 为避免认证链路依赖 token 表导致 401，这里允许仅校验 JWT。
+        if (bytedeskProperties.isDisableIpFilter()) {
           String subject = JwtUtils.getSubjectFromJwtToken(accessToken);
-          //
           UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);
           SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-          log.debug("Token is invalid or revoked");
+          // 从数据库验证token是否有效（未被撤销且未过期）
+          Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
+          if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
+            String subject = JwtUtils.getSubjectFromJwtToken(accessToken);
+            UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+          } else {
+            log.debug("Token is invalid or revoked");
+          }
         }
       }
     } catch (Exception e) {

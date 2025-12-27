@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+      Drop legacy proactive trigger fields that were removed from ServiceSettingsEntity.
+      Safe to run multiple times due to preConditions.
+    -->
+
+    <changeSet id="251226-drop-service-settings-enable-proactive-trigger" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="enable_proactive_trigger"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="enable_proactive_trigger"/>
+    </changeSet>
+
+    <changeSet id="251226-drop-service-settings-no-response-timeout" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="no_response_timeout"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="no_response_timeout"/>
+    </changeSet>
+
+    <changeSet id="251226-drop-service-settings-proactive-message" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="proactive_message"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="proactive_message"/>
+    </changeSet>
+
+    <changeSet id="251226-drop-service-settings-max-proactive-count" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="max_proactive_count"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="max_proactive_count"/>
+    </changeSet>
+
+    <changeSet id="251226-drop-service-settings-proactive-interval" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="proactive_interval"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="proactive_interval"/>
+    </changeSet>
+
+    <changeSet id="251226-drop-service-settings-trigger-conditions" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="trigger_conditions"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="trigger_conditions"/>
+    </changeSet>
+
+    <changeSet id="251226-drop-service-settings-proactive-faqs-join-table" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings_proactive_faqs"/>
+        </preConditions>
+        <dropTable tableName="bytedesk_kbase_service_settings_proactive_faqs" cascadeConstraints="true"/>
+    </changeSet>
+
+</databaseChangeLog>

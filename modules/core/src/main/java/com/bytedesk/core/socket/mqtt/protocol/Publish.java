@@ -23,9 +23,9 @@ import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
-// @Slf4j
+@Slf4j
 @AllArgsConstructor
 public class Publish {
 
@@ -95,9 +95,8 @@ public class Publish {
             // 
             messageSendService.sendJsonMessage(messageJson);
         } catch (Exception e) {
-            // log.warn("Failed to parse protobuf message: {}, message length: {}", e.getMessage(), messageBytes.length);
+            log.warn("Failed to parse protobuf message: {}, message length: {}", e.getMessage(), messageBytes.length);
             // 对于无法解析的消息，我们可以记录但不抛出异常，以免影响整个系统
-            // e.printStackTrace();
         }
     }
 

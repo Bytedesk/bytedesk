@@ -30,7 +30,7 @@ public class FileInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // init();
-        initPermissions();
+        initAuthority();
     }
 
     // 迁移到kbaseInitializer
@@ -38,7 +38,7 @@ public class FileInitializer implements SmartInitializingSingleton {
 
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = FilePermissions.FILE_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

@@ -6,8 +6,12 @@
 package com.bytedesk.kbase.settings;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.kbase.settings_emotion.EmotionSettingRequest;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsRequest;
 import com.bytedesk.kbase.settings_invite.InviteSettingsRequest;
+import com.bytedesk.kbase.settings_service.ServiceSettingsRequest;
+import com.bytedesk.kbase.settings_summary.SummarySettingsRequest;
+import com.bytedesk.kbase.settings_trigger.TriggerSettingsRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -74,6 +78,11 @@ public abstract class BaseSettingsRequest extends BaseRequest {
     private ServiceSettingsRequest serviceSettings;
 
     /**
+     * Trigger settings (common to all settings)
+     */
+    private TriggerSettingsRequest triggerSettings;
+
+    /**
      * Invitation settings (common to all settings)
      */
     private InviteSettingsRequest inviteSettings;
@@ -82,4 +91,14 @@ public abstract class BaseSettingsRequest extends BaseRequest {
      * Intention recognition settings (common to all settings)
      */
     private IntentionSettingsRequest intentionSettings;
+
+    /**
+     * Emotion recognition settings (common to all settings)
+     */
+    private EmotionSettingRequest emotionSettings;
+
+    /**
+     * Conversation summary settings (common to all settings)
+     */
+    private SummarySettingsRequest summarySettings;
 }

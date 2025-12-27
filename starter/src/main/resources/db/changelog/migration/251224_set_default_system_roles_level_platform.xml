@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251224-set-default-system-roles-level-platform" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_role" />
+        </preConditions>
+        <comment>
+            Align persisted default system roles to PLATFORM level_type.
+            Current code initializes all system=true default roles with level=PLATFORM.
+        </comment>
+        <sql>
+            UPDATE bytedesk_core_role
+            SET level_type = 'PLATFORM'
+            WHERE is_deleted = 0
+              AND uuid IN (
+                'df_role_super_uid',
+                'df_role_admin_uid',
+                'df_role_dept_admin_uid',
+                'df_role_wg_admin_uid',
+                'df_role_agent_uid',
+                'df_role_user_uid'
+              )
+              AND (level_type IS NULL OR level_type &lt;&gt; 'PLATFORM');
+        </sql>
+        <rollback>
+            <comment>No rollback - level alignment for default system roles</comment>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

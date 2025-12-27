@@ -147,7 +147,7 @@ public class TicketEntity extends BaseEntity {
     
     /**
      * Ticket reporter information stored as JSON string
-     * 工单提出者
+     * 工单提出者/创建人
      */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
@@ -218,12 +218,6 @@ public class TicketEntity extends BaseEntity {
      * Client platform from which the ticket was created
      */
     private String channel;
-    
-    /**
-     * 当前工单处理人 使用 assignee 字段代替
-     */
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // private UserEntity owner;
     
     // 获取工单的处理人
     public UserProtobuf getAssignee() {

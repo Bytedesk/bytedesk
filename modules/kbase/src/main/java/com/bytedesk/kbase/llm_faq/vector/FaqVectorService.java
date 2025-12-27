@@ -25,6 +25,7 @@ import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.kbase.config.KbaseConst;
@@ -65,7 +66,7 @@ public class FaqVectorService {
      * 
      * @param faq FAQ实体
      */
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void indexFaqVector(FaqEntity faq) {
         log.info("开始向量索引FAQ: {}, ID: {}", faq.getQuestion(), faq.getUid());
 

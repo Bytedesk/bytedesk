@@ -106,8 +106,7 @@ public class PushApnsService {
             }
 
         } catch (final Exception e) {
-            log.error("推送失败 Failed to send push notification.");
-            e.printStackTrace();
+            log.error("推送失败 Failed to send push notification.", e);
         }
 
     }
@@ -130,7 +129,6 @@ public class PushApnsService {
 
         // } catch (Exception e) {
         //     log.error("ios get pushy apns client failed!");
-        //     e.printStackTrace();
         // }
 
         return apnsClient;

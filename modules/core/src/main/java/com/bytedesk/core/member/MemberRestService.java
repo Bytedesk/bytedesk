@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -39,12 +40,18 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
+import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.role.RoleResponseSimple;
+import com.bytedesk.core.rbac.role.RoleRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserRequest;
-import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.department.DepartmentEntity;
@@ -72,6 +79,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
     private final AuthService authService;
 
+    private final RoleRestService roleRestService;
+
     private final ThreadRestService threadRestService;
 
     private final DepartmentRestService departmentRestService;
@@ -88,20 +97,29 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
     public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("Login required");
+        }
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            throw new IllegalArgumentException("orgUid is required");
+        }
         Optional<MemberEntity> memberOptional = findByUserAndOrgUid(user, request.getOrgUid());
         if (memberOptional.isPresent()) {
             return convertToResponse(memberOptional.get());
         } else {
-            throw new RuntimeException("Member not found by user: " + request.getUserUid());
+            throw new NotFoundException("Member not found");
         }
     }
 
     public MemberResponse queryByUserUid(MemberRequest request) {
+        if (!StringUtils.hasText(request.getUserUid())) {
+            throw new IllegalArgumentException("userUid is required");
+        }
         Optional<MemberEntity> memberOptional = findByUserUid(request.getUserUid());
         if (memberOptional.isPresent()) {
             return convertToResponse(memberOptional.get());
         } else {
-            throw new RuntimeException("Member not found by userUid: " + request.getUserUid());
+            throw new NotFoundException("Member not found");
         }
     }
 
@@ -132,13 +150,15 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         member.setDeptUid(request.getDeptUid());
         member.setOrgUid(request.getOrgUid());
-        member.setRoleUids(request.getRoleUids());
+        // 
+        Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
+        request.setRoleUids(normalizedRoleUids);
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = modelMapper.map(request, UserRequest.class);
         userRequest.setAvatar(AvatarConsts.getDefaultUserAvatarUrl());
         userRequest.setPlatform(PlatformEnum.BYTEDESK.name());
         userRequest.setOrgUid(request.getOrgUid());
-        // TODO: 同一个用户增加支持绑定多个组织
+        // 检查用户是否存在，不存在则创建
         UserEntity user = null;
         if (StringUtils.hasText(request.getMobile())) {
             user = userService.findByMobileAndPlatform(request.getMobile(),
@@ -151,6 +171,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         } else {
             throw new RuntimeException("mobile and email should not be both null.");
         }
+
+        // 确保 user 处于当前组织上下文，并按请求写入角色
+        userService.ensureCurrentOrganization(user, request.getOrgUid());
+        user = userService.updateUserRoles(user, normalizedRoleUids);
         // 设置用户到成员对象中
         member.setUser(user);
         //
@@ -182,10 +206,12 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         member.setJobNo(request.getJobNo());
         member.setSeatNo(request.getSeatNo());
         member.setTelephone(request.getTelephone());
-        member.setRoleUids(request.getRoleUids());
+        Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
+        request.setRoleUids(normalizedRoleUids);
         // 
         UserEntity user = member.getUser();
-        userService.updateUserFromMember(user, request);
+        userService.ensureCurrentOrganization(user, member.getOrgUid());
+        userService.updateUserRoles(user, normalizedRoleUids);
         //
         MemberEntity savedMember = save(member);
         if (savedMember == null) {
@@ -193,6 +219,26 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
  
         return convertToResponse(savedMember);
+    }
+
+    private Set<String> normalizeRoleUids(Set<String> roleUids) {
+        if (roleUids == null) {
+            return new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_USER_UID));
+        }
+
+        Set<String> normalized = roleUids.stream()
+                .filter(StringUtils::hasText)
+                .map(uid -> BytedeskConsts.DEPRECATED_ROLE_MEMBER_UID.equals(uid)
+                        ? BytedeskConsts.DEFAULT_ROLE_USER_UID
+                        : uid)
+                .collect(Collectors.toSet());
+
+        // All users must have ROLE_USER (df_role_user_uid)
+        if (!normalized.contains(BytedeskConsts.DEFAULT_ROLE_USER_UID)) {
+            normalized.add(BytedeskConsts.DEFAULT_ROLE_USER_UID);
+        }
+
+        return normalized;
     }
 
     // activate
@@ -344,7 +390,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         MemberEntity member = modelMapper.map(excel, MemberEntity.class);
         member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
-        member.setRoleUids(roleUids);
         // 
         Optional<DepartmentEntity> departmentOptional = departmentRestService.findByNameAndOrgUid(excel.getDepartmentName(), orgUid);
         if (departmentOptional.isPresent()) {
@@ -389,7 +434,9 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                     .mobile(excel.getMobile())
                     .password(excel.getPassword())
                     .platform(PlatformEnum.BYTEDESK.name())
+                    .registerSource(RegisterSource.ADMIN.name())
                     .orgUid(orgUid) // 确保设置组织UID，避免OrganizationRepository.findByUid接收null参数
+                    .roleUids(roleUids)
                     .build();
                     
                 if (!StringUtils.hasText(excel.getMobile()) && !StringUtils.hasText(excel.getEmail())) {
@@ -399,6 +446,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                 // 直接创建用户，避免使用orElseGet回调方式
                 user = userService.createUserFromMember(userRequest);
             }
+
+            // 确保 user 处于当前组织上下文，并写入默认导入角色
+            userService.ensureCurrentOrganization(user, orgUid);
+            user = userService.updateUserRoles(user, roleUids);
             
             // 设置用户到成员对象中
             member.setUser(user);
@@ -491,9 +542,56 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (entity.getUser() != null) {
             // 预加载user，确保user数据被包含在缓存中
             entity.getUser().getUid();
-            response.setUser(modelMapper.map(entity.getUser(), UserResponse.class));
+            response.setUser(modelMapper.map(entity.getUser(), UserResponseSimple.class));
+            response.setRoles(getRolesForOrg(entity.getUser(), entity.getOrgUid()));
         }
         return response;
+    }
+
+    private Set<RoleResponseSimple> getRolesForOrg(UserEntity user, String orgUid) {
+        if (user == null || !StringUtils.hasText(orgUid)) {
+            return new HashSet<>();
+        }
+
+        Set<String> roleUidSet = new HashSet<>();
+
+        // Prefer computing from userOrganizationRoles by orgUid to avoid relying on currentOrganization.
+        try {
+            if (user.getUserOrganizationRoles() != null) {
+                for (var uor : user.getUserOrganizationRoles()) {
+                    OrganizationEntity org = uor.getOrganization();
+                    if (org != null && orgUid.equals(org.getUid()) && uor.getRoles() != null) {
+                        for (var role : uor.getRoles()) {
+                            if (role != null && StringUtils.hasText(role.getUid())) {
+                                roleUidSet.add(role.getUid());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+            // Fall back below
+        }
+
+        // Fallback to current organization roles when association isn't loaded.
+        if (roleUidSet.isEmpty()) {
+            roleUidSet.addAll(user.getRoleUids());
+        }
+
+        // Backward compatibility + enforce ROLE_USER
+        roleUidSet = normalizeRoleUids(roleUidSet);
+
+        Set<RoleResponseSimple> roles = new HashSet<>();
+        for (String roleUid : roleUidSet) {
+            try {
+                roleRestService.findByUid(roleUid)
+                        .map(role -> modelMapper.map(role, RoleResponseSimple.class))
+                        .ifPresent(roles::add);
+            } catch (Exception e) {
+                log.warn("Failed to map role uid to RoleResponse: {}", roleUid);
+            }
+        }
+        return roles;
     }
 
     @Override

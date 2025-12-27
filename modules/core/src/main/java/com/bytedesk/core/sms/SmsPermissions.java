@@ -22,52 +22,17 @@ public class SmsPermissions extends BasePermissions {
 
     public static final String SMS_PREFIX = "SMS_";
 
-    // 平台级别权限
-    public static final String SMS_PLATFORM_CREATE = "SMS_PLATFORM_CREATE";
-    public static final String SMS_PLATFORM_READ = "SMS_PLATFORM_READ";
-    public static final String SMS_PLATFORM_UPDATE = "SMS_PLATFORM_UPDATE";
-    public static final String SMS_PLATFORM_DELETE = "SMS_PLATFORM_DELETE";
-    public static final String SMS_PLATFORM_EXPORT = "SMS_PLATFORM_EXPORT";
+    // 统一权限（不再在权限字符串中编码层级）
+    public static final String SMS_READ = "SMS_READ";
+    public static final String SMS_CREATE = "SMS_CREATE";
+    public static final String SMS_UPDATE = "SMS_UPDATE";
+    public static final String SMS_DELETE = "SMS_DELETE";
+    public static final String SMS_EXPORT = "SMS_EXPORT";
 
-    // 组织级别权限
-    public static final String SMS_ORGANIZATION_CREATE = "SMS_ORGANIZATION_CREATE";
-    public static final String SMS_ORGANIZATION_READ = "SMS_ORGANIZATION_READ";
-    public static final String SMS_ORGANIZATION_UPDATE = "SMS_ORGANIZATION_UPDATE";
-    public static final String SMS_ORGANIZATION_DELETE = "SMS_ORGANIZATION_DELETE";
-    public static final String SMS_ORGANIZATION_EXPORT = "SMS_ORGANIZATION_EXPORT";
-
-    // 部门级别权限
-    public static final String SMS_DEPARTMENT_CREATE = "SMS_DEPARTMENT_CREATE";
-    public static final String SMS_DEPARTMENT_READ = "SMS_DEPARTMENT_READ";
-    public static final String SMS_DEPARTMENT_UPDATE = "SMS_DEPARTMENT_UPDATE";
-    public static final String SMS_DEPARTMENT_DELETE = "SMS_DEPARTMENT_DELETE";
-    public static final String SMS_DEPARTMENT_EXPORT = "SMS_DEPARTMENT_EXPORT";
-
-    // 工作组级别权限
-    public static final String SMS_WORKGROUP_CREATE = "SMS_WORKGROUP_CREATE";
-    public static final String SMS_WORKGROUP_READ = "SMS_WORKGROUP_READ";
-    public static final String SMS_WORKGROUP_UPDATE = "SMS_WORKGROUP_UPDATE";
-    public static final String SMS_WORKGROUP_DELETE = "SMS_WORKGROUP_DELETE";
-    public static final String SMS_WORKGROUP_EXPORT = "SMS_WORKGROUP_EXPORT";
-
-    // 客服级别权限
-    public static final String SMS_AGENT_CREATE = "SMS_AGENT_CREATE";
-    public static final String SMS_AGENT_READ = "SMS_AGENT_READ";
-    public static final String SMS_AGENT_UPDATE = "SMS_AGENT_UPDATE";
-    public static final String SMS_AGENT_DELETE = "SMS_AGENT_DELETE";
-    public static final String SMS_AGENT_EXPORT = "SMS_AGENT_EXPORT";
-    // 用户级权限
-    public static final String SMS_USER_READ = "SMS_USER_READ";
-    public static final String SMS_USER_CREATE = "SMS_USER_CREATE";
-    public static final String SMS_USER_UPDATE = "SMS_USER_UPDATE";
-    public static final String SMS_USER_DELETE = "SMS_USER_DELETE";
-    public static final String SMS_USER_EXPORT = "SMS_USER_EXPORT";
-
-
-    // PreAuthorize注解使用的SpEL表达式 - 任意级别权限检查
-    public static final String HAS_SMS_CREATE_ANY_LEVEL = "hasAnyAuthority('SMS_PLATFORM_CREATE', 'SMS_ORGANIZATION_CREATE', 'SMS_DEPARTMENT_CREATE', 'SMS_WORKGROUP_CREATE', 'SMS_AGENT_CREATE', 'SMS_USER_CREATE')";
-    public static final String HAS_SMS_READ_ANY_LEVEL = "hasAnyAuthority('SMS_PLATFORM_READ', 'SMS_ORGANIZATION_READ', 'SMS_DEPARTMENT_READ', 'SMS_WORKGROUP_READ', 'SMS_AGENT_READ', 'SMS_USER_READ')";
-    public static final String HAS_SMS_UPDATE_ANY_LEVEL = "hasAnyAuthority('SMS_PLATFORM_UPDATE', 'SMS_ORGANIZATION_UPDATE', 'SMS_DEPARTMENT_UPDATE', 'SMS_WORKGROUP_UPDATE', 'SMS_AGENT_UPDATE', 'SMS_USER_UPDATE')";
-    public static final String HAS_SMS_DELETE_ANY_LEVEL = "hasAnyAuthority('SMS_PLATFORM_DELETE', 'SMS_ORGANIZATION_DELETE', 'SMS_DEPARTMENT_DELETE', 'SMS_WORKGROUP_DELETE', 'SMS_AGENT_DELETE', 'SMS_USER_DELETE')";
-    public static final String HAS_SMS_EXPORT_ANY_LEVEL = "hasAnyAuthority('SMS_PLATFORM_EXPORT', 'SMS_ORGANIZATION_EXPORT', 'SMS_DEPARTMENT_EXPORT', 'SMS_WORKGROUP_EXPORT', 'SMS_AGENT_EXPORT', 'SMS_USER_EXPORT')";
+    // PreAuthorize 表达式 - 统一权限（不区分层级）
+    public static final String HAS_SMS_READ = "hasAuthority('SMS_READ')";
+    public static final String HAS_SMS_CREATE = "hasAuthority('SMS_CREATE')";
+    public static final String HAS_SMS_UPDATE = "hasAuthority('SMS_UPDATE')";
+    public static final String HAS_SMS_DELETE = "hasAuthority('SMS_DELETE')";
+    public static final String HAS_SMS_EXPORT = "hasAuthority('SMS_EXPORT')";
 }

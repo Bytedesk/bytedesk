@@ -58,7 +58,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Slf4j
 public class DefaultUidGenerator implements UidGeneratorService, InitializingBean {
-    // private static final Logger log = LoggerFactory.getLogger(DefaultUidGenerator.class);
 
     protected UidProperties uidProperties;
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Step 1: Remove duplicate visitor records, keeping only the latest one -->
+    <changeSet id="251127-remove-duplicate-visitors" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_visitor" />
+        </preConditions>
+        <comment>Remove duplicate visitor_uid + org_uid records, keeping only the latest one (by id).</comment>
+        <sql>
+            DELETE v1 FROM bytedesk_service_visitor v1
+            INNER JOIN bytedesk_service_visitor v2
+            WHERE v1.visitor_uid = v2.visitor_uid
+              AND v1.org_uid = v2.org_uid
+              AND v1.id &lt; v2.id;
+        </sql>
+        <rollback>
+            <!-- Cannot rollback deleted records -->
+        </rollback>
+    </changeSet>
+
+    <!-- Step 2: Add unique constraint for visitor_uid + org_uid -->
+    <changeSet id="251127-add-visitor-uid-org-uid-unique-constraint" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_visitor" />
+            <not>
+                <indexExists tableName="bytedesk_service_visitor" indexName="uk_visitor_uid_org_uid" />
+            </not>
+        </preConditions>
+        <comment>Ensure visitor_uid is unique per org_uid.</comment>
+        <addUniqueConstraint
+            tableName="bytedesk_service_visitor"
+            columnNames="visitor_uid, org_uid"
+            constraintName="uk_visitor_uid_org_uid" />
+        <rollback>
+            <dropUniqueConstraint tableName="bytedesk_service_visitor" constraintName="uk_visitor_uid_org_uid" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

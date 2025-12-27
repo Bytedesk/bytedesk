@@ -43,5 +43,6 @@
 注意：mac上双击 bin/ApacheJMeter.jar 启动 jmeter 会报错，需要使用终端运行。
 
 ```bash
+# cd /Users/ningjinpeng/Desktop/apache-jmeter-5.6.3
 cd bin/ && ./jmeter.sh
 ```

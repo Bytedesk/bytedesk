@@ -26,15 +26,15 @@ public class SmsInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // create default
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // smsRestService.initSmss(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = SmsPermissions.ARTICLE_PREFIX + permission.name();
+        //     String permissionValue = SmsPermissions.SMS_PREFIX + permission.name();
         //     authorityService.createForPlatform(permissionValue);
         // }
     }

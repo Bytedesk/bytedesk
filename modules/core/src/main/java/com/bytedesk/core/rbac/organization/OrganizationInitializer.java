@@ -56,12 +56,13 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
+        // 先创建组织权限（ROLE_USER 默认绑定依赖这些 authority 存在）
+        initAuthority();
         // 
         roleInitializer.init();
         userInitializer.init();
         // 
         init();
-        initPermissions();
     }
 
     @Transactional
@@ -98,7 +99,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
         }
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = OrganizationPermissions.ORGANIZATION_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

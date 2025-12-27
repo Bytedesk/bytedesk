@@ -18,7 +18,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -80,45 +80,35 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
         return convertToResponse(optional.get());
     }
 
-    /**
-     * 根据 topic 查询未读消息
-     * 参考 ThreadEntity.getUnreadCount 的逻辑
-     * @deprecated 此功能已迁移到企业版
-     */
-    @Deprecated
-    public Page<MessageResponse> queryUnread(MessageRequest request) {
-        // 此功能已迁移到企业版
-        throw new UnsupportedOperationException("此功能已迁移到企业版，请使用 MessageRestServiceVip.queryUnread");
-    }
-
-    @Cacheable(value = "message", key = "#uid", unless = "#result == null")
+    // 不能使用 @Cacheable 注解，否则会无法更新已读状态
+    // @Cacheable(value = "message", key = "#uid", unless = "#result == null")
     public Optional<MessageEntity> findByUid(String uid) {
         return messageRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "message", key = "# type + #messageUid", unless = "#result == null")
+    // @Cacheable(value = "message", key = "#type + #messageUid", unless = "#result == null")
     public Optional<MessageEntity> findTransferMessage(String type, String messageUid) {
         return messageRepository.findTransferMessage(type, messageUid);
     }
 
-    @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
+    // @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
     public Optional<MessageEntity> findLatestByThreadUid(String threadUid) {
         return messageRepository.findFirstByThread_UidOrderByCreatedAtDesc(threadUid);
     }
 
-    @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
+    // @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
     public List<MessageEntity> findByThreadUid(String threadUid) {
         return messageRepository.findByThread_UidOrderByCreatedAtAsc(threadUid);
     }
     
-    @Cacheable(value = "message", key = "#threadUid + #type + #userUid", unless = "#result == null")
+    // @Cacheable(value = "message", key = "#threadUid + #type + #userUid", unless = "#result == null")
     public Optional<MessageEntity> findByThreadUidAndTypeAndUserContains(String threadUid, String type,
             String userUid) {
         return messageRepository.findFirstByThread_UidAndTypeAndUserContainsOrderByCreatedAtDesc(threadUid, type,
                 userUid);
     }
 
-    @Cacheable(value = "message", key = "#threadTopic + #limit", unless = "#result == null")
+    // @Cacheable(value = "message", key = "#threadTopic + #limit", unless = "#result == null")
     public List<MessageEntity> getRecentMessages(String threadTopic, int limit) {
         // 只返回前5条记录
         PageRequest pageRequest = PageRequest.of(0, limit);
@@ -126,7 +116,7 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
         // return messageEntities.stream().map(MessageProtobuf::convertToProtobuf).collect(Collectors.toList());
     }
 
-    @Cacheable(value = "message", key = "#uid", unless = "#result == null")
+    // @Cacheable(value = "message", key = "#uid", unless = "#result == null")
     public Boolean isMessageExists(String uid) {
         return messageRepository.existsByUid(uid);
     }
@@ -144,7 +134,7 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
     }
 
     @Override
-    @CachePut(value = "message", key = "#message.uid")
+    // @CachePut(value = "message", key = "#message.uid")
     protected MessageEntity doSave(MessageEntity entity) {
         return messageRepository.save(entity);
     }

@@ -180,14 +180,12 @@ public class XmlCurlService {
     // --- helpers ---
     private static void logDisabled(String section, String envKey) {
         // 用 info 便于默认日志级别下也能观察到未启用原因
-        org.slf4j.LoggerFactory.getLogger(XmlCurlService.class)
-                .info("xmlcurl.{} disabled (enable by env {})", section, envKey);
+        log.info("xmlcurl.{} disabled (enable by env {})", section, envKey);
     }
 
     private static void logNotFound(String section, String reason) {
-        if (org.slf4j.LoggerFactory.getLogger(XmlCurlService.class).isDebugEnabled()) {
-            org.slf4j.LoggerFactory.getLogger(XmlCurlService.class)
-                    .debug("xmlcurl.{} not-found: {}", section, reason);
+        if (log.isDebugEnabled()) {
+            log.debug("xmlcurl.{} not-found: {}", section, reason);
         }
     }
     private static String pick(Map<String, String> m, String... keys) {

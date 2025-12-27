@@ -64,7 +64,6 @@ public static void main(String[] args) {
         Thread.sleep(5000); // 等待合成完成
         
     } catch (Exception e) {
-        e.printStackTrace();
     } finally {
         example.close();
     }
@@ -85,7 +84,6 @@ public static void main(String[] args) {
         example.executeIvrFlow();
         
     } catch (Exception e) {
-        e.printStackTrace();
     } finally {
         example.close();
     }

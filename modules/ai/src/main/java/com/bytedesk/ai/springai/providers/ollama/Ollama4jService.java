@@ -83,7 +83,6 @@ public class Ollama4jService {
             OllamaAPI ollamaAPI = createOllamaAPI(request);
             return ollamaAPI.listModelsFromLibrary();
         } catch (Exception e) {
-            // e.printStackTrace();
             log.warn("Ollama4j get models error: {}", e.getMessage());
         }
         return List.of();
@@ -97,7 +96,6 @@ public class Ollama4jService {
             OllamaAPI ollamaAPI = createOllamaAPI(request);
             return ollamaAPI.ps();
         } catch (Exception e) {
-            // e.printStackTrace();
             log.warn("Ollama4j get ps error: {}", e.getMessage());
         }
         return null;
@@ -152,7 +150,6 @@ public class Ollama4jService {
             ollamaAPI.pullModel(libraryModelTag);
             return; // 成功时返回
         } catch (Exception e) {
-            // e.printStackTrace();
             log.warn("Ollama4j pull model error: {}", e.getMessage());
         }
     }

@@ -263,9 +263,14 @@ services:
       SPRING_DATA_REDIS_TIMEOUT: 10000
       SPRING_DATA_REDIS_REPOSITORIES_ENABLED: "false"
       # Cache config
-      BYTEDESK_CACHE_LEVEL: 0
+      BYTEDESK_CACHE_LEVEL: 2
       BYTEDESK_CACHE_PREFIX: bytedeskim
       BYTEDESK_CACHE_REDIS_STREAM_KEY: bytedeskim:stream
+      SPRING_CACHE_TYPE: redis
+      SPRING_CACHE_REDIS_TIME_TO_LIVE: 1800000
+      SPRING_CACHE_REDIS_CACHE_NULL_VALUES: "false"
+      SPRING_CACHE_REDIS_USE_KEY_PREFIX: "true"
+      SPRING_CACHE_REDIS_KEY_PREFIX: "bytedeskim:cache:"
       # Upload config
       BYTEDESK_UPLOAD_TYPE: local
       BYTEDESK_UPLOAD_DIR: /app/uploads

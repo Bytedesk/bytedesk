@@ -293,7 +293,6 @@ try {
     }
 } catch (MrcpInvocationException e) {
     System.err.println("调用失败: " + e.getMessage());
-    e.printStackTrace();
 }
 ```
 

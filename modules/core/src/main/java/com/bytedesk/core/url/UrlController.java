@@ -46,7 +46,7 @@ public class UrlController {
         try {
             response.sendRedirect(url);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("短链重定向失败 shortUrl: {}", shortUrl, e);
         }
     }
     

@@ -6,8 +6,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +34,23 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketSettingsRestControllerVisitor {
 
     private final TicketSettingsRestService ticketSettingsRestService;
+
+    /**
+     * 与管理端对齐：按 orgUid + workgroupUid 获取 TicketSettings（不存在则返回默认模板）。
+     * visitor 端用于工单提交页面：拿到分类/表单/basic/process 等最小元数据。
+     */
+    @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}")
+    public ResponseEntity<?> getByWorkgroup(
+            @PathVariable("orgUid") String orgUid,
+            @PathVariable("workgroupUid") String workgroupUid,
+            @RequestParam(value = "type", required = false) String type) {
+
+        TicketSettingsResponse resp = StringUtils.hasText(type)
+                ? ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid, type)
+                : ticketSettingsRestService.getOrDefaultByWorkgroup(orgUid, workgroupUid);
+
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
 
     @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/categories")
     public ResponseEntity<?> getCategoriesByWorkgroup(

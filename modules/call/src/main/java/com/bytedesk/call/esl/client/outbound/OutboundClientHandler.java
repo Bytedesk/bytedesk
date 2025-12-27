@@ -20,6 +20,7 @@ import com.bytedesk.call.esl.client.internal.AbstractEslClientHandler;
 import com.bytedesk.call.esl.client.internal.Context;
 import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import com.bytedesk.call.esl.client.transport.message.EslMessage;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutorService;
 
@@ -35,6 +36,7 @@ import java.util.concurrent.ExecutorService;
  * pipeline prior to this handler. This will ensure that each incoming message is processed in its
  * own thread (although still guaranteed to be processed in the order of receipt).
  */
+@Slf4j
 class OutboundClientHandler extends AbstractEslClientHandler {
 
 	private final IClientHandler clientHandler;

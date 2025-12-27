@@ -43,7 +43,7 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "组织查询", description = "query role by org")
     @Operation(summary = "Query Roles by Organization", description = "Retrieve roles for the current organization")
-    @PreAuthorize(RolePermissions.HAS_ROLE_READ_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.HAS_ROLE_READ)
     @Override
     public ResponseEntity<?> queryByOrg(RoleRequest request) {
         
@@ -54,7 +54,7 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "用户查询", description = "query role by user")
     @Operation(summary = "Query Roles by User", description = "Retrieve roles for the current user")
-    @PreAuthorize(RolePermissions.HAS_ROLE_READ_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.HAS_ROLE_READ)
     @Override
     public ResponseEntity<?> queryByUser(RoleRequest request) {
 
@@ -65,7 +65,7 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "查询详情", description = "query role by uid")
     @Operation(summary = "Query Role by UID", description = "Retrieve a specific role by its unique identifier")
-    @PreAuthorize(RolePermissions.HAS_ROLE_READ_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.HAS_ROLE_READ)
     @Override
     public ResponseEntity<?> queryByUid(RoleRequest request) {
         
@@ -76,7 +76,7 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "新建", description = "create role")
     @Operation(summary = "Create Role", description = "Create a new role")
-    @PreAuthorize(RolePermissions.HAS_ROLE_CREATE_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.HAS_ROLE_CREATE)
     @Override
     public ResponseEntity<?> create(RoleRequest request) {
 
@@ -87,7 +87,7 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "更新", description = "update role")
     @Operation(summary = "Update Role", description = "Update an existing role")
-    @PreAuthorize(RolePermissions.HAS_ROLE_UPDATE_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.HAS_ROLE_UPDATE)
     @Override
     public ResponseEntity<?> update(RoleRequest request) {
 
@@ -98,7 +98,7 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "删除", description = "delete role")
     @Operation(summary = "Delete Role", description = "Delete a role")
-    @PreAuthorize(RolePermissions.HAS_ROLE_DELETE_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.HAS_ROLE_DELETE)
     @Override
     public ResponseEntity<?> delete(RoleRequest request) {
 
@@ -109,7 +109,7 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "导出", description = "export role")
     @Operation(summary = "Export Roles", description = "Export roles to Excel format")
-    @PreAuthorize(RolePermissions.HAS_ROLE_EXPORT_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.HAS_ROLE_EXPORT)
     @GetMapping("/export")
     @Override
     public Object export(RoleRequest request, HttpServletResponse response) {
@@ -125,12 +125,34 @@ public class RoleRestController extends BaseRestController<RoleRequest, RoleRest
 
     @ActionAnnotation(title = "Role", action = "重置层级权限", description = "reset role authorities by level")
     @Operation(summary = "Reset role authorities for a level", description = "Reapply canonical permissions for the specified level on a role")
-    @PreAuthorize(RolePermissions.HAS_ROLE_UPDATE_ANY_LEVEL)
-    @PostMapping("/reset/level")
-    public ResponseEntity<?> resetLevelAuthorities(@RequestBody RoleRequest request) {
+    @PreAuthorize(RolePermissions.HAS_ROLE_UPDATE)
+    @PostMapping("/authorities/reset")
+    public ResponseEntity<?> resetAuthorities(@RequestBody RoleRequest request) {
 
-        RoleResponse role = roleRestService.resetLevelAuthorities(request);
+        RoleResponse role = roleRestService.resetAuthorities(request);
         
+        return ResponseEntity.ok(JsonResult.success(role));
+    }
+
+    @ActionAnnotation(title = "Role", action = "新增权限", description = "add role authorities")
+    @Operation(summary = "Add role authorities", description = "Add authorities to a role without updating the whole role")
+    @PreAuthorize(RolePermissions.HAS_ROLE_UPDATE)
+    @PostMapping("/authorities/add")
+    public ResponseEntity<?> addAuthorities(@RequestBody RoleRequest request) {
+
+        RoleResponse role = roleRestService.addAuthorities(request);
+
+        return ResponseEntity.ok(JsonResult.success(role));
+    }
+
+    @ActionAnnotation(title = "Role", action = "移除权限", description = "remove role authorities")
+    @Operation(summary = "Remove role authorities", description = "Remove authorities from a role without updating the whole role")
+    @PreAuthorize(RolePermissions.HAS_ROLE_UPDATE)
+    @PostMapping("/authorities/remove")
+    public ResponseEntity<?> removeAuthorities(@RequestBody RoleRequest request) {
+
+        RoleResponse role = roleRestService.removeAuthorities(request);
+
         return ResponseEntity.ok(JsonResult.success(role));
     }
 

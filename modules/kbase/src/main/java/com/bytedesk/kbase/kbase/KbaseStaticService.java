@@ -99,7 +99,7 @@ public class KbaseStaticService {
             fileOutputStream.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
     }
 
@@ -140,7 +140,7 @@ public class KbaseStaticService {
             fileOutputStream.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
     }
 
@@ -181,7 +181,7 @@ public class KbaseStaticService {
             fileOutputStream.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
     }
 
@@ -216,7 +216,7 @@ public class KbaseStaticService {
             fileOutputStream.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unhandled exception", e);
         }
 
     }

@@ -85,7 +85,7 @@ public class PageTemplateService {
             fileOutputStream.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("toHtml failed, tempName {}", tempName, e);
         }
     }
 
@@ -190,7 +190,6 @@ public class PageTemplateService {
     //         inputStream.close();
     //         fileOutputStream.close();
     //     } catch (Exception e) {
-    //         e.printStackTrace();
     //     }
     // }
 

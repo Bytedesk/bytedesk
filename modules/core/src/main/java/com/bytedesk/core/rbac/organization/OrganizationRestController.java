@@ -40,7 +40,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     private final OrganizationRestService organizationRestService;
 
     @ActionAnnotation(title = "组织", action = "组织查询", description = "query organization by org")
-    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ_ANY_LEVEL)
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     public ResponseEntity<?> queryByOrg(OrganizationRequest request) {
         
@@ -50,7 +50,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     }
 
     @ActionAnnotation(title = "组织", action = "用户查询", description = "query organization by user")
-    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ_ANY_LEVEL)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ)
     @Override
     public ResponseEntity<?> queryByUser(OrganizationRequest request) {
         
@@ -60,7 +60,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     }
 
     @ActionAnnotation(title = "组织", action = "查询详情", description = "query organization by uid")
-    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ_ANY_LEVEL)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ)
     @Override
     public ResponseEntity<?> queryByUid(OrganizationRequest request) {
         //
@@ -69,7 +69,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_CREATE_ANY_LEVEL)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_CREATE)
     @ActionAnnotation(title = "组织", action = "新建", description = "organization create")
     @Override
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
@@ -89,7 +89,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_UPDATE_ANY_LEVEL)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_UPDATE)
     @ActionAnnotation(title = "组织", action = "更新", description = "organization update")
     @Override
     public ResponseEntity<?> update(@RequestBody OrganizationRequest request) {
@@ -109,7 +109,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_DELETE_ANY_LEVEL)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_DELETE)
     @ActionAnnotation(title = "组织", action = "删除", description = "organization delete")
     @Override
     public ResponseEntity<?> delete(OrganizationRequest request) {
@@ -119,7 +119,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_EXPORT_ANY_LEVEL)
+    @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_EXPORT)
     @ActionAnnotation(title = "组织", action = "导出", description = "organization export")
     @GetMapping("/export")
     @Override

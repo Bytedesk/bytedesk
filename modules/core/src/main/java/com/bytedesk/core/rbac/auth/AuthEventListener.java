@@ -37,21 +37,20 @@ public class AuthEventListener {
 
     @EventListener
     public void onActionCreateEvent(ActionCreateEvent event) {
-        // log.info("onActionCreateEvent Received event: {}", event.toString());
         // do something
         ActionEntity action = event.getAction();
         if (action == null) {
             return;
         }
+        UserEntity user = action.getUser();
+        if (user == null) {
+            return;
+        }
+        final String actionName = action.getAction();
         // 监听登录action，发送登录系统消息，提醒相关用户
-        if (action.getAction().equals(BytedeskConsts.ACTION_LOGIN_USERNAME)
-                || action.getAction().equals(BytedeskConsts.ACTION_LOGIN_MOBILE)
-                || action.getAction().equals(BytedeskConsts.ACTION_LOGIN_EMAIL)) {
-            //
-            UserEntity user = action.getUser();
-            if (user == null) {
-                return;
-            }
+        if (BytedeskConsts.ACTION_LOGIN_USERNAME.equals(actionName)
+                || BytedeskConsts.ACTION_LOGIN_MOBILE.equals(actionName)
+                || BytedeskConsts.ACTION_LOGIN_EMAIL.equals(actionName)) {
             //
             NoticeExtraLogin noticeExtraLogin = NoticeExtraLogin.builder()
                     .loginIp(action.getIp())

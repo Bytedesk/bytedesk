@@ -78,6 +78,10 @@ public class RedisCacheConfig implements CachingConfigurer {
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
         // 用户缓存配置 - 30分钟过期
         cacheConfigurations.put("user", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
+        // 在线状态缓存 - 5秒过期（避免 presence 接口频繁扫库）
+        cacheConfigurations.put("presence", defaultCacheConfiguration().entryTtl(Duration.ofSeconds(5)));
+        // 活跃连接列表缓存 - 5秒过期
+        cacheConfigurations.put("activeConnections", defaultCacheConfiguration().entryTtl(Duration.ofSeconds(5)));
         // 会话缓存 - 4小时过期
         // cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(24)));
         // 

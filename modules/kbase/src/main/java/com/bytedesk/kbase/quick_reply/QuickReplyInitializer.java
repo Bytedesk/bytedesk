@@ -33,7 +33,7 @@ public class QuickReplyInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         // 为保证执行顺序，迁移到KbaseInitializer中
-        initPermissions();
+        initAuthority();
     }
 
     // 迁移到kbaseInitializer
@@ -45,9 +45,9 @@ public class QuickReplyInitializer implements SmartInitializingSingleton {
         quickReplyRestService.initQuickReply(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
-            String permissionValue = QuickReplyPermissions.QUICKREPLY_PREFIX + permission.name();
+            String permissionValue = QuickReplyPermissions.QUICK_REPLY_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);
         }
     }

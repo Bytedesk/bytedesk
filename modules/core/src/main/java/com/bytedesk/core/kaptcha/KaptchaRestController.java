@@ -71,7 +71,7 @@ public class KaptchaRestController {
             //
             return ResponseEntity.ok(JsonResult.success("kaptcha success", jsonObject));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("getKaptcha 生成验证码失败", e);
         }
         //
         return ResponseEntity.ok(JsonResult.error("kaptcha get failed"));

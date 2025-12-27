@@ -40,7 +40,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     private final MessageLeaveRestService messageLeaveRestService;
 
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_READ_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
     @ActionAnnotation(title = "留言管理", action = "查询组织留言", description = "queryByOrg leave message")
     @Override
     @Operation(summary = "查询留言消息")
@@ -51,7 +51,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_READ_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
     @ActionAnnotation(title = "留言管理", action = "查询用户留言", description = "queryByUser leave message")
     @Override
     @Operation(summary = "查询用户留言消息")
@@ -62,7 +62,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_READ_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
     @ActionAnnotation(title = "留言管理", action = "查询留言详情", description = "queryByUid leave message")
     @Override
     @Operation(summary = "查询留言消息详情")
@@ -74,7 +74,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @GetMapping("/query/threads")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_READ_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
     @ActionAnnotation(title = "留言管理", action = "查询关联会话", description = "query threads by leave message")
     @Operation(summary = "查询留言消息关联的会话")
     public ResponseEntity<?> queryThreadsByLeaveMessage(MessageLeaveRequest request) {
@@ -85,7 +85,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @GetMapping("/count/pending")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_READ_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
     @ActionAnnotation(title = "留言管理", action = "查询待处理数量", description = "count pending leave messages")
     @Operation(summary = "查询当前组织未处理的留言数量")
     public ResponseEntity<?> countPendingByOrg(MessageLeaveRequest request) {
@@ -95,7 +95,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(count));
     }
 
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_CREATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_CREATE)
     @ActionAnnotation(title = "留言管理", action = "创建留言", description = "create leave message")
     @Override
     @Operation(summary = "创建留言消息")
@@ -106,7 +106,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
     @ActionAnnotation(title = "留言管理", action = "更新留言", description = "update leave message")
     @Override
     @Operation(summary = "更新留言消息")
@@ -118,7 +118,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PostMapping("/reply")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
     @ActionAnnotation(title = "留言管理", action = "回复留言", description = "reply leave message")
     @Operation(summary = "回复留言消息")
     public ResponseEntity<?> reply(@RequestBody MessageLeaveRequest request) {
@@ -129,7 +129,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PostMapping("/status/update")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
     @ActionAnnotation(title = "留言管理", action = "更新状态", description = "update leave message status")
     @Operation(summary = "更新留言消息状态")
     public ResponseEntity<?> updateStatus(@RequestBody MessageLeaveRequest request) {
@@ -140,7 +140,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PostMapping("/read")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
     @ActionAnnotation(title = "留言管理", action = "标记已读", description = "mark leave message as read")
     @Operation(summary = "标记留言消息为已读")
     public ResponseEntity<?> markAsRead(@RequestBody MessageLeaveRequest request) {
@@ -151,7 +151,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PostMapping("/transfer")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
     @ActionAnnotation(title = "留言管理", action = "转接留言", description = "transfer leave message")
     @Operation(summary = "转接留言消息")
     public ResponseEntity<?> transfer(@RequestBody MessageLeaveRequest request) {
@@ -162,7 +162,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PostMapping("/close")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
     @ActionAnnotation(title = "留言管理", action = "关闭留言", description = "close leave message")
     @Operation(summary = "关闭留言消息")
     public ResponseEntity<?> close(@RequestBody MessageLeaveRequest request) {
@@ -173,7 +173,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PostMapping("/spam")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_UPDATE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
     @ActionAnnotation(title = "留言管理", action = "标记垃圾", description = "mark leave message as spam")
     @Operation(summary = "标记留言消息为垃圾")
     public ResponseEntity<?> markAsSpam(@RequestBody MessageLeaveRequest request) {
@@ -183,7 +183,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_DELETE_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_DELETE)
     @ActionAnnotation(title = "留言管理", action = "删除留言", description = "delete leave message")
     @Override
     @Operation(summary = "删除留言消息")
@@ -195,7 +195,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @GetMapping("/export")
-    @PreAuthorize(MessageLeavePermissions.HAS_LEAVEMSG_EXPORT_ANY_LEVEL)
+    @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_EXPORT)
     @ActionAnnotation(title = "留言管理", action = "导出留言", description = "export leave message")
     @Override
     @Operation(summary = "导出留言消息")

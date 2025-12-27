@@ -43,4 +43,31 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
     }
 
+    // @Override
+    // public void addFormatters(FormatterRegistry registry) {
+    //     // 兼容前端在 query 参数中传递 superUser=undefined 的情况。
+    //     // 这里将 "undefined"/"null"/空字符串 统一视为 false，避免参数绑定阶段报错。
+    //     registry.addConverter(new Converter<String, Boolean>() {
+    //         @Override
+    //         public Boolean convert(String source) {
+    //             if (source == null) {
+    //                 return null;
+    //             }
+    //             String value = source.trim();
+    //             if (value.isEmpty()) {
+    //                 return Boolean.FALSE;
+    //             }
+    //             value = value.toLowerCase(Locale.ROOT);
+    //             if ("undefined".equals(value) || "null".equals(value)) {
+    //                 return Boolean.FALSE;
+    //             }
+    //             return switch (value) {
+    //                 case "true", "on", "yes", "1" -> Boolean.TRUE;
+    //                 case "false", "off", "no", "0" -> Boolean.FALSE;
+    //                 default -> throw new IllegalArgumentException("Invalid boolean value [" + source + "]");
+    //             };
+    //         }
+    //     });
+    // }
+
 }

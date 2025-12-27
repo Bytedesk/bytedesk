@@ -222,9 +222,21 @@ public class QueueMemberResponse extends BaseResponse {
     @Builder.Default
     private String intentionType = ThreadIntentionTypeEnum.OTHER.name();
 
+    // 意图识别原始结果（JSON/文本）
+    @Builder.Default
+    private String threadIntentionResult = "";
+
     // 情绪类型
     @Builder.Default
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
+
+    // 情绪识别原始结果（JSON/文本）
+    @Builder.Default
+    private String threadEmotionResult = "";
+
+    // 会话小结原始结果（JSON）
+    @Builder.Default
+    private String threadSummaryResult = "";
 
     // 机器人转人工
     @Builder.Default

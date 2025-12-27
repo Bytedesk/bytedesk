@@ -6,8 +6,12 @@
 package com.bytedesk.kbase.settings;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
+import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
+import com.bytedesk.kbase.settings_summary.SummarySettingsEntity;
+import com.bytedesk.kbase.settings_trigger.TriggerSettingsEntity;
 
 import java.time.ZonedDateTime;
 
@@ -40,6 +44,7 @@ import lombok.experimental.SuperBuilder;
  * - serviceSettings: Common service settings
  * - inviteSettings: Invitation settings
  * - intentionSettings: Intention recognition settings
+ * - summarySettings: Conversation summary settings
  * 
  * Usage:
  * - Extend this class in AgentSettingsEntity, WorkgroupSettingsEntity,
@@ -92,26 +97,33 @@ public abstract class BaseSettingsEntity extends BaseEntity {
     private ServiceSettingsEntity serviceSettings;
 
     /**
-     * Invitation settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    private InviteSettingsEntity inviteSettings;
-
-    /**
-     * Intention recognition settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    private IntentionSettingsEntity intentionSettings;
-
-    /**
      * Draft service settings (used in admin editing/testing, not affecting online
      * runtime until published)
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.REMOVE })
     private ServiceSettingsEntity draftServiceSettings;
+
+    /**
+     * Trigger settings (published)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private TriggerSettingsEntity triggerSettings;
+
+    /**
+     * Draft trigger settings (admin editing/testing only)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private TriggerSettingsEntity draftTriggerSettings;
+
+    /**
+     * Invitation settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private InviteSettingsEntity inviteSettings;
 
     /**
      * Draft invitation settings (admin editing/testing only)
@@ -121,11 +133,46 @@ public abstract class BaseSettingsEntity extends BaseEntity {
     private InviteSettingsEntity draftInviteSettings;
 
     /**
+     * Intention recognition settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private IntentionSettingsEntity intentionSettings;
+    
+    /**
      * Draft intention recognition settings (admin editing/testing only)
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.REMOVE })
     private IntentionSettingsEntity draftIntentionSettings;
+
+    /**
+     * Emotion recognition settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private EmotionSettingEntity emotionSettings;
+    
+    /**
+     * Draft emotion recognition settings (admin editing/testing only)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private EmotionSettingEntity draftEmotionSettings;
+
+    /**
+     * Conversation summary settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private SummarySettingsEntity summarySettings;
+
+    /**
+     * Draft conversation summary settings (admin editing/testing only)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private SummarySettingsEntity draftSummarySettings;
 
     /**
      * Whether there are unpublished changes in draft

@@ -102,7 +102,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 3. 处理现有活跃会话
         if (isExistingRobotThread(thread)) {
-            return handleExistingRobotThread(robotEntity, thread);
+            return handleExistingRobotThread(request, robotEntity, thread);
         }
 
         // 4. 处理新会话或重新激活的会话
@@ -162,9 +162,9 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理现有的机器人会话
      */
-    private MessageProtobuf handleExistingRobotThread(RobotEntity robotEntity, ThreadEntity thread) {
+    private MessageProtobuf handleExistingRobotThread(VisitorRequest request, RobotEntity robotEntity, ThreadEntity thread) {
         log.info("Continuing existing robot thread: {}", thread.getUid());
-        return getRobotContinueMessage(robotEntity, thread);
+        return getRobotContinueMessage(request, robotEntity, thread);
     }
 
     /**
@@ -178,7 +178,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.info("Robot enqueued to queue: {}", queueMemberEntity.getUid());
 
         // 2. 配置线程状态
-        String tip = getRobotWelcomeMessage(robotEntity);
+        String tip = getRobotWelcomeMessage(request, robotEntity);
         WelcomeContent welcomeContent = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
         thread.setRoboting().setContent(welcomeContent != null ? welcomeContent.toJson() : null);
 
@@ -202,11 +202,23 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取机器人欢迎消息
      */
-    private String getRobotWelcomeMessage(RobotEntity robotEntity) {
-        String customMessage = robotEntity.getSettings() != null
-                && robotEntity.getSettings().getServiceSettings() != null
+    private boolean isDraftEnabled(VisitorRequest visitorRequest) {
+        return visitorRequest != null && Boolean.TRUE.equals(visitorRequest.getDraft());
+    }
+
+    private String getRobotWelcomeMessage(VisitorRequest visitorRequest, RobotEntity robotEntity) {
+        String customMessage = null;
+        boolean useDraft = isDraftEnabled(visitorRequest);
+        if (robotEntity.getSettings() != null) {
+            if (useDraft && robotEntity.getSettings().getDraftServiceSettings() != null) {
+                customMessage = robotEntity.getSettings().getDraftServiceSettings().getWelcomeTip();
+            }
+            if (customMessage == null || customMessage.isEmpty()) {
+                customMessage = robotEntity.getSettings().getServiceSettings() != null
                         ? robotEntity.getSettings().getServiceSettings().getWelcomeTip()
                         : null;
+            }
+        }
         return getValidWelcomeMessage(customMessage);
     }
 
@@ -216,11 +228,11 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private void updateQueueMemberForRobot(QueueMemberEntity queueMemberEntity) {
         try {
             queueMemberEntity.robotAutoAcceptThread();
-            queueMemberRestService.save(queueMemberEntity);
-            log.debug("Updated queue member status for robot auto-accept: {}", queueMemberEntity.getUid());
+            queueMemberRestService.saveAsyncBestEffort(queueMemberEntity);
+            log.debug("Queued async queue member update for robot auto-accept: {}", queueMemberEntity.getUid());
         } catch (Exception e) {
-            log.error("Failed to update queue member for robot auto-accept: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to update queue member status", e);
+            // best-effort: 不影响主流程
+            log.warn("Failed to queue async update for robot auto-accept: {}", e.getMessage(), e);
         }
     }
 
@@ -257,11 +269,11 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取机器人继续对话消息
      */
-    private MessageProtobuf getRobotContinueMessage(RobotEntity robotEntity, @Nonnull ThreadEntity thread) {
+    private MessageProtobuf getRobotContinueMessage(VisitorRequest request, RobotEntity robotEntity, @Nonnull ThreadEntity thread) {
         validateThread(thread, "get robot continue message");
 
-        String tip = getRobotWelcomeMessage(robotEntity);
-    WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
+        String tip = getRobotWelcomeMessage(request, robotEntity);
+        WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);

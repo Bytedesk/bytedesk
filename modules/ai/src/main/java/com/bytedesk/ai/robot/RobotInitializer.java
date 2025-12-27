@@ -37,7 +37,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         init();
-        initPermissions();
+        initAuthority();
     }
     
     public void init() {
@@ -55,7 +55,7 @@ public class RobotInitializer implements SmartInitializingSingleton {
         robotRestService.initRobotJson(level, orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = RobotPermissions.ROBOT_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

@@ -35,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.utils.JsonResult;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
@@ -46,6 +47,12 @@ import lombok.extern.slf4j.Slf4j;
 // @ControllerAdvice
 @RestControllerAdvice
 public class GlobalControllerAdvice {
+
+    @ExceptionHandler(UploadStorageException.class)
+    public ResponseEntity<?> handleUploadStorageException(UploadStorageException e) {
+        // 上传失败通常属于客户端输入/文件问题（类型/大小/内容校验等），返回可读提示
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), e.getCode() == null ? 400 : e.getCode()));
+    }
 
     // @Autowired
     // private BytedeskProperties bytedeskProperties;
@@ -131,9 +138,8 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
-        // 方便测试，打印异常堆栈信息
-        e.printStackTrace();
-        log.error("not handled exception 1:", e.getMessage());
+        // 统一记录未显式处理的运行时异常
+        log.error("not handled exception 1", e);
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 
@@ -204,7 +210,6 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = NullPointerException.class)
     public ResponseEntity<?> handleNullPointerException(NullPointerException ex) {
         log.error("not handled exception 2:", ex);
-        ex.printStackTrace();
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_NULL_POINTER_EXCEPTION));
     }
 
@@ -273,7 +278,6 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> handleException(Exception e) {
         // if (bytedeskProperties.getDebug()) {
         log.error("not handled exception 3:", e);
-        e.printStackTrace();
         // }
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_INTERNAL_SERVER_ERROR));
     }

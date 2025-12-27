@@ -21,9 +21,6 @@ import org.springframework.data.domain.Sort;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.enums.PlatformEnum;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -80,15 +77,15 @@ public abstract class BaseRequestNoOrg implements Serializable, PageableRequest 
 
     // platform: 只有超级管理员才有权限
     // organization: 管理员才有权限
-    @Builder.Default
-    private String level = LevelEnum.USER.name();
+    // @Builder.Default
+    private String level;// = LevelEnum.USER.name();
 
     // 默认bytedesk平台
-    @Builder.Default
-    private String platform = PlatformEnum.BYTEDESK.name();
+    // @Builder.Default
+    private String platform;// = PlatformEnum.BYTEDESK.name();
 
     @Builder.Default
-    private Boolean isSuperUser = false;
+    private Boolean superUser = false;
 
     // 导出全部数据，默认false
     @Builder.Default

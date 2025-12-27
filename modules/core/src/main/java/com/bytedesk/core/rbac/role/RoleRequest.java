@@ -14,7 +14,6 @@
 package com.bytedesk.core.rbac.role;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +21,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseRequest;
@@ -40,14 +38,17 @@ public class RoleRequest extends BaseRequest {
 
     private String name;
 
+    private String value;
+
     private String description;
 
     // 是否是系统角色
     private Boolean system;
 
-    @Builder.Default
-    private Set<String> authorityUids = new HashSet<>();
-
-    // 组织+平台角色
-    // private Boolean orgAndPlatform;
+    /**
+     * 注意：不要给 authorityUids 默认初始化为空集合。
+     * 否则在 /role/update 时，即使前端未传该字段，反序列化后也会变成空集合，
+     * 导致 update() 误判为“请求明确携带 authorityUids”，从而清空角色权限。
+     */
+    private Set<String> authorityUids;
 }

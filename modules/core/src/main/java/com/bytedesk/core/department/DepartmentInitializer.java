@@ -33,7 +33,7 @@ public class DepartmentInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         init();
-        initPermissions();
+        initAuthority();
     }
 
     // @PostConstruct
@@ -57,7 +57,7 @@ public class DepartmentInitializer implements SmartInitializingSingleton {
         departmentService.create(csDept);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = DepartmentPermissions.DEPARTMENT_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);

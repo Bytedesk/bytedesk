@@ -62,12 +62,13 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_READ_ANY_LEVEL) 前端很多地方需要查询，所以不需要权限
+    // @PreAuthorize(AgentPermissions.HAS_AGENT_READ) 前端很多地方需要查询，所以不需要权限
     @ActionAnnotation(title = "客服", action = "组织查询", description = "query agent by org")
     @Operation(summary = "查询组织下的客服", description = "根据组织ID查询客服列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
+    @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
@@ -76,29 +77,40 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_READ_ANY_LEVEL)
     @ActionAnnotation(title = "客服", action = "用户查询", description = "query agent by user")
     @Operation(summary = "查询用户下的客服", description = "根据用户ID查询客服信息")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
+    @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
-        AgentResponse agentResponse = agentRestService.query(request);
-        if (agentResponse == null) {
-            return ResponseEntity.ok(JsonResult.error("agent not found"));
-        }
-        
+        Page<AgentResponse> agentResponse = agentRestService.queryByUser(request);
+
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
 
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_READ_ANY_LEVEL)
+    @ActionAnnotation(title = "客服", action = "用户UID查询", description = "query agent by user uid")
+    @Operation(summary = "根据用户UID查询客服", description = "根据 userUid 查询单个客服信息（可选传 orgUid 进行精确匹配）")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = AgentResponse.class)))
+    @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
+    @GetMapping("/query/user/uid")
+    public ResponseEntity<?> queryByUserUid(AgentRequest request) {
+
+        AgentResponse agent = agentRestService.queryByUserUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(agent));
+    }
+
     @ActionAnnotation(title = "客服", action = "查询详情", description = "query agent by uid")
     @Operation(summary = "根据UID查询客服", description = "根据UID查询客服详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
+    @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
     @Override
     public ResponseEntity<?> queryByUid(AgentRequest request) {
         
@@ -120,12 +132,12 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(threadResponse));   
     }
 
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_CREATE_ANY_LEVEL)
     @ActionAnnotation(title = "客服", action = "新建", description = "create agent")
     @Operation(summary = "创建客服", description = "创建新的客服")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
+    @PreAuthorize(AgentPermissions.HAS_AGENT_CREATE)
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
@@ -134,12 +146,12 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE_ANY_LEVEL)
     @ActionAnnotation(title = "客服", action = "更新", description = "update agent")
     @Operation(summary = "更新客服", description = "更新客服信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
 
@@ -148,8 +160,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    // updateAvatar
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE_ANY_LEVEL) // 客服自己修改头像，不需要权限限制
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
     @ActionAnnotation(title = "客服", action = "更新头像", description = "update agent avatar")
     @Operation(summary = "更新客服头像", description = "更新客服的头像")
     @ApiResponse(responseCode = "200", description = "更新成功",
@@ -163,7 +174,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE_ANY_LEVEL) // 客服自己修改在线状态，不需要权限限制
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
     @ActionAnnotation(title = "客服", action = "更新状态", description = "update agent status")
     @Operation(summary = "更新客服状态", description = "更新客服的在线状态")
     @ApiResponse(responseCode = "200", description = "更新成功",
@@ -177,7 +188,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    // @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE_ANY_LEVEL) // 客服自己修改自动回复，不需要权限限制
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
     @ActionAnnotation(title = "客服", action = "更新自动回复", description = "update agent autoreply")
     @Operation(summary = "更新客服自动回复", description = "更新客服的自动回复设置")
     @ApiResponse(responseCode = "200", description = "更新成功",
@@ -191,7 +202,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
     
-    @PreAuthorize(AgentPermissions.HAS_AGENT_DELETE_ANY_LEVEL)
+    @PreAuthorize(AgentPermissions.HAS_AGENT_DELETE)
     @ActionAnnotation(title = "客服", action = "删除", description = "delete agent")
     @Operation(summary = "删除客服", description = "删除指定的客服")
     @ApiResponse(responseCode = "200", description = "删除成功")
@@ -203,7 +214,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
-    @PreAuthorize(AgentPermissions.HAS_AGENT_EXPORT_ANY_LEVEL)
+    @PreAuthorize(AgentPermissions.HAS_AGENT_EXPORT)
     @ActionAnnotation(title = "客服", action = "导出", description = "export agent")
     @Operation(summary = "导出客服", description = "导出客服数据")
     @ApiResponse(responseCode = "200", description = "导出成功")

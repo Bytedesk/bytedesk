@@ -17,11 +17,37 @@ public class UploadStorageException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 应用层错误码（用于 JsonResult.code），不等同于 HTTP 状态码。
+	 * 约定：
+	 * - 400 参数/请求错误
+	 * - 404 资源不存在（如本地文件不存在）
+	 * - 413 文件过大
+	 * - 415 不支持的媒体类型
+	 * - 422 内容校验失败（如伪造图片）
+	 * - 503 存储服务不可用
+	 * - 500 服务端内部错误
+	 */
+	private final Integer code;
+
 	public UploadStorageException(String message) {
-		super(message);
+		this(message, 400, null);
 	}
 
 	public UploadStorageException(String message, Throwable cause) {
+		this(message, 400, cause);
+	}
+
+	public UploadStorageException(String message, Integer code) {
+		this(message, code, null);
+	}
+
+	public UploadStorageException(String message, Integer code, Throwable cause) {
 		super(message, cause);
+		this.code = code == null ? 400 : code;
+	}
+
+	public Integer getCode() {
+		return code;
 	}
 }

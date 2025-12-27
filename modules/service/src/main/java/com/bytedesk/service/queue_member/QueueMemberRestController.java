@@ -19,10 +19,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
+
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
-// import com.bytedesk.service.queue_member.mq.QueueMemberMessageService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -42,13 +42,12 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
 
     private final QueueMemberRestService queueMemberRestService;
 
-    // private final QueueMemberMessageService queueMemberMessageService;
-
+    @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_READ)
+    @ActionAnnotation(title = "队列成员管理", action = "查询组织队列成员", description = "queryByOrg queue member")
     @Operation(summary = "查询组织下的队列成员", description = "根据组织ID查询队列成员列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(QueueMemberRequest request) {
         
@@ -57,6 +56,8 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_READ)
+    @ActionAnnotation(title = "队列成员管理", action = "查询用户队列成员", description = "queryByUser queue member")
     @Operation(summary = "查询用户下的队列成员", description = "根据用户ID查询队列成员列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
@@ -69,17 +70,21 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_READ)
+    @ActionAnnotation(title = "队列成员管理", action = "查询队列成员详情", description = "queryByUid queue member")
     @Operation(summary = "查询指定队列成员", description = "根据UID查询队列成员详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
     @Override
     public ResponseEntity<?> queryByUid(QueueMemberRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        QueueMemberResponse response = queueMemberRestService.queryByUid(request);
+        return ResponseEntity.ok(JsonResult.success(response));
     }
     
 
+    @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_CREATE)
+    @ActionAnnotation(title = "队列成员管理", action = "创建队列成员", description = "create queue member")
     @Operation(summary = "创建队列成员", description = "创建新的队列成员")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
@@ -92,6 +97,8 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_UPDATE)
+    @ActionAnnotation(title = "队列成员管理", action = "更新队列成员", description = "update queue member")
     @Operation(summary = "更新队列成员", description = "更新队列成员信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
@@ -104,6 +111,8 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_DELETE)
+    @ActionAnnotation(title = "队列成员管理", action = "删除队列成员", description = "delete queue member")
     @Operation(summary = "删除队列成员", description = "删除指定的队列成员")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @Override
@@ -114,6 +123,8 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_EXPORT)
+    @ActionAnnotation(title = "队列成员管理", action = "导出队列成员", description = "export queue member")
     @Operation(summary = "导出队列成员", description = "导出队列成员数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
     @Override

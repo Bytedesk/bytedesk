@@ -325,6 +325,50 @@ public class RobotService extends AbstractRobotService {
                 I18Consts.I18N_LLM_CONFIG_TIP, false);
     }
 
+    // ==================== 客服质检/分析相关 ====================
+
+    /**
+     * 意图识别 - 纯文本处理，不需要知识库
+     */
+    public String intentClassification(String content, String orgUid) {
+        try {
+            validateParameters(content, orgUid);
+            return processSyncRequest(RobotConsts.ROBOT_NAME_INTENT_CLASSIFICATION, orgUid, content,
+                    I18Consts.I18N_LLM_CONFIG_TIP, false);
+        } catch (Exception e) {
+            log.error("Error in intentClassification", e);
+            throw new RuntimeException("Service error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 情绪分析 - 纯文本处理，不需要知识库
+     */
+    public String emotionAnalysis(String content, String orgUid) {
+        try {
+            validateParameters(content, orgUid);
+            return processSyncRequest(RobotConsts.ROBOT_NAME_EMOTION_ANALYSIS, orgUid, content,
+                    I18Consts.I18N_LLM_CONFIG_TIP, false);
+        } catch (Exception e) {
+            log.error("Error in emotionAnalysis", e);
+            throw new RuntimeException("Service error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 会话小结 - 纯文本处理，不需要知识库
+     */
+    public String threadSummary(String content, String orgUid) {
+        try {
+            validateParameters(content, orgUid);
+            return processSyncRequest(RobotConsts.ROBOT_NAME_THREAD_SUMMARY, orgUid, content,
+                    I18Consts.I18N_LLM_CONFIG_TIP, false);
+        } catch (Exception e) {
+            log.error("Error in threadSummary", e);
+            throw new RuntimeException("Service error: " + e.getMessage());
+        }
+    }
+
     /**
      * 备用回复服务 - 可能需要查询知识库作为备用答案
      */

@@ -34,5 +34,14 @@
     <include file="db/changelog/migration/251217_drop_kbase_settings_flags.xml" />
     <include file="db/changelog/migration/251218_drop_process_key_and_ticket_process_definition_key.xml" />
     <include file="db/changelog/migration/251218_drop_ticket_rated_and_rating.xml" />
+    <include file="db/changelog/migration/251222_migrate_authorities_to_module_action.xml" />
+    <include file="db/changelog/migration/251225_sync_authority_fields_after_module_action.xml" />
+    <include file="db/changelog/migration/251223_sync_default_role_authorities.xml" />
+    <include file="db/changelog/migration/251224_add_role_user_organization_authorities.xml" />
+    <include file="db/changelog/migration/251224_set_default_system_roles_level_platform.xml" />
+    <include file="db/changelog/migration/251224_add_role_value_to_core_role.xml" />
+    <include file="db/changelog/migration/251226_drop_service_settings_proactive_trigger.xml" />
+    <include file="db/changelog/migration/251226_update_authority_level_settings_platform_others_organization.xml" />
+    <include file="db/changelog/migration/251223_drop_bytedesk_core_quartz.xml" />
 
 </databaseChangeLog>

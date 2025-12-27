@@ -16,9 +16,6 @@ package com.bytedesk.core.thread;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.enums.PermissionEnum;
-import com.bytedesk.core.rbac.authority.AuthorityRestService;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ThreadInitializer implements SmartInitializingSingleton {
 
-    private final AuthorityRestService authorityRestService;
+    // private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -35,10 +32,10 @@ public class ThreadInitializer implements SmartInitializingSingleton {
     }
 
     private void initAuthority() {
-        for (PermissionEnum permission : PermissionEnum.values()) {
-            String permissionValue = ThreadPermissions.THREAD_PREFIX + permission.name();
-            authorityRestService.createForPlatform(permissionValue);
-        }
+        // for (PermissionEnum permission : PermissionEnum.values()) {
+        //     String permissionValue = ThreadPermissions.THREAD_PREFIX + permission.name();
+        //     authorityRestService.createForPlatform(permissionValue);
+        // }
     }
 
     

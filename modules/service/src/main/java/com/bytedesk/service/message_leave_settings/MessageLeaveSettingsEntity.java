@@ -50,7 +50,7 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
 
     @NotBlank
     @Builder.Default
-    private String messageLeaveTip = I18Consts.I18N_LEAVEMSG_TIP;
+    private String messageLeaveTip = I18Consts.I18N_MESSAGE_LEAVE_TIP;
 
     // 处理留言agent
     @Builder.Default

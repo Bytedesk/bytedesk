@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.rbac.authority;
 
-import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.base.BaseResponseNoOrg;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,16 +26,13 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthorityResponse extends BaseResponse {
+public class AuthorityResponse extends BaseResponseNoOrg {
 
     private static final long serialVersionUID = 1L;
-
 
     private String name;
 
     private String value;
 
-    // private String level;
-
-    // private String description;
+    private String description;
 }

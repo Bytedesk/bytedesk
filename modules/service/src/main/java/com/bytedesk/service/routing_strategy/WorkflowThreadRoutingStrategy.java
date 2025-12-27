@@ -211,11 +211,11 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
     private void updateQueueMemberForWorkflow(QueueMemberEntity queueMemberEntity) {
         try {
             queueMemberEntity.workflowAutoAcceptThread();
-            queueMemberRestService.save(queueMemberEntity);
-            log.debug("Updated queue member status for workflow auto-accept: {}", queueMemberEntity.getUid());
+            queueMemberRestService.saveAsyncBestEffort(queueMemberEntity);
+            log.debug("Queued async queue member update for workflow auto-accept: {}", queueMemberEntity.getUid());
         } catch (Exception e) {
-            log.error("Failed to update queue member for workflow auto-accept: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to update queue member status", e);
+            // best-effort: 不影响主流程
+            log.warn("Failed to queue async update for workflow auto-accept: {}", e.getMessage(), e);
         }
     }
 

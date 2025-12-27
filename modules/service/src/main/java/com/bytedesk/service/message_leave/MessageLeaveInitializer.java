@@ -30,14 +30,14 @@ public class MessageLeaveInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         init();
-        initPermissions();
+        initAuthority();
     }
 
     private void init() {}
 
-    private void initPermissions() {
+    private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
-            String permissionValue = MessageLeavePermissions.LEAVEMSG_PREFIX + permission.name();
+            String permissionValue = MessageLeavePermissions.MESSAGE_LEAVE_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);
         }
     }

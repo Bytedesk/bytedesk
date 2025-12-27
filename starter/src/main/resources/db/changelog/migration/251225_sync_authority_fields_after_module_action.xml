@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251225-sync-authority-fields-after-module-action" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_authority" />
+        </preConditions>
+        <comment>
+            Sync authority uuid/name/description/level_type with unified authority_value (MODULE_ACTION).
+            After 251222 normalization, make records consistent with AuthorityRestService.createForPlatform:
+            - uuid = lower(authority_value)
+            - name = i18n.&lt;authority_value&gt;
+            - description = Permission for &lt;authority_value&gt;
+            - level_type = PLATFORM
+        </comment>
+        <sql>
+            UPDATE bytedesk_core_authority
+            SET
+                uuid = LOWER(authority_value),
+                name = CONCAT('i18n.', authority_value),
+                description = CONCAT('Permission for ', authority_value),
+                level_type = 'PLATFORM'
+            WHERE is_deleted = 0
+                AND authority_value IS NOT NULL
+                AND authority_value &lt;&gt; ''
+                AND (
+                    uuid &lt;&gt; LOWER(authority_value)
+                    OR name &lt;&gt; CONCAT('i18n.', authority_value)
+                    OR description &lt;&gt; CONCAT('Permission for ', authority_value)
+                    OR level_type &lt;&gt; 'PLATFORM'
+                );
+        </sql>
+        <rollback>
+            <comment>No rollback - sync to canonical authority fields</comment>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

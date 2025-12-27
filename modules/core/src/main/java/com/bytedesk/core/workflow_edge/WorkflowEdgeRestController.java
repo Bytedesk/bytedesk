@@ -72,7 +72,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
     @ActionAnnotation(title = "Workflow Edge", action = "新建", description = "create workflow_edge")
     @Operation(summary = "Create WorkflowEdge", description = "Create a new workflow_edge")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    // @PreAuthorize(WorkflowEdgePermissions.HAS_WORKFLOW_EDGE_CREATE)
     public ResponseEntity<?> create(WorkflowEdgeRequest request) {
         
         WorkflowEdgeResponse workflow_edge = workflow_edgeRestService.create(request);
@@ -83,7 +83,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
     @ActionAnnotation(title = "Workflow Edge", action = "更新", description = "update workflow_edge")
     @Operation(summary = "Update WorkflowEdge", description = "Update an existing workflow_edge")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    // @PreAuthorize(WorkflowEdgePermissions.HAS_WORKFLOW_EDGE_UPDATE)
     public ResponseEntity<?> update(WorkflowEdgeRequest request) {
         
         WorkflowEdgeResponse workflow_edge = workflow_edgeRestService.update(request);
@@ -94,7 +94,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
     @ActionAnnotation(title = "Workflow Edge", action = "删除", description = "delete workflow_edge")
     @Operation(summary = "Delete WorkflowEdge", description = "Delete a workflow_edge")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    // @PreAuthorize(WorkflowEdgePermissions.HAS_WORKFLOW_EDGE_DELETE)
     public ResponseEntity<?> delete(WorkflowEdgeRequest request) {
         
         workflow_edgeRestService.delete(request);
@@ -105,7 +105,7 @@ public class WorkflowEdgeRestController extends BaseRestController<WorkflowEdgeR
     @ActionAnnotation(title = "Workflow Edge", action = "导出", description = "export workflow_edge")
     @Operation(summary = "Export WorkflowEdges", description = "Export workflow_edges to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    // @PreAuthorize(WorkflowEdgePermissions.HAS_WORKFLOW_EDGE_EXPORT)
     @GetMapping("/export")
     public Object export(WorkflowEdgeRequest request, HttpServletResponse response) {
         return exportTemplate(

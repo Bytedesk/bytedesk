@@ -15,10 +15,10 @@ package com.bytedesk.service.visitor_thread;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
@@ -42,6 +42,11 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.kbase.settings_trigger.TriggerSettingsEntity;
+import com.bytedesk.kbase.trigger.TriggerEntity;
+import com.bytedesk.kbase.trigger.TriggerKeyConsts;
+import com.bytedesk.kbase.trigger.config.TriggerConfigRegistry;
+import com.bytedesk.kbase.trigger.config.VisitorNoResponseProactiveMessageConfig;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -136,45 +141,15 @@ public class VisitorThreadEventListener {
      * 使用缓存数据处理主动触发逻辑
      */
     private void processProactiveTriggerFromCache(ActiveThreadCache cache) {
-        // 使用缓存中的时间戳计算
-        long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
-        long updatedAtMillis = cache.getUpdatedAtMillis();
-
-        long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
-
-        if (diffInMilliseconds < 0) {
-            log.warn("Thread {} updatedAt is in the future, skipping proactive trigger check", cache.getUid());
-            return;
-        }
-
-        long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
-
-        // 处理主动触发（需要从数据库获取完整信息）
-        handleProactiveTriggerFromCache(cache, diffInSeconds);
+        // 主动触发改为使用 QueueMember.visitorLastMessageAt 判断，避免被客服/系统消息刷新 updatedAt 干扰
+        handleProactiveTriggerFromCache(cache);
     }
 
     /**
      * 处理单个线程的主动触发逻辑
      */
     private void processProactiveTrigger(ThreadEntity thread) {
-        // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
-        long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
-        long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
-
-        // 移除Math.abs()，确保时间顺序正确
-        long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
-
-        // 如果updatedAt在未来，说明时间有问题，跳过处理
-        if (diffInMilliseconds < 0) {
-            log.warn("Thread {} updatedAt is in the future, skipping proactive trigger check", thread.getUid());
-            return;
-        }
-
-        // Convert to seconds
-        long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilliseconds);
-
-        // 处理主动触发
-        handleProactiveTrigger(thread, diffInSeconds);
+        handleProactiveTrigger(thread);
     }
 
     /**
@@ -191,7 +166,7 @@ public class VisitorThreadEventListener {
                 queueMember.setAgentClosedAt(BdDateUtils.now());
                 queueMember.setAgentClose(true);
             }
-            queueMemberRestService.save(queueMember);
+            queueMemberRestService.saveAsyncBestEffort(queueMember);
         }
     }
 
@@ -292,15 +267,15 @@ public class VisitorThreadEventListener {
     /**
      * 处理主动触发消息
      */
-    private void handleProactiveTrigger(ThreadEntity thread, long diffInSeconds) {
+    private void handleProactiveTrigger(ThreadEntity thread) {
         String topic = thread.getTopic();
 
         if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-            handleWorkgroupProactiveTrigger(thread, topic, diffInSeconds);
+            handleWorkgroupProactiveTrigger(thread, topic);
         } else if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
-            handleAgentProactiveTrigger(thread, topic, diffInSeconds);
+            handleAgentProactiveTrigger(thread, topic);
         } else if (thread.getType().equals(ThreadTypeEnum.ROBOT.name())) {
-            handleRobotProactiveTrigger(thread, topic, diffInSeconds);
+            handleRobotProactiveTrigger(thread, topic);
         }
     }
 
@@ -308,40 +283,48 @@ public class VisitorThreadEventListener {
      * 使用缓存数据处理主动触发消息
      * 根据类型从缓存中判断是否需要触发，仅在需要时才查询数据库获取完整信息
      */
-    private void handleProactiveTriggerFromCache(ActiveThreadCache cache, long diffInSeconds) {
+    private void handleProactiveTriggerFromCache(ActiveThreadCache cache) {
         String topic = cache.getTopic();
         String type = cache.getType();
 
         if (ThreadTypeEnum.WORKGROUP.name().equals(type)) {
-            handleWorkgroupProactiveTriggerFromCache(cache, topic, diffInSeconds);
+            handleWorkgroupProactiveTriggerFromCache(cache, topic);
         } else if (ThreadTypeEnum.AGENT.name().equals(type)) {
-            handleAgentProactiveTriggerFromCache(cache, topic, diffInSeconds);
+            handleAgentProactiveTriggerFromCache(cache, topic);
         } else if (ThreadTypeEnum.ROBOT.name().equals(type)) {
-            handleRobotProactiveTriggerFromCache(cache, topic, diffInSeconds);
+            handleRobotProactiveTriggerFromCache(cache, topic);
         }
     }
 
     /**
      * 处理工作组主动触发（使用缓存）
      */
-    private void handleWorkgroupProactiveTriggerFromCache(ActiveThreadCache cache, String topic, long diffInSeconds) {
+    private void handleWorkgroupProactiveTriggerFromCache(ActiveThreadCache cache, String topic) {
         String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
 
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
-            if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
-                if (workgroup.getSettings().getServiceSettings().getEnableProactiveTrigger()
-                        && diffInSeconds > workgroup.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    // 需要发送消息时才从数据库获取完整的 ThreadEntity
-                    threadRestService.findByUid(cache.getUid()).ifPresent(thread -> {
-                        log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message",
-                                thread.getUid());
-                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                                workgroup.getSettings().getServiceSettings().getProactiveMessage());
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    });
+            if (workgroup.getSettings() != null && workgroup.getSettings().getTriggerSettings() != null) {
+                var triggerSettings = workgroup.getSettings().getTriggerSettings();
+                Optional<NoResponseProactiveTriggerConfig> configOpt = resolveNoResponseProactiveTriggerConfig(triggerSettings);
+                if (configOpt.isEmpty()) {
+                    return;
                 }
+                NoResponseProactiveTriggerConfig config = configOpt.get();
+
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds())) {
+                    return;
+                }
+
+                // 需要发送消息时才从数据库获取完整的 ThreadEntity
+                threadRestService.findByUid(cache.getUid()).ifPresent(thread -> {
+                    log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message",
+                            thread.getUid());
+                    String message = config.message();
+                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, message);
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                });
             }
         }
     }
@@ -349,24 +332,32 @@ public class VisitorThreadEventListener {
     /**
      * 处理客服主动触发（使用缓存）
      */
-    private void handleAgentProactiveTriggerFromCache(ActiveThreadCache cache, String topic, long diffInSeconds) {
+    private void handleAgentProactiveTriggerFromCache(ActiveThreadCache cache, String topic) {
         String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
 
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
-            if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
-                if (agent.getSettings().getServiceSettings().getEnableProactiveTrigger()
-                        && diffInSeconds > agent.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    // 需要发送消息时才从数据库获取完整的 ThreadEntity
-                    threadRestService.findByUid(cache.getUid()).ifPresent(thread -> {
-                        log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message",
-                                thread.getUid());
-                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                                agent.getSettings().getServiceSettings().getProactiveMessage());
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    });
+            if (agent.getSettings() != null && agent.getSettings().getTriggerSettings() != null) {
+                var triggerSettings = agent.getSettings().getTriggerSettings();
+                Optional<NoResponseProactiveTriggerConfig> configOpt = resolveNoResponseProactiveTriggerConfig(triggerSettings);
+                if (configOpt.isEmpty()) {
+                    return;
                 }
+                NoResponseProactiveTriggerConfig config = configOpt.get();
+
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds())) {
+                    return;
+                }
+
+                // 需要发送消息时才从数据库获取完整的 ThreadEntity
+                threadRestService.findByUid(cache.getUid()).ifPresent(thread -> {
+                    log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message",
+                            thread.getUid());
+                    String message = config.message();
+                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, message);
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                });
             }
         }
     }
@@ -374,24 +365,32 @@ public class VisitorThreadEventListener {
     /**
      * 处理机器人主动触发（使用缓存）
      */
-    private void handleRobotProactiveTriggerFromCache(ActiveThreadCache cache, String topic, long diffInSeconds) {
+    private void handleRobotProactiveTriggerFromCache(ActiveThreadCache cache, String topic) {
         String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
         Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
 
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
-            if (robot.getSettings() != null && robot.getSettings().getServiceSettings() != null) {
-                if (robot.getSettings().getServiceSettings().getEnableProactiveTrigger()
-                        && diffInSeconds > robot.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    // 需要发送消息时才从数据库获取完整的 ThreadEntity
-                    threadRestService.findByUid(cache.getUid()).ifPresent(thread -> {
-                        log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message",
-                                thread.getUid());
-                        MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                                robot.getSettings().getServiceSettings().getProactiveMessage());
-                        messageSendService.sendProtobufMessage(messageProtobuf);
-                    });
+            if (robot.getSettings() != null && robot.getSettings().getTriggerSettings() != null) {
+                var triggerSettings = robot.getSettings().getTriggerSettings();
+                Optional<NoResponseProactiveTriggerConfig> configOpt = resolveNoResponseProactiveTriggerConfig(triggerSettings);
+                if (configOpt.isEmpty()) {
+                    return;
                 }
+                NoResponseProactiveTriggerConfig config = configOpt.get();
+
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds())) {
+                    return;
+                }
+
+                // 需要发送消息时才从数据库获取完整的 ThreadEntity
+                threadRestService.findByUid(cache.getUid()).ifPresent(thread -> {
+                    log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message",
+                            thread.getUid());
+                    String message = config.message();
+                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, message);
+                    messageSendService.sendProtobufMessage(messageProtobuf);
+                });
             }
         }
     }
@@ -399,21 +398,29 @@ public class VisitorThreadEventListener {
     /**
      * 处理工作组主动触发
      */
-    private void handleWorkgroupProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
+    private void handleWorkgroupProactiveTrigger(ThreadEntity thread, String topic) {
         String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(topic);
         Optional<WorkgroupEntity> workgroupOptional = workgroupRestService.findByUid(workgroupUid);
 
         if (workgroupOptional.isPresent()) {
             WorkgroupEntity workgroup = workgroupOptional.get();
-            if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
-                if (workgroup.getSettings().getServiceSettings().getEnableProactiveTrigger()
-                        && diffInSeconds > workgroup.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message",
-                            thread.getUid());
-                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                            workgroup.getSettings().getServiceSettings().getProactiveMessage());
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+            if (workgroup.getSettings() != null && workgroup.getSettings().getTriggerSettings() != null) {
+                var triggerSettings = workgroup.getSettings().getTriggerSettings();
+                Optional<NoResponseProactiveTriggerConfig> configOpt = resolveNoResponseProactiveTriggerConfig(triggerSettings);
+                if (configOpt.isEmpty()) {
+                    return;
                 }
+                NoResponseProactiveTriggerConfig config = configOpt.get();
+
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(thread.getUid(), config.timeoutSeconds())) {
+                    return;
+                }
+
+                log.info("visitor_thread quartz one min event thread: {} trigger workgroup proactive message",
+                        thread.getUid());
+                String message = config.message();
+                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, message);
+                messageSendService.sendProtobufMessage(messageProtobuf);
             }
         }
     }
@@ -421,21 +428,29 @@ public class VisitorThreadEventListener {
     /**
      * 处理客服主动触发
      */
-    private void handleAgentProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
+    private void handleAgentProactiveTrigger(ThreadEntity thread, String topic) {
         String agentUid = TopicUtils.getAgentUidFromThreadTopic(topic);
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(agentUid);
 
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
-            if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
-                if (agent.getSettings().getServiceSettings().getEnableProactiveTrigger()
-                        && diffInSeconds > agent.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message",
-                            thread.getUid());
-                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                            agent.getSettings().getServiceSettings().getProactiveMessage());
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+            if (agent.getSettings() != null && agent.getSettings().getTriggerSettings() != null) {
+                var triggerSettings = agent.getSettings().getTriggerSettings();
+                Optional<NoResponseProactiveTriggerConfig> configOpt = resolveNoResponseProactiveTriggerConfig(triggerSettings);
+                if (configOpt.isEmpty()) {
+                    return;
                 }
+                NoResponseProactiveTriggerConfig config = configOpt.get();
+
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(thread.getUid(), config.timeoutSeconds())) {
+                    return;
+                }
+
+                log.info("visitor_thread quartz one min event thread: {} trigger agent proactive message",
+                        thread.getUid());
+                String message = config.message();
+                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, message);
+                messageSendService.sendProtobufMessage(messageProtobuf);
             }
         }
     }
@@ -443,23 +458,69 @@ public class VisitorThreadEventListener {
     /**
      * 处理机器人主动触发
      */
-    private void handleRobotProactiveTrigger(ThreadEntity thread, String topic, long diffInSeconds) {
+    private void handleRobotProactiveTrigger(ThreadEntity thread, String topic) {
         String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
         Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
 
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
-            if (robot.getSettings() != null && robot.getSettings().getServiceSettings() != null) {
-                if (robot.getSettings().getServiceSettings().getEnableProactiveTrigger()
-                        && diffInSeconds > robot.getSettings().getServiceSettings().getNoResponseTimeout()) {
-                    log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message",
-                            thread.getUid());
-                    MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread,
-                            robot.getSettings().getServiceSettings().getProactiveMessage());
-                    messageSendService.sendProtobufMessage(messageProtobuf);
+            if (robot.getSettings() != null && robot.getSettings().getTriggerSettings() != null) {
+                var triggerSettings = robot.getSettings().getTriggerSettings();
+                Optional<NoResponseProactiveTriggerConfig> configOpt = resolveNoResponseProactiveTriggerConfig(triggerSettings);
+                if (configOpt.isEmpty()) {
+                    return;
+                }
+                NoResponseProactiveTriggerConfig config = configOpt.get();
+
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(thread.getUid(), config.timeoutSeconds())) {
+                    return;
+                }
+
+                log.info("visitor_thread quartz one min event thread: {} trigger robot proactive message",
+                        thread.getUid());
+                String message = config.message();
+                MessageProtobuf messageProtobuf = MessageUtils.createSystemMessage(thread, message);
+                messageSendService.sendProtobufMessage(messageProtobuf);
+            }
+        }
+    }
+
+    private record NoResponseProactiveTriggerConfig(int timeoutSeconds, String message) {
+    }
+
+    private Optional<NoResponseProactiveTriggerConfig> resolveNoResponseProactiveTriggerConfig(
+            TriggerSettingsEntity triggerSettings) {
+        if (triggerSettings == null || triggerSettings.getTriggers() == null || triggerSettings.getTriggers().isEmpty()) {
+            return Optional.empty();
+        }
+
+        TriggerEntity trigger = triggerSettings.getTriggers().stream()
+                .filter(t -> t != null && TriggerKeyConsts.VISITOR_NO_RESPONSE_PROACTIVE_MESSAGE.equals(t.getTriggerKey()))
+                .findFirst()
+                .orElse(null);
+
+        if (trigger == null || !Boolean.TRUE.equals(trigger.getEnabled())) {
+            return Optional.empty();
+        }
+
+        int timeoutSeconds = VisitorNoResponseProactiveMessageConfig.DEFAULT_NO_RESPONSE_TIMEOUT;
+        String message = VisitorNoResponseProactiveMessageConfig.DEFAULT_PROACTIVE_MESSAGE;
+
+        if (StringUtils.hasText(trigger.getConfig())) {
+            Object parsed = TriggerConfigRegistry
+                    .parse(trigger.getTriggerKey(), trigger.getConfig())
+                    .orElse(null);
+            if (parsed instanceof VisitorNoResponseProactiveMessageConfig payload) {
+                if (payload.noResponseTimeout != null && payload.noResponseTimeout > 0) {
+                    timeoutSeconds = payload.noResponseTimeout;
+                }
+                if (StringUtils.hasText(payload.proactiveMessage)) {
+                    message = payload.proactiveMessage;
                 }
             }
         }
+
+        return Optional.of(new NoResponseProactiveTriggerConfig(timeoutSeconds, message));
     }
 
 }

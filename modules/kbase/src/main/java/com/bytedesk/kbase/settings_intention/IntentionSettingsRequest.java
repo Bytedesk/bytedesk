@@ -15,6 +15,9 @@ package com.bytedesk.kbase.settings_intention;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.kbase.settings_trigger.ExecutionTimingConsts;
+import com.bytedesk.kbase.settings_trigger.TriggerScopeConsts;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -35,19 +38,58 @@ public class IntentionSettingsRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
+    /**
+     * 绑定用于意图识别的机器人（RobotEntity.uid）
+     */
+    private String robotUid;
+
+    /**
+     * 是否启用意图识别
+     */
+    @Builder.Default
+    private Boolean enabled = true;
+
+    /**
+     * 执行时机
+     * - ON_MESSAGE: 收到新消息时
+     * - THREAD_END: 会话结束时
+     */
+    @Builder.Default
+    private String executionTiming = ExecutionTimingConsts.ON_MESSAGE;
+
+    /**
+     * 触发范围
+     * - VISITOR_ONLY: 仅访客消息
+     * - AGENT_ONLY: 仅客服消息
+     * - ALL: 所有非系统消息
+     */
+    @Builder.Default
+    private String triggerScope = TriggerScopeConsts.VISITOR_ONLY;
+
+    /**
+     * 触发频率：每隔 N 条消息触发一次
+     */
+    @Builder.Default
+    private Integer triggerEveryNMessages = 1;
+
+    /**
+     * 触发冷却时间（秒）
+     */
+    @Builder.Default
+    private Integer triggerCooldownSeconds = 0;
+
+    /**
+     * 是否仅按时间冷却触发（忽略 triggerEveryNMessages）
+     */
+    @Builder.Default
+    private Boolean triggerCooldownOnly = false;
+
     // @Builder.Default
     // private String type = IntentionSettingsTypeEnum.CUSTOMER.name();
-
-    @Builder.Default
-    private String color = "red";
-
-    @Builder.Default
-    private Integer order = 0;
 
 }

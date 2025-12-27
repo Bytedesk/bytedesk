@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.utils;
 
-import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
@@ -28,8 +27,9 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.kbase.settings.ServiceSettingsEntity;
-import com.bytedesk.kbase.settings.ServiceTrigger;
+import com.bytedesk.kbase.settings_trigger.TriggerSettingsEntity;
+import com.bytedesk.kbase.trigger.TriggerKeyConsts;
+
 import lombok.experimental.UtilityClass;
 
 // 可以根据需要选择是否使用 @Component 注解
@@ -247,8 +247,16 @@ public class ThreadMessageUtil {
     }
 
     // 检查无响应触发
-    public static void checkNoResponse(String userUid, long lastActiveTime, ServiceSettingsEntity settings) {
-        if (!settings.getEnableProactiveTrigger()) {
+    public static void checkNoResponse(String userUid, long lastActiveTime, TriggerSettingsEntity settings) {
+        if (settings == null || settings.getTriggers() == null || settings.getTriggers().isEmpty()) {
+            return;
+        }
+
+        boolean enabled = settings.getTriggers().stream()
+                .anyMatch(t -> t != null
+                        && TriggerKeyConsts.VISITOR_NO_RESPONSE_PROACTIVE_MESSAGE.equals(t.getTriggerKey())
+                        && Boolean.TRUE.equals(t.getEnabled()));
+        if (!enabled) {
             return;
         }
 
@@ -265,19 +273,19 @@ public class ThreadMessageUtil {
         // return;
         // }
 
-        ServiceTrigger trigger = JSON.parseObject(
-                settings.getTriggerConditions(),
-                ServiceTrigger.class);
+        // ServiceTrigger trigger = JSON.parseObject(
+        //         settings.getTriggerConditions(),
+        //         ServiceTrigger.class);
 
         // 检查无响应触发
-        trigger.getConditions().stream()
-                .filter(c -> c.getType().equals(ServiceTrigger.TriggerCondition.TYPE_NO_RESPONSE))
-                .filter(c -> (System.currentTimeMillis() - lastActiveTime) / 1000 > c.getTimeout())
-                .findFirst()
-                .ifPresent(condition -> {
-                    // TODO: 发送主动推送消息
-                    // sendProactiveMessage(userId, condition.getMessage());
-                });
+        // trigger.getConditions().stream()
+        //         .filter(c -> c.getType().equals(ServiceTrigger.TriggerCondition.TYPE_NO_RESPONSE))
+        //         .filter(c -> (System.currentTimeMillis() - lastActiveTime) / 1000 > c.getTimeout())
+        //         .findFirst()
+        //         .ifPresent(condition -> {
+        //             // TODO: 发送主动推送消息
+        //             // sendProactiveMessage(userId, condition.getMessage());
+        //         });
     }
 
 }

@@ -58,7 +58,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
-    @PreAuthorize(FaqPermissions.HAS_FAQ_READ_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
     @ActionAnnotation(title = "常见问题", action = "组织查询", description = "query faq by org")
     @Override
     public ResponseEntity<?> queryByOrg(FaqRequest request) {
@@ -72,7 +72,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
-    @PreAuthorize(FaqPermissions.HAS_FAQ_READ_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
     @ActionAnnotation(title = "常见问题", action = "用户查询", description = "query faq by user")
     @Override
     public ResponseEntity<?> queryByUser(FaqRequest request) {
@@ -86,7 +86,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
-    @PreAuthorize(FaqPermissions.HAS_FAQ_READ_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
     @ActionAnnotation(title = "常见问题", action = "查询详情", description = "query faq by uid")
     @Override
     public ResponseEntity<?> queryByUid(FaqRequest request) {
@@ -100,7 +100,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
-    @PreAuthorize(FaqPermissions.HAS_FAQ_CREATE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_CREATE)
     @ActionAnnotation(title = "常见问题", action = "新建", description = "create faq")
     @Override
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
@@ -114,7 +114,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
-    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
     @ActionAnnotation(title = "常见问题", action = "更新", description = "update faq")
     @Override
     public ResponseEntity<?> update(@RequestBody FaqRequest request) {
@@ -126,7 +126,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     @Operation(summary = "删除常见问题", description = "删除指定的常见问题")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @PreAuthorize(FaqPermissions.HAS_FAQ_DELETE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_DELETE)
     @ActionAnnotation(title = "常见问题", action = "删除", description = "delete faq")
     @Override
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
@@ -138,7 +138,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     @Operation(summary = "删除所有常见问题", description = "删除所有常见问题")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @PreAuthorize(FaqPermissions.HAS_FAQ_DELETE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_DELETE)
     @ActionAnnotation(title = "常见问题", action = "删除所有", description = "delete faq all")
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(@RequestBody FaqRequest request) {
@@ -152,7 +152,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @ApiResponse(responseCode = "200", description = "操作成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
-    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
     @ActionAnnotation(title = "常见问题", action = "启用", description = "enable faq")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody FaqRequest request) {
@@ -164,7 +164,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     @Operation(summary = "导出常见问题", description = "导出常见问题数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
-    @PreAuthorize(FaqPermissions.HAS_FAQ_EXPORT_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_EXPORT)
     @ActionAnnotation(title = "常见问题", action = "导出", description = "export faq")
     @GetMapping("/export")
     public Object export(FaqRequest request, HttpServletResponse response) {
@@ -180,7 +180,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     @Operation(summary = "更新常见问题索引", description = "更新常见问题的Elasticsearch索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
-    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
     @ActionAnnotation(title = "常见问题", action = "更新索引", description = "update faq index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody FaqRequest request) {
@@ -192,7 +192,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     @Operation(summary = "更新常见问题向量索引", description = "更新常见问题的向量索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
-    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
     @ActionAnnotation(title = "常见问题", action = "更新向量索引", description = "update faq vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody FaqRequest request) {
@@ -206,7 +206,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     @Operation(summary = "更新所有常见问题索引", description = "更新所有常见问题的Elasticsearch索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
-    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
     @ActionAnnotation(title = "常见问题", action = "更新所有索引", description = "update all faq index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody FaqRequest request) {
@@ -218,7 +218,7 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     @Operation(summary = "更新所有常见问题向量索引", description = "更新所有常见问题的向量索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
-    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE_ANY_LEVEL)
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
     @ActionAnnotation(title = "常见问题", action = "更新所有向量索引", description = "update all faq vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody FaqRequest request) {

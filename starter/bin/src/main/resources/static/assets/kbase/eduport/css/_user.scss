@@ -1,0 +1,94 @@
+// Should you need to overwrite any of our SCSS code or need to add any custom code, We highly recommend that you add your code into this file, so whenever theme update is available and you update the theme, You will not lose your hard work :)
+
+// Note for dark mode:
+// Uncomment below code and change primary color code to set different primary(i.e. light color of your primary) color in dark mode only.
+
+/*User CSS*/
+
+// [data-bs-theme="dark"] {
+//   --bs-primary: #19f032 !important;
+//   --bs-primary-rgb: 25, 240, 50 !important; 
+//   --bs-link-color:#19f032 !important;
+//   --bs-link-hover-color:#0c911c !important;
+//   --bs-link-color-rgb:25, 240, 50 !important;
+//   --bs-link-hover-color-rgb:12, 145, 28;
+//   --bs-nav-pills-link-active-bg: #19f032 !important;
+
+//   .navbar {
+//     --bs-navbar-hover-color: var(--#{$prefix}primary);
+//     --bs-navbar-active-color: var(--#{$prefix}primary);
+//     }
+    
+//     .navbar-dark {
+//       --bs-navbar-hover-color: var(--#{$prefix}primary) !important;
+//       --bs-navbar-active-color: var(--#{$prefix}primary) !important;
+//     }
+//     .nav{
+//       --bs-nav-link-hover-color: var(--#{$prefix}primary);
+//     }
+//     .dropdown-menu {
+//       --bs-dropdown-link-hover-color: var(--#{$prefix}primary) !important;
+//       --bs-dropdown-link-hover-bg: rgba(var(--#{$prefix}primary-rgb), 0.1) !important;
+//       --bs-dropdown-link-active-color: var(--#{$prefix}primary) !important;
+//       --bs-dropdown-link-active-bg: rgba(var(--#{$prefix}primary-rgb), 0.1) !important;
+//     }
+  
+//   .btn-primary {
+//     --bs-btn-bg: var(--#{$prefix}primary);
+//     --bs-btn-border-color: var(--#{$prefix}primary);
+//     --bs-btn-hover-bg: var(--#{$prefix}link-hover-color);
+//     --bs-btn-hover-border-color: var(--#{$prefix}link-hover-color);
+//     --bs-btn-active-bg: var(--#{$prefix}link-hover-color);
+//     --bs-btn-active-border-color: var(--#{$prefix}link-hover-color);
+//     --bs-btn-disabled-bg: var(--#{$prefix}primary);
+//   }
+//   .btn-link {
+//     --bs-btn-color: var(--#{$prefix}primary);
+//     --bs-link-color: var(--#{$prefix}primary);
+//     --bs-btn-hover-color: var(--#{$prefix}link-hover-color);
+//     --bs-btn-active-color: var(--#{$prefix}link-hover-color);
+//   }
+//   .btn-outline-primary {
+//     --bs-btn-color: var(--#{$prefix}primary);
+//     --bs-btn-border-color: var(--#{$prefix}primary);
+//     --bs-btn-hover-bg: var(--#{$prefix}primary);
+//     --bs-btn-hover-border-color: var(--#{$prefix}primary);
+//     --bs-btn-active-bg: var(--#{$prefix}primary);
+//     --bs-btn-active-border-color: var(--#{$prefix}primary);
+//     --bs-btn-disabled-color: var(--#{$prefix}primary);
+//     --bs-btn-disabled-border-color: var(--#{$prefix}primary);
+//   }
+//   .btn-primary-soft{
+//     color: var(--#{$prefix}primary);
+//     background-color: rgba(var(--#{$prefix}primary-rgb), 0.1);
+//     &:hover, &:focus{
+//       color: $white;
+//       background-color: var(--#{$prefix}primary) !important;
+//       border-color: var(--#{$prefix}primary) !important;
+//     }
+//   }
+//   .nav-pills {
+//     --bs-nav-pills-link-active-bg: var(--#{$prefix}primary);
+//   }
+//   .form-control:focus{
+//     border-color: var(--#{$prefix}primary);
+//   }
+//   .text-bg-primary{
+//     background-color: rgba(var(--#{$prefix}primary-rgb), 1) !important;
+//   }
+//   .form-check-input:checked {
+//     background-color: var(--#{$prefix}primary);
+//     border-color: var(--#{$prefix}primary);
+//   }
+//   .choices.is-focused .choices__inner{
+//     border-color: var(--#{$prefix}primary);
+//   }
+
+//   .btn-primary-shadow{
+//     background-color: var(--#{$prefix}primary);
+//     box-shadow: 0 0 0 10px rgba(var(--#{$prefix}primary-rgb), .4);
+//     &:hover ,&.active, &:focus{
+//       border-color: var(--#{$prefix}primary);
+//     }
+//   }
+// }

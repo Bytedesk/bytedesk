@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f8f9fa"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#2c3e50">医疗行业智能客服解决方案</text>
+    
+    <!-- 解决方案框架图 -->
+    <rect x="50" y="80" width="700" height="380" rx="10" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+    
+    <!-- 智能就医引导 -->
+    <rect x="80" y="120" width="320" height="150" rx="8" fill="#3498db" fill-opacity="0.1" stroke="#3498db" stroke-width="2"/>
+    <text x="240" y="150" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#3498db">智能就医引导</text>
+    
+    <rect x="100" y="180" width="130" height="70" rx="5" fill="#ffffff" stroke="#3498db" stroke-width="1"/>
+    <circle cx="115" cy="195" r="10" fill="#3498db"/>
+    <text x="115" y="199" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">1</text>
+    <text x="165" y="200" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">24小时就医助手</text>
+    <text x="165" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">全天候服务可用性99.9%</text>
+    
+    <rect x="250" y="180" width="130" height="70" rx="5" fill="#ffffff" stroke="#3498db" stroke-width="1"/>
+    <circle cx="265" cy="195" r="10" fill="#3498db"/>
+    <text x="265" y="199" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">2</text>
+    <text x="315" y="200" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">精准导诊分诊</text>
+    <text x="315" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">智能推荐科室和医生</text>
+    
+    <!-- 健康咨询辅助 -->
+    <rect x="80" y="290" width="320" height="150" rx="8" fill="#e74c3c" fill-opacity="0.1" stroke="#e74c3c" stroke-width="2"/>
+    <text x="240" y="320" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#e74c3c">健康咨询辅助</text>
+    
+    <rect x="100" y="350" width="130" height="70" rx="5" fill="#ffffff" stroke="#e74c3c" stroke-width="1"/>
+    <circle cx="115" cy="365" r="10" fill="#e74c3c"/>
+    <text x="115" y="369" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">1</text>
+    <text x="165" y="370" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">初步症状评估</text>
+    <text x="165" y="395" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">辅助分析，提供建议</text>
+    
+    <rect x="250" y="350" width="130" height="70" rx="5" fill="#ffffff" stroke="#e74c3c" stroke-width="1"/>
+    <circle cx="265" cy="365" r="10" fill="#e74c3c"/>
+    <text x="265" y="369" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">2</text>
+    <text x="315" y="370" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">用药指导助手</text>
+    <text x="315" y="395" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">解答常见用药问题</text>
+    
+    <!-- 医疗数据智能分析 -->
+    <rect x="420" y="120" width="320" height="150" rx="8" fill="#2ecc71" fill-opacity="0.1" stroke="#2ecc71" stroke-width="2"/>
+    <text x="580" y="150" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#2ecc71">医疗数据智能分析</text>
+    
+    <rect x="440" y="180" width="130" height="70" rx="5" fill="#ffffff" stroke="#2ecc71" stroke-width="1"/>
+    <circle cx="455" cy="195" r="10" fill="#2ecc71"/>
+    <text x="455" y="199" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">1</text>
+    <text x="505" y="200" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">患者需求分析</text>
+    <text x="505" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">挖掘患者真实需求</text>
+    
+    <rect x="590" y="180" width="130" height="70" rx="5" fill="#ffffff" stroke="#2ecc71" stroke-width="1"/>
+    <circle cx="605" cy="195" r="10" fill="#2ecc71"/>
+    <text x="605" y="199" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">2</text>
+    <text x="655" y="200" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">医疗资源调配</text>
+    <text x="655" y="225" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">合理调配医疗资源</text>
+    
+    <!-- 患者全生命周期管理 -->
+    <rect x="420" y="290" width="320" height="150" rx="8" fill="#9b59b6" fill-opacity="0.1" stroke="#9b59b6" stroke-width="2"/>
+    <text x="580" y="320" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#9b59b6">患者全生命周期管理</text>
+    
+    <rect x="440" y="350" width="130" height="70" rx="5" fill="#ffffff" stroke="#9b59b6" stroke-width="1"/>
+    <circle cx="455" cy="365" r="10" fill="#9b59b6"/>
+    <text x="455" y="369" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">1</text>
+    <text x="505" y="370" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">健康档案管理</text>
+    <text x="505" y="395" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">智能汇总就医记录</text>
+    
+    <rect x="590" y="350" width="130" height="70" rx="5" fill="#ffffff" stroke="#9b59b6" stroke-width="1"/>
+    <circle cx="605" cy="365" r="10" fill="#9b59b6"/>
+    <text x="605" y="369" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#ffffff">2</text>
+    <text x="655" y="370" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">就医提醒服务</text>
+    <text x="655" y="395" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">智能推送复诊提醒</text>
+    
+    <!-- 底部说明 -->
+    <text x="400" y="470" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#7f8c8d">微语AI医疗行业智能客服解决方案 - 提升医疗服务效率与患者体验</text>
+</svg>

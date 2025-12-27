@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,6 +49,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
+import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
@@ -577,7 +578,7 @@ public class ThreadRestService
                 .uid(thread.getUid())
                 .topic(thread.getTopic())
                 .userUid(user != null ? user.getUid() : null)
-                .closeType(com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name())
+                .closeType(ThreadCloseTypeEnum.AUTO.name())
                 .status(ThreadProcessStatusEnum.CLOSED.name())
                 .build();
         return closeByUid(threadRequest);
@@ -706,25 +707,25 @@ public class ThreadRestService
         return threadRepository.existsByUid(uid);
     }
 
-    @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
+    // @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicAndOwner(@NonNull String topic, UserEntity user) {
         return threadRepository.findFirstByTopicAndOwnerAndDeletedOrderByUpdatedAtDesc(topic, user, false);
     }
 
     // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a
     // unique result: 4 results were returned
-    @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
+    // @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
     public List<ThreadEntity> findListByTopic(@NonNull String topic) {
         return threadRepository.findByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
-    @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
+    // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
         return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
     // 找到某个访客当前对应某工作组未关闭会话
-    @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
+    // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
     public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
         List<String> states = Arrays.asList(new String[] { ThreadProcessStatusEnum.CLOSED.name(), 
                 ThreadProcessStatusEnum.TIMEOUT.name() });
@@ -736,7 +737,7 @@ public class ThreadRestService
         return threadRepository.findByTopicStartsWithAndStatusAndDeletedFalse(topicPrefix, status);
     }
 
-    @Cacheable(value = "thread", key = "#user.uid + '-' + #pageable.getPageNumber()", unless = "#result == null")
+    // @Cacheable(value = "thread", key = "#user.uid + '-' + #pageable.getPageNumber()", unless = "#result == null")
     public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
         return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
     }

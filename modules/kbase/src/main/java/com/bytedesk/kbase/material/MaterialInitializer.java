@@ -17,7 +17,6 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
-
 import lombok.AllArgsConstructor;
 
 @Component
@@ -26,18 +25,20 @@ public class MaterialInitializer implements SmartInitializingSingleton {
 
     private final MaterialRestService materialRestService;
 
+    // private final AuthorityRestService authorityRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
-        initPermissions();
+        initAuthority();
         // 创建默认的工单分类
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         materialRestService.initMaterials(orgUid);
     }
 
-    private void initPermissions() {
+    private void initAuthority() {
         // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = MaterialPermissions.ARTICLE_PREFIX + permission.name();
-        //     authorityService.createForPlatform(permissionValue);
+        //     String permissionValue = MaterialPermissions.MATERIAL_PREFIX + permission.name();
+        //     authorityRestService.createForPlatform(permissionValue);
         // }
     }
 
