@@ -40,21 +40,21 @@ public class SimpleExample {
         channel.addEventListener(new MrcpEventListener() {
             @Override
             public void eventReceived(MrcpEvent event) {
-                System.out.println("收到事件: " + event.getEventName());
+                log.info("收到事件: {}", event.getEventName());
                 if (event.getContent() != null) {
-                    System.out.println("事件内容: " + event.getContent());
+                    log.debug("事件内容: {}", event.getContent());
                 }
             }
         });
         
-        System.out.println("MRCP客户端初始化完成");
+        log.info("MRCP客户端初始化完成");
     }
 
     /**
      * 执行语音识别
      */
     public void recognize() throws Exception {
-        System.out.println("开始语音识别...");
+        log.info("开始语音识别...");
         
         // 使用 channel 创建请求
         MrcpRequest request = channel.createVendorSpecificRequest("RECOGNIZE");
@@ -82,14 +82,14 @@ public class SimpleExample {
 
         // 发送请求
         MrcpResponse response = channel.sendRequest(request);
-        System.out.println("识别请求响应: " + response.getStatusCode());
+        log.info("识别请求响应: {}", response.getStatusCode());
     }
 
     /**
      * 执行语音合成
      */
     public void synthesize() throws Exception {
-        System.out.println("开始语音合成...");
+        log.info("开始语音合成...");
         
         // 使用 channel 创建请求
         MrcpRequest request = channel.createVendorSpecificRequest("SPEAK");
@@ -110,7 +110,7 @@ public class SimpleExample {
 
         // 发送请求
         MrcpResponse response = channel.sendRequest(request);
-        System.out.println("合成请求响应: " + response.getStatusCode());
+        log.info("合成请求响应: {}", response.getStatusCode());
     }
 
     /**
@@ -131,7 +131,7 @@ public class SimpleExample {
             example.synthesize();
             Thread.sleep(5000); // 等待合成完成
             
-            System.out.println("示例执行完成");
+            log.info("示例执行完成");
             
         } catch (Exception e) {
             log.error("SimpleExample 执行异常", e);

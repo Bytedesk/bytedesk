@@ -158,6 +158,11 @@ public class I18Consts {
     // 群组相关
     public static final String I18N_GROUP_NAME = "群组名称"; // 群组名称
     public static final String I18N_GROUP_DESCRIPTION = "群组描述"; // 群组描述
+    // 工单相关
+    public static final String I18N_TICKET_SETTINGS_EXTERNAL_NAME = "默认外部工单配置"; // 外部工单配置名称
+    public static final String I18N_TICKET_SETTINGS_EXTERNAL_DESCRIPTION = "系统默认外部工单配置"; // 外部工单配置描述
+    public static final String I18N_TICKET_SETTINGS_INTERNAL_NAME = "默认内部工单配置"; // 内部工单配置名称
+    public static final String I18N_TICKET_SETTINGS_INTERNAL_DESCRIPTION = "系统默认内部工单配置"; // 内部工单配置描述
     // 通知相关
     public static final String I18N_NOTICE_TITLE = "通知标题"; // 通知标题
     public static final String I18N_NOTICE_TYPE = "通知类型"; // 通知类型

@@ -26,13 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class PushEventListener {
 
-    private final PushRestService pushService;
+    private final PushRestService pushRestService;
 
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        // log.info("push quartz one min event");
         // auto outdate code
-        pushService.autoOutdateCode();
+        pushRestService.autoOutdateCode();
     }
     
 }

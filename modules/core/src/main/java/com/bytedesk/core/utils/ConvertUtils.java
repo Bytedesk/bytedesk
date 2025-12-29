@@ -21,6 +21,7 @@ import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.config.properties.BytedeskPropertiesResponse;
@@ -52,6 +53,25 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ConvertUtils {
+
+    private static String firstNonBlank(String... candidates) {
+        if (candidates == null) {
+            return null;
+        }
+        for (String candidate : candidates) {
+            if (StringUtils.hasText(candidate)) {
+                return candidate.trim();
+            }
+        }
+        return null;
+    }
+
+    private static void addGrantedAuthorityIfPresent(Set<GrantedAuthority> authorities, String value) {
+        if (!StringUtils.hasText(value)) {
+            return;
+        }
+        authorities.add(new SimpleGrantedAuthority(value.trim()));
+    }
 
     private static ModelMapper getModelMapper() {
         return ApplicationContextHolder.getBean(ModelMapper.class);
@@ -208,11 +228,22 @@ public class ConvertUtils {
         // currentRoles already reflects the active organization; merge their authorities and role names
         if (user.getCurrentRoles() != null) {
             user.getCurrentRoles().forEach(role -> {
-                if (role.getAuthorities() != null) {
-                    role.getAuthorities().forEach(authority ->
-                        authorities.add(new SimpleGrantedAuthority(authority.getValue())));
+                if (role == null) {
+                    return;
                 }
-                authorities.add(new SimpleGrantedAuthority(role.getValue()));
+                if (role.getAuthorities() != null) {
+                    role.getAuthorities().forEach(authority -> {
+                        if (authority == null) {
+                            return;
+                        }
+                        addGrantedAuthorityIfPresent(
+                                authorities,
+                                firstNonBlank(authority.getValue(), authority.getUid()));
+                    });
+                }
+
+                // role.value 可能为空（自定义角色未填），兜底到 role.name（必填）/uid
+                addGrantedAuthorityIfPresent(authorities, firstNonBlank(role.getValue(), role.getUid()));
             });
         }
 

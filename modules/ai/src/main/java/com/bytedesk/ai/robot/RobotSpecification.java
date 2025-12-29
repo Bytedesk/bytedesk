@@ -62,7 +62,9 @@ public class RobotSpecification extends BaseSpecification<RobotEntity, RobotRequ
             jakarta.persistence.criteria.Join<Object, Object> settingsJoin = null;
             try {
                 settingsJoin = root.join("settings", jakarta.persistence.criteria.JoinType.LEFT);
-            } catch (Exception ignored) {}
+            } catch (Exception ex) {
+                log.debug("RobotSpecification join 'settings' failed", ex);
+            }
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
@@ -75,7 +77,9 @@ public class RobotSpecification extends BaseSpecification<RobotEntity, RobotRequ
                     jakarta.persistence.criteria.Join<Object, Object> llmJoin = null;
                     try {
                         llmJoin = settingsJoin.join("llm", jakarta.persistence.criteria.JoinType.LEFT);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ex) {
+                        log.debug("RobotSpecification join 'llm' failed", ex);
+                    }
                     if (llmJoin != null) {
                         predicates.add(criteriaBuilder.like(llmJoin.get("prompt"), "%" + request.getPrompt() + "%"));
                     }

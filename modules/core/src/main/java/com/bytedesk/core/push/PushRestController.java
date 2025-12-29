@@ -38,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class PushRestController extends BaseRestController<PushRequest, PushRestService> {
 
     private final PushRestService pushRestService;
+    
     private final PushSendService pushSendService;
 
     @PreAuthorize(RolePermissions.ROLE_ADMIN)

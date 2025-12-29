@@ -139,7 +139,11 @@ public class AIFileUtils {
             return null;
         } finally {
             if (conn != null) {
-                try { conn.disconnect(); } catch (Exception ignore) {}
+                try {
+                    conn.disconnect();
+                } catch (Exception ex) {
+                    log.debug("fetchHttpAsBase64 disconnect failed", ex);
+                }
             }
         }
     }

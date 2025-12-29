@@ -323,22 +323,22 @@ public class IpUtils {
         String testIp1 = "192.168.1.100";
         String testIp2 = "192.168.2.100";
         
-        System.out.println("Testing CIDR functionality:");
-        System.out.println("CIDR: " + cidr1);
-        System.out.println("IP " + testIp1 + " in range: " + isIpInCidrRange(testIp1, cidr1));
-        System.out.println("IP " + testIp2 + " in range: " + isIpInCidrRange(testIp2, cidr1));
+        log.info("Testing CIDR functionality:");
+        log.info("CIDR: {}", cidr1);
+        log.info("IP {} in range: {}", testIp1, isIpInCidrRange(testIp1, cidr1));
+        log.info("IP {} in range: {}", testIp2, isIpInCidrRange(testIp2, cidr1));
         
         // 测试更小的子网
         String cidr2 = "10.0.0.0/8";
         String testIp3 = "10.1.2.3";
-        System.out.println("CIDR: " + cidr2);
-        System.out.println("IP " + testIp3 + " in range: " + isIpInCidrRange(testIp3, cidr2));
+        log.info("CIDR: {}", cidr2);
+        log.info("IP {} in range: {}", testIp3, isIpInCidrRange(testIp3, cidr2));
         
         // 测试精确匹配
         String cidr3 = "172.16.0.0/12";
         String testIp4 = "172.20.1.1";
-        System.out.println("CIDR: " + cidr3);
-        System.out.println("IP " + testIp4 + " in range: " + isIpInCidrRange(testIp4, cidr3));
+        log.info("CIDR: {}", cidr3);
+        log.info("IP {} in range: {}", testIp4, isIpInCidrRange(testIp4, cidr3));
     }
 
 }

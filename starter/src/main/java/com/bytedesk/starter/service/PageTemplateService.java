@@ -198,12 +198,12 @@ public class PageTemplateService {
         if (!directory.exists()) {
             boolean success = directory.mkdirs();
             if (success) {
-                log.info("Directory created successfully at: " + directory.getAbsolutePath());
+                log.info("Directory created successfully at: {}", directory.getAbsolutePath());
             } else {
-                log.error("Failed to create directory at: " + directory.getAbsolutePath());
+                log.error("Failed to create directory at: {}", directory.getAbsolutePath());
             }
         } else {
-            System.out.println("Directory already exists at: " + directory.getAbsolutePath());
+            log.info("Directory already exists at: {}", directory.getAbsolutePath());
         }
     }
 

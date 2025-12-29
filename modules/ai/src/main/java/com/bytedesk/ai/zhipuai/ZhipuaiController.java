@@ -759,7 +759,7 @@ public class ZhipuaiController {
 
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
-            System.out.println(reply);
+            log.info("Zhipuai test reply: {}", reply);
             return ResponseEntity.ok(JsonResult.success(reply));
         } else {
             log.error("错误: " + response.getMsg());
@@ -893,7 +893,7 @@ public class ZhipuaiController {
 
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
-            System.out.println(reply);
+            log.info("Zhipuai multi-image reply: {}", reply);
             return ResponseEntity.ok(JsonResult.success(reply));
         } else {
             log.error("Error in testZhipuaiMultiModelImage: {}", response.getMsg());
@@ -937,7 +937,7 @@ public class ZhipuaiController {
 
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
-            System.out.println(reply);
+            log.info("Zhipuai base64-image reply: {}", reply);
             return ResponseEntity.ok(JsonResult.success(reply));
         } else {
             log.error("Error in testZhipuaiBase64Image: {}", response.getMsg());
@@ -978,7 +978,7 @@ public class ZhipuaiController {
 
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
-            System.out.println(reply);
+            log.info("Zhipuai video reply: {}", reply);
             return ResponseEntity.ok(JsonResult.success(reply));
         } else {
             log.error("Error in testZhipuaiMultiModelVideo: {}", response.getMsg());
@@ -1025,7 +1025,7 @@ public class ZhipuaiController {
 
         if (response.isSuccess()) {
             Object reply = response.getData().getChoices().get(0).getMessage();
-            System.out.println(reply);
+            log.info("Zhipuai file reply: {}", reply);
             return ResponseEntity.ok(JsonResult.success(reply));
         } else {
             log.error("Error in testZhipuaiMultiModelFile: {}", response.getMsg());

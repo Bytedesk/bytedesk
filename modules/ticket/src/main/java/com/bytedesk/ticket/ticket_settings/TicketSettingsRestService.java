@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -64,7 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class TicketSettingsRestService extends
-    BaseRestServiceWithExport<TicketSettingsEntity, TicketSettingsRequest, TicketSettingsResponse, TicketSettingsExcel> {
+        BaseRestServiceWithExport<TicketSettingsEntity, TicketSettingsRequest, TicketSettingsResponse, TicketSettingsExcel> {
 
     private final TicketSettingsRepository ticketSettingsRepository;
 
@@ -151,7 +152,7 @@ public class TicketSettingsRestService extends
         entity.setCategorySettings(category);
 
         TicketCategorySettingsEntity draftCategory = TicketCategorySettingsEntity
-            .fromRequest(resolveDraftCategoryRequest(request), uidUtils::getUid);
+                .fromRequest(resolveDraftCategoryRequest(request), uidUtils::getUid);
         draftCategory.setUid(uidUtils.getUid());
         entity.setDraftCategorySettings(draftCategory);
 
@@ -189,7 +190,7 @@ public class TicketSettingsRestService extends
     public TicketSettingsResponse update(TicketSettingsRequest request) {
         Optional<TicketSettingsEntity> optional = ticketSettingsRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
-            // 
+            //
             TicketSettingsEntity entity = optional.get();
             String normalizedType = StringUtils.hasText(request.getType())
                     ? resolveSettingsType(request.getType())
@@ -197,7 +198,8 @@ public class TicketSettingsRestService extends
             // 更新基础字段（不直接覆盖子配置）
             // modelMapper.map(request, entity);
             entity.setName(request.getName() != null ? request.getName() : entity.getName());
-            entity.setDescription(request.getDescription() != null ? request.getDescription() : entity.getDescription());
+            entity.setDescription(
+                    request.getDescription() != null ? request.getDescription() : entity.getDescription());
             entity.setType(normalizedType);
             boolean draftUpdated = false;
 
@@ -311,7 +313,8 @@ public class TicketSettingsRestService extends
     }
 
     /**
-     * Resolve ticket settings entity by workgroup/org for downstream domain services.
+     * Resolve ticket settings entity by workgroup/org for downstream domain
+     * services.
      */
     @Transactional
     public TicketSettingsEntity resolveEntityByWorkgroup(String orgUid, String workgroupUid, String rawType) {
@@ -374,15 +377,27 @@ public class TicketSettingsRestService extends
         }
 
         // 按 WorkgroupSettingsRestService 模式创建：发布 + 草稿各自独立初始化并分配唯一 UID
+        String settingsName;
+        String settingsDescription;
+        
+        // 根据工单类型区分名称和描述
+        if (TicketTypeEnum.INTERNAL.name().equals(normalizedType)) {
+            settingsName = I18Consts.I18N_TICKET_SETTINGS_INTERNAL_NAME;
+            settingsDescription = I18Consts.I18N_TICKET_SETTINGS_INTERNAL_DESCRIPTION;
+        } else {
+            settingsName = I18Consts.I18N_TICKET_SETTINGS_EXTERNAL_NAME;
+            settingsDescription = I18Consts.I18N_TICKET_SETTINGS_EXTERNAL_DESCRIPTION;
+        }
+        
         TicketSettingsEntity settings = TicketSettingsEntity.builder()
                 .uid(uidUtils.getUid())
                 .orgUid(orgUid)
                 .type(normalizedType)
-                .name("默认工单配置")
-                .description("系统默认工单配置")
+                .name(settingsName)
+                .description(settingsDescription)
                 .isDefault(true)
                 .enabled(true)
-            .customFormEnabled(false)
+                .customFormEnabled(false)
                 .build();
 
         TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
@@ -581,7 +596,7 @@ public class TicketSettingsRestService extends
         // 发布时间与草稿标记维护
         entity.setPublishedAt(ZonedDateTime.now());
         entity.setHasUnpublishedChanges(false);
-        // 
+        //
         TicketSettingsEntity saved = save(entity);
         if (saved == null) {
             throw new RuntimeException("Publish ticketSettings failed");
@@ -699,7 +714,8 @@ public class TicketSettingsRestService extends
         }
         // 通过 Utils.formatUid 生成默认的 processUid
         String defaultProcessUid = processType == ProcessTypeEnum.TICKET_EXTERNAL
-                ? Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
+                ? Utils.formatUid(orgUid,
+                        TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
                 : Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
         return ticketProcessRepository
                 .findByUidAndOrgUidAndType(defaultProcessUid, orgUid, processType.name())

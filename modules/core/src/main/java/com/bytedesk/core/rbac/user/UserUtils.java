@@ -20,8 +20,10 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class UserUtils {
     // 通过Spring注入服务到静态上下文，便于静态方法读取数据库
     private static UserService userService;
@@ -40,7 +42,10 @@ public class UserUtils {
                     return u;
                 }
             }
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+            log.debug("Failed to load file assistant user from DB, fallback to default uid={}",
+                    BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID, ignored);
+        }
         // 兜底：未找到数据库记录时返回默认内置信息
         return UserProtobuf.builder()
                 .uid(BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID)
@@ -60,7 +65,10 @@ public class UserUtils {
                     return u;
                 }
             }
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+            log.debug("Failed to load queue assistant user from DB, fallback to default uid={}",
+                    BytedeskConsts.DEFAULT_QUEUE_ASSISTANT_UID, ignored);
+        }
         // 兜底：未找到数据库记录时返回默认内置信息
         return UserProtobuf.builder()
                 .uid(BytedeskConsts.DEFAULT_QUEUE_ASSISTANT_UID)
@@ -80,7 +88,10 @@ public class UserUtils {
                     return u;
                 }
             }
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+            log.debug("Failed to load system user from DB, fallback to default uid={}",
+                    BytedeskConsts.DEFAULT_SYSTEM_UID, ignored);
+        }
         // 兜底：未找到数据库记录时返回默认内置信息
         return UserProtobuf.builder()
                 .uid(BytedeskConsts.DEFAULT_SYSTEM_UID)

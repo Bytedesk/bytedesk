@@ -1,6 +1,8 @@
 package com.bytedesk.call.httapi;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class HttapiXml {
     private final StringBuilder sb = new StringBuilder();
     private boolean opened = false;
@@ -78,7 +80,9 @@ public class HttapiXml {
                     return mid.replaceAll("^\\[[^]]+]", "");
                 }
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ex) {
+            log.debug("nlsmlToText parse failed, len={}", nlsml == null ? 0 : nlsml.length(), ex);
+        }
         return null;
     }
 }

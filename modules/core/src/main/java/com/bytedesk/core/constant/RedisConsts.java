@@ -47,6 +47,12 @@ public class RedisConsts {
     // 推送验证码发送频率控制相关常量
     public static final String PUSH_CODE_IP_PREFIX = BYTEDESK_REDIS_PREFIX + "push:code:ip:";
 
+    // 推送记录过期处理（验证码/扫码登录）
+    // ZSET: member=pushUid, score=expireAtEpochMillis
+    public static final String PUSH_EXPIRE_ZSET_KEY = BYTEDESK_REDIS_PREFIX + "push:expire:zset";
+    // DB 兜底过期任务的分布式锁（避免多实例重复跑）
+    public static final String PUSH_EXPIRE_BACKFILL_LOCK_KEY = BYTEDESK_REDIS_PREFIX + "push:expire:backfill:lock";
+
     // 验证码相关常量
     public static final String KAPTCHA_PREFIX = BYTEDESK_REDIS_PREFIX + "kaptcha:";
 

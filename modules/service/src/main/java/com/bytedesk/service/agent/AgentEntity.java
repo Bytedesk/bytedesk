@@ -81,7 +81,6 @@ public class AgentEntity extends BaseEntity {
      * All settings are managed through the settings entity
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    // @NotFound(action = NotFoundAction.IGNORE)
     private AgentSettingsEntity settings;
 
     // 以下设置项已迁移至 AgentSettingsEntity
@@ -160,16 +159,6 @@ public class AgentEntity extends BaseEntity {
         }
         return I18Consts.I18N_AGENT_TIMEOUT_TIP;
     }
-
-    /**
-     * Resolve the per-agent queue notice batch window with a sane default when the agent lacks explicit queue settings.
-     */
-    // public int resolveQueueNoticeBatchWindowMs() {
-    //     if (this.settings != null) {
-    //         return this.settings.resolveQueueNoticeBatchWindowMs();
-    //     }
-    //     return QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
-    // }
 
 }
 

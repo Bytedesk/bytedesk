@@ -46,7 +46,8 @@ public class ConnectionHeartbeatFlushTask {
                 try {
                     long ts = Long.parseLong(String.valueOf(v));
                     heartbeats.put(clientId, ts);
-                } catch (NumberFormatException ignore) {
+                } catch (NumberFormatException ex) {
+                    log.debug("Invalid heartbeat timestamp, clientId={}, value={}", clientId, v, ex);
                 }
             }
             if (heartbeats.isEmpty()) return;
@@ -67,11 +68,13 @@ public class ConnectionHeartbeatFlushTask {
                         if (lastDb >= hbTs) {
                             stringRedisTemplate.opsForHash().delete(RedisConsts.REDIS_HEARTBEAT_HASH_KEY, clientId);
                         }
-                    } catch (NumberFormatException ignore) {}
+                    } catch (NumberFormatException ex) {
+                        log.debug("Invalid last-db-write timestamp, clientId={}, value={}", clientId, lastDbStr, ex);
+                    }
                 }
             }
         } catch (Exception e) {
-            log.warn("flushHeartbeatCacheBatch error: {}", e.getMessage());
+            log.warn("flushHeartbeatCacheBatch error", e);
         }
     }
 }

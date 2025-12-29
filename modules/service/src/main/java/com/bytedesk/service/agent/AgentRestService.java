@@ -386,7 +386,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return null;
     }
 
-    @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
+    // 有可能导致缓存中连接状态不准确，导致请求客服离线，暂时注释掉缓存
+    // @Cacheable(value = "agent", key = "#uid", unless = "#result == null")
     public Optional<AgentEntity> findByUid(String uid) {
         Optional<AgentEntity> agentOptional = agentRepository.findByUid(uid);
         // 确保所有延迟加载的关联都被初始化，以便正确缓存
@@ -423,7 +424,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return agentOptional;
     }
 
-    @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
+    // @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
     public Optional<AgentEntity> findByUserUid(String userUid) {
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(userUid);
         // 确保所有延迟加载的关联都被初始化，以便正确缓存
@@ -435,7 +436,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return agentOptional;
     }
 
-    @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")
+    // @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")
     public Optional<AgentEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
         Optional<AgentEntity> agentOptional = agentRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
         // 确保所有延迟加载的关联都被初始化，以便正确缓存
@@ -447,7 +448,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return agentOptional;
     }
 
-    @Cacheable(value = "agent", key = "#email", unless = "#result == null")
+    // @Cacheable(value = "agent", key = "#email", unless = "#result == null")
     public Optional<AgentEntity> findByEmailAndOrgUid(String email, String orgUid) {
         Optional<AgentEntity> agentOptional = agentRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
         // 确保所有延迟加载的关联都被初始化，以便正确缓存
@@ -459,7 +460,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return agentOptional;
     }
 
-    @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
+    // @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
     public Optional<AgentEntity> findByUserUidAndOrgUid(String userUid, String orgUid) {
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
         // 确保所有延迟加载的关联都被初始化，以便正确缓存

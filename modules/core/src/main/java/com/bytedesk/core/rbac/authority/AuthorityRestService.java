@@ -17,7 +17,6 @@ import lombok.AllArgsConstructor;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +29,6 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
 import io.jsonwebtoken.lang.Assert;
@@ -49,25 +47,6 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
 
-    @Override
-    public Page<AuthorityResponse> queryByOrg(AuthorityRequest request) {
-        Pageable pageable = request.getPageable();
-        Specification<AuthorityEntity> specification = AuthoritySpecification.search(request, authService);
-        Page<AuthorityEntity> page = authorityRepository.findAll(specification, pageable);
-        return page.map(this::convertToResponse);
-    }
-
-    @Override
-    public Page<AuthorityResponse> queryByUser(AuthorityRequest request) {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            // Authority 为全局（无组织）数据：允许未登录情况下查询
-            return queryByOrg(request);
-        }
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
-    }
-
     @Cacheable(value = "authority", key = "#uid", unless = "#result==null")
     @Override
     public Optional<AuthorityEntity> findByUid(String uid) {
@@ -81,6 +60,108 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
 
     public Boolean existsByValue(String value) {
         return authorityRepository.existsByValue(value);
+    }
+
+    @Override
+    @Transactional
+    public AuthorityResponse create(AuthorityRequest request) {
+        if (existsByValue(request.getValue())) {
+            return findByValue(request.getValue()).map(this::convertToResponse).orElse(null);
+        }
+        // 
+        AuthorityEntity authorityEntity = modelMapper.map(request, AuthorityEntity.class);
+        if (StringUtils.hasText(request.getUid())) {
+            authorityEntity.setUid(request.getUid());
+        } else {
+            authorityEntity.setUid(uidUtils.getUid());
+        }
+        // 
+        AuthorityEntity authorityEntitySaved = save(authorityEntity);
+        if (authorityEntitySaved == null) {
+            throw new RuntimeException("save authority failed");
+        }
+        return convertToResponse(authorityEntitySaved);
+    }
+
+   @Override
+   @Transactional
+    public AuthorityResponse update(AuthorityRequest request) {
+        Optional<AuthorityEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            // 
+            optional.get().setName(request.getName());
+            optional.get().setDescription(request.getDescription());
+            // 
+            AuthorityEntity authorityEntity = save(optional.get());
+            if (authorityEntity == null) {
+                throw new RuntimeException("update authority failed");
+            }
+            return convertToResponse(authorityEntity);
+        } else {
+            throw new RuntimeException("authority " + request.getUid() + " not found");
+        }
+    }
+
+    @Override
+    protected AuthorityEntity doSave(AuthorityEntity entity) {
+        return authorityRepository.save(entity);
+    }
+
+    @Override
+    public AuthorityEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AuthorityEntity entity) {
+        try {
+            Optional<AuthorityEntity> latest = authorityRepository.findByUid(entity.getUid());
+            if (latest.isPresent()) {
+                AuthorityEntity latestEntity = latest.get();
+                // 合并需要保留的数据
+                authorityRepository.save(latestEntity);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+
+    @CacheEvict(value = "authority", key = "#uid")
+    @Override
+    public void deleteByUid(String uid) {
+        Optional<AuthorityEntity> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            optional.get().setDeleted(true);
+            save(optional.get());
+        }
+    }
+
+    @CacheEvict(value = "authority", key = "#entity.uid")
+    @Override
+    public void delete(AuthorityRequest entity) {
+        deleteByUid(entity.getUid());
+    }
+
+    @Override
+    public AuthorityResponse convertToResponse(AuthorityEntity entity) {
+        return modelMapper.map(entity, AuthorityResponse.class);
+    }
+
+    @Override
+    protected Specification<AuthorityEntity> createSpecification(AuthorityRequest request) {
+        return AuthoritySpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<AuthorityEntity> executePageQuery(Specification<AuthorityEntity> spec, Pageable pageable) {
+        return authorityRepository.findAll(spec, pageable);
+    }
+
+    public Set<AuthorityEntity> findByLevelMarker(String levelMarker) {
+        List<AuthorityEntity> authorities = authorityRepository
+            .findByValueContainingIgnoreCaseAndDeletedFalse(levelMarker);
+        return new HashSet<>(authorities);
+    }
+
+    public Set<AuthorityEntity> findAllActive() {
+        return new HashSet<>(authorityRepository.findByDeletedFalse());
     }
 
     /**
@@ -127,122 +208,5 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
             "descriptionUpdated", descriptionUpdated);
     }
 
-    @Override
-    @Transactional
-    public AuthorityResponse create(AuthorityRequest request) {
-        if (existsByValue(request.getValue())) {
-            return findByValue(request.getValue()).map(this::convertToResponse).orElse(null);
-        }
-        // 
-        AuthorityEntity authorityEntity = modelMapper.map(request, AuthorityEntity.class);
-        if (StringUtils.hasText(request.getUid())) {
-            authorityEntity.setUid(request.getUid());
-        } else {
-            authorityEntity.setUid(uidUtils.getUid());
-        }
-        // 
-        AuthorityEntity authorityEntitySaved = save(authorityEntity);
-        if (authorityEntitySaved == null) {
-            throw new RuntimeException("save authority failed");
-        }
-        return convertToResponse(authorityEntitySaved);
-    }
-
-    // @PreAuthorize(AuthorityPermissions.HAS_AUTHORITY_UPDATE)
-   @Override
-   @Transactional
-    public AuthorityResponse update(AuthorityRequest request) {
-        Optional<AuthorityEntity> optional = findByUid(request.getUid());
-        if (optional.isPresent()) {
-            // 
-            optional.get().setName(request.getName());
-            optional.get().setDescription(request.getDescription());
-            // 
-            AuthorityEntity authorityEntity = save(optional.get());
-            if (authorityEntity == null) {
-                throw new RuntimeException("update authority failed");
-            }
-            return convertToResponse(authorityEntity);
-        } else {
-            throw new RuntimeException("authority " + request.getUid() + " not found");
-        }
-    }
-
-    @CachePut(value = "authority", key = "#entity.uid")
-    @Override
-    public AuthorityEntity save(AuthorityEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
-    protected AuthorityEntity doSave(AuthorityEntity entity) {
-        return authorityRepository.save(entity);
-    }
-
-    @Override
-    public AuthorityEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AuthorityEntity entity) {
-        try {
-            Optional<AuthorityEntity> latest = authorityRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                AuthorityEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                authorityRepository.save(latestEntity);
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
-        }
-        return null;
-    }
-
-    @CacheEvict(value = "authority", key = "#uid")
-    @Override
-    public void deleteByUid(String uid) {
-        Optional<AuthorityEntity> optional = findByUid(uid);
-        if (optional.isPresent()) {
-            optional.get().setDeleted(true);
-            save(optional.get());
-        }
-    }
-
-    @CacheEvict(value = "authority", key = "#entity.uid")
-    @Override
-    public void delete(AuthorityRequest entity) {
-        deleteByUid(entity.getUid());
-    }
-
-    @Override
-    public AuthorityResponse convertToResponse(AuthorityEntity entity) {
-        return modelMapper.map(entity, AuthorityResponse.class);
-    }
-
-    @Override
-    public AuthorityResponse queryByUid(AuthorityRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
-    @Override
-    protected Specification<AuthorityEntity> createSpecification(AuthorityRequest request) {
-        return AuthoritySpecification.search(request, authService);
-    }
-
-    @Override
-    protected Page<AuthorityEntity> executePageQuery(Specification<AuthorityEntity> spec, Pageable pageable) {
-        return authorityRepository.findAll(spec, pageable);
-    }
-
-    public Set<AuthorityEntity> findByLevelMarker(String levelMarker) {
-        List<AuthorityEntity> authorities = authorityRepository
-            .findByValueContainingIgnoreCaseAndDeletedFalse(levelMarker);
-        return new HashSet<>(authorities);
-    }
-
-    public Set<AuthorityEntity> findAllActive() {
-        return new HashSet<>(authorityRepository.findByDeletedFalse());
-    }
 
 }

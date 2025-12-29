@@ -36,17 +36,14 @@ public class PushService {
     private final PushRepository pushRepository;
     private final PushFilterService pushFilterService;
     private final PushSendService pushSendService;
+    private final PushExpireCacheService pushExpireCacheService;
    
-    // =============== REST接口方法 ===============
-
     /**
      * 发送验证码
      */
     public PushSendResult sendCode(AuthRequest authRequest, HttpServletRequest request) {
         return pushSendService.sendCode(authRequest, request);
     }
-
-    // =============== 业务逻辑方法 ===============
 
     /**
      * 验证验证码
@@ -63,6 +60,13 @@ public class PushService {
             PushEntity push = pushOptional.get();
             push.setStatus(PushStatusEnum.CONFIRMED.name());
             pushRepository.save(push);
+
+            // 从过期队列移除，避免后续重复处理
+            try {
+                pushExpireCacheService.remove(push.getUid());
+            } catch (Exception e) {
+                log.warn("push expire cache remove failed, uid={}", push.getUid(), e);
+            }
             
             // 清除IP发送时间限制
             String ip = IpUtils.getClientIp(request);

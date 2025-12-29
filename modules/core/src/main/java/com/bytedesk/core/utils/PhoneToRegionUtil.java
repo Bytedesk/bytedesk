@@ -87,7 +87,7 @@ public class PhoneToRegionUtil {
             PhoneNumber number = PHONE_NUMBER_UTIL.parse(phoneNumber, regionCode);  
             return PHONE_NUMBER_UTIL.format(number, PhoneNumberFormat.E164); // E.164 格式  
         } catch (NumberParseException e) {  
-            System.err.println("NumberParseException was thrown: " + e.toString());  
+            log.warn("Failed to parse phone number: phoneNumber={}, regionCode={}, error={}", phoneNumber, regionCode, e.getMessage(), e);
             return null;  
         }  
     }  

@@ -48,9 +48,17 @@ public class EslService {
             return res;
         }
         String reply = null;
-        try { reply = msg.getHeaderValue(EslHeaders.Name.REPLY_TEXT); } catch (Throwable ignore) {}
+        try {
+            reply = msg.getHeaderValue(EslHeaders.Name.REPLY_TEXT);
+        } catch (Throwable ex) {
+            log.debug("Failed to read ESL Reply-Text header", ex);
+        }
         String contentType = null;
-        try { contentType = msg.getContentType(); } catch (Throwable ignore) {}
+        try {
+            contentType = msg.getContentType();
+        } catch (Throwable ex) {
+            log.debug("Failed to read ESL Content-Type", ex);
+        }
         List<String> bodyLines = msg.getBodyLines();
         String body = String.join("\n", bodyLines);
 

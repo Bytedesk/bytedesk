@@ -58,7 +58,9 @@ public class XmlCurlController {
             if (log.isDebugEnabled()) {
                 log.debug("XML-CURL raw param keys: {}", paramsRaw.keySet());
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ex) {
+            log.debug("XML-CURL request logging failed", ex);
+        }
         Map<String, String> p = normalize(paramsRaw);
         String section = p.getOrDefault("section", "").toLowerCase(Locale.ROOT);
         if (log.isDebugEnabled()) {
@@ -91,7 +93,9 @@ public class XmlCurlController {
                 String preview = out == null ? "" : truncate(new String(out, StandardCharsets.UTF_8), 800);
                 log.debug("XML-CURL resp preview: {}", preview);
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ex) {
+            log.debug("XML-CURL response logging failed", ex);
+        }
         return out;
     }
 
@@ -104,7 +108,11 @@ public class XmlCurlController {
         for (Map.Entry<String, java.util.List<String>> e : raw.entrySet()) {
             String k = e.getKey();
             String v = (e.getValue() != null && !e.getValue().isEmpty()) ? e.getValue().get(0) : "";
-            try { v = URLDecoder.decode(v, StandardCharsets.UTF_8.name()); } catch (Exception ignore) {}
+            try {
+                v = URLDecoder.decode(v, StandardCharsets.UTF_8.name());
+            } catch (Exception ex) {
+                log.debug("XML-CURL param decode failed key={}", k, ex);
+            }
             m.put(k, v);
             m.putIfAbsent("variable_" + k, v);
             m.putIfAbsent(k.toUpperCase(Locale.ROOT), v);

@@ -200,15 +200,15 @@ public class Ollama4jChatController {
             // "start" conversation with model
             chatResult = ollama4jApi.chat(requestModel);
 
-            System.out.println("First answer: " + chatResult.toString());
+            log.info("First answer: {}", chatResult);
 
             // create next userQuestion
             requestModel = builder.withMessages(chatResult.getChatHistory())
                     .withMessage(OllamaChatMessageRole.USER, "And what is the second largest city?").build();
             // "continue" conversation with model
             chatResult = ollama4jApi.chat(requestModel);
-            System.out.println("Second answer: " + chatResult.toString());
-            System.out.println("Chat History: " + chatResult.getChatHistory());
+            log.info("Second answer: {}", chatResult);
+            log.info("Chat History: {}", chatResult.getChatHistory());
 
             return ResponseEntity.ok(JsonResult.success(chatResult.toString()));
         } catch (Exception e) {

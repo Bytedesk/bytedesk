@@ -43,7 +43,7 @@ public class TicketNotificationService {
     
     public void notifyTicketClosed(TicketEntity ticket) {
         // 发送工单关闭通知
-        System.out.println("Ticket closed notification sent for ticket: " + ticket.getId());
+        log.info("Ticket closed notification sent for ticket: {}", ticket.getId());
     }
     
     /**

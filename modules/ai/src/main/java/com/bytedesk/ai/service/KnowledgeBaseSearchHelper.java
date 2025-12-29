@@ -131,7 +131,9 @@ public class KnowledgeBaseSearchHelper {
                 topP = robot.getLlm().getTopP();
                 topK = robot.getLlm().getTopK();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ex) {
+            log.debug("Read robot llm config failed, use defaults", ex);
+        }
 
         // 1) 先对来源进行 uid 聚合：同一内容保留分数最高的一条
         Map<String, RobotContent.SourceReference> bestSrcByUid = new LinkedHashMap<>();
@@ -438,7 +440,9 @@ public class KnowledgeBaseSearchHelper {
                     && robot.getLlm().getTopK() > 0) {
                 topK = robot.getLlm().getTopK();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ex) {
+            log.debug("Read robot topK failed, use default", ex);
+        }
         if (list.size() > topK) {
             list = list.subList(0, topK);
         }

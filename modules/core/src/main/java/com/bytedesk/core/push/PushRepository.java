@@ -16,8 +16,14 @@ package com.bytedesk.core.push;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import java.time.ZonedDateTime;
 
 public interface PushRepository extends JpaRepository<PushEntity, Long>, JpaSpecificationExecutor<PushEntity> {
 
@@ -28,7 +34,8 @@ public interface PushRepository extends JpaRepository<PushEntity, Long>, JpaSpec
     Optional<PushEntity> findByStatusAndReceiverAndContent(String status, String receiver, String content);
 
     // 注意：历史上同一 deviceUid 可能存在多条记录，这里提供按更新时间倒序取最新一条，避免非唯一结果异常
-    Optional<PushEntity> findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(String deviceUid, String status, String type);
+    Optional<PushEntity> findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(String deviceUid, String status,
+            String type);
 
     Optional<PushEntity> findByDeviceUidAndContent(String deviceUid, String code);
 
@@ -36,4 +43,36 @@ public interface PushRepository extends JpaRepository<PushEntity, Long>, JpaSpec
 
     Boolean existsByStatusAndTypeAndReceiverAndContent(String status, String type, String receiver,
             String content);
+
+    /**
+     * 将一批 UID 的状态从 oldStatus 更新为 newStatus（用于 Redis 过期批处理）。
+     */
+    @Modifying
+    @Query("update PushEntity p set p.status = :newStatus where p.uid in :uids and p.status = :oldStatus")
+    int updateStatusByUidsAndStatus(
+            @Param("uids") List<String> uids,
+            @Param("oldStatus") String oldStatus,
+            @Param("newStatus") String newStatus);
+
+    /**
+     * DB 兜底：过期扫码登录（PENDING 且 updatedAt 早于阈值）。
+     */
+    @Modifying
+    @Query("update PushEntity p set p.status = :newStatus where p.status = :oldStatus and p.type = :type and p.updatedAt < :before")
+    int expireByTypeBefore(
+            @Param("type") String type,
+            @Param("before") ZonedDateTime before,
+            @Param("oldStatus") String oldStatus,
+            @Param("newStatus") String newStatus);
+
+    /**
+     * DB 兜底：过期非扫码登录的验证码（PENDING 且 updatedAt 早于阈值）。
+     */
+    @Modifying
+    @Query("update PushEntity p set p.status = :newStatus where p.status = :oldStatus and (p.type is null or p.type <> :type) and p.updatedAt < :before")
+    int expireNotTypeBefore(
+            @Param("type") String type,
+            @Param("before") ZonedDateTime before,
+            @Param("oldStatus") String oldStatus,
+            @Param("newStatus") String newStatus);
 }

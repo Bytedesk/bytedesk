@@ -247,7 +247,9 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             if (stringRedisTemplate != null) {
                 stringRedisTemplate.opsForHash().put(RedisConsts.REDIS_HEARTBEAT_HASH_KEY, clientId, String.valueOf(ts));
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ex) {
+            log.debug("tryWriteHeartbeatToCache failed clientId={}", clientId, ex);
+        }
     }
 
     private void cacheLastDbWrite(String clientId, long ts) {
@@ -255,7 +257,9 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             if (stringRedisTemplate != null) {
                 stringRedisTemplate.opsForHash().put(RedisConsts.REDIS_LAST_DB_WRITE_HASH_KEY, clientId, String.valueOf(ts));
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ex) {
+            log.debug("cacheLastDbWrite failed clientId={}", clientId, ex);
+        }
     }
 
     private ConnectionEntity fetchConnectionForUpdate(String clientId, Supplier<ConnectionEntity> creator) {
@@ -298,7 +302,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             connectionMetrics.incCreated();
             return true;
         } catch (Exception ex) {
-            log.warn("ensureConnectionExistsFromHeartbeat failed clientId {}: {}", clientId, ex.getMessage());
+            log.warn("ensureConnectionExistsFromHeartbeat failed clientId {}", clientId, ex);
             return false;
         }
     }

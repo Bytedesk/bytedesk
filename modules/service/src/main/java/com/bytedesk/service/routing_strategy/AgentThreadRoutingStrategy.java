@@ -492,7 +492,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 获取客服实体
      */
     private AgentEntity getAgentEntity(String agentUid) {
-        long startTime = System.currentTimeMillis();
+        // long startTime = System.currentTimeMillis();
         log.debug("开始获取客服实体 - agentUid: {}", agentUid);
 
         try {
@@ -507,17 +507,17 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             }
 
             AgentEntity agent = agentOptional.get();
-            log.info("客服实体获取成功 - agentUid: {}, nickname: {}, 可用状态: {}, 最大接待数: {}, 查询耗时: {}ms",
-                    agent.getUid(), agent.getNickname(), agent.isAvailable(),
-                    agent.getMaxThreadCount(), System.currentTimeMillis() - startTime);
+            // log.info("客服实体获取成功 - agentUid: {}, nickname: {}, 可用状态: {}, 最大接待数: {}, 查询耗时: {}ms",
+            //         agent.getUid(), agent.getNickname(), agent.isAvailable(),
+            //         agent.getMaxThreadCount(), System.currentTimeMillis() - startTime);
             return agent;
 
         } catch (IllegalArgumentException e) {
             log.error("客服实体获取失败，参数错误 - agentUid: {}, 错误: {}", agentUid, e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("客服实体获取失败，系统异常 - agentUid: {}, 错误: {}, 耗时: {}ms",
-                    agentUid, e.getMessage(), System.currentTimeMillis() - startTime, e);
+            // log.error("客服实体获取失败，系统异常 - agentUid: {}, 错误: {}, 耗时: {}ms",
+            //         agentUid, e.getMessage(), System.currentTimeMillis() - startTime, e);
             throw new RuntimeException("Failed to get agent entity: " + agentUid, e);
         }
     }

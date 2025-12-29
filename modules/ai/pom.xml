@@ -178,11 +178,11 @@
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-graph-core -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-graph-core</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
+		</dependency> -->
 		<!-- <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-graph-observation</artifactId>

@@ -9,14 +9,16 @@
 package com.bytedesk.core.utils;
 
 import com.bytedesk.core.ip.IpUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CidrDemo {
     
     public static void main(String[] args) {
-        System.out.println("=== CIDR 功能演示 ===");
+        log.info("=== CIDR 功能演示 ===");
         
         // 测试CIDR验证
-        System.out.println("\n1. CIDR格式验证:");
+        log.info("\n1. CIDR格式验证:");
         String[] testCidrs = {
             "192.168.1.0/24",
             "10.0.0.0/8", 
@@ -28,11 +30,11 @@ public class CidrDemo {
         };
         
         for (String cidr : testCidrs) {
-            System.out.println(cidr + " -> " + IpUtils.isValidCidr(cidr));
+            log.info("{} -> {}", cidr, IpUtils.isValidCidr(cidr));
         }
         
         // 测试IP范围匹配
-        System.out.println("\n2. IP范围匹配测试:");
+        log.info("\n2. IP范围匹配测试:");
         
         // 测试 /24 子网
         String cidr24 = "192.168.1.0/24";
@@ -43,9 +45,9 @@ public class CidrDemo {
             "192.168.2.1"  // 不在范围内
         };
         
-        System.out.println("测试子网: " + cidr24);
+        log.info("测试子网: {}", cidr24);
         for (String ip : testIps24) {
-            System.out.println("  " + ip + " -> " + IpUtils.isIpInCidrRange(ip, cidr24));
+            log.info("  {} -> {}", ip, IpUtils.isIpInCidrRange(ip, cidr24));
         }
         
         // 测试 /8 子网
@@ -56,23 +58,23 @@ public class CidrDemo {
             "11.1.2.3"  // 不在范围内
         };
         
-        System.out.println("\n测试子网: " + cidr8);
+        log.info("\n测试子网: {}", cidr8);
         for (String ip : testIps8) {
-            System.out.println("  " + ip + " -> " + IpUtils.isIpInCidrRange(ip, cidr8));
+            log.info("  {} -> {}", ip, IpUtils.isIpInCidrRange(ip, cidr8));
         }
         
         // 测试精确匹配
         String cidr32 = "192.168.1.1/32";
-        System.out.println("\n测试精确匹配: " + cidr32);
-        System.out.println("  192.168.1.1 -> " + IpUtils.isIpInCidrRange("192.168.1.1", cidr32));
-        System.out.println("  192.168.1.2 -> " + IpUtils.isIpInCidrRange("192.168.1.2", cidr32));
+        log.info("\n测试精确匹配: {}", cidr32);
+        log.info("  192.168.1.1 -> {}", IpUtils.isIpInCidrRange("192.168.1.1", cidr32));
+        log.info("  192.168.1.2 -> {}", IpUtils.isIpInCidrRange("192.168.1.2", cidr32));
         
         // 测试全匹配
         String cidr0 = "0.0.0.0/0";
-        System.out.println("\n测试全匹配: " + cidr0);
-        System.out.println("  192.168.1.1 -> " + IpUtils.isIpInCidrRange("192.168.1.1", cidr0));
-        System.out.println("  10.1.2.3 -> " + IpUtils.isIpInCidrRange("10.1.2.3", cidr0));
+        log.info("\n测试全匹配: {}", cidr0);
+        log.info("  192.168.1.1 -> {}", IpUtils.isIpInCidrRange("192.168.1.1", cidr0));
+        log.info("  10.1.2.3 -> {}", IpUtils.isIpInCidrRange("10.1.2.3", cidr0));
         
-        System.out.println("\n=== 演示完成 ===");
+        log.info("\n=== 演示完成 ===");
     }
 } 

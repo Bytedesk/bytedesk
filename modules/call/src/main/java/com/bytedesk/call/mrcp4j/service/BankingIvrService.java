@@ -65,7 +65,7 @@ public class BankingIvrService {
             }
         });
         
-        System.out.println("银行IVR系统初始化完成");
+        log.info("银行IVR系统初始化完成");
     }
 
     /**
@@ -88,7 +88,7 @@ public class BankingIvrService {
      * 播放欢迎语
      */
     private void playWelcome() throws Exception {
-        System.out.println("播放欢迎语...");
+        log.info("播放欢迎语...");
         synthesisComplete = false;
         
         String welcomeText = "欢迎致电银行客户服务中心。请说出您需要的服务,比如:查询余额、转账、人工服务。";
@@ -98,14 +98,14 @@ public class BankingIvrService {
         request.setContent("application/ssml+xml", null, ssml);
         
         MrcpResponse response = ttsChannel.sendRequest(request);
-        System.out.println("欢迎语播放请求响应: " + response.getStatusCode());
+        log.info("欢迎语播放请求响应: {}", response.getStatusCode());
     }
 
     /**
      * 识别用户意图
      */
     private void recognizeIntent() throws Exception {
-        System.out.println("开始识别用户意图...");
+        log.info("开始识别用户意图...");
         recognitionComplete = false;
         
         String grammar = buildBankingGrammar();
@@ -117,7 +117,7 @@ public class BankingIvrService {
         request.addHeader(MrcpHeaderName.START_INPUT_TIMERS.constructHeader("true"));
         
         MrcpResponse response = asrChannel.sendRequest(request);
-        System.out.println("识别请求响应: " + response.getStatusCode());
+        log.info("识别请求响应: {}", response.getStatusCode());
     }
 
     /**
@@ -125,11 +125,11 @@ public class BankingIvrService {
      */
     private void processUserRequest() throws Exception {
         if (recognizedIntent == null) {
-            System.out.println("未识别到用户意图");
+            log.warn("未识别到用户意图");
             return;
         }
         
-        System.out.println("处理用户意图: " + recognizedIntent);
+        log.info("处理用户意图: {}", recognizedIntent);
         
         String responseText;
         if (recognizedIntent.contains("余额")) {
@@ -150,7 +150,7 @@ public class BankingIvrService {
         request.setContent("application/ssml+xml", null, ssml);
         
         MrcpResponse response = ttsChannel.sendRequest(request);
-        System.out.println("响应播放请求响应: " + response.getStatusCode());
+        log.info("响应播放请求响应: {}", response.getStatusCode());
         
         waitForSynthesisComplete();
     }
@@ -192,16 +192,16 @@ public class BankingIvrService {
      */
     private void handleAsrEvent(MrcpEvent event) {
         String eventName = event.getEventName().toString();
-        System.out.println("收到ASR事件: " + eventName);
+        log.info("收到ASR事件: {}", eventName);
         
         if ("START-OF-INPUT".equals(eventName)) {
-            System.out.println("检测到语音输入开始");
+            log.debug("检测到语音输入开始");
         } else if ("RECOGNITION-COMPLETE".equals(eventName)) {
             recognizedIntent = event.getContent();
-            System.out.println("识别完成,结果: " + recognizedIntent);
+            log.info("识别完成,结果: {}", recognizedIntent);
             recognitionComplete = true;
         } else if ("RECOGNITION-FAILED".equals(eventName)) {
-            System.out.println("识别失败");
+            log.warn("识别失败");
             recognitionComplete = true;
         }
     }
@@ -211,13 +211,13 @@ public class BankingIvrService {
      */
     private void handleTtsEvent(MrcpEvent event) {
         String eventName = event.getEventName().toString();
-        System.out.println("收到TTS事件: " + eventName);
+        log.info("收到TTS事件: {}", eventName);
         
         if ("SPEAK-COMPLETE".equals(eventName)) {
-            System.out.println("语音播放完成");
+            log.debug("语音播放完成");
             synthesisComplete = true;
         } else if ("SPEAK-FAILED".equals(eventName)) {
-            System.out.println("语音播放失败");
+            log.warn("语音播放失败");
             synthesisComplete = true;
         }
     }
@@ -233,7 +233,7 @@ public class BankingIvrService {
             waited += 100;
         }
         if (!recognitionComplete) {
-            System.out.println("识别超时");
+            log.warn("识别超时");
         }
     }
 
@@ -248,7 +248,7 @@ public class BankingIvrService {
             waited += 100;
         }
         if (!synthesisComplete) {
-            System.out.println("合成超时");
+            log.warn("合成超时");
         }
     }
 
@@ -265,7 +265,7 @@ public class BankingIvrService {
             // 执行IVR流程
             example.executeIvrFlow();
             
-            System.out.println("IVR流程执行完成");
+            log.info("IVR流程执行完成");
             
         } catch (Exception e) {
             log.error("BankingIvrService 执行异常", e);

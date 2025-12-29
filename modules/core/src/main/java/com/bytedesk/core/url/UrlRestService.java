@@ -56,7 +56,6 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
 
     @Override
     public UrlResponse create(UrlRequest request) {
-        
         UrlEntity entity = modelMapper.map(request, UrlEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
@@ -93,15 +92,6 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
     }
 
     @Override
-    public UrlEntity save(UrlEntity entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            return handleOptimisticLockingFailureException(e, entity);
-        }
-    }
-
-    @Override
     protected UrlEntity doSave(UrlEntity entity) {
         return urlRepository.save(entity);
     }
@@ -129,7 +119,6 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
-            // tagRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException("Url not found");
@@ -145,17 +134,7 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
     public UrlResponse convertToResponse(UrlEntity entity) {
         return modelMapper.map(entity, UrlResponse.class);
     }
-
-    @Override
-    public UrlResponse queryByUid(UrlRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
     
-    // public Boolean existsByPlatform(PlatformEnum platform) {
-    //     return tagRepository.existsByPlatform(platform.name());
-    // }
-
     @Override
     protected Specification<UrlEntity> createSpecification(UrlRequest request) {
         return UrlSpecification.search(request, authService);
