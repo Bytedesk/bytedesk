@@ -120,6 +120,9 @@ public class TicketEntity extends BaseEntity {
      */
     private String threadUid;
 
+    // 关联访客对话
+    private String visitorThreadUid;
+
     /**
      * Associated category UID for ticket classification
      */

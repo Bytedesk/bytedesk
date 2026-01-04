@@ -34,13 +34,13 @@ public class FormResultSpecification extends BaseSpecification<FormResultEntity,
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            // name
-            if (StringUtils.hasText(request.getName())) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            // formUid
+            if (StringUtils.hasText(request.getFormUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("formUid"), request.getFormUid()));
             }
-            // description
-            if (StringUtils.hasText(request.getDescription())) {
-                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            // user (json)
+            if (StringUtils.hasText(request.getUser())) {
+                predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUser() + "%"));
             }
             // type
             if (StringUtils.hasText(request.getType())) {

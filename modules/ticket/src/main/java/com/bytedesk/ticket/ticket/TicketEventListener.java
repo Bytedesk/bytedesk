@@ -82,20 +82,21 @@ public class TicketEventListener {
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
         variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
         variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
-        // 
+        //
         // processEntityUid 同时作为 Flowable 的 processDefinitionKey
         String processKey = ticket.getProcessEntityUid();
         if (!StringUtils.hasText(processKey)) {
             // 回退到默认的 processEntityUid（基于 orgUid 和 ticket type 计算）
             processKey = ticket.getType().equals(TicketTypeEnum.EXTERNAL.name())
-                    ? Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
+                    ? Utils.formatUid(ticket.getOrgUid(),
+                            TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
                     : Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY);
         }
-            // Flowable 要求 processDefinitionKey 为 NCName（不能以数字开头）
-            processKey = FlowableIdUtils.toProcessDefinitionKey(processKey);
+        // Flowable 要求 processDefinitionKey 为 NCName（不能以数字开头）
+        processKey = FlowableIdUtils.toProcessDefinitionKey(processKey);
         // 2. 启动流程实例
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-            .processDefinitionKey(processKey)
+                .processDefinitionKey(processKey)
                 .tenantId(ticket.getOrgUid())
                 .name(ticket.getTitle())
                 .businessKey(ticket.getUid())

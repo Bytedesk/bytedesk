@@ -80,6 +80,12 @@ public class ServiceSettingsRequest  implements Serializable {
     @Builder.Default
     private Boolean showHistory = false;
 
+    /**
+     * 访客发起咨询是否需要登录（未登录则应先登录再创建会话）
+     */
+    @Builder.Default
+    private Boolean requireLogin = false;
+
     // 输入联想开关
     // @Builder.Default
     // private Boolean showInputAssociation = false;

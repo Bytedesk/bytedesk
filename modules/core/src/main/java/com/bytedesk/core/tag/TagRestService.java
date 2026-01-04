@@ -50,9 +50,6 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     private final AuthService authService;
     
     private final PermissionService permissionService;
-
-    // 模块名称，用于权限检查
-    private static final String MODULE_NAME = "TAG";
     
     @Override
     public Page<TagEntity> queryByOrgEntity(TagRequest request) {
@@ -127,7 +124,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
         }
         
         // 检查用户是否有权限创建该层级的数据
-        if (!skipPermissionCheck && !permissionService.canCreateAtLevel(MODULE_NAME, level)) {
+        if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TagPermissions.MODULE_NAME, level)) {
             throw new RuntimeException("无权限创建该层级的标签数据");
         }
         
@@ -152,7 +149,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
             TagEntity entity = optional.get();
             
             // 检查用户是否有权限更新该实体
-            if (!permissionService.hasEntityPermission(MODULE_NAME, "UPDATE", entity)) {
+            if (!permissionService.hasEntityPermission(TagPermissions.MODULE_NAME, "UPDATE", entity)) {
                 throw new RuntimeException("无权限更新该标签数据");
             }
             
@@ -201,7 +198,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
             TagEntity entity = optional.get();
             
             // 检查用户是否有权限删除该实体
-            if (!permissionService.hasEntityPermission(MODULE_NAME, "DELETE", entity)) {
+            if (!permissionService.hasEntityPermission(TagPermissions.MODULE_NAME, "DELETE", entity)) {
                 throw new RuntimeException("无权限删除该标签数据");
             }
             

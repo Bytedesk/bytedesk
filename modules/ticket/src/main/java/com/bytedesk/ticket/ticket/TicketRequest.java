@@ -48,16 +48,18 @@ public class TicketRequest extends BaseRequest {
     private String wechat;
     // 
     private String ticketNumber;
-    private String ticketSettingsUid;
+    
     // 
     private String status;
     private String priority;
     // private String type;
-    // 
     private String topic;
+    // 工单对话
     private String threadUid;
-    private String categoryUid;
+    // 关联访客对话
+    private String visitorThreadUid;
     // 
+    private String categoryUid;
     private String workgroupUid;
     private String departmentUid;
     // 
@@ -78,6 +80,8 @@ public class TicketRequest extends BaseRequest {
     private String createdAtEnd;
     private Set<String> uploadUids;
 
+    // 
+    private String ticketSettingsUid;
     // 流程实例ID
     private String processInstanceId;
     // 流程定义实体UID

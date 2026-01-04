@@ -168,7 +168,6 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
                 .orgUid(orgUid)
                 .type(type.name())
                 .status(FormStatusEnum.PUBLISHED.name())
-                // .enabled(true)
                 .name(resolveDefaultFormName(type))
                 .description(resolveDefaultFormDescription(type))
                 .schema(buildDefaultTicketFormSchema(type))

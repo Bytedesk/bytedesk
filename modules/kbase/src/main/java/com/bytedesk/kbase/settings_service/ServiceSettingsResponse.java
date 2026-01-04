@@ -68,6 +68,11 @@ public class ServiceSettingsResponse implements Serializable {
 
     private Boolean showHistory;
 
+    /**
+     * 访客发起咨询是否需要登录
+     */
+    private Boolean requireLogin;
+
     // 输入联想开关
     // private Boolean showInputAssociation;
 
@@ -161,6 +166,7 @@ public class ServiceSettingsResponse implements Serializable {
                 .showPreForm(settings.getShowPreForm())
                 .preFormRequired(settings.getPreFormRequired())
                 .showHistory(settings.getShowHistory())
+                .requireLogin(settings.getRequireLogin())
                 // .showInputAssociation(settings.getShowInputAssociation())
                 .showCaptcha(settings.getShowCaptcha())
                 .welcomeTip(settings.getWelcomeTip())

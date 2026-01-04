@@ -73,7 +73,7 @@
 		</dependency>
 
 		<!-- llm -->
-		<!-- https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-openai -->
 		<dependency>
@@ -81,6 +81,13 @@
 			<artifactId>spring-ai-starter-model-openai</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/anthropic-chat.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-anthropic -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-anthropic</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency> -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat/vertexai-gemini-chat.html -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-vertex-ai-gemini -->
 		<!-- <dependency>
@@ -102,6 +109,7 @@
 			<artifactId>spring-ai-starter-model-ollama</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-deepseek -->
 		<dependency>

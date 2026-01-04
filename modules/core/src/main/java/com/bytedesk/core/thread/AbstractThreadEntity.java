@@ -26,7 +26,7 @@ import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.bytedesk.core.converter.JsonListConverter;
+import com.bytedesk.core.converter.JsonStringListConverter;
 import com.bytedesk.core.converter.StringListConverter;
 
 import jakarta.persistence.Column;
@@ -174,7 +174,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     // 存放被转接客服，存放多个 UserProtobuf 实体转换成的 JSON
     // @Builder.Default
-    // @Convert(converter = JsonListConverter.class)
+    // @Convert(converter = JsonStringListConverter.class)
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     // private List<String> transfers = new ArrayList<>();
     @Builder.Default
@@ -183,25 +183,25 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     // 邀请多个客服参与会话，存放多个 UserProtobuf 实体转换成的 JSON
     @Builder.Default
-    @Convert(converter = JsonListConverter.class)
+    @Convert(converter = JsonStringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> invites = new ArrayList<>();
 
     // 多个管理员监听会话, 存放多个 UserProtobuf 实体转换成的 JSON
     @Builder.Default
-    @Convert(converter = JsonListConverter.class)
+    @Convert(converter = JsonStringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> monitors = new ArrayList<>();
 
     // 存放多个 UserProtobuf 实体转换成的 JSON
     @Builder.Default
-    @Convert(converter = JsonListConverter.class)
+    @Convert(converter = JsonStringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> assistants = new ArrayList<>();
 
     // 存放多个 UserProtobuf 实体转换成的 JSON
     @Builder.Default
-    @Convert(converter = JsonListConverter.class)
+    @Convert(converter = JsonStringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> ticketors = new ArrayList<>();
 

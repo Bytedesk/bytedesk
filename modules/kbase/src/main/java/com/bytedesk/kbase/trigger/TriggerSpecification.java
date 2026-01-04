@@ -27,9 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TriggerSpecification extends BaseSpecification<TriggerEntity, TriggerRequest> {
-
-    // 模块名称，用于权限检查
-    private static final String MODULE_NAME = "TRIGGER";
     
     public static Specification<TriggerEntity> search(TriggerRequest request, AuthService authService) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
@@ -37,7 +34,7 @@ public class TriggerSpecification extends BaseSpecification<TriggerEntity, Trigg
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // 使用带层级过滤的基础条件
-            predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, MODULE_NAME));
+            predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, TriggerPermissions.MODULE_NAME));
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

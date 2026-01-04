@@ -26,50 +26,21 @@ import lombok.Data;
  */
 @Data
 public class FormResultExcel {
-
-    @ExcelProperty(index = 0, value = "表单结果名称")
-    @ColumnWidth(20)
-    private String name;
-
-    @ExcelProperty(index = 1, value = "类型")
+    @ExcelProperty(index = 0, value = "类型")
     @ColumnWidth(15)
     private String type;
 
-    @ExcelProperty(index = 2, value = "表单UID")
+    @ExcelProperty(index = 1, value = "表单UID")
     @ColumnWidth(25)
     private String formUid;
 
-    @ExcelProperty(index = 3, value = "提交者姓名")
-    @ColumnWidth(20)
-    private String submitterName;
+    @ExcelProperty(index = 2, value = "提交者")
+    @ColumnWidth(40)
+    private String user;
 
-    @ExcelProperty(index = 4, value = "提交者邮箱")
-    @ColumnWidth(25)
-    private String submitterEmail;
-
-    @ExcelProperty(index = 5, value = "提交者手机")
-    @ColumnWidth(20)
-    private String submitterMobile;
-
-    @ExcelProperty(index = 6, value = "状态")
-    @ColumnWidth(15)
-    private String status;
-
-    @ExcelProperty(index = 7, value = "关联对象UID")
-    @ColumnWidth(25)
-    private String relatedUid;
-
-    @ExcelProperty(index = 8, value = "关联对象类型")
-    @ColumnWidth(15)
-    private String relatedType;
-
-    @ExcelProperty(index = 9, value = "表单版本")
+    @ExcelProperty(index = 3, value = "表单版本")
     @ColumnWidth(10)
     private Integer formVersion;
-
-    @ExcelProperty(index = 10, value = "处理人UID")
-    @ColumnWidth(25)
-    private String processorUid;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)

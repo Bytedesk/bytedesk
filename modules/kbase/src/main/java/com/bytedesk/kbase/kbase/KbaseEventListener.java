@@ -36,6 +36,7 @@ import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.event.ArticleCreateEvent;
 import com.bytedesk.kbase.article.event.ArticleUpdateEvent;
+import com.bytedesk.kbase.blog.BlogStaticService;
 import com.bytedesk.kbase.kbase.event.KbaseCreateEvent;
 import com.bytedesk.kbase.kbase.event.KbaseUpdateEvent;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
@@ -59,6 +60,8 @@ public class KbaseEventListener {
         private final QuickReplyRestService quickReplyRestService;
 
         private final ArticleRestService articleRestService;
+
+        private final BlogStaticService blogStaticService;
 
         @EventListener
         public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -87,18 +90,22 @@ public class KbaseEventListener {
                 // KbaseCreateEvent kbaseCreateEvent = event.getObject();
                 KbaseEntity kbase = event.getKbase();
                 // log.info("onKbaseCreateEvent {}", kbase.getUid());
-                if (!kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                if (kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                        List<CategoryResponse> categories = new ArrayList<>();
+                        Page<ArticleResponse> articles = new PageImpl<>(
+                                        Collections.emptyList(),
+                                        PageRequest.of(0, 10),
+                                        1
+                        );
+                        kbaseStaticService.toHtmlKb(kbase, categories, articles, articles, articles);
+                        kbaseStaticService.toHtmlSearch(kbase);
                         return;
                 }
-                //
-                List<CategoryResponse> categories = new ArrayList<>();
-                Page<ArticleResponse> articles = new PageImpl<>(
-                                Collections.emptyList(), // 空的内容列表
-                                PageRequest.of(0, 10), // 第一页，一页显示1个元素
-                                1 // 总元素数为0
-                );
-                kbaseStaticService.toHtmlKb(kbase, categories, articles, articles, articles);
-                kbaseStaticService.toHtmlSearch(kbase);
+
+                if (kbase.getType().equals(KbaseTypeEnum.BLOG.name())) {
+                        blogStaticService.updateBlogKbase(kbase.getUid());
+                        return;
+                }
         }
 
         @EventListener
@@ -106,11 +113,14 @@ public class KbaseEventListener {
                 // KbaseUpdateEvent kbaseUpdateEvent = event.getObject();
                 KbaseEntity kbase = event.getKbase();
                 // log.info("onKbaseUpdateEvent {}", kbase.getUid());
-                if (!kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                if (kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                        kbaseStaticService.updateKbase(kbase);
                         return;
                 }
-                //
-                kbaseStaticService.updateKbase(kbase);
+                if (kbase.getType().equals(KbaseTypeEnum.BLOG.name())) {
+                        blogStaticService.updateBlogKbase(kbase.getUid());
+                        return;
+                }
         }
 
         @EventListener
@@ -125,11 +135,14 @@ public class KbaseEventListener {
                 //
                 Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(kbUid);
                 if (kbaseOptional.isPresent()) {
-                        if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                        if (kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                                kbaseStaticService.updateKbase(kbaseOptional.get());
                                 return;
                         }
-                        //
-                        kbaseStaticService.updateKbase(kbaseOptional.get());
+                        if (kbaseOptional.get().getType().equals(KbaseTypeEnum.BLOG.name())) {
+                                blogStaticService.updateBlogKbase(kbUid);
+                                return;
+                        }
                 } else {
                         log.error("onCategoryCreateEvent kb not found {}", kbUid);
                 }
@@ -146,11 +159,14 @@ public class KbaseEventListener {
                 //
                 Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(category.getKbUid());
                 if (kbaseOptional.isPresent()) {
-                        if (!kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                        if (kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
+                                kbaseStaticService.updateKbase(kbaseOptional.get());
                                 return;
                         }
-                        //
-                        kbaseStaticService.updateKbase(kbaseOptional.get());
+                        if (kbaseOptional.get().getType().equals(KbaseTypeEnum.BLOG.name())) {
+                                blogStaticService.updateBlogKbase(category.getKbUid());
+                                return;
+                        }
                 } else {
                         log.error("onCategoryUpdateEvent kb not found {}", category.getKbUid());
                 }

@@ -349,11 +349,11 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         long start = System.currentTimeMillis();
         long now = start;
         List<ConnectionEntity> all = connectionRepository.findAll();
-        int scanned = 0;
+        // int scanned = 0;
         int changed = 0;
         Set<String> changedUsers = new HashSet<>();
         for (ConnectionEntity c : all) {
-            scanned++;
+            // scanned++;
             if (c.isDeleted()) continue;
             if (CONNECTED.name().equals(c.getStatus())) {
                 Long last = c.getLastHeartbeatAt();
@@ -371,8 +371,8 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         for (String userUid : changedUsers) {
             evictPresenceCaches(userUid);
         }
-        long cost = System.currentTimeMillis() - start;
-        log.info("expireStaleSessions scanned={}, expired={}, costMs={}", scanned, changed, cost);
+        // long cost = System.currentTimeMillis() - start;
+        // log.info("expireStaleSessions scanned={}, expired={}, costMs={}", scanned, changed, cost);
         return changed;
     }
 

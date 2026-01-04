@@ -15,6 +15,7 @@ package com.bytedesk.core.server_metrics;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -124,6 +125,7 @@ public interface ServerMetricsRepository extends JpaRepository<ServerMetricsEnti
      * @param cutoffTime cutoff time
      * @return number of deleted records
      */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("DELETE FROM ServerMetricsEntity m WHERE m.deleted = false " +
            "AND m.timestamp < :cutoffTime")
     int deleteOldMetrics(@Param("cutoffTime") ZonedDateTime cutoffTime);

@@ -54,7 +54,7 @@ import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
-import com.bytedesk.service.workgroup.WorkgroupRoutingService;
+import com.bytedesk.service.workgroup_routing.WorkgroupRoutingService;
 import com.bytedesk.core.thread.ThreadEntity;
 
 import lombok.AllArgsConstructor;

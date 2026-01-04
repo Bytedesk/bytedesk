@@ -33,18 +33,13 @@ public class FormRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
-
-    // private String type;
 
     private String status;
 
     private String schema;
 
-    // private Boolean enabled;
-
-    // private String categoryUid;
+    private Integer formVersion;
 }

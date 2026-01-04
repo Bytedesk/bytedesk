@@ -80,14 +80,10 @@ public class FormEntity extends BaseEntity {
     private String schema;
 
     /**
-     * Whether is enabled
+     * 表单 schema 业务版本号（用于表单结果快照），与 BaseEntity.version（乐观锁）不同
      */
-    // @Builder.Default
-    // private Boolean enabled = false;
-
-    /**
-     * Category UID for organizing servers (optional)
-     */
-    // private String categoryUid;
+    @Builder.Default
+    @Column(name = "form_version")
+    private Integer formVersion = 1;
 
 }

@@ -107,16 +107,6 @@ public class ServiceSettingsEntity extends BaseEntity {
     @Builder.Default
     private Integer rateMsgCount = 3;
 
-    // 5星评分、10星评分
-    // @Builder.Default
-    // private Integer rateStarCount = 5;
-
-    // 评价选择按钮文字
-    // @Builder.Default
-    // @Convert(converter = StringListConverter.class)
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    // private List<String> rateTagList = new ArrayList<>();
-
     //-----------------------------------------------------------------------------------
 
     // 询前表单
@@ -141,7 +131,15 @@ public class ServiceSettingsEntity extends BaseEntity {
     @Builder.Default
     private Boolean showHistory = false;
 
-    // 防骚扰验证开关，TODO: 自定义验证规则: 1. 访问频率 2. 发消息时间间隔
+    /**
+     * 访客发起咨询是否需要登录（未登录则应先登录再创建会话）
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "require_login")
+    private Boolean requireLogin = false;
+
+    // 防骚扰验证开关，自定义验证规则: 1. 访问频率 2. 发消息时间间隔
     @NotNull
     @Builder.Default
     private Boolean showCaptcha = false;

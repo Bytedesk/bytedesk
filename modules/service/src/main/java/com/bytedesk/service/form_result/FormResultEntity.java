@@ -14,8 +14,10 @@
 package com.bytedesk.service.form_result;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.service.form.FormTypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
@@ -45,26 +47,8 @@ import lombok.experimental.SuperBuilder;
 // @EntityListeners({FormResultEntityListener.class})
 @Table(name = "bytedesk_service_form_result")
 public class FormResultEntity extends BaseEntity {
+
     private static final long serialVersionUID = 1L;
-
-
-    /**
-     * 结果标题或名称
-     */
-    private String name;
-
-    /**
-     * 结果描述
-     */
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
-
-    /**
-     * 表单结果类型（THREAD, CUSTOMER, TICKET）
-     */
-    @Builder.Default
-    @Column(name = "form_type")
-    private String type = FormResultTypeEnum.CUSTOMER.name();
 
     /**
      * 关联的表单UID - 引用FormEntity的uid
@@ -73,34 +57,18 @@ public class FormResultEntity extends BaseEntity {
     private String formUid;
 
     /**
-     * 提交者信息 - 可以是访客、客户或用户
+     * 表单结果类型
      */
-    @Column(name = "submitter_uid")
-    private String submitterUid;
+    @Builder.Default
+    @Column(name = "form_type")
+    private String type = FormTypeEnum.GENERAL.name();
 
     /**
-     * 提交者姓名
+     * 提交者信息的JSON表示
      */
-    @Column(name = "submitter_name")
-    private String submitterName;
-
-    /**
-     * 提交者邮箱
-     */
-    @Column(name = "submitter_email")
-    private String submitterEmail;
-
-    /**
-     * 提交者手机号
-     */
-    @Column(name = "submitter_mobile")
-    private String submitterMobile;
-
-    /**
-     * 提交者IP地址
-     */
-    @Column(name = "submitter_ip")
-    private String submitterIp;
+    @Builder.Default
+    @Column(name = "form_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 表单数据 - 存储用户填写的表单数据，JSON格式
@@ -109,46 +77,9 @@ public class FormResultEntity extends BaseEntity {
     private String formData;
 
     /**
-     * 关联的业务对象UID（如工单UID、会话UID等）
-     */
-    @Column(name = "related_uid")
-    private String relatedUid;
-
-    /**
-     * 关联的业务对象类型（TICKET, THREAD, CUSTOMER等）
-     */
-    @Column(name = "related_type")
-    private String relatedType;
-
-    /**
-     * 提交状态：DRAFT（草稿）、SUBMITTED（已提交）、PROCESSED（已处理）
-     */
-    @Builder.Default
-    @Column(name = "submit_status")
-    private String status = FormResultStatusEnum.SUBMITTED.name();
-
-    /**
-     * 处理结果或备注
-     */
-    @Column(name = "process_result", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String processResult;
-
-    /**
-     * 处理人UID
-     */
-    @Column(name = "processor_uid")
-    private String processorUid;
-
-    /**
      * 表单版本号 - 记录提交时表单的版本
      */
     @Column(name = "form_version")
     private Integer formVersion;
-
-    /**
-     * 附件信息 - 存储上传的文件信息，JSON格式
-     */
-    @Column(name = "attachments", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String attachments;
 
 }

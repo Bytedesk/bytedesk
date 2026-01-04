@@ -88,15 +88,20 @@ public class TicketService {
         }
         TicketEntity ticket = ticketOptional.get();
 
+        final String status = ticket.getStatus();
+        final String statusNew = TicketStatusEnum.NEW.name();
+        final String statusAssigned = TicketStatusEnum.ASSIGNED.name();
+        final String statusUnclaimed = TicketStatusEnum.UNCLAIMED.name();
+
         // 判断状态是否为NEW或ASSIGNED或退回状态，如果不是，则不能认领
-        if (!ticket.getStatus().equals(TicketStatusEnum.NEW.name()) &&
-                !ticket.getStatus().equals(TicketStatusEnum.ASSIGNED.name()) &&
-                !ticket.getStatus().equals(TicketStatusEnum.UNCLAIMED.name())) {
-            throw new RuntimeException("已经被认领，工单状态为" + ticket.getStatus() + "，不能重复认领: " + request.getUid());
+        if (!statusNew.equals(status) &&
+                !statusAssigned.equals(status) &&
+                !statusUnclaimed.equals(status)) {
+            throw new RuntimeException("已经被认领，工单状态为" + status + "，不能重复认领: " + request.getUid());
         }
 
         // 如果是ASSIGNED状态，判断是否为本人
-        if (ticket.getStatus().equals(TicketStatusEnum.ASSIGNED.name())) {
+        if (statusAssigned.equals(status)) {
             if (!ticket.getAssignee().getUid().equals(assigneeUid)) {
                 throw new RuntimeException("工单已经被分配，非本人不能认领: " + request.getUid());
             }

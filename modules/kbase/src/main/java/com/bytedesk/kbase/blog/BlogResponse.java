@@ -16,6 +16,8 @@ package com.bytedesk.kbase.blog;
 
 import com.bytedesk.core.base.BaseResponse;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,6 +40,28 @@ public class BlogResponse extends BaseResponse {
     private String description;
 
     private String type;
+
+    private String coverImageUrl;
+
+    private String contentMarkdown;
+
+    private String contentHtml;
+
+    private List<String> tagList;
+
+    private Boolean top;
+
+    private Boolean published;
+
+    private Integer readCount;
+
+    private Integer likeCount;
+
+    private String editor;
+
+    private String categoryUid;
+
+    private String kbUid;
 
 
 }

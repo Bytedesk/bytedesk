@@ -17,6 +17,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.kbase.blog.event.BlogCreateEvent;
+import com.bytedesk.kbase.blog.event.BlogDeleteEvent;
+import com.bytedesk.kbase.blog.event.BlogUpdateEvent;
+
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 
@@ -30,13 +34,57 @@ public class BlogEventListener {
 
     private final BlogRestService blogRestService;
 
-    @Order(3)
+    private final BlogStaticService blogStaticService;
+
+    @Order(12)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
         log.info("thread - organization created: {}", organization.getName());
         blogRestService.initBlogs(orgUid);
+    }
+
+    @EventListener
+    public void onBlogCreateEvent(BlogCreateEvent event) {
+        BlogEntity blog = event.getBlog();
+        if (blog == null) {
+            return;
+        }
+        if (blog.getKbUid() == null || blog.getKbUid().isBlank()) {
+            log.warn("onBlogCreateEvent skipped: missing kbUid for blog uid={}", blog.getUid());
+            return;
+        }
+        log.info("blog - created: {}", blog.getUid());
+        blogStaticService.updateBlogPost(blog.getUid());
+    }
+
+    @EventListener
+    public void onBlogUpdateEvent(BlogUpdateEvent event) {
+        BlogEntity blog = event.getBlog();
+        if (blog == null) {
+            return;
+        }
+        if (blog.getKbUid() == null || blog.getKbUid().isBlank()) {
+            log.warn("onBlogUpdateEvent skipped: missing kbUid for blog uid={}", blog.getUid());
+            return;
+        }
+        log.info("blog - updated: {}", blog.getUid());
+        blogStaticService.updateBlogPost(blog.getUid());
+    }
+
+    @EventListener
+    public void onBlogDeleteEvent(BlogDeleteEvent event) {
+        BlogEntity blog = event.getBlog();
+        if (blog == null) {
+            return;
+        }
+        if (blog.getKbUid() == null || blog.getKbUid().isBlank()) {
+            log.warn("onBlogDeleteEvent skipped: missing kbUid for blog uid={}", blog.getUid());
+            return;
+        }
+        log.info("blog - deleted: {}", blog.getUid());
+        blogStaticService.deleteBlogPostStatic(blog.getKbUid(), blog.getUid());
     }
 
  

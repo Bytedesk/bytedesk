@@ -135,7 +135,6 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
     }
 
-
     @Override
     public void delete(TokenRequest request) {
         deleteByUid(request.getUid());
@@ -226,7 +225,6 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             return false;
         }
     }
-
 
     /**
      * 撤销指定的accessToken，使其失效

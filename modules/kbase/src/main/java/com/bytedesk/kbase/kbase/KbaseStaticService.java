@@ -85,7 +85,7 @@ public class KbaseStaticService {
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
             //
-            String saveHtmlPathWithKbUid = kbaseProperties.getHtmlPath() + "/" + kbase.getUid();
+            String saveHtmlPathWithKbUid = kbaseProperties.resolveHelpcenterHtmlPath() + "/" + kbase.getUid();
             log.info("toHtmlKb saveHtmlPathWithKbUid {}", saveHtmlPathWithKbUid);
             File file = new File(saveHtmlPathWithKbUid);
             if (!file.exists()) {
@@ -125,7 +125,7 @@ public class KbaseStaticService {
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
             //
-            String saveHtmlPathWithKbUid = kbaseProperties.getHtmlPath() + "/" + kbase.getUid() + "/category";
+            String saveHtmlPathWithKbUid = kbaseProperties.resolveHelpcenterHtmlPath() + "/" + kbase.getUid() + "/category";
             log.info("toHtmlCategory saveHtmlPathWithKbUid {}", saveHtmlPathWithKbUid);
             File file = new File(saveHtmlPathWithKbUid);
             if (!file.exists()) {
@@ -166,7 +166,7 @@ public class KbaseStaticService {
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
             //
-            String saveHtmlPathWithKbUid = kbaseProperties.getHtmlPath() + "/" + kbase.getUid() + "/article";
+            String saveHtmlPathWithKbUid = kbaseProperties.resolveHelpcenterHtmlPath() + "/" + kbase.getUid() + "/article";
             log.info("toHtmlArticle saveHtmlPathWithKbUid {}", saveHtmlPathWithKbUid);
             File file = new File(saveHtmlPathWithKbUid);
             if (!file.exists()) {
@@ -196,13 +196,13 @@ public class KbaseStaticService {
             Template template = configuration.getTemplate("/kbase/themes/" + kbase.getTheme() + "/search.ftl");
             // 数据模型
             Map<String, Object> map = new HashMap<>();
-            map.put("apiHost", kbaseProperties.getApiUrl());
+            map.put("apiHost", kbaseProperties.resolveHelpcenterApiUrl());
             map.put("kbase", kbase);
             // 静态化页面内容
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
             //
-            String saveHtmlPathWithKbUid = kbaseProperties.getHtmlPath() + "/" + kbase.getUid();
+            String saveHtmlPathWithKbUid = kbaseProperties.resolveHelpcenterHtmlPath() + "/" + kbase.getUid();
             log.info("toHtmlSearch saveHtmlPathWithKbUid {}", saveHtmlPathWithKbUid);
             File file = new File(saveHtmlPathWithKbUid);
             if (!file.exists()) {

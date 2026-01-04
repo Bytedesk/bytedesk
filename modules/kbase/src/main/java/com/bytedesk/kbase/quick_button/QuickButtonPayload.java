@@ -55,4 +55,10 @@ public class QuickButtonPayload implements Serializable {
 
     /** Custom code for client side extensions */
     private String customCode;
+
+    /** Goods reference uid when type = GOODS (optional) */
+    private String goodsUid;
+
+    /** Order reference uid when type = ORDER (optional) */
+    private String orderUid;
 }

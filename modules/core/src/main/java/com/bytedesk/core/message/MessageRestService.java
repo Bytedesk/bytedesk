@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
@@ -50,6 +51,13 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
 
     @Override
     public Page<MessageEntity> queryByOrgEntity(MessageRequest request) {
+        // 非超级管理员请求如果未传 orgUid，默认使用当前用户的 orgUid，避免抛异常导致 500
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            UserEntity user = authService.getUser();
+            if (user != null && StringUtils.hasText(user.getOrgUid())) {
+                request.setOrgUid(user.getOrgUid());
+            }
+        }
         Pageable pageable = request.getPageable();
         Specification<MessageEntity> specs = MessageSpecification.search(request, authService);
         return messageRepository.findAll(specs, pageable);

@@ -58,6 +58,8 @@ public class KbaseConsts {
 
     public static final String KB_LLM_NAME = "大语言模型";
 
+    public static final String KB_BLOG_NAME = "博客";
+
     // public static final String KB_KEYWORD_NAME = "关键词";
 
     public static final String KB_FAQ_NAME = "常见问题";

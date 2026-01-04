@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="251231-add-form-form_version" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form" />
+            <not>
+                <columnExists tableName="bytedesk_service_form" columnName="form_version" />
+            </not>
+        </preConditions>
+        <comment>Add business schema version for forms</comment>
+        <addColumn tableName="bytedesk_service_form">
+            <column name="form_version" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_form" columnName="form_version" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-add-form-result-form_user" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <not>
+                <columnExists tableName="bytedesk_service_form_result" columnName="form_user" />
+            </not>
+        </preConditions>
+        <comment>Add submitter snapshot JSON for form results</comment>
+        <addColumn tableName="bytedesk_service_form_result">
+            <column name="form_user" type="VARCHAR(2048)" defaultValue="{}">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_form_result" columnName="form_user" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -27,9 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class BlogSpecification extends BaseSpecification<BlogEntity, BlogRequest> {
-
-    // 模块名称，用于权限检查
-    private static final String MODULE_NAME = "BLOG";
     
     public static Specification<BlogEntity> search(BlogRequest request, AuthService authService) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
@@ -37,7 +34,7 @@ public class BlogSpecification extends BaseSpecification<BlogEntity, BlogRequest
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // 使用带层级过滤的基础条件
-            predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, MODULE_NAME));
+            predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, BlogPermissions.MODULE_NAME));
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
@@ -46,9 +43,24 @@ public class BlogSpecification extends BaseSpecification<BlogEntity, BlogRequest
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
+            // content
+            if (StringUtils.hasText(request.getContentMarkdown())) {
+                predicates.add(criteriaBuilder.like(root.get("contentMarkdown"), "%" + request.getContentMarkdown() + "%"));
+            }
+            if (StringUtils.hasText(request.getContentHtml())) {
+                predicates.add(criteriaBuilder.like(root.get("contentHtml"), "%" + request.getContentHtml() + "%"));
+            }
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            // kbUid
+            if (StringUtils.hasText(request.getKbUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
+            }
+            // categoryUid
+            if (StringUtils.hasText(request.getCategoryUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
             // level - 如果指定了level则精确过滤
             if (StringUtils.hasText(request.getLevel())) {

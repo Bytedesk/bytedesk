@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Drop legacy columns removed from FormResultEntity -->
+
+    <changeSet id="251231-drop-form-result-name" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="name" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="name" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="name" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-description" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="description" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="description" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="description" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-submitter-uid" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="submitter_uid" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="submitter_uid" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="submitter_uid" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-submitter-name" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="submitter_name" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="submitter_name" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="submitter_name" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-submitter-email" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="submitter_email" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="submitter_email" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="submitter_email" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-submitter-mobile" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="submitter_mobile" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="submitter_mobile" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="submitter_mobile" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-submitter-ip" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="submitter_ip" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="submitter_ip" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="submitter_ip" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-related-uid" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="related_uid" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="related_uid" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="related_uid" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-related-type" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="related_type" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="related_type" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="related_type" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-submit-status" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="submit_status" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="submit_status" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="submit_status" type="VARCHAR(32)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-process-result" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="process_result" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="process_result" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="process_result" type="TEXT" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-processor-uid" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="processor_uid" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="processor_uid" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="processor_uid" type="VARCHAR(255)" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="251231-drop-form-result-attachments" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <columnExists tableName="bytedesk_service_form_result" columnName="attachments" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_form_result" columnName="attachments" />
+        <rollback>
+            <addColumn tableName="bytedesk_service_form_result">
+                <column name="attachments" type="TEXT" />
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -56,6 +56,7 @@ public class BytedeskConsts {
     public static final String DEFAULT_KB_NOTEBASE_UID = "df_kb_nb_uid";
     public static final String DEFAULT_KB_TABOO_UID = "df_kb_tb_uid";
     public static final String DEFAULT_KB_LLM_UID = "df_kb_llm_uid";
+    public static final String DEFAULT_KB_BLOG_UID = "df_kb_bg_uid";
     // public static final String DEFAULT_KB_KEYWORD_UID = "df_kb_kw_uid";
     // public static final String DEFAULT_KB_FAQ_UID = "df_kb_faq_uid";
     public static final String DEFAULT_KB_AUTOREPLY_UID = "df_kb_ar_uid";

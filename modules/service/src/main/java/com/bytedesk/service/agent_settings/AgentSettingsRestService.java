@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -822,15 +823,23 @@ public class AgentSettingsRestService
                 continue;
             }
             String title = tab.getTitle();
+            if (title != null) {
+                title = title.trim();
+            }
+
             String url = tab.getUrl();
-            boolean hasTitle = title != null && !title.trim().isEmpty();
-            boolean hasUrl = url != null && !url.trim().isEmpty();
+            if (url != null) {
+                url = url.trim();
+            }
+
+            boolean hasTitle = StringUtils.hasText(title);
+            boolean hasUrl = StringUtils.hasText(url);
             if (!hasTitle && !hasUrl) {
                 continue;
             }
             out.add(AgentRightPanelTab.builder()
-                    .title(hasTitle ? title.trim() : null)
-                    .url(hasUrl ? url.trim() : null)
+                    .title(hasTitle ? title : null)
+                    .url(hasUrl ? url : null)
                     .build());
         }
         return out;

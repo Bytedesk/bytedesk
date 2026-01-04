@@ -326,4 +326,9 @@ public class BdDateUtils {
         return parsedDate;
     }
 
+    // 获取当天日期
+    public static String getCurrentDay() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    }
+
 }

@@ -60,11 +60,6 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
         return tagRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "tag", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<FormResultEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return tagRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
-    }
-
     public Boolean existsByUid(String uid) {
         return tagRepository.existsByUid(uid);
     }
@@ -75,13 +70,6 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
-        }
-        // 检查name+orgUid+type是否已经存在
-        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<FormResultEntity> tag = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-            if (tag.isPresent()) {
-                return convertToResponse(tag.get());
-            }
         }
         // 
         UserEntity user = authService.getUser();
@@ -132,7 +120,11 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
             if (latest.isPresent()) {
                 FormResultEntity latestEntity = latest.get();
                 // 合并需要保留的数据
-                latestEntity.setName(entity.getName());
+                latestEntity.setFormUid(entity.getFormUid());
+                latestEntity.setType(entity.getType());
+                latestEntity.setUser(entity.getUser());
+                latestEntity.setFormData(entity.getFormData());
+                latestEntity.setFormVersion(entity.getFormVersion());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
                 return tagRepository.save(latestEntity);

@@ -70,7 +70,7 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
      * Moved from WorkgroupEntity to centralize configuration
      */
     @lombok.Builder.Default
-    private String routingMode = com.bytedesk.service.workgroup.WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
+    private String routingMode = com.bytedesk.service.workgroup_routing.WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
 
     /**
      * Message leave settings

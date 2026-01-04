@@ -33,10 +33,12 @@ public class MessageExtra extends BaseExtra {
     
     private static final long serialVersionUID = 1L;
 
-    // 是否内部消息
-    // 例如：企业内部员工之间的消息，true: 内部消息，false: 外部消息
+    // 消息可见范围
+    // public: 外部公开可见（默认）
+    // internal: 企业内部可见
+    // private: 仅我自己可见
     @Builder.Default
-    private Boolean isInternal = false; // 设置默认值为false
+    private MessageVisibilityEnum visibility = MessageVisibilityEnum.PUBLIC;
 
     private String translatedText; // 翻译后的文本
     

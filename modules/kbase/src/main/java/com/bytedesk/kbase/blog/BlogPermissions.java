@@ -20,6 +20,9 @@ public class BlogPermissions extends BasePermissions {
     // 模块前缀
     public static final String BLOG_PREFIX = "BLOG_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "BLOG";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String BLOG_READ = "BLOG_READ";
     public static final String BLOG_CREATE = "BLOG_CREATE";

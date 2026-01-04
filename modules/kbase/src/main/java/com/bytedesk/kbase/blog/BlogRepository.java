@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.blog;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +26,10 @@ public interface BlogRepository extends JpaRepository<BlogEntity, Long>, JpaSpec
     Boolean existsByUid(String uid);
 
     Optional<BlogEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+
+    List<BlogEntity> findByKbUidAndDeletedFalse(String kbUid);
+
+    List<BlogEntity> findByKbUidAndCategoryUidAndDeletedFalse(String kbUid, String categoryUid);
 
     // Boolean existsByPlatform(String platform);
 }

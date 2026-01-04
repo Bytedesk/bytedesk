@@ -28,8 +28,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
@@ -62,6 +63,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     private final ThreadRestService threadRestService;
+    private final PlatformTransactionManager transactionManager;
 
     // 后续严格测试之后再启用缓存
     // @Cacheable(value = "queue_member", key = "#uid", unless = "#result == null")
@@ -118,13 +120,14 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
      * - 冲突时仅记录日志，不影响主流程
      */
     @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveAsyncBestEffort(QueueMemberEntity entity) {
         if (entity == null || !StringUtils.hasText(entity.getUid())) {
             return;
         }
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         try {
-            queueMemberRepository.saveAndFlush(entity);
+            transactionTemplate.executeWithoutResult(status -> queueMemberRepository.saveAndFlush(entity));
         } catch (ObjectOptimisticLockingFailureException e) {
             log.warn("QueueMember async update optimistic lock ignored: uid={}, msg={}", entity.getUid(), e.getMessage());
         } catch (Exception e) {

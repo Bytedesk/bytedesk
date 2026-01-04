@@ -14,14 +14,21 @@
 //  */
 package com.bytedesk.core.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.bytedesk.core.config.idempotency.IdempotencyInterceptor;
 
 @Configuration
 @Description("Core Web MVC Configuration - 核心Web MVC配置类，配置静态资源等基础功能")
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    @Autowired(required = false)
+    private IdempotencyInterceptor idempotencyInterceptor;
 
     // https://www.baeldung.com/spring-mvc-static-resources
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
@@ -41,6 +48,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
                 .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        if (idempotencyInterceptor != null) {
+            registry.addInterceptor(idempotencyInterceptor)
+                    .addPathPatterns("/api/**");
+        }
     }
 
     // @Override

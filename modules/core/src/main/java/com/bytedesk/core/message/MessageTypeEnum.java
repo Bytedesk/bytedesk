@@ -29,13 +29,13 @@ public enum MessageTypeEnum {
     MUSIC, // 音乐消息
     LOCATION, // 位置消息
     LINK, // 链接消息
-    GOODS, // 商品消息
     CARD, // 名片消息
     EVENT, // 事件：离线、上线等
     EXTRA, // 附加信息
     GUESS, // 猜你想问
     HOT, // 热门话题
     SHORTCUT, // 快捷路径
+    GOODS, // 商品消息
     ORDER, // 订单
     // 
     QUEUE, // 排队消息: 用户进入排队队列
@@ -105,6 +105,7 @@ public enum MessageTypeEnum {
     // ROBOT_ANSWER, // 机器人答案：非流式回答，直接使用 ROBOT 消息类型
     // 
     ARTICLE, // 文章
+    BLOG, // 博客
     // 
     RATE_INVITE, // 邀请评价
     RATE, // 访客主动评价

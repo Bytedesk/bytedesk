@@ -36,35 +36,31 @@ public class TicketResponse extends BaseResponse {
     private static final long serialVersionUID = 1L;
     // 
     private String title;
+    // 问题描述
     private String description;
-
+    // 联系称呼
     private String contactName;
+    // 联系手机号
     private String phone;
+    // 联系邮箱
     private String email;
+    // 联系微信
     private String wechat;
-
+    // 
     private String ticketNumber;
-    private String ticketSettingsUid;
+   
     // 
     private String status;
     private String priority;
-    // 
     private String type;
-
-    // private ThreadResponse serviceThread;
     private String topic;
-
-    // private ThreadResponse thread;
+    // 工单对话
     private String threadUid;
+    // 关联访客对话
+    private String visitorThreadUid;
     // 
-    // private CategoryResponse category;
     private String categoryUid;
-
-    // 使用UserProtobuf json格式化
-    // private UserProtobuf user;
-
     private String workgroupUid;
-    
     private String departmentUid;
     // 
     // 工单处理人
@@ -76,13 +72,14 @@ public class TicketResponse extends BaseResponse {
     private UserProtobuf reporter;
     // 
     private Set<TicketAttachmentResponse> attachments;
+
+    // 
+     private String ticketSettingsUid;
     // 流程实例ID
     private String processInstanceId;
     // 流程定义实体UID，同时作为 Flowable 的 processDefinitionKey
     private String processEntityUid;
     private String formEntityUid;
-    // 流程定义实体
-    // private TicketProcessResponse processEntity;
 
     // 客户验证
     private Boolean verified;

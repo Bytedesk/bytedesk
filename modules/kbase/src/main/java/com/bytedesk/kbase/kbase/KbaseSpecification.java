@@ -38,10 +38,12 @@ public class KbaseSpecification extends BaseSpecification<KbaseEntity, KbaseRequ
             // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             
             if (request.getQueryNotebase()) {
+                // 用于在notebase管理模块中查询知识库列表
                 predicates.add(
                     criteriaBuilder.or(
                         criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.HELPCENTER.name()),
-                        criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.NOTEBASE.name())
+                        criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.NOTEBASE.name()),
+                        criteriaBuilder.equal(root.get("type"), KbaseTypeEnum.BLOG.name())
                     )
                 );
             } else if (StringUtils.hasText(request.getType())) {

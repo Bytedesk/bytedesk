@@ -292,6 +292,17 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
                 .build();
         create(kbaseLlmRequest);
 
+        // 初始化博客 BLOG 知识库
+        KbaseRequest kbaseBlogRequest = KbaseRequest.builder()
+            .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_BLOG_UID))
+            .type(KbaseTypeEnum.BLOG.name())
+            .name(KbaseConsts.KB_BLOG_NAME)
+            .descriptionHtml(KbaseConsts.KB_DESCRIPTION)
+            .language(LanguageEnum.ZH_CN.name())
+            .orgUid(orgUid)
+            .build();
+        create(kbaseBlogRequest);
+
         // 初始化自动回复关键词知识库
         // KbaseRequest kbaseAutoReplyKeywordRequest = KbaseRequest.builder()
         //         .uid(Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_AUTOREPLY_KEYWORD_UID))

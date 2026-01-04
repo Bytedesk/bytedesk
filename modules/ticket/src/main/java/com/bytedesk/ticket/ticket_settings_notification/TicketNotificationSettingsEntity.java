@@ -29,39 +29,45 @@ import lombok.extern.slf4j.Slf4j;
 @Table(name = "bytedesk_ticket_notification_settings")
 @Slf4j
 public class TicketNotificationSettingsEntity extends BaseEntity {
+
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
     private Boolean emailEnabled = Boolean.TRUE;
     /** 邮件事件集合 */
     @Builder.Default
-    @Convert(converter = com.bytedesk.ticket.ticket_settings_notification.StringListConverter.class)
+    @Convert(converter = com.bytedesk.core.converter.JsonStringListConverter.class)
     @Column(length = 512)
     private java.util.List<String> emailEvents = new java.util.ArrayList<>();
+
     /** 邮件模板集合 */
     @Builder.Default
-    @Convert(converter = com.bytedesk.ticket.ticket_settings_notification.EmailTemplateListConverter.class)
+    @Convert(converter = com.bytedesk.ticket.utils.EmailTemplateListConverter.class)
     @Column(length = 1024)
     private java.util.List<com.bytedesk.ticket.ticket_settings_notification.EmailTemplateDef> emailTemplates = new java.util.ArrayList<>();
 
     @Builder.Default
     private Boolean internalEnabled = Boolean.TRUE;
+
     /** 内部事件集合 */
     @Builder.Default
-    @Convert(converter = com.bytedesk.ticket.ticket_settings_notification.StringListConverter.class)
+    @Convert(converter = com.bytedesk.core.converter.JsonStringListConverter.class)
     @Column(length = 512)
     private java.util.List<String> internalEvents = new java.util.ArrayList<>();
 
     @Builder.Default
     private Boolean webhookEnabled = Boolean.FALSE;
+
     private String webhookUrl; // 可为空
+
     /** webhook事件集合 */
     @Builder.Default
-    @Convert(converter = com.bytedesk.ticket.ticket_settings_notification.StringListConverter.class)
+    @Convert(converter = com.bytedesk.core.converter.JsonStringListConverter.class)
     @Column(length = 512)
     private java.util.List<String> webhookEvents = new java.util.ArrayList<>();
 
     public static TicketNotificationSettingsEntity fromRequest(TicketNotificationSettingsRequest req) {
+        
         TicketNotificationSettingsEntity entity = new TicketNotificationSettingsEntity();
         if (req == null) {
             return entity;

@@ -33,43 +33,17 @@ public class FormResultResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
-    private String name;
-
-    private String description;
-
     private String type;
 
     private String formUid;
 
-    private String submitterUid;
-
-    private String submitterName;
-
-    private String submitterEmail;
-
-    private String submitterMobile;
-
-    private String submitterIp;
+    /**
+     * 提交者信息的JSON表示
+     */
+    private String user;
 
     private String formData;
 
-    private String relatedUid;
-
-    private String relatedType;
-
-    private String status;
-
-    private String processResult;
-
-    private String processorUid;
-
     private Integer formVersion;
-
-    private String attachments;
-
-    private String color;
-
-    private Integer order;
 
 }

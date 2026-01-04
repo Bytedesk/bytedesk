@@ -24,7 +24,5 @@ public interface FormResultRepository extends JpaRepository<FormResultEntity, Lo
 
     Boolean existsByUid(String uid);
 
-    Optional<FormResultEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
-
     // Boolean existsByPlatform(String platform);
 }

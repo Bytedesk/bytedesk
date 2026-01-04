@@ -286,10 +286,18 @@ services:
       BYTEDESK_MINIO_REGION: us-east-1
       BYTEDESK_MINIO_SECURE: false
       # Knowledge base config
-      BYTEDESK_KBASE_THEME: default
-      BYTEDESK_KBASE_HTML_PATH: helpcenter
-      # 知识库的访问地址，请修改为服务器实际的地址
-      BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
+      # BYTEDESK_KBASE_THEME: default
+      # # legacy keys (helpcenter defaults)
+      # BYTEDESK_KBASE_HTML_PATH: /app/helpcenter
+      # # 知识库的访问地址，请修改为服务器实际的地址
+      # BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
+      # split config: helpcenter/blog
+      BYTEDESK_KBASE_HELPCENTER_THEME: default
+      BYTEDESK_KBASE_HELPCENTER_HTML_PATH: /app/helpcenter
+      BYTEDESK_KBASE_HELPCENTER_API_URL: http://127.0.0.1:9003
+      BYTEDESK_KBASE_BLOG_THEME: default
+      BYTEDESK_KBASE_BLOG_HTML_PATH: /app/blog
+      BYTEDESK_KBASE_BLOG_API_URL: http://127.0.0.1:9003
       # Socket config
       BYTEDESK_SOCKET_HOST: 0.0.0.0
       BYTEDESK_SOCKET_WEBSOCKET_PORT: 9885
@@ -534,6 +542,8 @@ services:
       - 9885:9885
     volumes:
       - upload_data:/app/uploads
+      - helpcenter_data:/app/helpcenter
+      - blog_data:/app/blog
     networks:
       - bytedesk-network
 
@@ -546,6 +556,10 @@ volumes:
     name: bytedesk_elasticsearch_data
   upload_data:
     name: bytedesk_upload_data
+  helpcenter_data:
+    name: bytedesk_helpcenter_data
+  blog_data:
+    name: bytedesk_blog_data
   artemis_data:
     name: bytedesk_artemis_data
   zipkin_data:

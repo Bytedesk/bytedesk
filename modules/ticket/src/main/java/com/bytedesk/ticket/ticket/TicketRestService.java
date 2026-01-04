@@ -147,12 +147,14 @@ public class TicketRestService
         //
         if (StringUtils.hasText(request.getAssigneeJson())
                 && StringUtils.hasText(request.getAssignee().getUid())) {
+            // TODO: 需要通知被分配人员
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
         } else {
             ticket.setStatus(TicketStatusEnum.NEW.name());
         }
         ticket.setReporter(request.getReporterJson());
 
+        // 应用工单设置
         applyTicketSettings(ticket, request);
 
         if (!skipLoginEnforce) {
@@ -405,7 +407,6 @@ public class TicketRestService
 
     public void initTicketCategory(String orgUid) {
         log.info("initTicketCategory", orgUid);
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         List<CategoryTypeEnum> ticketCategoryTypes = List.of(CategoryTypeEnum.TICKET_INTERNAL, CategoryTypeEnum.TICKET_EXTERNAL);
         for (String category : TicketCategories.getAllCategories()) {
             for (CategoryTypeEnum categoryType : ticketCategoryTypes) {

@@ -14,7 +14,17 @@
 package com.bytedesk.kbase.blog;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -35,7 +45,36 @@ public class BlogRequest extends BaseRequest {
 
     private String description;
 
-    // @Builder.Default
-    // private String type = BlogTypeEnum.CUSTOMER.name();
+    private String coverImageUrl;
+
+    private String contentMarkdown;
+
+    private String contentHtml;
+
+    private String type;
+
+    private String categoryUid;
+
+    private String kbUid;
+
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
+
+    @Builder.Default
+    private Boolean top = false;
+
+    @Builder.Default
+    private Boolean published = false;
+
+    @Builder.Default
+    private Integer readCount = 0;
+
+    @Builder.Default
+    private Integer likeCount = 0;
+
+    @Builder.Default
+    private String editor = BytedeskConsts.EMPTY_STRING;
 
 }

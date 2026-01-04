@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.annotation.Idempotent;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -76,6 +77,7 @@ public class BlogRestController extends BaseRestController<BlogRequest, BlogRest
     @Operation(summary = "Create Blog", description = "Create a new blog")
     @Override
     @PreAuthorize(BlogPermissions.HAS_BLOG_CREATE)
+    @Idempotent(ttlSeconds = 120)
     public ResponseEntity<?> create(BlogRequest request) {
         
         BlogResponse blog = blogRestService.create(request);
@@ -120,7 +122,5 @@ public class BlogRestController extends BaseRestController<BlogRequest, BlogRest
             "blog"
         );
     }
-
-    
     
 }

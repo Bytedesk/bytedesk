@@ -101,7 +101,7 @@ public class KbaseController {
         //
         // model.addAttribute("kbUid", kbUid);
         // model.addAttribute("content", content);
-        model.addAttribute("apiHost", kbaseProperties.getApiUrl());
+        model.addAttribute("apiHost", kbaseProperties.resolveHelpcenterApiUrl());
         // 
         Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(kbUid);
         if (kbaseOptional.isPresent()) {

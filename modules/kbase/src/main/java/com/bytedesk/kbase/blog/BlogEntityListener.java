@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.kbase.blog.event.BlogCreateEvent;
+import com.bytedesk.kbase.blog.event.BlogDeleteEvent;
 import com.bytedesk.kbase.blog.event.BlogUpdateEvent;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
@@ -40,7 +41,11 @@ public class BlogEntityListener {
     public void onPostUpdate(BlogEntity blog) {
         log.info("onPostUpdate: {}", blog);
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new BlogUpdateEvent(blog));
+        if (blog.isDeleted()) {
+            bytedeskEventPublisher.publishEvent(new BlogDeleteEvent(blog));
+        } else {
+            bytedeskEventPublisher.publishEvent(new BlogUpdateEvent(blog));
+        }
     }
     
 }

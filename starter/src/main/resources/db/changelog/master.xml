@@ -44,4 +44,7 @@
     <include file="db/changelog/migration/251226_update_authority_level_settings_platform_others_organization.xml" />
     <include file="db/changelog/migration/251223_drop_bytedesk_core_quartz.xml" />
 
+    <include file="db/changelog/migration/251231_add_form_version_and_form_user.xml" />
+    <include file="db/changelog/migration/251231_drop_form_result_legacy_columns.xml" />
+
 </databaseChangeLog>

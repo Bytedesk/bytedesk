@@ -75,6 +75,10 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 if (user == null) {
                         return null;
                 }
+                // 防御性处理：上层可能传入 null request
+                if (request == null) {
+                        request = new RoleRequest();
+                }
                 // 非超级管理员查询系统角色：将请求提升为平台级查询，并固定到默认组织
                 // - 避免 BaseSpecification 对 orgUid 的强制校验
                 // - 避免将 orgUid 绑定为用户 org 导致查询不到系统角色
@@ -99,6 +103,10 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 UserEntity user = authService.getUser();
                 if (user == null) {
                         return null;
+                }
+                // 防御性处理：上层可能传入 null request
+                if (request == null) {
+                        request = new RoleRequest();
                 }
                 request.setUserUid(user.getUid());
                 if (!user.isSuperUser() && request != null && Boolean.TRUE.equals(request.getSystem())) {

@@ -15,7 +15,9 @@ public enum QuickButtonTypeEnum {
     FORM,
     IMAGE,
     PHONE,
-    EMAIL;
+    EMAIL,
+    ORDER,
+    GOODS;
 
     public static QuickButtonTypeEnum fromValue(String value) {
         if (value == null || value.isBlank()) {
