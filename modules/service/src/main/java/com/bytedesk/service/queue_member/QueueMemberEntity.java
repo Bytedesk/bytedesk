@@ -254,7 +254,7 @@ public class QueueMemberEntity extends BaseEntity {
     private ZonedDateTime intentionLastTriggeredAt;
 
     /**
-     * 情绪识别最近触发时间（用于冷却控制）
+     * 情绪分析最近触发时间（用于冷却控制）
      */
     @Column(name = "emotion_last_triggered_at")
     private ZonedDateTime emotionLastTriggeredAt;
@@ -299,7 +299,7 @@ public class QueueMemberEntity extends BaseEntity {
     @Column(name = "thread_emotion_type")
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
 
-    // 情绪识别原始结果（JSON/文本），便于回溯与二次处理
+    // 情绪分析原始结果（JSON/文本），便于回溯与二次处理
     @Builder.Default
     @Column(name = "thread_emotion_result", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String threadEmotionResult = "";

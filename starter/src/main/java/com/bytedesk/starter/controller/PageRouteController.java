@@ -376,18 +376,18 @@ public class PageRouteController {
 		return "forward:/chat/iframe.html";
 	}
 
-	// http://127.0.0.1:9003/agenticflow
+	// http://127.0.0.1:9003/workflow
 	@GetMapping({
-			"/agenticflow",
-			"/agenticflow/",
-			"/agenticflow/{path:[^\\.]*}",
-			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}",
-			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
-			"/agenticflow/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+			"/workflow",
+			"/workflow/",
+			"/workflow/{path:[^\\.]*}",
+			"/workflow/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/workflow/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/workflow/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
-	public String agenticflow(@PathVariable(required = false) String path,
+	public String workflow(@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
-		return "forward:/agenticflow/index.html"; // 默认路径
+		return "forward:/workflow/index.html"; // 默认路径
 	}
 
 	/**

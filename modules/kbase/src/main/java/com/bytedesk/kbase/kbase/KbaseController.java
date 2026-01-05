@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
@@ -50,7 +51,7 @@ public class KbaseController {
 
 	// kb/${currentKbase?.uid}
 	// http://127.0.0.1:9003/helpcenter/${currentArticle?.uid}
-    @KbaseAnnotation(title = "KbaseRouter", action = "kbIndex", description = "show kbase")
+    @ActionAnnotation(title = "KbaseRouter", action = "kbIndex", description = "show kbase")
 	@GetMapping({"/{kbUid:[^\\.]*}", "/{kbUid:[^\\.]*}/"})
 	public String kbIndex(@PathVariable String kbUid, Model model) {
 		log.info("kbIndex path: {}", kbUid);

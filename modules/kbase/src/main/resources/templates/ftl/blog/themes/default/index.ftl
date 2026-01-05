@@ -44,8 +44,8 @@
         <p>${(kbase.descriptionHtml)!""}</p>
       </div>
       <nav class="nav">
-        <a href="index.html">首页</a>
-        <a href="search.html">搜索</a>
+        <a href="/blog/${kbase.uid!''}">首页</a>
+        <a href="/blog/${kbase.uid!''}/search.html">搜索</a>
       </nav>
     </header>
 
@@ -53,7 +53,7 @@
       <h2>分类</h2>
       <ul class="chips">
         <#list categories as c>
-          <li class="chip"><a href="category/${c.uid}.html">${(c.name)!c.uid}</a></li>
+          <li class="chip"><a href="/blog/${kbase.uid!''}/category/${c.uid}.html">${(c.name)!c.uid}</a></li>
         </#list>
       </ul>
     </section>
@@ -67,7 +67,7 @@
           <#list blogs as b>
             <li class="card">
               <h3>
-                <a href="post/${b.uid}.html">${(b.name)!b.uid}</a>
+                <a href="/blog/${kbase.uid!''}/post/${b.uid}.html">${(b.name)!b.uid}</a>
                 <#if (b.published)?? && b.published == false>
                   <span class="meta">（未发布）</span>
                 </#if>

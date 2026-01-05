@@ -108,7 +108,7 @@ public class VisitorEntity extends BaseEntity {
 	// 浏览的IP地址
 	private String ipLocation;
 
-	// 会员等级
+	// 会员等级，tier层级
 	@Builder.Default
 	private Integer vipLevel = 0;
 	

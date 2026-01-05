@@ -36,12 +36,12 @@ public class EmotionSettingResponse extends BaseResponse {
     private String description;
 
     /**
-     * 绑定用于情绪识别的机器人（RobotEntity.uid）
+     * 绑定用于情绪分析的机器人（RobotEntity.uid）
      */
     private String robotUid;
 
     /**
-     * 是否启用情绪识别
+     * 是否启用情绪分析
      */
     private Boolean enabled;
 

@@ -85,16 +85,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
     private final DepartmentRestService departmentRestService;
 
-    @Override
-    protected Specification<MemberEntity> createSpecification(MemberRequest request) {
-        return MemberSpecification.search(request, authService);
-    }
-
-    @Override
-    protected Page<MemberEntity> executePageQuery(Specification<MemberEntity> spec, Pageable pageable) {
-        return memberRepository.findAll(spec, pageable);
-    }
-
     public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
@@ -606,5 +596,52 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         return excel;
     }
+
+    @Override
+    protected Specification<MemberEntity> createSpecification(MemberRequest request) {
+        expandDeptUidToSubDeptUidsIfNeeded(request);
+        return MemberSpecification.search(request, authService);
+    }
+
+    private void expandDeptUidToSubDeptUidsIfNeeded(MemberRequest request) {
+        if (request == null) {
+            return;
+        }
+        // 1) 未传 deptUid 或者是“全部”场景（前端可能传空字符串）则不处理
+        if (!StringUtils.hasText(request.getDeptUid())) {
+            return;
+        }
+        // 2) 如果前端已经传了 subDeptUids，则尊重前端传参
+        if (request.getSubDeptUids() != null && !request.getSubDeptUids().isEmpty()) {
+            return;
+        }
+
+        Optional<DepartmentEntity> departmentOptional = departmentRestService.findByUid(request.getDeptUid());
+        if (departmentOptional.isEmpty()) {
+            return;
+        }
+
+        Set<String> descendantUids = new HashSet<>();
+        collectDescendantDepartmentUids(departmentOptional.get(), descendantUids);
+        request.setSubDeptUids(descendantUids);
+    }
+
+    private void collectDescendantDepartmentUids(DepartmentEntity department, Set<String> out) {
+        if (department == null || out == null || department.getChildren() == null || department.getChildren().isEmpty()) {
+            return;
+        }
+        for (DepartmentEntity child : department.getChildren()) {
+            if (child != null && StringUtils.hasText(child.getUid())) {
+                out.add(child.getUid());
+            }
+            collectDescendantDepartmentUids(child, out);
+        }
+    }
+
+    @Override
+    protected Page<MemberEntity> executePageQuery(Specification<MemberEntity> spec, Pageable pageable) {
+        return memberRepository.findAll(spec, pageable);
+    }
+
 
 }

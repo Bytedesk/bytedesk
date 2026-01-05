@@ -233,6 +233,24 @@ public class PermissionService {
                 break;
             }
         }
+
+        // 兼容“统一权限”（不在权限字符串中编码层级）的模块
+        // 例如：DEPARTMENT_READ / MEMBER_READ
+        if (accessibleLevels.isEmpty()) {
+            String unifiedPermission = module + "_" + action;
+            if (authorities.contains(unifiedPermission)) {
+                // 默认视为组织级可访问（及以下层级）
+                boolean startAdding = false;
+                for (String level : levels) {
+                    if (LevelEnum.ORGANIZATION.name().equals(level)) {
+                        startAdding = true;
+                    }
+                    if (startAdding) {
+                        accessibleLevels.add(level);
+                    }
+                }
+            }
+        }
         
         // 用户始终可以访问自己创建的数据
         // accessibleLevels.add(LevelEnum.USER.name());

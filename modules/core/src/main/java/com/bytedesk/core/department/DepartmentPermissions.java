@@ -17,6 +17,8 @@ import com.bytedesk.core.base.BasePermissions;
 
 public class DepartmentPermissions extends BasePermissions {
 
+    public static final String MODULE_NAME = "DEPARTMENT";
+
     // 模块前缀
     public static final String DEPARTMENT_PREFIX = "DEPARTMENT_";
 

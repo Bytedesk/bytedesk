@@ -117,7 +117,7 @@ Features START -->
 						<i class="bi bi-clipboard-data fs-5"></i>
 					</div>
 					<h5><@t key="page.callcenter.feature.qa.title">质检分析</@t></h5>
-					<p class="mb-0"><@t key="page.callcenter.feature.qa.desc">AI自动质检，情绪识别，关键词检测，服务质量评估</@t></p>
+					<p class="mb-0"><@t key="page.callcenter.feature.qa.desc">AI自动质检，情绪分析，关键词检测，服务质量评估</@t></p>
 				</div>
 			</div>
 		</div>

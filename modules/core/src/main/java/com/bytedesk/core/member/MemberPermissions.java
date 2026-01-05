@@ -17,6 +17,8 @@ import com.bytedesk.core.base.BasePermissions;
 
 public class MemberPermissions extends BasePermissions {
 
+    public static final String MODULE_NAME = "MEMBER";
+
     // 模块前缀
     public static final String MEMBER_PREFIX = "MEMBER_";
 

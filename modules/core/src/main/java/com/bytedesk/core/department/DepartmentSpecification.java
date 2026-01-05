@@ -30,11 +30,11 @@ public class DepartmentSpecification extends BaseSpecification<DepartmentEntity,
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             // 校验：非超级管理员必须传 orgUid
-            if (!Boolean.TRUE.equals(request.getSuperUser()) && (request.getOrgUid() == null || request.getOrgUid().trim().isEmpty())) {
-                throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
-            }
+            // if (!Boolean.TRUE.equals(request.getSuperUser()) && (request.getOrgUid() == null || request.getOrgUid().trim().isEmpty())) {
+            //     throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
+            // }
             List<Predicate> predicates = new ArrayList<>();
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+            predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, DepartmentPermissions.MODULE_NAME));
             // parent == null
             predicates.add(criteriaBuilder.isNull(root.get("parent")));
             // 过滤掉children中deleted==true的数据

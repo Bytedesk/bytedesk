@@ -43,13 +43,13 @@
   <div class="container">
     <header class="topbar">
       <div class="brand">
-        <h1><a href="../index.html">${(kbase.name)!"Blog"}</a></h1>
+        <h1><a href="/blog/${kbase.uid!''}">${(kbase.name)!"Blog"}</a></h1>
       </div>
       <nav class="nav">
-        <a href="../index.html">首页</a>
-        <a href="../search.html">搜索</a>
+        <a href="/blog/${kbase.uid!''}">首页</a>
+        <a href="/blog/${kbase.uid!''}/search.html">搜索</a>
         <#if (blog.categoryUid)??>
-          <a href="../category/${blog.categoryUid}.html">返回分类</a>
+          <a href="/blog/${kbase.uid!''}/category/${blog.categoryUid}.html">返回分类</a>
         </#if>
       </nav>
     </header>
@@ -86,7 +86,7 @@
         <h3>分类</h3>
         <ul class="chips">
           <#list categories as c>
-            <li class="chip"><a href="../category/${c.uid}.html">${(c.name)!c.uid}</a></li>
+            <li class="chip"><a href="/blog/${kbase.uid!''}/category/${c.uid}.html">${(c.name)!c.uid}</a></li>
           </#list>
         </ul>
       </aside>

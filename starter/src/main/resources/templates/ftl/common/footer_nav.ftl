@@ -47,6 +47,8 @@
 				<h5 class="mb-3 text-white"><@t key="footer.quicklinks">快速链接</@t></h5>
 				<ul class="nav flex-column">
 					<li class="nav-item"><a class="nav-link text-white-50" href="https://www.weiyuai.cn/docs/zh-CN/" target="_blank"><@t key="nav.docs">文档</@t></a></li>
+					<li class="nav-item"><a class="nav-link text-white-50" href="https://www.weiyuai.cn/blog/df_org_uid_df_kb_bg_uid/index.html" target="_blank"><@t key="nav.blog">博客</@t></a></li>
+					<li class="nav-item"><a class="nav-link text-white-50" href="https://www.weiyuai.cn/helpcenter/df_org_uid_df_kb_hc_uid/index.html" target="_blank"><@t key="nav.helpcenter">帮助中心</@t></a></li>
 					<li class="nav-item"><a class="nav-link text-white-50" href="${langPrefix}/pages/download.html"><@t key="nav.download">下载</@t></a></li>
 					<li class="nav-item"><a class="nav-link text-white-50" href="${langPrefix}/pages/about.html"><@t key="nav.about">关于</@t></a></li>
 					<li class="nav-item"><a class="nav-link text-white-50" href="${langPrefix}/pages/contact.html"><@t key="nav.contact">联系</@t></a></li>

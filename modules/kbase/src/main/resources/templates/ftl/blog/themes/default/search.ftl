@@ -32,10 +32,10 @@
   <div class="container">
     <header class="topbar">
       <div class="brand">
-        <h1><a href="index.html">${(kbase.name)!"Blog"}</a></h1>
+        <h1><a href="/blog/${kbase.uid!''}">${(kbase.name)!"Blog"}</a></h1>
       </div>
       <nav class="nav">
-        <a href="index.html">首页</a>
+        <a href="/blog/${kbase.uid!''}">首页</a>
       </nav>
     </header>
 

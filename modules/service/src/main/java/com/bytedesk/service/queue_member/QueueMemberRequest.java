@@ -166,7 +166,7 @@ public class QueueMemberRequest extends BaseRequest {
     @Builder.Default
     private String emotionType = ThreadEmotionTypeEnum.OTHER.name();
 
-    // 情绪识别原始结果（JSON/文本）
+    // 情绪分析原始结果（JSON/文本）
     @Builder.Default
     private String threadEmotionResult = "";
 

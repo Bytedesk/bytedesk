@@ -39,12 +39,12 @@
   <div class="container">
     <header class="topbar">
       <div class="brand">
-        <h1><a href="../index.html">${(kbase.name)!"Blog"}</a></h1>
+        <h1><a href="/blog/${kbase.uid!''}">${(kbase.name)!"Blog"}</a></h1>
         <h2>${(category.name)!category.uid}</h2>
       </div>
       <nav class="nav">
-        <a href="../index.html">首页</a>
-        <a href="../search.html">搜索</a>
+        <a href="/blog/${kbase.uid!''}">首页</a>
+        <a href="/blog/${kbase.uid!''}/search.html">搜索</a>
       </nav>
     </header>
 
@@ -53,7 +53,7 @@
         <h3>全部分类</h3>
         <ul class="chips">
           <#list categories as c>
-            <li class="chip"><a href="${c.uid}.html">${(c.name)!c.uid}</a></li>
+            <li class="chip"><a href="/blog/${kbase.uid!''}/category/${c.uid}.html">${(c.name)!c.uid}</a></li>
           </#list>
         </ul>
       </aside>
@@ -66,7 +66,7 @@
           <ul class="list">
             <#list blogs as b>
               <li class="card">
-                <h4><a href="../post/${b.uid}.html">${(b.name)!b.uid}</a></h4>
+                <h4><a href="/blog/${kbase.uid!''}/post/${b.uid}.html">${(b.name)!b.uid}</a></h4>
                 <div class="meta">${(b.description)!""}</div>
               </li>
             </#list>

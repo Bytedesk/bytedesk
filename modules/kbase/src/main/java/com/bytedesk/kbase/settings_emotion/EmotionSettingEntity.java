@@ -51,7 +51,7 @@ public class EmotionSettingEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 设置名称，用于区分不同的情绪识别设置模板
+     * 设置名称，用于区分不同的情绪分析设置模板
      */
     @Column(name = "settings_name")
     private String name;
@@ -63,7 +63,7 @@ public class EmotionSettingEntity extends BaseEntity {
     private String description;
 
     /**
-     * 关联robot entity uid，用于调用LLM大模型进行情绪识别
+     * 关联robot entity uid，用于调用LLM大模型进行情绪分析
      */
     @Column(name = "robot_uid")
     private String robotUid;
@@ -76,7 +76,7 @@ public class EmotionSettingEntity extends BaseEntity {
     private Boolean defaultTemplate = false;
 
     /**
-     * 是否启用情绪识别
+     * 是否启用情绪分析
      */
     @Builder.Default
     @Column(name = "is_enabled")
@@ -141,7 +141,7 @@ public class EmotionSettingEntity extends BaseEntity {
     ));
     
     /**
-     * 情绪信心度阈值，低于该阈值的情绪识别结果将被认为是不确定的
+     * 情绪信心度阈值，低于该阈值的情绪分析结果将被认为是不确定的
      * 范围：0-1，例如0.75表示75%的置信度
      */
     @Builder.Default
@@ -149,7 +149,7 @@ public class EmotionSettingEntity extends BaseEntity {
     private Double confidenceThreshold = 0.7;
 
     /**
-     * 情绪识别触发条件
+     * 情绪分析触发条件
      * 格式：{"触发条件1": "值1", "触发条件2": "值2"}
      * 例如：{"message_length": "10", "keyword_match": "true"}
      */

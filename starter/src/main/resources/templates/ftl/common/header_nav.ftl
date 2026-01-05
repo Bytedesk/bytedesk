@@ -59,6 +59,8 @@
 				<!-- Nav item 2 Course -->
 				<li class="nav-item dropdown"><a class="nav-link" href="${docBaseUrl}" target="_blank"><@t key="nav.docs">文档</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${pricingUrl}" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/blog/df_org_uid_df_kb_bg_uid/index.html" target="_blank"><@t key="nav.blog">博客</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/helpcenter/df_org_uid_df_kb_hc_uid/index.html" target="_blank"><@t key="nav.helpcenter">帮助中心</@t></a></li>
 				
 				<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
 				<#-- pruned: voice, forum, help, architecture -->
