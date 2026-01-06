@@ -109,6 +109,10 @@ public class KbaseProperties {
             String hcRoot = resolveHelpcenterHtmlPath();
             root = (hcRoot == null ? null : hcRoot + "/blog");
         }
+        // explicit null-check so static analysis recognizes root may be null
+        if (root == null) {
+            return null;
+        }
         if (!StringUtils.hasText(root)) {
             return root;
         }
