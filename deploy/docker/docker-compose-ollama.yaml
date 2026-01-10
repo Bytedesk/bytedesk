@@ -228,12 +228,12 @@ services:
       # Member config
       BYTEDESK_MEMBER_PASSWORD: 123456
       # Performance Testing config
-      BYTEDESK_TESTING_ENABLED: "false"
+      BYTEDESK_TESTING_ENABLED: "true"
       # BYTEDESK_TESTING_ACCOUNT_COUNT: 300
       # BYTEDESK_TESTING_ACCOUNT_USERNAME: test
       # BYTEDESK_TESTING_ACCOUNT_PASSWORD: password
-      BYTEDESK_TESTING_DISABLE_CAPTCHA: "false"
-      BYTEDESK_TESTING_DISABLE_IP_FILTER: "false"
+      BYTEDESK_TESTING_DISABLE_CAPTCHA: "true"
+      BYTEDESK_TESTING_DISABLE_IP_FILTER: "true"
       # whitelist ip for performance testing
       BYTEDESK_TESTING_IP_WHITELIST: 127.0.0.1,127.0.0.2
       # Organization config
