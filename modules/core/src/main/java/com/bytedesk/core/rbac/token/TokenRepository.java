@@ -17,8 +17,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSpecificationExecutor<TokenEntity> {
     
@@ -39,4 +43,21 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
      * @return 有效令牌列表
      */
     List<TokenEntity> findByUserUidAndTypeAndRevokedFalseAndDeletedFalseAndExpiresAtAfter(String userUid, String type, ZonedDateTime now);
+
+        /**
+         * 原子更新 lastActiveAt（仅当超过阈值才更新），避免在高并发鉴权场景下对 detached entity 执行 merge 导致乐观锁异常。
+         *
+         * 注意：JPQL bulk update 会绕过 @Version 机制（不会递增 version），这里是刻意为之。
+         */
+        @Transactional
+        @Modifying
+        @Query("""
+                        update TokenEntity t
+                             set t.lastActiveAt = :now
+                         where t.id = :id
+                             and t.revoked = false
+                             and t.deleted = false
+                             and (t.lastActiveAt is null or t.lastActiveAt <= :threshold)
+                        """)
+        int updateLastActiveAtIfDue(@Param("id") Long id, @Param("now") ZonedDateTime now, @Param("threshold") ZonedDateTime threshold);
 }

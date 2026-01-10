@@ -14,8 +14,8 @@
 package com.bytedesk.core.rbac.token;
 
 import java.util.Optional;
-import java.time.ZonedDateTime;
-import java.time.Duration;
+// import java.time.ZonedDateTime;
+// import java.time.Duration;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
@@ -44,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest, TokenResponse> {
 
     // 触发 lastActiveAt 写库的最小间隔（避免每次请求都更新）
-    private static final Duration LAST_ACTIVE_UPDATE_MIN_INTERVAL = Duration.ofMinutes(5);
+    // private static final Duration LAST_ACTIVE_UPDATE_MIN_INTERVAL = Duration.ofMinutes(5);
 
     private final TokenRepository tokenRepository;
 
@@ -252,18 +253,31 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      * 在 token 被成功校验/使用后，按需更新最近活跃时间。
      * 为避免高频写库，只有 lastActiveAt 为空或超过最小间隔才会更新。
      */
+    @Transactional
     public void touchLastActiveAtIfNeeded(@NonNull TokenEntity entity) {
         if (bytedeskProperties.isDisableIpFilter()) {
             // 性能测试模式可能不落库，这里不强制写库
             return;
         }
 
-        ZonedDateTime now = com.bytedesk.core.utils.BdDateUtils.now();
-        ZonedDateTime last = entity.getLastActiveAt();
-        if (last == null || Duration.between(last, now).compareTo(LAST_ACTIVE_UPDATE_MIN_INTERVAL) >= 0) {
-            entity.setLastActiveAt(now);
-            save(entity);
-        }
+        // ZonedDateTime now = com.bytedesk.core.utils.BdDateUtils.now();
+        // ZonedDateTime last = entity.getLastActiveAt();
+        // if (last != null && Duration.between(last, now).compareTo(LAST_ACTIVE_UPDATE_MIN_INTERVAL) < 0) {
+        //     return;
+        // }
+
+        // // 使用原子 update 避免对缓存/游离态实体 merge 触发乐观锁异常
+        // try {
+        //     ZonedDateTime threshold = now.minus(LAST_ACTIVE_UPDATE_MIN_INTERVAL);
+        //     int updated = tokenRepository.updateLastActiveAtIfDue(entity.getId(), now, threshold);
+        //     if (updated > 0) {
+        //         // 尽量同步缓存对象，减少下一次重复 update 尝试
+        //         entity.setLastActiveAt(now);
+        //     }
+        // } catch (Exception e) {
+        //     // lastActiveAt 是非关键字段：更新失败不应影响鉴权链路
+        //     log.debug("Ignore lastActiveAt update failure for token uid {}: {}", entity.getUid(), e.getMessage());
+        // }
     }
 
     
