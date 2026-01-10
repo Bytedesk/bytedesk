@@ -14,6 +14,8 @@
 package com.bytedesk.kbase.kbase;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -28,21 +30,32 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class KbaseEntityListener {
 
+    private void publishAfterCommit(BytedeskEventPublisher publisher, Object event) {
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    publisher.publishEvent(event);
+                }
+            });
+        } else {
+            publisher.publishEvent(event);
+        }
+    }
+
     @PostPersist
     void postPersist(KbaseEntity kbase) {
         // log.info("kbase postPersist: {}", kbase.getName());
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new KbaseCreateEvent(this, kbase));
+        publishAfterCommit(publisher, new KbaseCreateEvent(this, kbase));
     }
 
     // 
     @PostUpdate
     void postUpdate(KbaseEntity kbase) {
         // log.info("kbase postUpdate: {}", kbase.getName());
-        // 
         BytedeskEventPublisher publisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        publisher.publishEvent(new KbaseUpdateEvent(this, kbase));
+        publishAfterCommit(publisher, new KbaseUpdateEvent(this, kbase));
     }
 
 

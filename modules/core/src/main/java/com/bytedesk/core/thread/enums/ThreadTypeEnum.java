@@ -39,6 +39,7 @@ public enum ThreadTypeEnum {
     WORKFLOW(17), // 工作流对话
     // 
     QUEUE(18), // 一对一排队会话-用于更新排队状态
+    CALLCENTER(19) // 呼叫中心会话-用于呼叫中心场景
     ;
 
     private final int value;

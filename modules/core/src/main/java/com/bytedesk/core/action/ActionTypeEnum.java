@@ -15,6 +15,7 @@ package com.bytedesk.core.action;
 
 public enum ActionTypeEnum {
     LOG,
+    LOGIN,
     FAILED,
     VISITOR;
 

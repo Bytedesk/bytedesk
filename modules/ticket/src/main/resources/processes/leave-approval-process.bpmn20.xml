@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="BytedeskLeaveApproval">
+  <process id="leaveApprovalProcess" name="请假审批流程" isExecutable="true">
+    <extensionElements>
+      <flowable:executionListener event="start" delegateExpression="${demoExecutionListener}"/>
+      <flowable:executionListener event="end" delegateExpression="${demoExecutionListener}"/>
+    </extensionElements>
+
+    <!-- 开始事件 -->
+    <startEvent id="start" name="提交申请"/>
+
+    <!-- 提交请假申请 -->
+    <userTask id="submitLeave" name="填写请假申请" flowable:assignee="${applicantUid}">
+      <documentation>员工填写请假申请，包括请假类型、开始时间、结束时间、请假事由</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="submitLeave"/>
+
+    <!-- 判断请假天数网关 -->
+    <exclusiveGateway id="checkDaysGateway" name="判断请假天数"/>
+
+    <sequenceFlow id="flow2" sourceRef="submitLeave" targetRef="checkDaysGateway"/>
+
+    <!-- 短期请假：直接主管审批 -->
+    <sequenceFlow id="flowShortLeave" name="短期请假（≤3天）" sourceRef="checkDaysGateway" targetRef="supervisorApproval">
+      <conditionExpression xsi:type="tFormalExpression">${leaveDays &lt;= 3}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="supervisorApproval" name="主管审批" flowable:candidateGroups="${supervisorGroupId}">
+      <documentation>直接主管审批请假申请</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- 主管审批结果网关 -->
+    <exclusiveGateway id="supervisorResultGateway" name="主管审批结果"/>
+
+    <sequenceFlow id="flow3" sourceRef="supervisorApproval" targetRef="supervisorResultGateway"/>
+
+    <!-- 主管批准，进入结束 -->
+    <sequenceFlow id="flowSupervisorApproved" name="批准" sourceRef="supervisorResultGateway" targetRef="end">
+      <conditionExpression xsi:type="tFormalExpression">${supervisorApproved == true}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 主管拒绝，结束 -->
+    <sequenceFlow id="flowSupervisorRejected" name="拒绝" sourceRef="supervisorResultGateway" targetRef="rejectEnd">
+      <conditionExpression xsi:type="tFormalExpression">${supervisorApproved == false}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 长期请假：部门经理审批 -->
+    <sequenceFlow id="flowLongLeave" name="长期请假（>3天）" sourceRef="checkDaysGateway" targetRef="managerApproval">
+      <conditionExpression xsi:type="tFormalExpression">${leaveDays &gt; 3}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="managerApproval" name="部门经理审批" flowable:candidateGroups="${managerGroupId}">
+      <documentation>部门经理审批长期请假申请</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+        <!-- 审批超时定时器：2天 -->
+        <flowable:taskListener event="create" delegateExpression="${demoTaskTimeoutListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- 经理审批超时定时器 -->
+    <boundaryEvent id="managerTimeout" cancelActivity="false" attachedToRef="managerApproval">
+      <timerEventDefinition>
+        <timeDuration>P2D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <serviceTask id="managerTimeoutNotify" name="超时提醒" flowable:delegateExpression="${demoTimeoutNotifyDelegate}"/>
+
+    <sequenceFlow id="flowManagerTimeout" sourceRef="managerTimeout" targetRef="managerTimeoutNotify"/>
+
+    <sequenceFlow id="flowManagerTimeoutNotify" sourceRef="managerTimeoutNotify" targetRef="managerApproval"/>
+
+    <!-- 经理审批结果网关 -->
+    <exclusiveGateway id="managerResultGateway" name="经理审批结果"/>
+
+    <sequenceFlow id="flow4" sourceRef="managerApproval" targetRef="managerResultGateway"/>
+
+    <!-- 经理批准，需要HR备案 -->
+    <sequenceFlow id="flowManagerApproved" name="批准" sourceRef="managerResultGateway" targetRef="hrRecord">
+      <conditionExpression xsi:type="tFormalExpression">${managerApproved == true}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 经理拒绝 -->
+    <sequenceFlow id="flowManagerRejected" name="拒绝" sourceRef="managerResultGateway" targetRef="rejectEnd">
+      <conditionExpression xsi:type="tFormalExpression">${managerApproved == false}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- HR备案 -->
+    <userTask id="hrRecord" name="HR备案" flowable:candidateGroups="${hrGroupId}">
+      <documentation>HR部门记录请假信息，更新考勤系统</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow5" sourceRef="hrRecord" targetRef="end"/>
+
+    <!-- 正常结束事件 -->
+    <endEvent id="end" name="批准结束"/>
+
+    <!-- 拒绝结束事件 -->
+    <endEvent id="rejectEnd" name="拒绝结束"/>
+  </process>
+
+  <!-- 流程图布局 -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_leaveApprovalProcess">
+      <bpmndi:BPMNPlane bpmnElement="leaveApprovalProcess" id="BPMNPlane_leaveApprovalProcess">
+        <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+          <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="200.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="submitLeave" id="BPMNShape_submitLeave">
+          <omgdc:Bounds height="60.0" width="100.0" x="180.0" y="185.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="checkDaysGateway" id="BPMNShape_checkDaysGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="330.0" y="195.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="supervisorApproval" id="BPMNShape_supervisorApproval">
+          <omgdc:Bounds height="60.0" width="100.0" x="430.0" y="80.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="managerApproval" id="BPMNShape_managerApproval">
+          <omgdc:Bounds height="60.0" width="100.0" x="430.0" y="280.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="supervisorResultGateway" id="BPMNShape_supervisorResultGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="580.0" y="90.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="managerResultGateway" id="BPMNShape_managerResultGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="580.0" y="290.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="hrRecord" id="BPMNShape_hrRecord">
+          <omgdc:Bounds height="60.0" width="100.0" x="700.0" y="280.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+          <omgdc:Bounds height="28.0" width="28.0" x="850.0" y="296.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="rejectEnd" id="BPMNShape_rejectEnd">
+          <omgdc:Bounds height="28.0" width="28.0" x="750.0" y="96.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="managerTimeout" id="BPMNShape_managerTimeout">
+          <omgdc:Bounds height="30.0" width="30.0" x="465.0" y="340.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="managerTimeoutNotify" id="BPMNShape_managerTimeoutNotify">
+          <omgdc:Bounds height="60.0" width="100.0" x="560.0" y="390.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+          <omgdi:waypoint x="129.949998" y="215.0"/>
+          <omgdi:waypoint x="180.0" y="215.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+          <omgdi:waypoint x="280.0" y="215.0"/>
+          <omgdi:waypoint x="330.0" y="215.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowShortLeave" id="BPMNEdge_flowShortLeave">
+          <omgdi:waypoint x="350.0" y="195.0"/>
+          <omgdi:waypoint x="350.0" y="110.0"/>
+          <omgdi:waypoint x="430.0" y="110.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowLongLeave" id="BPMNEdge_flowLongLeave">
+          <omgdi:waypoint x="350.0" y="235.0"/>
+          <omgdi:waypoint x="350.0" y="310.0"/>
+          <omgdi:waypoint x="430.0" y="310.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+          <omgdi:waypoint x="530.0" y="110.0"/>
+          <omgdi:waypoint x="580.0" y="110.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSupervisorApproved" id="BPMNEdge_flowSupervisorApproved">
+          <omgdi:waypoint x="620.0" y="110.0"/>
+          <omgdi:waypoint x="865.0" y="110.0"/>
+          <omgdi:waypoint x="865.0" y="296.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSupervisorRejected" id="BPMNEdge_flowSupervisorRejected">
+          <omgdi:waypoint x="600.0" y="130.0"/>
+          <omgdi:waypoint x="600.0" y="180.0"/>
+          <omgdi:waypoint x="764.0" y="180.0"/>
+          <omgdi:waypoint x="764.0" y="124.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+          <omgdi:waypoint x="530.0" y="310.0"/>
+          <omgdi:waypoint x="580.0" y="310.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowManagerApproved" id="BPMNEdge_flowManagerApproved">
+          <omgdi:waypoint x="620.0" y="310.0"/>
+          <omgdi:waypoint x="750.0" y="310.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowManagerRejected" id="BPMNEdge_flowManagerRejected">
+          <omgdi:waypoint x="600.0" y="330.0"/>
+          <omgdi:waypoint x="600.0" y="480.0"/>
+          <omgdi:waypoint x="764.0" y="480.0"/>
+          <omgdi:waypoint x="764.0" y="124.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+          <omgdi:waypoint x="800.0" y="310.0"/>
+          <omgdi:waypoint x="850.0" y="310.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowManagerTimeout" id="BPMNEdge_flowManagerTimeout">
+          <omgdi:waypoint x="495.0" y="369.949998"/>
+          <omgdi:waypoint x="495.0" y="390.0"/>
+          <omgdi:waypoint x="560.0" y="390.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowManagerTimeoutNotify" id="BPMNEdge_flowManagerTimeoutNotify">
+          <omgdi:waypoint x="660.0" y="420.0"/>
+          <omgdi:waypoint x="710.0" y="420.0"/>
+          <omgdi:waypoint x="710.0" y="339.949998"/>
+        </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

@@ -78,7 +78,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ_OR_TICKET_READ)
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
         

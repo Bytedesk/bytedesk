@@ -80,6 +80,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     private String status = ThreadProcessStatusEnum.NEW.name();
 
     // transfer status
+    // @Deprecated // 该字段已废弃，使用 thread transfer 表存储更详细的转接信息，待删除
     @Builder.Default
     @Column(name = "thread_transfer_status")
     private String transferStatus = ThreadTransferStatusEnum.NONE.name();

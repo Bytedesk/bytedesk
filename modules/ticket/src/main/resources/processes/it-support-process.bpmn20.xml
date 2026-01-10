@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="BytedeskITSupport">
+  <process id="itSupportProcess" name="IT支持流程" isExecutable="true">
+    <extensionElements>
+      <flowable:executionListener event="start" delegateExpression="${demoExecutionListener}"/>
+      <flowable:executionListener event="end" delegateExpression="${demoExecutionListener}"/>
+    </extensionElements>
+
+    <!-- 开始事件 -->
+    <startEvent id="start" name="提交工单"/>
+
+    <!-- 提交IT工单 -->
+    <userTask id="submitTicket" name="提交IT工单" flowable:assignee="${requesterUid}">
+      <documentation>用户填写IT工单，包括问题描述、优先级、附件</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="submitTicket"/>
+
+    <!-- 工单分类网关 -->
+    <exclusiveGateway id="categoryGateway" name="工单分类"/>
+
+    <sequenceFlow id="flow2" sourceRef="submitTicket" targetRef="categoryGateway"/>
+
+    <!-- 硬件问题 -->
+    <sequenceFlow id="flowHardware" name="硬件问题" sourceRef="categoryGateway" targetRef="hardwareSupport">
+      <conditionExpression xsi:type="tFormalExpression">${category == 'HARDWARE'}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="hardwareSupport" name="硬件支持" flowable:candidateGroups="${hardwareGroupId}">
+      <documentation>IT硬件团队处理硬件相关问题</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- 软件问题 -->
+    <sequenceFlow id="flowSoftware" name="软件问题" sourceRef="categoryGateway" targetRef="softwareSupport">
+      <conditionExpression xsi:type="tFormalExpression">${category == 'SOFTWARE'}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="softwareSupport" name="软件支持" flowable:candidateGroups="${softwareGroupId}">
+      <documentation>IT软件团队处理软件相关问题</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- 网络问题 -->
+    <sequenceFlow id="flowNetwork" name="网络问题" sourceRef="categoryGateway" targetRef="networkSupport">
+      <conditionExpression xsi:type="tFormalExpression">${category == 'NETWORK'}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="networkSupport" name="网络支持" flowable:candidateGroups="${networkGroupId}">
+      <documentation>IT网络团队处理网络相关问题</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- 账号权限问题 -->
+    <sequenceFlow id="flowAccount" name="账号权限" sourceRef="categoryGateway" targetRef="accountSupport">
+      <conditionExpression xsi:type="tFormalExpression">${category == 'ACCOUNT'}</conditionExpression>
+    </sequenceFlow>
+
+    <serviceTask id="accountSupport" name="自动账号处理" flowable:delegateExpression="${demoAccountDelegate}">
+      <documentation>自动处理账号权限相关问题</documentation>
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${demoExecutionListener}"/>
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow id="flowAccountComplete" sourceRef="accountSupport" targetRef="verify"/>
+
+    <!-- 优先级判断网关 -->
+    <exclusiveGateway id="priorityGateway" name="判断优先级"/>
+
+    <sequenceFlow id="flowHardwareToPriority" sourceRef="hardwareSupport" targetRef="priorityGateway"/>
+    <sequenceFlow id="flowSoftwareToPriority" sourceRef="softwareSupport" targetRef="priorityGateway"/>
+    <sequenceFlow id="flowNetworkToPriority" sourceRef="networkSupport" targetRef="priorityGateway"/>
+
+    <!-- 高优先级：需要升级 -->
+    <sequenceFlow id="flowHighPriority" name="高优先级" sourceRef="priorityGateway" targetRef="escalate">
+      <conditionExpression xsi:type="tFormalExpression">${priority == 'HIGH' || priority == 'URGENT'}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="escalate" name="升级处理" flowable:candidateGroups="${itManagerGroupId}">
+      <documentation>IT经理处理高优先级问题</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+        <!-- 高优先级任务超时定时器：1小时 -->
+      </extensionElements>
+    </userTask>
+
+    <!-- 高优先级超时定时器 -->
+    <boundaryEvent id="escalateTimeout" cancelActivity="false" attachedToRef="escalate">
+      <timerEventDefinition>
+        <timeDuration>PT1H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <serviceTask id="escalateTimeoutNotify" name="超时升级通知" flowable:delegateExpression="${demoEscalationNotifyDelegate}"/>
+
+    <sequenceFlow id="flowEscalateTimeout" sourceRef="escalateTimeout" targetRef="escalateTimeoutNotify"/>
+
+    <sequenceFlow id="flowEscalateTimeoutNotify" sourceRef="escalateTimeoutNotify" targetRef="notifyEnd"/>
+
+    <sequenceFlow id="flowEscalateToVerify" sourceRef="escalate" targetRef="verify"/>
+
+    <!-- 普通优先级：直接验证 -->
+    <sequenceFlow id="flowNormalPriority" name="普通优先级" sourceRef="priorityGateway" targetRef="verify">
+      <conditionExpression xsi:type="tFormalExpression">${priority == 'NORMAL' || priority == 'LOW'}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- SLA超时定时器（针对所有支持任务） -->
+    <boundaryEvent id="slaTimeout" cancelActivity="false" attachedToRef="hardwareSupport">
+      <timerEventDefinition>
+        <timeDuration>${slaTimeISO != null ? slaTimeISO : 'PT4H'}</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <serviceTask id="slaTimeoutNotify" name="SLA超时通知" flowable:delegateExpression="${demoSlaTimeoutNotifyDelegate}"/>
+
+    <sequenceFlow id="flowSlaTimeout" sourceRef="slaTimeout" targetRef="slaTimeoutNotify"/>
+
+    <sequenceFlow id="flowSlaTimeoutNotify" sourceRef="slaTimeoutNotify" targetRef="hardwareSupport"/>
+
+    <!-- 用户验证 -->
+    <userTask id="verify" name="用户验证" flowable:assignee="${requesterUid}">
+      <documentation>用户验证问题是否已解决</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- 验证结果网关 -->
+    <exclusiveGateway id="verifyResultGateway" name="验证结果"/>
+
+    <sequenceFlow id="flowVerify" sourceRef="verify" targetRef="verifyResultGateway"/>
+
+    <!-- 已解决 -->
+    <sequenceFlow id="flowSolved" name="已解决" sourceRef="verifyResultGateway" targetRef="closeTicket">
+      <conditionExpression xsi:type="tFormalExpression">${solved == true}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 未解决：重新处理 -->
+    <sequenceFlow id="flowNotSolved" name="未解决" sourceRef="verifyResultGateway" targetRef="categoryGateway">
+      <conditionExpression xsi:type="tFormalExpression">${solved == false}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 关闭工单 -->
+    <serviceTask id="closeTicket" name="关闭工单" flowable:delegateExpression="${demoCloseTicketDelegate}">
+      <documentation>关闭工单并发送满意度调查</documentation>
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${demoExecutionListener}"/>
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow id="flowClose" sourceRef="closeTicket" targetRef="end"/>
+
+    <!-- 满意度调查 -->
+    <serviceTask id="satisfactionSurvey" name="满意度调查" flowable:delegateExpression="${demoSatisfactionDelegate}">
+      <documentation>发送满意度调查问卷</documentation>
+    </serviceTask>
+
+    <sequenceFlow id="flowSurvey" sourceRef="end" targetRef="satisfactionSurvey"/>
+
+    <!-- 结束事件 -->
+    <endEvent id="end" name="流程结束"/>
+
+    <!-- 升级通知结束事件 -->
+    <endEvent id="notifyEnd" name="发送升级通知结束"/>
+  </process>
+
+  <!-- 流程图布局 -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_itSupportProcess">
+      <bpmndi:BPMNPlane bpmnElement="itSupportProcess" id="BPMNPlane_itSupportProcess">
+        <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+          <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="300.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="submitTicket" id="BPMNShape_submitTicket">
+          <omgdc:Bounds height="60.0" width="100.0" x="180.0" y="285.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="categoryGateway" id="BPMNShape_categoryGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="330.0" y="295.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="hardwareSupport" id="BPMNShape_hardwareSupport">
+          <omgdc:Bounds height="60.0" width="100.0" x="430.0" y="150.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="softwareSupport" id="BPMNShape_softwareSupport">
+          <omgdc:Bounds height="60.0" width="100.0" x="430.0" y="240.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="networkSupport" id="BPMNShape_networkSupport">
+          <omgdc:Bounds height="60.0" width="100.0" x="430.0" y="330.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="accountSupport" id="BPMNShape_accountSupport">
+          <omgdc:Bounds height="60.0" width="100.0" x="430.0" y="420.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="priorityGateway" id="BPMNShape_priorityGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="590.0" y="235.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="escalate" id="BPMNShape_escalate">
+          <omgdc:Bounds height="60.0" width="100.0" x="700.0" y="100.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="verify" id="BPMNShape_verify">
+          <omgdc:Bounds height="60.0" width="100.0" x="850.0" y="225.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="verifyResultGateway" id="BPMNShape_verifyResultGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="1000.0" y="235.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="closeTicket" id="BPMNShape_closeTicket">
+          <omgdc:Bounds height="60.0" width="100.0" x="1100.0" y="225.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+          <omgdc:Bounds height="28.0" width="28.0" x="1250.0" y="241.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="satisfactionSurvey" id="BPMNShape_satisfactionSurvey">
+          <omgdc:Bounds height="60.0" width="100.0" x="1330.0" y="225.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="notifyEnd" id="BPMNShape_notifyEnd">
+          <omgdc:Bounds height="28.0" width="28.0" x="920.0" y="56.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="slaTimeout" id="BPMNShape_slaTimeout">
+          <omgdc:Bounds height="30.0" width="30.0" x="465.0" y="210.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="slaTimeoutNotify" id="BPMNShape_slaTimeoutNotify">
+          <omgdc:Bounds height="60.0" width="100.0" x="560.0" y="100.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="escalateTimeout" id="BPMNShape_escalateTimeout">
+          <omgdc:Bounds height="30.0" width="30.0" x="735.0" y="160.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="escalateTimeoutNotify" id="BPMNShape_escalateTimeoutNotify">
+          <omgdc:Bounds height="60.0" width="100.0" x="850.0" y="50.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+          <omgdi:waypoint x="129.949998" y="315.0"/>
+          <omgdi:waypoint x="180.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+          <omgdi:waypoint x="280.0" y="315.0"/>
+          <omgdi:waypoint x="330.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowHardware" id="BPMNEdge_flowHardware">
+          <omgdi:waypoint x="350.0" y="295.0"/>
+          <omgdi:waypoint x="350.0" y="180.0"/>
+          <omgdi:waypoint x="430.0" y="180.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSoftware" id="BPMNEdge_flowSoftware">
+          <omgdi:waypoint x="350.0" y="315.0"/>
+          <omgdi:waypoint x="430.0" y="270.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowNetwork" id="BPMNEdge_flowNetwork">
+          <omgdi:waypoint x="350.0" y="335.0"/>
+          <omgdi:waypoint x="430.0" y="360.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowAccount" id="BPMNEdge_flowAccount">
+          <omgdi:waypoint x="350.0" y="365.0"/>
+          <omgdi:waypoint x="350.0" y="450.0"/>
+          <omgdi:waypoint x="430.0" y="450.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowAccountComplete" id="BPMNEdge_flowAccountComplete">
+          <omgdi:waypoint x="530.0" y="450.0"/>
+          <omgdi:waypoint x="900.0" y="450.0"/>
+          <omgdi:waypoint x="900.0" y="285.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowHardwareToPriority" id="BPMNEdge_flowHardwareToPriority">
+          <omgdi:waypoint x="530.0" y="180.0"/>
+          <omgdi:waypoint x="610.0" y="180.0"/>
+          <omgdi:waypoint x="610.0" y="235.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSoftwareToPriority" id="BPMNEdge_flowSoftwareToPriority">
+          <omgdi:waypoint x="530.0" y="270.0"/>
+          <omgdi:waypoint x="590.0" y="270.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowNetworkToPriority" id="BPMNEdge_flowNetworkToPriority">
+          <omgdi:waypoint x="530.0" y="360.0"/>
+          <omgdi:waypoint x="610.0" y="360.0"/>
+          <omgdi:waypoint x="610.0" y="275.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowHighPriority" id="BPMNEdge_flowHighPriority">
+          <omgdi:waypoint x="610.0" y="235.0"/>
+          <omgdi:waypoint x="610.0" y="130.0"/>
+          <omgdi:waypoint x="700.0" y="130.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowNormalPriority" id="BPMNEdge_flowNormalPriority">
+          <omgdi:waypoint x="630.0" y="255.0"/>
+          <omgdi:waypoint x="900.0" y="255.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowEscalateToVerify" id="BPMNEdge_flowEscalateToVerify">
+          <omgdi:waypoint x="800.0" y="130.0"/>
+          <omgdi:waypoint x="900.0" y="130.0"/>
+          <omgdi:waypoint x="900.0" y="225.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSlaTimeout" id="BPMNEdge_flowSlaTimeout">
+          <omgdi:waypoint x="480.0" y="210.0"/>
+          <omgdi:waypoint x="480.0" y="160.0"/>
+          <omgdi:waypoint x="610.0" y="160.0"/>
+          <omgdi:waypoint x="610.0" y="130.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSlaTimeoutNotify" id="BPMNEdge_flowSlaTimeoutNotify">
+          <omgdi:waypoint x="660.0" y="130.0"/>
+          <omgdi:waypoint x="750.0" y="130.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowVerify" id="BPMNEdge_flowVerify">
+          <omgdi:waypoint x="950.0" y="255.0"/>
+          <omgdi:waypoint x="1000.0" y="255.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSolved" id="BPMNEdge_flowSolved">
+          <omgdi:waypoint x="1040.0" y="255.0"/>
+          <omgdi:waypoint x="1100.0" y="255.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowNotSolved" id="BPMNEdge_flowNotSolved">
+          <omgdi:waypoint x="1020.0" y="235.0"/>
+          <omgdi:waypoint x="1020.0" y="80.0"/>
+          <omgdi:waypoint x="350.0" y="80.0"/>
+          <omgdi:waypoint x="350.0" y="295.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowClose" id="BPMNEdge_flowClose">
+          <omgdi:waypoint x="1200.0" y="255.0"/>
+          <omgdi:waypoint x="1250.0" y="255.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSurvey" id="BPMNEdge_flowSurvey">
+          <omgdi:waypoint x="1278.0" y="255.0"/>
+          <omgdi:waypoint x="1330.0" y="255.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowEscalateTimeout" id="BPMNEdge_flowEscalateTimeout">
+          <omgdi:waypoint x="750.0" y="160.0"/>
+          <omgdi:waypoint x="750.0" y="180.0"/>
+          <omgdi:waypoint x="900.0" y="180.0"/>
+          <omgdi:waypoint x="900.0" y="109.949998"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowEscalateTimeoutNotify" id="BPMNEdge_flowEscalateTimeoutNotify">
+          <omgdi:waypoint x="950.0" y="80.0"/>
+          <omgdi:waypoint x="934.0" y="70.0"/>
+        </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

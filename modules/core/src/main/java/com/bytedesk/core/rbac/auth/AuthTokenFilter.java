@@ -66,6 +66,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
           // 从数据库验证token是否有效（未被撤销且未过期）
           Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
           if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
+            // 记录最近活跃时间（节流更新）
+            tokenRestService.touchLastActiveAtIfNeeded(tokenOpt.get());
             String subject = JwtUtils.getSubjectFromJwtToken(accessToken);
             UsernamePasswordAuthenticationToken authentication = authService.getAuthentication(request, subject);
             SecurityContextHolder.getContext().setAuthentication(authentication);

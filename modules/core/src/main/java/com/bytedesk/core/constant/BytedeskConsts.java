@@ -37,6 +37,7 @@ public class BytedeskConsts {
     public static final String DEFAULT_WORKGROUP_UID = "df_wg_uid"; // 默认工作组uid
     public static final String DEFAULT_WORKGROUP_UID_PRESALES = "df_wg_presales"; // 售前
     public static final String DEFAULT_WORKGROUP_UID_AFTERSALES = "df_wg_aftersales"; // 售后
+    public static final String DEFAULT_WORKGROUP_UID_TICKET = "df_wg_ticket"; // 工单
     public static final String DEFAULT_DEPARTMENT_UID = "df_dp_uid";
     public static final String DEFAULT_MEMBER_UID = "df_mb_uid"; // 默认团队成员uid
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid"; // 默认机器人uid

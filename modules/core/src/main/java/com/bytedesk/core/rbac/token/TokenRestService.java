@@ -14,6 +14,8 @@
 package com.bytedesk.core.rbac.token;
 
 import java.util.Optional;
+import java.time.ZonedDateTime;
+import java.time.Duration;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,6 +42,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Service
 public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest, TokenResponse> {
+
+    // 触发 lastActiveAt 写库的最小间隔（避免每次请求都更新）
+    private static final Duration LAST_ACTIVE_UPDATE_MIN_INTERVAL = Duration.ofMinutes(5);
 
     private final TokenRepository tokenRepository;
 
@@ -214,6 +219,8 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             // 从数据库验证token是否有效（未被撤销且未过期）
             Optional<TokenEntity> tokenOpt = findByAccessToken(accessToken);
             if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
+                // 记录最近活跃时间（节流更新）
+                touchLastActiveAtIfNeeded(tokenOpt.get());
                 log.debug("accessToken is valid");
                 return true;
             } else {
@@ -237,6 +244,24 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             TokenEntity entity = optional.get();
             entity.setRevoked(true);
             entity.setRevokeReason(reason);
+            save(entity);
+        }
+    }
+
+    /**
+     * 在 token 被成功校验/使用后，按需更新最近活跃时间。
+     * 为避免高频写库，只有 lastActiveAt 为空或超过最小间隔才会更新。
+     */
+    public void touchLastActiveAtIfNeeded(@NonNull TokenEntity entity) {
+        if (bytedeskProperties.isDisableIpFilter()) {
+            // 性能测试模式可能不落库，这里不强制写库
+            return;
+        }
+
+        ZonedDateTime now = com.bytedesk.core.utils.BdDateUtils.now();
+        ZonedDateTime last = entity.getLastActiveAt();
+        if (last == null || Duration.between(last, now).compareTo(LAST_ACTIVE_UPDATE_MIN_INTERVAL) >= 0) {
+            entity.setLastActiveAt(now);
             save(entity);
         }
     }

@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import java.util.HashSet;
 import java.util.List;
@@ -34,12 +35,9 @@ import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -48,7 +46,6 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
@@ -57,9 +54,8 @@ import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
-import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
-import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.core.topic.TopicUtils;
 
@@ -98,7 +94,21 @@ public class TicketRestService
         return ticketRepository.findByUid(uid);
     }
 
-    // query by user
+    @Override
+    public Page<TicketResponse> queryByOrg(TicketRequest request) {
+        if (!StringUtils.hasText(request.getUserUid())) {
+            String reporterUid = resolveReporterUid(request);
+            if (StringUtils.hasText(reporterUid)) {
+                request.setUserUid(reporterUid);
+            }
+        }
+        Pageable pageable = request.getPageable();
+        Specification<TicketEntity> spec = createSpecification(request);
+        Page<TicketEntity> page = executePageQuery(spec, pageable);
+        return page.map(this::convertToResponse);
+    }
+
+    @Override
     public Page<TicketResponse> queryByUser(TicketRequest request) {
         if (!StringUtils.hasText(request.getUserUid())) {
             String reporterUid = resolveReporterUid(request);
@@ -110,6 +120,16 @@ public class TicketRestService
         Specification<TicketEntity> spec = createSpecification(request);
         Page<TicketEntity> page = executePageQuery(spec, pageable);
         return page.map(this::convertToResponse);
+    }
+
+    @Override
+    public TicketResponse queryByUid(TicketRequest request) {
+        Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new NotFoundException("ticket not found");
+        }
+        TicketEntity ticket = ticketOptional.get();
+        return convertToResponse(ticket);
     }
 
     @Transactional
@@ -124,43 +144,35 @@ public class TicketRestService
     }
 
     private TicketResponse createInternal(TicketRequest request, boolean skipLoginEnforce) {
-        boolean platformTicketCenterRequest = ensurePlatformTicketRequestDefaults(request);
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+        Assert.hasText(request.getReporterJson(), "reporter info required");
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
-        ticket.setType(resolveTicketType(request.getType()));
+        ticket.setType(TicketTypeEnum.getNameFromValue(request.getType()));
         ticket.setUid(uidUtils.getUid());
-        // 
-        if (platformTicketCenterRequest) {
-            ticket.setLevel(LevelEnum.PLATFORM.name());
-            ticket.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        }
-        if (!StringUtils.hasText(ticket.getUserUid())) {
-            String reporterUid = resolveReporterUid(request);
-            if (StringUtils.hasText(reporterUid)) {
-                ticket.setUserUid(reporterUid);
-            }
-        }
         // 工单处理人
         ticket.setAssignee(request.getAssigneeJson());
         // 工单创建人
         ticket.setReporter(request.getReporterJson());
         //
-        if (StringUtils.hasText(request.getAssigneeJson())
-                && StringUtils.hasText(request.getAssignee().getUid())) {
+        if (StringUtils.hasText(request.getAssigneeJson()) 
+            && StringUtils.hasText(request.getAssignee().getUid())) {
             // TODO: 需要通知被分配人员
             ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
         } else {
             ticket.setStatus(TicketStatusEnum.NEW.name());
         }
         ticket.setReporter(request.getReporterJson());
-
-        // 应用工单设置
-        applyTicketSettings(ticket, request);
-
-        if (!skipLoginEnforce) {
-            enforceRequireLoginRule(ticket, request);
+        if (!StringUtils.hasText(ticket.getUserUid())) {
+            String reporterUid = resolveReporterUid(request);
+            if (StringUtils.hasText(reporterUid)) {
+                ticket.setUserUid(reporterUid);
+            }
         }
-        ensureTicketNumber(ticket, request);
+        // 应用工单设置
+        TicketSettingsEntity settings = applyTicketSettings(ticket, request);
+        ensureTicketNumber(ticket, request, settings);
         // 先保存工单
         TicketEntity savedTicket = save(ticket);
         // 保存附件
@@ -182,18 +194,11 @@ public class TicketRestService
         }
         savedTicket.setAttachments(attachments);
 
-        // 未绑定客服会话的情况下，创建工单客服会话
-        if (!StringUtils.hasText(ticket.getThreadUid())) {
-            // 如果创建工单的时候没有绑定会话，则创建会话
-            if (!skipLoginEnforce) {
-                ThreadEntity thread = createTicketThread(ticket);
-                if (thread != null) {
-                    ticket.setTopic(thread.getTopic());
-                    ticket.setThreadUid(thread.getUid());
-                }
-            } else {
-                log.debug("Skip creating ticket thread for anonymous visitor ticket: {}", ticket.getUid());
-            }
+        // 创建工单会话
+        ThreadEntity thread = createTicketThread(ticket);
+        if (thread != null) {
+            ticket.setTopic(thread.getTopic());
+            ticket.setThreadUid(thread.getUid());
         }
 
         // 保存工单
@@ -208,29 +213,46 @@ public class TicketRestService
     @Transactional
     @Override
     public TicketResponse update(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getUid(), "ticket uid required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+        Assert.hasText(request.getReporterJson(), "reporter info required");
+
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
         if (ticketOptional.isEmpty()) {
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
 
+        // 预先记录旧值，避免后续 setXXX 覆盖导致事件判断失效
+        final String oldAssigneeUid = (ticket.getAssignee() != null) ? ticket.getAssignee().getUid() : null;
+        final String oldDepartmentUid = ticket.getDepartmentUid();
+
         // 更新基本信息
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setPriority(request.getPriority());
         ticket.setStatus(request.getStatus());
-        if (StringUtils.hasText(request.getType())) {
-            ticket.setType(resolveTicketType(request.getType()));
-        }
+        ticket.setEmail(request.getEmail());
+        ticket.setPhone(request.getPhone());
+        ticket.setWechat(request.getWechat());
+        ticket.setContactName(request.getContactName());
 
-        // 更新工作组和处理人信息
+        // 更新关联信息
         ticket.setAssignee(request.getAssigneeJson());
+        ticket.setReporter(request.getReporterJson());
         ticket.setDepartmentUid(request.getDepartmentUid());
-        // ticket = updateAssigneeAndWorkgroup(ticket, request);
 
         // 处理附件更新
         if (request.getUploadUids() != null) {
             ticket = updateAttachments(ticket, request.getUploadUids());
+        }
+
+        // 关联工单会话，如果不存在则创建，兼容旧数据
+        ThreadEntity thread = createTicketThread(ticket);
+        if (thread != null) {
+            ticket.setTopic(thread.getTopic());
+            ticket.setThreadUid(thread.getUid());
         }
 
         // 保存更新后的工单
@@ -240,21 +262,23 @@ public class TicketRestService
         }
 
         // 发布事件，判断assignee是否被修改
-        if (StringUtils.hasText(request.getAssignee().getUid()) && StringUtils.hasText(ticket.getAssigneeString())) {
-            String oldAssigneeUid = ticket.getAssignee().getUid();
-            if (oldAssigneeUid != null && !oldAssigneeUid.equals(request.getAssignee().getUid())) {
+        String newAssigneeUid = request.getAssigneeUid();
+        if (!StringUtils.hasText(newAssigneeUid) && request.getAssignee() != null) {
+            newAssigneeUid = request.getAssignee().getUid();
+        }
+        if (StringUtils.hasText(newAssigneeUid) && StringUtils.hasText(ticket.getAssigneeString())) {
+            if (oldAssigneeUid != null && !oldAssigneeUid.equals(newAssigneeUid)) {
                 TicketUpdateAssigneeEvent ticketUpdateAssigneeEvent = new TicketUpdateAssigneeEvent(ticket,
-                        oldAssigneeUid, request.getAssignee().getUid());
+                        oldAssigneeUid, newAssigneeUid);
                 applicationEventPublisher.publishEvent(ticketUpdateAssigneeEvent);
             }
         }
 
-        // 发布事件，判断workgroupUid是否被修改
+        // 发布事件，判断departmentUid是否被修改
         if (StringUtils.hasText(request.getDepartmentUid())) {
-            String oldWorkgroupUid = ticket.getDepartmentUid();
-            if (oldWorkgroupUid != null && !oldWorkgroupUid.equals(request.getDepartmentUid())) {
+            if (oldDepartmentUid != null && !oldDepartmentUid.equals(request.getDepartmentUid())) {
                 TicketUpdateDepartmentEvent TicketUpdateDepartmentEvent = new TicketUpdateDepartmentEvent(ticket,
-                        oldWorkgroupUid, request.getDepartmentUid());
+                        oldDepartmentUid, request.getDepartmentUid());
                 applicationEventPublisher.publishEvent(TicketUpdateDepartmentEvent);
             }
         }
@@ -297,22 +321,51 @@ public class TicketRestService
 
     // 创建工单会话
     public ThreadEntity createTicketThread(TicketEntity ticket) {
-        //
-        UserEntity owner = authService.getUser();
-        if (owner == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
+        // thread.user 赋值规则：
+        // - 外部工单：使用提交工单人信息(ticket.reporter)
+        // - 内部工单：如果有关联 visitorThreadUid(访客会话)，使用关联会话 thread.user；否则使用 ticket.reporter
+        final TicketTypeEnum ticketType = TicketTypeEnum.fromValue(ticket.getType());
+        String reporterUserJson = ticket.getReporterString();
+        if (!StringUtils.hasText(reporterUserJson)) {
+            reporterUserJson = BytedeskConsts.EMPTY_JSON_STRING;
         }
-        //
-        if (ticket.getDepartmentUid() == null || ticket.getDepartmentUid().isEmpty()) {
-            ticket.setDepartmentUid("all");
+        String ticketThreadUserJson = reporterUserJson;
+        if (TicketTypeEnum.INTERNAL == ticketType && StringUtils.hasText(ticket.getVisitorThreadUid())) {
+            Optional<ThreadEntity> visitorThreadOptional = threadRestService.findByUid(ticket.getVisitorThreadUid());
+            if (visitorThreadOptional.isPresent()) {
+                String visitorThreadUserJson = visitorThreadOptional.get().getUser();
+                if (StringUtils.hasText(visitorThreadUserJson)
+                        && !BytedeskConsts.EMPTY_JSON_STRING.equals(visitorThreadUserJson)) {
+                    ticketThreadUserJson = visitorThreadUserJson;
+                }
+            }
         }
-        //
-        String topic = TopicUtils.formatOrgDepartmentTicketThreadTopic(ticket.getDepartmentUid(), ticket.getUid());
+
+        // internal(部门) -> external(工作组) -> org兜底
+        final String ticketUid = ticket.getUid();
+        String topic;
+        if (StringUtils.hasText(ticket.getDepartmentUid())) {
+            topic = TopicUtils.formatOrgDepartmentTicketThreadTopic(ticket.getDepartmentUid(), ticketUid);
+        } else if (StringUtils.hasText(ticket.getWorkgroupUid())) {
+            topic = TopicUtils.formatOrgWorkgroupTicketThreadTopic(ticket.getWorkgroupUid(), ticketUid);
+        } else if (StringUtils.hasText(ticket.getOrgUid())) {
+            topic = TopicUtils.formatOrgTicketThreadTopic(ticket.getOrgUid(), ticketUid);
+        } else {
+            throw new IllegalArgumentException("ticket thread topic requires departmentUid/workgroupUid/orgUid");
+        }
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
         if (threadOptional.isPresent()) {
-            return threadOptional.get();
+            ThreadEntity existing = threadOptional.get();
+            // 对历史数据/异常数据进行补写：若 thread.user 为空或不符合当前规则，则更新
+            String existingUserJson = existing.getUser();
+            boolean existingEmpty = !StringUtils.hasText(existingUserJson)
+                    || BytedeskConsts.EMPTY_JSON_STRING.equals(existingUserJson);
+            if (existingEmpty || (StringUtils.hasText(ticketThreadUserJson) && !ticketThreadUserJson.equals(existingUserJson))) {
+                existing.setUser(ticketThreadUserJson);
+                return threadRestService.save(existing);
+            }
+            return existing;
         }
-        String user = ConvertUtils.convertToUserProtobufString(owner);
         // 创建工单会话
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -320,10 +373,9 @@ public class TicketRestService
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .topic(topic)
                 .hide(true) // 默认隐藏
-                .user(user)
-                // .agent(user) // 客服会话的创建者是客服
-                .userUid(owner.getUid())
-                .owner(owner)
+                .user(ticketThreadUserJson)
+                // .userUid(owner.getUid())
+                // .owner(owner)
                 .channel(ticket.getChannel())
                 .orgUid(ticket.getOrgUid())
                 .build();
@@ -374,30 +426,7 @@ public class TicketRestService
     }
     
     public void deleteByVisitor(TicketRequest request) {
-        if (request == null || !StringUtils.hasText(request.getUid())) {
-            throw new IllegalArgumentException("ticket uid required");
-        }
-        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
-        if (ticketOptional.isEmpty()) {
-            throw new NotFoundException("ticket not found");
-        }
-        TicketEntity ticket = ticketOptional.get();
-        String reporterUid = resolveReporterUid(request);
-        if (!StringUtils.hasText(reporterUid)) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        String ticketReporterUid = ticket.getUserUid();
-        if (!StringUtils.hasText(ticketReporterUid) && StringUtils.hasText(ticket.getReporterString())) {
-            UserProtobuf reporter = ticket.getReporter();
-            if (reporter != null && StringUtils.hasText(reporter.getUid())) {
-                ticketReporterUid = reporter.getUid();
-            }
-        }
-        if (!StringUtils.hasText(ticketReporterUid) || !ticketReporterUid.equals(reporterUid)) {
-            throw new NotFoundException("ticket not found");
-        }
-        ticket.setDeleted(true);
-        save(ticket);
+        deleteByUid(request.getUid());
     }
 
     @Override
@@ -431,7 +460,6 @@ public class TicketRestService
 
     @Override
     protected Specification<TicketEntity> createSpecification(TicketRequest request) {
-        ensurePlatformTicketRequestDefaults(request);
         return TicketSpecification.search(request, authService);
     }
 
@@ -440,64 +468,40 @@ public class TicketRestService
         return ticketRepository.findAll(specification, pageable);
     }
 
-    private void ensureTicketNumber(TicketEntity ticket, TicketRequest request) {
-        if (ticket == null || StringUtils.hasText(ticket.getTicketNumber())) {
-            return;
-        }
-        String orgUid = resolveOrgUid(ticket, request);
-        String workgroupUid = resolveWorkgroupUid(ticket, request);
-        ticket.setTicketNumber(generateTicketNumber(orgUid, workgroupUid, ticket.getType()));
-    }
+    /**
+     * 确保工单已分配唯一的 ticketNumber。
+     * <p>
+     * 该方法会直接对入参 {@code ticket} 进行赋值：当生成到可用号码后，调用 {@code ticket.setTicketNumber(...)} 并返回。
+     * <p>
+     * 生成规则：
+     * <ul>
+     *   <li>组织范围：优先使用 {@code request.orgUid}，为空则回退到 {@code BytedeskConsts.DEFAULT_ORGANIZATION_UID}</li>
+     *   <li>前缀：优先使用 {@code settings.basicSettings.numberPrefix}（trim + upper），否则默认 {@code TK}</li>
+     *   <li>长度：优先使用 {@code settings.basicSettings.numberLength}（需大于前缀长度），否则默认前缀长度 + 8；
+     *       数字部分长度最终限制在 [4, 32]</li>
+     *   <li>唯一性：最多尝试 5 次（prefix + 数字段），若仍冲突则使用 fallback（prefix + 完整 uid）再尝试 3 次</li>
+     * </ul>
+     *
+     * @param ticket   需要写入 ticketNumber 的工单实体
+     * @param request  工单请求（用于 orgUid 等上下文）
+     * @param settings 工单设置（用于号码前缀/长度配置）
+     * @throws IllegalStateException 当多次尝试后仍无法分配到唯一号码时抛出
+     */
+    private void ensureTicketNumber(TicketEntity ticket, TicketRequest request, TicketSettingsEntity settings) {
+        Assert.notNull(ticket, "ticket required");
+        Assert.notNull(request, "ticket request required");
+        Assert.notNull(settings, "ticket settings required");
 
-    private String resolveTicketType(String requestedType) {
-        return TicketTypeEnum.fromValue(requestedType).name();
-    }
-
-    private String generateTicketNumber(String orgUid, String workgroupUid, String ticketType) {
+        String orgUid = request.getOrgUid();
         String scopedOrgUid = StringUtils.hasText(orgUid) ? orgUid : BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(scopedOrgUid, workgroupUid, ticketType);
-        String prefix = resolvePrefix(basicSettings);
-        int numericLength = resolveNumericLength(prefix, basicSettings);
-        for (int i = 0; i < 5; i++) {
-            String candidate = prefix + buildNumericPart(numericLength);
-            if (!ticketNumberExists(scopedOrgUid, candidate)) {
-                return candidate;
-            }
-        }
-        return generateFallbackTicketNumber(scopedOrgUid, prefix);
-    }
 
-    private TicketBasicSettingsResponse fetchBasicSettings(String orgUid, String workgroupUid, String ticketType) {
-        if (!StringUtils.hasText(orgUid)) {
-            return null;
-        }
-        String normalizedType = resolveTicketType(ticketType);
-        if (TicketTypeEnum.EXTERNAL.name().equals(normalizedType) && !StringUtils.hasText(workgroupUid)) {
-            return null;
-        }
-        try {
-            TicketSettingsResponse settings = ticketSettingsRestService
-                    .getOrDefaultByWorkgroup(orgUid, workgroupUid, normalizedType);
-            if (settings == null) {
-                return null;
-            }
-            return settings.getBasicSettings() != null
-                    ? settings.getBasicSettings()
-                    : settings.getDraftBasicSettings();
-        } catch (Exception ex) {
-            log.warn("Failed to load ticket settings for org {} workgroup {}: {}", orgUid, workgroupUid, ex.getMessage());
-            return null;
-        }
-    }
+        TicketBasicSettingsEntity basicSettings = settings.getBasicSettings();
 
-    private String resolvePrefix(TicketBasicSettingsResponse basicSettings) {
+        String prefix = "TK";
         if (basicSettings != null && StringUtils.hasText(basicSettings.getNumberPrefix())) {
-            return basicSettings.getNumberPrefix().trim().toUpperCase();
+            prefix = basicSettings.getNumberPrefix().trim().toUpperCase();
         }
-        return "TK";
-    }
 
-    private int resolveNumericLength(String prefix, TicketBasicSettingsResponse basicSettings) {
         int prefixLength = StringUtils.hasText(prefix) ? prefix.length() : 0;
         Integer configuredLength = basicSettings != null ? basicSettings.getNumberLength() : null;
         int totalLength = (configuredLength != null && configuredLength > prefixLength)
@@ -505,137 +509,72 @@ public class TicketRestService
                 : prefixLength + 8;
         int numericLength = totalLength - prefixLength;
         numericLength = Math.max(numericLength, 4);
-        return Math.min(numericLength, 32);
-    }
+        numericLength = Math.min(numericLength, 32);
 
-    private String buildNumericPart(int length) {
-        String raw = uidUtils.getUid();
-        if (length <= 0) {
-            return raw;
-        }
-        if (raw.length() > length) {
-            return raw.substring(raw.length() - length);
-        }
-        StringBuilder builder = new StringBuilder();
-        for (int i = raw.length(); i < length; i++) {
-            builder.append('0');
-        }
-        builder.append(raw);
-        return builder.toString();
-    }
+        for (int i = 0; i < 5; i++) {
+            String raw = uidUtils.getUid();
+            String numericPart;
+            if (numericLength <= 0) {
+                numericPart = raw;
+            } else if (raw.length() > numericLength) {
+                numericPart = raw.substring(raw.length() - numericLength);
+            } else {
+                StringBuilder builder = new StringBuilder();
+                for (int j = raw.length(); j < numericLength; j++) {
+                    builder.append('0');
+                }
+                builder.append(raw);
+                numericPart = builder.toString();
+            }
 
-    private String resolveOrgUid(TicketEntity ticket, TicketRequest request) {
-        if (ticket != null && StringUtils.hasText(ticket.getOrgUid())) {
-            return ticket.getOrgUid();
-        }
-        if (request != null && StringUtils.hasText(request.getOrgUid())) {
-            return request.getOrgUid();
-        }
-        UserEntity user = authService.getUser();
-        if (user != null && StringUtils.hasText(user.getOrgUid())) {
-            return user.getOrgUid();
-        }
-        return BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-    }
-
-    private String resolveWorkgroupUid(TicketEntity ticket, TicketRequest request) {
-        if (ticket != null && StringUtils.hasText(ticket.getWorkgroupUid())) {
-            return ticket.getWorkgroupUid();
-        }
-        if (request != null && StringUtils.hasText(request.getWorkgroupUid())) {
-            return request.getWorkgroupUid();
-        }
-        if (ticket != null && StringUtils.hasText(ticket.getDepartmentUid())) {
-            return ticket.getDepartmentUid();
-        }
-        return BytedeskConsts.DEFAULT_WORKGROUP_UID;
-    }
-
-    private boolean ticketNumberExists(String orgUid, String candidate) {
-        return ticketRepository.existsByOrgUidAndTicketNumber(orgUid, candidate);
-    }
-
-    private String generateFallbackTicketNumber(String orgUid, String prefix) {
-        for (int i = 0; i < 3; i++) {
-            String candidate = prefix + uidUtils.getUid();
-            if (!ticketNumberExists(orgUid, candidate)) {
-                return candidate;
+            String candidate = prefix + numericPart;
+            if (!ticketRepository.existsByOrgUidAndTicketNumber(scopedOrgUid, candidate)) {
+                ticket.setTicketNumber(candidate);
+                return;
             }
         }
-        throw new IllegalStateException("Unable to allocate unique ticket number for org " + orgUid);
+
+        for (int i = 0; i < 3; i++) {
+            String candidate = prefix + uidUtils.getUid();
+            if (!ticketRepository.existsByOrgUidAndTicketNumber(scopedOrgUid, candidate)) {
+                ticket.setTicketNumber(candidate);
+                return;
+            }
+        }
+
+        throw new IllegalStateException("Unable to allocate unique ticket number for org " + scopedOrgUid);
     }
 
-    private void applyTicketSettings(TicketEntity ticket, TicketRequest request) {
-        if (ticket == null) {
-            return;
-        }
-        String orgUid = resolveOrgUid(ticket, request);
-        String workgroupUid = resolveWorkgroupUid(ticket, request);
-        TicketSettingsEntity settings = resolveTicketSettingsEntity(request, orgUid, workgroupUid, ticket.getType());
-        if (settings == null) {
-            ensureProcessDefinitionFallback(ticket);
-            return;
-        }
-        ticket.setTicketSettingsUid(settings.getUid());
+    private TicketSettingsEntity applyTicketSettings(TicketEntity ticket, TicketRequest request) {
+        Assert.notNull(ticket, "ticket required");
+        Assert.notNull(request, "ticket request required");
 
-        ProcessEntity process = settings.getProcess();
-        if (process != null) {
-            // processEntityUid 同时作为 Flowable 的 processDefinitionKey
-            ticket.setProcessEntityUid(process.getUid());
+        TicketSettingsEntity settings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
+                    .orElseThrow(() -> new NotFoundException(
+                            "ticket settings not found: " + request.getTicketSettingsUid()));
+        ticket.setTicketSettingsUid(request.getTicketSettingsUid());
+
+        // 优先使用前端明确传入的流程 UID（便于草稿流程/自定义流程创建工单）
+        if (StringUtils.hasText(request.getProcessEntityUid())) {
+            ticket.setProcessEntityUid(request.getProcessEntityUid());
+        } else {
+            ProcessEntity process = settings.getProcess();
+            if (process != null) {
+                // processEntityUid 同时作为 Flowable 的 processDefinitionKey
+                ticket.setProcessEntityUid(process.getUid());
+            }
         }
 
         FormEntity form = settings.getForm();
         if (form != null) {
             ticket.setFormEntityUid(form.getUid());
-            if (!StringUtils.hasText(ticket.getSchema())) {
-                ticket.setSchema(form.getSchema());
-            }
         }
 
-        ensureProcessDefinitionFallback(ticket);
-    }
-
-    private TicketSettingsEntity resolveTicketSettingsEntity(TicketRequest request, String orgUid,
-            String workgroupUid, String ticketType) {
-        if (!StringUtils.hasText(orgUid)) {
-            return null;
-        }
-        String normalizedType = resolveTicketType(ticketType);
-        if (request != null && StringUtils.hasText(request.getTicketSettingsUid())) {
-            return ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
-                    .orElseThrow(() -> new NotFoundException(
-                            "ticket settings not found: " + request.getTicketSettingsUid()));
-        }
-        return ticketSettingsRestService.resolveEntityByWorkgroup(orgUid, workgroupUid, normalizedType);
-    }
-
-    private void ensureProcessDefinitionFallback(TicketEntity ticket) {
-        if (ticket != null && !StringUtils.hasText(ticket.getProcessEntityUid())) {
-            // 根据工单类型计算默认的 processEntityUid
-            String defaultProcessUid = TicketTypeEnum.EXTERNAL.name().equals(ticket.getType())
-                    ? Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
-                    : Utils.formatUid(ticket.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY);
-            ticket.setProcessEntityUid(defaultProcessUid);
-        }
-    }
-
-    private void enforceRequireLoginRule(TicketEntity ticket, TicketRequest request) {
-        String orgUid = resolveOrgUid(ticket, request);
-        String workgroupUid = resolveWorkgroupUid(ticket, request);
-        TicketBasicSettingsResponse basicSettings = fetchBasicSettings(orgUid, workgroupUid, ticket.getType());
-        if (basicSettings == null || !Boolean.TRUE.equals(basicSettings.getRequireLogin())) {
-            return;
-        }
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
+        return settings;
     }
 
     private String resolveReporterUid(TicketRequest request) {
-        if (request == null) {
-            return null;
-        }
+        Assert.notNull(request, "ticket request required");
         if (StringUtils.hasText(request.getReporterUid())) {
             return request.getReporterUid();
         }
@@ -644,45 +583,6 @@ public class TicketRestService
             return reporter.getUid();
         }
         return null;
-    }
-
-    private boolean ensurePlatformTicketRequestDefaults(TicketRequest request) {
-        boolean platformTicketCenterRequest = isPlatformTicketCenterRequest(request);
-        if (!platformTicketCenterRequest) {
-            return false;
-        }
-        UserEntity currentUser = requireLoginUser();
-        request.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-        request.setLevel(LevelEnum.PLATFORM.name());
-        if (!StringUtils.hasText(request.getUserUid())) {
-            request.setUserUid(currentUser.getUid());
-        }
-        if (!StringUtils.hasText(request.getReporterUid())) {
-            request.setReporterUid(currentUser.getUid());
-        }
-        if (request.getReporter() == null) {
-            request.setReporter(ConvertUtils.convertToUserProtobuf(currentUser));
-        }
-        return true;
-    }
-
-    private boolean isPlatformTicketCenterRequest(TicketRequest request) {
-        if (request == null) {
-            return false;
-        }
-        boolean defaultOrg = StringUtils.hasText(request.getOrgUid())
-                && BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(request.getOrgUid());
-        boolean platformLevel = StringUtils.hasText(request.getLevel())
-                && LevelEnum.PLATFORM.name().equalsIgnoreCase(request.getLevel());
-        return defaultOrg && platformLevel;
-    }
-
-    private UserEntity requireLoginUser() {
-        UserEntity user = authService.getUser();
-        if (user == null) {
-            throw new NotLoginException(I18Consts.I18N_LOGIN_REQUIRED);
-        }
-        return user;
     }
 
 }

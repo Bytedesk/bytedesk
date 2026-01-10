@@ -28,4 +28,16 @@ public enum TicketTypeEnum {
         }
         return TicketTypeEnum.EXTERNAL;
     }
+
+    public static String getNameFromValue(String value) {
+        if (value == null || value.isBlank()) {
+            return TicketTypeEnum.EXTERNAL.name();
+        }
+        for (TicketTypeEnum item : TicketTypeEnum.values()) {
+            if (item.name().equalsIgnoreCase(value)) {
+                return item.name();
+            }
+        }
+        return TicketTypeEnum.EXTERNAL.name();
+    }
 }

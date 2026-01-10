@@ -80,6 +80,10 @@ public class TabooMessageRestService extends BaseRestServiceWithExport<TabooMess
         if (optional.isPresent()) {
             TabooMessageEntity taboo_message = optional.get();
             taboo_message.setContent(request.getContent());
+            taboo_message.setMessageUid(request.getMessageUid());
+            taboo_message.setThreadUid(request.getThreadUid());
+            taboo_message.setReplacedContent(request.getReplacedContent());
+            taboo_message.setTabooWordList(request.getTabooWordList());
             // categoryUid
             // Optional<CategoryEntity> categoryOptional = categoryRestService.findByUid(request.getCategoryUid());
             // if (categoryOptional.isPresent()) {

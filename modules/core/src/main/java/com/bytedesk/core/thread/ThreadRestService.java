@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -30,6 +29,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
@@ -83,8 +83,62 @@ public class ThreadRestService
     private final TopicRestService topicRestService;
 
     private final ActiveThreadCacheService activeThreadCacheService;
-    
-    public Map<String, Long> reportClosedByCloseType(java.time.ZonedDateTime start, java.time.ZonedDateTime end) {
+
+    // @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
+    public Optional<ThreadEntity> findByUid(@NonNull String uid) {
+        return threadRepository.findByUid(uid);
+    }
+
+    public Boolean existsByUid(@NonNull String uid) {
+        return threadRepository.existsByUid(uid);
+    }
+
+    // @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless =
+    // "#result == null")
+    public Optional<ThreadEntity> findFirstByTopicAndOwner(@NonNull String topic, UserEntity user) {
+        return threadRepository.findFirstByTopicAndOwnerAndDeletedOrderByUpdatedAtDesc(topic, user, false);
+    }
+
+    // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a
+    // unique result: 4 results were returned
+    // @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
+    public List<ThreadEntity> findListByTopic(@NonNull String topic) {
+        return threadRepository.findByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
+    }
+
+    // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
+    public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
+        return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
+    }
+
+    // 找到某个访客当前对应某工作组未关闭会话
+    // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
+    public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
+        List<String> states = Arrays.asList(new String[] { ThreadProcessStatusEnum.CLOSED.name(),
+                ThreadProcessStatusEnum.TIMEOUT.name() });
+        return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
+    }
+
+    // 根据topic前缀和状态查询会话列表
+    public List<ThreadEntity> findByTopicStartsWithAndStatus(String topicPrefix, String status) {
+        return threadRepository.findByTopicStartsWithAndStatusAndDeletedFalse(topicPrefix, status);
+    }
+
+    // @Cacheable(value = "thread", key = "#user.uid + '-' +
+    // #pageable.getPageNumber()", unless = "#result == null")
+    public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
+        return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
+    }
+
+    /**
+     * 根据访客ID查找最近的客服会话记录
+     * 用于最近一次会话路由策略
+     */
+    public List<ThreadEntity> findRecentAgentThreadsByVisitorUid(String visitorUid) {
+        return threadRepository.findRecentAgentThreadsByVisitorUid(visitorUid);
+    }
+
+    public Map<String, Long> queryClosedByCloseType(java.time.ZonedDateTime start, java.time.ZonedDateTime end) {
         List<Object[]> rows = threadRepository.countClosedGroupedByCloseType(start, end);
         Map<String, Long> result = new HashMap<>();
         for (Object[] row : rows) {
@@ -102,27 +156,49 @@ public class ThreadRestService
         return threadRepository.findAll(specs, pageable);
     }
 
+    @Override
     public Page<ThreadResponse> queryByOrg(ThreadRequest request) {
         Page<ThreadEntity> threadPage = queryByOrgEntity(request);
         return threadPage.map(this::convertToResponse);
     }
 
-    public Page<ThreadResponse> query(ThreadRequest request) {
-        UserEntity user = authService.getUser();
-        // 
-        request.setUserUid(user.getUid());
-        request.setOwnerUid(user.getUid());
-        //
-        return queryByOrg(request);
-    }
-
+    // 客服端-加载自己的会话列表
     @Override
     public Page<ThreadResponse> queryByUser(ThreadRequest request) {
         UserEntity user = authService.getUser();
-        
+
+        if (user == null) {
+            throw new NotLoginException("login required");
+        }
+
         request.setUserUid(user.getUid());
-        // 
-        return queryByOrg(request);
+        request.setOwnerUid(user.getUid());
+
+        Pageable pageable = request.getPageable();
+        Specification<ThreadEntity> specs = ThreadSpecification.searchForUser(request, user.getUid(), user.getOrgUid());
+        Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
+        return threadPage.map(this::convertToResponse);
+    }
+
+    /**
+     * 访客端-根据访客UID分页查询其相关的会话列表（支持基础筛选）
+     */
+    public Page<ThreadResponse> queryByVisitor(ThreadRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            return Page.empty();
+        }
+
+        String visitorUid = request.getUid();
+        Pageable pageable = request.getPageable();
+
+        // visitor(匿名)侧：统一走 Specification 查询，避免 repository native query 的列名/排序兼容问题
+        Pageable effectivePageable = (pageable == null)
+                ? Pageable.unpaged()
+                : PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+
+        Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, visitorUid);
+        Page<ThreadEntity> threadPage = threadRepository.findAll(specs, effectivePageable);
+        return threadPage.map(this::convertToResponse);
     }
 
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
@@ -589,7 +665,7 @@ public class ThreadRestService
         if (user != null) {
             request.setUserUid(user.getUid());
         }
-        // 
+        //
         Optional<ThreadEntity> threadOptional = findByUid(request.getUid());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("close thread " + request.getUid() + " not found");
@@ -622,8 +698,8 @@ public class ThreadRestService
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
         }
-        if (Boolean.TRUE.equals(request.getUnsubscribe()) 
-            || com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+        if (Boolean.TRUE.equals(request.getUnsubscribe())
+                || com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
             TopicRequest topicRequest = TopicRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
@@ -657,9 +733,11 @@ public class ThreadRestService
                 String content;
                 if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
                     content = I18Consts.I18N_AUTO_CLOSED;
-                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
+                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name()
+                        .equalsIgnoreCase(closeType)) {
                     content = I18Consts.I18N_AGENT_CLOSED;
-                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name()
+                        .equalsIgnoreCase(closeType)) {
                     content = I18Consts.I18N_AGENT_CLOSE_TIP;
                 } else {
                     content = I18Consts.I18N_AGENT_CLOSED;
@@ -698,67 +776,6 @@ public class ThreadRestService
         return threadRepository.countByTopicAndStatusNotAndDeletedFalse(topic, state);
     }
 
-    // @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
-    public Optional<ThreadEntity> findByUid(@NonNull String uid) {
-        return threadRepository.findByUid(uid);
-    }
-
-    public Boolean existsByUid(@NonNull String uid) {
-        return threadRepository.existsByUid(uid);
-    }
-
-    // @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless = "#result == null")
-    public Optional<ThreadEntity> findFirstByTopicAndOwner(@NonNull String topic, UserEntity user) {
-        return threadRepository.findFirstByTopicAndOwnerAndDeletedOrderByUpdatedAtDesc(topic, user, false);
-    }
-
-    // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a
-    // unique result: 4 results were returned
-    // @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
-    public List<ThreadEntity> findListByTopic(@NonNull String topic) {
-        return threadRepository.findByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
-    }
-
-    // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
-        return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
-    }
-
-    // 找到某个访客当前对应某工作组未关闭会话
-    // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    public Optional<ThreadEntity> findFirstByTopicNotClosed(String topic) {
-        List<String> states = Arrays.asList(new String[] { ThreadProcessStatusEnum.CLOSED.name(), 
-                ThreadProcessStatusEnum.TIMEOUT.name() });
-        return threadRepository.findTopicAndStatusesNotInAndDeleted(topic, states, false);
-    }
-
-    // 根据topic前缀和状态查询会话列表
-    public List<ThreadEntity> findByTopicStartsWithAndStatus(String topicPrefix, String status) {
-        return threadRepository.findByTopicStartsWithAndStatusAndDeletedFalse(topicPrefix, status);
-    }
-
-    // @Cacheable(value = "thread", key = "#user.uid + '-' + #pageable.getPageNumber()", unless = "#result == null")
-    public Page<ThreadEntity> findByOwner(UserEntity user, Pageable pageable) {
-        return threadRepository.findByOwnerAndHideAndDeleted(user, false, false, pageable);
-    }
-
-    /**
-     * 根据访客ID查找最近的客服会话记录
-     * 用于最近一次会话路由策略
-     */
-    public List<ThreadEntity> findRecentAgentThreadsByVisitorUid(String visitorUid) {
-        return threadRepository.findRecentAgentThreadsByVisitorUid(visitorUid);
-    }
-
-    /**
-     * 根据访客UID分页查询其相关的会话列表
-     * 通过判断user字段中是否包含访客uid来查询
-     */
-    public Page<ThreadResponse> queryByVisitorUid(String visitorUid, Pageable pageable) {
-        Page<ThreadEntity> threadPage = threadRepository.findByVisitorUidInUserField(visitorUid, pageable);
-        return threadPage.map(this::convertToResponse);
-    }
-
     @Transactional
     public ThreadSequenceResponse allocateMessageMetadata(@NonNull String threadUid) {
         if (!StringUtils.hasText(threadUid)) {
@@ -784,7 +801,8 @@ public class ThreadRestService
             @CachePut(value = "thread", key = "#thread.topic", unless = "#result == null")
     })
     protected ThreadEntity doSave(ThreadEntity entity) {
-        // log.info("doSave thread agent: {}, owner: {}", entity.getAgent(), entity.getOwner());
+        // log.info("doSave thread agent: {}, owner: {}", entity.getAgent(),
+        // entity.getOwner());
         ThreadEntity savedEntity = threadRepository.save(entity);
         // 更新活跃会话缓存
         if (savedEntity != null) {
@@ -823,7 +841,8 @@ public class ThreadRestService
                 log.info("latestEntity status: {}", latestEntity.getStatus());
 
                 // Preserve thread state flags
-                // latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(), entity.getUnreadCount()));
+                // latestEntity.setUnreadCount(Math.max(latestEntity.getUnreadCount(),
+                // entity.getUnreadCount()));
                 latestEntity.setStar(entity.getStar() != null ? entity.getStar() : latestEntity.getStar());
                 latestEntity.setTop(entity.getTop() != null ? entity.getTop() : latestEntity.getTop());
                 latestEntity.setUnread(entity.getUnread() != null ? entity.getUnread() : latestEntity.getUnread());
@@ -977,6 +996,5 @@ public class ThreadRestService
     protected Page<ThreadEntity> executePageQuery(Specification<ThreadEntity> spec, Pageable pageable) {
         return threadRepository.findAll(spec, pageable);
     }
-
 
 }

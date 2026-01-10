@@ -231,7 +231,6 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         );
     }
 
-    // @PreAuthorize("hasAnyRole('SUPER', 'ADMIN', 'MEMBER', 'AGENT')")
     @BlackIpFilter(title = "black", action = "sendAgentSseMessage")
     @BlackUserFilter(title = "black", action = "sendAgentSseMessage")
     @TabooJsonFilter(title = "敏感词", action = "sendAgentSseMessage")

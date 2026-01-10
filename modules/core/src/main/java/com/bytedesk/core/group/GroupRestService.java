@@ -135,10 +135,23 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
         }
         //
         GroupEntity group = GroupEntity.builder().build();
-        group.setName(request.getName());
+        if (StringUtils.hasText(request.getName())) {
+            group.setName(request.getName());
+        }
+        if (StringUtils.hasText(request.getAvatar())) {
+            group.setAvatar(request.getAvatar());
+        }
         group.setUid(uidUtils.getUid());
-        group.setType(GroupTypeEnum.fromValue(request.getType()).name());
-        //
+        // 
+        GroupTypeEnum groupType = GroupTypeEnum.NORMAL;
+        if (StringUtils.hasText(request.getType())) {
+            try {
+                groupType = GroupTypeEnum.fromValue(request.getType());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid group type: {}, fallback to NORMAL", request.getType());
+            }
+        }
+        group.setType(groupType.name());
         group.getAdmins().add(creator);
         //
         if (request.getMemberUids() != null && request.getMemberUids().size() > 0) {
@@ -155,6 +168,7 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
         }
         //
         group.setCreator(creator);
+        group.setUserUid(creator.getUid());
         group.setOrgUid(creator.getOrgUid());
         //
         GroupEntity saved = save(group);

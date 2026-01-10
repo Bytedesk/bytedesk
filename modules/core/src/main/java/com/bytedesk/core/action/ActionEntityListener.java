@@ -28,8 +28,7 @@ public class ActionEntityListener {
 
     @PostPersist
     private void onPostPersist(ActionEntity action) {
-        log.info("actionLog after: model {}, action {}", action.getTitle(), action.getAction());
-        //
+        // log.info("actionLog after: model {}, action {}", action.getTitle(), action.getAction());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishEvent(new ActionCreateEvent(this, action));
     }

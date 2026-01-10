@@ -24,7 +24,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -67,8 +66,10 @@ public class ActionRestService extends BaseRestServiceWithExport<ActionEntity, A
         if (user != null) {
             action.setUser(user);
             action.setOrgUid(user.getOrgUid());
-        } else {
-            action.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        } 
+        else {
+            // 暂不设置默认组织
+            // action.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
         }
         ActionEntity savedAction = save(action);
         if (savedAction == null) {

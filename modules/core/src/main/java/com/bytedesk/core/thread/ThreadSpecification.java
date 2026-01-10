@@ -21,11 +21,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
-import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.thread.enums.ThreadTypeEnum;
-
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -35,143 +32,165 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadRequest> {
 
+    /**
+     * User(登录) 侧客服会话查询：
+     * - 仅返回当前客服“参与”的会话（owner / invites / monitors / assistants / ticketors）
+     * - 合并相同 topic，仅取 updatedAt 最新的一条
+     * - 与会话列表展示行为对齐：updatedAt 倒序
+     */
+    public static Specification<ThreadEntity> searchForUser(ThreadRequest request, String userUid, String orgUid) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            predicates.add(criteriaBuilder.equal(root.get("hide"), false));
+
+            // userUid 为空时不应返回任何数据（避免误查全量）
+            if (!StringUtils.hasText(userUid)) {
+                return criteriaBuilder.disjunction();
+            }
+
+            // 默认限制在当前组织；同时兼容历史数据：orgUid 为空且 level=USER
+            if (StringUtils.hasText(orgUid)) {
+                predicates.add(
+                        criteriaBuilder.or(
+                                criteriaBuilder.equal(root.get("orgUid"), orgUid),
+                                criteriaBuilder.and(
+                                        criteriaBuilder.isNull(root.get("orgUid")),
+                                        criteriaBuilder.equal(root.get("level"), LevelEnum.USER.name()))));
+            }
+
+            // 当前客服参与会话（owner / invites / monitors / assistants / ticketors）
+            Predicate participatedPredicate = criteriaBuilder.or(
+                    criteriaBuilder.and(
+                            criteriaBuilder.isNotNull(root.get("owner")),
+                            criteriaBuilder.equal(root.get("owner").get("uid"), userUid)),
+                    criteriaBuilder.like(root.get("invites"), "%" + userUid + "%"),
+                    criteriaBuilder.like(root.get("monitors"), "%" + userUid + "%"),
+                    criteriaBuilder.like(root.get("assistants"), "%" + userUid + "%"),
+                    criteriaBuilder.like(root.get("ticketors"), "%" + userUid + "%"));
+            predicates.add(participatedPredicate);
+
+            // 合并相同 topic，仅取参与范围内 updatedAt 最新的一条
+            Subquery<ZonedDateTime> maxDateSubquery = query.subquery(ZonedDateTime.class);
+            var subRoot = maxDateSubquery.from(ThreadEntity.class);
+            Path<ZonedDateTime> updatedAtPath = subRoot.get("updatedAt");
+            Expression<ZonedDateTime> maxExpression = criteriaBuilder.greatest(updatedAtPath);
+
+            Predicate subParticipatedPredicate = criteriaBuilder.or(
+                    criteriaBuilder.and(
+                            criteriaBuilder.isNotNull(subRoot.get("owner")),
+                            criteriaBuilder.equal(subRoot.get("owner").get("uid"), userUid)),
+                    criteriaBuilder.like(subRoot.get("invites"), "%" + userUid + "%"),
+                    criteriaBuilder.like(subRoot.get("monitors"), "%" + userUid + "%"),
+                    criteriaBuilder.like(subRoot.get("assistants"), "%" + userUid + "%"),
+                    criteriaBuilder.like(subRoot.get("ticketors"), "%" + userUid + "%"));
+
+            List<Predicate> subPredicates = new ArrayList<>();
+            subPredicates.add(criteriaBuilder.equal(subRoot.get("deleted"), false));
+            subPredicates.add(criteriaBuilder.equal(subRoot.get("hide"), false));
+            subPredicates.add(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
+            subPredicates.add(subParticipatedPredicate);
+            if (StringUtils.hasText(orgUid)) {
+                subPredicates.add(
+                        criteriaBuilder.or(
+                                criteriaBuilder.equal(subRoot.get("orgUid"), orgUid),
+                                criteriaBuilder.and(
+                                        criteriaBuilder.isNull(subRoot.get("orgUid")),
+                                        criteriaBuilder.equal(subRoot.get("level"), LevelEnum.USER.name()))));
+            }
+
+            maxDateSubquery.select(maxExpression)
+                    .where(criteriaBuilder.and(subPredicates.toArray(new Predicate[0])));
+            predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
+
+            // 基础筛选
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+
+            if (StringUtils.hasText(request.getUid())) {
+                predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
+            }
+
+            if (StringUtils.hasText(request.getTopic())) {
+                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
+            }
+
+            if (StringUtils.hasText(request.getChannel())) {
+                predicates.add(criteriaBuilder.equal(root.get("channel"), request.getChannel()));
+            }
+
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText();
+                predicates.add(
+                        criteriaBuilder.or(
+                                criteriaBuilder.like(root.get("content"), "%" + searchText + "%"),
+                                criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
+                                criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
+                                criteriaBuilder.like(root.get("uid"), "%" + searchText + "%")));
+            }
+
+            query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
+            
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    /**
+     * Visitor(匿名) 侧会话查询：
+     * - 不依赖 AuthService（无登录态）
+     * - 不做 orgUid/superUser 权限校验
+     * - 通过 thread_user(JSON) 中包含 visitorUid 来过滤
+     * - 与历史 native query 行为对齐：updatedAt 倒序
+     */
+    public static Specification<ThreadEntity> searchForVisitor(ThreadRequest request, String visitorUid) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+
+            // visitorUid 为空时不应返回任何数据（避免匿名全量查询）
+            if (!StringUtils.hasText(visitorUid)) {
+                return criteriaBuilder.disjunction();
+            }
+            predicates.add(criteriaBuilder.like(root.get("user"), "%" + visitorUid + "%"));
+
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+
+            if (StringUtils.hasText(request.getTopic())) {
+                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
+            }
+
+            if (StringUtils.hasText(request.getChannel())) {
+                predicates.add(criteriaBuilder.equal(root.get("channel"), request.getChannel()));
+            }
+
+            // visitor 侧 searchText：对齐旧实现（topic 或 uid 模糊匹配）
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText();
+                predicates.add(
+                        criteriaBuilder.or(
+                                criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
+                                criteriaBuilder.like(root.get("uid"), "%" + searchText + "%")));
+            }
+
+            query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+
     public static Specification<ThreadEntity> search(ThreadRequest request, AuthService authService) {
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // 基础过滤：deleted=false + 权限校验 + 组织过滤
-            // 使用自定义逻辑以便在特定场景放宽 orgUid 限制
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-
-            // 校验超级管理员标识（如果前端设置了 superUser，则确保确实有权限）
-            validateSuperUserPermission(request, authService);
-
-            var user = authService.getUser();
-            // 非超级管理员必须提供 orgUid
-            if (user != null && !Boolean.TRUE.equals(request.getSuperUser()) && !StringUtils.hasText(request.getOrgUid())) {
-                throw new IllegalArgumentException("orgUid不能为空(非超级管理员必须指定组织)");
-            }
-            // 验证请求的 orgUid 是否与当前用户的 orgUid 相同（非超级管理员）
-            if (StringUtils.hasText(request.getOrgUid())) {
-                if (user != null && !Boolean.TRUE.equals(request.getSuperUser())) {
-                    String userOrgUid = user.getOrgUid();
-                    if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
-                        throw new IllegalArgumentException("无权访问其他组织的数据");
-                    }
-                }
-            }
-
-            boolean isMergeByTopicAndOwner = Boolean.TRUE.equals(request.getMergeByTopic()) && StringUtils.hasText(request.getOwnerUid());
-            // 组织过滤：
-            // - 默认与 BaseSpecification 一致：非超级管理员且有 orgUid => 等于指定 orgUid
-            // - 当 mergeByTopic=true 且 ownerUid 有值时，额外允许 (orgUid IS NULL AND level=USER)
-            if (!Boolean.TRUE.equals(request.getSuperUser())) {
-                if (StringUtils.hasText(request.getOrgUid())) {
-                    if (isMergeByTopicAndOwner) {
-                        predicates.add(
-                                criteriaBuilder.or(
-                                        criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()),
-                                        criteriaBuilder.and(
-                                                criteriaBuilder.isNull(root.get("orgUid")),
-                                                criteriaBuilder.equal(root.get("level"), LevelEnum.USER.name())
-                                        )
-                                )
-                        );
-                    } else {
-                        predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
-                    }
-                }
-            }
-
-            // 仅当mergeByTopic为true时才应用topic合并逻辑
-            if (Boolean.TRUE.equals(request.getMergeByTopic())) {
-                // 创建子查询获取每个topic的最新记录的updatedAt时间
-                Subquery<ZonedDateTime> maxDateSubquery = query.subquery(ZonedDateTime.class);
-                var subRoot = maxDateSubquery.from(ThreadEntity.class);
-
-                // 明确指定类型为 ZonedDateTime
-                Path<ZonedDateTime> updatedAtPath = subRoot.get("updatedAt");
-                Expression<ZonedDateTime> maxExpression = criteriaBuilder.greatest(updatedAtPath);
-
-                maxDateSubquery.select(maxExpression)
-                        .where(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
-
-                // 如果ownerUid不为空，优先选择owner不为空的记录
-                if (StringUtils.hasText(request.getOwnerUid())) {
-                    // 创建子查询来获取同一topic中匹配ownerUid的最新记录
-                    Subquery<ZonedDateTime> ownerMaxDateSubquery = query.subquery(ZonedDateTime.class);
-                    var ownerSubRoot = ownerMaxDateSubquery.from(ThreadEntity.class);
-
-                    Path<ZonedDateTime> ownerUpdatedAtPath = ownerSubRoot.get("updatedAt");
-                    Expression<ZonedDateTime> ownerMaxExpression = criteriaBuilder.greatest(ownerUpdatedAtPath);
-
-                    ownerMaxDateSubquery.select(ownerMaxExpression)
-                            .where(criteriaBuilder.and(
-                                    criteriaBuilder.equal(ownerSubRoot.get("topic"), root.get("topic")),
-                                    criteriaBuilder.isNotNull(ownerSubRoot.get("owner")),
-                                    criteriaBuilder.equal(ownerSubRoot.get("owner").get("uid"),
-                                            request.getOwnerUid())));
-
-                    // 创建子查询来检查同一topic中是否存在匹配ownerUid的记录
-                    Subquery<Long> ownerExistsSubquery = query.subquery(Long.class);
-                    var ownerExistsSubRoot = ownerExistsSubquery.from(ThreadEntity.class);
-
-                    ownerExistsSubquery.select(criteriaBuilder.count(ownerExistsSubRoot))
-                            .where(criteriaBuilder.and(
-                                    criteriaBuilder.equal(ownerExistsSubRoot.get("topic"), root.get("topic")),
-                                    criteriaBuilder.isNotNull(ownerExistsSubRoot.get("owner")),
-                                    criteriaBuilder.equal(ownerExistsSubRoot.get("owner").get("uid"),
-                                            request.getOwnerUid())));
-
-                    // 两种情况：
-                    // 1. 如果存在匹配ownerUid的记录，取该组记录中updatedAt最新的一条
-                    // 2. 如果不存在匹配ownerUid的记录，取所有记录中updatedAt最新的一条
-                    predicates.add(
-                            criteriaBuilder.or(
-                                    criteriaBuilder.and(
-                                            criteriaBuilder.greaterThan(ownerExistsSubquery, 0L),
-                                            criteriaBuilder.isNotNull(root.get("owner")),
-                                            criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()),
-                                            criteriaBuilder.equal(root.get("updatedAt"), ownerMaxDateSubquery)),
-                                    criteriaBuilder.and(
-                                            criteriaBuilder.equal(ownerExistsSubquery, 0L),
-                                            criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery))));
-                } else {
-                    // 如果没有指定ownerUid，则使用原来的逻辑：按updatedAt最新的记录
-                    predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
-                }
-            }
-
-            // 根据组件类型过滤
-            if (StringUtils.hasText(request.getComponentType())) {
-                if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
-                    predicates.add(criteriaBuilder.or(
-                            criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.GROUP.toString()),
-                            criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.MEMBER.toString())));
-                } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
-                    predicates.add(criteriaBuilder.or(
-                            criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.AGENT.toString()),
-                            criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.toString())));
-                } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
-                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.ROBOT.toString()));
-                } else if (TypeConsts.COMPONENT_TYPE_VISITOR.equals(request.getComponentType())) {
-                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.LLM.toString()));
-                } else if (TypeConsts.COMPONENT_TYPE_CHANNEL.equals(request.getComponentType())) {
-                    predicates.add(criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.CHANNEL.toString()));
-                }
-            } else if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
-            }
-
-            // 其他条件
-            if (StringUtils.hasText(request.getUid())) {
-                predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
-            }
-            
-            //
-            if (StringUtils.hasText(request.getTopic())) {
-                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
-            }
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
 
             // 主题列表查询 - 支持批量查询指定的主题
             if (request.getTopicList() != null && !request.getTopicList().isEmpty()) {
@@ -188,73 +207,23 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                 }
             }
             
+            // type
+            if (StringUtils.hasText(request.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+
+            // 其他条件
+            if (StringUtils.hasText(request.getUid())) {
+                predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
+            }
+            //
+            if (StringUtils.hasText(request.getTopic())) {
+                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
+            }
+
             // 状态查询
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
-            }
-
-            // 创建一个包含inviteUids、monitorUids和ownerUid的OR条件组
-            List<Predicate> filterPredicates = new ArrayList<>();
-            // 通过 private List<String> inviteUids 查询 private List<String> invites
-            if (request.getInviteUids() != null && !request.getInviteUids().isEmpty()) {
-                List<Predicate> invitePredicates = new ArrayList<>();
-                for (String inviteUid : request.getInviteUids()) {
-                    if (StringUtils.hasText(inviteUid)) {
-                        // 使用LIKE查询匹配invites字段中包含特定uid的记录
-                        // 匹配JSON格式：\"uid\":\"1688358346555520\"
-                        invitePredicates.add(criteriaBuilder.like(root.get("invites"), "%" + inviteUid + "%"));
-                    }
-                }
-                if (!invitePredicates.isEmpty()) {
-                    // 将所有inviteUids条件合并为一个条件
-                    filterPredicates.add(criteriaBuilder.or(invitePredicates.toArray(new Predicate[0])));
-                }
-            }
-
-            // monitorUids
-            if (request.getMonitorUids() != null && !request.getMonitorUids().isEmpty()) {
-                List<Predicate> monitorPredicates = new ArrayList<>();
-                for (String monitorUid : request.getMonitorUids()) {
-                    if (StringUtils.hasText(monitorUid)) {
-                        // 使用LIKE查询匹配monitors字段中包含特定uid的记录
-                        // 匹配JSON格式：\"uid\":\"1688358346555520\"
-                        monitorPredicates.add(criteriaBuilder.like(root.get("monitors"), "%" + monitorUid + "%"));
-                    }
-                }
-                if (!monitorPredicates.isEmpty()) {
-                    // 将所有monitorUids条件合并为一个条件
-                    filterPredicates.add(criteriaBuilder.or(monitorPredicates.toArray(new Predicate[0])));
-                }
-            }
-
-            // ticketorUids
-            if (request.getTicketorUids() != null && !request.getTicketorUids().isEmpty()) {
-                List<Predicate> ticketorPredicates = new ArrayList<>();
-                for (String ticketorUid : request.getTicketorUids()) {
-                    if (StringUtils.hasText(ticketorUid)) {
-                        // 使用LIKE查询匹配ticketors字段中包含特定uid的记录
-                        // 匹配JSON格式：\"uid\":\"1688342408200341\"
-                        ticketorPredicates.add(criteriaBuilder.like(root.get("ticketors"), "%" + ticketorUid + "%"));
-                    }
-                }
-                if (!ticketorPredicates.isEmpty()) {
-                    // 将所有ticketorUids条件合并为一个条件
-                    filterPredicates.add(criteriaBuilder.or(ticketorPredicates.toArray(new Predicate[0])));
-                }
-            }
-
-            // ownerUid
-            if (StringUtils.hasText(request.getOwnerUid())) {
-                List<Predicate> ownerPredicates = new ArrayList<>();
-                ownerPredicates.add(criteriaBuilder.equal(root.get("hide"), false));
-                ownerPredicates.add(criteriaBuilder.equal(root.get("owner").get("uid"), request.getOwnerUid()));
-                // 将ownerUid相关条件合并为一个条件
-                filterPredicates.add(criteriaBuilder.and(ownerPredicates.toArray(new Predicate[0])));
-            }
-
-            // 将三组条件之间用OR连接（只要满足其中一组条件即可）
-            if (!filterPredicates.isEmpty()) {
-                predicates.add(criteriaBuilder.or(filterPredicates.toArray(new Predicate[0])));
             }
 
             // user 使用 string 存储，此处暂时用like查询
@@ -277,7 +246,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                 predicates.add(criteriaBuilder.like(root.get("workgroup"), "%" + request.getWorkgroupNickname() + "%"));
             }
 
-            //
+            // channel
             if (StringUtils.hasText(request.getChannel())) {
                 predicates.add(criteriaBuilder.equal(root.get("channel"), request.getChannel()));
             }
@@ -303,8 +272,6 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
             
-            // 按更新时间排序
-            query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

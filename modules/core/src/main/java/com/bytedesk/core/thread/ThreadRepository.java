@@ -101,7 +101,39 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
          * 根据访客UID分页查询其相关的会话列表
          * 通过判断user字段中是否包含访客uid来查询
          */
-        @Query(value = "SELECT * FROM bytedesk_core_thread t WHERE t.thread_user LIKE %:visitorUid% AND t.is_deleted = false ORDER BY t.updated_at DESC", nativeQuery = true)
-        Page<ThreadEntity> findByVisitorUidInUserField(@Param("visitorUid") String visitorUid, Pageable pageable);
+        // @Query(value = "SELECT * FROM bytedesk_core_thread t WHERE t.thread_user LIKE %:visitorUid% AND t.is_deleted = false ORDER BY t.updated_at DESC", nativeQuery = true)
+        // Page<ThreadEntity> findByVisitorUidInUserField(@Param("visitorUid") String visitorUid, Pageable pageable);
+
+        /**
+         * 根据访客UID分页查询其相关的会话列表（支持基础筛选）
+         * - thread uid 存储于 uuid 列（BaseEntity.uid -> uuid）
+         * - topic 存储于 thread_topic
+         * - type 存储于 thread_type
+         * - channel 默认列名为 channel
+         */
+        // @Query(
+        //                 value = "SELECT * FROM bytedesk_core_thread t "
+        //                                 + "WHERE t.thread_user LIKE %:visitorUid% "
+        //                                 + "AND t.is_deleted = false "
+        //                                 + "AND (:topic IS NULL OR :topic = '' OR t.thread_topic LIKE CONCAT('%', :topic, '%')) "
+        //                                 + "AND (:type IS NULL OR :type = '' OR t.thread_type = :type) "
+        //                                 + "AND (:channel IS NULL OR :channel = '' OR t.channel = :channel) "
+        //                                 + "AND (:searchText IS NULL OR :searchText = '' OR t.thread_topic LIKE CONCAT('%', :searchText, '%') OR t.uuid LIKE CONCAT('%', :searchText, '%')) "
+        //                                 + "ORDER BY t.updated_at DESC",
+        //                 countQuery = "SELECT COUNT(1) FROM bytedesk_core_thread t "
+        //                                 + "WHERE t.thread_user LIKE %:visitorUid% "
+        //                                 + "AND t.is_deleted = false "
+        //                                 + "AND (:topic IS NULL OR :topic = '' OR t.thread_topic LIKE CONCAT('%', :topic, '%')) "
+        //                                 + "AND (:type IS NULL OR :type = '' OR t.thread_type = :type) "
+        //                                 + "AND (:channel IS NULL OR :channel = '' OR t.channel = :channel) "
+        //                                 + "AND (:searchText IS NULL OR :searchText = '' OR t.thread_topic LIKE CONCAT('%', :searchText, '%') OR t.uuid LIKE CONCAT('%', :searchText, '%'))",
+        //                 nativeQuery = true)
+        // Page<ThreadEntity> findByVisitorUidInUserFieldWithFilters(
+        //                 @Param("visitorUid") String visitorUid,
+        //                 @Param("topic") String topic,
+        //                 @Param("type") String type,
+        //                 @Param("channel") String channel,
+        //                 @Param("searchText") String searchText,
+        //                 Pageable pageable);
 
 }

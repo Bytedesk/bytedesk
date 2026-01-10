@@ -96,9 +96,11 @@ public class I18Consts {
     public static final String I18N_WORKGROUP_NICKNAME = "默认工作组"; // 工作组昵称
     public static final String I18N_WORKGROUP_BEFORE_NICKNAME = "售前工作组"; // 工作组前缀昵称
     public static final String I18N_WORKGROUP_AFTER_NICKNAME = "售后工作组"; // 工作组后缀昵称
+    public static final String I18N_WORKGROUP_TICKET_NICKNAME = "工单工作组"; // 工单工作组昵称
     public static final String I18N_WORKGROUP_DESCRIPTION = "工作组描述"; // 工作组描述
     public static final String I18N_WORKGROUP_BEFORE_DESCRIPTION = "售前工作组描述"; // 工作组前缀描述
     public static final String I18N_WORKGROUP_AFTER_DESCRIPTION = "售后工作组描述"; // 工作组后缀描述
+    public static final String I18N_WORKGROUP_TICKET_DESCRIPTION = "工单工作组描述"; // 工单工作组描述
     // 客服相关
     public static final String I18N_AGENT_NICKNAME = "客服昵称"; // 客服昵称
     public static final String I18N_AGENT_DESCRIPTION = "客服描述"; // 客服描述
@@ -163,6 +165,12 @@ public class I18Consts {
     public static final String I18N_TICKET_SETTINGS_EXTERNAL_DESCRIPTION = "系统默认外部工单配置"; // 外部工单配置描述
     public static final String I18N_TICKET_SETTINGS_INTERNAL_NAME = "默认内部工单配置"; // 内部工单配置名称
     public static final String I18N_TICKET_SETTINGS_INTERNAL_DESCRIPTION = "系统默认内部工单配置"; // 内部工单配置描述
+
+    // 工单提示语默认文案（TicketBasicSettingsEntity 默认值）
+    public static final String I18N_TICKET_ACCESS_TIP = "您好，工单已接入，我们将尽快为您处理。"; // 工单接入提示语
+    public static final String I18N_TICKET_CLOSE_TIP = "本工单会话已关闭，如需继续请提交新工单。"; // 工单关闭提示语
+    public static final String I18N_TICKET_AGENT_TIMEOUT_TIP = "客服暂时未回复，我们正在处理中，请您稍候。"; // 工单客服超时未回复提示语
+    public static final String I18N_TICKET_VISITOR_TIMEOUT_TIP = "如您暂时不方便回复，后续可随时继续补充信息。"; // 工单访客超时未回复提示语
     // 通知相关
     public static final String I18N_NOTICE_TITLE = "通知标题"; // 通知标题
     public static final String I18N_NOTICE_TYPE = "通知类型"; // 通知类型
@@ -208,7 +216,7 @@ public class I18Consts {
     public static final String I18N_CANT_ANSWER = "您的这个问题我不能回答，请提问其他问题。"; 
 
     public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
-    public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "请首先在管理后台配置大模型apiUrl和apiKey"; // 服务暂时不可用，请稍后重试
+    public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "请首先在管理后台配置大模型apiUrl和apiKey。如果已经配置，请检查大模型提供商账号是否欠费。"; // 服务暂时不可用，请稍后重试
     public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》选择分类-》大模型Agent"; // 大模型配置提示
     public static final String I18N_LLM_THREAD_INTENTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-选择分类-》大模型Agent-》意图识别"; // 会话意图识别大模型配置提示
     public static final String I18N_LLM_THREAD_EMOTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-选择分类-》大模型Agent-》情绪分析"; // 情绪分析大模型配置提示

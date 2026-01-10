@@ -16,10 +16,10 @@ package com.bytedesk.core.action.aop;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
+// import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.reflect.MethodSignature;
+// import org.aspectj.lang.annotation.Before;
+// import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -55,10 +55,10 @@ public class ActionAspect {
     /**
      * 处理请求前执行
      */
-    @Before(value = "@annotation(actionAnnotation)")
-    public void doBefore(JoinPoint joinPoint, ActionAnnotation actionAnnotation) {
-        log.debug("actionLog before: model {}, action {}", actionAnnotation.title(), actionAnnotation.action());
-    }
+    // @Before(value = "@annotation(actionAnnotation)")
+    // public void doBefore(JoinPoint joinPoint, ActionAnnotation actionAnnotation) {
+    //     log.debug("actionLog before: model {}, action {}", actionAnnotation.title(), actionAnnotation.action());
+    // }
 
     /**
      * 处理完请求后执行
@@ -67,29 +67,28 @@ public class ActionAspect {
      */
     @AfterReturning(pointcut = "@annotation(actionAnnotation)", returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, ActionAnnotation actionAnnotation, Object jsonResult) {
-        log.debug("actionLog after returning: title {}, action {}", actionAnnotation.title(), actionAnnotation.action());
+        // log.debug("actionLog after returning: title {}, action {}", actionAnnotation.title(), actionAnnotation.action());
         //
         ActionRequest actionRequest = ActionRequest.builder()
                 .title(actionAnnotation.title())
                 .action(actionAnnotation.action())
                 .description(actionAnnotation.description())
+                .type(actionAnnotation.type().name())
                 .build();
-        actionRequest.setType(actionAnnotation.type().name());
         // 
         // 获取方法签名
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        // MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         // 获取方法参数列表
-        Object[] args = joinPoint.getArgs();
+        // Object[] args = joinPoint.getArgs();
         // 遍历参数
-        for (int i = 0; i < args.length; i++) {
-            // 获取参数名
-            String paramName = signature.getParameterNames()[i];
-            // 获取参数值
-            Object paramValue = args[i];
-            // 参数名: authRequest, 参数值: AuthRequest(username=admin@email.com, password=admin,
-            // mobile=null, email=null, code=null, platform=bytedesk)
-            log.debug("TODO: 参数名: {}, 参数值: {}", paramName, paramValue);
-        }
+        // for (int i = 0; i < args.length; i++) {
+        //     // 获取参数名
+        //     // String paramName = signature.getParameterNames()[i];
+        //     // 获取参数值
+        //     // Object paramValue = args[i];
+        //     // 参数名: authRequest, 参数值: AuthRequest(username=admin@email.com, password=admin,
+        //     // mobile=null, email=null, code=null, platform=bytedesk)
+        // }
         // 
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
@@ -115,11 +114,11 @@ public class ActionAspect {
      * @param joinPoint 切点
      * @param e         异常
      */
-    @AfterThrowing(value = "@annotation(actionAnnotation)", throwing = "e")
-    public void doAfterThrowing(JoinPoint joinPoint, ActionAnnotation actionAnnotation, Exception e) {
-        log.info("actionLog after throwing: model {}, action {}", actionAnnotation.title(), actionAnnotation.action());
-        // handleLog(joinPoint, actionAnnotation, e, null);
-    }
+    // @AfterThrowing(value = "@annotation(actionAnnotation)", throwing = "e")
+    // public void doAfterThrowing(JoinPoint joinPoint, ActionAnnotation actionAnnotation, Exception e) {
+    //     log.info("actionLog after throwing: model {}, action {}", actionAnnotation.title(), actionAnnotation.action());
+    //     // handleLog(joinPoint, actionAnnotation, e, null);
+    // }
 
   
 

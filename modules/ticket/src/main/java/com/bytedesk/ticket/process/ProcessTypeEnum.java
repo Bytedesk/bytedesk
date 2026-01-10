@@ -22,7 +22,13 @@ public enum ProcessTypeEnum {
      * 外部工单流程 - 用于访客提交的工单
      */
     TICKET_EXTERNAL,
-    // 会话流程
+    /**
+     * 会话流程 - 用于客服会话管理
+     */
     THREAD,
+    /**
+     * 演示流程 - 用于展示工作流能力（请假、报销、IT支持等）
+     */
+    DEMO,
     // FLOW
 }

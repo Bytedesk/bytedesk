@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="BytedeskReimbursement">
+  <process id="reimbursementApprovalProcess" name="报销审批流程" isExecutable="true">
+    <extensionElements>
+      <flowable:executionListener event="start" delegateExpression="${demoExecutionListener}"/>
+      <flowable:executionListener event="end" delegateExpression="${demoExecutionListener}"/>
+    </extensionElements>
+
+    <!-- 开始事件 -->
+    <startEvent id="start" name="提交报销"/>
+
+    <!-- 提交报销申请 -->
+    <userTask id="submitReimbursement" name="填写报销申请" flowable:assignee="${applicantUid}">
+      <documentation>员工填写报销申请，包括报销类型、金额、发票附件</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="submitReimbursement"/>
+
+    <!-- 财务初审 -->
+    <userTask id="financeReview" name="财务初审" flowable:candidateGroups="${financeGroupId}">
+      <documentation>财务人员审核报销单据的合规性</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow2" sourceRef="submitReimbursement" targetRef="financeReview"/>
+
+    <!-- 财务初审结果网关 -->
+    <exclusiveGateway id="financeReviewGateway" name="财务初审结果"/>
+
+    <sequenceFlow id="flow3" sourceRef="financeReview" targetRef="financeReviewGateway"/>
+
+    <!-- 初审不通过 -->
+    <sequenceFlow id="flowFinanceRejected" name="初审不通过" sourceRef="financeReviewGateway" targetRef="rejectEnd">
+      <conditionExpression xsi:type="tFormalExpression">${financeApproved == false}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 判断报销金额网关 -->
+    <exclusiveGateway id="checkAmountGateway" name="判断报销金额"/>
+
+    <sequenceFlow id="flowFinanceApproved" name="初审通过" sourceRef="financeReviewGateway" targetRef="checkAmountGateway">
+      <conditionExpression xsi:type="tFormalExpression">${financeApproved == true}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 小额报销：部门经理审批 -->
+    <sequenceFlow id="flowSmallAmount" name="小额报销（≤5000）" sourceRef="checkAmountGateway" targetRef="managerApproval">
+      <conditionExpression xsi:type="tFormalExpression">${amount &lt;= 5000}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="managerApproval" name="部门经理审批" flowable:candidateGroups="${managerGroupId}">
+      <documentation>部门经理审批小额报销</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- 经理审批结果网关 -->
+    <exclusiveGateway id="managerResultGateway" name="经理审批结果"/>
+
+    <sequenceFlow id="flow4" sourceRef="managerApproval" targetRef="managerResultGateway"/>
+
+    <!-- 经理批准 -->
+    <sequenceFlow id="flowManagerApproved" name="批准" sourceRef="managerResultGateway" targetRef="parallelFork">
+      <conditionExpression xsi:type="tFormalExpression">${managerApproved == true}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 经理拒绝 -->
+    <sequenceFlow id="flowManagerRejected" name="拒绝" sourceRef="managerResultGateway" targetRef="rejectEnd">
+      <conditionExpression xsi:type="tFormalExpression">${managerApproved == false}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 大额报销：并行网关，财务总监+总经理同时审批 -->
+    <sequenceFlow id="flowLargeAmount" name="大额报销（>5000）" sourceRef="checkAmountGateway" targetRef="parallelFork">
+      <conditionExpression xsi:type="tFormalExpression">${amount &gt; 5000}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 并行网关：分叉 -->
+    <parallelGateway id="parallelFork" name="并行审批"/>
+
+    <!-- 财务总监审批 -->
+    <userTask id="cfoApproval" name="财务总监审批" flowable:candidateGroups="${cfoGroupId}">
+      <documentation>财务总监审批大额报销</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow5" sourceRef="parallelFork" targetRef="cfoApproval"/>
+
+    <!-- 总经理审批 -->
+    <userTask id="ceoApproval" name="总经理审批" flowable:candidateGroups="${ceoGroupId}">
+      <documentation>总经理审批大额报销</documentation>
+      <extensionElements>
+        <flowable:taskListener event="create" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="assignment" delegateExpression="${demoTaskListener}"/>
+        <flowable:taskListener event="complete" delegateExpression="${demoTaskListener}"/>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow6" sourceRef="parallelFork" targetRef="ceoApproval"/>
+
+    <!-- 并行网关：汇聚 -->
+    <parallelGateway id="parallelJoin" name="等待并行审批完成"/>
+
+    <sequenceFlow id="flow7" sourceRef="cfoApproval" targetRef="parallelJoin"/>
+
+    <sequenceFlow id="flow8" sourceRef="ceoApproval" targetRef="parallelJoin"/>
+
+    <!-- 判断大额审批结果网关 -->
+    <exclusiveGateway id="largeAmountResultGateway" name="大额审批结果"/>
+
+    <sequenceFlow id="flow9" sourceRef="parallelJoin" targetRef="largeAmountResultGateway"/>
+
+    <!-- 大额审批全部批准 -->
+    <sequenceFlow id="flowLargeApproved" name="全部批准" sourceRef="largeAmountResultGateway" targetRef="paymentProcess">
+      <conditionExpression xsi:type="tFormalExpression">${cfoApproved == true &amp;&amp; ceoApproved == true}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 大额审批有拒绝 -->
+    <sequenceFlow id="flowLargeRejected" name="有拒绝" sourceRef="largeAmountResultGateway" targetRef="rejectEnd">
+      <conditionExpression xsi:type="tFormalExpression">${cfoApproved == false || ceoApproved == false}</conditionExpression>
+    </sequenceFlow>
+
+    <!-- 打款处理 -->
+    <serviceTask id="paymentProcess" name="打款处理" flowable:delegateExpression="${demoPaymentDelegate}">
+      <documentation>财务系统自动打款</documentation>
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${demoExecutionListener}"/>
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow id="flow10" sourceRef="paymentProcess" targetRef="notifyPayment"/>
+
+    <!-- 打款通知 -->
+    <serviceTask id="notifyPayment" name="发送打款通知" flowable:delegateExpression="${demoNotificationDelegate}">
+      <documentation>发送打款成功通知给申请人</documentation>
+    </serviceTask>
+
+    <sequenceFlow id="flow11" sourceRef="notifyPayment" targetRef="end"/>
+
+    <!-- 正常结束事件 -->
+    <endEvent id="end" name="流程结束"/>
+
+    <!-- 拒绝结束事件 -->
+    <endEvent id="rejectEnd" name="拒绝结束"/>
+  </process>
+
+  <!-- 流程图布局 -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_reimbursementApprovalProcess">
+      <bpmndi:BPMNPlane bpmnElement="reimbursementApprovalProcess" id="BPMNPlane_reimbursementApprovalProcess">
+        <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+          <omgdc:Bounds height="30.0" width="30.0" x="80.0" y="300.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="submitReimbursement" id="BPMNShape_submitReimbursement">
+          <omgdc:Bounds height="60.0" width="100.0" x="160.0" y="285.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="financeReview" id="BPMNShape_financeReview">
+          <omgdc:Bounds height="60.0" width="100.0" x="300.0" y="285.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="financeReviewGateway" id="BPMNShape_financeReviewGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="450.0" y="295.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="checkAmountGateway" id="BPMNShape_checkAmountGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="560.0" y="295.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="managerApproval" id="BPMNShape_managerApproval">
+          <omgdc:Bounds height="60.0" width="100.0" x="650.0" y="180.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="managerResultGateway" id="BPMNShape_managerResultGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="800.0" y="190.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="parallelFork" id="BPMNShape_parallelFork">
+          <omgdc:Bounds height="40.0" width="40.0" x="690.0" y="295.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="cfoApproval" id="BPMNShape_cfoApproval">
+          <omgdc:Bounds height="60.0" width="100.0" x="780.0" y="260.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="ceoApproval" id="BPMNShape_ceoApproval">
+          <omgdc:Bounds height="60.0" width="100.0" x="780.0" y="350.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="parallelJoin" id="BPMNShape_parallelJoin">
+          <omgdc:Bounds height="40.0" width="40.0" x="940.0" y="295.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="largeAmountResultGateway" id="BPMNShape_largeAmountResultGateway">
+          <omgdc:Bounds height="40.0" width="40.0" x="1040.0" y="295.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="paymentProcess" id="BPMNShape_paymentProcess">
+          <omgdc:Bounds height="60.0" width="100.0" x="1140.0" y="285.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="notifyPayment" id="BPMNShape_notifyPayment">
+          <omgdc:Bounds height="60.0" width="100.0" x="1280.0" y="285.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+          <omgdc:Bounds height="28.0" width="28.0" x="1430.0" y="301.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNShape bpmnElement="rejectEnd" id="BPMNShape_rejectEnd">
+          <omgdc:Bounds height="28.0" width="28.0" x="970.0" y="96.0"/>
+        </bpmndi:BPMNShape>
+        <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+          <omgdi:waypoint x="109.949998" y="315.0"/>
+          <omgdi:waypoint x="160.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+          <omgdi:waypoint x="260.0" y="315.0"/>
+          <omgdi:waypoint x="300.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+          <omgdi:waypoint x="400.0" y="315.0"/>
+          <omgdi:waypoint x="450.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowFinanceApproved" id="BPMNEdge_flowFinanceApproved">
+          <omgdi:waypoint x="490.0" y="315.0"/>
+          <omgdi:waypoint x="560.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowFinanceRejected" id="BPMNEdge_flowFinanceRejected">
+          <omgdi:waypoint x="470.0" y="295.0"/>
+          <omgdi:waypoint x="470.0" y="150.0"/>
+          <omgdi:waypoint x="969.0" y="150.0"/>
+          <omgdi:waypoint x="969.0" y="124.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowSmallAmount" id="BPMNEdge_flowSmallAmount">
+          <omgdi:waypoint x="580.0" y="295.0"/>
+          <omgdi:waypoint x="580.0" y="210.0"/>
+          <omgdi:waypoint x="650.0" y="210.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowLargeAmount" id="BPMNEdge_flowLargeAmount">
+          <omgdi:waypoint x="600.0" y="315.0"/>
+          <omgdi:waypoint x="690.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+          <omgdi:waypoint x="750.0" y="210.0"/>
+          <omgdi:waypoint x="800.0" y="210.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowManagerApproved" id="BPMNEdge_flowManagerApproved">
+          <omgdi:waypoint x="840.0" y="210.0"/>
+          <omgdi:waypoint x="1190.0" y="210.0"/>
+          <omgdi:waypoint x="1190.0" y="285.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowManagerRejected" id="BPMNEdge_flowManagerRejected">
+          <omgdi:waypoint x="820.0" y="230.0"/>
+          <omgdi:waypoint x="820.0" y="180.0"/>
+          <omgdi:waypoint x="984.0" y="180.0"/>
+          <omgdi:waypoint x="984.0" y="124.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+          <omgdi:waypoint x="730.0" y="305.0"/>
+          <omgdi:waypoint x="780.0" y="290.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+          <omgdi:waypoint x="730.0" y="325.0"/>
+          <omgdi:waypoint x="780.0" y="380.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+          <omgdi:waypoint x="880.0" y="290.0"/>
+          <omgdi:waypoint x="960.0" y="305.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+          <omgdi:waypoint x="880.0" y="380.0"/>
+          <omgdi:waypoint x="960.0" y="325.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+          <omgdi:waypoint x="980.0" y="315.0"/>
+          <omgdi:waypoint x="1040.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowLargeApproved" id="BPMNEdge_flowLargeApproved">
+          <omgdi:waypoint x="1080.0" y="315.0"/>
+          <omgdi:waypoint x="1140.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flowLargeRejected" id="BPMNEdge_flowLargeRejected">
+          <omgdi:waypoint x="1060.0" y="295.0"/>
+          <omgdi:waypoint x="1060.0" y="150.0"/>
+          <omgdi:waypoint x="1000.0" y="150.0"/>
+          <omgdi:waypoint x="1000.0" y="124.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+          <omgdi:waypoint x="1240.0" y="315.0"/>
+          <omgdi:waypoint x="1280.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+        <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+          <omgdi:waypoint x="1380.0" y="315.0"/>
+          <omgdi:waypoint x="1430.0" y="315.0"/>
+        </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

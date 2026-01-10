@@ -277,9 +277,18 @@ public class ProcessRestService
         }
         // 替换 process id，使每个 ProcessEntity 有唯一的 processDefinitionKey
         // 根据流程路径判断使用哪个 process key 进行替换
-        String originalProcessKey = processPath.contains("thread") 
-                ? ThreadConsts.THREAD_PROCESS_KEY 
-                : TicketConsts.TICKET_PROCESS_KEY;
+        String originalProcessKey;
+        if (processPath.contains("thread")) {
+            originalProcessKey = ThreadConsts.THREAD_PROCESS_KEY;
+        } else if (processPath.contains("leave-approval")) {
+            originalProcessKey = ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_KEY;
+        } else if (processPath.contains("reimbursement-approval")) {
+            originalProcessKey = ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_KEY;
+        } else if (processPath.contains("it-support")) {
+            originalProcessKey = ProcessDemoConsts.IT_SUPPORT_PROCESS_KEY;
+        } else {
+            originalProcessKey = TicketConsts.TICKET_PROCESS_KEY;
+        }
 
         String processDefinitionKey = FlowableIdUtils.toProcessDefinitionKey(processUid);
         bpmnXml = rewriteBpmnProcessId(bpmnXml, originalProcessKey, processDefinitionKey);
@@ -378,9 +387,24 @@ public class ProcessRestService
         String bpmnXml = processEntity.getSchema();
         // 统一：部署时将 BPMN <process id> 归一为可运行的 processDefinitionKey
         String processDefinitionKey = FlowableIdUtils.toProcessDefinitionKey(processUid);
-        String originalProcessKey = ProcessTypeEnum.THREAD.name().equalsIgnoreCase(processEntity.getType())
-            ? ThreadConsts.THREAD_PROCESS_KEY
-            : TicketConsts.TICKET_PROCESS_KEY;
+        String originalProcessKey;
+        if (ProcessTypeEnum.THREAD.name().equalsIgnoreCase(processEntity.getType())) {
+            originalProcessKey = ThreadConsts.THREAD_PROCESS_KEY;
+        } else if (ProcessTypeEnum.DEMO.name().equalsIgnoreCase(processEntity.getType())) {
+            // 根据流程名称判断具体是哪个演示流程
+            String name = processEntity.getName();
+            if (name.contains(ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_NAME)) {
+                originalProcessKey = ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_KEY;
+            } else if (name.contains(ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_NAME)) {
+                originalProcessKey = ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_KEY;
+            } else if (name.contains(ProcessDemoConsts.IT_SUPPORT_PROCESS_NAME)) {
+                originalProcessKey = ProcessDemoConsts.IT_SUPPORT_PROCESS_KEY;
+            } else {
+                originalProcessKey = ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_KEY; // 默认
+            }
+        } else {
+            originalProcessKey = TicketConsts.TICKET_PROCESS_KEY;
+        }
         bpmnXml = rewriteBpmnProcessId(bpmnXml, originalProcessKey, processDefinitionKey);
         // 直接使用 processUid 作为 deploymentName，确保唯一性且不受用户修改 name 影响
         String deploymentName = processUid;
@@ -613,11 +637,96 @@ public class ProcessRestService
                 throw new RuntimeException("Failed to reset process: unable to save entity");
             }
             log.info("重置流程成功: processUid={}, type={}", processUid, type);
-            
+
             return convertToResponse(savedEntity);
         } catch (IOException e) {
             log.error("重置流程失败: processUid={}", processUid, e);
             throw new RuntimeException("Failed to reset process: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 初始化演示流程模板
+     * 用于展示工单系统的流程能力
+     */
+    public void initProcessDemos(String orgUid) {
+        try {
+            // 初始化请假审批流程
+            initLeaveApprovalProcess(orgUid);
+
+            // 初始化报销审批流程
+            initReimbursementApprovalProcess(orgUid);
+
+            // 初始化IT支持流程
+            initItSupportProcess(orgUid);
+
+            log.info("演示流程初始化成功: orgUid={}", orgUid);
+        } catch (Exception e) {
+            log.error("初始化演示流程失败: orgUid={}", orgUid, e);
+        }
+    }
+
+    /**
+     * 初始化请假审批流程
+     */
+    private void initLeaveApprovalProcess(String orgUid) throws IOException {
+        String processUid = Utils.formatUid(orgUid, ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_KEY);
+        String bpmnXml = loadDemoProcessSchema(ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_PATH);
+
+        create(buildDefaultProcessRequest(
+                processUid,
+                orgUid,
+                bpmnXml,
+                ProcessTypeEnum.DEMO,
+                ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_NAME));
+
+        deployProcessByType(orgUid, processUid, ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_PATH);
+        log.info("创建请假审批流程成功: processUid={}, orgUid={}", processUid, orgUid);
+    }
+
+    /**
+     * 初始化报销审批流程
+     */
+    private void initReimbursementApprovalProcess(String orgUid) throws IOException {
+        String processUid = Utils.formatUid(orgUid, ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_KEY);
+        String bpmnXml = loadDemoProcessSchema(ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_PATH);
+
+        create(buildDefaultProcessRequest(
+                processUid,
+                orgUid,
+                bpmnXml,
+                ProcessTypeEnum.DEMO,
+                ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_NAME));
+
+        deployProcessByType(orgUid, processUid, ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_PATH);
+        log.info("创建报销审批流程成功: processUid={}, orgUid={}", processUid, orgUid);
+    }
+
+    /**
+     * 初始化IT支持流程
+     */
+    private void initItSupportProcess(String orgUid) throws IOException {
+        String processUid = Utils.formatUid(orgUid, ProcessDemoConsts.IT_SUPPORT_PROCESS_KEY);
+        String bpmnXml = loadDemoProcessSchema(ProcessDemoConsts.IT_SUPPORT_PROCESS_PATH);
+
+        create(buildDefaultProcessRequest(
+                processUid,
+                orgUid,
+                bpmnXml,
+                ProcessTypeEnum.DEMO,
+                ProcessDemoConsts.IT_SUPPORT_PROCESS_NAME));
+
+        deployProcessByType(orgUid, processUid, ProcessDemoConsts.IT_SUPPORT_PROCESS_PATH);
+        log.info("创建IT支持流程成功: processUid={}, orgUid={}", processUid, orgUid);
+    }
+
+    /**
+     * 加载演示流程模板文件
+     */
+    private String loadDemoProcessSchema(String processPath) throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:" + processPath);
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 

@@ -35,6 +35,17 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- https://docs.spring.io/spring-integration/reference/stomp.html -->
+		<!-- <dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-stomp</artifactId>
+		</dependency> -->
+		<!-- https://docs.spring.io/spring-integration/reference/mqtt.html -->
+		<!-- <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-mqtt</artifactId>
+        </dependency> -->
+
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.security/spring-security-messaging -->
 		<dependency>
@@ -147,16 +158,6 @@
 			<groupId>com.github.houbb</groupId>
 			<artifactId>pinyin</artifactId>
 			<version>0.4.0</version>
-		</dependency>
-
-		<!-- 敏感词过滤 -->
-		<!-- https://github.com/houbb/sensitive-word -->
-		<!-- https://mvnrepository.com/artifact/com.github.houbb/sensitive-word -->
-		<!-- https://mp.weixin.qq.com/s/7wSy0PuJLTudEo9gTY5s5w -->
-		<dependency>
-			<groupId>com.github.houbb</groupId>
-			<artifactId>sensitive-word</artifactId>
-			<version>0.25.0</version>
 		</dependency>
 
 		<!-- Required for Hibernate5Module to work with JPA annotations -->

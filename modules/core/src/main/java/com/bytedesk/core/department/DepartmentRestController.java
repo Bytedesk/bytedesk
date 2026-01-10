@@ -60,11 +60,13 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @ActionAnnotation(title = "部门", action = "查询详情", description = "query department by uid")
-    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
+    @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_OR_TICKET_READ)
     @Override
     public ResponseEntity<?> queryByUid(DepartmentRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+
+        DepartmentResponse department = departmentRestService.queryByUid(request);
+        
+        return ResponseEntity.ok(JsonResult.success(department));
     }
 
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_CREATE)

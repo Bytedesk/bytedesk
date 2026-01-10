@@ -177,6 +177,72 @@ public class TicketController {
     }
 
     /**
+     * 委托工单任务
+     */
+    @PostMapping("/delegate")
+    public ResponseEntity<?> delegateTicket(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.delegateTicket(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 解决委托任务（被委托人处理完成后，归还给委托人）
+     */
+    @PostMapping("/delegate/resolve")
+    public ResponseEntity<?> resolveDelegatedTicket(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.resolveDelegatedTicket(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 抄送工单（知会相关人员，不参与流转）
+     */
+    @PostMapping("/cc")
+    public ResponseEntity<?> ccTicket(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.ccTicket(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 加签（最小实现：为当前任务追加候选人）
+     */
+    @PostMapping("/addsign")
+    public ResponseEntity<?> addSignTicket(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.addSignTicket(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 退回（跳转回指定节点）
+     */
+    @PostMapping("/rollback")
+    public ResponseEntity<?> rollbackTicket(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.rollbackTicket(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 撤销（终止流程实例）
+     */
+    @PostMapping("/revoke")
+    public ResponseEntity<?> revokeTicket(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.revokeTicket(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
      * 查询工单任务历史
      */
     @GetMapping("/history/task")

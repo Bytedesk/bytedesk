@@ -406,6 +406,8 @@ services:
       # SPRING_AI_ZHIPUAI_EMBEDDING_BASE_URL: https://api.bigmodel.cn
       # SPRING_AI_ZHIPUAI_EMBEDDING_API_KEY: 'sk-xxx'
       SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-2
+      # SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-3
+      SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_DIMENSIONS: 1024
       # deepseek
       # 申请key https://api-docs.deepseek.com/zh-cn/
       # SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com

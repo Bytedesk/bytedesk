@@ -217,6 +217,24 @@ public class AgentSettingsRestService
         entity.setIsDefault(request.getIsDefault());
         entity.setEnabled(request.getEnabled());
 
+        // Agent meta fields（不属于嵌套 settings，需要在 update 中单独持久化）
+        if (request.getMaxThreadCount() != null) {
+            entity.setMaxThreadCount(request.getMaxThreadCount());
+            entity.setHasUnpublishedChanges(true);
+        }
+        if (request.getTimeoutRemindEnabled() != null) {
+            entity.setTimeoutRemindEnabled(request.getTimeoutRemindEnabled());
+            entity.setHasUnpublishedChanges(true);
+        }
+        if (request.getTimeoutRemindTime() != null) {
+            entity.setTimeoutRemindTime(request.getTimeoutRemindTime());
+            entity.setHasUnpublishedChanges(true);
+        }
+        if (StringUtils.hasText(request.getTimeoutRemindTip())) {
+            entity.setTimeoutRemindTip(request.getTimeoutRemindTip());
+            entity.setHasUnpublishedChanges(true);
+        }
+
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
             // 复用并更新现有草稿，避免新建导致孤儿记录

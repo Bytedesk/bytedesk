@@ -52,6 +52,10 @@ public class TopicUtils {
     // public static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX = "org/ticket/workgroup/";
     // department ticket thread
     public static final String TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX = "org/ticket/department/";
+    // workgroup ticket thread
+    public static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX = "org/ticket/workgroup/";
+    // org ticket thread (fallback when no department/workgroup)
+    public static final String TOPIC_ORG_TICKET_THREAD_PREFIX = "org/ticket/org/";
 
     // topic格式定义：
     // 注意：开头没有 '/' ，防止stomp主题中将 '/' 替换为 '.'之后，在最前面多余一个 '.'
@@ -102,6 +106,8 @@ public class TopicUtils {
     private static final String TOPIC_ORG_UNIFIED_THREAD_PATTERN = TOPIC_ORG_UNIFIED_PREFIX + "%s/%s"; // "org/unified/%s/%s";
     private static final String TOPIC_ORG_QUEUE_PATTERN = TOPIC_ORG_QUEUE_PREFIX + "%s"; // "org/queue/%s";
     private static final String TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN = TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/department/%s/%s";
+    private static final String TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN = TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/workgroup/%s/%s";
+    private static final String TOPIC_ORG_TICKET_THREAD_PATTERN = TOPIC_ORG_TICKET_THREAD_PREFIX + "%s/%s"; // "org/ticket/org/%s/%s";
     private static final String TOPIC_ORG_WORKFLOW_THREAD_PATTERN = TOPIC_ORG_WORKFLOW_PREFIX + "%s/%s"; // "org/workflow/%s/%s";
 
 
@@ -117,6 +123,8 @@ public class TopicUtils {
                isOrgWorkgroupTopic(topic) || 
                isOrgUnifiedTopic(topic) || 
                isOrgDepartmentTicketThreadTopic(topic) ||
+               isOrgWorkgroupTicketThreadTopic(topic) ||
+               isOrgTicketThreadTopic(topic) ||
                isOrgQueueTopic(topic);
     }
 
@@ -321,6 +329,22 @@ public class TopicUtils {
 
     public static String formatOrgDepartmentTicketThreadTopic(String departmentUid, String ticketUid) {
         return String.format(TOPIC_ORG_DEPARTMENT_TICKET_THREAD_PATTERN, departmentUid, ticketUid);
+    }
+
+    public static Boolean isOrgWorkgroupTicketThreadTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PREFIX);
+    }
+
+    public static String formatOrgWorkgroupTicketThreadTopic(String workgroupUid, String ticketUid) {
+        return String.format(TOPIC_ORG_WORKGROUP_TICKET_THREAD_PATTERN, workgroupUid, ticketUid);
+    }
+
+    public static Boolean isOrgTicketThreadTopic(String topic) {
+        return topic.startsWith(TOPIC_ORG_TICKET_THREAD_PREFIX);
+    }
+
+    public static String formatOrgTicketThreadTopic(String orgUid, String ticketUid) {
+        return String.format(TOPIC_ORG_TICKET_THREAD_PATTERN, orgUid, ticketUid);
     }
     //////////////////////////////////////////////////////////////////////////
     // 统一客服入口

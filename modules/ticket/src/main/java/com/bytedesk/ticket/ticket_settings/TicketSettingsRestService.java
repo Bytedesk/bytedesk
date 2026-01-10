@@ -21,7 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -91,13 +91,13 @@ public class TicketSettingsRestService extends
         return ticketSettingsRepository.findAll(spec, pageable);
     }
 
-    @Cacheable(value = "ticketSettings", key = "#uid", unless = "#result==null")
+    // @Cacheable(value = "ticketSettings", key = "#uid", unless = "#result==null")
     @Override
     public Optional<TicketSettingsEntity> findByUid(String uid) {
         return ticketSettingsRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' + #type", unless = "#result==null")
+    // @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' + #type", unless = "#result==null")
     public Optional<TicketSettingsEntity> findByNameAndOrgUid(String name, String orgUid, String type) {
         return ticketSettingsRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
@@ -360,8 +360,39 @@ public class TicketSettingsRestService extends
     public TicketSettingsEntity getOrCreateDefault(String orgUid, String rawType) {
         String normalizedType = resolveSettingsType(rawType);
         Optional<TicketSettingsEntity> existing = ticketSettingsRepository.findDefaultForUpdate(orgUid, normalizedType);
-        if (existing.isPresent())
-            return existing.get();
+        if (existing.isPresent()) {
+            TicketSettingsEntity existingEntity = existing.get();
+            boolean changed = false;
+
+            // 兼容历史数据：若默认 settings 已存在但未绑定默认流程/表单，则在读的时候补齐。
+            if (existingEntity.getProcess() == null || existingEntity.getDraftProcess() == null) {
+                String defaultProcessUid = resolveDefaultProcessUid(orgUid, normalizedType);
+                ProcessEntity defaultProcess = resolveProcessReference(defaultProcessUid, orgUid);
+                if (existingEntity.getProcess() == null && defaultProcess != null) {
+                    existingEntity.setProcess(defaultProcess);
+                    changed = true;
+                }
+                if (existingEntity.getDraftProcess() == null && defaultProcess != null) {
+                    existingEntity.setDraftProcess(defaultProcess);
+                    changed = true;
+                }
+            }
+
+            if (existingEntity.getForm() == null || existingEntity.getDraftForm() == null) {
+                String defaultFormUid = resolveDefaultFormUid(orgUid, normalizedType);
+                FormEntity defaultForm = resolveFormReference(defaultFormUid, orgUid);
+                if (existingEntity.getForm() == null && defaultForm != null) {
+                    existingEntity.setForm(defaultForm);
+                    changed = true;
+                }
+                if (existingEntity.getDraftForm() == null && defaultForm != null) {
+                    existingEntity.setDraftForm(defaultForm);
+                    changed = true;
+                }
+            }
+
+            return changed ? save(existingEntity) : existingEntity;
+        }
 
         // 兼容旧数据：若存在未设置 type 的默认记录，则补全后复用
         List<TicketSettingsEntity> legacyDefaults = ticketSettingsRepository.findByOrgUidAndIsDefaultTrue(orgUid);
@@ -820,6 +851,21 @@ public class TicketSettingsRestService extends
         if (request.getAssignmentMode() != null) {
             target.setAssignmentMode(request.getAssignmentMode());
         }
+
+        // 工单提示语配置
+        if (request.getAccessTip() != null) {
+            target.setAccessTip(request.getAccessTip());
+        }
+        if (request.getCloseTip() != null) {
+            target.setCloseTip(request.getCloseTip());
+        }
+        if (request.getAgentTimeoutTip() != null) {
+            target.setAgentTimeoutTip(request.getAgentTimeoutTip());
+        }
+        if (request.getVisitorTimeoutTip() != null) {
+            target.setVisitorTimeoutTip(request.getVisitorTimeoutTip());
+        }
+
         // 联系方式字段配置
         if (request.getShowContactName() != null) {
             target.setShowContactName(request.getShowContactName());
@@ -859,6 +905,13 @@ public class TicketSettingsRestService extends
         target.setEnableAutoClose(source.getEnableAutoClose());
         target.setRequireLogin(source.getRequireLogin());
         target.setAssignmentMode(source.getAssignmentMode());
+
+        // 工单提示语配置
+        target.setAccessTip(source.getAccessTip());
+        target.setCloseTip(source.getCloseTip());
+        target.setAgentTimeoutTip(source.getAgentTimeoutTip());
+        target.setVisitorTimeoutTip(source.getVisitorTimeoutTip());
+
         // 联系方式字段配置
         target.setShowContactName(source.getShowContactName());
         target.setRequireContactName(source.getRequireContactName());
@@ -884,6 +937,13 @@ public class TicketSettingsRestService extends
                 .enableAutoClose(entity.getEnableAutoClose())
                 .requireLogin(entity.getRequireLogin())
                 .assignmentMode(entity.getAssignmentMode())
+
+                // 工单提示语配置
+                .accessTip(entity.getAccessTip())
+                .closeTip(entity.getCloseTip())
+                .agentTimeoutTip(entity.getAgentTimeoutTip())
+                .visitorTimeoutTip(entity.getVisitorTimeoutTip())
+
                 // 联系方式字段配置
                 .showContactName(entity.getShowContactName())
                 .requireContactName(entity.getRequireContactName())

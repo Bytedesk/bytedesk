@@ -14,6 +14,10 @@
 package com.bytedesk.core.task;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.ZonedDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,6 +38,25 @@ public class TaskRequest extends BaseRequest {
     private String name;
 
     private String description;
+
+    private String color;
+
+    private Integer order;
+
+    private String taskListUid;
+
+    private String status;
+
+    private String priority;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime startAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime dueAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime completedAt;
 
     // @Builder.Default
     // private String type = TaskTypeEnum.CUSTOMER.name();

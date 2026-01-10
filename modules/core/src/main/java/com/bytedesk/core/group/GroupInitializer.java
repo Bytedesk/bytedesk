@@ -29,11 +29,11 @@ public class GroupInitializer implements SmartInitializingSingleton {
 
     @Override
     public void afterSingletonsInstantiated() {
-        init();
+        // init();
         initAuthority();
     }
 
-    private void init() {}
+    // private void init() {}
 
     private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {

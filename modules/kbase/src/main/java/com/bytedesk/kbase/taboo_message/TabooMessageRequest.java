@@ -13,9 +13,8 @@
  */
 package com.bytedesk.kbase.taboo_message;
 
-import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -36,21 +35,22 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TabooMessageRequest extends BaseRequest {
+    
     private static final long serialVersionUID = 1L;
 
-    
-    // private String content;
+    // 原始内容
+    private String content;
 
-    // private String type;
+    // 所属消息 uid
+    private String messageUid;
+
+    // 所属会话 uid
+    private String threadUid;
+
+    // 替换后内容
+    private String replacedContent;
 
     @Builder.Default
-    private List<String> tagList = new ArrayList<>();
-    
-    private ZonedDateTime startDate;
+    private List<String> tabooWordList = new ArrayList<>();
 
-    private ZonedDateTime endDate;
-
-    private String categoryUid;
-
-    private String kbUid; // 对应知识库
 }

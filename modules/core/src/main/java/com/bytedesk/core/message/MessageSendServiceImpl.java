@@ -15,6 +15,10 @@ package com.bytedesk.core.message;
 
 import org.springframework.stereotype.Service;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
+import com.bytedesk.core.annotation.TabooJsonFilter;
+import com.bytedesk.core.annotation.TabooProtobufFilter;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
@@ -24,12 +28,19 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class MessageSendServiceImpl implements IMessageSendService {
 
+
+    @BlackIpFilter(title = "black", action = "sendJsonMessage")
+    @BlackUserFilter(title = "black", action = "sendJsonMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendJsonMessage")
     @Override
     public void sendJsonMessage(String json) {
         // log.debug("sendJsonMessage: {}", json);
         publishMessageJsonEvent(json);
     }
 
+    @BlackIpFilter(title = "black", action = "sendProtobufMessage")
+    @BlackUserFilter(title = "black", action = "sendProtobufMessage")
+    @TabooProtobufFilter(title = "敏感词", action = "sendProtobufMessage")
     @Override
     public void sendProtobufMessage(MessageProtobuf messageProtobuf) {
         String json = messageProtobuf.toJson(); 

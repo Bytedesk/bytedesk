@@ -28,19 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 public class TabooMessageSpecification extends BaseSpecification<TabooMessageEntity, TabooMessageRequest> {
     
     public static Specification<TabooMessageEntity> search(TabooMessageRequest request, AuthService authService) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             //
             if (StringUtils.hasText(request.getContent())) {
                 predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
-            }
-            if (StringUtils.hasText(request.getCategoryUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
-            }
-            if (StringUtils.hasText(request.getKbUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("kbUid"), request.getKbUid()));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

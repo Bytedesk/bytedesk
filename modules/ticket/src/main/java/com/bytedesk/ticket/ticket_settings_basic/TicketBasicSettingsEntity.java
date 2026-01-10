@@ -1,6 +1,8 @@
 package com.bytedesk.ticket.ticket_settings_basic;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.I18Consts;
+import org.springframework.util.StringUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,6 +60,36 @@ public class TicketBasicSettingsEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "assignment_mode", length = 64)
     private String assignmentMode = TicketAssignmentModeEnum.ROUND_ROBIN.name();
+
+    // ============ 工单提示语配置 ============
+
+    /**
+     * 工单接入提示语（线程 NEW -> CHATTING 时发送给访客）
+     */
+    @Builder.Default
+    @Column(name = "access_tip", length = 2048)
+    private String accessTip = I18Consts.I18N_TICKET_ACCESS_TIP;
+
+    /**
+     * 工单关闭提示语（会话关闭后仅用于展示/提示）
+     */
+    @Builder.Default
+    @Column(name = "close_tip", length = 2048)
+    private String closeTip = I18Consts.I18N_TICKET_CLOSE_TIP;
+
+    /**
+     * 工单客服超时未回复提示语（预留给超时触发器/定时任务使用）
+     */
+    @Builder.Default
+    @Column(name = "agent_timeout_tip", length = 2048)
+    private String agentTimeoutTip = I18Consts.I18N_TICKET_AGENT_TIMEOUT_TIP;
+
+    /**
+     * 工单访客超时未回复提示语（预留给超时触发器/定时任务使用）
+     */
+    @Builder.Default
+    @Column(name = "visitor_timeout_tip", length = 2048)
+    private String visitorTimeoutTip = I18Consts.I18N_TICKET_VISITOR_TIMEOUT_TIP;
 
     // ============ 联系方式字段显示配置 ============
 
@@ -128,6 +160,20 @@ public class TicketBasicSettingsEntity extends BaseEntity {
         // 若提供 mapper，直接 map 后再补默认值（避免为 null 覆盖默认）
         TicketBasicSettingsEntity entity = mapper.map(request, TicketBasicSettingsEntity.class);
         entity.setAssignmentMode(request.getAssignmentMode());
+
+        // 提示语字段：避免 request 未传时被 mapper 覆盖成 null
+        if (!StringUtils.hasText(entity.getAccessTip())) {
+            entity.setAccessTip(I18Consts.I18N_TICKET_ACCESS_TIP);
+        }
+        if (!StringUtils.hasText(entity.getCloseTip())) {
+            entity.setCloseTip(I18Consts.I18N_TICKET_CLOSE_TIP);
+        }
+        if (!StringUtils.hasText(entity.getAgentTimeoutTip())) {
+            entity.setAgentTimeoutTip(I18Consts.I18N_TICKET_AGENT_TIMEOUT_TIP);
+        }
+        if (!StringUtils.hasText(entity.getVisitorTimeoutTip())) {
+            entity.setVisitorTimeoutTip(I18Consts.I18N_TICKET_VISITOR_TIMEOUT_TIP);
+        }
         return entity;
     }
 

@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.BdDateUtils;
 
@@ -29,8 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TicketSpecification extends BaseSpecification<TicketEntity, TicketRequest> {
 
+    private static final char LIKE_ESCAPE_CHAR = '\\';
+    private static final String ASSIGNEE_UID_KEYWORD_UNASSIGNED = "UNASSIGNED";
+
     public static Specification<TicketEntity> search(TicketRequest request, AuthService authService) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
@@ -81,9 +85,44 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getDepartmentUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("departmentUid"), request.getDepartmentUid()));
             }
+
+            // reporterUid (stored in JSON string column: reporter)
+            if (StringUtils.hasText(request.getReporterUid())) {
+                String reporterUid = escapeLike(request.getReporterUid());
+                String reporterPattern = "%\"uid\":\"" + reporterUid + "\"%";
+                predicates.add(criteriaBuilder.like(root.get("reporter"), reporterPattern, LIKE_ESCAPE_CHAR));
+            }
+
+            // assigneeUid (stored in JSON string column: assignee)
+            if (StringUtils.hasText(request.getAssigneeUid())) {
+                if (ASSIGNEE_UID_KEYWORD_UNASSIGNED.equalsIgnoreCase(request.getAssigneeUid())) {
+                    // 未分配：assignee 为空/null/{} 或不包含 uid 字段
+                    Predicate assigneeIsNull = criteriaBuilder.isNull(root.get("assignee"));
+                    Predicate assigneeIsEmptyString = criteriaBuilder.equal(root.get("assignee"), "");
+                    Predicate assigneeIsEmptyJson = criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING);
+                    Predicate assigneeUidEmpty = criteriaBuilder.like(root.get("assignee"), "%\"uid\":\"\"%", LIKE_ESCAPE_CHAR);
+                    Predicate assigneeHasNoUidField = criteriaBuilder.notLike(root.get("assignee"), "%\"uid\":\"%", LIKE_ESCAPE_CHAR);
+                    predicates.add(criteriaBuilder.or(
+                            assigneeIsNull,
+                            assigneeIsEmptyString,
+                            assigneeIsEmptyJson,
+                            assigneeUidEmpty,
+                            assigneeHasNoUidField));
+                } else {
+                    String assigneeUid = escapeLike(request.getAssigneeUid());
+                    String assigneePattern = "%\"uid\":\"" + assigneeUid + "\"%";
+                    predicates.add(criteriaBuilder.like(root.get("assignee"), assigneePattern, LIKE_ESCAPE_CHAR));
+                }
+            }
+
             // userUid
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
+            }
+
+            // level (platform / organization)
+            if (StringUtils.hasText(request.getLevel())) {
+                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
             // 时间范围过滤 - 使用BdDateUtils进行时间解析和转换
             if (StringUtils.hasText(request.getCreatedAtStart())) {
@@ -109,5 +148,15 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             // 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private static String escapeLike(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value
+                .replace("\\\\", "\\\\\\\\")
+                .replace("%", "\\\\%")
+                .replace("_", "\\\\_");
     }
 }

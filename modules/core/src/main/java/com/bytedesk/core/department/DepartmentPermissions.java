@@ -31,6 +31,8 @@ public class DepartmentPermissions extends BasePermissions {
 
     // PreAuthorize 表达式 - 统一权限（不区分层级）
     public static final String HAS_DEPARTMENT_READ = "hasAuthority('DEPARTMENT_READ')";
+    // 用于工单详情等“只读展示”场景：允许拥有工单读取权限的用户获取部门详情
+    public static final String HAS_DEPARTMENT_READ_OR_TICKET_READ = "hasAuthority('DEPARTMENT_READ') or hasAuthority('TICKET_READ')";
     public static final String HAS_DEPARTMENT_CREATE = "hasAuthority('DEPARTMENT_CREATE')";
     public static final String HAS_DEPARTMENT_UPDATE = "hasAuthority('DEPARTMENT_UPDATE')";
     public static final String HAS_DEPARTMENT_DELETE = "hasAuthority('DEPARTMENT_DELETE')";

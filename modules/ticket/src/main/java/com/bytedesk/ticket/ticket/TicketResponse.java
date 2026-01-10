@@ -48,12 +48,13 @@ public class TicketResponse extends BaseResponse {
     private String wechat;
     // 
     private String ticketNumber;
-   
     // 
     private String status;
     private String priority;
     private String type;
+    // 
     private String topic;
+    private String visitorThreadTopic;
     // 工单对话
     private String threadUid;
     // 关联访客对话

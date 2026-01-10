@@ -39,4 +39,10 @@ public class TaskListResponse extends BaseResponse {
 
     private String type;
 
+    private String color;
+
+    private Integer order;
+
+    private Boolean archived;
+
 }

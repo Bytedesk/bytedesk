@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
+@Component("processInitializer")
 @RequiredArgsConstructor
 public class ProcessInitializer implements SmartInitializingSingleton {
 
@@ -34,10 +34,13 @@ public class ProcessInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
+        // 初始化默认组织机构的流程
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        log.info("ticket process - organization created: {}", orgUid);
+        // log.info("ticket process - organization created: {}", orgUid);
         processRestService.initProcess(orgUid);
         processRestService.initThreadProcess(orgUid);
+        // 初始化演示流程模板
+        processRestService.initProcessDemos(orgUid);
     }
 
     private void initAuthority() {

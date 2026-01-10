@@ -50,6 +50,19 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     private final MemberRepository memberRepository;
 
+    @Override
+    public DepartmentResponse queryByUid(DepartmentRequest request) {
+        DepartmentEntity department = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("department not found with uid: " + request.getUid()));
+
+        // 安全兜底：若请求携带 orgUid，则强制校验资源归属组织，避免凭 UID 跨组织探测
+        if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(department.getOrgUid())) {
+            throw new RuntimeException("department org mismatch");
+        }
+
+        return convertToResponse(department);
+    }
+
     public Page<DepartmentResponse> queryByOrg(DepartmentRequest request) {
         Pageable pageable = request.getPageable();
         Specification<DepartmentEntity> specification = DepartmentSpecification.search(request, authService);

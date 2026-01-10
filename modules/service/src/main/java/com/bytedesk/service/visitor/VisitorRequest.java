@@ -77,6 +77,9 @@ public class VisitorRequest extends BaseRequest {
 	// for thread request
 	private String sid;
 
+	// for visitor thread list filter
+	private String topic;
+
 	// 强制转人工服务，默认false
 	@Builder.Default
 	private Boolean forceAgent = false;

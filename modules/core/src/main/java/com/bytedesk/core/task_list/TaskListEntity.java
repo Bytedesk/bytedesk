@@ -17,6 +17,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 待办任务list列表
+ * 待办任务列表
  * 
  * TaskList entity for content categorization and organization
  * Provides task_listging functionality for various system entities
@@ -44,7 +45,15 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({TaskListEntityListener.class})
-@Table(name = "bytedesk_core_task_list")
+@Table(
+    name = "bytedesk_core_task_list",
+    indexes = {
+        @Index(name = "idx_task_list_uid", columnList = "uuid"),
+        @Index(name = "idx_task_list_org_uid", columnList = "org_uid"),
+        @Index(name = "idx_task_list_user_uid", columnList = "user_uid"),
+        @Index(name = "idx_task_list_type", columnList = "task_list_type")
+    }
+)
 public class TaskListEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -52,12 +61,14 @@ public class TaskListEntity extends BaseEntity {
     /**
      * Name of the task_list
      */
+    @Column(length = 128)
     private String name;
 
     /**
      * Description of the task_list
      */
     @Builder.Default
+    @Column(length = 512)
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
@@ -66,5 +77,26 @@ public class TaskListEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "task_list_type")
     private String type = TaskListTypeEnum.CUSTOMER.name();
+
+    /**
+     * Color theme for the task list display
+     */
+    @Builder.Default
+    @Column(name = "task_list_color", length = 32)
+    private String color = "blue";
+
+    /**
+     * Display order
+     */
+    @Builder.Default
+    @Column(name = "task_list_order")
+    private Integer order = 0;
+
+    /**
+     * Whether this list is archived (hidden from default views)
+     */
+    @Builder.Default
+    @Column(name = "is_archived")
+    private Boolean archived = false;
 
 }

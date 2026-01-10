@@ -115,6 +115,10 @@ public class TicketEntity extends BaseEntity {
     @Column(name = "thread_topic")
     private String topic;
 
+    // 关联访客对话主题
+    @Column(name = "visitor_thread_topic")
+    private String visitorThreadTopic;
+
     /**
      * Associated thread UID for ticket conversation
      */
@@ -142,7 +146,7 @@ public class TicketEntity extends BaseEntity {
 
     /**
      * Ticket assignee information stored as JSON string
-     * 工单处理人
+     * 工单处理人、办理人
      */
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
@@ -155,12 +159,6 @@ public class TicketEntity extends BaseEntity {
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String reporter = BytedeskConsts.EMPTY_JSON_STRING;
-
-    /**
-     * Comments associated with the ticket
-     */
-    // @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<TicketCommentEntity> comments;
 
     /**
      * Attachments associated with the ticket
@@ -183,6 +181,7 @@ public class TicketEntity extends BaseEntity {
      * Process definition entity UID
      * Also used as Flowable's processDefinitionKey
      */
+    @Column(name = "process_entity_uid")
     private String processEntityUid;
 
     /**

@@ -75,6 +75,10 @@ public class TokenEntity extends BaseEntity {
 
     private ZonedDateTime expiresAt;
 
+    // 当前 accessToken 最近活跃时间（最后一次通过鉴权/校验的时间）
+    @Column(name = "last_active_at")
+    private ZonedDateTime lastActiveAt;
+
     // 是否永久有效
     @Builder.Default
     @Column(name = "is_permanent")

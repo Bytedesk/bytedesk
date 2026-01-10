@@ -76,9 +76,26 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     @Override
     public ResponseEntity<?> queryByUser(ThreadRequest request) {
 
-        Page<ThreadResponse> threadPage = threadRestService.query(request);
+        Page<ThreadResponse> threadPage = threadRestService.queryByUser(request);
         //
         return ResponseEntity.ok(JsonResult.success(threadPage));
+    }
+
+    /**
+     * 根据UID查询会话
+     * 
+     * @param request 查询请求
+     * @return 会话信息
+     */
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ)
+    @ActionAnnotation(title = "会话管理", action = "查询会话详情", description = "queryByUid thread")
+    @Operation(summary = "根据UID查询会话", description = "通过唯一标识符查询会话")
+    @Override
+    public ResponseEntity<?> queryByUid(ThreadRequest request) {
+
+        ThreadResponse threadResponse = threadRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
     /**
@@ -131,23 +148,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }
 
-    /**
-     * 根据UID查询会话
-     * 
-     * @param request 查询请求
-     * @return 会话信息
-     */
-    // @PreAuthorize(ThreadPermissions.HAS_THREAD_READ)
-    @ActionAnnotation(title = "会话管理", action = "查询会话详情", description = "queryByUid thread")
-    @Operation(summary = "根据UID查询会话", description = "通过唯一标识符查询会话")
-    @Override
-    public ResponseEntity<?> queryByUid(ThreadRequest request) {
-
-        ThreadResponse threadResponse = threadRestService.queryByUid(request);
-
-        return ResponseEntity.ok(JsonResult.success(threadResponse));
-    }
-
+    
     /**
      * 创建会话
      * 

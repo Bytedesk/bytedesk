@@ -14,9 +14,18 @@
 package com.bytedesk.kbase.taboo_message;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -39,6 +48,23 @@ public class TabooMessageEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // 
+    // 原始内容
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
+
+    // 所属消息 uid
+    private String messageUid;
+
+    // 所属会话 uid
+    private String threadUid;
+
+    // 替换后内容
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String replacedContent;
+
+    // 命中敏感词列表
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tabooWordList = new ArrayList<>();
 }

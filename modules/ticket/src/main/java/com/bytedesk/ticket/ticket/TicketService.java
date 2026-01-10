@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,51 @@ public class TicketService {
     private final ThreadRestService threadRestService;
     private final TopicRestService topicRestService;
     private final TicketRestService ticketRestService;
+
+    private TicketEntity getTicketOrThrow(String ticketUid) {
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticketUid);
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + ticketUid);
+        }
+        return ticketOptional.get();
+    }
+
+    private Task getActiveTaskOrThrow(TicketEntity ticket, TicketRequest request) {
+        if (StringUtils.hasText(request.getTaskId())) {
+            Task task = taskService.createTaskQuery()
+                    .taskId(request.getTaskId())
+                    .active()
+                    .singleResult();
+            if (task == null) {
+                throw new RuntimeException("任务不存在或已结束: " + request.getTaskId());
+            }
+            if (!Objects.equals(task.getProcessInstanceId(), ticket.getProcessInstanceId())) {
+                throw new RuntimeException("任务不属于该工单流程实例: " + request.getTaskId());
+            }
+            return task;
+        }
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .processInstanceId(ticket.getProcessInstanceId())
+                .active()
+                .list();
+
+        if (tasks == null || tasks.isEmpty()) {
+            throw new RuntimeException("工单任务不存在: " + ticket.getUid());
+        }
+        if (tasks.size() > 1) {
+            throw new RuntimeException("当前存在多个并行任务，请指定 taskId");
+        }
+        return tasks.get(0);
+    }
+
+    private void addTaskComment(Task task, TicketEntity ticket, String userId, String type, String message) {
+        Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(), type, message);
+        if (StringUtils.hasText(userId)) {
+            comment.setUserId(userId);
+        }
+        taskService.saveComment(comment);
+    }
 
     /**
      * 认领工单
@@ -909,13 +955,225 @@ public class TicketService {
         }
 
         // comment
-        taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                "CANCELLED", "工单已取消");
+        addTaskComment(task, ticket, assigneeUid, TicketStatusEnum.CANCELLED.name(), "工单已取消");
 
-        // 4. 取消任务
-        taskService.deleteTask(task.getId());
+        // 4. 终止流程实例（比直接 deleteTask 更一致，避免流程实例悬挂）
+        try {
+            runtimeService.deleteProcessInstance(ticket.getProcessInstanceId(),
+                    StringUtils.hasText(request.getReason()) ? request.getReason() : "cancel ticket");
+        } catch (Exception e) {
+            log.warn("终止流程实例失败，继续更新工单状态: processInstanceId={}, err={}",
+                    ticket.getProcessInstanceId(), e.getMessage());
+        }
 
         // 5. 更新工单状态
+        ticket.setStatus(TicketStatusEnum.CANCELLED.name());
+        ticketRestService.save(ticket);
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 委托工单任务
+     */
+    @Transactional
+    public TicketResponse delegateTicket(TicketRequest request) {
+        String operatorUid = request.getAssignee() != null ? request.getAssignee().getUid() : null;
+        Assert.hasText(operatorUid, "操作人uid不能为空");
+        Assert.hasText(request.getDelegateUid(), "被委托人uid不能为空");
+
+        TicketEntity ticket = getTicketOrThrow(request.getUid());
+        Task task = getActiveTaskOrThrow(ticket, request);
+
+        // 基础校验：只有当前任务办理人才能委托（如果任务未分配，则允许委托但建议先转办/认领）
+        if (StringUtils.hasText(task.getAssignee()) && !Objects.equals(task.getAssignee(), operatorUid)) {
+            throw new RuntimeException("非当前任务办理人，不能委托");
+        }
+
+        // Flowable 委托语义：owner=委托人, assignee=被委托人, delegationState=PENDING
+        if (!StringUtils.hasText(task.getOwner())) {
+            taskService.setOwner(task.getId(), operatorUid);
+        }
+        taskService.delegateTask(task.getId(), request.getDelegateUid());
+
+        addTaskComment(task, ticket, operatorUid, "DELEGATED",
+                "任务被委托给 " + request.getDelegateUid() + (StringUtils.hasText(request.getReason()) ? ("，原因：" + request.getReason()) : ""));
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 被委托人处理完成后“解决委托”，任务回到委托人
+     */
+    @Transactional
+    public TicketResponse resolveDelegatedTicket(TicketRequest request) {
+        String operatorUid = request.getAssignee() != null ? request.getAssignee().getUid() : null;
+        Assert.hasText(operatorUid, "操作人uid不能为空");
+        Assert.hasText(request.getTaskId(), "taskId不能为空");
+
+        TicketEntity ticket = getTicketOrThrow(request.getUid());
+        Task task = getActiveTaskOrThrow(ticket, request);
+
+        if (StringUtils.hasText(task.getAssignee()) && !Objects.equals(task.getAssignee(), operatorUid)) {
+            throw new RuntimeException("非当前任务办理人，不能解决委托");
+        }
+
+        taskService.resolveTask(task.getId());
+
+        addTaskComment(task, ticket, operatorUid, "DELEGATION_RESOLVED",
+                "委托任务已由 " + operatorUid + " 处理并归还" + (StringUtils.hasText(request.getReason()) ? ("，说明：" + request.getReason()) : ""));
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 抄送工单：知会相关人员（不参与流转）
+     */
+    @Transactional
+    public TicketResponse ccTicket(TicketRequest request) {
+        String operatorUid = request.getAssignee() != null ? request.getAssignee().getUid() : null;
+        Assert.hasText(operatorUid, "操作人uid不能为空");
+
+        Set<String> ccUids = request.getCcUids();
+        if (ccUids == null || ccUids.isEmpty()) {
+            throw new RuntimeException("ccUids不能为空");
+        }
+
+        TicketEntity ticket = getTicketOrThrow(request.getUid());
+
+        // 1) 尽量将抄送人加入工单会话订阅，便于接收通知/查看会话
+        if (StringUtils.hasText(ticket.getThreadUid())) {
+            Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
+            if (threadOptional.isPresent()) {
+                ThreadEntity thread = threadOptional.get();
+                for (String ccUid : ccUids) {
+                    if (!StringUtils.hasText(ccUid)) {
+                        continue;
+                    }
+                    Optional<MemberEntity> memberOptional = memberRestService.findByUid(ccUid);
+                    if (!memberOptional.isPresent()) {
+                        continue;
+                    }
+                    MemberEntity member = memberOptional.get();
+                    UserProtobuf ccProtobuf = UserProtobuf.builder()
+                            .uid(member.getUid())
+                            .nickname(member.getNickname())
+                            .avatar(member.getAvatar())
+                            .type(UserTypeEnum.MEMBER.name())
+                            .build();
+                    String ccJson = ccProtobuf.toJson();
+                    if (!thread.getTicketors().contains(ccJson)) {
+                        thread.getTicketors().add(ccJson);
+                    }
+                    // 订阅工单会话 topic，便于收到站内信/IM
+                    String userUid = member.getUser() != null ? member.getUser().getUid() : null;
+                    if (StringUtils.hasText(userUid)) {
+                        topicRestService.create(thread.getTopic(), userUid);
+                    }
+                }
+                threadRestService.save(thread);
+            }
+        }
+
+        // 2) 记录到流程评论
+        try {
+            Task task = getActiveTaskOrThrow(ticket, request);
+            addTaskComment(task, ticket, operatorUid, "CC",
+                    "工单抄送给：" + String.join(",", ccUids) + (StringUtils.hasText(request.getReason()) ? ("，说明：" + request.getReason()) : ""));
+        } catch (Exception e) {
+            log.debug("抄送记录评论失败（可能无活动任务）: {}", e.getMessage());
+        }
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 加签：最小实现为给当前任务追加候选人
+     */
+    @Transactional
+    public TicketResponse addSignTicket(TicketRequest request) {
+        String operatorUid = request.getAssignee() != null ? request.getAssignee().getUid() : null;
+        Assert.hasText(operatorUid, "操作人uid不能为空");
+
+        Set<String> addSignUids = request.getAddSignUids();
+        if (addSignUids == null || addSignUids.isEmpty()) {
+            throw new RuntimeException("addSignUids不能为空");
+        }
+
+        TicketEntity ticket = getTicketOrThrow(request.getUid());
+        Task task = getActiveTaskOrThrow(ticket, request);
+
+        for (String uid : addSignUids) {
+            if (!StringUtils.hasText(uid)) {
+                continue;
+            }
+            taskService.addCandidateUser(task.getId(), uid);
+        }
+
+        addTaskComment(task, ticket, operatorUid, "ADDSIGN",
+                "任务加签候选人：" + String.join(",", addSignUids) + (StringUtils.hasText(request.getReason()) ? ("，原因：" + request.getReason()) : ""));
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 退回：跳转回指定节点（需要 BPMN 节点 activityId）
+     */
+    @Transactional
+    public TicketResponse rollbackTicket(TicketRequest request) {
+        String operatorUid = request.getAssignee() != null ? request.getAssignee().getUid() : null;
+        Assert.hasText(operatorUid, "操作人uid不能为空");
+        Assert.hasText(request.getRollbackToActivityId(), "rollbackToActivityId不能为空");
+
+        TicketEntity ticket = getTicketOrThrow(request.getUid());
+        Task task = getActiveTaskOrThrow(ticket, request);
+
+        String fromActivityId = StringUtils.hasText(request.getRollbackFromActivityId())
+                ? request.getRollbackFromActivityId()
+                : task.getTaskDefinitionKey();
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(ticket.getProcessInstanceId())
+                .moveActivityIdTo(fromActivityId, request.getRollbackToActivityId())
+                .changeState();
+
+        addTaskComment(task, ticket, operatorUid, "ROLLBACK",
+                "流程退回：" + fromActivityId + " -> " + request.getRollbackToActivityId()
+                        + (StringUtils.hasText(request.getReason()) ? ("，原因：" + request.getReason()) : ""));
+
+        return TicketConvertUtils.convertToResponse(ticket);
+    }
+
+    /**
+     * 撤销：终止流程实例（通常用于发起人撤回/管理员撤销）
+     */
+    @Transactional
+    public TicketResponse revokeTicket(TicketRequest request) {
+        String operatorUid = request.getAssignee() != null ? request.getAssignee().getUid() : null;
+        Assert.hasText(operatorUid, "操作人uid不能为空");
+
+        TicketEntity ticket = getTicketOrThrow(request.getUid());
+
+        // 尽量先给当前活动任务写评论（删除实例后就无法再写 task comment）
+        List<Task> tasks = taskService.createTaskQuery()
+                .processInstanceId(ticket.getProcessInstanceId())
+                .active()
+                .list();
+        if (tasks != null) {
+            for (Task t : tasks) {
+                try {
+                    addTaskComment(t, ticket, operatorUid, "REVOKED",
+                            "流程已撤销" + (StringUtils.hasText(request.getReason()) ? ("，原因：" + request.getReason()) : ""));
+                } catch (Exception ex) {
+                    log.debug("写撤销评论失败: {}", ex.getMessage());
+                }
+            }
+        }
+
+        runtimeService.deleteProcessInstance(ticket.getProcessInstanceId(),
+                StringUtils.hasText(request.getReason()) ? request.getReason() : "revoke ticket");
+
+        // 工单侧统一落到 CANCELLED（前端已有该状态）
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
         ticketRestService.save(ticket);
 

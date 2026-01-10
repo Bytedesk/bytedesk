@@ -122,6 +122,10 @@ public final class RoleAuthorityRules {
     // Keep as literals to avoid core -> service module dependency.
     public static final String QUEUE_READ = "QUEUE_READ";
 
+    // workgroup (modules/service)
+    // Keep as literals to avoid core -> service module dependency.
+    public static final String WORKGROUP_READ = "WORKGROUP_READ";
+
     // kbase (modules/kbase)
     // Keep as literals to avoid core -> kbase module dependency.
     public static final String KBASE_READ = "KBASE_READ";
@@ -140,20 +144,7 @@ public final class RoleAuthorityRules {
             THREAD_READ,
             THREAD_CREATE,
             THREAD_UPDATE,
-            // "THREAD_DELETE",
-            // kbase (modules/kbase)
-            // KBASE_READ,
-            // FAQ_READ,
-            // ai (modules/ai) - keep as literals to avoid core -> ai module dependency
-            // "ROBOT_READ",
-            // "ROBOT_CREATE",
-            // "ROBOT_UPDATE",
-            // "ROBOT_DELETE",
-            //
-            // "LLM_PROVIDER_READ",
-            // "LLM_PROVIDER_UPDATE",
-            // "LLM_MODEL_READ",
-            // "LLM_MODEL_UPDATE",
+            
             // ticket category
             CATEGORY_READ,
             CATEGORY_CREATE,
@@ -168,6 +159,8 @@ public final class RoleAuthorityRules {
             ORGANIZATION_CREATE,
             ORGANIZATION_READ,
             ORGANIZATION_UPDATE,
+            // 
+            DEPARTMENT_READ,
             //
             MEMBER_READ,
             MEMBER_UPDATE,
@@ -175,10 +168,7 @@ public final class RoleAuthorityRules {
             GROUP_READ,
             GROUP_CREATE,
             GROUP_UPDATE,
-            GROUP_DELETE,
-            //
-            DEPARTMENT_READ
-            // "WORKGROUP_READ"
+            GROUP_DELETE
     );
 
     /**
@@ -194,6 +184,7 @@ public final class RoleAuthorityRules {
             AGENT_STATUS_READ,
             AGENT_STATUS_CREATE,
             QUEUE_READ,
+            WORKGROUP_READ,
 
             // 快捷回复：ROLE_AGENT 默认需要增删改
             QUICK_REPLY_CREATE,

@@ -18,8 +18,6 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.enums.ThreadInviteStatusEnum;
-import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,12 +46,12 @@ public class ThreadResponse extends BaseResponse {
     private String status;
 
     // transfer status
-    @Builder.Default
-    private String transferStatus = ThreadTransferStatusEnum.NONE.name();
+    // @Builder.Default
+    private String transferStatus;// = ThreadTransferStatusEnum.NONE.name();
 
     // invite status
-    @Builder.Default
-    private String inviteStatus = ThreadInviteStatusEnum.NONE.name();
+    // @Builder.Default
+    private String inviteStatus;// = ThreadInviteStatusEnum.NONE.name();
 
     // 迁移到QueueMemberEntity.resolvedStatus
     // resolved status

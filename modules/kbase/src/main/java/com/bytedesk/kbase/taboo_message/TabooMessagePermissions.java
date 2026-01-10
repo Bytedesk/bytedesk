@@ -16,10 +16,19 @@ package com.bytedesk.kbase.taboo_message;
 public class TabooMessagePermissions {
 
     public static final String TABOO_MESSAGE_PREFIX = "TABOO_MESSAGE_";
-    // TabooMessage permissions
-    public static final String TABOO_MESSAGE_CREATE = "hasAuthority('TABOO_MESSAGE_CREATE')";
-    public static final String TABOO_MESSAGE_READ = "hasAuthority('TABOO_MESSAGE_READ')";
-    public static final String TABOO_MESSAGE_UPDATE = "hasAuthority('TABOO_MESSAGE_UPDATE')";
-    public static final String TABOO_MESSAGE_DELETE = "hasAuthority('TABOO_MESSAGE_DELETE')";
-    public static final String TABOO_MESSAGE_EXPORT = "hasAuthority('TABOO_MESSAGE_EXPORT')";
+
+    // 统一权限（不区分层级）
+    public static final String TABOO_MESSAGE_READ = "TABOO_MESSAGE_READ";
+    public static final String TABOO_MESSAGE_CREATE = "TABOO_MESSAGE_CREATE";
+    public static final String TABOO_MESSAGE_UPDATE = "TABOO_MESSAGE_UPDATE";
+    public static final String TABOO_MESSAGE_DELETE = "TABOO_MESSAGE_DELETE";
+    public static final String TABOO_MESSAGE_EXPORT = "TABOO_MESSAGE_EXPORT";
+
+    // PreAuthorize 表达式 - 统一权限（不区分层级）
+    public static final String HAS_TABOO_MESSAGE_READ = "hasAuthority('TABOO_MESSAGE_READ')";
+    public static final String HAS_TABOO_MESSAGE_CREATE = "hasAuthority('TABOO_MESSAGE_CREATE')";
+    public static final String HAS_TABOO_MESSAGE_UPDATE = "hasAuthority('TABOO_MESSAGE_UPDATE')";
+    public static final String HAS_TABOO_MESSAGE_DELETE = "hasAuthority('TABOO_MESSAGE_DELETE')";
+    public static final String HAS_TABOO_MESSAGE_EXPORT = "hasAuthority('TABOO_MESSAGE_EXPORT')";
+
 }

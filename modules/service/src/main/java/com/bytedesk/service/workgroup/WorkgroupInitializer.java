@@ -55,7 +55,6 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
 
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         List<String> agentUids = Arrays.asList(BytedeskConsts.DEFAULT_AGENT_UID);
-        //
         // add workgroups
         WorkgroupRequest workgroupRequest = WorkgroupRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID)
@@ -83,6 +82,15 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .orgUid(orgUid)
                 .build();
         workgroupRestService.create(workgroupAfterRequest);
+        // add ticket workgroup
+        WorkgroupRequest ticketWorkgroupRequest = WorkgroupRequest.builder()
+                .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_TICKET)
+                .nickname(I18Consts.I18N_WORKGROUP_TICKET_NICKNAME)
+                .description(I18Consts.I18N_WORKGROUP_TICKET_DESCRIPTION)
+                .agentUids(agentUids)
+                .orgUid(orgUid)
+                .build();
+        workgroupRestService.create(ticketWorkgroupRequest);
     }
 
     private void initAuthority() {

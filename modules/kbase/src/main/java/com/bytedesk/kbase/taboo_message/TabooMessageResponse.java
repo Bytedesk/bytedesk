@@ -13,12 +13,9 @@
  */
 package com.bytedesk.kbase.taboo_message;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.utils.BdDateUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -38,31 +35,14 @@ public class TabooMessageResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String content;
 
-    private String type;
+    private String messageUid;
 
-    private List<String> tagList;
+    private String threadUid;
 
-    private Boolean enabled;
+    private String replacedContent;
 
-    // 有效开始日期
-    private ZonedDateTime startDate;
+    private List<String> tabooWordList;
 
-    // 有效结束日期
-    private ZonedDateTime endDate;
-
-    private String categoryUid;
-
-    private String kbUid; // 对应知识库
-
-    // 
-    public String getStartDate() {
-        return BdDateUtils.formatDatetimeToString(startDate);
-    }
-
-    public String getEndDate() {
-        return BdDateUtils.formatDatetimeToString(endDate);
-    }
 }

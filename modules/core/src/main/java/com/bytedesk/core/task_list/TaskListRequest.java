@@ -35,6 +35,12 @@ public class TaskListRequest extends BaseRequest {
 
     private String description;
 
+    private String color;
+
+    private Integer order;
+
+    private Boolean archived;
+
     // @Builder.Default
     // private String type = TaskListTypeEnum.CUSTOMER.name();
 

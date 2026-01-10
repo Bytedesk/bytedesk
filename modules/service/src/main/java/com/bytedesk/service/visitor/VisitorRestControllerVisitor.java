@@ -214,11 +214,11 @@ public class VisitorRestControllerVisitor {
      * 关闭来源分布报表(按 updatedAt 时间范围统计)
      */
     @GetMapping("/thread/report/close-type")
-    public ResponseEntity<?> reportCloseType(@RequestParam(value = "start", required = false) Long startEpoch,
+    public ResponseEntity<?> queryCloseType(@RequestParam(value = "start", required = false) Long startEpoch,
                                              @RequestParam(value = "end", required = false) Long endEpoch) {
         ZonedDateTime end = endEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(endEpoch), java.time.ZoneId.systemDefault()) : ZonedDateTime.now();
         ZonedDateTime start = startEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(startEpoch), java.time.ZoneId.systemDefault()) : end.minusDays(1);
-        Map<String, Long> data = threadRestService.reportClosedByCloseType(start, end);
+        Map<String, Long> data = threadRestService.queryClosedByCloseType(start, end);
         return ResponseEntity.ok(JsonResult.success("report success", data));
     }
 
@@ -242,17 +242,14 @@ public class VisitorRestControllerVisitor {
      * @return 分页会话列表
      */
     @GetMapping("/threads")
-    public ResponseEntity<?> getThreadsByVisitorUid(VisitorRequest request) {
+    public ResponseEntity<?> queryVisitorThreads(ThreadRequest request) {
 
-        Page<ThreadResponse> threads = threadRestService.queryByVisitorUid(request.getUid(), request.getPageable());
+        Page<ThreadResponse> threads = threadRestService.queryByVisitor(request);
         
         return ResponseEntity.ok(JsonResult.success("查询成功", threads));
     }
 
     // 访客发送http消息
-    @BlackIpFilter(title = "black", action = "sendRestMessage")
-    @BlackUserFilter(title = "black", action = "sendRestMessage")
-    @TabooJsonFilter(title = "敏感词", action = "sendRestMessage")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {

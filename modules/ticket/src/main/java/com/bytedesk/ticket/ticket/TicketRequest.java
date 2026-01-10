@@ -48,12 +48,13 @@ public class TicketRequest extends BaseRequest {
     private String wechat;
     // 
     private String ticketNumber;
-    
     // 
     private String status;
     private String priority;
     // private String type;
+    // 
     private String topic;
+    private String visitorThreadTopic;
     // 工单对话
     private String threadUid;
     // 关联访客对话
@@ -67,12 +68,10 @@ public class TicketRequest extends BaseRequest {
 
     // 工单处理人
     private String assigneeUid; // 方便get查询
-    // private String assignee; // 原始json字符串
     private UserProtobuf assignee; // 方便post存储
 
     // 工单提出者
     private String reporterUid; // 方便get查询
-    // private String reporter;  // 原始 JSON 字符串
     private UserProtobuf reporter; // 方便post存储
 
     // 前端根据创建时间范围查询
@@ -91,6 +90,22 @@ public class TicketRequest extends BaseRequest {
     private Boolean verified;
     // 自定义表单 json schema
     private String schema;
+
+    // ===================== 工作流增强操作参数（Flowable） =====================
+    // 当一个流程实例可能存在多个并行任务（如会签/或签）时，建议明确传入 taskId
+    private String taskId;
+    // 委托：将当前任务委托给指定处理人（member uid）
+    private String delegateUid;
+    // 抄送：知会人员列表（member uid）
+    private Set<String> ccUids;
+    // 加签：新增候选审批人（member uid），最小实现为追加候选人
+    private Set<String> addSignUids;
+    // 退回：从当前节点退回到指定 activityId（BPMN 节点 id）
+    private String rollbackToActivityId;
+    // 退回：指定从哪个 activityId 退回（可选，默认取当前任务 definitionKey）
+    private String rollbackFromActivityId;
+    // 撤销/退回/加签/抄送等操作原因
+    private String reason;
 
     public String getAssigneeJson() {
         if (assignee == null) {

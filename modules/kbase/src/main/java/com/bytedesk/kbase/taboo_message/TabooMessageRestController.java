@@ -15,6 +15,7 @@ package com.bytedesk.kbase.taboo_message;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +38,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Operation(summary = "根据组织查询敏感词消息", description = "查询组织的敏感词消息列表")
+    @PreAuthorize(TabooMessagePermissions.HAS_TABOO_MESSAGE_READ)
     @Override
     public ResponseEntity<?> queryByOrg(TabooMessageRequest request) {
         
@@ -46,6 +48,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
     }
 
     @Operation(summary = "根据用户查询敏感词消息", description = "查询用户的敏感词消息列表")
+    @PreAuthorize(TabooMessagePermissions.HAS_TABOO_MESSAGE_READ)
     @Override
     public ResponseEntity<?> queryByUser(TabooMessageRequest request) {
         
@@ -54,8 +57,19 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "根据UID查询敏感词消息", description = "通过UID查询具体的敏感词消息")
+    @PreAuthorize(TabooMessagePermissions.HAS_TABOO_MESSAGE_READ)
+    @Override
+    public ResponseEntity<?> queryByUid(TabooMessageRequest request) {
+        
+        TabooMessageResponse tabooMessage = tabooMessageService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(tabooMessage));
+    }
+
     @ActionAnnotation(title = "taboo_message", action = "新建", description = "create taboo_message")
     @Operation(summary = "创建敏感词消息", description = "创建新的敏感词消息")
+    @PreAuthorize(TabooMessagePermissions.HAS_TABOO_MESSAGE_CREATE)
     @Override
     public ResponseEntity<?> create(TabooMessageRequest request) {
         
@@ -66,6 +80,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
 
     @ActionAnnotation(title = "taboo_message", action = "更新", description = "update taboo_message")
     @Operation(summary = "更新敏感词消息", description = "更新现有的敏感词消息")
+    @PreAuthorize(TabooMessagePermissions.HAS_TABOO_MESSAGE_UPDATE)
     @Override
     public ResponseEntity<?> update(TabooMessageRequest request) {
         
@@ -76,6 +91,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
 
     @ActionAnnotation(title = "taboo_message", action = "删除", description = "delete taboo_message")
     @Operation(summary = "删除敏感词消息", description = "删除指定的敏感词消息")
+    @PreAuthorize(TabooMessagePermissions.HAS_TABOO_MESSAGE_DELETE)
     @Override
     public ResponseEntity<?> delete(TabooMessageRequest request) {
         
@@ -86,6 +102,7 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
     
     @ActionAnnotation(title = "taboo_message", action = "导出", description = "export taboo_message")
     @Operation(summary = "导出敏感词消息", description = "导出敏感词消息数据")
+    @PreAuthorize(TabooMessagePermissions.HAS_TABOO_MESSAGE_EXPORT)
     @Override
     public Object export(TabooMessageRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -98,12 +115,6 @@ public class TabooMessageRestController extends BaseRestController<TabooMessageR
         );
     }
 
-    @Operation(summary = "根据UID查询敏感词消息", description = "通过UID查询具体的敏感词消息")
-    @Override
-    public ResponseEntity<?> queryByUid(TabooMessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
-    }
-
+    
     
 }

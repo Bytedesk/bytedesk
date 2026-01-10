@@ -20,6 +20,7 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
@@ -51,8 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 public class JmsArtemisConfig {
 
 	private final JmsErrorHandler jmsErrorHandler;
-    
-  	@Bean
+
+	@Bean
 	public JmsListenerContainerFactory<?> jmsArtemisQueueFactory(ConnectionFactory connectionFactory,
 													DefaultJmsListenerContainerFactoryConfigurer configurer) {
 		log.info("Creating JMS Queue Listener Container Factory");
@@ -61,6 +62,8 @@ public class JmsArtemisConfig {
 		configurer.configure(factory, connectionFactory);
 		// You could still override some settings if necessary.
 		factory.setPubSubDomain(false);
+		// 避免缓存 Session/Consumer：睡眠恢复后旧连接可能已关闭，缓存对象会导致反复 IllegalStateException
+		factory.setCacheLevel(DefaultMessageListenerContainer.CACHE_NONE);
 		// 设置确认模式为自动确认，避免阻塞
 		factory.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
 		// 设置并发数
@@ -89,6 +92,8 @@ public class JmsArtemisConfig {
 		configurer.configure(factory, connectionFactory);
 		// You could still override some settings if necessary.
 		factory.setPubSubDomain(true);
+		// 避免缓存 Session/Consumer：断链恢复时旧 Session 容易处于 closed 状态
+		factory.setCacheLevel(DefaultMessageListenerContainer.CACHE_NONE);
 		// 设置并发数为1-3，允许适当的并发处理但避免过多实例
 		factory.setConcurrency("1-3");
 		// 设置确认模式为自动确认，避免阻塞
@@ -123,40 +128,31 @@ public class JmsArtemisConfig {
 	}
 
 	@Bean
-    public DynamicDestinationResolver destinationResolver() {
-        return new DynamicDestinationResolver() {
-            @Override
-            public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain) throws JMSException {
-                // 根据目标名称确定是否为 topic
-                boolean isTopicDestination = destinationName.startsWith(JmsArtemisConsts.TOPIC_PREFIX);
-                // log.debug("Resolving destination: {}, pubSubDomain: {}, isTopic: {}", destinationName, pubSubDomain, isTopicDestination);
-                return super.resolveDestinationName(session, destinationName, isTopicDestination);
-            }
-        };
-    }
+	public DynamicDestinationResolver destinationResolver() {
+		return new DynamicDestinationResolver() {
+			@Override
+			public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain)
+					throws JMSException {
+				boolean isTopicDestination = destinationName.startsWith(JmsArtemisConsts.TOPIC_PREFIX);
+				return super.resolveDestinationName(session, destinationName, isTopicDestination);
+			}
+		};
+	}
 
 	@Bean
 	public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
 		log.info("Creating JmsTemplate with custom configuration");
 		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
-		// 设置消息转换器
 		jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
-		// 设置目标解析器
 		jmsTemplate.setDestinationResolver(destinationResolver());
-		// 设置接收超时时间
 		jmsTemplate.setReceiveTimeout(30000L);
-		// 设置发送超时时间
 		jmsTemplate.setTimeToLive(30000L);
-		// 禁用事务
 		jmsTemplate.setSessionTransacted(false);
-		// 设置确认模式
 		jmsTemplate.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
-		// 设置消息优先级
 		jmsTemplate.setPriority(4);
-		// 设置传送模式为非持久化，提高性能
 		jmsTemplate.setDeliveryMode(jakarta.jms.DeliveryMode.NON_PERSISTENT);
-		// 启用显式 QoS 设置
 		jmsTemplate.setExplicitQosEnabled(true);
 		return jmsTemplate;
 	}
+
 }
