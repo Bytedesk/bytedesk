@@ -44,7 +44,7 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         Optional<ThreadEntity> findFirstByTopicAndStatusNotContainingAndDeleted(String topic, String status, Boolean deleted);
 
-        @Query(value = "select * from bytedesk_core_thread t where t.thread_topic = ?1 and t.thread_status not in ?2 and t.is_deleted = ?3 LIMIT 1", nativeQuery = true)
+        @Query(value = "select * from bytedesk_core_thread t where t.thread_topic = ?1 and t.thread_status not in ?2 and t.is_deleted = ?3 order by t.updated_at desc, t.created_at desc LIMIT 1", nativeQuery = true)
         Optional<ThreadEntity> findTopicAndStatusesNotInAndDeleted(String topic, List<String> statuses, Boolean deleted);
 
         Page<ThreadEntity> findByOwnerAndHideAndDeleted(UserEntity owner, Boolean hide, Boolean deleted, Pageable pageable);

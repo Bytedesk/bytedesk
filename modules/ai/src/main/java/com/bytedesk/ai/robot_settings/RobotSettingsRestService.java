@@ -7,7 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -47,7 +48,7 @@ public class RobotSettingsRestService
 
     private final TriggerSettingsHelper triggerSettingsHelper;
 
-    @Cacheable(value = "robotSettings", key = "#uid", unless = "#result == null")
+    // @Cacheable(value = "robotSettings", key = "#uid", unless = "#result == null")
     @Override
     public Optional<RobotSettingsEntity> findByUid(String uid) {
         return robotSettingsRepository.findByUid(uid);
@@ -342,6 +343,18 @@ public class RobotSettingsRestService
         return convertToResponse(updated);
     }
 
+    @Caching(
+        put = @CachePut(value = "robotSettings", key = "#entity.uid", unless = "#result == null"),
+        // RobotSettings 变更会影响所有引用该 settings 的 Robot；
+        // 为避免 robot 缓存里持有旧的 settings 关联对象，这里直接清空 robot cache。
+        // （如需更细粒度，可改为按 settingsUid 找到相关 robots 再逐个 evict。）
+        evict = @CacheEvict(value = "robot", allEntries = true)
+    )
+    @Override
+    protected RobotSettingsEntity doSave(RobotSettingsEntity entity) {
+        return robotSettingsRepository.save(entity);
+    }
+
     @CacheEvict(value = "robotSettings", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
@@ -352,27 +365,12 @@ public class RobotSettingsRestService
         }
     }
 
+    @CacheEvict(value = "robotSettings", key = "#request.uid")
     @Override
     public void delete(RobotSettingsRequest request) {
         deleteByUid(request.getUid());
     }
-
-    @Override
-    protected Specification<RobotSettingsEntity> createSpecification(RobotSettingsRequest request) {
-        return RobotSettingsSpecification.search(request, authService);
-    }
-
-    @Override
-    protected Page<RobotSettingsEntity> executePageQuery(Specification<RobotSettingsEntity> spec, Pageable pageable) {
-        return robotSettingsRepository.findAll(spec, pageable);
-    }
-
-    @CachePut(value = "robotSettings", key = "#entity.uid", unless = "#result == null")
-    @Override
-    protected RobotSettingsEntity doSave(RobotSettingsEntity entity) {
-        return robotSettingsRepository.save(entity);
-    }
-
+    
     @Override
     public RobotSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             RobotSettingsEntity entity) {
@@ -605,6 +603,16 @@ public class RobotSettingsRestService
         } else {
             BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
         }
+    }
+
+    @Override
+    protected Specification<RobotSettingsEntity> createSpecification(RobotSettingsRequest request) {
+        return RobotSettingsSpecification.search(request, authService);
+    }
+
+    @Override
+    protected Page<RobotSettingsEntity> executePageQuery(Specification<RobotSettingsEntity> spec, Pageable pageable) {
+        return robotSettingsRepository.findAll(spec, pageable);
     }
 
     @Override

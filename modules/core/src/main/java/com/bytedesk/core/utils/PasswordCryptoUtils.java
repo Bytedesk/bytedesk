@@ -50,8 +50,8 @@ public class PasswordCryptoUtils {
             // 使用盐值生成固定长度的密钥（与前端保持一致）
             String key = generateKeyFromSalt(salt);
             
-            log.debug("加密参数: password长度={}, salt={}, generatedKey={}", 
-                     password.length(), salt, key);
+            // Avoid logging secrets (salt/key). Keep only safe diagnostics.
+            log.debug("加密参数: password长度={}, salt长度={}", password.length(), salt.length());
             
             // 创建密钥规范
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
@@ -94,8 +94,8 @@ public class PasswordCryptoUtils {
             // 使用盐值生成固定长度的密钥（与前端保持一致）
             String key = generateKeyFromSalt(salt);
             
-            log.debug("解密参数: encryptedPassword={}, salt={}, generatedKey={}", 
-                     encryptedPassword, salt, key);
+            // Avoid logging secrets (encrypted payload/salt/key). Keep only safe diagnostics.
+            log.debug("解密参数: encryptedPassword长度={}, salt长度={}", encryptedPassword.length(), salt.length());
             
             // 创建密钥规范
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
@@ -106,20 +106,23 @@ public class PasswordCryptoUtils {
             
             // 解码Base64
             byte[] encryptedBytes = Base64.getDecoder().decode(encryptedPassword);
-            
+
             log.debug("Base64解码后数据长度: {}", encryptedBytes.length);
-            
+
             // 解密
             byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
-            
-            String decryptedPassword = new String(decryptedBytes, StandardCharsets.UTF_8);
-            
+
+            // 手动去除PKCS7填充
+            byte[] unpaddedBytes = removePKCS7Padding(decryptedBytes);
+
+            String decryptedPassword = new String(unpaddedBytes, StandardCharsets.UTF_8);
+
             if (decryptedPassword.isEmpty()) {
                 throw new RuntimeException("解密失败，可能是密钥错误");
             }
-            
+
             log.debug("解密成功，密码长度: {}", decryptedPassword.length());
-            
+
             return decryptedPassword;
             
         } catch (Exception e) {
@@ -178,5 +181,43 @@ public class PasswordCryptoUtils {
             log.error("加密解密验证失败", e);
             return false;
         }
+    }
+
+    /**
+     * 去除PKCS7填充
+     * @param paddedData 包含填充的数据
+     * @return 去除填充后的数据
+     */
+    private static byte[] removePKCS7Padding(byte[] paddedData) {
+        if (paddedData == null || paddedData.length == 0) {
+            return paddedData;
+        }
+
+        // 获取填充长度（最后一个字节的值）
+        int paddingLength = paddedData[paddedData.length - 1] & 0xFF;
+
+        // 验证填充
+        if (paddingLength < 1 || paddingLength > 16) {
+            // 无效的填充长度，返回原数据
+            log.warn("Invalid PKCS7 padding length: {}", paddingLength);
+            return paddedData;
+        }
+
+        // 验证所有填充字节都正确
+        for (int i = 1; i <= paddingLength; i++) {
+            if ((paddedData[paddedData.length - i] & 0xFF) != paddingLength) {
+                // 填充不正确，返回原数据
+                log.warn("Invalid PKCS7 padding");
+                return paddedData;
+            }
+        }
+
+        // 去除填充
+        byte[] unpadded = new byte[paddedData.length - paddingLength];
+        System.arraycopy(paddedData, 0, unpadded, 0, unpadded.length);
+
+        log.debug("Removed PKCS7 padding: {} -> {} bytes", paddedData.length, unpadded.length);
+
+        return unpadded;
     }
 }

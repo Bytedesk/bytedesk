@@ -308,6 +308,23 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     }
 
     /**
+     * 更新会话状态
+     *
+     * @param request 更新请求
+     * @return 更新后的会话
+     */
+    @PostMapping("/update/status")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE)
+    @ActionAnnotation(title = "会话管理", action = "更新会话状态", description = "update thread status")
+    @Operation(summary = "更新会话状态", description = "更新会话的处理状态")
+    public ResponseEntity<?> updateStatus(@RequestBody ThreadRequest request) {
+        
+        ThreadResponse threadResponse = threadRestService.updateStatus(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
+    /**
      * 查询用户所有客服会话
      * 
      * @return 用户所有会话列表
@@ -330,6 +347,22 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     public ResponseEntity<?> updateNote(@RequestBody ThreadRequest request) {
         
         ThreadResponse threadResponse = threadRestService.updateNote(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadResponse));
+    }
+
+    /**
+     * 管理后台更新会话（聚合更新）
+     * - 主要给管理后台编辑抽屉使用，避免多次接口调用
+     * - 当前支持：status、tagList（后续可按需扩展）
+     */
+    @PostMapping("/update/admin")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE)
+    @ActionAnnotation(title = "会话管理", action = "管理后台更新会话", description = "admin update thread")
+    @Operation(summary = "管理后台更新会话", description = "管理后台聚合更新会话字段")
+    public ResponseEntity<?> adminUpdate(@RequestBody ThreadRequest request) {
+
+        ThreadResponse threadResponse = threadRestService.adminUpdate(request);
 
         return ResponseEntity.ok(JsonResult.success(threadResponse));
     }

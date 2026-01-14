@@ -111,9 +111,16 @@ public class ZhipuaiChatConfig {
         }
 
         log.info("Initializing ZhipuAiClient with model: {}", model);
-        
-        return ZhipuAiClient.builder()
-                .apiKey(apiKey)
-                .build();
+
+        try {
+            return ZhipuAiClient.builder()
+                    .apiKey(apiKey)
+                    .build();
+        } catch (Exception e) {
+            // zai-sdk 会在 setApiKey 时做格式校验；无效 key 不应阻塞应用启动
+            log.warn("Failed to initialize ZhipuAiClient due to invalid api key, ZhipuAI features will be disabled: {}",
+                    e.getMessage());
+            return null;
+        }
     }
 } 

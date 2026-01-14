@@ -22,7 +22,6 @@ import java.util.List;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LanguageEnum;
-import com.bytedesk.kbase.settings.ToolbarSettings;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -141,6 +140,18 @@ public class ServiceSettingsRequest  implements Serializable {
     // 访客输入预览：访客输入内容预览发送给客服（MESSAGE_TYPE_PREVIEW）
     @Builder.Default
     private Boolean inputPreviewEnabled = false;
+
+    /**
+     * 输入预览是否一直显示（客服端预览框常驻）
+     */
+    @Builder.Default
+    private Boolean inputPreviewAlwaysShow = false;
+
+    /**
+     * 输入预览显示时长（秒），仅当 inputPreviewAlwaysShow=false 时生效
+     */
+    @Builder.Default
+    private Integer inputPreviewShowSeconds = 5;
 
     @Builder.Default
     private Boolean showFaqs = true;

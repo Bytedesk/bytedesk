@@ -124,7 +124,7 @@ public class CalendarEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "calendar_status", length = 32)
-    private String status = "SCHEDULED";
+    private String status = CalendarStatusEnum.SCHEDULED.name();
 
     /**
      * Reminder time (optional)

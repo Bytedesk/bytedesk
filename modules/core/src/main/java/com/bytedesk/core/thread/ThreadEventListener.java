@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.Set;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +36,20 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ThreadEventListener {
 
+    private static final Set<String> CREATE_EVENT_IMMEDIATE_SUBSCRIBE_TYPES = Set.of(
+            ThreadTypeEnum.AGENT.name(),
+            ThreadTypeEnum.WORKGROUP.name(),
+            ThreadTypeEnum.MEMBER.name(),
+            ThreadTypeEnum.GROUP.name(),
+            ThreadTypeEnum.TICKET.name());
+
+    private static final Set<String> ADD_TOPIC_IMMEDIATE_SUBSCRIBE_TYPES = Set.of(
+            ThreadTypeEnum.AGENT.name(),
+            ThreadTypeEnum.WORKGROUP.name(),
+            ThreadTypeEnum.MEMBER.name(),
+            ThreadTypeEnum.TICKET.name()
+        );
+
     private final TopicCacheService topicCacheService;
 
     private final TopicRestService topicRestService;
@@ -43,6 +59,9 @@ public class ThreadEventListener {
     @EventListener
     public void onThreadCreateEvent(ThreadCreateEvent event) {
         ThreadEntity thread = event.getThread();
+        if (thread == null) {
+            return;
+        }
         UserEntity user = thread.getOwner();
         log.info("thread ThreadCreateEvent: {}", thread.getUid());
 
@@ -55,11 +74,7 @@ public class ThreadEventListener {
         }
 
         // 创建客服会话之后，需要订阅topic
-        if (thread.getType().equals(ThreadTypeEnum.AGENT.name())
-                || thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())
-                || thread.getType().equals(ThreadTypeEnum.MEMBER.name())
-                || thread.getType().equals(ThreadTypeEnum.GROUP.name())
-                || thread.getType().equals(ThreadTypeEnum.TICKET.name())) {
+        if (CREATE_EVENT_IMMEDIATE_SUBSCRIBE_TYPES.contains(thread.getType())) {
             // 防止首次消息延迟，立即订阅
             String topic = thread.getTopic();
             // 订阅内部会话
@@ -83,45 +98,27 @@ public class ThreadEventListener {
     @EventListener
     public void onThreadAddTopicEvent(ThreadAddTopicEvent event) {
         ThreadEntity thread = event.getThread();
-        UserEntity user = thread.getOwner();
-        log.info("thread ThreadUpdateTopicEvent: {}", thread.getUid());
-        // if (thread.isClosed()) {
-        // return;
-        // }
-
-        // 机器人接待的会话存在user == null的情况，不需要订阅topic
-        if (thread == null || user == null) {
+        if (thread == null) {
             return;
         }
 
-        if (thread.getType().equals(ThreadTypeEnum.AGENT.name())) {
-            // 防止首次消息延迟，立即订阅
-            TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
-            topicRestService.create(request);
-        } else if (thread.getType().equals(ThreadTypeEnum.WORKGROUP.name())) {
-            // 工作组会话，需要订阅topic
-            // 重新订阅
-            TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
-            topicRestService.create(request);
-        } else if (thread.getType().equals(ThreadTypeEnum.MEMBER.name())) {
-            // 会员会话，需要订阅topic
-            TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
+        UserEntity user = thread.getOwner();
+        log.info("thread ThreadUpdateTopicEvent: {}", thread.getUid());
+
+        // 机器人接待的会话存在user == null的情况，不需要订阅topic
+        if (user == null) {
+            return;
+        }
+
+        TopicRequest request = TopicRequest.builder()
+                .topic(thread.getTopic())
+                .userUid(user.getUid())
+                .build();
+
+        // AGENT/WORKGROUP/MEMBER 立即订阅；其他延迟订阅
+        if (ADD_TOPIC_IMMEDIATE_SUBSCRIBE_TYPES.contains(thread.getType())) {
             topicRestService.create(request);
         } else {
-            // 文件助手、系统通知会话延迟订阅topic
-            TopicRequest request = TopicRequest.builder()
-                    .topic(thread.getTopic())
-                    .userUid(user.getUid())
-                    .build();
             topicCacheService.pushRequest(request);
         }
     }

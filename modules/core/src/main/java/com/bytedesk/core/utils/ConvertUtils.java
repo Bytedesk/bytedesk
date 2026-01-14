@@ -46,6 +46,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadResponseSimple;
+import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadResponse;
 
@@ -161,6 +162,14 @@ public class ConvertUtils {
         }
 
         return response;
+    }
+
+    /**
+     * Public wrapper for converting OrganizationEntity to OrganizationResponseSimple.
+     * Keep the actual mapping logic in the existing private method to avoid duplication.
+     */
+    public static OrganizationResponseSimple toOrganizationResponseSimple(OrganizationEntity organization) {
+        return convertToOrganizationResponseSimple(organization);
     }
 
     private static UserResponseSimple convertToUserResponseSimpleManual(UserEntity user) {
@@ -377,6 +386,13 @@ public class ConvertUtils {
     public static ThreadResponse convertToThreadResponse(ThreadEntity thread) {
         // ensureThreadResponseTypeMapConfigured(modelMapper);
         ThreadResponse threadResponse = getModelMapper().map(thread, ThreadResponse.class);
+
+        // 兼容：thread.content 可能已升级为 ThreadContent JSON；对外仍返回可读摘要
+        ThreadContent tc = ThreadContent.fromStored(thread.getContent());
+        if (tc != null) {
+            threadResponse.setContentObject(tc);
+            threadResponse.setContent(tc.getDisplayText());
+        }
         // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,
         // 否则会内容缺失，因为可能为RobotProtobuf类型, 其中含有llm字段
         // if (thread.getAgent() != null) {
@@ -449,9 +465,11 @@ public class ConvertUtils {
     }
 
     public static ThreadResponseSimple convertToThreadResponseSimple(ThreadEntity thread) {
+        ThreadContent tc = ThreadContent.fromStored(thread.getContent());
+        String displayContent = tc != null ? tc.getDisplayText() : thread.getContent();
         ThreadResponseSimple threadResponse = ThreadResponseSimple.builder()
             .topic(thread.getTopic())
-            .content(thread.getContent())
+            .content(displayContent)
             .type(thread.getType())
             .status(thread.getStatus())
             .top(thread.getTop())
@@ -468,6 +486,9 @@ public class ConvertUtils {
             .agent(thread.getAgent())
             .workgroup(thread.getWorkgroup())
         .build();
+        if (tc != null) {
+            threadResponse.setContentObject(tc);
+        }
         // ThreadResponseSimple threadResponse = getModelMapper().map(thread, ThreadResponseSimple.class);
         threadResponse.setUser(thread.getUserProtobuf());
         // 
@@ -523,6 +544,7 @@ public class ConvertUtils {
         
         // 明确设置Custom所有字段的值，确保从配置中获取
         if (bytedeskProperties.getCustom() != null) {
+            response.getCustom().setMqttWebsocketUrl(bytedeskProperties.getCustom().getMqttWebsocketUrl());
             response.getCustom().setShowRightCornerChat(bytedeskProperties.getCustom().getShowRightCornerChat());
             response.getCustom().setLoginUsernameEnable(bytedeskProperties.getCustom().getLoginUsernameEnable());
             response.getCustom().setLoginMaxRetryCount(bytedeskProperties.getCustom().getLoginMaxRetryCount());

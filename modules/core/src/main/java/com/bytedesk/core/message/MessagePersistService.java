@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.message.content.RobotContent;
 
 import jakarta.annotation.Nonnull;
@@ -148,18 +149,24 @@ public class MessagePersistService {
     }
 
     private ThreadEntity updateThreadContent(ThreadEntity thread, MessageTypeEnum type, MessageProtobuf messageProtobuf) {
-        String newContent;
-        if (MessageTypeEnum.TEXT.equals(type)) {
-            newContent = messageProtobuf.getContent();
-        } else {
-            newContent = MessageTypeConverter.convertToChineseType(type != null ? type.name() : null);
-        }
-        if (newContent == null) {
-            newContent = "";
-        }
-        if (!Objects.equals(thread.getContent(), newContent)) {
-            thread.setContent(newContent);
-            // Persist the latest preview so thread lists reflect the newest message type/content.
+        ThreadContent next = ThreadContent.fromMessage(type, messageProtobuf);
+        String nextJson = next != null ? next.toJson() : null;
+
+        // 避免频繁写库：仅当摘要/类型/payload 任一发生变化时才更新
+        ThreadContent current = ThreadContent.fromStored(thread.getContent());
+        String currentPreview = current != null ? current.getPreview() : thread.getContent();
+        String nextPreview = next != null ? next.getPreview() : null;
+
+        String currentMsgType = current != null ? current.getMsgType() : null;
+        String nextMsgType = next != null ? next.getMsgType() : null;
+
+        String currentPayload = current != null ? current.getPayload() : null;
+        String nextPayload = next != null ? next.getPayload() : null;
+
+        if (!Objects.equals(currentPreview, nextPreview)
+                || !Objects.equals(currentMsgType, nextMsgType)
+                || !Objects.equals(currentPayload, nextPayload)) {
+            thread.setContent(nextJson);
             return threadRestService.save(thread);
         }
         return thread;

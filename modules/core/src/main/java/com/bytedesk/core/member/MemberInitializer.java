@@ -20,10 +20,11 @@ import java.util.Set;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.department.DepartmentConsts;
 
@@ -35,7 +36,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
 
     private final MemberRestService memberService;
 
-    private final BytedeskProperties bytedeskProperties;
+    private final UserService userService;
 
     private final AuthorityRestService authorityRestService;
 
@@ -43,7 +44,6 @@ public class MemberInitializer implements SmartInitializingSingleton {
     public void afterSingletonsInstantiated() {
         // 迁移到 WorkgroupInitializer 执行
         // init();
-        //
         initAuthority();
     }
 
@@ -52,9 +52,12 @@ public class MemberInitializer implements SmartInitializingSingleton {
     public void init() {
         //
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        String nickname = bytedeskProperties.getNickname();
-        String email = bytedeskProperties.getEmail();
-        String mobile = bytedeskProperties.getMobile();
+        // 仅允许 UserInitializer 使用 bytedeskProperties 的邮箱/手机号；这里从数据库的超管用户读取
+        UserEntity superUser = userService.getSuper()
+            .orElseThrow(() -> new RuntimeException("MemberInitializer: Super User Not Found"));
+        String nickname = superUser.getNickname();
+        String email = superUser.getEmail();
+        String mobile = superUser.getMobile();
         //
         Set<String> roleUids = new HashSet<>(Arrays.asList(
                 BytedeskConsts.DEFAULT_ROLE_SUPER_UID));

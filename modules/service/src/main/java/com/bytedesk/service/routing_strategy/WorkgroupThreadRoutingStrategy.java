@@ -33,11 +33,12 @@ import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.service.agent.AgentCapacityService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue.QueueEntity;
@@ -50,11 +51,13 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
+import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
-import com.bytedesk.service.workgroup_routing.WorkgroupRoutingService;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadContent;
+import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,13 +90,15 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final WorkgroupRestService workgroupRestService;
     private final ThreadRestService threadRestService;
     private final VisitorThreadService visitorThreadService;
+    private final VisitorThreadTimeoutService visitorThreadTimeoutService;
     private final IMessageSendService messageSendService;
     private final QueueService queueService;
     private final QueueMemberRestService queueMemberRestService;
     private final MessageRestService messageRestService;
-    private final WorkgroupRoutingService workgroupRoutingService;
+    private final AgentCapacityService agentCapacityService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
+    private final TopicRestService topicRestService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -125,7 +130,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 2. 生成会话主题并检查现有会话
         log.debug("步骤2: 开始处理线程创建或获取");
-        String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroup.getUid(), visitorRequest.getUid());
+            String visitorUidForTopic = resolveVisitorUidForThreadTopic(visitorRequest);
+            String topic = TopicUtils.formatOrgWorkgroupThreadTopic(workgroup.getUid(), visitorUidForTopic);
         log.debug("生成工作组线程主题: {}", topic);
         ThreadEntity thread = getOrCreateWorkgroupThread(visitorRequest, workgroup, topic);
         log.info("步骤2完成: 线程处理完成 - threadUid: {}, 状态: {}, 是否新建: {}",
@@ -220,8 +226,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         if (thread.isQueuing()) {
-            log.info("发现现有排队会话，返回排队消息");
-            return getWorkgroupQueueMessage(visitorRequest, thread);
+            log.info("发现现有排队会话，检查是否可直接接入空闲客服");
+            return handleExistingQueuingWorkgroupThread(visitorRequest, thread, workgroup);
         }
 
         if (thread.isOffline()) {
@@ -231,6 +237,49 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         log.debug("线程状态不匹配任何已知处理流程，继续新会话流程 - 状态: {}", thread.getStatus());
         return null; // 其他状态继续新会话流程
+    }
+
+    /**
+     * 处理现有排队会话：刷新/重入时，如果此刻存在空闲客服则直接接入，否则继续排队。
+     */
+    private MessageProtobuf handleExistingQueuingWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
+            WorkgroupEntity workgroup) {
+
+        // 以最新线程状态为准，避免并发下重复接入
+        ThreadEntity latestThread = getThreadByUid(threadFromRequest.getUid());
+        if (!latestThread.isQueuing()) {
+            log.info("排队线程状态已变化，按最新状态返回 - threadUid: {}, status: {}",
+                    latestThread.getUid(), latestThread.getStatus());
+            return handleExistingWorkgroupThread(visitorRequest, latestThread, workgroup);
+        }
+
+        // 不在服务时间内，保持当前排队（避免刷新时意外切换流程）
+        if (!resolveIsInServiceTime(workgroup)) {
+            log.debug("不在服务时间内，继续返回排队消息 - threadUid: {}", latestThread.getUid());
+            return getWorkgroupQueueMessage(visitorRequest, latestThread);
+        }
+
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+        if (availableAgents == null || availableAgents.isEmpty()) {
+            log.debug("当前无在线可用客服，继续排队 - threadUid: {}", latestThread.getUid());
+            return getWorkgroupQueueMessage(visitorRequest, latestThread);
+        }
+
+        AgentEntity availableAgentWithCapacity = agentCapacityService.findAvailableAgentWithCapacity(
+                workgroup, latestThread, availableAgents);
+        if (availableAgentWithCapacity == null) {
+            log.debug("当前无空闲客服(均满员)，继续排队 - threadUid: {}", latestThread.getUid());
+            return getWorkgroupQueueMessage(visitorRequest, latestThread);
+        }
+
+        log.info("排队会话检测到空闲客服，准备直接接入 - threadUid: {}, agentUid: {}",
+                latestThread.getUid(), availableAgentWithCapacity.getUid());
+
+        // 复用已有队列成员，并把 agentQueue 绑定到该成员（不产生重复入队）
+        QueueMemberEntity queueMemberEntity = queueService.enqueueWorkgroup(
+                latestThread, availableAgentWithCapacity.toUserProtobuf(), workgroup, visitorRequest);
+
+        return handleAvailableWorkgroup(visitorRequest, latestThread, availableAgentWithCapacity, queueMemberEntity);
     }
 
     /**
@@ -402,7 +451,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 首先判断是否有空闲客服（有接待名额的客服）
         long selectStartTime = System.currentTimeMillis();
-        AgentEntity availableAgentWithCapacity = findAvailableAgentWithCapacity(workgroup, thread, availableAgents);
+        AgentEntity availableAgentWithCapacity = agentCapacityService.findAvailableAgentWithCapacity(workgroup, thread, availableAgents);
         log.info("空闲客服查找完成 - 耗时: {}ms, 找到空闲客服: {}", 
                 System.currentTimeMillis() - selectStartTime, availableAgentWithCapacity != null);
 
@@ -432,7 +481,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             int maxWaiting = resolveMaxWaiting(queueSettings);
             log.info("Workgroup queue limit reached, diverting to leave message - workgroupUid: {}, queueSize: {}, maxWaiting: {}",
                 workgroup.getUid(), queuingCount, maxWaiting);
-            return visitorThreadService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
+            return visitorThreadTimeoutService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
         }
 
         if (visitorRequest.getForceAgent()) {
@@ -444,56 +493,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         log.info("客服有接待名额，进入接待流程 - agentUid: {}, agentName {}", availableAgentWithCapacity.getUid(),
                 availableAgentWithCapacity.getNickname());
         return handleAvailableWorkgroup(visitorRequest, thread, availableAgentWithCapacity, queueMemberEntity);
-    }
-
-    /**
-     * 查找有空闲接待名额的客服
-     * 
-     * @param workgroup 工作组
-     * @param thread 会话线程
-     * @param availableAgents 在线且可用的客服列表
-     * @return 有空闲名额的客服，如果都满员则返回 null
-     */
-    private AgentEntity findAvailableAgentWithCapacity(WorkgroupEntity workgroup, ThreadEntity thread,
-            List<AgentEntity> availableAgents) {
-        if (availableAgents == null || availableAgents.isEmpty()) {
-            return null;
-        }
-
-        // 优先使用路由策略选择的客服（如果有空闲名额）
-        AgentEntity routedAgent = workgroupRoutingService.selectAgent(workgroup, thread);
-        if (routedAgent != null && presenceFacadeService.isAgentOnlineAndAvailable(routedAgent)) {
-            if (hasCapacity(routedAgent)) {
-                log.debug("路由策略选择的客服有空闲名额 - agentUid: {}", routedAgent.getUid());
-                return routedAgent;
-            }
-        }
-
-        // 遍历所有在线客服，查找第一个有空闲名额的
-        for (AgentEntity agent : availableAgents) {
-            if (hasCapacity(agent)) {
-                log.debug("找到有空闲名额的客服 - agentUid: {}", agent.getUid());
-                return agent;
-            }
-        }
-
-        log.debug("所有在线客服均已满员");
-        return null;
-    }
-
-    /**
-     * 判断客服是否有空闲接待名额
-     */
-    private boolean hasCapacity(AgentEntity agent) {
-        String today = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_DATE);
-        String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
-        Optional<QueueEntity> queueEntityOpt = queueService.findByTopicAndDay(queueTopic, today);
-        int currentChattingCount = queueEntityOpt.map(QueueEntity::getChattingCount).orElse(0);
-        int maxThreadCount = agent.getMaxThreadCount();
-        boolean hasCapacity = currentChattingCount < maxThreadCount;
-        log.debug("客服接待名额检查 - agentUid: {}, 当前接待数: {}, 最大接待数: {}, 有空闲: {}", 
-                agent.getUid(), currentChattingCount, maxThreadCount, hasCapacity);
-        return hasCapacity;
     }
 
     /**
@@ -517,7 +516,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             int maxWaiting = resolveMaxWaiting(queueSettings);
             log.info("Workgroup queue limit reached, diverting to leave message - workgroupUid: {}, queueSize: {}, maxWaiting: {}",
                 workgroup.getUid(), queuingCount, maxWaiting);
-            return visitorThreadService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
+            return visitorThreadTimeoutService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
         }
 
         if (visitorRequest.getForceAgent()) {
@@ -565,11 +564,15 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             .estimatedWaitTime(estimatedWaitTime);
         QueueContent queueContent = builder.build();
 
-        // 设置线程状态（使用结构化JSON）
-        latestThread.setQueuing().setContent(queueContent.toJson());
+        // 设置线程状态（ThreadContent + payload=QueueContent JSON）
+        latestThread.setQueuing().setContent(
+            ThreadContent.of(MessageTypeEnum.QUEUE, queueContentText, queueContent.toJson()).toJson());
 
         // 保存线程
         ThreadEntity savedThread = saveThread(latestThread);
+
+        // 同步订阅 topic（含 internal），避免首条排队消息因订阅延迟而丢失
+        subscribeThreadTopics(savedThread, topicRestService);
 
         // 发布事件
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
@@ -597,6 +600,13 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         for (AgentEntity agent : availableAgents) {
             try {
                 ThreadEntity agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
+
+                // 确保客服已订阅其排队通知线程 topic，避免通知丢失（同步 best-effort）
+                try {
+                    subscribeThreadTopics(agentQueueThread, topicRestService);
+                } catch (Exception e) {
+                    log.debug("Failed to subscribe agent queue thread topic - agentUid: {}, error: {}", agent.getUid(), e.getMessage());
+                }
 
                 QueueNotification queueNotification = QueueNotification.builder()
                         .queueMemberUid(queueMemberEntity.getUid())
@@ -672,7 +682,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 设置欢迎内容和线程状态
         String welcomeTip = getAgentWelcomeMessage(visitorRequest, agentEntity);
         thread.setUserUid(agentEntity.getUid());
-        thread.setChatting().setContent(welcomeTip);
+        WelcomeContent welcomeContent = WelcomeContentUtils.buildAgentWelcomeContent(agentEntity, welcomeTip);
+        String welcomePayload = welcomeContent != null ? welcomeContent.toJson() : null;
+        thread.setChatting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, welcomeTip, welcomePayload).toJson());
 
         // 设置线程所有者
         setThreadOwner(thread, agentEntity);
@@ -684,14 +696,16 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 保存线程
         ThreadEntity savedThread = saveThread(thread);
 
+        // 同步订阅 topic（含 internal），放在发消息之前，避免首条离线消息丢失
+        subscribeThreadTopics(savedThread, topicRestService);
+
         // 更新队列状态为自动接受
         updateQueueMemberForAgentAccept(queueMemberEntity);
 
         // 发布事件
-        publishWorkgroupThreadEvents(savedThread);
+        // publishWorkgroupThreadEvents(savedThread);
 
         // 发送欢迎消息（结构化 WelcomeContent）
-        WelcomeContent welcomeContent = WelcomeContentUtils.buildAgentWelcomeContent(agentEntity);
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
@@ -710,7 +724,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 设置离线内容
         String offlineContent = getWorkgroupOfflineMessage(visitorRequest, workgroup);
-        thread.setOffline().setContent(offlineContent);
+        thread.setOffline().setContent(ThreadContent.of(MessageTypeEnum.LEAVE_MSG, offlineContent, offlineContent).toJson());
 
         // 设置客服信息
         UserProtobuf agentProtobuf = agentEntity.toUserProtobuf();
@@ -759,8 +773,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 设置机器人接待状态
         String welcomeContent = getRobotWelcomeMessage(visitorRequest, robotEntity);
+        WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, welcomeContent);
+        String welcomePayload = wc != null ? wc.toJson() : null;
         thread.setUserUid(robotEntity.getUid());
-        thread.setRoboting().setContent(welcomeContent);
+        thread.setRoboting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, welcomeContent, welcomePayload).toJson());
 
         // 设置机器人信息（使用精简版，避免 prompt 过长导致字段超限）
         String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
@@ -774,7 +790,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
 
         // 创建欢迎消息（结构化 WelcomeContent）
-        WelcomeContent wc = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity);
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, savedThread);
         messageRestService.save(message);
 
@@ -807,9 +822,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 线程content通常为结构化QueueContent JSON；解析失败则降级为仅文本
         QueueContent qc = null;
         try {
-            String c = thread.getContent();
-            if (c != null && c.trim().startsWith("{")) {
-                qc = JSON.parseObject(c, QueueContent.class);
+            ThreadContent tc = ThreadContent.fromStored(thread.getContent());
+            String payload = tc != null ? tc.getPayload() : thread.getContent();
+            if (payload != null && payload.trim().startsWith("{")) {
+                qc = JSON.parseObject(payload, QueueContent.class);
             }
         } catch (Exception e) {
             log.debug("Parse queue content failed, fallback to text - threadUid: {}, error: {}", thread.getUid(),
@@ -817,7 +833,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
         if (qc == null) {
             qc = QueueContent.builder()
-                    .content(thread.getContent())
+                    .content(ThreadContent.fromStored(thread.getContent()) != null
+                            ? ThreadContent.fromStored(thread.getContent()).getDisplayText()
+                            : thread.getContent())
                     .serverTimestamp(System.currentTimeMillis())
                     .build();
         }
@@ -1008,16 +1026,18 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     /**
      * 发布工作组线程相关事件
      */
-    private void publishWorkgroupThreadEvents(ThreadEntity savedThread) {
-        try {
-            bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
-            bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-            log.debug("Published workgroup thread events for thread: {}", savedThread.getUid());
-        } catch (Exception e) {
-            log.warn("Failed to publish thread events for workgroup thread {}: {}", savedThread.getUid(),
-                    e.getMessage());
-        }
-    }
+    // private void publishWorkgroupThreadEvents(ThreadEntity savedThread) {
+    //     try {
+    //         // 同步订阅 topic（含 internal），避免首条消息因订阅延迟而丢失
+    //         subscribeThreadTopics(savedThread, topicRestService);
+    //         // 
+    //         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+    //         log.debug("Published workgroup thread events for thread: {}", savedThread.getUid());
+    //     } catch (Exception e) {
+    //         log.warn("Failed to publish thread events for workgroup thread {}: {}", savedThread.getUid(),
+    //                 e.getMessage());
+    //     }
+    // }
 
     private boolean resolveIsInServiceTime(WorkgroupEntity workgroup) {
         if (workgroup == null || workgroup.getSettings() == null) {
@@ -1029,40 +1049,6 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
         return true;
     }
-
-    // @EventListener
-    // public void handleWorkgroupAutoAssign(AgentUpdateStatusEvent event) {
-    //     AgentEntity agent = event.getAgent();
-    //     if (!shouldTriggerWorkgroupAutoAssign(agent)) {
-    //         return;
-    //     }
-    //     List<WorkgroupEntity> workgroups = workgroupRepository.findByAgentUid(agent.getUid());
-    //     if (workgroups == null || workgroups.isEmpty()) {
-    //         return;
-    //     }
-    //     int capacityHint = estimateAvailableSlots(agent);
-    //     for (WorkgroupEntity workgroup : workgroups) {
-    //         if (workgroup == null || !StringUtils.hasText(workgroup.getUid())) {
-    //             continue;
-    //         }
-    //         queueAutoAssignService.triggerWorkgroupAutoAssign(
-    //                 workgroup.getUid(),
-    //                 agent.getUid(),
-    //                 QueueAutoAssignTriggerSource.WORKGROUP_STATUS_EVENT,
-    //                 capacityHint);
-    //     }
-    // }
-
-    // private boolean shouldTriggerWorkgroupAutoAssign(AgentEntity agent) {
-    //     return agent != null
-    //             && StringUtils.hasText(agent.getUid())
-    //             && presenceFacadeService.isAgentOnlineAndAvailable(agent);
-    // }
-
-    // private int estimateAvailableSlots(AgentEntity agent) {
-    //     int maxThreadCount = agent.getMaxThreadCount();
-    //     return maxThreadCount > 0 ? maxThreadCount : 1;
-    // }
 
     
 }

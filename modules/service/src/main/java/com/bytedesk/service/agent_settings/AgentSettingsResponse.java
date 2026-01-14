@@ -61,6 +61,11 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
     private String timeoutRemindTip;
 
     /**
+     * Whether agent can manually close thread/session
+     */
+    private Boolean allowAgentCloseThread;
+
+    /**
      * Message leave settings (Agent-specific)
      */
     private MessageLeaveSettingsResponse messageLeaveSettings;

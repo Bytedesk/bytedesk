@@ -179,6 +179,7 @@ public final class RoleAuthorityRules {
             MESSAGE_LEAVE_UPDATE,
             MESSAGE_RATING_READ,
             MESSAGE_RATING_UPDATE,
+            // 
             AGENT_READ,
             AGENT_UPDATE,
             AGENT_STATUS_READ,

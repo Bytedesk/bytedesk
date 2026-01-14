@@ -17,8 +17,8 @@ AI powered Omnichannel customer service With Team Cooperation
 
 ## Language
 
-- [English](./README.md)
-- [中文](./README.zh.md)
+- [English](./readme.md)
+- [中文](./readme.zh.md)
 
 ## Admin Dashboard
 
@@ -157,6 +157,7 @@ bytedesk/
 ## Open Source Client
 
 - [desktop](https://github.com/Bytedesk/bytedesk-desktop)
+- [QT client](https://github.com/Bytedesk/bytedesk-qt)
 - [mobile](https://github.com/Bytedesk/bytedesk-mobile)
 - [siphone](https://github.com/Bytedesk/bytedesk-phone)
 - [conference](https://github.com/Bytedesk/bytedesk-conference)

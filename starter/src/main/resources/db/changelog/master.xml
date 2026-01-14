@@ -47,4 +47,10 @@
     <include file="db/changelog/migration/251231_add_form_version_and_form_user.xml" />
     <include file="db/changelog/migration/251231_drop_form_result_legacy_columns.xml" />
 
+    <include file="db/changelog/migration/260112_alter_browse_user_agent_length.xml" />
+    <include file="db/changelog/migration/260112_alter_browse_event_data_to_text.xml" />
+    <include file="db/changelog/migration/260113_add_input_preview_display_settings.xml" />
+    <include file="db/changelog/migration/260114_add_toolbar_upload_robot.xml" />
+    <!-- <include file="db/changelog/migration/260114_drop_org_name_code_unique_constraints.xml" /> -->
+
 </databaseChangeLog>

@@ -83,15 +83,6 @@ public class QueueSettingsEntity extends BaseEntity {
     @Builder.Default
     private String queueReadyTip = I18Consts.I18N_QUEUE_READY_TIP;
 
-    // public static final int DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS = 2000;
-
-    /**
-     * Batch window for queue notices, in milliseconds; keeps notices always on but rate-limited per agent.
-     */
-    // @Builder.Default
-    // @Column(name = "queue_notice_batch_window_ms")
-    // private Integer queueNoticeBatchWindowMs = DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
-    
     /**
      * 从 QueueSettingsRequest 创建 QueueSettings 实体
      * 如果 request 为 null，返回默认构建的实体
@@ -115,13 +106,6 @@ public class QueueSettingsEntity extends BaseEntity {
     public int resolveMaxWaitTimeSeconds() {
         return maxWaitTime != null && maxWaitTime > 0 ? maxWaitTime : DEFAULT_MAX_WAIT_TIME_SECONDS;
     }
-
-    /**
-     * Returns a non-null batch window ensuring downstream services can rely on a default cadence.
-     */
-    // public int resolveQueueNoticeBatchWindowMs() {
-    //     return queueNoticeBatchWindowMs != null ? queueNoticeBatchWindowMs : DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
-    // }
     
 }
 

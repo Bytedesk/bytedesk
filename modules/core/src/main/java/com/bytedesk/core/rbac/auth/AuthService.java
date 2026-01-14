@@ -241,15 +241,20 @@ public class AuthService {
         try {
             // 2. 使用AES解密前端发送的加密密码
             String decryptedPassword = PasswordCryptoUtils.decryptPassword(
-                authRequest.getPasswordHash(), 
+                authRequest.getPasswordHash(),
                 authRequest.getPasswordSalt()
             );
-            log.debug("Password decrypted successfully for user: {}", authRequest.getUsername());
+            log.debug("Password decrypted successfully for user: {}, length: {}, first 3 chars: {}",
+                     authRequest.getUsername(),
+                     decryptedPassword.length(),
+                     decryptedPassword.length() > 3 ? decryptedPassword.substring(0, 3) + "***" : decryptedPassword);
 
             return authenticateWithPassword(userDetails, decryptedPassword, authRequest.getUsername());
             
         } catch (Exception e) {
-            log.error("Password hash authentication error for user: {}: {}", authRequest.getUsername(), e.getMessage());
+            // Do not log credential material; keep enough context for troubleshooting
+            log.warn("Password hash authentication failed (decrypt/verify): username={}, platform={}, channel={}",
+                    authRequest.getUsername(), authRequest.getPlatform(), authRequest.getChannel(), e);
             return null;
         }
     }

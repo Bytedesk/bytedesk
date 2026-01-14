@@ -15,11 +15,15 @@ package com.bytedesk.core.task;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.converter.JsonStringListConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.time.ZonedDateTime;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 // import jakarta.persistence.EntityListeners;
@@ -107,18 +111,47 @@ public class TaskEntity extends BaseEntity {
     private String taskListUid;
 
     /**
-     * Status (TODO, IN_PROGRESS, DONE, etc.)
+     * Status
      */
     @Builder.Default
     @Column(name = "task_status", length = 32)
-    private String status = "TODO";
+    private String status = TaskStatusEnum.TODO.name();
 
     /**
      * Priority (LOW, MEDIUM, HIGH, URGENT)
      */
     @Builder.Default
     @Column(name = "task_priority", length = 32)
-    private String priority = "MEDIUM";
+    private String priority = TaskPriorityEnum.MEDIUM.name();
+
+    /**
+     * Task images (URLs)
+     */
+    @Builder.Default
+    @Convert(converter = JsonStringListConverter.class)
+    @Column(name = "task_images", columnDefinition = "TEXT")
+    private List<String> images = new ArrayList<>();
+
+    /**
+     * Comment count for this task
+     */
+    @Builder.Default
+    @Column(name = "comment_count")
+    private Integer commentCount = 0;
+
+    /**
+     * Like count for this task
+     */
+    @Builder.Default
+    @Column(name = "like_count")
+    private Integer likeCount = 0;
+
+    /**
+     * Favorite/collect count for this task
+     */
+    @Builder.Default
+    @Column(name = "favorite_count")
+    private Integer favoriteCount = 0;
 
     /**
      * Optional planned start time

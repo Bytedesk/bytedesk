@@ -21,7 +21,6 @@ import java.util.List;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_faq.FaqResponse;
 import com.bytedesk.kbase.quick_button.QuickButtonResponse;
-import com.bytedesk.kbase.settings.ToolbarSettings;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -116,6 +115,12 @@ public class ServiceSettingsResponse implements Serializable {
     // 访客输入预览：访客输入内容预览发送给客服（MESSAGE_TYPE_PREVIEW）
     private Boolean inputPreviewEnabled;
 
+    // 输入预览是否一直显示（客服端预览框常驻）
+    private Boolean inputPreviewAlwaysShow;
+
+    // 输入预览显示时长（秒），仅当 inputPreviewAlwaysShow=false 时生效
+    private Integer inputPreviewShowSeconds;
+
     private Boolean showFaqs;
     private List<FaqResponse> faqs;
     private String faqKbUid;
@@ -179,6 +184,8 @@ public class ServiceSettingsResponse implements Serializable {
                 .inputAssociationEnabled(settings.getInputAssociationEnabled())
                 .inputAssociationKbUid(settings.getInputAssociationKbUid())
                 .inputPreviewEnabled(settings.getInputPreviewEnabled())
+                .inputPreviewAlwaysShow(settings.getInputPreviewAlwaysShow())
+                .inputPreviewShowSeconds(settings.getInputPreviewShowSeconds())
                 .showFaqs(settings.getShowFaqs())
                 .faqKbUid(settings.getFaqKbUid())
                 .showQuickButtons(settings.getShowQuickButtons())

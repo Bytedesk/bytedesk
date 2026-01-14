@@ -37,6 +37,8 @@ public class ThreadResponseSimple extends BaseResponse {
 
     private String content;
 
+    private ThreadContent contentObject;
+
     private String type;
 
     private String status;

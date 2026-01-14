@@ -22,6 +22,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.topic.TopicRequest;
+import com.bytedesk.core.topic.TopicRestService;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 
@@ -70,6 +73,21 @@ public abstract class AbstractThreadRoutingStrategy {
      * @return ThreadRestService实例
      */
     protected abstract ThreadRestService getThreadRestService();
+
+    /**
+     * 生成线程 topic 时使用的访客标识。
+     *
+     * <p>优先使用前端传入的 visitorUid（稳定、可跨刷新复用）；若未提供，则退化为 request.uid。
+     */
+    protected String resolveVisitorUidForThreadTopic(VisitorRequest visitorRequest) {
+        if (visitorRequest == null) {
+            return null;
+        }
+        // if (StringUtils.hasText(visitorRequest.getVisitorUid())) {
+        //     return visitorRequest.getVisitorUid();
+        // }
+        return visitorRequest.getUid();
+    }
 
     // ==================== 通用方法 ====================
     
@@ -139,6 +157,40 @@ public abstract class AbstractThreadRoutingStrategy {
             log.error("Error saving thread {}: {}", thread.getUid(), e.getMessage(), e);
             throw new RuntimeException("Failed to save thread " + thread.getUid(), e);
         }
+    }
+
+    /**
+     * 同步订阅会话 topic（含 internal topic），避免首条消息因订阅延迟而丢失。
+     *
+     * <p>注意：此方法是同步执行的；调用方可按需自行 try/catch 做 best-effort。
+     */
+    protected void subscribeThreadTopics(ThreadEntity thread, TopicRestService topicRestService) {
+        if (thread == null || !StringUtils.hasText(thread.getTopic()) || topicRestService == null) {
+            return;
+        }
+
+        String subscriberUid = null;
+        try {
+            if (thread.getOwner() != null && StringUtils.hasText(thread.getOwner().getUid())) {
+                subscriberUid = thread.getOwner().getUid();
+            }
+        } catch (Exception ignore) {
+            // ignore
+        }
+
+        if (!StringUtils.hasText(subscriberUid)) {
+            subscriberUid = thread.getUserUid();
+        }
+        if (!StringUtils.hasText(subscriberUid)) {
+            return;
+        }
+
+        TopicRequest request = TopicRequest.builder()
+                .userUid(subscriberUid)
+                .build();
+        request.getTopics().add(thread.getTopic());
+        request.getTopics().add(TopicUtils.formatTopicInternal(thread.getTopic()));
+        topicRestService.create(request);
     }
     
     /**

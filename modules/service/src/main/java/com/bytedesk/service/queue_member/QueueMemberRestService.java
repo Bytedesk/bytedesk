@@ -76,6 +76,13 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     public Optional<QueueMemberEntity> findByThreadUid(String threadUid) {
         return queueMemberRepository.findByThreadUid(threadUid);
     }
+
+    public List<QueueMemberEntity> findByThreadUids(List<String> threadUids) {
+        if (threadUids == null || threadUids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return queueMemberRepository.findByThreadUids(threadUids);
+    }
     
     @Override
     public QueueMemberResponse create(QueueMemberRequest request) {
@@ -317,6 +324,17 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return queueMemberRepository.findFirstWorkgroupQueueMemberByThreadStatus(
             workgroupQueueUid,
             ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    public Optional<QueueMemberEntity> findEarliestWorkgroupQueueMemberForUpdate(String workgroupQueueUid) {
+        if (!StringUtils.hasText(workgroupQueueUid)) {
+            return Optional.empty();
+        }
+        List<QueueMemberEntity> members = queueMemberRepository.findWorkgroupQueueHeadForUpdate(
+            workgroupQueueUid,
+            ThreadProcessStatusEnum.QUEUING.name(),
+            PageRequest.of(0, 1));
+        return members.isEmpty() ? Optional.empty() : Optional.of(members.get(0));
     }
 
     public List<QueueMemberEntity> findQueuingMembersByWorkgroupQueueUid(String workgroupQueueUid) {

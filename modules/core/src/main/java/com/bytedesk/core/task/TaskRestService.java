@@ -13,7 +13,11 @@
  */
 package com.bytedesk.core.task;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,7 +28,11 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.relation.RelationEntity;
+import com.bytedesk.core.relation.RelationRepository;
+import com.bytedesk.core.relation.RelationTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -44,6 +52,8 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
 
     private final AuthService authService;
 
+    private final RelationRepository relationRepository;
+
     @Override
     protected Specification<TaskEntity> createSpecification(TaskRequest request) {
         return TaskSpecification.search(request, authService);
@@ -52,6 +62,61 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
     @Override
     protected Page<TaskEntity> executePageQuery(Specification<TaskEntity> spec, Pageable pageable) {
         return taskRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Page<TaskResponse> queryByOrg(TaskRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<TaskEntity> spec = createSpecification(request);
+        Page<TaskEntity> page = executePageQuery(spec, pageable);
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            return page.map(this::convertToResponseWithoutUser);
+        }
+
+        List<String> taskUids = new ArrayList<>();
+        for (TaskEntity e : page.getContent()) {
+            if (StringUtils.hasText(e.getUid())) taskUids.add(e.getUid());
+        }
+
+        Set<String> likedUids = new HashSet<>();
+        Set<String> favoritedUids = new HashSet<>();
+        if (!taskUids.isEmpty()) {
+            List<RelationEntity> relations = relationRepository
+                    .findBySubjectUserUidAndObjectContentUidInAndTypeInAndDeletedFalse(
+                            user.getUid(),
+                            taskUids,
+                            List.of(RelationTypeEnum.LIKE.name(), RelationTypeEnum.FAVORITE.name()));
+            for (RelationEntity r : relations) {
+                if (!StringUtils.hasText(r.getObjectContentUid())) continue;
+                if (RelationTypeEnum.LIKE.name().equalsIgnoreCase(r.getType())) {
+                    likedUids.add(r.getObjectContentUid());
+                } else if (RelationTypeEnum.FAVORITE.name().equalsIgnoreCase(r.getType())) {
+                    favoritedUids.add(r.getObjectContentUid());
+                }
+            }
+        }
+
+        return page.map(entity -> convertToResponseWithFlags(entity, likedUids.contains(entity.getUid()), favoritedUids.contains(entity.getUid())));
+    }
+
+    @Override
+    public TaskResponse queryByUid(TaskRequest request) {
+        Optional<TaskEntity> optional = findByUid(request.getUid());
+        if (optional.isEmpty()) {
+            throw new RuntimeException("Task not found");
+        }
+        TaskEntity entity = optional.get();
+
+        UserEntity user = authService.getUser();
+        boolean liked = false;
+        boolean favorited = false;
+        if (user != null && StringUtils.hasText(user.getUid())) {
+            liked = Boolean.TRUE.equals(relationRepository.hasLiked(user.getUid(), entity.getUid()));
+            favorited = Boolean.TRUE.equals(relationRepository.hasFavorited(user.getUid(), entity.getUid()));
+        }
+        return convertToResponseWithFlags(entity, liked, favorited);
     }
 
     @Cacheable(value = "task", key = "#uid", unless="#result==null")
@@ -165,7 +230,99 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
 
     @Override
     public TaskResponse convertToResponse(TaskEntity entity) {
-        return modelMapper.map(entity, TaskResponse.class);
+        // queryByOrg/queryByUid 已经做了批量/单条 enrich；这里作为兜底
+        return convertToResponseWithoutUser(entity);
+    }
+
+    private TaskResponse convertToResponseWithoutUser(TaskEntity entity) {
+        return convertToResponseWithFlags(entity, false, false);
+    }
+
+    private TaskResponse convertToResponseWithFlags(TaskEntity entity, boolean liked, boolean favorited) {
+        TaskResponse resp = modelMapper.map(entity, TaskResponse.class);
+        resp.setCommentCount(entity.getCommentCount());
+        resp.setLikeCount(entity.getLikeCount());
+        resp.setFavoriteCount(entity.getFavoriteCount());
+        resp.setLiked(liked);
+        resp.setFavorited(favorited);
+        return resp;
+    }
+
+    @Transactional
+    public TaskResponse like(TaskRequest request) {
+        return toggleRelation(request, RelationTypeEnum.LIKE.name(), true);
+    }
+
+    @Transactional
+    public TaskResponse unlike(TaskRequest request) {
+        return toggleRelation(request, RelationTypeEnum.LIKE.name(), false);
+    }
+
+    @Transactional
+    public TaskResponse favorite(TaskRequest request) {
+        return toggleRelation(request, RelationTypeEnum.FAVORITE.name(), true);
+    }
+
+    @Transactional
+    public TaskResponse unfavorite(TaskRequest request) {
+        return toggleRelation(request, RelationTypeEnum.FAVORITE.name(), false);
+    }
+
+    private TaskResponse toggleRelation(TaskRequest request, String relationType, boolean enable) {
+        if (!StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("Task uid is required");
+        }
+        UserEntity user = authService.getUser();
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        TaskEntity task = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("Task not found"));
+
+        Optional<RelationEntity> existing = relationRepository
+                .findBySubjectUserUidAndObjectContentUidAndTypeAndDeletedFalse(user.getUid(), task.getUid(), relationType);
+
+        if (enable) {
+            if (existing.isEmpty()) {
+                RelationEntity relation = RelationEntity.builder()
+                        .uid(uidUtils.getUid())
+                        .orgUid(task.getOrgUid())
+                        .userUid(user.getUid())
+                        .type(relationType)
+                        .subjectUserUid(user.getUid())
+                        .objectContentUid(task.getUid())
+                        .build();
+                relationRepository.save(relation);
+
+                if (RelationTypeEnum.LIKE.name().equals(relationType)) {
+                    task.setLikeCount((task.getLikeCount() == null ? 0 : task.getLikeCount()) + 1);
+                } else if (RelationTypeEnum.FAVORITE.name().equals(relationType)) {
+                    task.setFavoriteCount((task.getFavoriteCount() == null ? 0 : task.getFavoriteCount()) + 1);
+                }
+                save(task);
+            }
+            return convertToResponseWithFlags(task, RelationTypeEnum.LIKE.name().equals(relationType) || Boolean.TRUE.equals(relationRepository.hasLiked(user.getUid(), task.getUid())),
+                    RelationTypeEnum.FAVORITE.name().equals(relationType) || Boolean.TRUE.equals(relationRepository.hasFavorited(user.getUid(), task.getUid())));
+        }
+
+        if (existing.isPresent()) {
+            RelationEntity rel = existing.get();
+            rel.setDeleted(true);
+            relationRepository.save(rel);
+
+            if (RelationTypeEnum.LIKE.name().equals(relationType)) {
+                int cur = task.getLikeCount() == null ? 0 : task.getLikeCount();
+                task.setLikeCount(Math.max(0, cur - 1));
+            } else if (RelationTypeEnum.FAVORITE.name().equals(relationType)) {
+                int cur = task.getFavoriteCount() == null ? 0 : task.getFavoriteCount();
+                task.setFavoriteCount(Math.max(0, cur - 1));
+            }
+            save(task);
+        }
+
+        boolean liked = Boolean.TRUE.equals(relationRepository.hasLiked(user.getUid(), task.getUid()));
+        boolean favorited = Boolean.TRUE.equals(relationRepository.hasFavorited(user.getUid(), task.getUid()));
+        return convertToResponseWithFlags(task, liked, favorited);
     }
 
     @Override

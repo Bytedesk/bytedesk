@@ -27,7 +27,6 @@ import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.quick_button.QuickButtonEntity;
-import com.bytedesk.kbase.settings.ToolbarSettings;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -193,6 +192,18 @@ public class ServiceSettingsEntity extends BaseEntity {
     // 访客输入预览：访客输入内容预览发送给客服（MESSAGE_TYPE_PREVIEW）
     @Builder.Default
     private Boolean inputPreviewEnabled = false;
+
+    /**
+     * 输入预览是否一直显示（客服端预览框常驻，直到访客清空输入框或发送 clear 消息）
+     */
+    @Builder.Default
+    private Boolean inputPreviewAlwaysShow = false;
+
+    /**
+     * 输入预览显示时长（秒）。仅当 inputPreviewAlwaysShow=false 时生效。
+     */
+    @Builder.Default
+    private Integer inputPreviewShowSeconds = 5;
     
     // 常见问题
     @Builder.Default
@@ -219,42 +230,6 @@ public class ServiceSettingsEntity extends BaseEntity {
         inverseJoinColumns = @JoinColumn(name = "quick_button_id")
     )
     private List<QuickButtonEntity> quickButtons = new ArrayList<>();
-
-    // 猜你想问
-    // @Builder.Default
-    // private Boolean showGuessFaqs = false;
-    // @Builder.Default
-    // @ManyToMany(fetch = FetchType.LAZY)
-    // @JoinTable(
-    //     name = "bytedesk_kbase_service_settings_guess_faqs",
-    //     joinColumns = @JoinColumn(name = "service_settings_id"),
-    //     inverseJoinColumns = @JoinColumn(name = "guess_faqs_id")
-    // )
-    // private List<FaqEntity> guessFaqs = new ArrayList<>();
-
-    // 热门问题
-    // @Builder.Default
-    // private Boolean showHotFaqs = false;
-    // @Builder.Default
-    // @ManyToMany(fetch = FetchType.LAZY)
-    // @JoinTable(
-    //     name = "bytedesk_kbase_service_settings_hot_faqs",
-    //     joinColumns = @JoinColumn(name = "service_settings_id"),
-    //     inverseJoinColumns = @JoinColumn(name = "hot_faqs_id")
-    // )
-    // private List<FaqEntity> hotFaqs = new ArrayList<>();
-
-    // 快捷功能
-    // @Builder.Default
-    // private Boolean showShortcutFaqs = false;
-    // @Builder.Default
-    // @ManyToMany(fetch = FetchType.LAZY)
-    // @JoinTable(
-    //     name = "bytedesk_kbase_service_settings_shortcut_faqs",
-    //     joinColumns = @JoinColumn(name = "service_settings_id"),
-    //     inverseJoinColumns = @JoinColumn(name = "shortcut_faqs_id")
-    // )
-    // private List<FaqEntity> shortcutFaqs = new ArrayList<>();
 
     @NotNull
     @Builder.Default

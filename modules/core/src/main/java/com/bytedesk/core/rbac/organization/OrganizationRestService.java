@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -153,7 +154,21 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setVipExpireDate(BdDateUtils.now().plusDays(30));
         organization.setLevel(LevelEnum.ORGANIZATION.name());
         //
-        OrganizationEntity savedOrganization = save(organization);
+        OrganizationEntity savedOrganization;
+        try {
+            savedOrganization = save(organization);
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Creating organization failed due to DB constraint. name={}, code={}, userUid={}",
+                    request.getName(), request.getCode(), authUser.getUid(), e);
+
+            if (StringUtils.hasText(request.getName()) && existsByName(request.getName())) {
+                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称后重试。");
+            }
+            if (StringUtils.hasText(request.getCode()) && existsByCode(request.getCode())) {
+                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在，请修改组织代码后重试。");
+            }
+            throw new ExistsException("创建组织失败：组织名称/代码已存在或不符合约束，请修改后重试。");
+        }
         if (savedOrganization == null) {
             throw new RuntimeException("Failed to create organization.");
         }
@@ -192,7 +207,21 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             
         }
         // 
-        OrganizationEntity savedOrganization = save(organization);
+        OrganizationEntity savedOrganization;
+        try {
+            savedOrganization = save(organization);
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Creating organization by super failed due to DB constraint. name={}, code={}, operatorUid={}",
+                    request.getName(), request.getCode(), authUser.getUid(), e);
+
+            if (StringUtils.hasText(request.getName()) && existsByName(request.getName())) {
+                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称后重试。");
+            }
+            if (StringUtils.hasText(request.getCode()) && existsByCode(request.getCode())) {
+                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在，请修改组织代码后重试。");
+            }
+            throw new ExistsException("创建组织失败：组织名称/代码已存在或不符合约束，请修改后重试。");
+        }
         if (savedOrganization == null) {
             throw new RuntimeException("Failed to create organization.");
         }

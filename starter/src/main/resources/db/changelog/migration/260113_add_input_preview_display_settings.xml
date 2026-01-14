@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 添加 input_preview_always_show 字段 -->
+    <changeSet id="260113-add-input-preview-always-show" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <not>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="input_preview_always_show" />
+            </not>
+        </preConditions>
+        <comment>Add input_preview_always_show field to control whether input preview is always visible on agent side.</comment>
+        <addColumn tableName="bytedesk_kbase_service_settings">
+            <column name="input_preview_always_show" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_kbase_service_settings" columnName="input_preview_always_show" />
+        </rollback>
+    </changeSet>
+
+    <!-- 添加 input_preview_show_seconds 字段 -->
+    <changeSet id="260113-add-input-preview-show-seconds" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <not>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="input_preview_show_seconds" />
+            </not>
+        </preConditions>
+        <comment>Add input_preview_show_seconds field (seconds) to control preview display duration when not always showing.</comment>
+        <addColumn tableName="bytedesk_kbase_service_settings">
+            <column name="input_preview_show_seconds" type="INT" defaultValueNumeric="5">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_kbase_service_settings" columnName="input_preview_show_seconds" />
+        </rollback>
+    </changeSet>
+
+    <!-- 回填新字段的默认值（对于现有数据） -->
+    <changeSet id="260113-backfill-input-preview-display-settings" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="input_preview_always_show" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="input_preview_show_seconds" />
+        </preConditions>
+        <comment>Backfill default values for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_kbase_service_settings
+            SET input_preview_always_show = false
+            WHERE input_preview_always_show IS NULL;
+
+            UPDATE bytedesk_kbase_service_settings
+            SET input_preview_show_seconds = 5
+            WHERE input_preview_show_seconds IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

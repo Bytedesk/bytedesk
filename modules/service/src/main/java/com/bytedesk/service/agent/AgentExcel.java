@@ -32,27 +32,31 @@ public class AgentExcel {
     @ColumnWidth(20)
     private String nickname;
 
-    @ExcelProperty(index = 1, value = "手机号")
+    @ExcelProperty(index = 1, value = "客服工号")
+    @ColumnWidth(15)
+    private String agentNo;
+
+    @ExcelProperty(index = 2, value = "手机号")
     @ColumnWidth(15)
     private String mobile;
 
-    @ExcelProperty(index = 2, value = "邮箱")
+    @ExcelProperty(index = 3, value = "邮箱")
     @ColumnWidth(25)
     private String email;
 
-    @ExcelProperty(index = 3, value = "描述")
+    @ExcelProperty(index = 4, value = "描述")
     @ColumnWidth(30)
     private String description;
 
-    @ExcelProperty(index = 4, value = "状态")
+    @ExcelProperty(index = 5, value = "状态")
     @ColumnWidth(15)
     private String status;
 
-    @ExcelProperty(index = 5, value = "是否在线")
+    @ExcelProperty(index = 6, value = "是否在线")
     @ColumnWidth(15)
     private Boolean connected;
 
-    @ExcelProperty(index = 6, value = "是否启用")
+    @ExcelProperty(index = 7, value = "是否启用")
     @ColumnWidth(15)
     private Boolean enabled;
 

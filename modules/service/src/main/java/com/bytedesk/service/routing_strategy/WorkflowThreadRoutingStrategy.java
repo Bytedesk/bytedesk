@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
@@ -94,7 +96,8 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         WorkflowEntity workflowEntity = getWorkflowEntity(request.getSid());
 
         // 2. 生成会话主题并检查现有会话
-        String topic = TopicUtils.formatOrgWorkflowThreadTopic(workflowEntity.getUid(), request.getUid());
+        String visitorUidForTopic = resolveVisitorUidForThreadTopic(request);
+        String topic = TopicUtils.formatOrgWorkflowThreadTopic(workflowEntity.getUid(), visitorUidForTopic);
         ThreadEntity thread = getOrCreateWorkflowThread(request, workflowEntity, topic);
 
         // 3. 处理现有活跃会话
@@ -177,7 +180,8 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         // 2. 配置线程状态
         String tip = getWorkflowWelcomeMessage(workflowEntity);
         WelcomeContent welcomeContent = WelcomeContentUtils.buildWorkflowWelcomeContent(workflowEntity, tip);
-        thread.setRoboting().setContent(welcomeContent != null ? welcomeContent.toJson() : null);
+        String payload = welcomeContent != null ? welcomeContent.toJson() : null;
+        thread.setRoboting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, tip, payload).toJson());
 
         // 3. 设置工作流信息 - 使用统一的转换方法
         String workflowString = ServiceConvertUtils.convertToWorkflowProtobufString(workflowEntity);

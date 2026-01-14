@@ -15,7 +15,7 @@ package com.bytedesk.core.calendar;
 
 
 import com.bytedesk.core.base.BaseResponse;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import java.time.ZonedDateTime;
 
@@ -46,11 +46,17 @@ public class CalendarResponse extends BaseResponse {
 
     private Integer order;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private ZonedDateTime startAt;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    public String getStartAt() {
+        return BdDateUtils.formatDatetimeToString(startAt);
+    }
+
     private ZonedDateTime endAt;
+
+    public String getEndAt() {
+        return BdDateUtils.formatDatetimeToString(endAt);
+    }
 
     private Boolean allDay;
 
@@ -58,7 +64,10 @@ public class CalendarResponse extends BaseResponse {
 
     private String status;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private ZonedDateTime remindAt;
+
+    public String getRemindAt() {
+        return BdDateUtils.formatDatetimeToString(remindAt);
+    }
 
 }

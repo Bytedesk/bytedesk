@@ -372,7 +372,7 @@ public class TicketRestService
                 .type(ThreadTypeEnum.TICKET.name())
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .topic(topic)
-                .hide(true) // 默认隐藏
+                .hide(TicketTypeEnum.INTERNAL == ticketType) // 内部工单暂时隐藏
                 .user(ticketThreadUserJson)
                 // .userUid(owner.getUid())
                 // .owner(owner)

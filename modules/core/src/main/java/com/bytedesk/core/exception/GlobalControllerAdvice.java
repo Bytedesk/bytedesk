@@ -16,7 +16,6 @@ package com.bytedesk.core.exception;
 import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-// import org.apache.coyote.BadRequestException; // tomcat
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,7 +27,6 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
-// import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -74,17 +72,24 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USER_SIGNUP_FIRST));
+        // 登录/鉴权失败：返回 401，前端统一弹出提示并可引导去登录
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_USER_SIGNUP_FIRST, HttpStatus.UNAUTHORIZED.value()));
     }
 
     @ExceptionHandler(EmailNotFoundException.class)
     public ResponseEntity<?> handleEmailNotFoundException(EmailNotFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_EMAIL_SIGNUP_FIRST));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_EMAIL_SIGNUP_FIRST, HttpStatus.UNAUTHORIZED.value()));
     }
 
     @ExceptionHandler(MobileNotFoundException.class)
     public ResponseEntity<?> handleMobileNotFoundException(MobileNotFoundException e) {
-        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_MOBILE_SIGNUP_FIRST));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_MOBILE_SIGNUP_FIRST, HttpStatus.UNAUTHORIZED.value()));
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -94,17 +99,24 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(NotLoginException.class)
     public ResponseEntity<?> handleNotLoginException(NotLoginException e) {
-        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_LOGIN_REQUIRED));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_LOGIN_REQUIRED, HttpStatus.UNAUTHORIZED.value()));
     }
 
     @ExceptionHandler(UserDisabledException.class)
     public ResponseEntity<?> handleUserDisabledException(UserDisabledException e) {
-        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USER_DISABLED));
+        // 账号被禁用：返回 403（与 token 过期的 401 区分开）
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_USER_DISABLED, HttpStatus.FORBIDDEN.value()));
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<?> handleForbiddenException(ForbiddenException e) {
-        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_FORBIDDEN_ACCESS));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_FORBIDDEN_ACCESS, HttpStatus.FORBIDDEN.value()));
     }
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
@@ -138,8 +150,15 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
-        // 统一记录未显式处理的运行时异常
-        log.error("not handled exception 1", e);
+        // 对于已知的业务异常类型，使用debug级别而不是error级别
+        if (e instanceof org.springframework.security.access.AccessDeniedException) {
+            log.debug("Access denied: {}", e.getMessage());
+        } else if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+            log.debug("Duplicate entry exception: {}", e.getMessage());
+        } else {
+            // 其他未显式处理的运行时异常
+            log.error("not handled exception", e);
+        }
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 

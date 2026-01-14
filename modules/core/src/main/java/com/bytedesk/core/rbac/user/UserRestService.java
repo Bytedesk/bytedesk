@@ -13,20 +13,30 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +50,8 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     private final AuthService authService;
 
     private final UserService userService;
+
+    private final UserDetailsServiceImpl userDetailsService;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -89,6 +101,135 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    /**
+     * 获取当前用户所属组织列表（从 userOrganizationRoles + currentOrganization 归并去重）。
+     */
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<OrganizationResponseSimple> getOrganizations() {
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new RuntimeException("Login required");
+        }
+
+        // 直接查库拿 managed entity，避免从缓存拿到 detached entity 导致懒加载失败
+        UserEntity managedUser = userRepository.findByUid(authUser.getUid())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 保持插入顺序，优先把 currentOrganization 放在第一位
+        LinkedHashMap<String, OrganizationResponseSimple> result = new LinkedHashMap<>();
+
+        if (managedUser.getCurrentOrganization() != null
+                && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
+            OrganizationEntity org = managedUser.getCurrentOrganization();
+            result.put(org.getUid(), ConvertUtils.toOrganizationResponseSimple(org));
+        }
+
+        if (managedUser.getUserOrganizationRoles() != null) {
+            for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
+                if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                    continue;
+                }
+                OrganizationEntity org = uor.getOrganization();
+                result.putIfAbsent(org.getUid(), ConvertUtils.toOrganizationResponseSimple(org));
+            }
+        }
+
+        return new ArrayList<>(result.values());
+    }
+
+    /**
+     * 切换当前组织：
+     * - 校验用户是否属于该组织（superUser 允许任意已存在组织）
+     * - 更新 currentOrganization
+     * - 同步 currentRoles 为该组织维度的角色集合，并确保包含 ROLE_USER
+     * - 刷新 SecurityContext，保证后续请求立即使用新的 orgUid/roles
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public UserResponse switchCurrentOrganization(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new RuntimeException("Login required");
+        }
+
+        UserEntity managedUser = userRepository.findByUid(authUser.getUid())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // membership check
+        if (!managedUser.isSuperUser()) {
+            boolean isMember = false;
+
+            if (managedUser.getCurrentOrganization() != null
+                    && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())
+                    && orgUid.equals(managedUser.getCurrentOrganization().getUid())) {
+                isMember = true;
+            }
+
+            if (!isMember && managedUser.getUserOrganizationRoles() != null) {
+                for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
+                    if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                        continue;
+                    }
+                    if (orgUid.equals(uor.getOrganization().getUid())) {
+                        isMember = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!isMember) {
+                throw new RuntimeException("Access denied");
+            }
+        }
+
+        // 1) switch current organization
+        userService.ensureCurrentOrganization(managedUser, orgUid);
+
+        // 2) sync currentRoles from userOrganizationRoles for that org
+        managedUser.getUserOrganizationRoles().removeIf(u -> u == null || u.getOrganization() == null || !StringUtils.hasText(u.getOrganization().getUid()));
+
+        Set<com.bytedesk.core.rbac.role.RoleEntity> rolesForOrg = new HashSet<>();
+        for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
+            if (uor.getOrganization() != null && orgUid.equals(uor.getOrganization().getUid()) && uor.getRoles() != null) {
+                rolesForOrg.addAll(uor.getRoles());
+                break;
+            }
+        }
+
+        managedUser.getCurrentRoles().clear();
+        managedUser.getCurrentRoles().addAll(rolesForOrg);
+
+        // 3) ensure ROLE_USER in the new org context
+        UserEntity ensured = userService.addRoleUser(managedUser);
+
+        // 4) persist + refresh cache
+        UserEntity saved = userService.save(ensured);
+
+        // 5) refresh security context so AuthService.getUser() sees latest org/roles immediately
+        try {
+            Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+            String platform = StringUtils.hasText(saved.getPlatform()) ? saved.getPlatform() : PlatformEnum.BYTEDESK.name();
+            UserDetailsImpl refreshedDetails = userDetailsService.loadUserByUsernameAndPlatform(saved.getUsername(), platform);
+
+            UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                    refreshedDetails,
+                    currentAuth != null ? currentAuth.getCredentials() : null,
+                    refreshedDetails.getAuthorities());
+
+            if (currentAuth != null) {
+                newAuth.setDetails(currentAuth.getDetails());
+            }
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+        } catch (Exception ignored) {
+            // If refresh fails, switching is still persisted; client can re-fetch profile.
+        }
+
+        return convertToResponse(saved);
     }
 
     @Override
@@ -149,12 +290,16 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
                 userEntity.setDescription(request.getDescription());
             }
             if (StringUtils.hasText(request.getMobile())) {
+                // 禁止将其他用户手机号设置为超管手机号
+                userService.validateNotUsingSuperCredentials(null, request.getMobile(), targetUid);
                 userEntity.setMobile(request.getMobile());
             }
             if (request.getMobileVerified() != null) {
                 userEntity.setMobileVerified(request.getMobileVerified());
             }
             if (StringUtils.hasText(request.getEmail())) {
+                // 禁止将其他用户邮箱设置为超管邮箱
+                userService.validateNotUsingSuperCredentials(request.getEmail(), null, targetUid);
                 userEntity.setEmail(request.getEmail());
             }
             if (request.getEmailVerified() != null) {

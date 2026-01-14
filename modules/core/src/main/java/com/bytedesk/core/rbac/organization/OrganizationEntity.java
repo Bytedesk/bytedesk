@@ -53,7 +53,6 @@ public class OrganizationEntity extends BaseEntityNoOrg {
 
     @NotBlank
     /** name should be unique */
-    @Column(unique = true)
     private String name;
 
     // logo
@@ -61,7 +60,6 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     private String logo = AvatarConsts.getDefaultAvatarUrl();
 
     // organization code, 可读性强，供用户搜索
-    @Column(unique = true)
     private String code;
 
     @Builder.Default

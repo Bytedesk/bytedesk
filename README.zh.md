@@ -4,8 +4,8 @@
 
 ## 语言
 
-- [English](./README.md)
-- [中文](./README.zh.md)
+- [English](./readme.md)
+- [中文](./readme.zh.md)
 
 ![weiyu](./images/nin1.png)
 
@@ -150,6 +150,7 @@ bytedesk/
 ## 开源客户端
 
 - [桌面客户端](https://github.com/Bytedesk/bytedesk-desktop)
+- [QT桌面客户端](https://github.com/Bytedesk/bytedesk-qt)
 - [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
 - [SipPhone](https://github.com/Bytedesk/bytedesk-phone)
 - [视频会议](https://github.com/Bytedesk/bytedesk-conference)

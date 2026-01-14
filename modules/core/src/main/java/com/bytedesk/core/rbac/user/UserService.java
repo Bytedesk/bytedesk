@@ -107,6 +107,9 @@ public class UserService {
             throw new RuntimeException("email or mobile is required..!!");
         }
 
+        // 保护超级管理员账号：禁止创建/注册与超管相同的邮箱/手机号
+        validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndPlatform(request.getEmail(), platform)) {
             throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
@@ -317,6 +320,8 @@ public class UserService {
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
             if (StringUtils.hasText(request.getEmail())) {
+                // 保护超级管理员账号：禁止将邮箱改为与超管相同（除非本人就是超管）
+                validateNotUsingSuperCredentials(request.getEmail(), null, user.getUid());
                 // 如果新邮箱跟旧邮箱不同，需要首先判断新邮箱是否已经存在，如果存在则抛出异常
                 if (!request.getEmail().equals(user.getEmail())) {
                     if (existsByEmailAndPlatform(request.getEmail(),
@@ -344,6 +349,8 @@ public class UserService {
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
             if (StringUtils.hasText(request.getMobile())) {
+                // 保护超级管理员账号：禁止将手机号改为与超管相同（除非本人就是超管）
+                validateNotUsingSuperCredentials(null, request.getMobile(), user.getUid());
                 // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
                 if (!request.getMobile().equals(user.getMobile())) {
                     if (existsByMobileAndPlatform(request.getMobile(),
@@ -367,6 +374,9 @@ public class UserService {
     @Transactional
     public UserEntity createUserFromMember(UserRequest request) {
         //
+        // 保护超级管理员账号：禁止从成员创建出与超管相同邮箱/手机号的用户
+        validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+
         if (StringUtils.hasText(request.getMobile())
                 && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
             Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), request.getPlatform());
@@ -420,6 +430,33 @@ public class UserService {
         //
         user = addRoleUser(user);
         return user;
+    }
+
+    /**
+     * 禁止普通用户占用超级管理员的邮箱/手机号。
+     * - 仅以数据库中的 superUser=true 为准（避免在其他地方读取 bytedeskProperties 的邮箱/手机号）
+     * - targetUid == 超管 uid 时允许（即超管本人更新/使用自身邮箱手机号）
+     */
+    public void validateNotUsingSuperCredentials(String email, String mobile, String targetUid) {
+        Optional<UserEntity> superOptional = userRepository.findFirstBySuperUserAndDeletedFalse(true);
+        if (superOptional.isEmpty()) {
+            return;
+        }
+
+        UserEntity superUser = superOptional.get();
+        if (StringUtils.hasText(targetUid) && targetUid.equals(superUser.getUid())) {
+            return;
+        }
+
+        if (StringUtils.hasText(email) && StringUtils.hasText(superUser.getEmail())
+                && email.trim().equalsIgnoreCase(superUser.getEmail().trim())) {
+            throw new EmailExistsException("邮箱为系统超级管理员保留，禁止使用");
+        }
+
+        if (StringUtils.hasText(mobile) && StringUtils.hasText(superUser.getMobile())
+                && mobile.trim().equals(superUser.getMobile().trim())) {
+            throw new MobileExistsException("手机号为系统超级管理员保留，禁止使用");
+        }
     }
 
     /**
@@ -580,59 +617,67 @@ public class UserService {
 
     @Transactional
     public UserEntity addRole(UserEntity user, String roleName) {
+        if (user == null) {
+            throw new RuntimeException("User is null");
+        }
+
+        // Always operate on a managed entity to avoid merge side-effects on join tables.
+        // New user objects may not have an id yet (e.g., createUserFromMember); persist first.
+        UserEntity managedUser;
+        if (user.getId() == null) {
+            managedUser = userRepository.save(user);
+        } else {
+            managedUser = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new RuntimeException("User not found: " + user.getUid()));
+        }
+
+        // Ensure organization context from input user is applied to the managed instance.
+        // Some callers set currentOrganization on the detached instance and then call addRole.
+        String orgUid = null;
+        if (user.getCurrentOrganization() != null && StringUtils.hasText(user.getCurrentOrganization().getUid())) {
+            orgUid = user.getCurrentOrganization().getUid();
+        }
+        ensureCurrentOrganization(managedUser, orgUid);
+
         Optional<RoleEntity> roleOptional = roleRestService.findByNamePlatform(roleName);
-        if (roleOptional.isPresent()) {
-            RoleEntity role = roleOptional.get();
-            
-            // 处理乐观锁冲突：使用重试机制或重新获取最新实体
-            RoleEntity managedRole;
-            try {
-                // 尝试合并实体状态
-                managedRole = entityManager.merge(role);
-            } catch (jakarta.persistence.OptimisticLockException e) {
-                log.warn("乐观锁冲突，重新获取角色实体: {}", roleName);
-                // 重新从数据库获取最新的角色实体
-                Optional<RoleEntity> freshRoleOptional = roleRestService.findByNamePlatform(roleName);
-                if (freshRoleOptional.isPresent()) {
-                    managedRole = freshRoleOptional.get();
-                } else {
-                    throw new RuntimeException("重新获取角色失败: " + roleName);
-                }
+        if (!roleOptional.isPresent()) {
+            throw new RuntimeException("Role not found: " + roleName);
+        }
+
+        RoleEntity role = roleOptional.get();
+        Long roleId = role.getId();
+        if (roleId == null) {
+            throw new RuntimeException("Role id is null for name: " + roleName);
+        }
+        // Avoid entityManager.merge(detachedRole) which may trigger OptimisticLockException
+        // and mark the surrounding transaction rollback-only under concurrent access.
+        RoleEntity managedRole = entityManager.find(RoleEntity.class, roleId);
+        if (managedRole == null) {
+            throw new RuntimeException("Role not found by id: " + roleId + ", name: " + roleName);
+        }
+
+        // Allow ROLE_USER without organization context so auto-registered users have a default role
+        if (managedUser.getCurrentOrganization() == null) {
+            if (!RoleConsts.ROLE_USER.equals(roleName)) {
+                throw new RuntimeException("当前用户未加入任何组织，无法分配角色: " + roleName);
             }
 
-            final RoleEntity targetRole = managedRole;
-
-            // Allow ROLE_USER without organization context so auto-registered users have a default role
-            if (user.getCurrentOrganization() == null) {
-                if (!RoleConsts.ROLE_USER.equals(roleName)) {
-                    throw new RuntimeException("当前用户未加入任何组织，无法分配角色: " + roleName);
-                }
-
-                boolean alreadyHasRole = user.getCurrentRoles().stream()
-                        .anyMatch(r -> r.getId() != null && r.getId().equals(targetRole.getId()));
-                if (!alreadyHasRole) {
-                    user.getCurrentRoles().add(targetRole);
-                }
-
-                try {
-                    return userRepository.save(user);
-                } catch (Exception e) {
-                    log.error("User add role failed..!!", e);
-                    throw new RuntimeException("User add role failed..!!", e);
-                }
-            }
-
-            user.addOrganizationRole(targetRole);
-
-            // 直接保存用户实体
-            try {
-                return userRepository.save(user);
-            } catch (Exception e) {
-                log.error("User add role failed..!!", e);
-                throw new RuntimeException("User add role failed..!!", e);
+            boolean alreadyHasRole = managedUser.getCurrentRoles().stream()
+                    .anyMatch(r -> r.getId() != null && r.getId().equals(managedRole.getId()));
+            if (!alreadyHasRole) {
+                managedUser.getCurrentRoles().add(managedRole);
             }
         } else {
-            throw new RuntimeException("Role not found..!!");
+            managedUser.addOrganizationRole(managedRole);
+        }
+
+        try {
+            return userRepository.save(managedUser);
+        } catch (Exception e) {
+            log.error("User add role failed..!!", e);
+            throw new RuntimeException(
+                    "User add role failed: " + e.getClass().getSimpleName() + ": " + e.getMessage(),
+                    e);
         }
     }
 
@@ -674,8 +719,7 @@ public class UserService {
 
     @Cacheable(value = "admin", unless = "#result == null")
     public Optional<UserEntity> getSuper() {
-        return userRepository.findByUsernameAndPlatformAndDeletedFalse(bytedeskProperties.getEmail(),
-                PlatformEnum.BYTEDESK.name());
+        return userRepository.findFirstBySuperUserAndDeletedFalse(true);
     }
 
     @Cacheable(value = "user:exists", key = "#username + '-' + #platform", unless = "#result == null")

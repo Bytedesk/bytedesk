@@ -17,6 +17,8 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -24,21 +26,23 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TaskListInitializer implements SmartInitializingSingleton {
 
-    private final TaskListRestService task_listRestService;
+    private final TaskListRestService taskListRestService;
+
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
         // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        task_listRestService.initTaskLists(orgUid);
+        taskListRestService.initTaskLists(orgUid);
     }
 
     private void initAuthority() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = TaskListPermissions.TASK_LIST_PREFIX + permission.name();
-        //     authorityService.createForPlatform(permissionValue);
-        // }
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = TaskListPermissions.TASK_LIST_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 
     

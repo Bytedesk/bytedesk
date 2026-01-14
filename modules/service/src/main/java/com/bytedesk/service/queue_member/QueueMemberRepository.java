@@ -45,6 +45,10 @@ public interface QueueMemberRepository
         @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.thread.uid = :threadUid AND qm.deleted = false")
         Optional<QueueMemberEntity> findByThreadUid(@Param("threadUid") String threadUid);
 
+        // 批量查询：用于队列列表展示（减少 N+1）
+        @Query("SELECT qm FROM QueueMemberEntity qm JOIN FETCH qm.thread t WHERE t.uid IN :threadUids AND qm.deleted = false")
+        List<QueueMemberEntity> findByThreadUids(@Param("threadUids") List<String> threadUids);
+
         // 统计指定组织在指定日期范围内的会话总数
         @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.orgUid = :orgUid AND qm.createdAt >= :startDate AND qm.createdAt <= :endDate")
         Long countByOrgUidAndDateBetween(@Param("orgUid") String orgUid, @Param("startDate") ZonedDateTime startDate,
@@ -86,6 +90,12 @@ public interface QueueMemberRepository
         @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.workgroupQueue.uid = :workgroupQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
         Optional<QueueMemberEntity> findFirstWorkgroupQueueMemberByThreadStatus(
                         @Param("workgroupQueueUid") String workgroupQueueUid, @Param("threadStatus") String threadStatus);
+
+        @Lock(LockModeType.PESSIMISTIC_WRITE)
+        @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.workgroupQueue.uid = :workgroupQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
+        List<QueueMemberEntity> findWorkgroupQueueHeadForUpdate(@Param("workgroupQueueUid") String workgroupQueueUid,
+                        @Param("threadStatus") String threadStatus,
+                        Pageable pageable);
 
         @Query("SELECT qm FROM QueueMemberEntity qm WHERE qm.workgroupQueue.uid = :workgroupQueueUid AND qm.deleted = false AND qm.thread.status = :threadStatus ORDER BY qm.queueNumber ASC")
         List<QueueMemberEntity> findWorkgroupQueueMembersByThreadStatus(

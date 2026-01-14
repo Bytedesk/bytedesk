@@ -18,6 +18,7 @@ import com.bytedesk.core.base.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,6 +52,36 @@ public class TaskResponse extends BaseResponse {
     private String status;
 
     private String priority;
+
+    /**
+     * Task images (URLs)
+     */
+    private List<String> images;
+
+    /**
+     * Comment count
+     */
+    private Integer commentCount;
+
+    /**
+     * Like count
+     */
+    private Integer likeCount;
+
+    /**
+     * Favorite/collect count
+     */
+    private Integer favoriteCount;
+
+    /**
+     * Whether current user liked this task
+     */
+    private Boolean liked;
+
+    /**
+     * Whether current user favorited/collected this task
+     */
+    private Boolean favorited;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private ZonedDateTime startAt;

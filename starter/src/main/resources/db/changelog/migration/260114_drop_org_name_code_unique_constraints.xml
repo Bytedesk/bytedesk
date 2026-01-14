@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260114-drop-org-name-code-unique-constraints" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_organization" />
+        </preConditions>
+        <comment>
+            Drop unique constraints/indexes on bytedesk_core_organization.name/code to support soft-delete re-creation.
+            Implemented with per-DB SQL blocks; unsupported DBs will effectively no-op.
+        </comment>
+
+        <!-- MySQL / MariaDB: drop unique indexes for single columns name/code if present (index names may vary). -->
+        <sql dbms="mysql,mariadb" splitStatements="true" stripComments="true">
+            -- Drop unique index for column `name` if exists
+            SET @idx_name := (
+                SELECT INDEX_NAME
+                FROM information_schema.STATISTICS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'bytedesk_core_organization'
+                  AND COLUMN_NAME = 'name'
+                  AND NON_UNIQUE = 0
+                LIMIT 1
+            );
+            SET @sql_name := IF(@idx_name IS NULL,
+                'SELECT 1',
+                CONCAT('ALTER TABLE bytedesk_core_organization DROP INDEX `', @idx_name, '`'));
+            PREPARE stmt_name FROM @sql_name;
+            EXECUTE stmt_name;
+            DEALLOCATE PREPARE stmt_name;
+
+            -- Drop unique index for column `code` if exists
+            SET @idx_code := (
+                SELECT INDEX_NAME
+                FROM information_schema.STATISTICS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'bytedesk_core_organization'
+                  AND COLUMN_NAME = 'code'
+                  AND NON_UNIQUE = 0
+                LIMIT 1
+            );
+            SET @sql_code := IF(@idx_code IS NULL,
+                'SELECT 1',
+                CONCAT('ALTER TABLE bytedesk_core_organization DROP INDEX `', @idx_code, '`'));
+            PREPARE stmt_code FROM @sql_code;
+            EXECUTE stmt_code;
+            DEALLOCATE PREPARE stmt_code;
+        </sql>
+
+        <!-- PostgreSQL: drop any UNIQUE constraints that exactly match single-column (name) or (code). -->
+        <sql dbms="postgresql" splitStatements="false" stripComments="true"><![CDATA[
+DO $$
+DECLARE
+  c record;
+BEGIN
+  FOR c IN
+    SELECT con.conname
+    FROM pg_constraint con
+    JOIN pg_class rel ON rel.oid = con.conrelid
+    JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace
+    WHERE con.contype = 'u'
+      AND rel.relname = 'bytedesk_core_organization'
+      AND nsp.nspname = current_schema()
+      AND (
+        con.conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = rel.oid AND attname = 'name')]
+        OR
+        con.conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = rel.oid AND attname = 'code')]
+      )
+  LOOP
+    EXECUTE format('ALTER TABLE %I.%I DROP CONSTRAINT %I', current_schema(), 'bytedesk_core_organization', c.conname);
+  END LOOP;
+END $$;
+        ]]></sql>
+
+        <rollback>
+            <!-- No rollback: previous unique constraint/index names can vary by environment. -->
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

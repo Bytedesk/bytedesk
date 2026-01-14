@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -184,13 +185,33 @@ public class MessageUnreadRestService
             String orgUid = extraObject.getOrgUid();
             messageUnread.setOrgUid(orgUid);
         }
-        MessageUnreadEntity savedMessageUnread = save(messageUnread);
-        if (savedMessageUnread == null) {
-            // 如果保存失败，删除 Redis 标记
+        try {
+            MessageUnreadEntity savedMessageUnread = save(messageUnread);
+            if (savedMessageUnread == null) {
+                // 如果保存失败，删除 Redis 标记
+                redisService.removeMessageExists(uid);
+                throw new RuntimeException("Failed to save MessageUnreadEntity");
+            }
+            log.info("create message unread: uid {}, content {}", savedMessageUnread.getUid(), savedMessageUnread.getContent());
+        } catch (DataIntegrityViolationException e) {
+            // 处理唯一键冲突异常 - 可能是并发插入导致的
+            if (e.getMessage() != null && e.getMessage().contains("Duplicate entry")) {
+                log.debug("Duplicate entry for message unread uid: {}, treating as success", uid);
+                // 对于未读消息，重复插入表示消息已存在，这是可接受的
+                return;
+            }
+            // 其他数据完整性异常，删除 Redis 标记并重新抛出
             redisService.removeMessageExists(uid);
-            throw new RuntimeException("Failed to save MessageUnreadEntity");
+            throw new RuntimeException("Failed to save MessageUnreadEntity due to data integrity violation", e);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // 乐观锁冲突，记录日志但不抛出异常
+            log.debug("Optimistic locking conflict for message unread uid: {}, treating as success", uid);
+            return;
+        } catch (Exception e) {
+            // 其他异常，删除 Redis 标记并重新抛出
+            redisService.removeMessageExists(uid);
+            throw new RuntimeException("Failed to save MessageUnreadEntity: " + e.getMessage(), e);
         }
-        log.info("create message unread: uid {}, content {}", savedMessageUnread.getUid(), savedMessageUnread.getContent());
         
         // 同步更新会话未读消息数
         try {

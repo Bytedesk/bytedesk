@@ -86,7 +86,12 @@ public class AuthController {
     @PostMapping("/login")
     @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
-        log.debug("login {}", authRequest.toString());
+        // Avoid logging sensitive fields (password/passwordHash/passwordSalt)
+        log.debug("login request: username={}, platform={}, channel={}, deviceUid={}",
+            authRequest.getUsername(),
+            authRequest.getPlatform(),
+            authRequest.getChannel(),
+            authRequest.getDeviceUid());
 
         // 性能测试模式：参考 IpAccessInterceptor，开启 disableIpFilter 后仅保留最基本登录验证流程
         boolean performanceTestingEnabled = bytedeskProperties.isDisableIpFilter();
@@ -154,8 +159,24 @@ public class AuthController {
             return ResponseEntity.ok(JsonResult.success(authResponse));
             
         } catch (Exception e) {
-            log.error("Authentication failed for user: {}: {}", authRequest.getUsername(), e.getMessage());
-            if (StringUtils.hasText(authRequest.getPasswordHash())) {
+            // Always log stacktrace for troubleshooting; do not include raw credential fields
+            log.error("Authentication failed: username={}, platform={}, channel={}",
+                    authRequest.getUsername(), authRequest.getPlatform(), authRequest.getChannel(), e);
+
+            // Only return decrypt-specific message when the exception strongly indicates a decrypt issue.
+            // (AuthService may also swallow decrypt errors and return null; in that case this catch won't run.)
+            String msg = e.getMessage();
+            boolean looksLikeDecryptError = StringUtils.hasText(authRequest.getPasswordHash())
+                    && (StringUtils.hasText(msg)
+                            && (msg.contains("密码解密失败")
+                                    || msg.contains("BadPadding")
+                                    || msg.contains("IllegalBlockSize")
+                                    || msg.contains("Base64")
+                                    || msg.contains("生成密钥失败")
+                                    || msg.contains("解密失败")));
+            if (looksLikeDecryptError) {
+                log.warn("Password decrypt failed: username={}, platform={}, channel={} (passwordHash present)",
+                        authRequest.getUsername(), authRequest.getPlatform(), authRequest.getChannel());
                 return ResponseEntity.ok().body(JsonResult.error("密码解密失败，请检查密码格式", -1, false));
             }
             // 性能测试模式下，避免额外的失败次数写入/锁定逻辑

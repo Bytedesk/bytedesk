@@ -99,6 +99,13 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     private String timeoutRemindTip = com.bytedesk.core.constant.I18Consts.I18N_AGENT_TIMEOUT_TIP;
 
     /**
+     * Whether agent can manually close thread/session
+     * Default: true
+     */
+    @lombok.Builder.Default
+    private Boolean allowAgentCloseThread = true;
+
+    /**
      * Desktop right panel dynamic tabs (published)
      */
     @lombok.Builder.Default

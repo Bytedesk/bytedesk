@@ -15,9 +15,7 @@ package com.bytedesk.service.visitor_thread;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,9 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
@@ -35,11 +31,6 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.message.IMessageSendService;
-import com.bytedesk.core.message.MessageEntity;
-import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -54,21 +45,16 @@ import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
-import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
-import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
-import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsResponseVisitor;
-import com.bytedesk.service.utils.ThreadMessageUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,15 +77,10 @@ public class VisitorThreadService
 
     private final AgentRestService agentRestService;
 
-    private final IMessageSendService messageSendService;
-
-    private final MessageRestService messageRestService;
-
     // For debug preview: allow overriding settings by uid when debug=true
     private final AgentSettingsRestService agentSettingsRestService;
     private final RobotSettingsRestService robotSettingsRestService;
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
-    private final WorkgroupRestService workgroupRestService;
 
     @Cacheable(value = "visitor_thread", key = "#uid", unless = "#result == null")
     @Override
@@ -486,315 +467,6 @@ public class VisitorThreadService
     public VisitorThreadResponse update(VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    /**
-     * 自动提醒客服或关闭会话
-     */
-    @Async
-    public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
-        // log.info("autoCloseThread size {}", threads.size());
-        threads.forEach(this::processThreadTimeout);
-    }
-
-    /**
-     * 处理单个Thread会话的超时逻辑
-     */
-    private void processThreadTimeout(ThreadEntity thread) {
-        // 处理排队等待超时，如果已处理则直接返回，不再执行后续逻辑
-        if (handleQueueWaitTimeout(thread)) {
-            return;
-        }
-
-        long diffInMinutes = calculateThreadTimeoutMinutes(thread);
-        if (diffInMinutes < 0) {
-            return; // 时间异常，跳过处理
-        }
-
-        // 处理自动关闭
-        handleAutoClose(thread, diffInMinutes);
-
-        // 处理超时提醒
-        handleTimeoutReminder(thread, diffInMinutes);
-    }
-
-    /**
-     * 计算线程超时分钟数
-     */
-    private long calculateThreadTimeoutMinutes(ThreadEntity thread) {
-        // 使用BdDateUtils.toTimestamp确保时区一致性，都使用Asia/Shanghai时区
-        long currentTimeMillis = BdDateUtils.toTimestamp(BdDateUtils.now());
-        long updatedAtMillis = BdDateUtils.toTimestamp(thread.getUpdatedAt());
-
-        // 移除Math.abs()，确保时间顺序正确
-        long diffInMilliseconds = currentTimeMillis - updatedAtMillis;
-
-        // 如果updatedAt在未来，说明时间有问题，跳过处理
-        if (diffInMilliseconds < 0) {
-            log.warn("Thread {} updatedAt is in the future, skipping auto close check", thread.getUid());
-            return -1;
-        }
-
-        // 转换为分钟
-        return TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds);
-    }
-
-    /**
-     * 处理自动关闭逻辑
-     */
-    private void handleAutoClose(ThreadEntity thread, long diffInMinutes) {
-        ServiceSettingsResponseVisitor settings = parseThreadSettings(thread);
-        double autoCloseValue = getAutoCloseMinutes(settings);
-
-        if (diffInMinutes > autoCloseValue) {
-            threadRestService.autoClose(thread);
-        }
-    }
-
-    /**
-     * 解析线程设置
-     */
-    private ServiceSettingsResponseVisitor parseThreadSettings(ThreadEntity thread) {
-        if (!StringUtils.hasText(thread.getExtra())) {
-            return null;
-        }
-
-        try {
-            return JSON.parseObject(thread.getExtra(), ServiceSettingsResponseVisitor.class);
-        } catch (Exception e) {
-            log.warn("Failed to parse thread extra JSON for thread {}: {}", thread.getUid(), e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * 获取自动关闭分钟数
-     */
-    private double getAutoCloseMinutes(ServiceSettingsResponseVisitor settings) {
-        if (settings == null) {
-            return 30.0; // 默认30分钟
-        }
-
-        Double autoCloseMinutes = settings.getAutoCloseMin();
-        return (autoCloseMinutes != null) ? autoCloseMinutes : 30.0;
-    }
-
-    /**
-     * 处理超时提醒逻辑
-     */
-    private void handleTimeoutReminder(ThreadEntity thread, long diffInMinutes) {
-        UserProtobuf agentProtobuf = thread.getAgentProtobuf();
-        if (agentProtobuf == null || !StringUtils.hasText(agentProtobuf.getUid())) {
-            return;
-        }
-
-        Optional<AgentEntity> agentOpt = agentRestService.findByUid(agentProtobuf.getUid());
-        if (!agentOpt.isPresent()) {
-            return;
-        }
-
-        AgentEntity agent = agentOpt.get();
-        if (diffInMinutes <= agent.getTimeoutRemindTime()) {
-            return;
-        }
-
-        processAgentTimeoutReminder(thread, agent);
-    }
-
-    /**
-     * 处理客服超时提醒
-     */
-    private void processAgentTimeoutReminder(ThreadEntity thread, AgentEntity agent) {
-        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
-        if (!queueMemberOpt.isPresent()) {
-            return;
-        }
-
-        QueueMemberEntity queueMember = queueMemberOpt.get();
-        if (queueMember.getAgentTimeout()) {
-            return; // 已经超时，不再处理
-        }
-
-        if (shouldSendTimeoutReminder(queueMember)) {
-            sendRemindMessage(queueMember, thread, agent);
-        }
-    }
-
-    /**
-     * 判断是否应该发送超时提醒
-     */
-    private boolean shouldSendTimeoutReminder(QueueMemberEntity queueMember) {
-        // 访客最后发送消息时间为空，不需要提醒
-        if (queueMember.getVisitorLastMessageAt() == null) {
-            return false;
-        }
-
-        // 客服最后回复时间为空，需要提醒
-        if (queueMember.getAgentLastResponseAt() == null) {
-            return true;
-        }
-
-        // 访客最后发送消息时间 大于 客服最后回复时间，需要提醒
-        return queueMember.getVisitorLastMessageAt().isAfter(queueMember.getAgentLastResponseAt());
-    }
-
-    private void sendRemindMessage(QueueMemberEntity queueMember, ThreadEntity thread, AgentEntity agent) {
-        // 只设置首次超时时间，后续不再更新
-        if (queueMember.getAgentTimeoutAt() == null) {
-            queueMember.setAgentTimeoutAt(BdDateUtils.now());
-            queueMember.setAgentTimeout(true);
-        }
-        // 更新超时次数
-        queueMember.setAgentTimeoutCount(queueMember.getAgentTimeoutCount() + 1);
-        // 保存队列成员信息
-        queueMemberRestService.saveAsyncBestEffort(queueMember);
-        // 发送会话超时提醒
-        MessageProtobuf messageProtobuf = MessageUtils.createAgentReplyTimeoutMessage(thread,
-                agent.getTimeoutRemindTip());
-        messageSendService.sendProtobufMessage(messageProtobuf);
-    }
-
-    /**
-     * 处理排队等待超时逻辑
-     * @return true 如果会话已被处理（触发了离线留言），false 如果未处理
-     */
-    private boolean handleQueueWaitTimeout(ThreadEntity thread) {
-        if (!thread.isQueuing()) {
-            return false;
-        }
-
-        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
-        if (!queueMemberOpt.isPresent()) {
-            return false;
-        }
-
-        QueueMemberEntity queueMember = queueMemberOpt.get();
-        if (Boolean.TRUE.equals(queueMember.getMessageLeave()) || queueMember.getVisitorEnqueueAt() == null) {
-            return false;
-        }
-
-        QueueSettingsEntity queueSettings = resolveQueueSettings(thread);
-        int maxWaitSeconds = resolveQueueMaxWaitSeconds(queueSettings);
-        if (maxWaitSeconds <= 0) {
-            return false;
-        }
-
-        long waitedSeconds = Duration.between(queueMember.getVisitorEnqueueAt(), BdDateUtils.now()).getSeconds();
-        if (waitedSeconds < maxWaitSeconds) {
-            return false;
-        }
-
-        triggerQueueLeaveMessage(thread, queueMember);
-        return true;
-    }
-
-    public MessageProtobuf handleQueueOverflowLeaveMessage(ThreadEntity thread, QueueMemberEntity queueMember) {
-        Assert.notNull(thread, "ThreadEntity must not be null");
-        Assert.notNull(queueMember, "QueueMemberEntity must not be null");
-        return triggerQueueLeaveMessage(thread, queueMember);
-    }
-
-    private QueueSettingsEntity resolveQueueSettings(ThreadEntity thread) {
-        try {
-            if (thread.isAgentType()) {
-                String agentUid = TopicUtils.getAgentUidFromThreadTopic(thread.getTopic());
-                return agentRestService.findByUid(agentUid)
-                        .map(this::resolveQueueSettingsFromAgent)
-                        .orElse(null);
-            } else if (thread.isWorkgroupType()) {
-                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(thread.getTopic());
-                return workgroupRestService.findByUid(workgroupUid)
-                        .map(this::resolveQueueSettingsFromWorkgroup)
-                        .orElse(null);
-            }
-        } catch (Exception e) {
-            log.debug("Failed to resolve queue settings for thread {}: {}", thread.getUid(), e.getMessage());
-        }
-        return null;
-    }
-
-    private QueueSettingsEntity resolveQueueSettingsFromAgent(AgentEntity agent) {
-        if (agent.getSettings() == null) {
-            return null;
-        }
-        QueueSettingsEntity settings = agent.getSettings().getQueueSettings();
-        if (settings == null) {
-            settings = agent.getSettings().getDraftQueueSettings();
-        }
-        return settings;
-    }
-
-    private QueueSettingsEntity resolveQueueSettingsFromWorkgroup(WorkgroupEntity workgroup) {
-        if (workgroup.getSettings() == null) {
-            return null;
-        }
-        QueueSettingsEntity settings = workgroup.getSettings().getQueueSettings();
-        if (settings == null) {
-            settings = workgroup.getSettings().getDraftQueueSettings();
-        }
-        return settings;
-    }
-
-    private int resolveQueueMaxWaitSeconds(QueueSettingsEntity queueSettings) {
-        if (queueSettings == null) {
-            return QueueSettingsEntity.DEFAULT_MAX_WAIT_TIME_SECONDS;
-        }
-        return queueSettings.resolveMaxWaitTimeSeconds();
-    }
-
-    private MessageProtobuf triggerQueueLeaveMessage(ThreadEntity thread, QueueMemberEntity queueMember) {
-        String leaveMessageTip = resolveLeaveMessageTip(thread);
-
-        thread.setOffline().setContent(leaveMessageTip);
-        ThreadEntity savedThread = threadRestService.save(thread);
-
-        queueMember.setMessageLeave(true);
-        queueMember.setMessageLeaveAt(BdDateUtils.now());
-        queueMember.setVisitorLeavedAt(BdDateUtils.now());
-        queueMemberRestService.saveAsyncBestEffort(queueMember);
-
-        MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(leaveMessageTip, savedThread);
-        messageRestService.save(message);
-        MessageProtobuf protobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
-        messageSendService.sendProtobufMessage(protobuf);
-        return protobuf;
-    }
-
-    private String resolveLeaveMessageTip(ThreadEntity thread) {
-        try {
-            if (thread.isAgentType()) {
-                String agentUid = TopicUtils.getAgentUidFromThreadTopic(thread.getTopic());
-                return agentRestService.findByUid(agentUid)
-                        .map(this::resolveLeaveMessageTip)
-                        .orElse(I18Consts.I18N_MESSAGE_LEAVE_TIP);
-            } else if (thread.isWorkgroupType()) {
-                String workgroupUid = TopicUtils.getWorkgroupUidFromThreadTopic(thread.getTopic());
-                return workgroupRestService.findByUid(workgroupUid)
-                        .map(this::resolveLeaveMessageTip)
-                        .orElse(I18Consts.I18N_MESSAGE_LEAVE_TIP);
-            }
-        } catch (Exception e) {
-            log.debug("Failed to resolve leave message tip for thread {}: {}", thread.getUid(), e.getMessage());
-        }
-        return I18Consts.I18N_MESSAGE_LEAVE_TIP;
-    }
-
-    private String resolveLeaveMessageTip(AgentEntity agent) {
-        if (agent.getSettings() != null
-                && agent.getSettings().getMessageLeaveSettings() != null
-                && StringUtils.hasText(agent.getSettings().getMessageLeaveSettings().getMessageLeaveTip())) {
-            return agent.getSettings().getMessageLeaveSettings().getMessageLeaveTip();
-        }
-        return I18Consts.I18N_MESSAGE_LEAVE_TIP;
-    }
-
-    private String resolveLeaveMessageTip(WorkgroupEntity workgroup) {
-        if (workgroup.getSettings() != null
-                && workgroup.getSettings().getMessageLeaveSettings() != null
-                && StringUtils.hasText(workgroup.getSettings().getMessageLeaveSettings().getMessageLeaveTip())) {
-            return workgroup.getSettings().getMessageLeaveSettings().getMessageLeaveTip();
-        }
-        return I18Consts.I18N_MESSAGE_LEAVE_TIP;
     }
 
     @Override

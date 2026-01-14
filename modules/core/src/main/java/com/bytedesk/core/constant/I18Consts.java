@@ -217,12 +217,12 @@ public class I18Consts {
 
     public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
     public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "请首先在管理后台配置大模型apiUrl和apiKey。如果已经配置，请检查大模型提供商账号是否欠费。"; // 服务暂时不可用，请稍后重试
-    public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》选择分类-》大模型Agent"; // 大模型配置提示
-    public static final String I18N_LLM_THREAD_INTENTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-选择分类-》大模型Agent-》意图识别"; // 会话意图识别大模型配置提示
-    public static final String I18N_LLM_THREAD_EMOTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-选择分类-》大模型Agent-》情绪分析"; // 情绪分析大模型配置提示
-    public static final String I18N_LLM_THREAD_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-选择分类-》大模型Agent-》会话总结"; // 工单大模型配置提示
-    public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-选择分类-》大模型Agent-》工单生成"; // 工单大模型配置提示
-    public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-选择分类-》大模型Agent-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
+    public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体"; // 大模型配置提示
+    public static final String I18N_LLM_THREAD_INTENTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》意图识别"; // 会话意图识别大模型配置提示
+    public static final String I18N_LLM_THREAD_EMOTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》情绪分析"; // 情绪分析大模型配置提示
+    public static final String I18N_LLM_THREAD_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》会话总结"; // 工单大模型配置提示
+    public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》工单生成"; // 工单大模型配置提示
+    public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
     
     // AI 服务相关常量
     public static final String I18N_THINKING = "正在思考中..."; // 正在思考中...

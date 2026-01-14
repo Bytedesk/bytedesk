@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/v1/action")
 @Tag(name = "Action Log Management", description = "Action log management APIs for tracking user activities and system events")
 public class ActionRestController extends BaseRestController<ActionRequest, ActionRestService> {
-    
+
     private final ActionRestService actionRestService;
 
     @Operation(summary = "Query Action Logs by Organization", description = "Retrieve action logs for the current organization")
@@ -51,7 +51,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
     public ResponseEntity<?> queryByUser(ActionRequest request) {
-        
+
         Page<ActionResponse> page = actionRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
@@ -61,7 +61,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
     public ResponseEntity<?> queryByUid(ActionRequest request) {
-        
+
         ActionResponse action = actionRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(action));
@@ -71,7 +71,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     @PreAuthorize(ActionPermissions.HAS_ACTION_CREATE)
     @Override
     public ResponseEntity<?> create(@RequestBody ActionRequest request) {
-        
+
         ActionResponse action = actionRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(action));
@@ -81,8 +81,8 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     @PreAuthorize(ActionPermissions.HAS_ACTION_UPDATE)
     @Override
     public ResponseEntity<?> update(@RequestBody ActionRequest request) {
-        
-        ActionResponse action = actionRestService.update(request);  
+
+        ActionResponse action = actionRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(action));
     }
@@ -91,7 +91,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
     @PreAuthorize(ActionPermissions.HAS_ACTION_DELETE)
     @Override
     public ResponseEntity<?> delete(@RequestBody ActionRequest request) {
-        
+
         actionRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
@@ -99,22 +99,19 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    // @ActionAnnotation(title = "action", action = "导出", description = "export action")
+    // @ActionAnnotation(title = "action", action = "导出", description = "export
+    // action")
     @Operation(summary = "Export Action Logs", description = "Export action logs to Excel format")
-        @PreAuthorize(ActionPermissions.HAS_ACTION_EXPORT)
+    @PreAuthorize(ActionPermissions.HAS_ACTION_EXPORT)
     @GetMapping("/export")
     public Object export(ActionRequest request, HttpServletResponse response) {
         return exportTemplate(
-            request,
-            response,
-            actionRestService,
-            ActionExcel.class,
-            "日志",
-            "actions"
-        );
+                request,
+                response,
+                actionRestService,
+                ActionExcel.class,
+                "日志",
+                "actions");
     }
 
-    
-
-    
 }

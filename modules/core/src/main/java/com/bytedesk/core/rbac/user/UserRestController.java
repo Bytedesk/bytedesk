@@ -25,6 +25,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -122,6 +123,32 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
         UserResponse userResponse = userRestService.getProfile();
         
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    /**
+     * 获取当前用户所属组织列表（用于前端组织切换 UI）。
+     */
+    @GetMapping("/organizations")
+    @PreAuthorize(UserPermissions.HAS_USER_READ + " or " + RolePermissions.ROLE_SUPER)
+    public ResponseEntity<?> getOrganizations() {
+
+        java.util.List<OrganizationResponseSimple> organizations = userRestService.getOrganizations();
+
+        return ResponseEntity.ok(JsonResult.success(organizations));
+    }
+
+    /**
+     * 切换当前组织（写入 User.currentOrganization，并同步 currentRoles）。
+     * 请求体使用 BaseRequest 的 orgUid 字段。
+     */
+    @ActionAnnotation(title = "user", action = "switchOrganization", description = "switch current organization")
+    @PostMapping("/switch/organization")
+    @PreAuthorize(UserPermissions.HAS_USER_READ + " or " + RolePermissions.ROLE_SUPER)
+    public ResponseEntity<?> switchOrganization(@RequestBody UserRequest userRequest) {
+
+        UserResponse userResponse = userRestService.switchCurrentOrganization(userRequest.getOrgUid());
+
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
     

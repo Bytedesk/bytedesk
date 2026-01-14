@@ -27,8 +27,8 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -44,9 +44,12 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
+import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadContent;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.service.utils.WelcomeContentUtils;
@@ -68,12 +71,14 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final AgentRestService agentRestService;
     private final ThreadRestService threadRestService;
     private final VisitorThreadService visitorThreadService;
+    private final VisitorThreadTimeoutService visitorThreadTimeoutService;
     private final IMessageSendService messageSendService;
     private final QueueService queueService;
     private final QueueMemberRestService queueMemberRestService;
     private final MessageRestService messageRestService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
+    private final TopicRestService topicRestService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -92,8 +97,9 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      */
     public MessageProtobuf createAgentThread(VisitorRequest visitorRequest) {
         long startTime = System.currentTimeMillis();
+        String visitorUidForTopic = resolveVisitorUidForThreadTopic(visitorRequest);
         log.info("开始创建客服线程 - visitorUid: {}, agentUid: {}",
-                visitorRequest.getUid(), visitorRequest.getSid());
+            visitorUidForTopic, visitorRequest.getSid());
 
         // 1. 验证和获取客服信息
         log.debug("步骤1: 开始获取客服信息 - agentUid: {}", visitorRequest.getSid());
@@ -104,7 +110,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 2. 处理现有线程或创建新线程
         log.debug("步骤2: 开始处理线程创建或获取");
-        String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorRequest.getUid());
+        String topic = TopicUtils.formatOrgAgentThreadTopic(visitorRequest.getSid(), visitorUidForTopic);
         log.debug("生成线程主题: {}", topic);
         ThreadEntity thread = getOrCreateThread(visitorRequest, agentEntity, topic);
         log.info("步骤2完成: 线程处理完成 - threadUid: {}, 状态: {}, 是否新建: {}",
@@ -132,8 +138,9 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      */
     private ThreadEntity getOrCreateThread(VisitorRequest visitorRequest, AgentEntity agentEntity, String topic) {
         long startTime = System.currentTimeMillis();
+        String visitorUidForTopic = resolveVisitorUidForThreadTopic(visitorRequest);
         log.debug("开始获取或创建线程 - topic: {}, visitorUid: {}, agentUid: {}",
-                topic, visitorRequest.getUid(), agentEntity.getUid());
+            topic, visitorUidForTopic, agentEntity.getUid());
 
         try {
             // 当强制新建会话时，直接创建新会话，跳过复用逻辑
@@ -181,7 +188,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         } catch (Exception e) {
             log.error("获取或创建线程失败 - topic: {}, visitorUid: {}, agentUid: {}, 错误: {}, 耗时: {}ms",
-                    topic, visitorRequest.getUid(), agentEntity.getUid(), e.getMessage(),
+                    topic, visitorUidForTopic, agentEntity.getUid(), e.getMessage(),
                     System.currentTimeMillis() - startTime, e);
             throw new RuntimeException("Failed to get or create thread", e);
         }
@@ -208,9 +215,37 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             log.info("Already have a processing thread {}", updatedThread.getAgent());
             return getAgentContinueMessage(updatedThread);
         } else if (thread.isQueuing()) {
-            return getAgentQueueMessage(thread);
+            return handleExistingQueuingAgentThread(request, thread, agentEntity);
         }
         throw new IllegalStateException("Unexpected thread state: " + thread.getStatus());
+    }
+
+    /**
+     * 处理现有排队线程：刷新/重入时，如果此刻客服在线且有接待名额则直接接入，否则继续排队。
+     */
+    private MessageProtobuf handleExistingQueuingAgentThread(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
+            AgentEntity agentEntity) {
+
+        ThreadEntity latestThread = getThreadByUid(threadFromRequest.getUid());
+        if (!latestThread.isQueuing()) {
+            log.info("排队线程状态已变化，按最新状态返回 - threadUid: {}, status: {}",
+                    latestThread.getUid(), latestThread.getStatus());
+            return handleExistingThread(visitorRequest, latestThread, agentEntity);
+        }
+
+        // 复用已有队列成员（不产生重复入队）
+        QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(latestThread, agentEntity.toUserProtobuf(), visitorRequest);
+
+        // 客服在线且可用，并且未达到最大接待数时，直接接入
+        if (presenceFacadeService.isAgentOnlineAndAvailable(agentEntity)
+                && queueMemberEntity.getAgentQueue() != null
+                && queueMemberEntity.getAgentQueue().getChattingCount() < agentEntity.getMaxThreadCount()) {
+            log.info("排队会话检测到客服空闲，准备直接接入 - threadUid: {}, agentUid: {}",
+                    latestThread.getUid(), agentEntity.getUid());
+            return handleAvailableAgent(visitorRequest, latestThread, agentEntity, queueMemberEntity);
+        }
+
+        return getAgentQueueMessage(latestThread);
     }
 
     /**
@@ -229,7 +264,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             int maxWaiting = resolveMaxWaiting(queueSettings);
             log.info("Agent queue limit reached, diverting to leave message - agentUid: {}, queueSize: {}, maxWaiting: {}",
                 agentEntity.getUid(), queuingCount, maxWaiting);
-            return visitorThreadService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
+            return visitorThreadTimeoutService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
         }
 
         // 根据客服状态路由
@@ -294,7 +329,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             String tip = getAgentWelcomeMessage(visitorRequest, agent);
             WelcomeContent welcomeContent = WelcomeContentUtils.buildAgentWelcomeContent(agent, tip);
             String jsonWelcome = welcomeContent != null ? welcomeContent.toJson() : null;
-            thread.setChatting().setContent(jsonWelcome);
+            thread.setChatting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, tip, jsonWelcome).toJson());
             log.debug("线程状态更新完成 - 状态: {}, 欢迎消息长度: {}",
                     thread.getStatus(), jsonWelcome != null ? jsonWelcome.length() : 0);
 
@@ -376,7 +411,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             .waitSeconds(waitSeconds)
             .estimatedWaitTime(estimatedWaitTime);
         QueueContent queueContent = builder.build();
-        thread.setQueuing().setContent(queueContent.toJson());
+        thread.setQueuing().setContent(ThreadContent.of(MessageTypeEnum.QUEUE, queueContentText, queueContent.toJson()).toJson());
         log.debug("线程状态设置为排队 - threadUid: {}, 排队消息长度: {}, 预计等待: {}分钟",
                 thread.getUid(), queueContentText != null ? queueContentText.length() : 0, waitMinutes);
 
@@ -403,6 +438,13 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         try {
             // 获取客服的排队会话线程
             ThreadEntity agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
+
+            // 确保客服已订阅其排队通知线程 topic，避免通知丢失（同步 best-effort）
+            try {
+                subscribeThreadTopics(agentQueueThread, topicRestService);
+            } catch (Exception e) {
+                log.debug("Failed to subscribe agent queue thread topic - agentUid: {}, error: {}", agent.getUid(), e.getMessage());
+            }
             
             // 构建排队通知内容
             QueueNotification queueNotification = QueueNotification.builder()
@@ -446,7 +488,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         log.debug("生成离线消息内容");
         String offlineContent = getAgentOfflineMessage(visitorRequest, agent);
-        thread.setOffline().setContent(offlineContent);
+        thread.setOffline().setContent(ThreadContent.of(MessageTypeEnum.LEAVE_MSG, offlineContent, offlineContent).toJson());
         log.debug("线程状态设置为离线 - threadUid: {}, 离线消息长度: {}",
                 thread.getUid(), offlineContent != null ? offlineContent.length() : 0);
 
@@ -469,6 +511,10 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("离线消息实体创建完成 - messageUid: {}, 创建耗时: {}ms",
                 savedMessage.getUid(), System.currentTimeMillis() - msgCreateStartTime);
 
+        // 发布事件（包含同步订阅 topic），放在发消息之前，避免首条离线消息因未订阅而丢失
+        log.debug("发布离线线程相关事件");
+        publishThreadEvents(savedThread);
+
         // 发送离线消息
         log.debug("开始发送离线消息");
         long msgSendStartTime = System.currentTimeMillis();
@@ -476,10 +522,6 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         messageSendService.sendProtobufMessage(messageProtobuf);
         log.info("离线消息发送完成 - threadUid: {}, 发送耗时: {}ms",
                 savedThread.getUid(), System.currentTimeMillis() - msgSendStartTime);
-
-        // 发布事件
-        log.debug("发布离线线程相关事件");
-        publishThreadEvents(savedThread);
 
         log.info("离线客服处理完成 - threadUid: {}, agentUid: {}, 总处理耗时: {}ms",
                 savedThread.getUid(), agent.getUid(), System.currentTimeMillis() - startTime);
@@ -671,10 +713,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.debug("开始发布线程相关事件 - threadUid: {}, 状态: {}", savedThread.getUid(), savedThread.getStatus());
 
         try {
-            // 发布添加主题事件
-            log.debug("发布ThreadAddTopicEvent事件 - threadUid: {}, topic: {}",
-                    savedThread.getUid(), savedThread.getTopic());
-            bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, savedThread));
+            // 同步订阅 topic（含 internal），避免首条消息因订阅延迟而丢失
+            subscribeThreadTopics(savedThread, topicRestService);
 
             // 发布线程处理创建事件
             log.debug("发布ThreadProcessCreateEvent事件 - threadUid: {}", savedThread.getUid());
@@ -708,11 +748,13 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private MessageProtobuf getAgentQueueMessage(ThreadEntity thread) {
         log.debug("生成客服排队消息 - threadUid: {}", thread.getUid());
 
-        // 线程content可能已是结构化QueueContent JSON；尝试解析，否则构造最小QueueContent
+        // 线程content 可能为 ThreadContent JSON（payload 才是 QueueContent JSON）；尝试解析，否则构造最小 QueueContent
         QueueContent queueContent = null;
         try {
-            if (thread.getContent() != null && thread.getContent().trim().startsWith("{")) {
-                queueContent = com.alibaba.fastjson2.JSON.parseObject(thread.getContent(), QueueContent.class);
+            ThreadContent tc = ThreadContent.fromStored(thread.getContent());
+            String payload = tc != null ? tc.getPayload() : thread.getContent();
+            if (payload != null && payload.trim().startsWith("{")) {
+                queueContent = com.alibaba.fastjson2.JSON.parseObject(payload, QueueContent.class);
             }
         } catch (Exception e) {
             log.debug("解析线程排队内容失败，使用降级模式 - threadUid: {}, error: {}", thread.getUid(), e.getMessage());
@@ -726,26 +768,4 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         return ThreadMessageUtil.getThreadQueueMessage(queueContent, thread);
     }
 
-    // @EventListener
-    // public void handleAgentStatusAutoAssign(AgentUpdateStatusEvent event) {
-    //     AgentEntity agent = event.getAgent();
-    //     if (!shouldTriggerAgentAutoAssign(agent)) {
-    //         return;
-    //     }
-    //     queueAutoAssignService.triggerAgentAutoAssign(
-    //             agent.getUid(),
-    //             QueueAutoAssignTriggerSource.AGENT_STATUS_EVENT,
-    //             estimateAvailableSlots(agent));
-    // }
-
-    // private boolean shouldTriggerAgentAutoAssign(AgentEntity agent) {
-    //     return agent != null
-    //             && StringUtils.hasText(agent.getUid())
-    //             && presenceFacadeService.isAgentOnlineAndAvailable(agent);
-    // }
-
-    // private int estimateAvailableSlots(AgentEntity agent) {
-    //     int maxThreadCount = agent.getMaxThreadCount();
-    //     return maxThreadCount > 0 ? maxThreadCount : 1;
-    // }
 }

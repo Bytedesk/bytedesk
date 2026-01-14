@@ -61,6 +61,12 @@ public class AgentEntity extends BaseEntity {
 
     private String nickname;
 
+    /**
+     * 客服工号（对外展示用）
+     */
+    @Column(name = "agent_no", length = 64)
+    private String agentNo;
+
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultAgentAvatarUrl();
 

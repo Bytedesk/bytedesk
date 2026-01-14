@@ -38,7 +38,6 @@ import javax.crypto.spec.SecretKeySpec;
 @ConfigurationProperties(BytedeskProperties.CONFIG_PREFIX)
 public class BytedeskProperties {
 
-    
     public static final String CONFIG_PREFIX = "bytedesk";
     private static final String ENCRYPTION_KEY = "bytedesk_license"; // 16字节密钥
 
@@ -254,6 +253,11 @@ public class BytedeskProperties {
         private String name;
         private String logo;
         private String description;
+        /**
+         * 外网可访问的 MQTT WebSocket 地址（完整URL），用于反向代理场景。
+         * 例如：wss://api.example.com/websocket
+         */
+        private String mqttWebsocketUrl;
         private Boolean showRightCornerChat = true;
         private String rightCornerChatPlacement = "bottom-right"; // 位置：bottom-right / bottom-left
         private Boolean showDemo = true; // 是否显示演示

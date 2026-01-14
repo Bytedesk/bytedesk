@@ -46,4 +46,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
 
     Boolean existsBySuperUserAndDeletedFalse(Boolean superUser);
 
+    Optional<UserEntity> findFirstBySuperUserAndDeletedFalse(Boolean superUser);
+
 }

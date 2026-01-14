@@ -52,6 +52,7 @@ import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
 import com.bytedesk.core.topic.TopicEntity;
@@ -421,7 +422,6 @@ public class ThreadRestService
         ThreadEntity thread = threadOptional.get();
         thread.setTop(threadRequest.getTop());
         thread.setUnread(threadRequest.getUnread());
-        // thread.setUnreadCount(threadRequest.getUnreadCount());
         thread.setMute(threadRequest.getMute());
         thread.setHide(threadRequest.getHide());
         thread.setStar(threadRequest.getStar());
@@ -606,7 +606,7 @@ public class ThreadRestService
     }
 
     // update state
-    public ThreadResponse updateState(ThreadRequest threadRequest) {
+    public ThreadResponse updateStatus(ThreadRequest threadRequest) {
         if (!StringUtils.hasText(threadRequest.getUid())) {
             throw new RuntimeException("thread uid is required");
         }
@@ -640,6 +640,35 @@ public class ThreadRestService
         ThreadEntity thread = threadOptional.get();
         thread.setNote(threadRequest.getNote());
         //
+        ThreadEntity updateThread = save(thread);
+        if (updateThread == null) {
+            throw new RuntimeException("thread save failed");
+        }
+        return convertToResponse(updateThread);
+    }
+
+    /**
+     * 管理后台更新会话（聚合更新），用于 ThreadEditDrawer 一次性提交
+     */
+    @Transactional
+    public ThreadResponse adminUpdate(ThreadRequest threadRequest) {
+        if (!StringUtils.hasText(threadRequest.getUid())) {
+            throw new RuntimeException("thread uid is required");
+        }
+        Optional<ThreadEntity> threadOptional = findByUid(threadRequest.getUid());
+        if (!threadOptional.isPresent()) {
+            throw new RuntimeException("update thread " + threadRequest.getUid() + " not found");
+        }
+
+        ThreadEntity thread = threadOptional.get();
+
+        if (StringUtils.hasText(threadRequest.getStatus())) {
+            thread.setStatus(threadRequest.getStatus());
+        }
+        if (threadRequest.getTagList() != null) {
+            thread.setTagList(threadRequest.getTagList());
+        }
+
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
             throw new RuntimeException("thread save failed");
@@ -692,7 +721,10 @@ public class ThreadRestService
         } else {
             content = I18Consts.I18N_AGENT_CLOSED;
         }
-        thread.setContent(content);
+        MessageTypeEnum mt = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)
+                ? MessageTypeEnum.AUTO_CLOSED
+                : MessageTypeEnum.AGENT_CLOSED;
+        thread.setContent(ThreadContent.of(mt, content, content).toJson());
         //
         ThreadEntity updateThread = save(thread);
         if (updateThread == null) {
@@ -721,49 +753,80 @@ public class ThreadRestService
         request.setUserUid(user.getUid());
 
         List<ThreadEntity> threads = findListByTopic(request.getTopic());
+        if (threads == null || threads.isEmpty()) {
+            return null;
+        }
+
+        ThreadEntity lastUpdatedThread = null;
+        ThreadEntity targetUpdatedThread = null;
         for (ThreadEntity thread : threads) {
-            // 找到第一个未关闭的，执行关闭并返回
-            if (!thread.isClosed()) {
-                if (StringUtils.hasText(request.getCloseType())) {
-                    thread.setCloseType(request.getCloseType());
-                }
-                thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
-                // 发布关闭消息, 通知用户
-                String closeType = thread.getCloseType();
-                String content;
-                if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
-                    content = I18Consts.I18N_AUTO_CLOSED;
-                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name()
-                        .equalsIgnoreCase(closeType)) {
-                    content = I18Consts.I18N_AGENT_CLOSED;
-                } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name()
-                        .equalsIgnoreCase(closeType)) {
-                    content = I18Consts.I18N_AGENT_CLOSE_TIP;
-                } else {
-                    content = I18Consts.I18N_AGENT_CLOSED;
-                }
-                thread.setContent(content);
-                //
-                ThreadEntity updateThread = save(thread);
-                if (updateThread == null) {
-                    throw new RuntimeException("thread save failed");
-                }
-                if (Boolean.TRUE.equals(request.getUnsubscribe())) {
-                    TopicRequest topicRequest = TopicRequest.builder()
-                            .topic(request.getTopic())
-                            .userUid(request.getUserUid())
-                            .build();
-                    topicRestService.remove(topicRequest);
-                }
-                // 发布关闭事件
-                bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
-                //
-                return convertToResponse(updateThread);
+            if (thread == null) {
+                continue;
+            }
+
+            if (thread.isClosed()) {
+                continue;
+            }
+
+            if (StringUtils.hasText(request.getCloseType())) {
+                thread.setCloseType(request.getCloseType());
+            }
+            thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+
+            // 发布关闭消息, 通知用户
+            String closeType = thread.getCloseType();
+            String content;
+            if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+                content = I18Consts.I18N_AUTO_CLOSED;
+            } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
+                content = I18Consts.I18N_AGENT_CLOSED;
+            } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                content = I18Consts.I18N_AGENT_CLOSE_TIP;
             } else {
-                return convertToResponse(thread);
+                content = I18Consts.I18N_AGENT_CLOSED;
+            }
+
+            MessageTypeEnum mt = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)
+                    ? MessageTypeEnum.AUTO_CLOSED
+                    : MessageTypeEnum.AGENT_CLOSED;
+            thread.setContent(ThreadContent.of(mt, content, content).toJson());
+
+            ThreadEntity updateThread = save(thread);
+            if (updateThread == null) {
+                throw new RuntimeException("thread save failed");
+            }
+
+            // 发布关闭事件（每条 thread 都要发）
+            bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
+            lastUpdatedThread = updateThread;
+
+            if (StringUtils.hasText(request.getUid()) && request.getUid().equals(updateThread.getUid())) {
+                targetUpdatedThread = updateThread;
             }
         }
-        return null;
+
+        if (Boolean.TRUE.equals(request.getUnsubscribe())) {
+            TopicRequest topicRequest = TopicRequest.builder()
+                    .topic(request.getTopic())
+                    .userUid(request.getUserUid())
+                    .build();
+            topicRestService.remove(topicRequest);
+        }
+
+        // 返回值：优先返回 thread.uid == request.uid
+        if (targetUpdatedThread != null) {
+            return convertToResponse(targetUpdatedThread);
+        }
+        if (StringUtils.hasText(request.getUid())) {
+            for (ThreadEntity thread : threads) {
+                if (thread != null && request.getUid().equals(thread.getUid())) {
+                    return convertToResponse(thread);
+                }
+            }
+        }
+
+        // 如果 request.uid 未命中：有更新则返回最后更新的，否则返回第一条
+        return convertToResponse(lastUpdatedThread != null ? lastUpdatedThread : threads.get(0));
     }
 
     // 获取当前接待会话数量

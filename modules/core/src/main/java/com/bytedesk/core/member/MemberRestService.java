@@ -123,6 +123,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
+
+        // 保护超级管理员账号：禁止创建与超管相同邮箱/手机号的成员
+        userService.validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {
             throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
@@ -185,6 +189,11 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         //
         MemberEntity member = memberOptional.get();
+
+        // 保护超级管理员账号：禁止将非超管成员的邮箱/手机号改成超管的
+        String targetUserUid = member.getUser() != null ? member.getUser().getUid() : null;
+        userService.validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), targetUserUid);
+
         // modelMapper.map(memberRequest, member);
         member.setDeptUid(request.getDeptUid());
         member.setNickname(request.getNickname());

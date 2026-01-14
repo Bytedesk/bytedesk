@@ -69,7 +69,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     private final ThreadRestService threadRestService;
-    
+
     private final AgentSettingsRestService agentSettingsRestService;
 
     private final ModelMapper modelMapper;
@@ -132,10 +132,13 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         //
         MemberEntity member = memberOptional.get();
         UserEntity user = member.getUser();
-        userService.addRoleAgent(member.getUser());
+        // 分配组织维度角色依赖 user.currentOrganization
+        userService.ensureCurrentOrganization(user, request.getOrgUid());
+        userService.addRoleAgent(user);
         //
         AgentEntity agent = AgentEntity.builder()
                 .nickname(request.getNickname())
+                .agentNo(request.getAgentNo())
                 .email(request.getEmail())
                 .mobile(request.getMobile())
                 .build();
@@ -150,8 +153,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         //
         // 设置客服配置：如果指定了 settingsUid，使用指定的配置；否则使用默认配置
         if (StringUtils.hasText(request.getSettingsUid())) {
-            Optional<com.bytedesk.service.agent_settings.AgentSettingsEntity> settingsOptional = 
-                agentSettingsRestService.findByUid(request.getSettingsUid());
+            Optional<com.bytedesk.service.agent_settings.AgentSettingsEntity> settingsOptional = agentSettingsRestService
+                    .findByUid(request.getSettingsUid());
             if (settingsOptional.isPresent()) {
                 agent.setSettings(settingsOptional.get());
             } else {
@@ -219,6 +222,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 更新Agent的信息
         // modelMapper.map(agentRequest, agent); // 需要排除 connected 字段，否则会改变真实连接状态
         agent.setNickname(request.getNickname());
+        agent.setAgentNo(request.getAgentNo());
         agent.setAvatar(request.getAvatar());
         agent.setMobile(request.getMobile());
         agent.setEmail(request.getEmail());
@@ -232,8 +236,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         //
         // 更新客服配置
         if (StringUtils.hasText(request.getSettingsUid())) {
-            Optional<com.bytedesk.service.agent_settings.AgentSettingsEntity> settingsOptional = 
-                agentSettingsRestService.findByUid(request.getSettingsUid());
+            Optional<com.bytedesk.service.agent_settings.AgentSettingsEntity> settingsOptional = agentSettingsRestService
+                    .findByUid(request.getSettingsUid());
             if (settingsOptional.isPresent()) {
                 agent.setSettings(settingsOptional.get());
             }
@@ -281,7 +285,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public ThreadResponseSimple acceptByAgent(ThreadRequest threadRequest) {
-        // 
+        //
         UserEntity user = authService.getUser();
         Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
         if (!agentOptional.isPresent()) {
@@ -310,7 +314,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 通知queue更新，queue member更新, 增加agent接待数量
         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, updateThread));
         bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, updateThread));
-        // 
+        //
         return ConvertUtils.convertToThreadResponseSimple(updateThread);
     }
 
@@ -360,7 +364,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             AgentEntity agent) {
         try {
             log.warn("处理坐席乐观锁冲突: {} - {}", agent.getUid(), e.getMessage());
-            
+
             // 获取最新版本的实体
             Optional<AgentEntity> latest = findByUid(agent.getUid());
             if (latest.isPresent()) {
@@ -368,12 +372,12 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
                 // 将当前实体的变更应用到最新实体上
                 // 注意：这里需要根据业务场景决定哪些字段需要保留，哪些需要覆盖
                 log.info("最新坐席信息: {}", latestEntity.getNickname());
-                
+
                 // 以下是示例，实际需要根据业务需求调整
                 // 保留原始实体ID和版本信息
                 // agent.setId(latestEntity.getId());
                 // agent.setVersion(latestEntity.getVersion());
-                
+
                 // 重新尝试保存
                 return doSave(agent);
             } else {
@@ -480,6 +484,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return agentRepository.existsByUid(uid);
     }
 
-    public List<AgentEntity> findAllConnected() { return java.util.Collections.emptyList(); }
+    public List<AgentEntity> findAllConnected() {
+        return java.util.Collections.emptyList();
+    }
 
 }

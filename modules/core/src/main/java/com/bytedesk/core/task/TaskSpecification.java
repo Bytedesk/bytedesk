@@ -20,7 +20,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserEntity;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,22 @@ public class TaskSpecification extends BaseSpecification<TaskEntity, TaskRequest
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+
+            // 可见性：
+            // - 组织任务（level=ORGANIZATION）对组织成员可见
+            // - 私人任务（level=USER）仅对创建者可见
+            // 说明：Task 当前不走 getBasicPredicatesWithLevel（权限模块），这里采用明确规则防止泄露其他用户私人任务。
+            UserEntity user = authService.getUser();
+            if (user != null) {
+                Predicate orgVisible = criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name());
+                Predicate userVisible = criteriaBuilder.and(
+                        criteriaBuilder.equal(root.get("level"), LevelEnum.USER.name()),
+                        criteriaBuilder.equal(root.get("userUid"), user.getUid()));
+                predicates.add(criteriaBuilder.or(orgVisible, userVisible));
+            } else {
+                // 未登录时仅允许查询组织级（避免暴露个人数据）
+                predicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name()));
+            }
             // name
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));

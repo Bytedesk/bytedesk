@@ -47,6 +47,22 @@ public interface RelationRepository extends JpaRepository<RelationEntity, Long>,
      * 根据客体内容ID和关系类型查询关系
      */
     List<RelationEntity> findByObjectContentUidAndTypeAndDeletedFalse(String objectContentUid, String type);
+
+        /**
+         * Find an active relation by subject user + object content + type
+         */
+        Optional<RelationEntity> findBySubjectUserUidAndObjectContentUidAndTypeAndDeletedFalse(
+            String subjectUserUid,
+            String objectContentUid,
+            String type);
+
+        /**
+         * Batch query relations for a user against multiple contents and types
+         */
+        List<RelationEntity> findBySubjectUserUidAndObjectContentUidInAndTypeInAndDeletedFalse(
+            String subjectUserUid,
+            List<String> objectContentUid,
+            List<String> type);
     
     /**
      * 查询用户关注的其他用户

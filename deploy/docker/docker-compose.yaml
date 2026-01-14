@@ -174,6 +174,8 @@ services:
       BYTEDESK_CUSTOM_SHOW_DEMO: "false"
       BYTEDESK_CUSTOM_PRIVACY_POLICY_URL: https://www.weiyuai.cn/privacy.html
       BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL: https://www.weiyuai.cn/terms.html
+      # 外网可访问的 MQTT WebSocket 地址（nginx/反向代理场景），例如：wss://api.weiyuai.cn/websocket
+      BYTEDESK_CUSTOM_MQTT_WEBSOCKET_URL:
       # enable login username 登录用户名开启
       BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: "true"
       # enable 2fa 双重验证开启

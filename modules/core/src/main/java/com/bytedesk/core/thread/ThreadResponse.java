@@ -41,6 +41,11 @@ public class ThreadResponse extends BaseResponse {
 
     private String content;
 
+    /**
+     * 结构化的会话摘要内容（新前端可直接使用；旧前端继续使用 content 字段）
+     */
+    private ThreadContent contentObject;
+
     private String type;
 
     private String status;
@@ -163,4 +168,7 @@ public class ThreadResponse extends BaseResponse {
     private Integer agentMessageCount;
     private Integer systemMessageCount;
     private Integer robotMessageCount;
+
+    // queue meta (filled by service module when needed)
+    private QueueMeta queueMeta;
 }

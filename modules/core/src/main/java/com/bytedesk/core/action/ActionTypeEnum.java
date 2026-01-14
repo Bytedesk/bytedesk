@@ -15,7 +15,16 @@ package com.bytedesk.core.action;
 
 public enum ActionTypeEnum {
     LOG,
+    // 
+    QUERY,
+    CREATE,
+    UPDATE,
+    DELETE,
+    EXPORT,
+    // 
     LOGIN,
+    REGISTER,
+    // 
     FAILED,
     VISITOR;
 

@@ -36,6 +36,7 @@ import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
 
 import lombok.AllArgsConstructor;
@@ -69,10 +70,55 @@ public class AgentSettingsRestService
         return agentSettingsRepository.findByUid(uid);
     }
 
+    /**
+     * Query agent settings by agent uid.
+     *
+     * Priority:
+     * 1) AgentEntity.settings (explicitly assigned)
+     * 2) Organization default settings (auto-created if missing)
+     */
+    @Transactional(readOnly = true)
+    public AgentSettingsResponse queryByAgentUid(String agentUid) {
+        if (!StringUtils.hasText(agentUid)) {
+            return null;
+        }
+
+        Optional<AgentEntity> optionalAgent = agentRepository.findByUid(agentUid);
+        if (!optionalAgent.isPresent()) {
+            return null;
+        }
+        AgentEntity agent = optionalAgent.get();
+
+        // Basic org isolation: only allow querying within current user's org
+        UserEntity user = authService.getUser();
+        if (user != null && StringUtils.hasText(user.getOrgUid())
+                && StringUtils.hasText(agent.getOrgUid())
+                && !user.getOrgUid().equals(agent.getOrgUid())) {
+            log.warn("queryByAgentUid forbidden: userOrg={}, agentOrg={}, agentUid={}", user.getOrgUid(),
+                    agent.getOrgUid(), agentUid);
+            return null;
+        }
+
+        AgentSettingsEntity settings = agent.getSettings();
+        if (settings == null) {
+            // fallback to org default settings (ensures rightPanelTabs still works)
+            if (!StringUtils.hasText(agent.getOrgUid())) {
+                return null;
+            }
+            settings = getOrCreateDefault(agent.getOrgUid());
+        }
+
+        return convertToResponse(settings);
+    }
+
     @Override
     public AgentSettingsResponse create(AgentSettingsRequest request) {
         AgentSettingsEntity entity = modelMapper.map(request, AgentSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
+        // Ensure defaults for newly created settings
+        if (entity.getAllowAgentCloseThread() == null) {
+            entity.setAllowAgentCloseThread(true);
+        }
         //
         UserEntity user = authService.getUser();
         if (user != null) {
@@ -220,6 +266,10 @@ public class AgentSettingsRestService
         // Agent meta fields（不属于嵌套 settings，需要在 update 中单独持久化）
         if (request.getMaxThreadCount() != null) {
             entity.setMaxThreadCount(request.getMaxThreadCount());
+            entity.setHasUnpublishedChanges(true);
+        }
+        if (request.getAllowAgentCloseThread() != null) {
+            entity.setAllowAgentCloseThread(request.getAllowAgentCloseThread());
             entity.setHasUnpublishedChanges(true);
         }
         if (request.getTimeoutRemindEnabled() != null) {
@@ -865,7 +915,12 @@ public class AgentSettingsRestService
 
     @Override
     public AgentSettingsResponse convertToResponse(AgentSettingsEntity entity) {
-        return modelMapper.map(entity, AgentSettingsResponse.class);
+        AgentSettingsResponse resp = modelMapper.map(entity, AgentSettingsResponse.class);
+        // Backward compatibility: old rows might be null
+        if (resp.getAllowAgentCloseThread() == null) {
+            resp.setAllowAgentCloseThread(true);
+        }
+        return resp;
     }
 
     // 仅复制业务字段,忽略 id/uid/version 与时间字段,避免发布时两边主键被覆盖或引用被替换

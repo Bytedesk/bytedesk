@@ -35,6 +35,18 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "根据客服UID查询客服配置", description = "根据客服UID查询其绑定的客服配置；若未绑定则返回组织默认配置")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @RequestMapping("/query/agent")
+    public ResponseEntity<?> queryByAgent(AgentSettingsRequest request) {
+        AgentSettingsResponse resp = agentSettingsRestService.queryByAgentUid(request.getAgentUid());
+        if (resp == null) {
+            return ResponseEntity.ok(JsonResult.error("query agent settings failed"));
+        }
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
     @Operation(summary = "根据UID查询客服配置", description = "根据UID查询客服配置详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))

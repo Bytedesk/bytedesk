@@ -37,6 +37,11 @@ public class AgentResponse extends BaseResponse {
 
     private String nickname;
 
+    /**
+     * 客服工号（对外展示用）
+     */
+    private String agentNo;
+
     private String avatar;
 
     private String mobile;

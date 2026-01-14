@@ -14,7 +14,9 @@
 package com.bytedesk.service.queue;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,15 +34,19 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.QueueMeta;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.queue_member.QueueMemberEntity;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
+import org.springframework.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,11 +70,9 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
     private final WorkgroupRepository workgroupRepository;
 
-    // private final QueueMemberRestService queueMemberRestService;
+    private final QueueMemberRestService queueMemberRestService;
 
     private final QueueService queueService;
-
-    // private final QueueAutoAssignService queueAutoAssignService;
 
     @Override
     protected Specification<QueueEntity> createSpecification(QueueRequest request) {
@@ -123,7 +127,51 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         log.debug("查询排队中会话，主题列表: {}", request.getTopicList());
         
         // 使用 threadRestService 查询排队中的会话
-        return threadRestService.queryByOrg(request);
+        Page<ThreadResponse> page = threadRestService.queryByOrg(request);
+
+        List<String> threadUids = page.getContent().stream()
+                .map(ThreadResponse::getUid)
+                .filter(StringUtils::hasText)
+                .toList();
+
+        Map<String, QueueMemberEntity> queueMemberByThreadUid = queueMemberRestService.findByThreadUids(threadUids)
+                .stream()
+                .filter(qm -> qm.getThread() != null && StringUtils.hasText(qm.getThread().getUid()))
+                .collect(Collectors.toMap(qm -> qm.getThread().getUid(), qm -> qm, (a, b) -> a));
+
+        long now = System.currentTimeMillis();
+
+        return page.map(thread -> {
+            if (thread == null || !StringUtils.hasText(thread.getUid())) {
+                return thread;
+            }
+
+            QueueMemberEntity qm = queueMemberByThreadUid.get(thread.getUid());
+            if (qm == null) {
+                return thread;
+            }
+
+            Long enqueuedAt = null;
+            if (qm.getVisitorEnqueueAt() != null) {
+                enqueuedAt = qm.getVisitorEnqueueAt().toInstant().toEpochMilli();
+            }
+
+            Long waitingMs = null;
+            if (enqueuedAt != null) {
+                waitingMs = Math.max(0, now - enqueuedAt);
+            }
+
+            QueueMeta meta = QueueMeta.builder()
+                    .queueMemberUid(qm.getUid())
+                    .position(qm.getQueueNumber())
+                    .serverTimestamp(now)
+                    .enqueuedAt(enqueuedAt)
+                    .waitingMs(waitingMs)
+                    .build();
+
+            thread.setQueueMeta(meta);
+            return thread;
+        });
     }
 
     @Cacheable(value = "queue", key = "#uid", unless = "#result==null")

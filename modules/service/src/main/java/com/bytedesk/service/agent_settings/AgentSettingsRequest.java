@@ -61,6 +61,11 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
     private String timeoutRemindTip;
 
     /**
+     * Whether agent can manually close thread/session
+     */
+    private Boolean allowAgentCloseThread;
+
+    /**
      * Message leave settings (Agent-specific)
      */
     private MessageLeaveSettingsRequest messageLeaveSettings;
@@ -94,4 +99,9 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
      * Desktop right panel dynamic tabs (draft updates)
      */
     private List<AgentRightPanelTab> rightPanelTabs;
+
+    /**
+     * Agent uid (used for querying settings by agent)
+     */
+    private String agentUid;
 }

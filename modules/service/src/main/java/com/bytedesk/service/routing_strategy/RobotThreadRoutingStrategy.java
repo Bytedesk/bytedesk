@@ -39,6 +39,8 @@ import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import jakarta.annotation.Nonnull;
 
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadContent;
+import com.bytedesk.core.message.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,7 +99,8 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         RobotEntity robotEntity = getRobotEntity(request.getSid());
 
         // 2. 生成会话主题并检查现有会话
-        String topic = TopicUtils.formatOrgRobotThreadTopic(robotEntity.getUid(), request.getUid());
+        String visitorUidForTopic = resolveVisitorUidForThreadTopic(request);
+        String topic = TopicUtils.formatOrgRobotThreadTopic(robotEntity.getUid(), visitorUidForTopic);
         ThreadEntity thread = getOrCreateRobotThread(request, robotEntity, topic);
 
         // 3. 处理现有活跃会话
@@ -180,7 +183,8 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 2. 配置线程状态
         String tip = getRobotWelcomeMessage(request, robotEntity);
         WelcomeContent welcomeContent = WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip);
-        thread.setRoboting().setContent(welcomeContent != null ? welcomeContent.toJson() : null);
+        String payload = welcomeContent != null ? welcomeContent.toJson() : null;
+        thread.setRoboting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, tip, payload).toJson());
 
         // 3. 设置机器人信息（只存储基础信息，避免 prompt 过长导致字段超限）
         String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);

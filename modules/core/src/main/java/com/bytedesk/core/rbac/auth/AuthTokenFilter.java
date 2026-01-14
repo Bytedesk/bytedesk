@@ -25,13 +25,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.UserDisabledException;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.rbac.token.TokenEntity;
 import com.bytedesk.core.rbac.token.TokenRestService;
+import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JwtUtils;
 
 @Slf4j
@@ -76,6 +81,24 @@ public class AuthTokenFilter extends OncePerRequestFilter {
           }
         }
       }
+    } catch (UsernameNotFoundException e) {
+      SecurityContextHolder.clearContext();
+      // token 对应用户不存在：给前端一个明确 401 文案
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.setContentType("application/json;charset=UTF-8");
+      response.getWriter().write(
+          JSON.toJSONString(
+              JsonResult.error(I18Consts.I18N_USER_SIGNUP_FIRST, HttpServletResponse.SC_UNAUTHORIZED)));
+      return;
+    } catch (UserDisabledException e) {
+      SecurityContextHolder.clearContext();
+      // token 对应用户被禁用：403
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      response.setContentType("application/json;charset=UTF-8");
+      response.getWriter().write(
+          JSON.toJSONString(
+              JsonResult.error(I18Consts.I18N_USER_DISABLED, HttpServletResponse.SC_FORBIDDEN)));
+      return;
     } catch (Exception e) {
       log.error("Cannot set user authentication: {}", e);
     }

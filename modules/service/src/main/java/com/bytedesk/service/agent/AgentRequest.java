@@ -40,6 +40,11 @@ public class AgentRequest extends BaseRequest {
     @NotBlank
     private String nickname;
 
+    /**
+     * 客服工号（对外展示用）
+     */
+    private String agentNo;
+
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultAgentAvatarUrl();
 

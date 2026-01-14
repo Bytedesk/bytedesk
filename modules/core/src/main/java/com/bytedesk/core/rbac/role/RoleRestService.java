@@ -365,7 +365,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 // 这里按 RoleInitializer 的规则恢复默认权限：
                 // - SUPER: 全量权限
                 // - ADMIN: 除 SETTINGS_CREATE/SETTINGS_UPDATE 外的所有权限
-                // - AGENT: 知识库模块所有 *_READ 权限
+                // - AGENT: 知识库模块所有 *_READ 权限 + 额外默认权限（留言/客服/队列/快捷回复等）
                 // - USER: 基础权限（用户/消息/会话/工单）
                 // - 其他角色：退化为恢复全部启用权限
                 // 兼容历史数据：可能存在仍携带 _PLATFORM_/_ORGANIZATION_ 等 marker 或同 value 多条记录
@@ -406,7 +406,9 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 } else if (BytedeskConsts.DEFAULT_ROLE_AGENT_UID.equals(roleUid)) {
                         selectedAuthorities = allActive.stream()
                                         .filter(a -> a != null
-                                                        && RoleAuthorityRules.isKbaseReadPermission(a.getValue()))
+                                                        && (RoleAuthorityRules.isKbaseReadPermission(a.getValue())
+                                                                        || RoleAuthorityRules.DEFAULT_ROLE_AGENT_EXTRA_AUTHORITY_VALUES
+                                                                                        .contains(a.getValue())))
                                         .collect(Collectors.toSet());
                 } else if (BytedeskConsts.DEFAULT_ROLE_USER_UID.equals(roleUid)) {
                         selectedAuthorities = allActive.stream()

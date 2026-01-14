@@ -17,6 +17,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,6 +49,11 @@ public class TaskRequest extends BaseRequest {
     private String status;
 
     private String priority;
+
+    /**
+     * Task images (URLs)
+     */
+    private List<String> images;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private ZonedDateTime startAt;

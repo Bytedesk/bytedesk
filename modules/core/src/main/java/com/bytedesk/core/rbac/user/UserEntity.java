@@ -215,10 +215,16 @@ public class UserEntity extends BaseEntityNoOrg {
         if (organization == null) {
             return;
         }
+
+		// 兼容历史/脏数据：有些 UserOrganizationRoleEntity 可能未绑定 organization
+		// 这会导致后续 stream 中对 getOrganization().getId() 的访问触发 NPE
+		userOrganizationRoles.removeIf(u -> u == null || u.getOrganization() == null || u.getOrganization().getId() == null);
         
         // 1. 处理用户组织角色关联
         UserOrganizationRoleEntity uor = userOrganizationRoles.stream()
-            .filter(u -> u.getOrganization().getId().equals(organization.getId()))
+			.filter(u -> u.getOrganization() != null
+					&& u.getOrganization().getId() != null
+					&& u.getOrganization().getId().equals(organization.getId()))
             .findFirst()
             .orElseGet(() -> {
                 UserOrganizationRoleEntity newUor = UserOrganizationRoleEntity.builder()
@@ -261,7 +267,7 @@ public class UserEntity extends BaseEntityNoOrg {
 		if (organization == null) {
 			return new HashSet<>();
 		}
-		return userOrganizationRoles.stream().filter(u -> u.getOrganization().equals(organization))
+		return userOrganizationRoles.stream().filter(u -> u.getOrganization() != null && u.getOrganization().equals(organization))
 				.flatMap(uor -> uor.getRoles().stream()).map(r -> r.getUid()).collect(Collectors.toSet());
 	}
 
@@ -271,7 +277,7 @@ public class UserEntity extends BaseEntityNoOrg {
 		if (organization == null) {
 			return false;
 		}
-		return userOrganizationRoles.stream().filter(u -> u.getOrganization().equals(organization)).findFirst()
+		return userOrganizationRoles.stream().filter(u -> u.getOrganization() != null && u.getOrganization().equals(organization)).findFirst()
 				.map(uor -> uor.getRoles().contains(role)).orElse(false);
 	}
 
@@ -284,10 +290,15 @@ public class UserEntity extends BaseEntityNoOrg {
         if (organization == null) {
             return;
         }
+
+		// 兼容历史/脏数据
+		userOrganizationRoles.removeIf(u -> u == null || u.getOrganization() == null || u.getOrganization().getId() == null);
         
         // 从userOrganizationRoles中移除
         userOrganizationRoles.stream()
-            .filter(u -> u.getOrganization().getId().equals(organization.getId()))
+			.filter(u -> u.getOrganization() != null
+					&& u.getOrganization().getId() != null
+					&& u.getOrganization().getId().equals(organization.getId()))
             .findFirst()
             .ifPresent(uor -> {
                 // 通过ID查找角色并移除
@@ -322,10 +333,14 @@ public class UserEntity extends BaseEntityNoOrg {
 		if (organization == null) {
 			return;
 		}
+		// 兼容历史/脏数据
+		userOrganizationRoles.removeIf(u -> u == null || u.getOrganization() == null || u.getOrganization().getId() == null);
 		
 		// 找到当前组织关联
 		Optional<UserOrganizationRoleEntity> uorOptional = userOrganizationRoles.stream()
-		    .filter(u -> u.getOrganization().getId().equals(organization.getId()))
+		    .filter(u -> u.getOrganization() != null
+		    		&& u.getOrganization().getId() != null
+		    		&& u.getOrganization().getId().equals(organization.getId()))
 		    .findFirst();
 		    
 		if (uorOptional.isPresent()) {

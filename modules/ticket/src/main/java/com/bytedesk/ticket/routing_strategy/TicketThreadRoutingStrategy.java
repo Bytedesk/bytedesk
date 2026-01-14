@@ -30,9 +30,11 @@ import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
+import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.constant.I18Consts;
@@ -84,6 +86,7 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final TicketSettingsRestService ticketSettingsRestService;
     private final IMessageSendService messageSendService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
+    private final TopicRestService topicRestService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -204,8 +207,13 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             accessTip = "您好，工单已接入，我们将尽快为您处理。";
         }
 
-        latestAfterAssign.setChatting().setContent(accessTip);
+        WelcomeContent welcomeContent = WelcomeContent.builder().content(accessTip).build();
+        String payload = welcomeContent.toJson();
+        latestAfterAssign.setChatting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, accessTip, payload).toJson());
         ThreadEntity savedThread = saveThread(latestAfterAssign);
+
+        // 同步订阅 topic（含 internal），放在发消息之前，避免首条消息因订阅延迟而丢失
+        subscribeThreadTopics(savedThread, topicRestService);
 
         // 通知被分配客服：按 WorkgroupThreadRoutingStrategy 的模式发布事件
         if (hasAssignedAgent(savedThread)) {
@@ -218,7 +226,6 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 发送接入提示语（结构化 welcome 消息）
         if (hasAssignedAgent(savedThread)) {
-            WelcomeContent welcomeContent = WelcomeContent.builder().content(accessTip).build();
             MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
             try {
                 messageSendService.sendProtobufMessage(messageProtobuf);

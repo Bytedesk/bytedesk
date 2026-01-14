@@ -40,6 +40,10 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String name;
         private String logo;
         private String description;
+        /**
+         * 外网可访问的 MQTT WebSocket 地址（完整URL），用于反向代理场景。
+         */
+        private String mqttWebsocketUrl;
         private Boolean showRightCornerChat;
         private String rightCornerChatPlacement; // 位置：bottom-right / bottom-left
         private Boolean showDemo = true; // 是否显示演示

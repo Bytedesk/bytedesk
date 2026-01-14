@@ -34,11 +34,17 @@ import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadContent;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
+import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.agent.AgentCapacityService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.presence.PresenceFacadeService;
 import com.bytedesk.service.queue.QueueEntity;
@@ -48,12 +54,12 @@ import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class QueueMemberEventListener {
 
     private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_DATE;
@@ -69,6 +75,8 @@ public class QueueMemberEventListener {
     private final PresenceFacadeService presenceFacadeService;
 
     private final QueueService queueService;
+
+    private final AgentCapacityService agentCapacityService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
@@ -91,32 +99,70 @@ public class QueueMemberEventListener {
     /**
      * 当某个会话关闭，则检查当前客服队列或所在工作组队列中是否有排队成员，如果有，则自动接入最前面的排队成员
      */
-    // @EventListener
-    // public void onThreadCloseEvent(ThreadCloseEvent event) {
-    //     ThreadEntity thread = event.getThread();
-    //     if (thread == null || thread.getTopic() == null) {
-    //         return;
-    //     }
-    //     // UserProtobuf agentProto = resolveAgentProtobuf(thread);
-    //     // if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
-    //     //     log.debug("queue member auto accept skipped, agent missing: threadUid={}",
-    //     //             thread != null ? thread.getUid() : null);
-    //     //     return;
-    //     // }
-    //     // QueueMemberEntity closingQueueMember = queueMemberRestService.findByThreadUid(thread.getUid())
-    //     //         .orElse(null);
-    //     // boolean assigned = tryAssignFromAgentQueue(agentProto, thread, closingQueueMember);
-    //     // if (!assigned) {
-    //     //     assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
-    //     // }
-    //     // if (assigned) {
-    //     //     log.info("queue member auto accept completed: agentUid={} closedThreadUid={}", agentProto.getUid(),
-    //     //             thread.getUid());
-    //     // } else {
-    //     //     log.debug("queue member auto accept skipped, no queued members: agentUid={} closedThreadUid={}",
-    //     //             agentProto.getUid(), thread.getUid());
-    //     // }
-    // }
+    @EventListener
+    public void onThreadCloseEvent(ThreadCloseEvent event) {
+        ThreadEntity thread = event.getThread();
+        if (thread == null || thread.getTopic() == null) {
+            return;
+        }
+
+        // 只在会话确实已关闭时触发（避免未来事件重复/误触发）
+        if (!ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())) {
+            return;
+        }
+
+        // 可配置：仅自动关闭时才触发自动接入（避免人工关闭也触发）
+        if (!ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(thread.getCloseType())) {
+            log.debug("queue member auto accept skipped, closeType not AUTO: threadUid={} closeType={} type={}",
+                    thread.getUid(), thread.getCloseType(), thread.getType());
+            return;
+        }
+
+        // 关闭会话必须能解析到接待客服，否则无法确定"谁来自动接入"
+        // Try to resolve agent from thread (works for agent threads)
+        UserProtobuf agentProto = resolveAgentProtobuf(thread);
+
+        // If no agent in thread and it's a workgroup thread, route via workgroup
+        if (agentProto == null && isWorkgroupThread(thread)) {
+            log.debug("Thread is workgroup type, attempting workgroup routing - threadUid: {}", thread.getUid());
+            agentProto = resolveWorkgroupAgent(thread);
+        }
+
+        // Validate we have an agent
+        if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
+            log.debug("queue member auto accept skipped, agent missing: threadUid={} topic={} status={} closeType={}",
+                    thread.getUid(), thread.getTopic(), thread.getStatus(), thread.getCloseType());
+            return;
+        }
+
+        QueueMemberEntity closingQueueMember = queueMemberRestService.findByThreadUid(thread.getUid()).orElse(null);
+
+        boolean assigned = false;
+        try {
+            if (isWorkgroupThread(thread)) {
+                // 工作组类型：只从工作组队列接入（避免误接入到客服一对一队列）
+                assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
+            } else {
+                // 一对一客服：优先从“客服个人队列”接入；若无，再从“工作组队列”兜底接入
+                assigned = tryAssignFromAgentQueue(agentProto, thread, closingQueueMember);
+                if (!assigned) {
+                    assigned = tryAssignFromWorkgroupQueue(agentProto, thread, closingQueueMember);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("queue member auto accept failed: agentUid={} closedThreadUid={} error={}",
+                    agentProto.getUid(), thread.getUid(), e.getMessage(), e);
+            return;
+        }
+
+        if (assigned) {
+            log.info("queue member auto accept completed: agentUid={} closedThreadUid={} closeType={}",
+                    agentProto.getUid(), thread.getUid(), thread.getCloseType());
+        } else {
+            log.debug("queue member auto accept skipped, no queued members: agentUid={} closedThreadUid={} closeType={}",
+                    agentProto.getUid(), thread.getUid(), thread.getCloseType());
+        }
+    }
 
     /**
      * 1. 通知工作组内其他成员该排队会话已被接受 QUEUE_ACCEPT, 并在desktop端从队列中删除此排队会话
@@ -147,6 +193,54 @@ public class QueueMemberEventListener {
             return null;
         }
         return UserProtobuf.fromJson(thread.getAgent());
+    }
+
+    /**
+     * Check if thread is a workgroup thread
+     */
+    private boolean isWorkgroupThread(ThreadEntity thread) {
+        if (thread == null) {
+            return false;
+        }
+        // 主逻辑：以 thread.type 为准（createWorkgroupThread 会写入 WORKGROUP）
+        if (ThreadTypeEnum.WORKGROUP.name().equalsIgnoreCase(thread.getType())) {
+            return true;
+        }
+
+        // 兼容历史数据：部分旧 thread 可能未写 type，但 workgroup 字段存在
+        return !StringUtils.hasText(thread.getType()) && StringUtils.hasText(thread.getWorkgroup());
+    }
+
+    /**
+     * Resolve agent for workgroup thread using routing strategy
+     */
+    private UserProtobuf resolveWorkgroupAgent(ThreadEntity thread) {
+        Optional<WorkgroupEntity> workgroupOpt = resolveWorkgroupEntity(thread);
+        if (workgroupOpt.isEmpty()) {
+            log.debug("Workgroup not found for thread - threadUid: {}", thread.getUid());
+            return null;
+        }
+
+        WorkgroupEntity workgroup = workgroupOpt.get();
+
+        // Get available agents (online + available status)
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+        if (availableAgents.isEmpty()) {
+            log.debug("No available agents for workgroup routing - workgroupUid: {}", workgroup.getUid());
+            return null;
+        }
+
+        // Use routing strategy to find agent with capacity
+        AgentEntity selectedAgent = agentCapacityService.findAvailableAgentWithCapacity(workgroup, thread, availableAgents);
+        if (selectedAgent == null) {
+            log.debug("No agent with capacity found - workgroupUid: {}", workgroup.getUid());
+            return null;
+        }
+
+        log.info("Workgroup routing selected agent - workgroupUid: {}, agentUid: {}, routingMode: {}",
+                workgroup.getUid(), selectedAgent.getUid(), workgroup.getRoutingMode());
+
+        return selectedAgent.toUserProtobuf();
     }
 
     public boolean tryAssignFromAgentQueue(UserProtobuf agentProto, ThreadEntity closedThread,
@@ -182,7 +276,7 @@ public class QueueMemberEventListener {
             return false;
         }
         Optional<QueueMemberEntity> nextMemberOpt = queueMemberRestService
-                .findEarliestWorkgroupQueueMember(workgroupQueueOpt.get().getUid());
+            .findEarliestWorkgroupQueueMemberForUpdate(workgroupQueueOpt.get().getUid());
         if (!nextMemberOpt.isPresent()) {
             return false;
         }
@@ -333,7 +427,7 @@ public class QueueMemberEventListener {
         log.debug("sendVisitorQueueUpdate: queueMemberUid={}, content={}",
                 queueMember.getUid(), queueContent.getContent());
         try {
-            targetThread.setContent(queueContent.toJson());
+            targetThread.setContent(ThreadContent.of(MessageTypeEnum.QUEUE_UPDATE, queueContent.getContent(), queueContent.toJson()).toJson());
             threadRestService.save(targetThread);
         } catch (Exception e) {
             log.debug("queue update content persistence skipped: threadUid={}, error={}",

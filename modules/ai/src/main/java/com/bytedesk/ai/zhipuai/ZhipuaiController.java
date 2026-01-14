@@ -16,6 +16,7 @@ package com.bytedesk.ai.zhipuai;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,6 +63,7 @@ import java.nio.file.Files;
 @RequestMapping("/zhipuai")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnBean(ZhipuAiClient.class)
 public class ZhipuaiController {
 
     private final ZhipuAiClient zhipuAiClient;

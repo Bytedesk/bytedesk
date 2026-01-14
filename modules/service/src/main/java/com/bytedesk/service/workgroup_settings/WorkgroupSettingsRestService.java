@@ -3,9 +3,9 @@ package com.bytedesk.service.workgroup_settings;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.CacheEvict;
+// import org.springframework.cache.annotation.CachePut;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -56,7 +56,8 @@ public class WorkgroupSettingsRestService
 
     private final RobotRepository robotRepository;
 
-    @Cacheable(value = "workgroupSettings", key = "#uid", unless = "#result == null")
+    // IMPORTANT: cache stores Entity only. Do not mix Response types in the same cache name/key.
+    // @Cacheable(value = "workgroupSettingsEntity", key = "#uid", unless = "#result == null")
     @Override
     public Optional<WorkgroupSettingsEntity> findByUid(String uid) {
         return workgroupSettingsRepository.findByUid(uid);
@@ -401,7 +402,7 @@ public class WorkgroupSettingsRestService
         return convertToResponse(updated);
     }
 
-    @CacheEvict(value = "workgroupSettings", key = "#uid")
+    // @CacheEvict(value = "workgroupSettingsEntity", key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<WorkgroupSettingsEntity> optional = findByUid(uid);
@@ -427,7 +428,7 @@ public class WorkgroupSettingsRestService
         return workgroupSettingsRepository.findAll(spec, pageable);
     }
 
-    @CachePut(value = "workgroupSettings", key = "#entity.uid", unless = "#result == null")
+    // @CachePut(value = "workgroupSettingsEntity", key = "#entity.uid", unless = "#result == null")
     @Override
     protected WorkgroupSettingsEntity doSave(WorkgroupSettingsEntity entity) {
         return workgroupSettingsRepository.save(entity);
@@ -551,7 +552,6 @@ public class WorkgroupSettingsRestService
      * Publish draft settings to online for workgroup
      */
     @Transactional
-    @CachePut(value = "workgroupSettings", key = "#uid", unless = "#result == null")
     public WorkgroupSettingsResponse publish(String uid) {
         Optional<WorkgroupSettingsEntity> optional = findByUid(uid);
         if (!optional.isPresent()) {

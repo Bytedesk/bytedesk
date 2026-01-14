@@ -14,7 +14,10 @@
 package com.bytedesk.core.assistant;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.event.UserCreateEvent;
@@ -30,16 +33,22 @@ public class AssistantEventListener {
 
     private final ThreadRestService threadRestService;
 
+    @Async
     @EventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onUserCreateEvent(UserCreateEvent event) {
         UserEntity user = event.getUser();
         log.info("assistant onUserCreateEvent: {}", user.getUid());
-        // 
-        // 每创建一个用户，自动给此用户生成一条文件助理的会话
-        threadRestService.createFileAssistantThread(user);
-        // 每创建一个用户，自动给此用户生成一条剪贴助理的会话
-        // threadService.createClipboardAssistantThread(user);
+        //
+        try {
+            // 每创建一个用户，自动给此用户生成一条文件助理的会话
+            threadRestService.createFileAssistantThread(user);
+            // 每创建一个用户，自动给此用户生成一条剪贴助理的会话
+            // threadService.createClipboardAssistantThread(user);
+        } catch (Exception e) {
+            log.error("Failed to create file assistant thread for user {}: {}", user.getUid(), e.getMessage());
+            // 不重新抛出异常，避免影响用户创建流程
+        }
     }
-    
-    
+
 }
