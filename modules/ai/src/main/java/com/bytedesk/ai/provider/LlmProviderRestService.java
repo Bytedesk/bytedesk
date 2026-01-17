@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
-// import org.springframework.cache.annotation.CacheEvict;
-// import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -60,18 +60,20 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return llmProviderRepository.findAll(spec, pageable);
     }
 
-    // @Cacheable(value = "provider", key = "#uid", unless = "#result == null || #result.isEmpty()")
+    // 注意：Spring Cache 对 Optional 返回值会进行“解包”，SpEL 中 #result 可能是实体而非 Optional。
+    // 因此 unless 不能写 #result.isEmpty()，否则会触发 SpelEvaluationException。
+    @Cacheable(value = "provider", key = "#uid", unless = "#result == null")
     @Override
     public Optional<LlmProviderEntity> findByUid(String uid) {
         return llmProviderRepository.findByUid(uid);
     }
 
-    // @Cacheable(value = "provider", key = "#type + '-' + #orgUid", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "provider", key = "#type + '-' + #orgUid", unless = "#result == null")
     public Optional<LlmProviderEntity> findByTypeAndOrgUid(String type, String orgUid) {
         return llmProviderRepository.findByTypeAndLevelAndOrgUidAndDeletedFalse(type, LevelEnum.ORGANIZATION.name(), orgUid);
     }
 
-    // @Cacheable(value = "provider", key = "#type + '-' + #level", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "provider", key = "#type + '-' + #level", unless = "#result == null || #result.isEmpty()")
     public List<LlmProviderEntity> findByType(String type, String level) {
         return llmProviderRepository.findByTypeAndLevelAndDeletedFalse(type, level);
     }
@@ -92,7 +94,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return llmProviderRepository.existsByTypeAndLevelAndOrgUidAndDeletedFalse(type, level, orgUid);
     }
 
-    // @CacheEvict(value = "provider", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "provider", allEntries = true, beforeInvocation = true)
     @Override
     public LlmProviderResponse create(LlmProviderRequest request) {
         // 
@@ -123,7 +125,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return create(request);
     }
 
-    // @CacheEvict(value = "provider", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "provider", allEntries = true, beforeInvocation = true)
     @Override
     public LlmProviderResponse update(LlmProviderRequest request) {
         Optional<LlmProviderEntity> optional = llmProviderRepository.findByUid(request.getUid());
@@ -183,7 +185,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return null;
     }
 
-    // @CacheEvict(value = "provider", allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = "provider", allEntries = true, beforeInvocation = true)
     @Override
     public void deleteByUid(String uid) {
         Optional<LlmProviderEntity> optional = llmProviderRepository.findByUid(uid);
