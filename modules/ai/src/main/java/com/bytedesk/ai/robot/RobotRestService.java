@@ -19,7 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,7 +46,10 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.llm.LlmProviderConfigDefault;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -66,6 +69,13 @@ import lombok.extern.slf4j.Slf4j;
 @Description("Robot Management Service - AI robot and chatbot management service")
 public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, RobotRequest, RobotResponse, RobotExcel> {
 
+    // Cache names (best-practice: separate caches by access pattern for
+    // fine-grained eviction)
+    private static final String CACHE_ENTITY = "robot:entity";
+    private static final String CACHE_RESP = "robot:resp";
+    private static final String CACHE_NAME_ORG = "robot:nameOrg";
+    private static final String CACHE_EXISTS = "robot:exists";
+
     private final RobotRepository robotRepository;
 
     private final ModelMapper modelMapper;
@@ -82,27 +92,27 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     private final RobotSettingsRestService robotSettingsRestService;
 
-    // @Cacheable(value = "robot", key = "#uid", unless = "#result == null")
+    // @Cacheable(value = CACHE_ENTITY, key = "'uid_' + #uid", condition = "#uid != null", unless = "T(org.springframework.util.ObjectUtils).isEmpty(#result)")
     @Override
     public Optional<RobotEntity> findByUid(String uid) {
         return robotRepository.findByUid(uid);
     }
 
     // 根据名称和组织id查询机器人，并且未删除
-    @Cacheable(value = "robot", key = "'nameOrg_' + #p0 + '_' + #p1", unless = "#result == null || #result.isEmpty()")
+    // @Cacheable(value = CACHE_NAME_ORG, key = "'name_org_' + #name + '_' + #orgUid", condition = "#name != null && #orgUid != null", unless = "T(org.springframework.util.ObjectUtils).isEmpty(#result)")
     public Optional<RobotEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid) {
         return robotRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
-    @Cacheable(value = "robot", key = "'exists_' + #p0", unless = "#result == null")
+    // @Cacheable(value = CACHE_EXISTS, key = "'exists_' + #uid", condition = "#uid != null", unless = "#result == null")
     public Boolean existsByUid(String uid) {
         return robotRepository.existsByUidAndDeleted(uid, false);
     }
 
-    @Cacheable(value = "robot", key = "'resp_' + #p0.uid", unless = "#result == null")
+    // @Cacheable(value = CACHE_RESP, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", unless = "#result == null")
     @Override
     public RobotResponse queryByUid(RobotRequest request) {
-        Optional<RobotEntity> robotOptional = robotRepository.findByUid(request.getUid());
+        Optional<RobotEntity> robotOptional = findByUid(request.getUid());
         if (!robotOptional.isPresent()) {
             throw new RuntimeException("robot not found by uid: " + request.getUid());
         }
@@ -111,7 +121,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     @Transactional
     @Override
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse create(RobotRequest request) {
         // 如果uid不为空，判断是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
@@ -163,31 +179,39 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             RobotLlm llm = request.getLlm();
             // Get default model config if not provided
             LlmProviderConfigDefault modelConfig = llmProviderRestService.getLlmProviderConfigDefault();
-            
+
             // Set default chat provider and model if not provided
             if (!StringUtils.hasText(llm.getTextProvider()) || !StringUtils.hasText(llm.getTextModel())) {
-                llm.setTextProvider(llm.getTextProvider() != null ? llm.getTextProvider() : modelConfig.getDefaultChatProvider());
+                llm.setTextProvider(
+                        llm.getTextProvider() != null ? llm.getTextProvider() : modelConfig.getDefaultChatProvider());
                 llm.setTextModel(llm.getTextModel() != null ? llm.getTextModel() : modelConfig.getDefaultChatModel());
             }
-            
+
             // Set default vision provider and model if not provided
-            // if (!StringUtils.hasText(llm.getVisionProvider()) || !StringUtils.hasText(llm.getVisionModel())) {
-            //     llm.setVisionProvider(llm.getVisionProvider() != null ? llm.getVisionProvider() : modelConfig.getDefaultVisionProvider());
-            //     llm.setVisionModel(llm.getVisionModel() != null ? llm.getVisionModel() : modelConfig.getDefaultVisionModel());
+            // if (!StringUtils.hasText(llm.getVisionProvider()) ||
+            // !StringUtils.hasText(llm.getVisionModel())) {
+            // llm.setVisionProvider(llm.getVisionProvider() != null ?
+            // llm.getVisionProvider() : modelConfig.getDefaultVisionProvider());
+            // llm.setVisionModel(llm.getVisionModel() != null ? llm.getVisionModel() :
+            // modelConfig.getDefaultVisionModel());
             // }
-            
+
             // Set default voice provider and model if not provided
             if (!StringUtils.hasText(llm.getAudioProvider()) || !StringUtils.hasText(llm.getAudioModel())) {
-                llm.setAudioProvider(llm.getAudioProvider() != null ? llm.getAudioProvider() : modelConfig.getDefaultVoiceProvider());
-                llm.setAudioModel(llm.getAudioModel() != null ? llm.getAudioModel() : modelConfig.getDefaultVoiceModel());
+                llm.setAudioProvider(llm.getAudioProvider() != null ? llm.getAudioProvider()
+                        : modelConfig.getDefaultVoiceProvider());
+                llm.setAudioModel(
+                        llm.getAudioModel() != null ? llm.getAudioModel() : modelConfig.getDefaultVoiceModel());
             }
-            
+
             // Set default rerank provider and model if not provided
             if (!StringUtils.hasText(llm.getRerankProvider()) || !StringUtils.hasText(llm.getRerankModel())) {
-                llm.setRerankProvider(llm.getRerankProvider() != null ? llm.getRerankProvider() : modelConfig.getDefaultRerankProvider());
-                llm.setRerankModel(llm.getRerankModel() != null ? llm.getRerankModel() : modelConfig.getDefaultRerankModel());
+                llm.setRerankProvider(llm.getRerankProvider() != null ? llm.getRerankProvider()
+                        : modelConfig.getDefaultRerankProvider());
+                llm.setRerankModel(
+                        llm.getRerankModel() != null ? llm.getRerankModel() : modelConfig.getDefaultRerankModel());
             }
-            
+
             robot.setLlm(llm);
         } else {
             RobotLlm robotLlm = RobotLlm.builder().build();
@@ -204,7 +228,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     @Transactional
     @Override
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse update(RobotRequest request) {
 
         Optional<RobotEntity> robotOptional = findByUid(request.getUid());
@@ -266,24 +296,24 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             throw new RuntimeException("robot is required");
         }
         // 因为robotProtobuf中没有name字段，所以前端通过uid传递name
-        String robotName = robotProtobuf.getUid();
-        if (!StringUtils.hasText(robotName)) {
+        String robotUid = robotProtobuf.getUid();
+        if (!StringUtils.hasText(robotUid)) {
             throw new RuntimeException("robotUid is required");
         }
-        Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(robotName, owner.getOrgUid());
+        Optional<RobotEntity> robotOptional = findByUid(robotProtobuf.getUid());
+        //findByNameAndOrgUidAndDeletedFalse(robotName, owner.getOrgUid());
         if (!robotOptional.isPresent()) {
-            throw new RuntimeException("robot " + robotName + " not found");
+            throw new RuntimeException("robot " + robotUid + " not found");
         }
-        String robotUid = robotOptional.get().getUid();
-        //
-        String topic = null;
-        if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
-            // org/robot/robotUid/userUid
-            topic = TopicUtils.formatOrgRobotThreadTopic(robotUid, owner.getUid());
-        } else {
+        // String robotUid = robotOptional.get().getUid();
+        // String topic = null;
+        // if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
+        //     // org/robot/robotUid/userUid
+        //     topic = TopicUtils.formatOrgRobotThreadTopic(robotUid, owner.getUid());
+        // } else {
             // org/robot/robotUid/userUid/randomUid
-            topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
-        }
+        String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
+        // }
         // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
         if (!request.getForceNew()) {
             Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicAndOwner(topic, owner);
@@ -291,12 +321,33 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 return threadRestService.convertToResponse(threadOptional.get());
             }
         }
-        //
+        // 
         RobotEntity robotEntity = robotOptional.get();
-        robotEntity.setAvatar(AvatarConsts.getLlmThreadDefaultAvatar());
-        String user = ConvertAiUtils.convertToUserProtobufString(robotEntity);
-        // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
-        String robot = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
+
+        // 从 UserProtobuf 中获取昵称和头像，如果没有则使用机器人默认值
+        UserProtobuf userProtobuf = request.getUser();
+        String userNickname = null;
+        String userAvatar = null;
+        if (userProtobuf != null) {
+            userNickname = StringUtils.hasText(userProtobuf.getNickname())
+                ? userProtobuf.getNickname()
+                : robotEntity.getNickname();
+            userAvatar = StringUtils.hasText(userProtobuf.getAvatar())
+                ? userProtobuf.getAvatar()
+                : AvatarConsts.getLlmThreadDefaultAvatar();
+        } else {
+            userNickname = robotEntity.getNickname();
+            userAvatar = AvatarConsts.getLlmThreadDefaultAvatar();
+        }
+
+        // 构建 UserProtobuf
+        UserProtobuf threadUser = UserProtobuf.builder()
+                .uid(robotUid)
+                .nickname(userNickname)
+                .avatar(userAvatar)
+                .build();
+        String user = threadUser.toJson();
+        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -309,6 +360,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 .robot(robot)
                 .userUid(owner.getUid())
                 .owner(owner)
+                .level(LevelEnum.ORGANIZATION.name())
                 .orgUid(owner.getOrgUid())
                 .build();
         //
@@ -352,7 +404,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     }
 
     @Transactional
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse updateAvatar(RobotRequest request) {
         Optional<RobotEntity> robotOptional = findByUid(request.getUid());
         if (!robotOptional.isPresent()) {
@@ -369,17 +427,16 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     }
 
     @Override
-    @Caching(
-            // 先清空整个 robot cache，避免更新 name/orgUid 等导致旧 key 残留
-            evict = @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true),
-            // 保存后按 uid 回填常用缓存项
-            put = @CachePut(value = "robot", key = "'entity_' + #result.uid", unless = "#result == null")
-    )
     protected RobotEntity doSave(RobotEntity entity) {
         return robotRepository.save(entity);
     }
 
-    @CacheEvict(value = "robot", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_EXISTS, allEntries = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true)
+    })
     public void save(List<RobotEntity> entities) {
         robotRepository.saveAll(entities);
     }
@@ -403,7 +460,12 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     }
 
     @Override
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #uid", beforeInvocation = true),
+            @CacheEvict(value = CACHE_RESP, key = "'uid_' + #uid", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #uid", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    })
     public void deleteByUid(String uid) {
         Optional<RobotEntity> robotOptional = findByUid(uid);
         robotOptional.ifPresent(robot -> {
@@ -416,7 +478,12 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     }
 
     @Override
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", beforeInvocation = true),
+            @CacheEvict(value = CACHE_RESP, key = "'uid_' + #request.uid", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    })
     public void delete(RobotRequest request) {
         deleteByUid(request.getUid());
     }
@@ -438,7 +505,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     // 创建一个机器人
     @Transactional
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #uid", condition = "#uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #uid", condition = "#uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse createDefaultRobot(String orgUid, String uid) {
         // 判断uid是否已经存在
         if (StringUtils.hasText(uid) && existsByUid(uid)) {
@@ -458,7 +531,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     // 创建一个空白智能体
     @Transactional
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #robotUid", condition = "#robotUid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #robotUid", condition = "#robotUid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse createDefaultPromptRobot(String orgUid, String robotUid) {
         // 判断uid是否已经存在
         if (StringUtils.hasText(robotUid) && existsByUid(robotUid)) {
@@ -466,7 +545,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
         // 使用组织默认 Settings（若不存在则创建）并绑定
         RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
-        // 
+        //
         RobotEntity robot = RobotEntity.builder()
                 .uid(robotUid)
                 .name(RobotConsts.ROBOT_NAME_VOID_AGENT)
@@ -487,97 +566,137 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         RobotConfiguration config = robotJsonLoader.loadRobots();
         List<Robot> robots = config.getRobots();
         for (Robot robotJson : robots) {
-            // 使用name代替uid，方便查询和创建机器人
-            String name = robotJson.getName();
-            Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(name, orgUid);
-            if (!robotOptional.isPresent()) {
-                String categoryUid = null;
-                Optional<CategoryEntity> categoryOptional = categoryRestService
-                        .findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
-                                robotJson.getCategory(), CategoryTypeEnum.ROBOT.name(), orgUid, level,
-                                BytedeskConsts.PLATFORM_BYTEDESK);
-                if (!categoryOptional.isPresent()) {
-                    CategoryRequest categoryRequest = CategoryRequest.builder()
-                            .name(robotJson.getCategory())
-                            .order(0)
-                            .level(level)
-                            .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-                            .type(CategoryTypeEnum.ROBOT.name())
-                            .orgUid(orgUid)
-                            .build();
-                    CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
-                    if (categoryResponse != null) {
-                        categoryUid = categoryResponse.getUid();
-                    } else {
-                        throw new RuntimeException("create category failed");
-                    }
-                } else {
-                    categoryUid = categoryOptional.get().getUid();
-                }
-                // Get locale data (default to zh_cn if available, fallback to en)
-                RobotJsonLoader.LocaleData localeData = robotJson.getI18n().getZh_cn() != null
-                        ? robotJson.getI18n().getZh_cn()
-                        : robotJson.getI18n().getEn();
+            String categoryUid = ensureRobotCategory(level, orgUid, robotJson.getCategory());
+            RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
 
-                RobotLlm robotLlm = RobotLlm.builder()
-                    .prompt(localeData.getPrompt())
-                    .build();
+            // 默认仅初始化简体中文机器人；多语言 Prompt 由 enterprise/ai 的 Prompt 初始化负责
+            createRobotIfAbsent(robotJson, level, orgUid, categoryUid, persistedSettings,
+                robotJson.getName(), resolveLocale(robotJson, LanguageEnum.ZH_CN));
+        }
+    }
 
-                // Use organization default settings (ignore per-robot custom prompt)
-                RobotSettingsEntity persistedSettings = robotSettingsRestService.getOrCreateDefault(orgUid);
-
-                String robotUid = uidUtils.getUid();
-                if ("airline_booking_assistant".equals(name)) {
-                    // External callers rely on a deterministic UID for airline booking tests
-                    robotUid = BytedeskConsts.DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID;
-                }
-
-                // Ensure the chosen UID is unique. If it already exists (including soft-deleted
-                // records), generate a new one to avoid unique constraint violations on `uuid`.
-                try {
-                    if (existsByUid(robotUid)) {
-                        log.warn("robotUid {} already exists, generating a new uid to avoid conflict", robotUid);
-                        // generate until unique (extremely unlikely to loop many times)
-                        do {
-                            robotUid = uidUtils.getUid();
-                        } while (existsByUid(robotUid));
-                    }
-                } catch (Exception ex) {
-                    // In rare cases the existence check may fail; fallback to generating a fresh uid
-                    log.warn("failed to check uid existence for {}: {}", robotUid, ex.getMessage());
-                    robotUid = uidUtils.getUid();
-                }
-
-                // Create robot entity
-                RobotEntity robot = RobotEntity.builder()
-                    .uid(robotUid)
-                    .name(robotJson.getName())
-                    .nickname(localeData.getNickname())
-                    .avatar(AvatarConsts.getDefaultRobotAvatar())
-                    .description(localeData.getDescription())
-                    .type(robotJson.getType())
-                    .llm(robotLlm)
-                    .categoryUid(categoryUid)
+    private String ensureRobotCategory(String level, String orgUid, String categoryName) {
+        String categoryUid = null;
+        Optional<CategoryEntity> categoryOptional = categoryRestService
+                .findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeleted(
+                        categoryName, CategoryTypeEnum.ROBOT.name(), orgUid, level, BytedeskConsts.PLATFORM_BYTEDESK);
+        if (!categoryOptional.isPresent()) {
+            CategoryRequest categoryRequest = CategoryRequest.builder()
+                    .name(categoryName)
+                    .order(0)
                     .level(level)
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .type(CategoryTypeEnum.ROBOT.name())
                     .orgUid(orgUid)
-                    .settings(persistedSettings)
-                    .system(true)
                     .build();
-                // Persist with defensive handling for unique constraint violations
-                try {
-                    save(robot);
-                } catch (org.springframework.dao.DataIntegrityViolationException dive) {
-                    log.warn("skipping robot creation due to DataIntegrityViolation for uid {}: {}", robotUid, dive.getMessage());
-                } catch (Exception ex) {
-                    log.error("failed to save robot {}: {}", robotUid, ex.getMessage(), ex);
-                }
+            CategoryResponse categoryResponse = categoryRestService.create(categoryRequest);
+            if (categoryResponse != null) {
+                categoryUid = categoryResponse.getUid();
+            } else {
+                throw new RuntimeException("create category failed");
             }
+        } else {
+            categoryUid = categoryOptional.get().getUid();
+        }
+        return categoryUid;
+    }
+
+    private RobotJsonLoader.LocaleData resolveLocale(Robot robotJson, LanguageEnum language) {
+        if (robotJson == null || robotJson.getI18n() == null) {
+            return null;
+        }
+        RobotJsonLoader.LocaleData zhCn = robotJson.getI18n().getZh_cn();
+        RobotJsonLoader.LocaleData en = robotJson.getI18n().getEn();
+        RobotJsonLoader.LocaleData zhTw = robotJson.getI18n().getZh_tw();
+
+        // 尽量按目标语言取；缺失时做兜底，避免初始化时 NPE
+        switch (language) {
+            case EN:
+                return en != null ? en : (zhCn != null ? zhCn : zhTw);
+            case ZH_TW:
+                return zhTw != null ? zhTw : (zhCn != null ? zhCn : en);
+            case ZH_CN:
+            default:
+                return zhCn != null ? zhCn : (en != null ? en : zhTw);
+        }
+    }
+
+    private void createRobotIfAbsent(
+            Robot robotJson,
+            String level,
+            String orgUid,
+            String categoryUid,
+            RobotSettingsEntity persistedSettings,
+            String robotName,
+            RobotJsonLoader.LocaleData localeData) {
+
+        if (!StringUtils.hasText(robotName)) {
+            return;
+        }
+
+        Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
+        if (robotOptional.isPresent()) {
+            return;
+        }
+
+        RobotLlm robotLlm = RobotLlm.builder()
+                .prompt(localeData != null ? localeData.getPrompt() : null)
+                .build();
+
+        String robotUid = uidUtils.getUid();
+        if ("airline_booking_assistant".equals(robotJson.getName())) {
+            // External callers rely on a deterministic UID for airline booking tests
+            robotUid = BytedeskConsts.DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID;
+        }
+
+        // Ensure the chosen UID is unique. If it already exists (including soft-deleted
+        // records), generate a new one to avoid unique constraint violations on `uuid`.
+        try {
+            if (existsByUid(robotUid)) {
+                log.warn("robotUid {} already exists, generating a new uid to avoid conflict", robotUid);
+                do {
+                    robotUid = uidUtils.getUid();
+                } while (existsByUid(robotUid));
+            }
+        } catch (Exception ex) {
+            log.warn("failed to check uid existence for {}: {}", robotUid, ex.getMessage());
+            robotUid = uidUtils.getUid();
+        }
+
+        RobotEntity robot = RobotEntity.builder()
+                .uid(robotUid)
+                .name(robotName)
+                .nickname(localeData != null ? localeData.getNickname() : null)
+                .avatar(AvatarConsts.getDefaultRobotAvatar())
+                .description(localeData != null ? localeData.getDescription() : null)
+                .type(robotJson.getType())
+                .llm(robotLlm)
+                .categoryUid(categoryUid)
+                .level(level)
+                .orgUid(orgUid)
+                .settings(persistedSettings)
+                .system(true)
+                .build();
+
+        try {
+            save(robot);
+        } catch (org.springframework.dao.DataIntegrityViolationException dive) {
+            log.warn("skipping robot creation due to DataIntegrityViolation for uid {}: {}", robotUid,
+                    dive.getMessage());
+        } catch (Exception ex) {
+            log.error("failed to save robot {}: {}", robotUid, ex.getMessage(), ex);
         }
     }
 
     // 创建智能体机器人（LLM 配置请通过 RobotSettings 进行）
     @Transactional
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse createPromptRobot(RobotRequest request) {
         RobotEntity robot = modelMapper.map(request, RobotEntity.class);
         robot.setUid(uidUtils.getUid());
@@ -591,7 +710,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     // update prompt robot
     @Transactional
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse updatePromptRobot(RobotRequest request) {
         Optional<RobotEntity> robotOptional = findByUid(request.getUid());
         if (!robotOptional.isPresent()) {
@@ -615,7 +740,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     }
 
     @Transactional
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse updatePromptText(RobotRequest request) {
         if (!StringUtils.hasText(request.getUid())) {
             throw new IllegalArgumentException("robot uid is required");
@@ -644,7 +775,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     // 知识库更新请通过 RobotSettings 接口更新 kbEnabled/kbUid
     @Transactional
-    @CacheEvict(value = "robot", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
     public RobotResponse updateKbUid(RobotRequest request) {
         // Deprecated path retained for compatibility; use RobotSettings APIs instead.
         log.warn("updateKbUid is deprecated. Please use RobotSettings APIs to update kbEnabled/kbUid.");

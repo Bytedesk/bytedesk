@@ -13,12 +13,12 @@
  */
 package com.bytedesk.core.action.disruptor;
 
-import lombok.Data;
+// import lombok.Data;
 
-// https://lmax-exchange.github.io/disruptor/user-guide/#_getting_started
-@Data
-public class LogEvent {
+// // https://lmax-exchange.github.io/disruptor/user-guide/#_getting_started
+// @Data
+// public class LogEvent {
 
-    private String content;
+//     private String content;
 
-}
+// }

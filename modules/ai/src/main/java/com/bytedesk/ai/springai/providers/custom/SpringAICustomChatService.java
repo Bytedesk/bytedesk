@@ -30,7 +30,6 @@ import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.service.BaseSpringAIService;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.constant.I18Consts;
 
@@ -58,65 +57,69 @@ public class SpringAICustomChatService extends BaseSpringAIService {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
-        
+
         try {
             // 创建自定义的选项对象
             return OpenAiChatOptions.builder()
-                .model(llm.getTextModel())
-                .temperature(llm.getTemperature())
-                .topP(llm.getTopP())
-                .build();
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .topP(llm.getTopP())
+                    .build();
         } catch (Exception e) {
             log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);
             return null;
         }
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
-        log.info("Custom API websocket ");
-        
-        if (customChatModel == null) {
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
-        
-        // 如果有自定义选项，创建新的Prompt
-        Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
-        if (customOptions != null) {
-            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
-        }
-        
-        // 使用同一个ChatModel实例，但传入不同的选项
-        customChatModel.stream(requestPrompt).subscribe(
-                response -> {
-                    if (response != null) {
-                        log.info("Custom API response metadata: {}", response.getMetadata());
-                        List<Generation> generations = response.getResults();
-                        for (Generation generation : generations) {
-                            AssistantMessage assistantMessage = generation.getOutput();
-                            String textContent = assistantMessage.getText();
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置
+    //     RobotLlm llm = robot.getLlm();
+    //     log.info("Custom API websocket ");
 
-                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-                        }
-                    }
-                },
-                error -> {
-                    log.error("Custom API error: ", error);
-                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                },
-                () -> {
-                    log.info("Chat stream completed");
-                });
-    }
+    //     if (customChatModel == null) {
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         return;
+    //     }
+
+    //     // 如果有自定义选项，创建新的Prompt
+    //     Prompt requestPrompt = prompt;
+    //     OpenAiChatOptions customOptions = createDynamicOptions(llm);
+    //     if (customOptions != null) {
+    //         requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+    //     }
+
+    //     // 使用同一个ChatModel实例，但传入不同的选项
+    //     customChatModel.stream(requestPrompt).subscribe(
+    //             response -> {
+    //                 if (response != null) {
+    //                     log.info("Custom API response metadata: {}", response.getMetadata());
+    //                     List<Generation> generations = response.getResults();
+    //                     for (Generation generation : generations) {
+    //                         AssistantMessage assistantMessage = generation.getOutput();
+    //                         String textContent = assistantMessage.getText();
+
+    //                         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent,
+    //                                 messageProtobufReply);
+    //                     }
+    //                 }
+    //             },
+    //             error -> {
+    //                 log.error("Custom API error: ", error);
+    //                 sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                         I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //             },
+    //             () -> {
+    //                 log.info("Chat stream completed");
+    //             });
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
         log.info("Custom API sync ");
-        
+
         try {
             if (customChatModel == null) {
                 return "Custom service is not available";
@@ -134,7 +137,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                         return promptHelper.extractTextFromResponse(response);
                     }
                 }
-                
+
                 var response = customChatModel.call(message);
                 return promptHelper.extractTextFromResponse(response);
             } catch (Exception e) {
@@ -148,19 +151,22 @@ public class SpringAICustomChatService extends BaseSpringAIService {
     }
 
     @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, 
-        MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences,
+            SseEmitter emitter) {
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         log.info("Custom API SSE ");
 
         if (customChatModel == null) {
-            sseMessageHelper.handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery, messageProtobufReply, emitter);
+            sseMessageHelper.handleSseError(new RuntimeException("Custom service not available"), messageProtobufQuery,
+                    messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+        sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                I18Consts.I18N_THINKING);
 
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
@@ -179,8 +185,9 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("Custom API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
-                                
-                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                                        textContent, null, sourceReferences);
                             }
                         }
                     } catch (Exception e) {
@@ -194,15 +201,17 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Custom API SSE complete");
-            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
-                            0, 0, 0, prompt, "custom", (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "custom-chat");
+                    sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                            0, 0, 0, prompt, "custom",
+                            (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+                                    : "custom-chat");
                 });
     }
 
     public OpenAiChatModel getChatModel() {
         return customChatModel;
     }
-    
+
     public Boolean isServiceHealthy() {
         if (customChatModel == null) {
             return false;

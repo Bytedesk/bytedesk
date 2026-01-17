@@ -69,6 +69,22 @@ public class FormRestService extends BaseRestService<FormEntity, FormRequest, Fo
         return queryByOrg(request);
     }
 
+    /**
+     * visitor: 点击表单（与 FAQ click 类似，当前仅返回表单详情）
+     */
+    public FormResponse clickForm(FormRequest request) {
+        if (!StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("Form uid is required");
+        }
+        Optional<FormEntity> optional = formRepository.findByUid(request.getUid());
+        if (optional.isEmpty()) {
+            throw new RuntimeException("Form not found");
+        }
+        FormEntity entity = optional.get();
+        // 可按需增加统计字段（当前 FormEntity 未定义 view/click 计数）
+        return convertToResponse(entity);
+    }
+
     @Override
     public FormResponse create(FormRequest request) {
         FormEntity entity = modelMapper.map(request, FormEntity.class);

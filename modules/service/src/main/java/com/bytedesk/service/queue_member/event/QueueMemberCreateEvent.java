@@ -13,24 +13,16 @@
  */
 package com.bytedesk.service.queue_member.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+/**
+ * Event published when a new queue member is created.
+ */
+public class QueueMemberCreateEvent extends AbstractQueueMemberEvent {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class QueueMemberCreateEvent extends ApplicationEvent {
-    
-    private final static long serialVersionUID = 1L;
-
-    private QueueMemberEntity member;
+    private static final long serialVersionUID = 1L;
 
     public QueueMemberCreateEvent(QueueMemberEntity member) {
-        super(member);
-        this.member = member;
+        super(member, member);
     }
-
 }

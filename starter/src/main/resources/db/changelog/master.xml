@@ -49,8 +49,11 @@
 
     <include file="db/changelog/migration/260112_alter_browse_user_agent_length.xml" />
     <include file="db/changelog/migration/260112_alter_browse_event_data_to_text.xml" />
+    <include file="db/changelog/migration/260114_alter_browse_referrer_url_title_length.xml" />
     <include file="db/changelog/migration/260113_add_input_preview_display_settings.xml" />
     <include file="db/changelog/migration/260114_add_toolbar_upload_robot.xml" />
     <!-- <include file="db/changelog/migration/260114_drop_org_name_code_unique_constraints.xml" /> -->
+
+    <include file="db/changelog/migration/260117_add_message_agent_reply_fields.xml" />
 
 </databaseChangeLog>

@@ -37,6 +37,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.FormContent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import lombok.AllArgsConstructor;
@@ -88,7 +89,20 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
         } else {
             entity.setUid(uidUtils.getUid());
         }
-        entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+        MessageTypeEnum messageType = MessageTypeEnum.fromValue(normalizeType(request.getType()));
+        entity.setType(messageType.name());
+
+        // FORM 类型：content 统一存储为 FormContent JSON
+        if (MessageTypeEnum.FORM == messageType) {
+            FormContent parsed = FormContent.fromJson(request.getContent());
+            if (parsed == null) {
+                parsed = FormContent.builder()
+                        .formSchema(request.getContent())
+                        .formVersion(1)
+                        .build();
+            }
+            entity.setContent(parsed.toJson());
+        }
 
         // 如果提供了 agentUid，则强制归属到该坐席的个人快捷回复知识库，并标记为 AGENT 级别
         if (StringUtils.hasText(request.getAgentUid())) {
@@ -133,8 +147,20 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
             // modelMapper.map(request, entity);
             entity.setTitle(request.getTitle());
             entity.setContent(request.getContent());
-            entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
+            MessageTypeEnum messageType = MessageTypeEnum.fromValue(normalizeType(request.getType()));
+            entity.setType(messageType.name());
             entity.setShortCut(request.getShortCut());
+
+            if (MessageTypeEnum.FORM == messageType) {
+                FormContent parsed = FormContent.fromJson(request.getContent());
+                if (parsed == null) {
+                    parsed = FormContent.builder()
+                            .formSchema(request.getContent())
+                            .formVersion(1)
+                            .build();
+                }
+                entity.setContent(parsed.toJson());
+            }
             // 
             if (StringUtils.hasText(request.getCategoryUid())) {
                 entity.setCategoryUid(request.getCategoryUid());
@@ -172,6 +198,22 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
 
     public void save(List<QuickReplyEntity> entities) {
         quickReplyRepository.saveAll(entities);
+    }
+
+    private String normalizeType(String rawType) {
+        if (!StringUtils.hasText(rawType)) {
+            return rawType;
+        }
+        if ("PHONE".equalsIgnoreCase(rawType)) {
+            return MessageTypeEnum.PHONE_NUMBER.name();
+        }
+        if ("EMAIL".equalsIgnoreCase(rawType)) {
+            return MessageTypeEnum.EMAILL_ADDRESS.name();
+        }
+        if ("WECHAT".equalsIgnoreCase(rawType)) {
+            return MessageTypeEnum.WECHAT_NUMBER.name();
+        }
+        return rawType;
     }
 
     // 启用/禁用快捷回复

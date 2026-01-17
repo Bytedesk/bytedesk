@@ -47,6 +47,12 @@ public class MessageExtra extends BaseExtra {
     
     private String orgUid; // 组织UID
 
+    // 来自访客端快捷按钮自动发送的标记
+    private Boolean fromQuickButton;
+
+    // 如果来自快捷按钮，可记录按钮 uid 以便追溯
+    private String quickButtonUid;
+
     public static MessageExtra fromJson(String json) {
         MessageExtra result = BaseExtra.fromJson(json, MessageExtra.class);
         return result != null ? result : MessageExtra.builder().build();

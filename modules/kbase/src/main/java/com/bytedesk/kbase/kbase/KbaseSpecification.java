@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class KbaseSpecification extends BaseSpecification<KbaseEntity, KbaseRequest> {
 
     public static Specification<KbaseEntity> search(KbaseRequest request, AuthService authService) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));

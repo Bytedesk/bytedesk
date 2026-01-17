@@ -17,6 +17,7 @@ import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -46,14 +47,39 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
+    /**
+     * 请求体不可读（常见于 JSON 不合法、被截断、Content-Type 与实际不符、或空 body 但声明了 JSON）
+     * 这类问题通常是客户端请求构造/网络中断导致，属于 4xx，不应打印 error 级别堆栈刷屏。
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                log.warn("HttpMessageNotReadable: method={} uri={} contentType={} contentLength={} msg={}",
+                        request.getMethod(),
+                        request.getRequestURI(),
+                        request.getContentType(),
+                        request.getContentLengthLong(),
+                        ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage());
+            } else {
+                log.warn("HttpMessageNotReadable: {}", ex.getMessage());
+            }
+        } catch (Exception ignore) {
+            log.warn("HttpMessageNotReadable (failed to log request context): {}", ex.getMessage());
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_INVALID_REQUEST_BODY, HttpStatus.BAD_REQUEST.value()));
+    }
+
     @ExceptionHandler(UploadStorageException.class)
     public ResponseEntity<?> handleUploadStorageException(UploadStorageException e) {
         // 上传失败通常属于客户端输入/文件问题（类型/大小/内容校验等），返回可读提示
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), e.getCode() == null ? 400 : e.getCode()));
     }
-
-    // @Autowired
-    // private BytedeskProperties bytedeskProperties;
 
     @ExceptionHandler(UsernameExistsException.class)
     public ResponseEntity<?> handleUsernameExistsException(UsernameExistsException e) {

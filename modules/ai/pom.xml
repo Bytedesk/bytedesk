@@ -23,7 +23,7 @@
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
 		<zhipuai.oapi-java-sdk.version>release-V4-2.4.3</zhipuai.oapi-java-sdk.version>
-		<zai-sdk.version>0.1.3</zai-sdk.version>
+		<zai-sdk.version>0.3.2</zai-sdk.version>
 	</properties>
 
 	<dependencies>
@@ -131,24 +131,7 @@
 			<artifactId>spring-ai-starter-model-zhipuai</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-
-		<!-- spring ai 官方无法正常统计 token 使用量，使用这个zhipuai 官方库 -->
-		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
-		<!-- https://bigmodel.cn/dev/api/devguide/sdk-install -->
-		<!-- https://mvnrepository.com/artifact/cn.bigmodel.openapi/oapi-java-sdk -->
-		<dependency>
-			<groupId>cn.bigmodel.openapi</groupId>
-			<artifactId>oapi-java-sdk</artifactId>
-			<version>${zhipuai.oapi-java-sdk.version}</version>
-		</dependency>
-		<!-- https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java -->
-		<!-- https://mvnrepository.com/artifact/ai.z.openapi/zai-sdk -->
-		<dependency>
-			<groupId>ai.z.openapi</groupId>
-			<artifactId>zai-sdk</artifactId>
-			<version>${zai-sdk.version}</version>
-		</dependency>
-
+		
 		<!-- vector store -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
 		<!--
@@ -158,7 +141,6 @@
 			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-		
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
@@ -177,12 +159,39 @@
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- spring ai 官方无法正常统计 token 使用量，使用这个zhipuai 官方库 -->
+		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
+		<!-- https://bigmodel.cn/dev/api/devguide/sdk-install -->
+		<!-- https://mvnrepository.com/artifact/cn.bigmodel.openapi/oapi-java-sdk -->
+		<dependency>
+			<groupId>cn.bigmodel.openapi</groupId>
+			<artifactId>oapi-java-sdk</artifactId>
+			<version>${zhipuai.oapi-java-sdk.version}</version>
+		</dependency>
+
+		<!-- https://github.com/zai-org/z-ai-sdk-java -->
+		<!-- https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java -->
+		<!-- https://mvnrepository.com/artifact/ai.z.openapi/zai-sdk -->
+		<dependency>
+			<groupId>ai.z.openapi</groupId>
+			<artifactId>zai-sdk</artifactId>
+			<version>${zai-sdk.version}</version>
+		</dependency>
+
+		<!-- https://java2ai.com/docs/quick-start -->
 		<!-- https://github.com/alibaba/spring-ai-alibaba -->
-		<!--
-		https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+			<version>${spring-ai-alibaba.version}</version>
+		</dependency>
+		<!-- Spring AI Alibaba Agent Framework -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-agent-framework -->
+		<dependency>
+			<groupId>com.alibaba.cloud.ai</groupId>
+			<artifactId>spring-ai-alibaba-agent-framework</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-graph-core -->
@@ -196,6 +205,7 @@
             <artifactId>spring-ai-alibaba-starter-graph-observation</artifactId>
             <version>${spring-ai-alibaba.version}</version>
         </dependency> -->
+		
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
 		<dependency>

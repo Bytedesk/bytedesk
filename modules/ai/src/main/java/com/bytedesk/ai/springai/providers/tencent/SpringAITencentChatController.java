@@ -13,12 +13,16 @@
  */
 package com.bytedesk.ai.springai.providers.tencent;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 // import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.ai.utils.output.ActorsFilms;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -42,13 +48,92 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/tencent")
+@RequestMapping("/tencent")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.tencent.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAITencentChatController {
 
+    private final BytedeskProperties bytedeskProperties;
     private final SpringAITencentChatService springAITencentService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    // http://127.0.0.1:9003/tencent/format?actor=
+    // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+    @GetMapping("/format")
+    public ResponseEntity<JsonResult<?>> generate(
+            @RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        var outputParser = new BeanOutputConverter<>(ActorsFilms.class);
+        String format = outputParser.getFormat();
+        log.info("format: {}", format);
+        String userMessage = """
+                Generate the filmography for the actor {actor}.
+                {format}
+                /no_think
+                """;
+
+        PromptTemplate promptTemplate = PromptTemplate.builder()
+                .template(userMessage)
+                .variables(Map.of("actor", actor, "format", format))
+                .build();
+        Prompt prompt = new Prompt(promptTemplate.createMessage());
+
+        OpenAiChatModel model = springAITencentService.getChatModel();
+        if (model == null) {
+            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
+        }
+
+        ChatResponse response = model.call(prompt);
+        String content = response.getResult().getOutput().getText();
+        ActorsFilms actorsFilms = outputParser.convert(content);
+        log.info("actorsFilms: {}", actorsFilms);
+
+        return ResponseEntity.ok(JsonResult.success(actorsFilms));
+    }
+
+    // structured output
+    // http://127.0.0.1:9003/tencent/structured?message=
+    // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+    @GetMapping("/structured")
+    public ResponseEntity<JsonResult<?>> structured(
+            @RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
+        String userInputTemplate = """
+                Your response should be in JSON format.
+                The data structure for the JSON should match this Java class: java.util.HashMap
+                Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+                {message}
+                {format}
+                /no_think
+                """;
+        log.info("userInputTemplate: {}", userInputTemplate);
+
+        Prompt prompt = new Prompt(
+                PromptTemplate.builder()
+                        .template(userInputTemplate)
+                        .variables(Map.of("message", message, "format", outputConverter.getFormat()))
+                        .build()
+                        .createMessage());
+
+        OpenAiChatModel model = springAITencentService.getChatModel();
+        if (model == null) {
+            return ResponseEntity.ok(JsonResult.error("Tencent service is not available"));
+        }
+
+        ChatResponse response = model.call(prompt);
+        log.info("response: {}", response);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
 
     /**
      * 方式1：同步调用
@@ -57,6 +142,10 @@ public class SpringAITencentChatController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         
         String response = springAITencentService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
@@ -69,6 +158,9 @@ public class SpringAITencentChatController {
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
         
         Prompt prompt = new Prompt(new UserMessage(message));
         OpenAiChatModel model = springAITencentService.getChatModel();
@@ -88,6 +180,16 @@ public class SpringAITencentChatController {
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+
+        if (!bytedeskProperties.getDebug()) {
+            try {
+                emitter.send(SseEmitter.event().name("error").data("Service is not available"));
+            } catch (Exception e) {
+                log.debug("Unable to send error event", e);
+            }
+            emitter.complete();
+            return emitter;
+        }
         
         executorService.execute(() -> {
             try {
@@ -118,6 +220,10 @@ public class SpringAITencentChatController {
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         
         OpenAiChatModel model = springAITencentService.getChatModel();
         if (model == null) {

@@ -39,7 +39,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -124,52 +123,52 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
     /**
      * 方式1：异步流式调用（带prompt参数）
      */
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置
+    // RobotLlm llm = robot.getLlm();
 
-        // 获取适当的模型实例
-        ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
+    //     // 获取适当的模型实例
+    //     ZhiPuAiChatModel chatModel = (llm != null) ? createDynamicChatModel(llm) : bytedeskZhipuaiChatModel;
 
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = {false};
-        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
+    //     long startTime = System.currentTimeMillis();
+    //     final boolean[] success = {false};
+    //     final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
-        chatModel.stream(prompt).subscribe(
-                response -> {
-                    if (response != null) {
-                        log.info("Zhipuai API response metadata: {}", response.getMetadata());
-                        List<Generation> generations = response.getResults();
-                        for (Generation generation : generations) {
-                            AssistantMessage assistantMessage = generation.getOutput();
-                            String textContent = assistantMessage.getText();
+    //     chatModel.stream(prompt).subscribe(
+    //             response -> {
+    //                 if (response != null) {
+    //                     log.info("Zhipuai API response metadata: {}", response.getMetadata());
+    //                     List<Generation> generations = response.getResults();
+    //                     for (Generation generation : generations) {
+    //                         AssistantMessage assistantMessage = generation.getOutput();
+    //                         String textContent = assistantMessage.getText();
 
-                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-                        }
-                        // 提取token使用情况
-                        tokenUsage[0] = extractZhipuaiTokenUsage(response);
-                        log.info("Zhipuai API websocket tokenUsage after manual extraction: {}", tokenUsage[0]);
-                        success[0] = true;
-                    }
-                },
-                error -> {
-                    log.error("Zhipuai API error: ", error);
-                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                    success[0] = false;
-                },
-                () -> {
-                    log.info("Chat stream completed");
-                    // 记录token使用情况
-                    long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo";
-                    log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
-                });
-    }
+    //                         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+    //                     }
+    //                     // 提取token使用情况
+    //                     tokenUsage[0] = extractZhipuaiTokenUsage(response);
+    //                     log.info("Zhipuai API websocket tokenUsage after manual extraction: {}", tokenUsage[0]);
+    //                     success[0] = true;
+    //                 }
+    //             },
+    //             error -> {
+    //                 log.error("Zhipuai API error: ", error);
+    //                 sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //                 success[0] = false;
+    //             },
+    //             () -> {
+    //                 log.info("Chat stream completed");
+    //                 // 记录token使用情况
+    //                 long responseTime = System.currentTimeMillis() - startTime;
+    //                 String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "glm-3-turbo";
+    //                 log.info("Zhipuai API websocket recording token usage - prompt: {}, completion: {}, total: {}, model: {}", 
+    //                         tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), modelType);
+    //         tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType, 
+    //                         tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
+    //             });
+    // }
 
     /**
      * 方式2：同步调用（带prompt参数）

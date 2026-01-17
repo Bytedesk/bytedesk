@@ -13,23 +13,16 @@
  */
 package com.bytedesk.service.queue_member.event;
 
-import org.springframework.context.ApplicationEvent;
-
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class QueueMemberUpdateEvent extends ApplicationEvent {
+/**
+ * Event published when a queue member is updated.
+ */
+public class QueueMemberUpdateEvent extends AbstractQueueMemberEvent {
     
-    private final static long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-    private QueueMemberEntity counter;
-
-    public QueueMemberUpdateEvent(Object source, QueueMemberEntity counter) {
-        super(source);
-        this.counter = counter;
+    public QueueMemberUpdateEvent(Object source, QueueMemberEntity member) {
+        super(source, member);
     }
 }

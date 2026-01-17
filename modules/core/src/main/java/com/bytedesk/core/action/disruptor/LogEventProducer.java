@@ -13,32 +13,32 @@
  */
 package com.bytedesk.core.action.disruptor;
 
-import org.springframework.stereotype.Component;
+// import org.springframework.stereotype.Component;
 
-import com.lmax.disruptor.RingBuffer;
+// import com.lmax.disruptor.RingBuffer;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Component
-@RequiredArgsConstructor
-public class LogEventProducer {
+// @Slf4j
+// @Component
+// @RequiredArgsConstructor
+// public class LogEventProducer {
 
-    private final RingBuffer<LogEvent> ringBuffer;
+//     private final RingBuffer<LogEvent> ringBuffer;
 
-    public void simulate() {
-        log.info("simulate producer");
-        // 模拟日志生成
-        for (int i = 0; i < 10000; i++) {
-            long sequence = ringBuffer.next();
-            try {
-                LogEvent event = ringBuffer.get(sequence);
-                event.setContent("Log Message " + i); // 模拟日志消息
-            } finally {
-                ringBuffer.publish(sequence);
-            }
-        }
+//     public void simulate() {
+//         log.info("simulate producer");
+//         // 模拟日志生成
+//         for (int i = 0; i < 10000; i++) {
+//             long sequence = ringBuffer.next();
+//             try {
+//                 LogEvent event = ringBuffer.get(sequence);
+//                 event.setContent("Log Message " + i); // 模拟日志消息
+//             } finally {
+//                 ringBuffer.publish(sequence);
+//             }
+//         }
 
-    }
-}
+//     }
+// }

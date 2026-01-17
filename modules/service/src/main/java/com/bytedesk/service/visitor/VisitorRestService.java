@@ -131,7 +131,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         if (!StringUtils.hasText(request.getVisitorUid())) {
             request.setVisitorUid(request.getUid());
         }
-        log.info("request {}", request);
+        // log.info("request {}", request);
         VisitorEntity visitor = modelMapper.map(request, VisitorEntity.class);
         VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
         visitor.setDeviceInfo(device);
@@ -274,7 +274,6 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
 
     @Override
     public VisitorExcel convertToExcel(VisitorEntity entity) {
-        // return VisitorExcelConverter.convert(entity);
         VisitorExcel excel = modelMapper.map(entity, VisitorExcel.class);
         excel.setChannel(ChannelEnum.toChineseDisplay(entity.getChannel()));
         return excel;

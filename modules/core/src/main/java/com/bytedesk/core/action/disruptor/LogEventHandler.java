@@ -13,17 +13,17 @@
  */
 package com.bytedesk.core.action.disruptor;
 
-import com.lmax.disruptor.EventHandler;
+// import com.lmax.disruptor.EventHandler;
 
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-// https://lmax-exchange.github.io/disruptor/user-guide/#_getting_started
-@Slf4j
-public class LogEventHandler implements EventHandler<LogEvent> {
+// // https://lmax-exchange.github.io/disruptor/user-guide/#_getting_started
+// @Slf4j
+// public class LogEventHandler implements EventHandler<LogEvent> {
 
-    @Override
-    public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
-        log.info("Disruptor LongEventHandler: {}, sequence {}, endOfBatch {}", event.getContent(), sequence, endOfBatch);
-    }
+//     @Override
+//     public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
+//         log.info("Disruptor LongEventHandler: {}, sequence {}, endOfBatch {}", event.getContent(), sequence, endOfBatch);
+//     }
 
-}
+// }

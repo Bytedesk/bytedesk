@@ -15,12 +15,17 @@ package com.bytedesk.ai.springai.providers.zhipuai;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
@@ -36,6 +41,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.utils.output.ActorsFilms;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.ServletException;
@@ -54,23 +61,108 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/zhipuai")
+@RequestMapping("/zhipuai")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiChatController {
 
+    private final BytedeskProperties bytedeskProperties;
     private final SpringAIZhipuaiChatService springAIZhipuaiService;
+    private final ChatClient bytedeskZhipuaiChatClient;
     private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
     private final ZhiPuAiImageModel bytedeskZhipuaiImageModel;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
+    // http://127.0.0.1:9003/zhipuai/format?actor=
+	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+	@GetMapping("/format")
+	public ResponseEntity<JsonResult<?>> generate(
+			@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
+
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+
+		// using the low-level ChatModel API directly:
+		var outputParser = new BeanOutputConverter<>(ActorsFilms.class);
+		String format = outputParser.getFormat();
+		log.info("format: " + format);
+		String userMessage = """
+				Generate the filmography for the actor {actor}.
+				{format}
+				/no_think
+				""";
+		// 使用 builder 模式替换废弃的构造函数
+		PromptTemplate promptTemplate = PromptTemplate.builder()
+				.template(userMessage)
+				.variables(Map.of("actor", actor, "format", format))
+				.build();
+		Prompt prompt = promptTemplate.create();
+
+        ActorsFilms actorsFilms = bytedeskZhipuaiChatClient.prompt(prompt)
+				.call()
+				.entity(ActorsFilms.class);
+		log.info("actorsFilms: {}", actorsFilms);
+
+        return ResponseEntity.ok(JsonResult.success(actorsFilms));
+
+		// String response = bytedeskZhipuaiChatClient.prompt(prompt)
+		// 		.call()
+		// 		.content();
+		// log.info("response: " + response);
+		// return ResponseEntity.ok(JsonResult.success(outputParser.convert(response)));
+	}
+
+	// structured output
+	// http://127.0.0.1:9003/zhipuai/structured?message=
+	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+	@GetMapping("/structured")
+	public ResponseEntity<JsonResult<?>> structured(
+			@RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message) {
+		
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+		 
+		StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
+		String userInputTemplate = """
+				Your response should be in JSON format.
+				The data structure for the JSON should match this Java class: java.util.HashMap
+				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+				{message}
+				{format}
+				/no_think
+				"""; // user input with a "format" placeholder.
+		log.info("userInputTemplate: {}", userInputTemplate);
+		 // 使用 builder 模式替换废弃的构造函数
+		Prompt prompt = new Prompt(
+				PromptTemplate.builder()
+						.template(userInputTemplate)
+						.variables(Map.of("message", message, "format", outputConverter.getFormat()))
+						.build()
+						.createMessage());
+
+		ChatResponse response = bytedeskZhipuaiChatClient.prompt(prompt)
+				.call()
+				.chatResponse();
+        // String response = bytedeskZhipuaiChatClient.prompt(prompt)
+        //         .call().content();
+        log.info("response: {}", response);
+
+		return ResponseEntity.ok(JsonResult.success(response));
+	}
+
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/zhipuai/chat/sync?message=hello
+     * http://127.0.0.1:9003/zhipuai/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
         
         String response = springAIZhipuaiService.processPromptSync(message, null);
         return ResponseEntity.ok(JsonResult.success(response));
@@ -78,11 +170,15 @@ public class SpringAIZhipuaiChatController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/zhipuai/chat/stream?message=hello
+     * http://127.0.0.1:9003/zhipuai/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
         
         Prompt prompt = new Prompt(new UserMessage(message));
         return bytedeskZhipuaiChatModel.stream(prompt);
@@ -90,13 +186,23 @@ public class SpringAIZhipuaiChatController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/zhipuai/chat/sse?message=hello
+     * http://127.0.0.1:9003/zhipuai/chat/sse?message=hello
      */
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+
+        if (!bytedeskProperties.getDebug()) {
+            try {
+                emitter.send(SseEmitter.event().name("error").data("Service is not available"));
+            } catch (Exception e) {
+                log.debug("Unable to send error event", e);
+            }
+            emitter.complete();
+            return emitter;
+        }
         
         executorService.execute(() -> {
             try {
@@ -122,11 +228,15 @@ public class SpringAIZhipuaiChatController {
 
     /**
      * 自定义模型参数的调用示例
-     * http://127.0.0.1:9003/api/v1/zhipuai/chat/custom?message=hello
+     * http://127.0.0.1:9003/zhipuai/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
         
         ChatResponse response = bytedeskZhipuaiChatModel.call(
             new Prompt(
@@ -143,11 +253,15 @@ public class SpringAIZhipuaiChatController {
 
     /**
      * 图像生成接口
-     * http://127.0.0.1:9003/api/v1/zhipuai/image
+     * http://127.0.0.1:9003/zhipuai/image
      */
     @GetMapping("/image")
     public ResponseEntity<JsonResult<?>> generateImage(
             @RequestParam(defaultValue = "A cute cat") String prompt) {
+        
+        if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
         
         ImageResponse response = bytedeskZhipuaiImageModel.call(new ImagePrompt(prompt));
         return ResponseEntity.ok(JsonResult.success(response));
@@ -155,10 +269,14 @@ public class SpringAIZhipuaiChatController {
 
     /**
      * 测试token提取功能
-     * http://127.0.0.1:9003/api/v1/zhipuai/test-tokens
+     * http://127.0.0.1:9003/zhipuai/test-tokens
      */
     @GetMapping("/test-tokens")
     public ResponseEntity<JsonResult<?>> testTokenExtraction() {
+
+        if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
         
         try {
             springAIZhipuaiService.testTokenExtraction();
@@ -176,7 +294,7 @@ public class SpringAIZhipuaiChatController {
         }
     }
 
-    // http://127.0.0.1:9003/api/v1/zhipuai/stream-sse
+    // http://127.0.0.1:9003/zhipuai/stream-sse
     @GetMapping("/stream-sse")
     public void streamSse(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -23,6 +23,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import lombok.ToString;
 
+import java.time.ZonedDateTime;
+
 @MappedSuperclass
 @Data
 @SuperBuilder
@@ -62,5 +64,25 @@ public abstract class AbstractMessageEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "message_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
+
+    /**
+     * 客服是否已回复该访客消息（用于超时提醒/统计）。
+     * 注意：该字段的业务语义是“是否已被客服消息覆盖回复”，并非投递/回执状态。
+     */
+    @Builder.Default
+    @Column(name = "agent_replied")
+    private Boolean agentReplied = false;
+
+    /**
+     * 客服回复时间（当 agentReplied=true 时记录），用于计算响应时长。
+     */
+    @Column(name = "agent_replied_at")
+    private ZonedDateTime agentRepliedAt;
+
+    /**
+     * 回复该批访客消息的客服 uid（可为空）。
+     */
+    @Column(name = "agent_replied_by_uid")
+    private String agentRepliedByUid;
     
 }

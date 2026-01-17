@@ -26,12 +26,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 // https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html
 @Embeddable
 @Data
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RobotLlm {
@@ -202,6 +201,7 @@ public class RobotLlm {
      */
     @Builder.Default
     @Column(name = "llm_response_format")
+    // private String responseFormat = RobotLlmResponseFormatEnum.TEXT.getValue();
     private String responseFormat = "text";
 
     // request_id 字符串类型，用于唯一标识一次请求，模型会返回相同的request_id。

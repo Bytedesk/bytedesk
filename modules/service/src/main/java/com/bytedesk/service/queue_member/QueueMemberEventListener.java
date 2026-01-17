@@ -28,6 +28,7 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.event.MessageCreateEvent;
@@ -79,6 +80,8 @@ public class QueueMemberEventListener {
     private final AgentCapacityService agentCapacityService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final MessageRestService messageRestService;
 
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
@@ -536,6 +539,10 @@ public class QueueMemberEventListener {
         return agentProto != null ? agentProto.getUid() : null;
     }
 
+
+    /**
+     * 
+     */
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
         MessageEntity message = event.getMessage();
@@ -557,20 +564,135 @@ public class QueueMemberEventListener {
             }
 
             if (message.isFromVisitor()) {
+                // 访客消息：标记为“待客服回复”
+                ensureVisitorMessageUnreplied(message);
                 // 更新访客消息统计
                 updateVisitorMessageStats(message, thread);
             } else if (message.isFromAgent()) {
+                // 客服消息：先抓取“上一次客服回复时间”作为窗口起点（避免扫描整段历史）
+                ZonedDateTime previousAgentLastResponseAt = null;
+                ZonedDateTime visitorFirstMessageAt = null;
+                Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+                if (queueMemberOpt.isPresent()) {
+                    previousAgentLastResponseAt = queueMemberOpt.get().getAgentLastResponseAt();
+                    visitorFirstMessageAt = queueMemberOpt.get().getVisitorFirstMessageAt();
+                }
+
+                // 客服消息本身不属于“待回复”消息
+                ensureNonVisitorMessageReplied(message);
                 // 更新客服消息统计
                 updateAgentMessageStats(message, thread);
+
+                // 批量标记：将该会话中“上次客服回复之后”的未回复访客消息全部置为已回复
+                markVisitorMessagesRepliedByAgent(thread, message, previousAgentLastResponseAt, visitorFirstMessageAt);
             } else if (message.isFromRobot()) {
+                // 机器人消息本身不属于“待回复”消息（但不清理访客待回复状态）
+                ensureNonVisitorMessageReplied(message);
                 // 处理机器人消息
                 updateRobotMessageStats(message, thread);
             } else if (message.isFromSystem()) {
+                // 系统消息本身不属于“待回复”消息
+                ensureNonVisitorMessageReplied(message);
                 // 处理系统消息
                 updateSystemMessageStats(message, thread);
             }
         } catch (Exception e) {
             log.error("处理消息事件时出错: {}", e.getMessage(), e);
+        }
+    }
+
+    private void ensureVisitorMessageUnreplied(MessageEntity message) {
+        if (message == null || !message.isFromVisitor()) {
+            return;
+        }
+
+        boolean changed = false;
+        if (message.getAgentReplied() == null || Boolean.TRUE.equals(message.getAgentReplied())) {
+            message.setAgentReplied(false);
+            changed = true;
+        }
+        if (message.getAgentRepliedAt() != null) {
+            message.setAgentRepliedAt(null);
+            changed = true;
+        }
+        if (StringUtils.hasText(message.getAgentRepliedByUid())) {
+            message.setAgentRepliedByUid(null);
+            changed = true;
+        }
+
+        if (changed) {
+            messageRestService.save(message);
+        }
+    }
+
+    private void ensureNonVisitorMessageReplied(MessageEntity message) {
+        if (message == null || message.isFromVisitor()) {
+            return;
+        }
+
+        if (!Boolean.TRUE.equals(message.getAgentReplied())) {
+            message.setAgentReplied(true);
+            messageRestService.save(message);
+        }
+    }
+
+    private void markVisitorMessagesRepliedByAgent(ThreadEntity thread, MessageEntity agentMessage,
+            ZonedDateTime previousAgentLastResponseAt, ZonedDateTime visitorFirstMessageAt) {
+        if (thread == null || agentMessage == null || !agentMessage.isFromAgent()) {
+            return;
+        }
+
+        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+        if (queueMemberOpt.isEmpty()) {
+            // QueueMember 缺失时，暂不做批量标记（避免无窗口起点导致扫描大量历史）
+            return;
+        }
+
+        ZonedDateTime now = BdDateUtils.now();
+        ZonedDateTime windowStart = previousAgentLastResponseAt;
+        if (windowStart == null) {
+            windowStart = visitorFirstMessageAt;
+        }
+        if (windowStart == null) {
+            windowStart = thread.getCreatedAt();
+        }
+        if (windowStart == null) {
+            // 极端兜底
+            windowStart = now.minusDays(1);
+        }
+
+        String agentUid = agentMessage.getUserProtobuf().getUid();
+        List<MessageEntity> candidates = messageRestService.findByThreadUidBetweenCreatedAt(thread.getUid(), windowStart,
+                now);
+        if (candidates == null || candidates.isEmpty()) {
+            return;
+        }
+
+        int updated = 0;
+        for (MessageEntity m : candidates) {
+            if (m == null) {
+                continue;
+            }
+            if (agentMessage.getUid() != null && agentMessage.getUid().equals(m.getUid())) {
+                continue;
+            }
+            if (!m.isFromVisitor()) {
+                continue;
+            }
+            if (Boolean.TRUE.equals(m.getAgentReplied())) {
+                continue;
+            }
+
+            m.setAgentReplied(true);
+            m.setAgentRepliedAt(now);
+            m.setAgentRepliedByUid(agentUid);
+            messageRestService.save(m);
+            updated++;
+        }
+
+        if (updated > 0) {
+            log.debug("已批量标记访客消息为已回复: threadUid={}, count={}, agentUid={}", thread.getUid(), updated,
+                    agentUid);
         }
     }
 
@@ -797,66 +919,6 @@ public class QueueMemberEventListener {
             log.error("更新系统消息统计时出错: {}", e.getMessage(), e);
         }
     }
-
-    /**
-     * 发送排队更新消息
-     */
-    // private void sendQueueUpdateMessage(ThreadEntity thread, int currentPosition, int totalCount) {
-    //     try {
-    //         // 构建用于展示的提示文本
-    //         String displayText;
-    //         if (currentPosition == 1) {
-    //             displayText = "请稍后，下一个就是您";
-    //         } else {
-    //             int waitMinutes = (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON;
-    //             displayText = "当前排队人数：" + totalCount + "，您的位置：" + currentPosition +
-    //                     "，大约等待时间：" + waitMinutes + " 分钟";
-    //         }
-
-    //         // 计算等待时间（秒）与人性化描述
-    //         int waitSeconds = currentPosition == 1 ? 0
-    //                 : (currentPosition - 1) * ThreadRoutingConstants.Timing.ESTIMATED_WAIT_TIME_PER_PERSON * 60;
-    //         String estimatedWaitTime = currentPosition == 1 ? "即将开始" : ("约" + (waitSeconds / 60) + "分钟");
-
-    //         QueueContent queueContent = QueueContent.builder()
-    //                 .content(displayText)
-    //                 .position(currentPosition)
-    //                 .queueSize(totalCount)
-    //                 .waitSeconds(waitSeconds)
-    //                 .estimatedWaitTime(estimatedWaitTime)
-    //                 .serverTimestamp(System.currentTimeMillis())
-    //                 .build();
-
-    //         // 将结构化内容写入线程（保持与其它策略一致）
-    //         thread.setContent(queueContent.toJson());
-    //         threadRestService.save(thread);
-
-    //         // 发送结构化排队消息
-    //         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, thread);
-    //         messageSendService.sendProtobufMessage(messageProtobuf);
-
-    //         log.debug("已发送排队更新消息(结构化): threadUid={}, position={}/{}, waitSeconds={}, content={}",
-    //                 thread.getUid(), currentPosition, totalCount, waitSeconds, displayText);
-    //     } catch (Exception e) {
-    //         log.error("发送排队更新消息时出错: threadUid={}, error={}", thread.getUid(), e.getMessage(), e);
-    //     }
-    // }
-
-    /**
-     * 从topic中提取前三个部分作为搜索前缀
-     * 例如：org/agent/{agent_uid}/{visitor_uid} -&gt; org/agent/{agent_uid}
-     */
-    // private String extractTopicPrefix(String topic) {
-    //     if (topic == null || topic.isEmpty()) {
-    //         return null;
-    //     }
-
-    //     String[] parts = topic.split("/");
-    //     if (parts.length >= 3) {
-    //         return parts[0] + "/" + parts[1] + "/" + parts[2];
-    //     }
-    //     return null;
-    // }
 
 
 }

@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -229,19 +231,31 @@ public class WorkgroupRoutingService {
     }
 
     private WorkgroupRoutingEntity getOrCreateRoutingState(WorkgroupEntity workgroup) {
-        return workgroupRoutingRepository
-                .findByWorkgroupUidAndDeletedFalse(workgroup.getUid())
-                .orElseGet(() -> {
-                    WorkgroupRoutingEntity created = WorkgroupRoutingEntity.builder()
-                            .uid(uidUtils.getUid())
-                            .orgUid(workgroup.getOrgUid())
-                            .userUid(workgroup.getUserUid())
-                            .name("routing_state_" + workgroup.getUid())
-                            .workgroupUid(workgroup.getUid())
-                            .cursor(0L)
-                            .build();
-                    return workgroupRoutingRepository.save(created);
-                });
+        List<WorkgroupRoutingEntity> existing = workgroupRoutingRepository
+            .findByWorkgroupUidAndDeletedFalseOrderByUpdatedAtDescIdDesc(workgroup.getUid(), PageRequest.of(0, 2));
+        if (existing != null && !existing.isEmpty()) {
+            if (existing.size() > 1) {
+            WorkgroupRoutingEntity kept = existing.get(0);
+            WorkgroupRoutingEntity extra = existing.get(1);
+            log.warn("multiple routing state rows found, keeping latest one: workgroupUid={}, keptUid={}, keptUpdatedAt={}, extraUid={}, extraUpdatedAt={}",
+                workgroup.getUid(),
+                kept != null ? kept.getUid() : "null",
+                kept != null ? kept.getUpdatedAtString() : "null",
+                extra != null ? extra.getUid() : "null",
+                extra != null ? extra.getUpdatedAtString() : "null");
+            }
+            return existing.get(0);
+        }
+
+        WorkgroupRoutingEntity created = WorkgroupRoutingEntity.builder()
+            .uid(uidUtils.getUid())
+            .orgUid(workgroup.getOrgUid())
+            .userUid(workgroup.getUserUid())
+            .name("routing_state_" + workgroup.getUid())
+            .workgroupUid(workgroup.getUid())
+            .cursor(0L)
+            .build();
+        return workgroupRoutingRepository.save(created);
     }
 
     private void resetStateForMode(WorkgroupRoutingEntity state, WorkgroupEntity workgroup, String routingMode) {

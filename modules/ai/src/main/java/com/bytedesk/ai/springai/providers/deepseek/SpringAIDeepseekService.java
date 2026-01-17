@@ -38,7 +38,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -135,80 +134,80 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         }
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
-        log.info("Deepseek API websocket ");
-        if (llm == null) {
-            log.info("Deepseek API not available");
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Deepseek service is not available",
-                    messageProtobufReply);
-            return;
-        }
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置
+    //     RobotLlm llm = robot.getLlm();
+    //     log.info("Deepseek API websocket ");
+    //     if (llm == null) {
+    //         log.info("Deepseek API not available");
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Deepseek service is not available",
+    //                 messageProtobufReply);
+    //         return;
+    //     }
 
-        // 获取适当的模型实例
-        OpenAiChatModel chatModel = createDeepseekChatModel(llm);
-        if (chatModel == null) {
-            log.error("Failed to create Deepseek chat model and no default chat model available");
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Deepseek service is not available",
-                    messageProtobufReply);
-            return;
-        }
+    //     // 获取适当的模型实例
+    //     OpenAiChatModel chatModel = createDeepseekChatModel(llm);
+    //     if (chatModel == null) {
+    //         log.error("Failed to create Deepseek chat model and no default chat model available");
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Deepseek service is not available",
+    //                 messageProtobufReply);
+    //         return;
+    //     }
 
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = { false };
-        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
+    //     long startTime = System.currentTimeMillis();
+    //     final boolean[] success = { false };
+    //     final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
 
-        try {
-            chatModel.stream(prompt).subscribe(
-                    response -> {
-                        if (response != null) {
-                            log.info("Deepseek API response metadata: {}", response.getMetadata());
-                            List<Generation> generations = response.getResults();
-                            for (Generation generation : generations) {
-                                AssistantMessage assistantMessage = generation.getOutput();
-                                String textContent = assistantMessage.getText();
-                                log.info("Deepseek API Websocket response text: {}", textContent);
+    //     try {
+    //         chatModel.stream(prompt).subscribe(
+    //                 response -> {
+    //                     if (response != null) {
+    //                         log.info("Deepseek API response metadata: {}", response.getMetadata());
+    //                         List<Generation> generations = response.getResults();
+    //                         for (Generation generation : generations) {
+    //                             AssistantMessage assistantMessage = generation.getOutput();
+    //                             String textContent = assistantMessage.getText();
+    //                             log.info("Deepseek API Websocket response text: {}", textContent);
 
-                                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent,
-                                        messageProtobufReply);
-                            }
-                            // 提取token使用情况
-                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
-                            success[0] = true;
-                        }
-                    },
-                    error -> {
-                        log.error("Deepseek API error: ", error);
-                        sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
-                                I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                        success[0] = false;
-                    },
-                    () -> {
-                        log.info("Chat stream completed");
-                        // 记录token使用情况
-                        long responseTime = System.currentTimeMillis() - startTime;
-                        String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
-                                : "deepseek-chat";
-                        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.DEEPSEEK, modelType,
-                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
-                                responseTime);
-                    });
-        } catch (Exception e) {
-            log.error("Error processing Deepseek prompt", e);
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
-                    messageProtobufReply);
-            success[0] = false;
-            // 记录token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
-                    : "deepseek-chat";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.DEEPSEEK, modelType,
-                    tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
-        }
-    }
+    //                             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent,
+    //                                     messageProtobufReply);
+    //                         }
+    //                         // 提取token使用情况
+    //                         tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
+    //                         success[0] = true;
+    //                     }
+    //                 },
+    //                 error -> {
+    //                     log.error("Deepseek API error: ", error);
+    //                     sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                             I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //                     success[0] = false;
+    //                 },
+    //                 () -> {
+    //                     log.info("Chat stream completed");
+    //                     // 记录token使用情况
+    //                     long responseTime = System.currentTimeMillis() - startTime;
+    //                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                             : "deepseek-chat";
+    //                     tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.DEEPSEEK, modelType,
+    //                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
+    //                             responseTime);
+    //                 });
+    //     } catch (Exception e) {
+    //         log.error("Error processing Deepseek prompt", e);
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         success[0] = false;
+    //         // 记录token使用情况
+    //         long responseTime = System.currentTimeMillis() - startTime;
+    //         String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                 : "deepseek-chat";
+    //         tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.DEEPSEEK, modelType,
+    //                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
+    //     }
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {

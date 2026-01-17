@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.message;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
@@ -107,6 +108,14 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
     // @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
     public List<MessageEntity> findByThreadUid(String threadUid) {
         return messageRepository.findByThread_UidOrderByCreatedAtAsc(threadUid);
+    }
+
+    /**
+     * 查询会话在指定时间窗口内的消息（闭区间）。
+     */
+    public List<MessageEntity> findByThreadUidBetweenCreatedAt(String threadUid, ZonedDateTime start,
+            ZonedDateTime end) {
+        return messageRepository.findByThread_UidAndCreatedAtBetweenOrderByCreatedAtAsc(threadUid, start, end);
     }
     
     // @Cacheable(value = "message", key = "#threadUid + #type + #userUid", unless = "#result == null")

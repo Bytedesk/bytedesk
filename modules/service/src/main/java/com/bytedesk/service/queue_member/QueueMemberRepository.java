@@ -32,6 +32,14 @@ import jakarta.persistence.LockModeType;
 public interface QueueMemberRepository
                 extends JpaRepository<QueueMemberEntity, Long>, JpaSpecificationExecutor<QueueMemberEntity> {
 
+        /**
+         * 仅查询用于“客服响应时长统计”的必要字段，避免加载完整实体。
+         */
+        @Query("SELECT qm.visitorFirstMessageAt, qm.agentFirstResponseAt, qm.agentAvgResponseLength " +
+               "FROM QueueMemberEntity qm " +
+               "WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false")
+        List<Object[]> findAgentResponseStatsRows(@Param("agentQueueUid") String agentQueueUid);
+
         Optional<QueueMemberEntity> findByUid(String uid);
 
         List<QueueMemberEntity> findByOrgUidAndCreatedAtBetweenAndResolved(String orgUid, ZonedDateTime startTime,

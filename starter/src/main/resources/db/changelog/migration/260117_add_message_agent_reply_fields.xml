@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 为消息增加“客服是否已回复”相关字段，用于待回复列表/超时提醒/响应时长统计 -->
+    <changeSet id="260117-add-message-agent-reply-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_message" />
+                <not>
+                    <columnExists tableName="bytedesk_core_message" columnName="agent_replied" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add agent reply tracking fields for per-message unreplied/replied state.</comment>
+        <addColumn tableName="bytedesk_core_message">
+            <column name="agent_replied" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true" />
+            </column>
+            <column name="agent_replied_at" type="DATETIME(6)">
+                <constraints nullable="true" />
+            </column>
+            <column name="agent_replied_by_uid" type="VARCHAR(64)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_core_message" columnName="agent_replied_by_uid" />
+            <dropColumn tableName="bytedesk_core_message" columnName="agent_replied_at" />
+            <dropColumn tableName="bytedesk_core_message" columnName="agent_replied" />
+        </rollback>
+    </changeSet>
+
+    <!-- 回填默认值与语义：访客消息 agent_replied=false，其它消息 agent_replied=true（避免待回复查询误扫） -->
+    <changeSet id="260117-backfill-message-agent-reply-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_message" />
+            <columnExists tableName="bytedesk_core_message" columnName="agent_replied" />
+            <columnExists tableName="bytedesk_core_message" columnName="message_user" />
+        </preConditions>
+        <comment>Backfill agent_replied by sender type inferred from message_user JSON.</comment>
+        <sql>
+            UPDATE bytedesk_core_message
+            SET agent_replied = false
+            WHERE agent_replied IS NULL
+              AND message_user LIKE '%"type"%"visitor"%';
+        </sql>
+        <sql>
+            UPDATE bytedesk_core_message
+            SET agent_replied = true
+            WHERE agent_replied IS NULL
+              AND (message_user NOT LIKE '%"type"%"visitor"%' OR message_user IS NULL);
+        </sql>
+    </changeSet>
+
+    <!-- 常用查询索引：thread_id + agent_replied + created_at -->
+    <changeSet id="260117-add-message-agent-reply-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_message" />
+            <columnExists tableName="bytedesk_core_message" columnName="thread_id" />
+            <columnExists tableName="bytedesk_core_message" columnName="agent_replied" />
+            <columnExists tableName="bytedesk_core_message" columnName="created_at" />
+            <not>
+                <indexExists tableName="bytedesk_core_message" indexName="idx_message_thread_agent_replied_created" />
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_core_message" indexName="idx_message_thread_agent_replied_created">
+            <column name="thread_id" />
+            <column name="agent_replied" />
+            <column name="created_at" />
+        </createIndex>
+        <rollback>
+            <dropIndex tableName="bytedesk_core_message" indexName="idx_message_thread_agent_replied_created" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

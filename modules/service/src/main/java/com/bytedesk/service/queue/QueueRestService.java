@@ -36,9 +36,12 @@ import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.QueueMeta;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRepository;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -47,6 +50,11 @@ import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 import org.springframework.util.StringUtils;
+import org.springframework.data.domain.PageImpl;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,6 +79,10 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
     private final WorkgroupRepository workgroupRepository;
 
     private final QueueMemberRestService queueMemberRestService;
+
+    private final MessageRepository messageRepository;
+
+    private final ThreadRepository threadRepository;
 
     private final QueueService queueService;
 
@@ -172,6 +184,113 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
             thread.setQueueMeta(meta);
             return thread;
         });
+    }
+
+    /**
+     * 查询当前客服待回复会话（含未回复访客消息）。
+     *
+     * 设计：
+     * - 先从 message 表按 thread 聚合出“最早未回复访客消息时间”，并分页取 thread uid。
+     * - 再批量加载 thread 实体并转为 ThreadResponse。
+     * - 将 waitingMs 写入 ThreadResponse.queueMeta（与排队中 query/queuing 一致的承载方式）。
+     */
+    public Page<ThreadResponse> queryUnreplied(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(user.getUid());
+        if (agentOptional.isEmpty()) {
+            return Page.empty();
+        }
+
+        AgentEntity agent = agentOptional.get();
+        String agentUid = agent.getUid();
+
+        Pageable pageable = request.getPageable();
+        int pageNumber = (pageable == null) ? 0 : pageable.getPageNumber();
+        int pageSize = (pageable == null) ? 20 : pageable.getPageSize();
+        int offset = Math.max(0, pageNumber) * Math.max(1, pageSize);
+
+        long total = messageRepository.countUnrepliedVisitorThreadsByAgentUid(agentUid);
+        if (total <= 0) {
+            return Page.empty(pageable);
+        }
+
+        List<Object[]> rows = messageRepository.pageUnrepliedVisitorThreadUidsByAgentUid(agentUid, pageSize, offset);
+        if (rows == null || rows.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, total);
+        }
+
+        List<String> threadUids = new ArrayList<>(rows.size());
+        Map<String, Long> firstUnrepliedAtByThreadUid = new HashMap<>(rows.size());
+        for (Object[] row : rows) {
+            if (row == null || row.length < 2) {
+                continue;
+            }
+            String threadUid = (row[0] == null) ? null : String.valueOf(row[0]);
+            if (!StringUtils.hasText(threadUid)) {
+                continue;
+            }
+
+            Long firstAt = null;
+            Object tsObj = row[1];
+            if (tsObj instanceof Timestamp ts) {
+                firstAt = ts.getTime();
+            } else if (tsObj instanceof java.util.Date d) {
+                firstAt = d.getTime();
+            }
+
+            threadUids.add(threadUid);
+            if (firstAt != null) {
+                firstUnrepliedAtByThreadUid.put(threadUid, firstAt);
+            }
+        }
+
+        if (threadUids.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, total);
+        }
+
+        // 批量加载线程并保持与 rows 相同的顺序
+        List<ThreadEntity> threadEntities = threadRepository.findByUidInAndDeletedFalse(threadUids);
+        Map<String, ThreadEntity> threadByUid = new HashMap<>();
+        for (ThreadEntity t : threadEntities) {
+            if (t != null && StringUtils.hasText(t.getUid())) {
+                threadByUid.put(t.getUid(), t);
+            }
+        }
+
+        Map<String, QueueMemberEntity> queueMemberByThreadUid = queueMemberRestService.findByThreadUids(threadUids)
+                .stream()
+                .filter(qm -> qm.getThread() != null && StringUtils.hasText(qm.getThread().getUid()))
+                .collect(Collectors.toMap(qm -> qm.getThread().getUid(), qm -> qm, (a, b) -> a));
+
+        long now = System.currentTimeMillis();
+        List<ThreadResponse> responses = new ArrayList<>(threadUids.size());
+        for (String threadUid : threadUids) {
+            ThreadEntity entity = threadByUid.get(threadUid);
+            if (entity == null) {
+                continue;
+            }
+
+            ThreadResponse resp = threadRestService.convertToResponse(entity);
+
+            Long firstUnrepliedAt = firstUnrepliedAtByThreadUid.get(threadUid);
+            Long waitingMs = (firstUnrepliedAt == null) ? null : Math.max(0, now - firstUnrepliedAt);
+
+            QueueMemberEntity qm = queueMemberByThreadUid.get(threadUid);
+            String queueMemberUid = (qm == null) ? null : qm.getUid();
+
+            QueueMeta meta = QueueMeta.builder()
+                    .queueMemberUid(queueMemberUid)
+                    .serverTimestamp(now)
+                    // 复用字段：这里 enqueuedAt 表示“最早未回复访客消息时间”
+                    .enqueuedAt(firstUnrepliedAt)
+                    .waitingMs(waitingMs)
+                    .build();
+            resp.setQueueMeta(meta);
+
+            responses.add(resp);
+        }
+
+        return new PageImpl<>(responses, pageable, total);
     }
 
     @Cacheable(value = "queue", key = "#uid", unless = "#result==null")

@@ -139,48 +139,4 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
         );
     }
 
-    /**
-     * 更新队列成员消息计数
-     */
-    // @PutMapping("/message/count")
-    // public ResponseEntity<?> updateMessageCount(@RequestBody QueueMemberEntity member) {
-    //     try {
-    //         // 使用消息队列异步更新消息计数
-    //         queueMemberMessageService.sendMessageCountUpdate(member);
-    //         return ResponseEntity.ok().build();
-    //     } catch (Exception e) {
-    //         log.error("更新消息计数失败: {}", e.getMessage(), e);
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新消息计数失败");
-    //     }
-    // }
-
-    /**
-     * 更新队列成员时间戳
-     */
-    // @PutMapping("/timestamp")
-    // public ResponseEntity<?> updateTimestamp(@RequestBody QueueMemberEntity member) {
-    //     try {
-    //         // 使用消息队列异步更新时间戳
-    //         queueMemberMessageService.sendTimestampUpdate(member);
-    //         return ResponseEntity.ok().build();
-    //     } catch (Exception e) {
-    //         log.error("更新时间戳失败: {}", e.getMessage(), e);
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新时间戳失败");
-    //     }
-    // }
-
-    /**
-     * 更新队列成员状态
-     */
-    // @PutMapping("/status")
-    // public ResponseEntity<?> updateStatus(@RequestBody QueueMemberEntity member) {
-    //     try {
-    //         // 使用消息队列异步更新状态
-    //         queueMemberMessageService.sendStatusUpdate(member);
-    //         return ResponseEntity.ok().build();
-    //     } catch (Exception e) {
-    //         log.error("更新状态失败: {}", e.getMessage(), e);
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("更新状态失败");
-    //     }
-    // }
 }

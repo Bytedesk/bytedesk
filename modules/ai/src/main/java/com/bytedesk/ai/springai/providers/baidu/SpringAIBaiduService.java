@@ -37,7 +37,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -128,85 +127,85 @@ public class SpringAIBaiduService extends BaseSpringAIService {
         }
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置
-        RobotLlm llm = robot.getLlm();
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置
+    //     RobotLlm llm = robot.getLlm();
         
-        if (llm == null) {
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
+    //     if (llm == null) {
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //         return;
+    //     }
 
-        // 获取适当的模型实例
-        OpenAiChatModel baiduChatModel = createBaiduChatModel(llm);
-        if (baiduChatModel == null) {
-            log.error("Failed to create Baidu chat model and no default chat model available");
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
+    //     // 获取适当的模型实例
+    //     OpenAiChatModel baiduChatModel = createBaiduChatModel(llm);
+    //     if (baiduChatModel == null) {
+    //         log.error("Failed to create Baidu chat model and no default chat model available");
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //         return;
+    //     }
 
-        // 如果有自定义选项，创建新的Prompt
-        Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
-        if (customOptions != null) {
-            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
-        }
+    //     // 如果有自定义选项，创建新的Prompt
+    //     Prompt requestPrompt = prompt;
+    //     OpenAiChatOptions customOptions = createDynamicOptions(llm);
+    //     if (customOptions != null) {
+    //         requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+    //     }
 
-        // 记录开始时间和初始化token使用统计
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = { false };
-        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
-        // 用于累积所有响应文本
-        final StringBuilder[] fullResponseText = { new StringBuilder() };
+    //     // 记录开始时间和初始化token使用统计
+    //     long startTime = System.currentTimeMillis();
+    //     final boolean[] success = { false };
+    //     final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
+    //     // 用于累积所有响应文本
+    //     final StringBuilder[] fullResponseText = { new StringBuilder() };
 
-        baiduChatModel.stream(requestPrompt).subscribe(
-                response -> {
-                    if (response != null) {
-                        log.info("Baidu API response metadata: {}", response.getMetadata());
-                        List<Generation> generations = response.getResults();
-                        for (Generation generation : generations) {
-                            AssistantMessage assistantMessage = generation.getOutput();
-                            String textContent = assistantMessage.getText();
+    //     baiduChatModel.stream(requestPrompt).subscribe(
+    //             response -> {
+    //                 if (response != null) {
+    //                     log.info("Baidu API response metadata: {}", response.getMetadata());
+    //                     List<Generation> generations = response.getResults();
+    //                     for (Generation generation : generations) {
+    //                         AssistantMessage assistantMessage = generation.getOutput();
+    //                         String textContent = assistantMessage.getText();
                             
-                            // 累积响应文本
-                            if (textContent != null) {
-                                fullResponseText[0].append(textContent);
-                            }
+    //                         // 累积响应文本
+    //                         if (textContent != null) {
+    //                             fullResponseText[0].append(textContent);
+    //                         }
                             
-                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-                        }
-                        // 提取token使用情况 - 使用百度专用的提取方法
-                        tokenUsage[0] = extractBaiduTokenUsage(response);
-                        success[0] = true;
-                    }
-                },
-                error -> {
-                    log.error("Baidu API error: ", error);
-                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                    success[0] = false;
-                },
-                () -> {
-                    log.info("Chat stream completed");
+    //                         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
+    //                     }
+    //                     // 提取token使用情况 - 使用百度专用的提取方法
+    //                     tokenUsage[0] = extractBaiduTokenUsage(response);
+    //                     success[0] = true;
+    //                 }
+    //             },
+    //             error -> {
+    //                 log.error("Baidu API error: ", error);
+    //                 sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //                 success[0] = false;
+    //             },
+    //             () -> {
+    //                 log.info("Chat stream completed");
                     
-                    // 如果token提取失败，使用累积的完整响应文本来估算token
-                    if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
-                        log.info("Baidu API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
-                        ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
-                        tokenUsage[0] = estimatedUsage;
-                        log.info("Baidu API final estimated token usage: {}", estimatedUsage);
-                    }
+    //                 // 如果token提取失败，使用累积的完整响应文本来估算token
+    //                 if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
+    //                     log.info("Baidu API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
+    //                     ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
+    //                     tokenUsage[0] = estimatedUsage;
+    //                     log.info("Baidu API final estimated token usage: {}", estimatedUsage);
+    //                 }
                     
-                    // 记录token使用情况
-                    long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
-                            : "ernie-bot";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
-                            responseTime);
-                });
-    }
+    //                 // 记录token使用情况
+    //                 long responseTime = System.currentTimeMillis() - startTime;
+    //                 String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                         : "ernie-bot";
+    //         tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
+    //                         tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
+    //                         responseTime);
+    //             });
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {

@@ -52,7 +52,7 @@ public class QuickButtonResponseVisitor implements Serializable {
 
     private String content;
 
-    private QuickButtonPayload payload;
+    // private QuickButtonPayload payload;
 
     public static QuickButtonResponseVisitor fromEntity(QuickButtonEntity entity) {
         if (entity == null) {
@@ -74,7 +74,7 @@ public class QuickButtonResponseVisitor implements Serializable {
                 .enabled(entity.getEnabled())
                 .kbUid(entity.getKbUid())
                 .content(entity.getContent())
-                .payload(entity.getPayload())
+                // .payload(entity.getPayload())
                 .build();
     }
 

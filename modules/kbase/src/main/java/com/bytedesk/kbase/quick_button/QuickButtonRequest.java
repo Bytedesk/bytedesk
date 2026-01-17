@@ -47,5 +47,5 @@ public class QuickButtonRequest extends BaseRequest {
     private String kbUid;
 
     /** Structured payload for action type specific data */
-    private QuickButtonPayload payload;
+    // private QuickButtonPayload payload;
 }

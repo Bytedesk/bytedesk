@@ -89,6 +89,42 @@ public abstract class AbstractRobotService {
     }
 
     /**
+     * 通用的直接调用 LLM 方法（结构化输出）。
+     *
+     * <p>
+     * 保持与 {@link #processSyncRequest(String, String, String, String, boolean)} 一致的机器人选择逻辑，
+     * 但通过 {@link BaseSpringAIService#processSyncRequest(String, RobotProtobuf, boolean, Class)}
+     * 直接返回结构化对象。
+     * </p>
+     */
+    protected <T> T processSyncRequest(String robotName, String orgUid, String query, String errorMessage,
+            boolean searchKnowledgeBase, Class<T> outputClass) {
+        log.info("processSyncRequest(结构化) robotName: {}, orgUid: {}, query: {}, searchKnowledgeBase: {}, outputClass: {}",
+                robotName, orgUid, query, searchKnowledgeBase, outputClass != null ? outputClass.getSimpleName() : null);
+
+        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
+        if (robotOptional.isPresent()) {
+            String provider;
+            if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
+                provider = robotOptional.get().getLlm().getTextProvider();
+            } else {
+                throw new RuntimeException(errorMessage);
+            }
+            log.info("processSyncRequest(结构化) provider: {}", provider);
+
+            try {
+                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
+                RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotOptional.get());
+                return service.processSyncRequest(query, robot, searchKnowledgeBase, outputClass);
+            } catch (IllegalArgumentException e) {
+                log.warn("Provider {} not found for structured request", provider);
+                throw new RuntimeException(errorMessage);
+            }
+        }
+        return null;
+    }
+
+    /**
      * 通用的多模态直接调用 LLM 方法，支持图片URL输入
      */
     protected String processMultiModalSyncRequest(String robotName, String orgUid, String textQuery, String imageUrl, String errorMessage, boolean searchKnowledgeBase) {

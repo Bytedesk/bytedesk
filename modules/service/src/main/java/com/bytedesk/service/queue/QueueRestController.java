@@ -99,6 +99,18 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
+    // 查询待回复会话 query/unreplied
+    @GetMapping("/query/unreplied")
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_READ)
+    @ActionAnnotation(title = "队列管理", action = "查询待回复会话", description = "query unreplied threads")
+    @Operation(summary = "查询待回复会话", description = "查询当前客服待回复的会话（含未回复访客消息），并返回等待回复时长")
+    public ResponseEntity<?> queryUnreplied(ThreadRequest request) {
+
+        Page<ThreadResponse> threadPage = queueRestService.queryUnreplied(request);
+
+        return ResponseEntity.ok(JsonResult.success(threadPage));
+    }
+
     // 获取客服完整排队人数统计
     @GetMapping("/agent/queuing/count")
     @PreAuthorize(QueuePermissions.HAS_QUEUE_READ)
@@ -183,48 +195,5 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
             "queue"
         );
     }
-
-    // @PostMapping("/agent/{agentUid}/members")
-    // @Operation(summary = "加入客服排队", description = "为指定客服追加一个排队成员")
-    // @ApiResponse(responseCode = "201", description = "入队成功",
-    //     content = @Content(mediaType = "application/json",
-    //     schema = @Schema(implementation = QueueMemberResponse.class)))
-    // public ResponseEntity<?> enqueueAgentQueueMember(
-    //         @PathVariable String agentUid,
-    //         @Valid @RequestBody AgentQueueEnqueueRequest request) {
-    //     try {
-    //         QueueMemberResponse response = queueRestService.enqueueAgentQueueMember(agentUid, request);
-    //         return ResponseEntity.status(HttpStatus.CREATED).body(JsonResult.success(response));
-    //     } catch (QueueMemberAlreadyExistsException | QueueFullException ex) {
-    //         return ResponseEntity.status(HttpStatus.CONFLICT)
-    //                 .body(JsonResult.error(ex.getMessage(), HttpStatus.CONFLICT.value()));
-    //     }
-    // }
-
-    // @GetMapping("/agent/{agentUid}/members")
-    // @Operation(summary = "获取客服排队列表", description = "按FIFO顺序返回指定客服的排队快照")
-    // @ApiResponse(responseCode = "200", description = "查询成功",
-    //     content = @Content(mediaType = "application/json",
-    //     schema = @Schema(implementation = AgentQueueSnapshotResponse.class)))
-    // public ResponseEntity<?> listAgentQueueMembers(
-    //         @PathVariable String agentUid,
-    //         @PageableDefault(size = 50) Pageable pageable) {
-    //     AgentQueueSnapshotResponse snapshot = queueRestService.listAgentQueueMembers(agentUid, pageable);
-    //     return ResponseEntity.ok(JsonResult.success(snapshot));
-    // }
-
-    // @PostMapping("/agent/{agentUid}/assignments/next")
-    // @Operation(summary = "触发下一位访客分配", description = "当客服手动释放容量时，主动请求队列自动分配下一位访客")
-    // @ApiResponse(responseCode = "202", description = "请求已受理")
-    // public ResponseEntity<?> triggerNextAssignment(
-    //         @PathVariable String agentUid,
-    //         @RequestBody(required = false) @Valid AgentQueueAssignmentRequest request) {
-    //     queueRestService.triggerManualAgentAssignment(agentUid, request);
-    //     return ResponseEntity.status(HttpStatus.ACCEPTED).body(JsonResult.success());
-    // }
-    
-
-    
-
 
 }

@@ -14,12 +14,16 @@
  */
 package com.bytedesk.ai.springai.providers.ollama;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
@@ -28,9 +32,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.utils.output.ActorsFilms;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -42,14 +49,98 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/ollama")
+@RequestMapping("/ollama")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaChatController {
 
+    private final BytedeskProperties bytedeskProperties;
     private final SpringAIOllamaChatService springAIOllamaService;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    // http://127.0.0.1:9003/ollama/format?actor=&baseUrl=http://127.0.0.1:11434&model=llama3
+    // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+    @GetMapping("/format")
+    public ResponseEntity<JsonResult<?>> generate(
+            @RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor,
+            OllamaRequest request) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        var outputParser = new BeanOutputConverter<>(ActorsFilms.class);
+        String format = outputParser.getFormat();
+        log.info("format: {}", format);
+        String userMessage = """
+                Generate the filmography for the actor {actor}.
+                {format}
+                /no_think
+                """;
+
+        PromptTemplate promptTemplate = PromptTemplate.builder()
+                .template(userMessage)
+                .variables(Map.of("actor", actor, "format", format))
+                .build();
+        Prompt prompt = new Prompt(promptTemplate.createMessage());
+
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
+        OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        if (model == null) {
+            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+        }
+        // 
+        ChatResponse response = model.call(prompt);
+        String content = response.getResult().getOutput().getText();
+        ActorsFilms actorsFilms = outputParser.convert(content);
+        log.info("actorsFilms: {}", actorsFilms);
+
+        return ResponseEntity.ok(JsonResult.success(actorsFilms));
+    }
+
+    // structured output
+    // http://127.0.0.1:9003/ollama/structured?message=&baseUrl=http://127.0.0.1:11434&model=llama3
+    // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+    @GetMapping("/structured")
+    public ResponseEntity<JsonResult<?>> structured(
+            @RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message,
+            OllamaRequest request) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
+        String userInputTemplate = """
+                Your response should be in JSON format.
+                The data structure for the JSON should match this Java class: java.util.HashMap
+                Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+                {message}
+                {format}
+                /no_think
+                """;
+        log.info("userInputTemplate: {}", userInputTemplate);
+
+        Prompt prompt = new Prompt(
+                PromptTemplate.builder()
+                        .template(userInputTemplate)
+                        .variables(Map.of("message", message, "format", outputConverter.getFormat()))
+                        .build()
+                        .createMessage());
+
+        OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
+        OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        if (model == null) {
+            return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
+        }
+
+        ChatResponse response = model.call(prompt);
+        log.info("response: {}", response);
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
 
     /**
      * 方式1：同步调用
@@ -57,6 +148,9 @@ public class SpringAIOllamaChatController {
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(OllamaRequest request) {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         // 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
@@ -78,6 +172,10 @@ public class SpringAIOllamaChatController {
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(OllamaRequest request) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
+
         Prompt prompt = new Prompt(new UserMessage(request.getMessage()));
         // 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
@@ -98,6 +196,16 @@ public class SpringAIOllamaChatController {
     public SseEmitter chatSSE(OllamaRequest request) {
 
         SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+
+        if (!bytedeskProperties.getDebug()) {
+            try {
+                emitter.send(SseEmitter.event().name("error").data("Service is not available"));
+            } catch (Exception e) {
+                log.debug("Unable to send error event", e);
+            }
+            emitter.complete();
+            return emitter;
+        }
 
         executorService.execute(() -> {
             try {
@@ -128,6 +236,10 @@ public class SpringAIOllamaChatController {
     @GetMapping("/chat/custom")
     public ResponseEntity<JsonResult<?>> chatCustom(OllamaRequest request) {
 
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
         OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
@@ -149,6 +261,9 @@ public class SpringAIOllamaChatController {
     // http://127.0.0.1:9003/api/v1/ollama4j/embedding-model/exists
     @GetMapping("/embedding-model/exists")
     public ResponseEntity<?> isEmbeddingModelExists(OllamaRequest request) {
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         boolean exists = springAIOllamaService.isModelExists(request);
         log.info("Embedding model exists: {}, {}", request.getModel(), exists);
         // 

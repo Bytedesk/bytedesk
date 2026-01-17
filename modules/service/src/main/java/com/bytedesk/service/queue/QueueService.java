@@ -388,6 +388,9 @@ public class QueueService {
 
         QueueEntity agentQueue = agentQueueOpt.get();
 
+        // 响应时长统计（基于 QueueMemberEntity 聚合）
+        var responseStats = queueMemberRestService.computeAgentResponseLengthStats(agentQueue.getUid());
+
         int totalCount = agentQueue.getTotalCount();
         int chattingCount = agentQueue.getChattingCount();
         int offlineCount = agentQueue.getOfflineCount();
@@ -414,6 +417,8 @@ public class QueueService {
                 .robotToAgentCount(robotToAgentCount)
                 .robotingCount(robotingCount)
                 .agentServedCount(agentServedCount)
+            .agentFirstResponseLength(responseStats.agentFirstResponseLength())
+            .agentAvgResponseLength(responseStats.agentAvgResponseLength())
                 .threadsCountByHour(threadsCountByHour)
                 .build();
     }

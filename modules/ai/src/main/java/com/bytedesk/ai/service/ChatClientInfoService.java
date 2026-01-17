@@ -426,7 +426,7 @@ public class ChatClientInfoService {
     /**
      * 根据提供商获取ChatClient
      */
-    private ChatClient getChatClientByProvider(String provider) {
+    public ChatClient getChatClientByProvider(String provider) {
         switch (provider) {
             case "zhipuai":
                 return zhipuaiChatClient;
@@ -458,7 +458,7 @@ public class ChatClientInfoService {
     /**
      * 获取Primary ChatClient
      */
-    private ChatClient getPrimaryChatClient() {
+    public ChatClient getPrimaryChatClient() {
         try {
             return applicationContext.getBean(ChatClient.class);
         } catch (Exception e) {

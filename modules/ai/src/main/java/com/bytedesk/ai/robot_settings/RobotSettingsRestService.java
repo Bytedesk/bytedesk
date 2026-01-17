@@ -38,6 +38,12 @@ import lombok.extern.slf4j.Slf4j;
 public class RobotSettingsRestService
         extends BaseRestService<RobotSettingsEntity, RobotSettingsRequest, RobotSettingsResponse> {
 
+    private static final String CACHE_ROBOT_SETTINGS = "robotSettings";
+    private static final String CACHE_ROBOT_ENTITY = "robot:entity";
+    private static final String CACHE_ROBOT_RESP = "robot:resp";
+    private static final String CACHE_ROBOT_NAME_ORG = "robot:nameOrg";
+    private static final String CACHE_ROBOT_EXISTS = "robot:exists";
+
     private final RobotSettingsRepository robotSettingsRepository;
 
     private final ModelMapper modelMapper;
@@ -56,6 +62,12 @@ public class RobotSettingsRestService
 
     @Override
     @Transactional
+    @Caching(put = @CachePut(value = CACHE_ROBOT_SETTINGS, key = "#result.uid", unless = "#result == null"), evict = {
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
     public RobotSettingsResponse create(RobotSettingsRequest request) {
         RobotSettingsEntity entity = modelMapper.map(request, RobotSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
@@ -75,7 +87,8 @@ public class RobotSettingsRestService
             triggerSettingsHelper.updateTriggerAssociationsIfPresent(trigger, request.getTriggerSettings());
         }
         entity.setTriggerSettings(trigger);
-        TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
+        TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(),
+                modelMapper);
         triggerDraft.setUid(uidUtils.getUid());
         if (request.getTriggerSettings() != null) {
             triggerSettingsHelper.updateTriggerAssociationsIfPresent(triggerDraft, request.getTriggerSettings());
@@ -127,7 +140,8 @@ public class RobotSettingsRestService
         RobotToolsSettingsEntity tools = RobotToolsSettingsEntity.fromRequest(request.getToolsSettings(), modelMapper);
         tools.setUid(uidUtils.getUid());
         entity.setToolsSettings(tools);
-        RobotToolsSettingsEntity toolsDraft = RobotToolsSettingsEntity.fromRequest(request.getToolsSettings(), modelMapper);
+        RobotToolsSettingsEntity toolsDraft = RobotToolsSettingsEntity.fromRequest(request.getToolsSettings(),
+                modelMapper);
         toolsDraft.setUid(uidUtils.getUid());
         entity.setDraftToolsSettings(toolsDraft);
 
@@ -142,6 +156,12 @@ public class RobotSettingsRestService
 
     @Override
     @Transactional
+    @Caching(put = @CachePut(value = CACHE_ROBOT_SETTINGS, key = "#result.uid", unless = "#result == null"), evict = {
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
     public RobotSettingsResponse update(RobotSettingsRequest request) {
         Optional<RobotSettingsEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
@@ -343,19 +363,18 @@ public class RobotSettingsRestService
         return convertToResponse(updated);
     }
 
-    @Caching(
-        put = @CachePut(value = "robotSettings", key = "#entity.uid", unless = "#result == null"),
-        // RobotSettings 变更会影响所有引用该 settings 的 Robot；
-        // 为避免 robot 缓存里持有旧的 settings 关联对象，这里直接清空 robot cache。
-        // （如需更细粒度，可改为按 settingsUid 找到相关 robots 再逐个 evict。）
-        evict = @CacheEvict(value = "robot", allEntries = true)
-    )
     @Override
     protected RobotSettingsEntity doSave(RobotSettingsEntity entity) {
         return robotSettingsRepository.save(entity);
     }
 
-    @CacheEvict(value = "robotSettings", key = "#uid")
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ROBOT_SETTINGS, key = "#uid"),
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
     @Override
     public void deleteByUid(String uid) {
         Optional<RobotSettingsEntity> optional = findByUid(uid);
@@ -365,12 +384,18 @@ public class RobotSettingsRestService
         }
     }
 
-    @CacheEvict(value = "robotSettings", key = "#request.uid")
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ROBOT_SETTINGS, key = "#request.uid"),
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
     @Override
     public void delete(RobotSettingsRequest request) {
         deleteByUid(request.getUid());
     }
-    
+
     @Override
     public RobotSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             RobotSettingsEntity entity) {
@@ -397,7 +422,7 @@ public class RobotSettingsRestService
         if (defaultSettings.isPresent()) {
             return defaultSettings.get();
         }
-        // 
+        //
         // Create default settings
         RobotSettingsEntity settings = RobotSettingsEntity.builder()
                 .uid(uidUtils.getUid())
@@ -441,6 +466,22 @@ public class RobotSettingsRestService
         inteDraft.setUid(uidUtils.getUid());
         settings.setDraftIntentionSettings(inteDraft);
 
+        // 发布与草稿：情绪配置（统一使用 fromRequest，内部已处理 null）
+        EmotionSettingEntity emo = EmotionSettingEntity.fromRequest(null, modelMapper);
+        emo.setUid(uidUtils.getUid());
+        settings.setEmotionSettings(emo);
+        EmotionSettingEntity emoDraft = EmotionSettingEntity.fromRequest(null, modelMapper);
+        emoDraft.setUid(uidUtils.getUid());
+        settings.setDraftEmotionSettings(emoDraft);
+
+        // 发布与草稿：会话小结配置（统一使用 fromRequest，内部已处理 null）
+        SummarySettingsEntity sum = SummarySettingsEntity.fromRequest(null, modelMapper);
+        sum.setUid(uidUtils.getUid());
+        settings.setSummarySettings(sum);
+        SummarySettingsEntity sumDraft = SummarySettingsEntity.fromRequest(null, modelMapper);
+        sumDraft.setUid(uidUtils.getUid());
+        settings.setDraftSummarySettings(sumDraft);
+
         // Ratedown settings（发布 + 草稿）
         RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(null, modelMapper);
         r.setUid(uidUtils.getUid());
@@ -478,21 +519,26 @@ public class RobotSettingsRestService
      * Publish draft settings to online for robot
      */
     @Transactional
-    @CachePut(value = "robotSettings", key = "#uid", unless = "#result == null")
+    @Caching(put = @CachePut(value = CACHE_ROBOT_SETTINGS, key = "#uid", unless = "#result == null"), evict = {
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
     public RobotSettingsResponse publish(String uid) {
         Optional<RobotSettingsEntity> optional = findByUid(uid);
         if (!optional.isPresent()) {
             throw new RuntimeException("RobotSettings not found: " + uid);
         }
         RobotSettingsEntity entity = optional.get();
-        
+
         // 复制草稿到发布版本
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
             if (published != null) {
-                log.info("welcomeTip {}, draftWelcomeTip {}", entity.getServiceSettings().getWelcomeTip(), 
-                entity.getDraftServiceSettings().getWelcomeTip());
-                // 
+                log.info("welcomeTip {}, draftWelcomeTip {}", entity.getServiceSettings().getWelcomeTip(),
+                        entity.getDraftServiceSettings().getWelcomeTip());
+                //
                 copyPropertiesExcludingIds(entity.getDraftServiceSettings(), published);
             } else {
                 ServiceSettingsEntity newPublished = new ServiceSettingsEntity();
@@ -526,7 +572,7 @@ public class RobotSettingsRestService
                 entity.setRateDownSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
             if (published != null) {
@@ -538,7 +584,7 @@ public class RobotSettingsRestService
                 entity.setInviteSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftIntentionSettings() != null) {
             IntentionSettingsEntity published = entity.getIntentionSettings();
             if (published != null) {
@@ -586,7 +632,7 @@ public class RobotSettingsRestService
                 entity.setToolsSettings(newPublished);
             }
         }
-        
+
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
         RobotSettingsEntity updated = save(entity);
@@ -597,9 +643,11 @@ public class RobotSettingsRestService
     // 使用 ServiceSettingsHelper 处理懒加载集合的正确复制
     private void copyPropertiesExcludingIds(Object source, Object target) {
         if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
-            serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source, (ServiceSettingsEntity) target);
+            serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source,
+                    (ServiceSettingsEntity) target);
         } else if (source instanceof TriggerSettingsEntity && target instanceof TriggerSettingsEntity) {
-            // triggerSettingsHelper.copyTriggerSettingsProperties((TriggerSettingsEntity) source, (TriggerSettingsEntity) target);
+            // triggerSettingsHelper.copyTriggerSettingsProperties((TriggerSettingsEntity)
+            // source, (TriggerSettingsEntity) target);
         } else {
             BeanUtils.copyProperties(source, target, "id", "uid", "version", "createdAt", "updatedAt");
         }

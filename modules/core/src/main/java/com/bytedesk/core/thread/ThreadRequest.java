@@ -34,7 +34,6 @@ public class ThreadRequest extends BaseRequest {
     
     private static final long serialVersionUID = 1L;
 
-    // 
     private String topic;
     
     // 主题列表，用于批量查询
@@ -130,7 +129,7 @@ public class ThreadRequest extends BaseRequest {
     private Boolean mergeByTopic = false;
 
     private UserProtobuf user;
-    
+
     private String userNickname;
 
     private String agentNickname;

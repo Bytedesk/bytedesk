@@ -22,6 +22,7 @@
         <module>forum</module>
         <module>kbase</module>
         <module>service</module>
+        <module>remote</module>
         <module>social</module>
         <module>team</module>
         <module>ticket</module>
@@ -373,12 +374,12 @@
 
         <!-- https://www.cnblogs.com/cao-lei/p/17099729.html -->
         <!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
-        <dependency>
+        <!-- <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
             <version>4.0.0</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency> -->
 
         <!-- https://github.com/redis/jedis?tab=readme-ov-file -->
         <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->

@@ -160,13 +160,13 @@ public class RobotService extends AbstractRobotService {
 
         // 查询重写 + 分词扩展查询（原 Pipeline 逻辑合并至访客接口）
         String rewritten = query;
-        try {
-            if (robot != null && robot.getOrgUid() != null) {
-                rewritten = queryRewrite(query, robot.getOrgUid());
-            }
-        } catch (Exception e) {
-            log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
-        }
+        // try {
+        //     if (robot != null && robot.getOrgUid() != null) {
+        //         rewritten = queryRewrite(query, robot.getOrgUid());
+        //     }
+        // } catch (Exception e) {
+        //     log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
+        // }
         List<String> tokens = preprocessAndSegment(rewritten);
         String finalQuery = buildExpandedQuery(rewritten, tokens);
 
@@ -212,58 +212,58 @@ public class RobotService extends AbstractRobotService {
     /**
      * 查询重写服务 - 纯文本处理，不需要知识库
      */
-    public String queryRewrite(String content, String orgUid) {
-        try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content,
-                    I18Consts.I18N_LLM_CONFIG_TIP, false);
-        } catch (Exception e) {
-            log.error("Error in queryRewrite", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
-        }
-    }
+    // public String queryRewrite(String content, String orgUid) {
+    //     try {
+    //         validateParameters(content, orgUid);
+    //         return processSyncRequest(RobotConsts.ROBOT_NAME_QUERY_REWRITE, orgUid, content,
+    //                 I18Consts.I18N_LLM_CONFIG_TIP, false);
+    //     } catch (Exception e) {
+    //         log.error("Error in queryRewrite", e);
+    //         throw new RuntimeException("Service error: " + e.getMessage());
+    //     }
+    // }
 
     /**
      * 摘要生成服务 - 纯文本处理，不需要知识库
      */
-    public String summaryGeneration(String content, String orgUid) {
-        try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content,
-                    I18Consts.I18N_LLM_CONFIG_TIP, false);
-        } catch (Exception e) {
-            log.error("Error in summaryGeneration", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
-        }
-    }
+    // public String summaryGeneration(String content, String orgUid) {
+    //     try {
+    //         validateParameters(content, orgUid);
+    //         return processSyncRequest(RobotConsts.ROBOT_NAME_SUMMARY_GENERATION, orgUid, content,
+    //                 I18Consts.I18N_LLM_CONFIG_TIP, false);
+    //     } catch (Exception e) {
+    //         log.error("Error in summaryGeneration", e);
+    //         throw new RuntimeException("Service error: " + e.getMessage());
+    //     }
+    // }
 
     /**
      * 会话标题生成服务 - 纯文本处理，不需要知识库
      */
-    public String threadTitleGeneration(String content, String orgUid) {
-        try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_THREAD_TITLE_GENERATION, orgUid, content,
-                    I18Consts.I18N_LLM_CONFIG_TIP, false);
-        } catch (Exception e) {
-            log.error("Error in threadTitleGeneration", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
-        }
-    }
+    // public String threadTitleGeneration(String content, String orgUid) {
+    //     try {
+    //         validateParameters(content, orgUid);
+    //         return processSyncRequest(RobotConsts.ROBOT_NAME_THREAD_TITLE_GENERATION, orgUid, content,
+    //                 I18Consts.I18N_LLM_CONFIG_TIP, false);
+    //     } catch (Exception e) {
+    //         log.error("Error in threadTitleGeneration", e);
+    //         throw new RuntimeException("Service error: " + e.getMessage());
+    //     }
+    // }
 
     /**
      * 上下文模板摘要服务 - 纯文本处理，不需要知识库
      */
-    public String contextTemplateSummary(String content, String orgUid) {
-        try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content,
-                    I18Consts.I18N_LLM_CONFIG_TIP, false);
-        } catch (Exception e) {
-            log.error("Error in contextTemplateSummary", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
-        }
-    }
+    // public String contextTemplateSummary(String content, String orgUid) {
+    //     try {
+    //         validateParameters(content, orgUid);
+    //         return processSyncRequest(RobotConsts.ROBOT_NAME_CONTEXT_TEMPLATE_SUMMARY, orgUid, content,
+    //                 I18Consts.I18N_LLM_CONFIG_TIP, false);
+    //     } catch (Exception e) {
+    //         log.error("Error in contextTemplateSummary", e);
+    //         throw new RuntimeException("Service error: " + e.getMessage());
+    //     }
+    // }
 
     /**
      * OCR文字提取服务 - 图片文字识别，不需要知识库
@@ -292,38 +292,38 @@ public class RobotService extends AbstractRobotService {
     /**
      * 实体提取服务 - 纯文本处理，不需要知识库
      */
-    public String entityExtraction(String content, String orgUid) {
-        try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content,
-                    I18Consts.I18N_LLM_CONFIG_TIP, false);
-        } catch (Exception e) {
-            log.error("Error in entityExtraction", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
-        }
-    }
+    // public String entityExtraction(String content, String orgUid) {
+    //     try {
+    //         validateParameters(content, orgUid);
+    //         return processSyncRequest(RobotConsts.ROBOT_NAME_ENTITY_EXTRACTION, orgUid, content,
+    //                 I18Consts.I18N_LLM_CONFIG_TIP, false);
+    //     } catch (Exception e) {
+    //         log.error("Error in entityExtraction", e);
+    //         throw new RuntimeException("Service error: " + e.getMessage());
+    //     }
+    // }
 
     /**
      * 关系提取服务 - 纯文本处理，不需要知识库
      */
-    public String relationshipExtraction(String content, String orgUid) {
-        try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content,
-                    I18Consts.I18N_LLM_CONFIG_TIP, false);
-        } catch (Exception e) {
-            log.error("Error in relationshipExtraction", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
-        }
-    }
+    // public String relationshipExtraction(String content, String orgUid) {
+    //     try {
+    //         validateParameters(content, orgUid);
+    //         return processSyncRequest(RobotConsts.ROBOT_NAME_RELATIONSHIP_EXTRACTION, orgUid, content,
+    //                 I18Consts.I18N_LLM_CONFIG_TIP, false);
+    //     } catch (Exception e) {
+    //         log.error("Error in relationshipExtraction", e);
+    //         throw new RuntimeException("Service error: " + e.getMessage());
+    //     }
+    // }
 
     /**
      * 问题建议服务 - 纯文本处理，不需要知识库
      */
-    public String questionSuggest(String content, String orgUid) {
-        return processSyncRequest(RobotConsts.ROBOT_NAME_QUESTION_SUGGEST, orgUid, content,
-                I18Consts.I18N_LLM_CONFIG_TIP, false);
-    }
+    // public String questionSuggest(String content, String orgUid) {
+    //     return processSyncRequest(RobotConsts.ROBOT_NAME_QUESTION_SUGGEST, orgUid, content,
+    //             I18Consts.I18N_LLM_CONFIG_TIP, false);
+    // }
 
     // ==================== 客服质检/分析相关 ====================
 
@@ -372,16 +372,16 @@ public class RobotService extends AbstractRobotService {
     /**
      * 备用回复服务 - 可能需要查询知识库作为备用答案
      */
-    public String fallbackResponse(String content, String orgUid) {
-        try {
-            validateParameters(content, orgUid);
-            return processSyncRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content,
-                    I18Consts.I18N_LLM_CONFIG_TIP, true);
-        } catch (Exception e) {
-            log.error("Error in fallbackResponse", e);
-            throw new RuntimeException("Service error: " + e.getMessage());
-        }
-    }
+    // public String fallbackResponse(String content, String orgUid) {
+    //     try {
+    //         validateParameters(content, orgUid);
+    //         return processSyncRequest(RobotConsts.ROBOT_NAME_FALLBACK_RESPONSE, orgUid, content,
+    //                 I18Consts.I18N_LLM_CONFIG_TIP, true);
+    //     } catch (Exception e) {
+    //         log.error("Error in fallbackResponse", e);
+    //         throw new RuntimeException("Service error: " + e.getMessage());
+    //     }
+    // }
 
     // ==================== 私有辅助方法 ====================
 

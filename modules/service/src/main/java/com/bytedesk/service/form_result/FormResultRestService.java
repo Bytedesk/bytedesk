@@ -24,7 +24,12 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -43,6 +48,8 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final MessageRestService messageRestService;
 
     @Override
     protected Specification<FormResultEntity> createSpecification(FormResultRequest request) {
@@ -86,6 +93,42 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
         if (savedEntity == null) {
             throw new RuntimeException("Create tag failed");
         }
+
+        // 可选：回写表单结果到对应的表单消息 content 中
+        if (StringUtils.hasText(request.getMessageUid())) {
+            try {
+                Optional<MessageEntity> messageOptional = messageRestService.findByUid(request.getMessageUid());
+                if (messageOptional.isPresent()) {
+                    MessageEntity messageEntity = messageOptional.get();
+                    // 简单校验：orgUid 不一致则不回写
+                    if (StringUtils.hasText(request.getOrgUid())
+                            && StringUtils.hasText(messageEntity.getOrgUid())
+                            && !request.getOrgUid().equals(messageEntity.getOrgUid())) {
+                        log.warn("Skip form message update due to orgUid mismatch, messageUid={}, requestOrgUid={}, messageOrgUid={}",
+                                request.getMessageUid(), request.getOrgUid(), messageEntity.getOrgUid());
+                    } else {
+                        JSONObject contentJson = null;
+                        if (StringUtils.hasText(messageEntity.getContent())) {
+                            contentJson = JSON.parseObject(messageEntity.getContent());
+                        }
+                        if (contentJson == null) {
+                            contentJson = new JSONObject();
+                        }
+                        // formData 是 JSON 字符串，前端可自行解析；同时保存 formResultUid 便于后续关联
+                        contentJson.put("formData", request.getFormData());
+                        contentJson.put("formResultUid", savedEntity.getUid());
+                        messageEntity.setContent(contentJson.toJSONString());
+                        messageRestService.save(messageEntity);
+                    }
+                } else {
+                    log.warn("Form message not found, messageUid={}", request.getMessageUid());
+                }
+            } catch (Exception e) {
+                // 不影响表单提交主流程
+                log.warn("Failed to update form message content, messageUid={}, error={}", request.getMessageUid(), e.getMessage());
+            }
+        }
+
         return convertToResponse(savedEntity);
     }
 

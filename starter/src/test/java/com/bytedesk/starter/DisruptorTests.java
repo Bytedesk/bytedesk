@@ -13,33 +13,33 @@
  */
 package com.bytedesk.starter;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bytedesk.core.action.disruptor.LogEventProducer;
+// import com.bytedesk.core.action.disruptor.LogEventProducer;
 
-import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@SpringBootTest(classes = { StarterApplication.class })
-public class DisruptorTests {
+// @Slf4j
+// @SpringBootTest(classes = { StarterApplication.class })
+// public class DisruptorTests {
 
-    @Autowired
-    private LogEventProducer logEventProducer;
+//     @Autowired
+//     private LogEventProducer logEventProducer;
 
-    // FIXME: 没有正常打印log
-    @Test
-    public void testLogEvent() {
-        System.out.println("testLogEvent system start");
-        log.info("testLogEvent start");
-        logEventProducer.simulate();
-        log.info("testLogEvent end");
-        // try {
-        // // 这里停止2000ms是为了确定是处理消息是异步的
-        // Thread.sleep(2000);
-        // } catch (InterruptedException e) {
-        // }
-    }
+//     // FIXME: 没有正常打印log
+//     @Test
+//     public void testLogEvent() {
+//         System.out.println("testLogEvent system start");
+//         log.info("testLogEvent start");
+//         logEventProducer.simulate();
+//         log.info("testLogEvent end");
+//         // try {
+//         // // 这里停止2000ms是为了确定是处理消息是异步的
+//         // Thread.sleep(2000);
+//         // } catch (InterruptedException e) {
+//         // }
+//     }
 
-}
+// }

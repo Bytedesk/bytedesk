@@ -38,7 +38,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -138,7 +137,8 @@ public class SpringAICustomService extends BaseSpringAIService {
             // 创建选项
             OpenAiChatOptions options = createDynamicOptions(llm);
             if (options == null) {
-                log.warn("Failed to create dynamic options for provider {}, using default chat model", provider.getType());
+                log.warn("Failed to create dynamic options for provider {}, using default chat model",
+                        provider.getType());
                 return defaultChatModel;
             }
 
@@ -147,108 +147,115 @@ public class SpringAICustomService extends BaseSpringAIService {
                     .defaultOptions(options)
                     .build();
         } catch (Exception e) {
-            log.error("Failed to create dynamic chat model for provider {}, using default chat model", provider.getUid(), e);
+            log.error("Failed to create dynamic chat model for provider {}, using default chat model",
+                    provider.getUid(), e);
             return defaultChatModel;
         }
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置和提供商信息
-    RobotLlm llm = robot.getLlm();
-        String providerName = getProviderType(llm);
-        log.info("{} API websocket", providerName);
-        
-        if (llm == null) {
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置和提供商信息
+    //     RobotLlm llm = robot.getLlm();
+    //     String providerName = getProviderType(llm);
+    //     log.info("{} API websocket", providerName);
 
-        // 获取适当的模型实例
-        OpenAiChatModel chatModel = createChatModel(llm);
-        if (chatModel == null) {
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
-        
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = {false};
-        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
-        final StringBuilder[] fullResponseText = {new StringBuilder()};
-        
-        try {
-            // 如果有自定义选项，创建新的Prompt
-            Prompt requestPrompt = prompt;
-            OpenAiChatOptions customOptions = createDynamicOptions(llm);
-            if (customOptions != null) {
-                requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
-            }
+    //     if (llm == null) {
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                 providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //         return;
+    //     }
 
-            chatModel.stream(requestPrompt).subscribe(
-                    response -> {
-                        if (response != null) {
-                            log.debug("{} API response metadata: {}", providerName, response.getMetadata());
-                            List<Generation> generations = response.getResults();
-                            for (Generation generation : generations) {
-                                AssistantMessage assistantMessage = generation.getOutput();
-                                String textContent = assistantMessage.getText();
-                                
-                                // 累积响应文本
-                                if (textContent != null) {
-                                    fullResponseText[0].append(textContent);
-                                }
-                                
-                                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-                            }
-                            // 提取token使用情况
-                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
-                            success[0] = true;
-                        }
-                    },
-                    error -> {
-                        log.error("{} API error: ", providerName, error);
-                        sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                        success[0] = false;
-                    },
-                    () -> {
-                        log.info("{} Chat stream completed", providerName);
-                        
-                        // 如果token提取失败，使用累积的完整响应文本来估算token
-                        if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
-                            log.info("{} API using accumulated response text for token estimation: {}", providerName, fullResponseText[0].toString());
-                            ChatTokenUsage estimatedUsage = estimateTokenUsageFromText(fullResponseText[0].toString());
-                            tokenUsage[0] = estimatedUsage;
-                            log.info("{} API final estimated token usage: {}", providerName, estimatedUsage);
-                        }
-                        
-                        // 记录token使用情况
-                        long responseTime = System.currentTimeMillis() - startTime;
-                        String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
-                                : "default-model";
-            tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
-                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
-                                responseTime);
-                    });
-        } catch (Exception e) {
-            log.error("{} API websocket error: ", providerName, e);
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            // 记录失败的token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
-                    : "default-model";
-            tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType, 0, 0, false, responseTime);
-        }
-    }
+    //     // 获取适当的模型实例
+    //     OpenAiChatModel chatModel = createChatModel(llm);
+    //     if (chatModel == null) {
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                 providerName + I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //         return;
+    //     }
+
+    //     long startTime = System.currentTimeMillis();
+    //     final boolean[] success = { false };
+    //     final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
+    //     final StringBuilder[] fullResponseText = { new StringBuilder() };
+
+    //     try {
+    //         // 如果有自定义选项，创建新的Prompt
+    //         Prompt requestPrompt = prompt;
+    //         OpenAiChatOptions customOptions = createDynamicOptions(llm);
+    //         if (customOptions != null) {
+    //             requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+    //         }
+
+    //         chatModel.stream(requestPrompt).subscribe(
+    //                 response -> {
+    //                     if (response != null) {
+    //                         log.debug("{} API response metadata: {}", providerName, response.getMetadata());
+    //                         List<Generation> generations = response.getResults();
+    //                         for (Generation generation : generations) {
+    //                             AssistantMessage assistantMessage = generation.getOutput();
+    //                             String textContent = assistantMessage.getText();
+
+    //                             // 累积响应文本
+    //                             if (textContent != null) {
+    //                                 fullResponseText[0].append(textContent);
+    //                             }
+
+    //                             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent,
+    //                                     messageProtobufReply);
+    //                         }
+    //                         // 提取token使用情况
+    //                         tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
+    //                         success[0] = true;
+    //                     }
+    //                 },
+    //                 error -> {
+    //                     log.error("{} API error: ", providerName, error);
+    //                     sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                             I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //                     success[0] = false;
+    //                 },
+    //                 () -> {
+    //                     log.info("{} Chat stream completed", providerName);
+
+    //                     // 如果token提取失败，使用累积的完整响应文本来估算token
+    //                     if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
+    //                         log.info("{} API using accumulated response text for token estimation: {}", providerName,
+    //                                 fullResponseText[0].toString());
+    //                         ChatTokenUsage estimatedUsage = estimateTokenUsageFromText(fullResponseText[0].toString());
+    //                         tokenUsage[0] = estimatedUsage;
+    //                         log.info("{} API final estimated token usage: {}", providerName, estimatedUsage);
+    //                     }
+
+    //                     // 记录token使用情况
+    //                     long responseTime = System.currentTimeMillis() - startTime;
+    //                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                             : "default-model";
+    //                     tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
+    //                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
+    //                             responseTime);
+    //                 });
+    //     } catch (Exception e) {
+    //         log.error("{} API websocket error: ", providerName, e);
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         // 记录失败的token使用情况
+    //         long responseTime = System.currentTimeMillis() - startTime;
+    //         String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                 : "default-model";
+    //         tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType, 0, 0, false, responseTime);
+    //     }
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
-        
+
         // 从robot中获取llm配置和提供商信息
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
         log.info("{} API sync: {}", providerName);
 
@@ -295,35 +302,39 @@ public class SpringAICustomService extends BaseSpringAIService {
                     && StringUtils.hasText(robot.getLlm().getTextModel()))
                             ? robot.getLlm().getTextModel()
                             : "default-model";
-        tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences,
+            SseEmitter emitter) {
         // 从robot中获取llm配置和提供商信息
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         String providerName = getProviderType(llm);
         log.info("{} API SSE: {}", providerName);
 
-    if (llm == null) {
-        sseMessageHelper.handleSseError(new RuntimeException(providerName + " service not available"), messageProtobufQuery,
-            messageProtobufReply, emitter);
-        return;
-    }
+        if (llm == null) {
+            sseMessageHelper.handleSseError(new RuntimeException(providerName + " service not available"),
+                    messageProtobufQuery,
+                    messageProtobufReply, emitter);
+            return;
+        }
 
         // 获取适当的模型实例
         OpenAiChatModel chatModel = createChatModel(llm);
-    if (chatModel == null) {
-        sseMessageHelper.handleSseError(new RuntimeException(providerName + " service not available"), messageProtobufQuery,
-            messageProtobufReply, emitter);
-        return;
-    }
+        if (chatModel == null) {
+            sseMessageHelper.handleSseError(new RuntimeException(providerName + " service not available"),
+                    messageProtobufQuery,
+                    messageProtobufReply, emitter);
+            return;
+        }
 
         // 发送起始消息
-    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+        sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -348,13 +359,14 @@ public class SpringAICustomService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.debug("{} API response metadata: {}, text {}", providerName, response.getMetadata(),
                                         textContent);
-                                
+
                                 // 累积响应文本
                                 if (textContent != null) {
                                     fullResponseText[0].append(textContent);
                                 }
-                                
-                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                                        textContent, null, sourceReferences);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
@@ -373,17 +385,18 @@ public class SpringAICustomService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("{} API SSE complete", providerName);
-                    
+
                     // 如果token提取失败，使用累积的完整响应文本来估算token
                     if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
-                        log.info("{} API using accumulated response text for token estimation: {}", providerName, fullResponseText[0].toString());
+                        log.info("{} API using accumulated response text for token estimation: {}", providerName,
+                                fullResponseText[0].toString());
                         ChatTokenUsage estimatedUsage = estimateTokenUsageFromText(fullResponseText[0].toString());
                         tokenUsage[0] = estimatedUsage;
                         log.info("{} API final estimated token usage: {}", providerName, estimatedUsage);
                     }
-                    
+
                     // 发送流结束消息，包含token使用情况和prompt内容
-            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                    sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
                             tokenUsage[0].getTotalTokens(), prompt, getProviderConstant(llm),
                             (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
@@ -392,7 +405,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "default-model";
-            tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
+                    tokenUsageHelper.recordAiTokenUsage(robot, getProviderConstant(llm), modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });
@@ -409,21 +422,21 @@ public class SpringAICustomService extends BaseSpringAIService {
             if (outputText == null || outputText.isEmpty()) {
                 return new ChatTokenUsage(0, 0, 0);
             }
-            
+
             // 估算token使用量
             // 中文大约1个字符=1个token，英文大约4个字符=1个token
             long completionTokens = estimateTokens(outputText);
-            
+
             // 假设输入文本长度约为输出文本的30%（这是一个常见的比例）
             long promptTokens = (long) (completionTokens * 0.3);
             long totalTokens = promptTokens + completionTokens;
-            
+
             log.info(
                     "Estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens",
                     outputText.length(), completionTokens, promptTokens, totalTokens);
-            
+
             return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
-            
+
         } catch (Exception e) {
             log.error("Error estimating token usage from text", e);
             return new ChatTokenUsage(0, 0, 0);
@@ -467,12 +480,12 @@ public class SpringAICustomService extends BaseSpringAIService {
         if (llm == null) {
             return "Unknown";
         }
-        
+
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isPresent()) {
             return llmProviderOptional.get().getType();
         }
-        
+
         return "Unknown Provider";
     }
 
@@ -483,7 +496,7 @@ public class SpringAICustomService extends BaseSpringAIService {
         if (llm == null) {
             return LlmProviderConstants.CUSTOM;
         }
-        
+
         Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
         if (llmProviderOptional.isPresent()) {
             String providerType = llmProviderOptional.get().getType();
@@ -492,7 +505,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                 return mapProviderNameToConstant(providerType.toLowerCase());
             }
         }
-        
+
         return LlmProviderConstants.CUSTOM;
     }
 
@@ -503,10 +516,10 @@ public class SpringAICustomService extends BaseSpringAIService {
         if (providerType == null) {
             return LlmProviderConstants.CUSTOM;
         }
-        
+
         // 移除空格并转为小写
         providerType = providerType.replaceAll("\\s+", "").toLowerCase();
-        
+
         // 根据名称匹配对应的常量
         if (providerType.contains("deepseek")) {
             return LlmProviderConstants.DEEPSEEK;

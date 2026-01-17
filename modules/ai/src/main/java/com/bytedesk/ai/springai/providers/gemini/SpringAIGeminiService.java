@@ -38,7 +38,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +59,7 @@ public class SpringAIGeminiService extends BaseSpringAIService {
     public SpringAIGeminiService() {
         super(); // 调用基类的无参构造函数
     }
-    
+
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions
      * 
@@ -115,7 +114,8 @@ public class SpringAIGeminiService extends BaseSpringAIService {
         }
 
         try {
-            log.info("Creating dynamic OpenAI chat model with provider: {} ({})", provider.getType(), provider.getUid());
+            log.info("Creating dynamic OpenAI chat model with provider: {} ({})", provider.getType(),
+                    provider.getUid());
             // 使用动态的OpenAiApi实例
             OpenAiApi openaiApi = createOpenaiApi(provider.getBaseUrl(), provider.getApiKey());
             OpenAiChatOptions options = createOpenaiOptions(llm);
@@ -128,87 +128,97 @@ public class SpringAIGeminiService extends BaseSpringAIService {
                     .defaultOptions(options)
                     .build();
         } catch (Exception e) {
-            log.error("Failed to create dynamic OpenAI chat model for provider {}, using default chat model", provider.getUid(), e);
+            log.error("Failed to create dynamic OpenAI chat model for provider {}, using default chat model",
+                    provider.getUid(), e);
             return defaultChatModel;
         }
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
-        log.info("OpenAI API websocket ");
-        if (llm == null) {
-            log.info("OpenAI API not available");
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置
+    //     RobotLlm llm = robot.getLlm();
+    //     log.info("OpenAI API websocket ");
+    //     if (llm == null) {
+    //         log.info("OpenAI API not available");
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         return;
+    //     }
 
-        // 获取适当的模型实例
-        OpenAiChatModel chatModel = createOpenaiChatModel(llm);
-        if (chatModel == null) {
-            log.error("Failed to create OpenAI chat model and no default chat model available");
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
-        
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = {false};
-        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
-        
-        try {
-            chatModel.stream(prompt).subscribe(
-                    response -> {
-                        if (response != null) {
-                            log.info("OpenAI API response metadata: {}", response.getMetadata());
-                            List<Generation> generations = response.getResults();
-                            for (Generation generation : generations) {
-                                AssistantMessage assistantMessage = generation.getOutput();
-                                String textContent = assistantMessage.getText();
-                                log.info("OpenAI API Websocket response text: {}", textContent);
+    //     // 获取适当的模型实例
+    //     OpenAiChatModel chatModel = createOpenaiChatModel(llm);
+    //     if (chatModel == null) {
+    //         log.error("Failed to create OpenAI chat model and no default chat model available");
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         return;
+    //     }
 
-                                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-                            }
-                            // 提取token使用情况
-                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
-                            success[0] = true;
-                        }
-                    },
-                    error -> {
-                        log.error("OpenAI API error: ", error);
-                        sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                        success[0] = false;
-                    },
-                    () -> {
-                        log.info("Chat stream completed");
-                        // 记录token使用情况
-                        long responseTime = System.currentTimeMillis() - startTime;
-                        String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gpt-3.5-turbo";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType, 
-                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
-                    });
-        } catch (Exception e) {
-            log.error("Error processing OpenAI prompt", e);
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            success[0] = false;
-            // 记录token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gpt-3.5-turbo";
-        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType, 
-                    tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
-        }
-    }
+    //     long startTime = System.currentTimeMillis();
+    //     final boolean[] success = { false };
+    //     final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
+
+    //     try {
+    //         chatModel.stream(prompt).subscribe(
+    //                 response -> {
+    //                     if (response != null) {
+    //                         log.info("OpenAI API response metadata: {}", response.getMetadata());
+    //                         List<Generation> generations = response.getResults();
+    //                         for (Generation generation : generations) {
+    //                             AssistantMessage assistantMessage = generation.getOutput();
+    //                             String textContent = assistantMessage.getText();
+    //                             log.info("OpenAI API Websocket response text: {}", textContent);
+
+    //                             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent,
+    //                                     messageProtobufReply);
+    //                         }
+    //                         // 提取token使用情况
+    //                         tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
+    //                         success[0] = true;
+    //                     }
+    //                 },
+    //                 error -> {
+    //                     log.error("OpenAI API error: ", error);
+    //                     sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                             I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //                     success[0] = false;
+    //                 },
+    //                 () -> {
+    //                     log.info("Chat stream completed");
+    //                     // 记录token使用情况
+    //                     long responseTime = System.currentTimeMillis() - startTime;
+    //                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                             : "gpt-3.5-turbo";
+    //                     tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType,
+    //                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
+    //                             responseTime);
+    //                 });
+    //     } catch (Exception e) {
+    //         log.error("Error processing OpenAI prompt", e);
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         success[0] = false;
+    //         // 记录token使用情况
+    //         long responseTime = System.currentTimeMillis() - startTime;
+    //         String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                 : "gpt-3.5-turbo";
+    //         tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType,
+    //                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
+    //     }
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
-        
+
         log.info("OpenAI API sync ");
-        
+
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         log.info("OpenAI API websocket ");
 
         if (llm == null) {
@@ -252,22 +262,26 @@ public class SpringAIGeminiService extends BaseSpringAIService {
         } finally {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextModel())) 
-                    ? robot.getLlm().getTextModel() : "gpt-3.5-turbo";
-        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType, 
+            String modelType = (robot != null && robot.getLlm() != null
+                    && StringUtils.hasText(robot.getLlm().getTextModel()))
+                            ? robot.getLlm().getTextModel()
+                            : "gpt-3.5-turbo";
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
-    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
+    protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences,
+            SseEmitter emitter) {
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         log.info("OpenAI API SSE ");
 
         if (llm == null) {
             log.info("OpenAI API not available");
-        sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.OPENAI,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gpt-3.5-turbo");
             return;
@@ -279,19 +293,20 @@ public class SpringAIGeminiService extends BaseSpringAIService {
         if (chatModel == null) {
             log.error("Failed to create OpenAI chat model and no default chat model available");
             // 使用sendStreamEndMessage方法替代重复的代码
-        sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
                     LlmProviderConstants.OPENAI,
                     (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gpt-3.5-turbo");
             return;
         }
 
         long startTime = System.currentTimeMillis();
-        final boolean[] success = {false};
-        final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
+        final boolean[] success = { false };
+        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
 
         try {
             // 发送初始消息，告知用户请求已收到，正在处理
-            sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+            sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                    I18Consts.I18N_THINKING);
 
             chatModel.stream(prompt).subscribe(
                     response -> {
@@ -303,7 +318,8 @@ public class SpringAIGeminiService extends BaseSpringAIService {
                                     String textContent = assistantMessage.getText();
                                     log.info("OpenAI API SSE response text: {}", textContent);
 
-                                    sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                    sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply,
+                                            emitter, textContent, null, sourceReferences);
                                 }
                                 // 提取token使用情况
                                 tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
@@ -332,7 +348,7 @@ public class SpringAIGeminiService extends BaseSpringAIService {
                         long responseTime = System.currentTimeMillis() - startTime;
                         String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                 : "gpt-3.5-turbo";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType,
+                        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                                 responseTime);
                     });
@@ -342,8 +358,9 @@ public class SpringAIGeminiService extends BaseSpringAIService {
             success[0] = false;
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "gpt-3.5-turbo";
-        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType,
+            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+                    : "gpt-3.5-turbo";
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OPENAI, modelType,
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
     }

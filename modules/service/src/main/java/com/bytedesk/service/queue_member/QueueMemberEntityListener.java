@@ -15,7 +15,6 @@ package com.bytedesk.service.queue_member;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.service.queue_member.event.QueueMemberCreateEvent;
@@ -30,10 +29,8 @@ public class QueueMemberEntityListener {
     @PostPersist
     public void onPostPersist(QueueMemberEntity queueMember) {
         log.info("QueueMemberEntityListener onPostPersist: {}", queueMember.getUid());
-        QueueMemberEntity clonedEntity = SerializationUtils.clone(queueMember);
-        // 
         ApplicationEventPublisher eventPublisher = ApplicationContextHolder.getBean(ApplicationEventPublisher.class);
-        eventPublisher.publishEvent(new QueueMemberCreateEvent(clonedEntity));
+        eventPublisher.publishEvent(new QueueMemberCreateEvent(queueMember));
     }
 
     // @PostUpdate

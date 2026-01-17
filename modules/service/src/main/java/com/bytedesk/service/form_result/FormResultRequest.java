@@ -34,6 +34,11 @@ public class FormResultRequest extends BaseRequest {
     private String formUid;
 
     /**
+     * 触发表单提交的消息UID（用于回写表单结果到该表单消息）
+     */
+    private String messageUid;
+
+    /**
      * 提交者信息的JSON表示
      */
     private String user;

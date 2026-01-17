@@ -33,6 +33,8 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
         
         Optional<ThreadEntity> findByUid(String uid);
 
+        List<ThreadEntity> findByUidInAndDeletedFalse(List<String> uids);
+
         Boolean existsByUid(String uid);
 
         /** used for member thread type */

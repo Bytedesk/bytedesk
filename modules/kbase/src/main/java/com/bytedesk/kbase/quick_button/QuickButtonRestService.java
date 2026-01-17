@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -52,17 +54,34 @@ public class QuickButtonRestService extends BaseRestService<QuickButtonEntity, Q
 
     @Override
     public QuickButtonResponse create(QuickButtonRequest request) {
-        QuickButtonEntity entity = modelMapper.map(request, QuickButtonEntity.class);
+        // 
+        QuickButtonEntity entity = new QuickButtonEntity();
+        entity.setTitle(request.getTitle());
+        entity.setSubtitle(request.getSubtitle());
+        entity.setDescription(request.getDescription());
+        entity.setIcon(request.getIcon());
+        entity.setColor(request.getColor());
+        entity.setBadge(request.getBadge());
+        entity.setCode(request.getCode());
+        entity.setImageUrl(request.getImageUrl());
+        entity.setOrderIndex(request.getOrderIndex());
+        entity.setHighlight(request.getHighlight());
+        entity.setEnabled(request.getEnabled());
+        entity.setKbUid(request.getKbUid());
+        entity.setContent(request.getContent());
         if (StringUtils.hasText(request.getUid())) {
             entity.setUid(request.getUid());
         } else {
             entity.setUid(uidUtils.getUid());
         }
-        entity.setType(QuickButtonTypeEnum.fromValue(request.getType()).name());
+        entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
         // 
         UserEntity currentUser = authService.getCurrentUser();
         if (currentUser != null) {
             entity.setUserUid(currentUser.getUid());
+            entity.setOrgUid(currentUser.getOrgUid());
+        } else {
+            throw new NotLoginException("Unauthorized access");
         }
         // 
         QuickButtonEntity savedEntity = save(entity);
@@ -88,13 +107,13 @@ public class QuickButtonRestService extends BaseRestService<QuickButtonEntity, Q
         entity.setBadge(request.getBadge());
         entity.setCode(request.getCode());
         entity.setImageUrl(request.getImageUrl());
-        entity.setType(QuickButtonTypeEnum.fromValue(request.getType()).name());
+        entity.setType(MessageTypeEnum.fromValue(request.getType()).name());
         entity.setOrderIndex(request.getOrderIndex());
         entity.setHighlight(request.getHighlight());
         entity.setEnabled(request.getEnabled());
         entity.setKbUid(request.getKbUid());
         entity.setContent(request.getContent());
-        entity.setPayload(request.getPayload());
+        // entity.setPayload(request.getPayload());
 
         QuickButtonEntity savedEntity = save(entity);
         if (savedEntity == null) {

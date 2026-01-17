@@ -35,8 +35,12 @@ public enum MessageTypeEnum {
     GUESS, // 猜你想问
     HOT, // 热门话题
     SHORTCUT, // 快捷路径
+    URL, // 网址消息
     GOODS, // 商品消息
     ORDER, // 订单
+    PHONE_NUMBER, // 电话号码
+    EMAILL_ADDRESS, // 邮箱地址
+    WECHAT_NUMBER, // 微信号
     // 
     QUEUE, // 排队消息: 用户进入排队队列
     QUEUE_NOTICE, // 排队通知消息: 通知客服，用户进入排队队列，通知客服人员

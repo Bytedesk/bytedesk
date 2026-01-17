@@ -101,6 +101,18 @@ public class AgentQueueStatsResponse {
     private Integer agentServedCount = 0;
 
     /**
+     * 首次响应时长(秒)：统计口径为“该客服今日会话中，已发生首次响应的会话的首次响应时长平均值”。
+     */
+    @Builder.Default
+    private Integer agentFirstResponseLength = 0;
+
+    /**
+     * 平均响应时长(秒)：统计口径为“该客服今日会话中，已产生有效响应统计的会话的平均响应时长平均值”。
+     */
+    @Builder.Default
+    private Integer agentAvgResponseLength = 0;
+
+    /**
      * 每小时接待人数（24小时数组）
      */
     @Builder.Default

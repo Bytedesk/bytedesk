@@ -13,13 +13,17 @@
  */
 package com.bytedesk.ai.springai.providers.minimax;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.utils.output.ActorsFilms;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -43,16 +49,95 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/minimax")
+@RequestMapping("/minimax")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.minimax.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIMinimaxChatController {
 
+    private final BytedeskProperties bytedeskProperties;
     @Autowired(required = false)
     @Qualifier("minimaxChatModel")
     private ChatModel minimaxChatModel;
     private final SpringAIMinimaxChatService springAIMinimaxService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    // http://127.0.0.1:9003/minimax/format?actor=
+    // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+    @GetMapping("/format")
+    public ResponseEntity<JsonResult<?>> generate(
+            @RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        var outputParser = new BeanOutputConverter<>(ActorsFilms.class);
+        String format = outputParser.getFormat();
+        log.info("format: {}", format);
+        String userMessage = """
+                Generate the filmography for the actor {actor}.
+                {format}
+                /no_think
+                """;
+
+        PromptTemplate promptTemplate = PromptTemplate.builder()
+                .template(userMessage)
+                .variables(Map.of("actor", actor, "format", format))
+                .build();
+        Prompt prompt = new Prompt(promptTemplate.createMessage());
+
+        ChatModel model = minimaxChatModel;
+        if (model == null) {
+            return ResponseEntity.ok(JsonResult.error("Minimax service is not available"));
+        }
+
+        ChatResponse response = model.call(prompt);
+        String content = response.getResult().getOutput().getText();
+        ActorsFilms actorsFilms = outputParser.convert(content);
+        log.info("actorsFilms: {}", actorsFilms);
+
+        return ResponseEntity.ok(JsonResult.success(actorsFilms));
+    }
+
+    // structured output
+    // http://127.0.0.1:9003/minimax/structured?message=
+    // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+    @GetMapping("/structured")
+    public ResponseEntity<JsonResult<?>> structured(
+            @RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
+        String userInputTemplate = """
+                Your response should be in JSON format.
+                The data structure for the JSON should match this Java class: java.util.HashMap
+                Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+                {message}
+                {format}
+                /no_think
+                """;
+        log.info("userInputTemplate: {}", userInputTemplate);
+
+        Prompt prompt = new Prompt(
+                PromptTemplate.builder()
+                        .template(userInputTemplate)
+                        .variables(Map.of("message", message, "format", outputConverter.getFormat()))
+                        .build()
+                        .createMessage());
+
+        ChatModel model = minimaxChatModel;
+        if (model == null) {
+            return ResponseEntity.ok(JsonResult.error("Minimax service is not available"));
+        }
+
+        ChatResponse response = model.call(prompt);
+        log.info("response: {}", response);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
 
     /**
      * 方式1：同步调用
@@ -61,6 +146,9 @@ public class SpringAIMinimaxChatController {
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {String response = springAIMinimaxService.processPromptSync(message, null);
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
@@ -71,6 +159,9 @@ public class SpringAIMinimaxChatController {
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {Prompt prompt = new Prompt(new UserMessage(message));
+        if (!bytedeskProperties.getDebug()) {
+            return Flux.empty();
+        }
         ChatModel model = minimaxChatModel;
         if (model != null) {
             return model.stream(prompt);
@@ -86,6 +177,15 @@ public class SpringAIMinimaxChatController {
     @GetMapping(value = "/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatSSE(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {SseEmitter emitter = new SseEmitter(180_000L); // 3分钟超时
+        if (!bytedeskProperties.getDebug()) {
+            try {
+                emitter.send(SseEmitter.event().name("error").data("Service is not available"));
+            } catch (Exception e) {
+                log.debug("Unable to send error event", e);
+            }
+            emitter.complete();
+            return emitter;
+        }
         
         executorService.execute(() -> {
             try {
@@ -116,6 +216,9 @@ public class SpringAIMinimaxChatController {
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {ChatModel model = minimaxChatModel;
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("DeepSeek service is not available"));
         }

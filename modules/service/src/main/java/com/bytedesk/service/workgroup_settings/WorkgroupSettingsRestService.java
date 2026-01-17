@@ -504,6 +504,22 @@ public class WorkgroupSettingsRestService
         settings.setIntentionSettings(inte);
         settings.setDraftIntentionSettings(inteDraft);
 
+        // 发布与草稿：情绪配置（统一使用 fromRequest，内部已处理 null）
+        EmotionSettingEntity emo = EmotionSettingEntity.fromRequest(null, modelMapper);
+        emo.setUid(uidUtils.getUid());
+        settings.setEmotionSettings(emo);
+        EmotionSettingEntity emoDraft = EmotionSettingEntity.fromRequest(null, modelMapper);
+        emoDraft.setUid(uidUtils.getUid());
+        settings.setDraftEmotionSettings(emoDraft);
+
+        // 发布与草稿：会话小结配置（统一使用 fromRequest，内部已处理 null）
+        SummarySettingsEntity sum = SummarySettingsEntity.fromRequest(null, modelMapper);
+        sum.setUid(uidUtils.getUid());
+        settings.setSummarySettings(sum);
+        SummarySettingsEntity sumDraft = SummarySettingsEntity.fromRequest(null, modelMapper);
+        sumDraft.setUid(uidUtils.getUid());
+        settings.setDraftSummarySettings(sumDraft);
+
         // 留言设置（发布 + 草稿）
         MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
         mls.setUid(uidUtils.getUid());

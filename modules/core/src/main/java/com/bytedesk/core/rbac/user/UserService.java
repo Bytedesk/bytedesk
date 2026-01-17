@@ -93,7 +93,6 @@ public class UserService {
             @CacheEvict(value = "user:exists", key = "#request.email + '-' + #request.platform", condition = "#request.email != null"),
     })
     public UserResponse register(UserRequest request) {
-        // log.info("register {}", request.toString());
 
         // platform 不能为空；管理员后台创建用户时可能未传该字段，默认使用 BYTEDESK
         String platform = request.getPlatform();
@@ -107,8 +106,11 @@ public class UserService {
             throw new RuntimeException("email or mobile is required..!!");
         }
 
-        // 保护超级管理员账号：禁止创建/注册与超管相同的邮箱/手机号
-        validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+        // 保护超级管理员账号：仅在超级管理员已存在时进行验证
+        // 首次安装时，超级管理员尚未创建，应跳过此验证
+        if (existsBySuperUser()) {
+            validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+        }
 
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndPlatform(request.getEmail(), platform)) {
@@ -176,8 +178,8 @@ public class UserService {
         }
         // 只有经过验证的手机号，才真正执行注册
         if (StringUtils.hasText(request.getMobile())) {
-            if (!StringUtils.hasText(request.getUsername()) 
-                && !StringUtils.hasText(request.getEmail())) {
+            if (!StringUtils.hasText(request.getUsername())
+                    && !StringUtils.hasText(request.getEmail())) {
                 user.setUsername(request.getMobile());
             } else {
                 user.setUsername(request.getUsername());
@@ -374,8 +376,11 @@ public class UserService {
     @Transactional
     public UserEntity createUserFromMember(UserRequest request) {
         //
-        // 保护超级管理员账号：禁止从成员创建出与超管相同邮箱/手机号的用户
-        validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+        // 保护超级管理员账号：仅在超级管理员已存在时进行验证
+        // 首次安装时，超级管理员尚未创建，应跳过此验证
+        if (existsBySuperUser()) {
+            validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+        }
 
         if (StringUtils.hasText(request.getMobile())
                 && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
@@ -405,8 +410,8 @@ public class UserService {
 
         // 设置默认用户名，优先使用邮箱，如果没有则使用手机号
         // if (StringUtils.hasText(request.getUsername())) {
-        //     user.setUsername(request.getUsername());
-        // } else 
+        // user.setUsername(request.getUsername());
+        // } else
         if (StringUtils.hasText(request.getEmail())) {
             user.setUsername(request.getEmail());
         } else if (StringUtils.hasText(request.getMobile())) {
@@ -548,7 +553,8 @@ public class UserService {
             Optional<RoleEntity> optional = roleRestService.findByUid(roleUid);
             if (optional.isPresent()) {
                 RoleEntity role = optional.get();
-                // Avoid entityManager.merge(detachedRole) which may trigger OptimisticLockException
+                // Avoid entityManager.merge(detachedRole) which may trigger
+                // OptimisticLockException
                 // and mark the surrounding transaction rollback-only.
                 Long roleId = role.getId();
                 if (roleId == null) {
@@ -621,8 +627,10 @@ public class UserService {
             throw new RuntimeException("User is null");
         }
 
-        // Always operate on a managed entity to avoid merge side-effects on join tables.
-        // New user objects may not have an id yet (e.g., createUserFromMember); persist first.
+        // Always operate on a managed entity to avoid merge side-effects on join
+        // tables.
+        // New user objects may not have an id yet (e.g., createUserFromMember); persist
+        // first.
         UserEntity managedUser;
         if (user.getId() == null) {
             managedUser = userRepository.save(user);
@@ -631,8 +639,10 @@ public class UserService {
                     .orElseThrow(() -> new RuntimeException("User not found: " + user.getUid()));
         }
 
-        // Ensure organization context from input user is applied to the managed instance.
-        // Some callers set currentOrganization on the detached instance and then call addRole.
+        // Ensure organization context from input user is applied to the managed
+        // instance.
+        // Some callers set currentOrganization on the detached instance and then call
+        // addRole.
         String orgUid = null;
         if (user.getCurrentOrganization() != null && StringUtils.hasText(user.getCurrentOrganization().getUid())) {
             orgUid = user.getCurrentOrganization().getUid();
@@ -649,14 +659,16 @@ public class UserService {
         if (roleId == null) {
             throw new RuntimeException("Role id is null for name: " + roleName);
         }
-        // Avoid entityManager.merge(detachedRole) which may trigger OptimisticLockException
+        // Avoid entityManager.merge(detachedRole) which may trigger
+        // OptimisticLockException
         // and mark the surrounding transaction rollback-only under concurrent access.
         RoleEntity managedRole = entityManager.find(RoleEntity.class, roleId);
         if (managedRole == null) {
             throw new RuntimeException("Role not found by id: " + roleId + ", name: " + roleName);
         }
 
-        // Allow ROLE_USER without organization context so auto-registered users have a default role
+        // Allow ROLE_USER without organization context so auto-registered users have a
+        // default role
         if (managedUser.getCurrentOrganization() == null) {
             if (!RoleConsts.ROLE_USER.equals(roleName)) {
                 throw new RuntimeException("当前用户未加入任何组织，无法分配角色: " + roleName);
@@ -739,7 +751,8 @@ public class UserService {
 
     // exists by username and mobile
     @Cacheable(value = "user:exists", key = "#username + '-' + #mobile + '-' + #platform", unless = "#result == null")
-    public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile, @NonNull String platform) {
+    public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile,
+            @NonNull String platform) {
         return userRepository.existsByUsernameAndMobileAndPlatformAndDeletedFalse(username, mobile, platform);
     }
 
@@ -753,7 +766,7 @@ public class UserService {
             @CachePut(value = "user", key = "#user.mobile + '-' + #user.platform", unless = "#user.mobile == null"),
             @CachePut(value = "user", key = "#user.email + '-' + #user.platform", unless = "#user.email == null"),
             @CachePut(value = "user", key = "#user.uid", unless = "#user.uid == null"),
-        }, evict = {
+    }, evict = {
             @CacheEvict(value = "user:exists", key = "#user.username + '-' + #user.platform", condition = "#user.username != null"),
             @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + #user.platform", condition = "#user.mobile != null"),
             @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform", condition = "#user.email != null"),

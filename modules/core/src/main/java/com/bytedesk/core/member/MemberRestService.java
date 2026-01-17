@@ -124,8 +124,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             return convertToResponse(findByUid(request.getUid()).get());
         }
 
-        // 保护超级管理员账号：禁止创建与超管相同邮箱/手机号的成员
-        userService.validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), null);
+        // 注意：不在此处验证超级管理员邮箱/手机号
+        // 原因：成员（Member）是组织维度的，用户（User）是平台维度的
+        // 成员应该可以使用关联用户的邮箱/手机号（例如为超管创建默认管理员成员）
+        // 组织级别的重复检查已在下方进行，平台级别的用户验证在 createUserFromMember 中进行
 
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {

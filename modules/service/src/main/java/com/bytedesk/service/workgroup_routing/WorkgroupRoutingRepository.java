@@ -13,8 +13,10 @@
  */
 package com.bytedesk.service.workgroup_routing;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -26,7 +28,7 @@ public interface WorkgroupRoutingRepository extends JpaRepository<WorkgroupRouti
 
     Optional<WorkgroupRoutingEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
 
-    Optional<WorkgroupRoutingEntity> findByWorkgroupUidAndDeletedFalse(String workgroupUid);
+    List<WorkgroupRoutingEntity> findByWorkgroupUidAndDeletedFalseOrderByUpdatedAtDescIdDesc(String workgroupUid, Pageable pageable);
 
     // Boolean existsByPlatform(String platform);
 }

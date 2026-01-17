@@ -117,7 +117,12 @@ public class RobotToAgentKeywordListener {
             return false;
         }
         UserProtobuf user = message.getUser();
-        return user != null && UserTypeEnum.VISITOR.name().equalsIgnoreCase(user.getType());
+        // 访客端 SSE 上行 payload 在极端情况下可能缺少 user.type（例如初始化尚未完成/字段裁剪）。
+        // 这里仅对“明确不是访客”的情况做排除，避免关键词转人工概率性失效。
+        if (user == null || !StringUtils.hasText(user.getType())) {
+            return true;
+        }
+        return UserTypeEnum.VISITOR.name().equalsIgnoreCase(user.getType());
     }
 
     private boolean hasAgentAssigned(ThreadEntity thread) {
@@ -168,7 +173,7 @@ public class RobotToAgentKeywordListener {
 
     protected void triggerForceAgentTransfer(ThreadEntity thread, WorkgroupEntity workgroup, MessageResponse message) {
         try {
-            // markThreadTransferPending(thread);
+            markThreadTransferPending(thread);
             VisitorRequest visitorRequest = buildVisitorRequest(thread, workgroup, message);
             visitorRequest.setForceAgent(true);
             visitorRestService.requestThread(visitorRequest);
@@ -178,23 +183,32 @@ public class RobotToAgentKeywordListener {
         }
     }
 
-    // private void markThreadTransferPending(ThreadEntity thread) {
-    //     if (thread == null) {
-    //         return;
-    //     }
-    //     String currentStatus = thread.getTransferStatus();
-    //     if (!StringUtils.hasText(currentStatus) || ThreadTransferStatusEnum.NONE.name().equals(currentStatus)) {
-    //         log.debug("Marking thread {} transfer status as TRANSFER_PENDING", thread.getUid());
-    //         thread.setTransferStatus(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
-    //         try {
-    //             threadRestService.save(thread);
-    //         } catch (Exception ex) {
-    //             log.warn("Failed to update transfer status for thread {}", thread.getUid(), ex);
-    //         }
-    //     } else {
-    //         log.debug("Thread {} transfer status already {}, skip update", thread.getUid(), currentStatus);
-    //     }
-    // }
+    private void markThreadTransferPending(ThreadEntity thread) {
+        if (thread == null) {
+            return;
+        }
+        String currentStatus = thread.getTransferStatus();
+        boolean isNone = !StringUtils.hasText(currentStatus) || ThreadTransferStatusEnum.NONE.name().equals(currentStatus);
+
+        // 关键：在 RobotService.processSseVisitorMessage() 内部仅通过 thread.isRoboting() 来决定是否跳过机器人回复。
+        // 因此这里需要尽早把状态从 ROBOTING 切走，避免“已触发转人工但机器人仍继续回复”的竞态。
+        if (thread.isRoboting()) {
+            thread.setQueuing();
+        }
+
+        if (isNone) {
+            thread.setTransferStatus(ThreadTransferStatusEnum.TRANSFER_PENDING.name());
+        }
+
+        if (thread.isRoboting() || isNone) {
+            try {
+                threadRestService.save(thread);
+                log.debug("Marked thread {} transfer pending, status={}, transferStatus={}", thread.getUid(), thread.getStatus(), thread.getTransferStatus());
+            } catch (Exception ex) {
+                log.warn("Failed to update transfer pending flags for thread {}", thread.getUid(), ex);
+            }
+        }
+    }
 
     private VisitorRequest buildVisitorRequest(ThreadEntity thread, WorkgroupEntity workgroup, MessageResponse message) {
         UserProtobuf visitor = resolveVisitor(thread, message);

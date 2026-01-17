@@ -41,7 +41,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
     @Autowired
     private TokenUsageHelper tokenUsageHelper;
-    
+
     public SpringAIOllamaService() {
         super(); // 调用基类的无参构造函数
     }
@@ -106,7 +105,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
             return defaultChatModel;
         }
-        
+
         try {
             // 使用默认的OllamaApi实例
             OllamaApi ollamaApi = createOllamaApi(llmProviderOptional.get().getBaseUrl());
@@ -120,79 +119,85 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     .defaultOptions(options)
                     .build();
         } catch (Exception e) {
-            log.error("Failed to create dynamic Ollama chat model for provider {}, using default chat model", llmProviderOptional.get().getUid(), e);
+            log.error("Failed to create dynamic Ollama chat model for provider {}, using default chat model",
+                    llmProviderOptional.get().getUid(), e);
             return defaultChatModel;
         }
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
-        log.info("Ollama API websocket ");
-        if (llm == null) {
-            log.info("Ollama API not available");
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Ollama service is not available", messageProtobufReply);
-            return;
-        }
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置
+    //     RobotLlm llm = robot.getLlm();
+    //     log.info("Ollama API websocket ");
+    //     if (llm == null) {
+    //         log.info("Ollama API not available");
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Ollama service is not available",
+    //                 messageProtobufReply);
+    //         return;
+    //     }
 
-        // 获取适当的模型实例
-        OllamaChatModel chatModel = createOllamaChatModel(llm);
-        if (chatModel == null) {
-            log.info("Ollama API not available");
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Ollama service is not available", messageProtobufReply);
-            return;
-        }
+    //     // 获取适当的模型实例
+    //     OllamaChatModel chatModel = createOllamaChatModel(llm);
+    //     if (chatModel == null) {
+    //         log.info("Ollama API not available");
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, "Ollama service is not available",
+    //                 messageProtobufReply);
+    //         return;
+    //     }
 
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = { false };
-        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
+    //     long startTime = System.currentTimeMillis();
+    //     final boolean[] success = { false };
+    //     final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
 
-        try {
-            chatModel.stream(prompt).subscribe(
-                    response -> {
-                        if (response != null) {
-                            log.info("Ollama API response metadata: {}", response.getMetadata());
-                            List<Generation> generations = response.getResults();
-                            for (Generation generation : generations) {
-                                AssistantMessage assistantMessage = generation.getOutput();
-                                String textContent = assistantMessage.getText();
-                                log.info("Ollama API Websocket response text: {}", textContent);
+    //     try {
+    //         chatModel.stream(prompt).subscribe(
+    //                 response -> {
+    //                     if (response != null) {
+    //                         log.info("Ollama API response metadata: {}", response.getMetadata());
+    //                         List<Generation> generations = response.getResults();
+    //                         for (Generation generation : generations) {
+    //                             AssistantMessage assistantMessage = generation.getOutput();
+    //                             String textContent = assistantMessage.getText();
+    //                             log.info("Ollama API Websocket response text: {}", textContent);
 
-                                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-                            }
-                            // 提取token使用情况
-                            tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
-                            success[0] = true;
-                        }
-                    },
-                    error -> {
-                        log.error("Ollama API error: ", error);
-                        sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                        success[0] = false;
-                    },
-                    () -> {
-                        log.info("Chat stream completed");
-                        // 记录token使用情况
-                        long responseTime = System.currentTimeMillis() - startTime;
-                        String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
-                                : "llama2";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
-                                tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
-                                responseTime);
-                    });
-        } catch (Exception e) {
-            log.error("Error processing Ollama prompt", e);
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            success[0] = false;
-            // 记录token使用情况
-            long responseTime = System.currentTimeMillis() - startTime;
-            String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2";
-        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
-                    tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
-        }
-    }
+    //                             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent,
+    //                                     messageProtobufReply);
+    //                         }
+    //                         // 提取token使用情况
+    //                         tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
+    //                         success[0] = true;
+    //                     }
+    //                 },
+    //                 error -> {
+    //                     log.error("Ollama API error: ", error);
+    //                     sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                             I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //                     success[0] = false;
+    //                 },
+    //                 () -> {
+    //                     log.info("Chat stream completed");
+    //                     // 记录token使用情况
+    //                     long responseTime = System.currentTimeMillis() - startTime;
+    //                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                             : "llama2";
+    //                     tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
+    //                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
+    //                             responseTime);
+    //                 });
+    //     } catch (Exception e) {
+    //         log.error("Error processing Ollama prompt", e);
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         success[0] = false;
+    //         // 记录token使用情况
+    //         long responseTime = System.currentTimeMillis() - startTime;
+    //         String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2";
+    //         tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
+    //                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
+    //     }
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
@@ -203,7 +208,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         log.info("Ollama API sync ");
 
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         log.info("Ollama API websocket ");
 
         if (llm == null) {
@@ -251,24 +256,25 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     && StringUtils.hasText(robot.getLlm().getTextModel()))
                             ? robot.getLlm().getTextModel()
                             : "llama2";
-        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences,
+            SseEmitter emitter) {
         Assert.notNull(emitter, "SseEmitter must not be null");
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
         log.info("Ollama API SSE ");
 
         if (llm == null) {
             log.info("Ollama API not available");
-        sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
-            LlmProviderConstants.OLLAMA,
-            (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
+                    LlmProviderConstants.OLLAMA,
+                    (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
             return;
         }
 
@@ -278,9 +284,9 @@ public class SpringAIOllamaService extends BaseSpringAIService {
         if (chatModel == null) {
             log.info("Ollama API not available");
             // 使用sendStreamEndMessage方法替代重复的代码
-        sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
-            LlmProviderConstants.OLLAMA,
-            (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
+            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 0, 0, 0, prompt,
+                    LlmProviderConstants.OLLAMA,
+                    (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2");
             return;
         }
 
@@ -290,7 +296,8 @@ public class SpringAIOllamaService extends BaseSpringAIService {
 
         try {
             // 发送初始消息，告知用户请求已收到，正在处理
-            sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+            sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                    I18Consts.I18N_THINKING);
 
             chatModel.stream(prompt).subscribe(
                     response -> {
@@ -302,7 +309,8 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                                     String textContent = assistantMessage.getText();
                                     log.info("Ollama API SSE response text: {}", textContent);
 
-                                    sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                    sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply,
+                                            emitter, textContent, null, sourceReferences);
                                 }
                                 // 提取token使用情况
                                 tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
@@ -322,7 +330,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                     () -> {
                         log.info("Ollama API SSE complete");
                         // 发送流结束消息，包含token使用情况和prompt内容
-            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                        sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
                                 tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.OLLAMA,
                                 (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
@@ -331,7 +339,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
                         long responseTime = System.currentTimeMillis() - startTime;
                         String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                                 : "llama2";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
+                        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                                 responseTime);
                     });
@@ -342,7 +350,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             // 记录token使用情况
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "llama2";
-        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.OLLAMA, modelType,
                     tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
         }
     }

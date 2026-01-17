@@ -48,6 +48,7 @@ import ai.z.openapi.service.model.Delta;
 import ai.z.openapi.service.model.FileUrl;
 import ai.z.openapi.service.model.ImageUrl;
 import ai.z.openapi.service.model.MessageContent;
+import ai.z.openapi.service.model.ResponseFormat;
 import ai.z.openapi.service.model.VideoUrl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -448,67 +449,67 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
         return Math.max(1, est);
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        try {
-            String model = getModel(robot);
-            List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
-            // 覆盖最新的用户消息为基于 MessageProtobuf 直接解析的多模态内容，避免 BD_MEDIA 标记往返
-            try {
-                List<MessageContent> directUserContents = buildUserContentsFromMessage(messageProtobufQuery);
-                if (directUserContents != null && !directUserContents.isEmpty()) {
-                    for (int i = zaiMessages.size() - 1; i >= 0; i--) {
-                        ChatMessage m = zaiMessages.get(i);
-                        if (ChatMessageRole.USER.value().equals(m.getRole())) {
-                            ChatMessage replaced = ChatMessage.builder()
-                                    .role(m.getRole())
-                                    .content(directUserContents)
-                                    .build();
-                            zaiMessages.set(i, replaced);
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception ig) {
-                log.debug("websocket override user content failed: {}", ig.getMessage());
-            }
-            ZhipuAiClient client = createDynamicClient(robot != null ? robot.getLlm() : null);
-            if (client == null) {
-                log.error("No available ZhipuAiClient");
-                sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
-                        I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
-                        messageProtobufReply);
-                return;
-            }
-            boolean enableThinking = robot != null && robot.getLlm() != null
-                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
-            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-                    .model(model)
-                    .messages(zaiMessages)
-                    .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
-                            .build())
-                    .build();
-            long start = System.currentTimeMillis();
-            ChatCompletionResponse resp = client.chat().createChatCompletion(req);
-            boolean success = resp != null && resp.isSuccess();
-            String text = success ? extractFinalTextFromResponse(resp) : "";
-            if (text == null)
-                text = "";
-            // 发送 websocket 文本
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.TEXT, text, messageProtobufReply);
-            // 记录用量事件（粗略估算）
-            long promptTokens = estimateTokens(prompt.getContents());
-            long completionTokens = estimateTokens(text);
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens,
-                    completionTokens, success,
-                    System.currentTimeMillis() - start);
-        } catch (Exception e) {
-            log.error("processPromptWebsocket failed", e);
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
-                    messageProtobufReply);
-        }
-    }
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     try {
+    //         String model = getModel(robot);
+    //         List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
+    //         // 覆盖最新的用户消息为基于 MessageProtobuf 直接解析的多模态内容，避免 BD_MEDIA 标记往返
+    //         try {
+    //             List<MessageContent> directUserContents = buildUserContentsFromMessage(messageProtobufQuery);
+    //             if (directUserContents != null && !directUserContents.isEmpty()) {
+    //                 for (int i = zaiMessages.size() - 1; i >= 0; i--) {
+    //                     ChatMessage m = zaiMessages.get(i);
+    //                     if (ChatMessageRole.USER.value().equals(m.getRole())) {
+    //                         ChatMessage replaced = ChatMessage.builder()
+    //                                 .role(m.getRole())
+    //                                 .content(directUserContents)
+    //                                 .build();
+    //                         zaiMessages.set(i, replaced);
+    //                         break;
+    //                     }
+    //                 }
+    //             }
+    //         } catch (Exception ig) {
+    //             log.debug("websocket override user content failed: {}", ig.getMessage());
+    //         }
+    //         ZhipuAiClient client = createDynamicClient(robot != null ? robot.getLlm() : null);
+    //         if (client == null) {
+    //             log.error("No available ZhipuAiClient");
+    //             sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                     I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                     messageProtobufReply);
+    //             return;
+    //         }
+    //         boolean enableThinking = robot != null && robot.getLlm() != null
+    //                 && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+    //         ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
+    //                 .model(model)
+    //                 .messages(zaiMessages)
+    //                 .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
+    //                         .build())
+    //                 .build();
+    //         long start = System.currentTimeMillis();
+    //         ChatCompletionResponse resp = client.chat().createChatCompletion(req);
+    //         boolean success = resp != null && resp.isSuccess();
+    //         String text = success ? extractFinalTextFromResponse(resp) : "";
+    //         if (text == null)
+    //             text = "";
+    //         // 发送 websocket 文本
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.TEXT, text, messageProtobufReply);
+    //         // 记录用量事件（粗略估算）
+    //         long promptTokens = estimateTokens(prompt.getContents());
+    //         long completionTokens = estimateTokens(text);
+    //         tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens,
+    //                 completionTokens, success,
+    //                 System.currentTimeMillis() - start);
+    //     } catch (Exception e) {
+    //         log.error("processPromptWebsocket failed", e);
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //     }
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
@@ -529,6 +530,8 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
                     && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
             ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
                     .model(model)
+                    // https://docs.bigmodel.cn/cn/guide/capabilities/struct-output
+                    .responseFormat(ResponseFormat.builder().type("json_object").build())
                     .messages(msgs)
                     .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
                             .build())

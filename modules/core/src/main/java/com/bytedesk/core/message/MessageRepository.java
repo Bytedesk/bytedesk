@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.message;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,15 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
 
     List<MessageEntity> findByThread_UidOrderByCreatedAtAsc(String threadUid);
 
+    /**
+     * 按创建时间窗口查询会话消息（用于“客服回复后批量标记之前未回复访客消息”为已回复）。
+     * between 为闭区间（含边界）。
+     */
+    List<MessageEntity> findByThread_UidAndCreatedAtBetweenOrderByCreatedAtAsc(
+            String threadUid,
+            ZonedDateTime start,
+            ZonedDateTime end);
+
     // 根据threadTopic查询最新n条消息
     @Query("SELECT m FROM MessageEntity m WHERE m.thread.topic = :threadTopic ORDER BY m.createdAt DESC")
     List<MessageEntity> findLatestByThreadTopicOrderByCreatedAtDesc(@Param("threadTopic") String threadTopic, org.springframework.data.domain.Pageable pageable);
@@ -56,6 +66,45 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
      * @return 消息列表
      */
     List<MessageEntity> findByThread_UidAndStatusInOrderByCreatedAtAsc(String threadUid, List<String> statuses);
+
+    /**
+     * 查询某客服负责的“含未回复访客消息”的会话 UID（按最早未回复消息时间升序）。
+     *
+     * 说明：
+     * - 以 message.agent_replied = 0 标识“未回复访客消息”。
+     * - 通过 message_user JSON 中 visitor type 判定访客消息（沿用 migration 回填的判断方式）。
+     * - 通过 thread.agent JSON 中 uid 过滤到当前客服。
+     */
+    @Query(value = "SELECT t.uuid AS thread_uid, MIN(m.created_at) AS first_unreplied_at "
+            + "FROM bytedesk_core_message m "
+            + "INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
+            + "WHERE m.agent_replied = 0 "
+            + "  AND m.message_user LIKE '%\"type\"%\"visitor\"%' "
+            + "  AND t.is_deleted = false "
+            + "  AND t.thread_status NOT IN ('CLOSED', 'TIMEOUT') "
+            + "  AND t.agent IS NOT NULL AND t.agent != '' "
+            + "  AND JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')) = :agentUid "
+            + "GROUP BY t.uuid "
+            + "ORDER BY first_unreplied_at ASC "
+            + "LIMIT :limit OFFSET :offset", nativeQuery = true)
+    List<Object[]> pageUnrepliedVisitorThreadUidsByAgentUid(
+            @Param("agentUid") String agentUid,
+            @Param("limit") int limit,
+            @Param("offset") int offset);
+
+    @Query(value = "SELECT COUNT(1) FROM (" 
+            + "  SELECT t.uuid "
+            + "  FROM bytedesk_core_message m "
+            + "  INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
+            + "  WHERE m.agent_replied = 0 "
+            + "    AND m.message_user LIKE '%\"type\"%\"visitor\"%' "
+            + "    AND t.is_deleted = false "
+            + "    AND t.thread_status NOT IN ('CLOSED', 'TIMEOUT') "
+            + "    AND t.agent IS NOT NULL AND t.agent != '' "
+            + "    AND JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')) = :agentUid "
+            + "  GROUP BY t.uuid "
+            + ") x", nativeQuery = true)
+    long countUnrepliedVisitorThreadsByAgentUid(@Param("agentUid") String agentUid);
 
     boolean existsByUid(String uid);
 }

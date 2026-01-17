@@ -13,14 +13,14 @@
  */
 package com.bytedesk.core.action.disruptor;
 
-import com.lmax.disruptor.EventFactory;
+// import com.lmax.disruptor.EventFactory;
 
-// https://lmax-exchange.github.io/disruptor/user-guide/#_getting_started
-public class LogEventFactory implements EventFactory<LogEvent> {
+// // https://lmax-exchange.github.io/disruptor/user-guide/#_getting_started
+// public class LogEventFactory implements EventFactory<LogEvent> {
 
-    @Override
-    public LogEvent newInstance() {
-        return new LogEvent();
-    }
+//     @Override
+//     public LogEvent newInstance() {
+//         return new LogEvent();
+//     }
 
-}
+// }

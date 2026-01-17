@@ -33,7 +33,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,86 +64,91 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
         }
         try {
             return OpenAiChatOptions.builder()
-                .model(llm.getTextModel())
-                .temperature(llm.getTemperature())
-                .topP(llm.getTopP())
-                .build();
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .topP(llm.getTopP())
+                    .build();
         } catch (Exception e) {
             log.error("Error creating dynamic Baidu options for model {}", llm.getTextModel(), e);
             return null;
         }
     }
 
-    @Override
-    protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply) {
-        // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
-        
-        if (baiduChatModel == null) {
-            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-            return;
-        }
+    // @Override
+    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // 从robot中获取llm配置
+    //     RobotLlm llm = robot.getLlm();
 
-        // 如果有自定义选项，创建新的Prompt
-        Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
-        if (customOptions != null) {
-            requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
-        }
+    //     if (baiduChatModel == null) {
+    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
+    //                 messageProtobufReply);
+    //         return;
+    //     }
 
-        // 记录开始时间和初始化token使用统计
-        long startTime = System.currentTimeMillis();
-        final boolean[] success = { false };
-        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
-        // 用于累积所有响应文本
-        final StringBuilder[] fullResponseText = { new StringBuilder() };
+    //     // 如果有自定义选项，创建新的Prompt
+    //     Prompt requestPrompt = prompt;
+    //     OpenAiChatOptions customOptions = createDynamicOptions(llm);
+    //     if (customOptions != null) {
+    //         requestPrompt = new Prompt(prompt.getInstructions(), customOptions);
+    //     }
 
-        baiduChatModel.stream(requestPrompt).subscribe(
-                response -> {
-                    if (response != null) {
-                        log.info("Baidu API response metadata: {}", response.getMetadata());
-                        List<Generation> generations = response.getResults();
-                        for (Generation generation : generations) {
-                            AssistantMessage assistantMessage = generation.getOutput();
-                            String textContent = assistantMessage.getText();
-                            
-                            // 累积响应文本
-                            if (textContent != null) {
-                                fullResponseText[0].append(textContent);
-                            }
-                            
-                            sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-                        }
-                        // 提取token使用情况 - 使用百度专用的提取方法
-                        tokenUsage[0] = extractBaiduTokenUsage(response);
-                        success[0] = true;
-                    }
-                },
-                error -> {
-                    log.error("Baidu API error: ", error);
-                    sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-                    success[0] = false;
-                },
-                () -> {
-                    log.info("Chat stream completed");
-                    
-                    // 如果token提取失败，使用累积的完整响应文本来估算token
-                    if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
-                        log.info("Baidu API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
-                        ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
-                        tokenUsage[0] = estimatedUsage;
-                        log.info("Baidu API final estimated token usage: {}", estimatedUsage);
-                    }
-                    
-                    // 记录token使用情况
-                    long responseTime = System.currentTimeMillis() - startTime;
-                    String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
-                            : "ernie-bot";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
-                            tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
-                            responseTime);
-                });
-    }
+    //     // 记录开始时间和初始化token使用统计
+    //     long startTime = System.currentTimeMillis();
+    //     final boolean[] success = { false };
+    //     final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
+    //     // 用于累积所有响应文本
+    //     final StringBuilder[] fullResponseText = { new StringBuilder() };
+
+    //     baiduChatModel.stream(requestPrompt).subscribe(
+    //             response -> {
+    //                 if (response != null) {
+    //                     log.info("Baidu API response metadata: {}", response.getMetadata());
+    //                     List<Generation> generations = response.getResults();
+    //                     for (Generation generation : generations) {
+    //                         AssistantMessage assistantMessage = generation.getOutput();
+    //                         String textContent = assistantMessage.getText();
+
+    //                         // 累积响应文本
+    //                         if (textContent != null) {
+    //                             fullResponseText[0].append(textContent);
+    //                         }
+
+    //                         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent,
+    //                                 messageProtobufReply);
+    //                     }
+    //                     // 提取token使用情况 - 使用百度专用的提取方法
+    //                     tokenUsage[0] = extractBaiduTokenUsage(response);
+    //                     success[0] = true;
+    //                 }
+    //             },
+    //             error -> {
+    //                 log.error("Baidu API error: ", error);
+    //                 sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR,
+    //                         I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
+    //                 success[0] = false;
+    //             },
+    //             () -> {
+    //                 log.info("Chat stream completed");
+
+    //                 // 如果token提取失败，使用累积的完整响应文本来估算token
+    //                 if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
+    //                     log.info("Baidu API using accumulated response text for token estimation: {}",
+    //                             fullResponseText[0].toString());
+    //                     ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
+    //                     tokenUsage[0] = estimatedUsage;
+    //                     log.info("Baidu API final estimated token usage: {}", estimatedUsage);
+    //                 }
+
+    //                 // 记录token使用情况
+    //                 long responseTime = System.currentTimeMillis() - startTime;
+    //                 String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
+    //                         : "ernie-bot";
+    //                 tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
+    //                         tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
+    //                         responseTime);
+    //             });
+    // }
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
@@ -194,25 +198,28 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                     && StringUtils.hasText(robot.getLlm().getTextModel()))
                             ? robot.getLlm().getTextModel()
                             : "ernie-bot";
-        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
                     tokenUsage.getPromptTokens(), tokenUsage.getCompletionTokens(), success, responseTime);
         }
     }
 
     @Override
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
+            MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences,
+            SseEmitter emitter) {
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
 
-    if (baiduChatModel == null) {
-        sseMessageHelper.handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery,
-            messageProtobufReply, emitter);
+        if (baiduChatModel == null) {
+            sseMessageHelper.handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE),
+                    messageProtobufQuery,
+                    messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-    sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+        sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
         OpenAiChatOptions customOptions = createDynamicOptions(llm);
@@ -237,13 +244,14 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                                 String textContent = assistantMessage.getText();
                                 log.info("Baidu API response metadata: {}, text {}", response.getMetadata(),
                                         textContent);
-                                
+
                                 // 累积响应文本
                                 if (textContent != null) {
                                     fullResponseText[0].append(textContent);
                                 }
-                                
-                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                                        textContent, null, sourceReferences);
                             }
                             // 提取token使用情况 - 使用百度专用的提取方法
                             tokenUsage[0] = extractBaiduTokenUsage(response);
@@ -262,15 +270,16 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                 },
                 () -> {
                     log.info("Baidu API SSE complete");
-                    
+
                     // 如果token提取失败，使用累积的完整响应文本来估算token
                     if (tokenUsage[0].getTotalTokens() == 0 && fullResponseText[0].length() > 0) {
-                        log.info("Baidu API using accumulated response text for token estimation: {}", fullResponseText[0].toString());
+                        log.info("Baidu API using accumulated response text for token estimation: {}",
+                                fullResponseText[0].toString());
                         ChatTokenUsage estimatedUsage = estimateBaiduTokenUsageFromText(fullResponseText[0].toString());
                         tokenUsage[0] = estimatedUsage;
                         log.info("Baidu API final estimated token usage: {}", estimatedUsage);
                     }
-                    
+
                     // 发送流结束消息，包含token使用情况和prompt内容
                     sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),
@@ -281,7 +290,7 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel()
                             : "ernie-bot";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
+                    tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.BAIDU, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0],
                             responseTime);
                 });
@@ -439,12 +448,13 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
      * @param response ChatResponse对象
      * @return 估算的TokenUsage对象
      */
-    private ChatTokenUsage estimateBaiduTokenUsageFromResponse(org.springframework.ai.chat.model.ChatResponse response) {
+    private ChatTokenUsage estimateBaiduTokenUsageFromResponse(
+            org.springframework.ai.chat.model.ChatResponse response) {
         try {
             if (response == null || response.getResults() == null || response.getResults().isEmpty()) {
                 return new ChatTokenUsage(0, 0, 0);
             }
-            
+
             // 获取输出文本
             String outputText = "";
             for (org.springframework.ai.chat.model.Generation generation : response.getResults()) {
@@ -452,9 +462,9 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                     outputText += generation.getOutput().getText();
                 }
             }
-            
+
             return estimateBaiduTokenUsageFromText(outputText);
-            
+
         } catch (Exception e) {
             log.error("Error estimating Baidu token usage", e);
             return new ChatTokenUsage(0, 0, 0);
@@ -472,21 +482,21 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
             if (outputText == null || outputText.isEmpty()) {
                 return new ChatTokenUsage(0, 0, 0);
             }
-            
+
             // 估算token使用量
             // 中文大约1个字符=1个token，英文大约4个字符=1个token
             long completionTokens = estimateTokens(outputText);
-            
+
             // 假设输入文本长度约为输出文本的30%（这是一个常见的比例）
             long promptTokens = (long) (completionTokens * 0.3);
             long totalTokens = promptTokens + completionTokens;
-            
+
             log.info(
                     "Baidu API estimated tokens - output: {} chars -> {} tokens, estimated prompt: {} tokens, total: {} tokens",
                     outputText.length(), completionTokens, promptTokens, totalTokens);
-            
+
             return new ChatTokenUsage(promptTokens, completionTokens, totalTokens);
-            
+
         } catch (Exception e) {
             log.error("Error estimating Baidu token usage from text", e);
             return new ChatTokenUsage(0, 0, 0);

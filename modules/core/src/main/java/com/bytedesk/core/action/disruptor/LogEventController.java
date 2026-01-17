@@ -13,11 +13,11 @@
  */
 package com.bytedesk.core.action.disruptor;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+// import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/v1")
-public class LogEventController {
+// @RestController
+// @RequestMapping("/api/v1")
+// public class LogEventController {
 
-}
+// }

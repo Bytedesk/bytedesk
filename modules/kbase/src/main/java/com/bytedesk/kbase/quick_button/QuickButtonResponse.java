@@ -59,7 +59,7 @@ public class QuickButtonResponse extends BaseResponse {
 
     private String content;
 
-    private QuickButtonPayload payload;
+    // private QuickButtonPayload payload;
 
     public static QuickButtonResponse fromEntity(QuickButtonEntity entity) {
         if (entity == null) {
@@ -87,7 +87,7 @@ public class QuickButtonResponse extends BaseResponse {
                 .enabled(entity.getEnabled())
                 .kbUid(entity.getKbUid())
                 .content(entity.getContent())
-                .payload(entity.getPayload())
+                // .payload(entity.getPayload())
                 .build();
     }
 

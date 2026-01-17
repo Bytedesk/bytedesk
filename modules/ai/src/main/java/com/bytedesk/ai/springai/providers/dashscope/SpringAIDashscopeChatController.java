@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.springai.providers.dashscope;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,6 +22,9 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,7 +36,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-
+import com.bytedesk.ai.utils.output.ActorsFilms;
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.RequiredArgsConstructor;
@@ -44,21 +49,95 @@ import reactor.core.publisher.Flux;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/dashscope")
+@RequestMapping("/dashscope")
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.dashscope.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeChatController {
 
+    private final BytedeskProperties bytedeskProperties;
     @Autowired(required = false)
     @Qualifier("bytedeskDashscopeChatModel")
     private ChatModel bytedeskDashscopeChatModel;
-    private final SpringAIDashscopeChatService springAIDashscopeService;
     private final ChatClient bytedeskDashscopeChatClient;
+    private final SpringAIDashscopeChatService springAIDashscopeService;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    // http://127.0.0.1:9003/dashscope/format?actor=
+	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+	@GetMapping("/format")
+	public ResponseEntity<JsonResult<?>> generate(
+			@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
+
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+
+		// using the low-level ChatModel API directly:
+		var outputParser = new BeanOutputConverter<>(ActorsFilms.class);
+		String format = outputParser.getFormat();
+		log.info("format: " + format);
+		String userMessage = """
+				Generate the filmography for the actor {actor}.
+				{format}
+				/no_think
+				""";
+		// 使用 builder 模式替换废弃的构造函数
+		PromptTemplate promptTemplate = PromptTemplate.builder()
+				.template(userMessage)
+				.variables(Map.of("actor", actor, "format", format))
+				.build();
+		Prompt prompt = promptTemplate.create();
+
+        ActorsFilms actorsFilms = bytedeskDashscopeChatClient.prompt(prompt)
+				.call()
+				.entity(ActorsFilms.class);
+		log.info("actorsFilms: {}", actorsFilms);
+
+        return ResponseEntity.ok(JsonResult.success(actorsFilms));
+	}
+
+	// structured output
+	// http://127.0.0.1:9003/dashscope/structured?message=
+	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
+	@GetMapping("/structured")
+	public ResponseEntity<JsonResult<?>> structured(
+			@RequestParam(value = "message", defaultValue = "Tell me about the actor Jeff Bridges") String message) {
+		
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+		
+		StructuredOutputConverter<ActorsFilms> outputConverter = new BeanOutputConverter<>(ActorsFilms.class);
+		String userInputTemplate = """
+				Your response should be in JSON format.
+				The data structure for the JSON should match this Java class: java.util.HashMap
+				Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
+				{message}
+				{format}
+				/no_think
+				"""; // user input with a "format" placeholder.
+		log.info("userInputTemplate: {}", userInputTemplate);
+		 // 使用 builder 模式替换废弃的构造函数
+		Prompt prompt = new Prompt(
+				PromptTemplate.builder()
+						.template(userInputTemplate)
+						.variables(Map.of("message", message, "format", outputConverter.getFormat()))
+						.build()
+						.createMessage());
+
+		ChatResponse response = bytedeskDashscopeChatClient.prompt(prompt)
+				.call()
+				.chatResponse();
+        // String response = bytedeskDashscopeChatModel.prompt(prompt)
+        //         .call().content();
+        log.info("response: {}", response);
+
+		return ResponseEntity.ok(JsonResult.success(response));
+	}
 
     /**
      * 方式1：同步调用
-     * http://127.0.0.1:9003/api/v1/dashscope/chat/sync?message=hello
+     * http://127.0.0.1:9003/dashscope/chat/sync?message=hello
      */
     @GetMapping("/chat/sync")
     public ResponseEntity<JsonResult<?>> chatSync(
@@ -68,7 +147,7 @@ public class SpringAIDashscopeChatController {
 
     /**
      * 方式2：异步流式调用
-     * http://127.0.0.1:9003/api/v1/dashscope/chat/stream?message=hello
+     * http://127.0.0.1:9003/dashscope/chat/stream?message=hello
      */
     @GetMapping("/chat/stream")
     public Flux<ChatResponse> chatStream(
@@ -83,7 +162,7 @@ public class SpringAIDashscopeChatController {
 
     /**
      * 方式3：SSE调用
-     * http://127.0.0.1:9003/api/v1/dashscope/chat/sse?message=hello
+     * http://127.0.0.1:9003/dashscope/chat/sse?message=hello
      */
     @GetMapping("/chat/sse")
     public SseEmitter chatSse(
@@ -153,7 +232,7 @@ public class SpringAIDashscopeChatController {
 
     /**
      * 方式4：自定义参数调用
-     * http://127.0.0.1:9003/api/v1/dashscope/chat/custom?message=hello
+     * http://127.0.0.1:9003/dashscope/chat/custom?message=hello
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
@@ -182,7 +261,7 @@ public class SpringAIDashscopeChatController {
 
     /**
      * 方式5：使用 ChatClient 调用演示
-     * http://127.0.0.1:9003/api/v1/dashscope/chat/client?message=hello
+     * http://127.0.0.1:9003/dashscope/chat/client?message=hello
      */
     @GetMapping("/chat/client")
     public ResponseEntity<JsonResult<?>> chatWithClient(
@@ -204,7 +283,7 @@ public class SpringAIDashscopeChatController {
 
     /**
      * 方式6：使用 ChatClient 流式调用演示
-     * http://127.0.0.1:9003/api/v1/dashscope/chat/client/stream?message=hello
+     * http://127.0.0.1:9003/dashscope/chat/client/stream?message=hello
      */
     @GetMapping("/chat/client/stream")
     public Flux<ChatResponse> chatWithClientStream(
@@ -222,7 +301,7 @@ public class SpringAIDashscopeChatController {
 
     /**
      * 方式7：使用 ChatClient 带系统提示的调用演示
-     * http://127.0.0.1:9003/api/v1/dashscope/chat/client/system?message=hello
+     * http://127.0.0.1:9003/dashscope/chat/client/system?message=hello
      */
     @GetMapping("/chat/client/system")
     public ResponseEntity<JsonResult<?>> chatWithClientSystem(

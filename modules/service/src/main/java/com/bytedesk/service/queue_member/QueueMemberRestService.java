@@ -13,6 +13,8 @@
  */
 package com.bytedesk.service.queue_member;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -390,6 +392,55 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         return queueMemberRepository.countUnassignedQueuingByWorkgroupQueueUids(
             workgroupQueueUids,
             ThreadProcessStatusEnum.QUEUING.name());
+    }
+
+    /**
+     * 聚合统计某个客服队列(按天)的首次/平均响应时长（秒）。
+     * - 首次响应：对 visitorFirstMessageAt 与 agentFirstResponseAt 均非空的会话计算 Duration
+     * - 平均响应：使用会话内已维护的 agentAvgResponseLength（>0 才计入）
+     */
+    public AgentResponseLengthStats computeAgentResponseLengthStats(String agentQueueUid) {
+        if (!StringUtils.hasText(agentQueueUid)) {
+            return new AgentResponseLengthStats(0, 0);
+        }
+
+        List<Object[]> rows = queueMemberRepository.findAgentResponseStatsRows(agentQueueUid);
+        if (rows == null || rows.isEmpty()) {
+            return new AgentResponseLengthStats(0, 0);
+        }
+
+        long firstSum = 0;
+        int firstCount = 0;
+        long avgSum = 0;
+        int avgCount = 0;
+
+        for (Object[] row : rows) {
+            // row[0]=visitorFirstMessageAt, row[1]=agentFirstResponseAt, row[2]=agentAvgResponseLength
+            ZonedDateTime visitorFirstMessageAt = (ZonedDateTime) row[0];
+            ZonedDateTime agentFirstResponseAt = (ZonedDateTime) row[1];
+            Integer agentAvgResponseLength = (Integer) row[2];
+
+            if (visitorFirstMessageAt != null && agentFirstResponseAt != null) {
+                long seconds = Duration.between(visitorFirstMessageAt, agentFirstResponseAt).getSeconds();
+                if (seconds >= 0) {
+                    firstSum += seconds;
+                    firstCount += 1;
+                }
+            }
+
+            if (agentAvgResponseLength != null && agentAvgResponseLength > 0) {
+                avgSum += agentAvgResponseLength;
+                avgCount += 1;
+            }
+        }
+
+        int firstAvg = firstCount == 0 ? 0 : (int) Math.round((double) firstSum / firstCount);
+        int avgAvg = avgCount == 0 ? 0 : (int) Math.round((double) avgSum / avgCount);
+
+        return new AgentResponseLengthStats(firstAvg, avgAvg);
+    }
+
+    public record AgentResponseLengthStats(int agentFirstResponseLength, int agentAvgResponseLength) {
     }
 
     /** 客服排队会话：org/queue/{agent_uid} */
