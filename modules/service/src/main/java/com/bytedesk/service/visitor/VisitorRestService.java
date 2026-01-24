@@ -208,7 +208,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return threadRoutingContext.createCsThread(request);
     }
 
-    @Cacheable(value = "visitor", key = "#uid", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
     @Override
     public Optional<VisitorEntity> findByUid(@NonNull String uid) {
         // 如果参数为空，则返回空
@@ -219,7 +219,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     }
     
     @Transactional
-    @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null")
     public Optional<VisitorEntity> findByVisitorUidAndOrgUid(@NonNull String visitorUid, @NonNull String orgUid) {
         // 如果参数为空，则返回空
         if (!StringUtils.hasText(visitorUid) || !StringUtils.hasText(orgUid)) {

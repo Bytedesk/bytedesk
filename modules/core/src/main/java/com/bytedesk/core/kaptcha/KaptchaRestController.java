@@ -54,7 +54,7 @@ public class KaptchaRestController {
         //
         String captchaUid = Utils.uuid();
         String code = kaptchaProducer.createText();
-        log.info("getKaptcha captchaUid {} code {}", captchaUid, code);
+        // log.info("getKaptcha captchaUid {} code {}", captchaUid, code);
         BufferedImage image = kaptchaProducer.createImage(code);
         // 转换流信息写出x
         try {
