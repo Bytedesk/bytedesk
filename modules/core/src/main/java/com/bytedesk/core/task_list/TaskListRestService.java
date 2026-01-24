@@ -78,15 +78,17 @@ public class TaskListRestService extends BaseRestServiceWithExport<TaskListEntit
         }
         // 检查name+orgUid+type是否已经存在
         if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<TaskListEntity> task_list = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-            if (task_list.isPresent()) {
-                return convertToResponse(task_list.get());
+            Optional<TaskListEntity> taskList = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
+            if (taskList.isPresent()) {
+                return convertToResponse(taskList.get());
             }
         }
         // 
-        UserEntity user = authService.getUser();
-        if (user != null) {
-            request.setUserUid(user.getUid());
+        if (!StringUtils.hasText(request.getUserUid())) {
+            UserEntity user = authService.getUser();
+            if (user != null) {
+                request.setUserUid(user.getUid());
+            }
         }
         // 
         TaskListEntity entity = modelMapper.map(request, TaskListEntity.class);

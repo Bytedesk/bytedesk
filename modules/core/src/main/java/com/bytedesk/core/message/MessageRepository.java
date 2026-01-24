@@ -106,5 +106,20 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             + ") x", nativeQuery = true)
     long countUnrepliedVisitorThreadsByAgentUid(@Param("agentUid") String agentUid);
 
+    /**
+     * 统计“访客端未读消息数”：当前会话中由客服发送且状态仍为未读（未到 READ）的消息数量。
+     *
+     * 注意：这里沿用 {@link MessageEntity#isUnread()} 的判定规则，即 status in (SENDING, SUCCESS, DELIVERED) 视为未读。
+     */
+    @Query(value = "SELECT COUNT(1) "
+            + "FROM bytedesk_core_message m "
+            + "INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
+            + "WHERE t.uuid = :threadUid "
+            + "  AND t.is_deleted = false "
+            + "  AND m.is_deleted = false "
+            + "  AND m.status IN ('SENDING','SUCCESS','DELIVERED') "
+            + "  AND m.message_user LIKE '%\"type\"%\"agent\"%'", nativeQuery = true)
+    long countVisitorUnreadByThreadUid(@Param("threadUid") String threadUid);
+
     boolean existsByUid(String uid);
 }

@@ -47,6 +47,8 @@ public class FileEventListener {
     private final ChunkRestService chunkRestService;
     
     private final ChunkMessageService chunkMessageService;
+
+    private final FileChunkService fileChunkService;
     
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
@@ -64,6 +66,9 @@ public class FileEventListener {
             try {
                 // 解析文件内容
                 List<Document> documents = fileService.parseFileContent(upload);
+
+                // 从 upload.extra 读取切块配置
+                FileChunkingConfig chunkingConfig = resolveChunkingConfig(upload);
                 
                 // 使用智能摘要提取方法
                 int maxContentLength = 60000; // 设置最大内容长度，预留一些空间
@@ -77,6 +82,9 @@ public class FileEventListener {
                     .fileUrl(upload.getFileUrl())
                     .fileType(upload.getFileType())
                     .content(content)
+                    .chunkingStrategy(chunkingConfig.getStrategy().name())
+                    .chunkSize(chunkingConfig.getChunkSize())
+                    .chunkOverlap(chunkingConfig.getChunkOverlap())
                     .categoryUid(upload.getCategoryUid())
                     .kbUid(upload.getKbUid())
                     .userUid(userProtobuf.getUid())
@@ -88,7 +96,7 @@ public class FileEventListener {
                 // 新的MQ处理方式：先创建chunks记录，再发送到MQ异步索引
                 log.info("使用MQ方式处理文件chunks: {}, 文档数量: {}", upload.getFileName(), documents.size());
                 
-                List<String> chunkUids = createChunksFromDocuments(documents, fileResponse);
+                List<String> chunkUids = createChunksFromDocuments(documents, fileResponse, chunkingConfig);
                 
                 if (!chunkUids.isEmpty()) {
                     // 使用批量MQ发送，避免并发问题
@@ -113,14 +121,14 @@ public class FileEventListener {
     
     /**
      * 从文档创建Chunk记录（同步创建，避免重复）
-     * 改进了重复检测和内容过滤逻辑
+     * 改进了重复检测和内容过滤逻辑，并支持按配置切块。
      */
-    private List<String> createChunksFromDocuments(List<Document> documents, FileResponse fileResponse) {
+    private List<String> createChunksFromDocuments(List<Document> documents, FileResponse fileResponse, FileChunkingConfig chunkingConfig) {
         List<String> chunkUids = new ArrayList<>();
         
         try {
-            // 使用改进的文本分割器，避免产生重复内容
-            var splittedDocs = splitDocumentsWithDeduplication(documents);
+            // 使用配置化的文本分割器，避免产生重复内容
+            var splittedDocs = splitDocumentsWithDeduplication(documents, chunkingConfig);
             log.info("文档分割完成，原始文档: {}, 分割后: {}", documents.size(), splittedDocs.size());
             
             for (Document doc : splittedDocs) {
@@ -167,23 +175,49 @@ public class FileEventListener {
     /**
      * 改进的文档分割器，避免产生重复内容
      */
-    private List<Document> splitDocumentsWithDeduplication(List<Document> documents) {
+    private List<Document> splitDocumentsWithDeduplication(List<Document> documents, FileChunkingConfig chunkingConfig) {
         List<Document> result = new ArrayList<>();
         
         try {
-            // 使用TokenTextSplitter进行分割
-            var tokenTextSplitter = new org.springframework.ai.transformer.splitter.TokenTextSplitter();
-            result = tokenTextSplitter.split(documents);
+            // 使用 FileChunkService 进行配置化分割
+            result = fileChunkService.splitDocuments(documents, chunkingConfig);
             
             // 去重处理
             result = deduplicateDocuments(result);
             
         } catch (Exception e) {
-            log.warn("TokenTextSplitter失败，使用备选方案: {}", e.getMessage());
-            result = fallbackSplitDocuments(documents);
+            log.warn("文档分割失败，使用备选方案: {}", e.getMessage());
+            result = fileChunkService.splitDocuments(documents, FileChunkingConfig.builder()
+                    .strategy(FileChunkingStrategyEnum.CHARACTER)
+                    .chunkSize(FileChunkingConfig.DEFAULT_CHUNK_SIZE)
+                    .chunkOverlap(FileChunkingConfig.DEFAULT_CHUNK_OVERLAP)
+                    .build());
         }
         
         return result;
+    }
+
+    private FileChunkingConfig resolveChunkingConfig(UploadEntity upload) {
+        if (upload == null || upload.getExtra() == null || upload.getExtra().trim().isEmpty()) {
+            return FileChunkingConfig.builder().build();
+        }
+        try {
+            FileUploadExtra extra = FileUploadExtra.fromJson(upload.getExtra());
+            String strategyRaw = extra != null ? extra.getChunkingStrategyOrDefault() : "TOKEN";
+            FileChunkingStrategyEnum strategy = FileChunkingStrategyEnum.fromString(strategyRaw);
+            int size = extra != null ? extra.getChunkSizeOrDefault(FileChunkingConfig.DEFAULT_CHUNK_SIZE)
+                    : FileChunkingConfig.DEFAULT_CHUNK_SIZE;
+            int overlap = extra != null ? extra.getChunkOverlapOrDefault(FileChunkingConfig.DEFAULT_CHUNK_OVERLAP, size)
+                    : FileChunkingConfig.DEFAULT_CHUNK_OVERLAP;
+            return FileChunkingConfig.normalize(FileChunkingConfig.builder()
+                    .strategy(strategy)
+                    .chunkSize(size)
+                    .chunkOverlap(overlap)
+                    .build());
+        } catch (Exception e) {
+            log.warn("解析 upload.extra 失败，使用默认切块配置: {}", e.getMessage());
+            return FileChunkingConfig.builder().build();
+        }
     }
     
     /**
@@ -269,38 +303,6 @@ public class FileEventListener {
         }
         
         return dp[s1.length()][s2.length()];
-    }
-    
-    /**
-     * 备选文档分割方案
-     */
-    private List<Document> fallbackSplitDocuments(List<Document> documents) {
-        List<Document> result = new ArrayList<>();
-        int chunkSize = 2000; // 增加chunk大小
-        int overlap = 200;
-        
-        for (Document doc : documents) {
-            String text = doc.getText();
-            if (text == null || text.trim().isEmpty()) {
-                continue;
-            }
-            
-            if (text.length() <= chunkSize) {
-                result.add(doc);
-            } else {
-                for (int start = 0; start < text.length(); start += chunkSize - overlap) {
-                    int end = Math.min(start + chunkSize, text.length());
-                    String chunk = text.substring(start, end);
-                    
-                    if (isValidContent(chunk)) {
-                        Document newDoc = new Document(chunk, doc.getMetadata());
-                        result.add(newDoc);
-                    }
-                }
-            }
-        }
-        
-        return deduplicateDocuments(result);
     }
     
     /**

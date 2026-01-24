@@ -37,18 +37,18 @@ public class CustomerSpecification extends BaseSpecification<CustomerEntity, Cus
             // 使用基类方法处理超级管理员权限和组织过滤
             // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
             
-            // if (StringUtils.hasText(request.getName())) {
-            //     predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
-            // }
-            
+            if (StringUtils.hasText(request.getNickname())) {
+                predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
+            }
             if (StringUtils.hasText(request.getMobile())) {
                 predicates.add(criteriaBuilder.like(root.get("mobile"), "%" + request.getMobile() + "%"));
             }
-            
             if (StringUtils.hasText(request.getEmail())) {
                 predicates.add(criteriaBuilder.like(root.get("email"), "%" + request.getEmail() + "%"));
             }
-            
+            if (StringUtils.hasText(request.getDescription())) {
+                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }

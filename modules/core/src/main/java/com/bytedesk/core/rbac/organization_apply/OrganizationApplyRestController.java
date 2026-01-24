@@ -13,12 +13,16 @@
  */
 package com.bytedesk.core.rbac.organization_apply;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -29,6 +33,13 @@ import lombok.AllArgsConstructor;
 public class OrganizationApplyRestController extends BaseRestController<OrganizationApplyRequest, OrganizationApplyRestService> {
 
     private final OrganizationApplyRestService organizationRestService;
+
+    @ActionAnnotation(title = "加入组织申请", action = "提交申请", description = "apply join organization")
+    @PostMapping("/join")
+    public ResponseEntity<?> applyJoin(@RequestBody OrganizationApplyRequest request) {
+        OrganizationApplyResponse response = organizationRestService.applyJoin(request);
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
 
     @ActionAnnotation(title = "加入组织申请", action = "导出", description = "export organizationApply")
     @Override

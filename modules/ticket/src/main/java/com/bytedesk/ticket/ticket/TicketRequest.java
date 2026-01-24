@@ -51,19 +51,15 @@ public class TicketRequest extends BaseRequest {
     // 
     private String status;
     private String priority;
-    // private String type;
     // 
-    private String topic;
-    private String visitorThreadTopic;
-    // 工单对话
+    private String threadTopic;
     private String threadUid;
-    // 关联访客对话
+    // 内部工单：关联的客服会话（非工单会话）
     private String visitorThreadUid;
     // 
     private String categoryUid;
     private String workgroupUid;
     private String departmentUid;
-    // 
     private Boolean assignmentAll;
 
     // 工单处理人

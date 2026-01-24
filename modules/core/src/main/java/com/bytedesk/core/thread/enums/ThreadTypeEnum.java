@@ -28,7 +28,7 @@ public enum ThreadTypeEnum {
     CHANNEL(8), // 渠道对话，包括系统通知、订阅号、服务号，NoticeAccountTypeEnum
     LOCAL(9), // 本地对话
     FRIEND(10), // 好友对话
-    TICKET(11), // 工单对话
+    TICKET_INTERNAL(11), // 内部工单会话
     // 
     KBASE(12), // 机器人-知识库对话，后台模拟测试
     KBDOC(13), // 机器人-知识库某一个文档对话，后台模拟测试
@@ -39,7 +39,8 @@ public enum ThreadTypeEnum {
     WORKFLOW(17), // 工作流对话
     // 
     QUEUE(18), // 一对一排队会话-用于更新排队状态
-    CALLCENTER(19) // 呼叫中心会话-用于呼叫中心场景
+    CALLCENTER(19), // 呼叫中心会话-用于呼叫中心场景
+    TICKET_EXTERNAL(20) // 外部工单会话
     ;
 
     private final int value;
@@ -90,8 +91,8 @@ public enum ThreadTypeEnum {
                 return "本地对话";
             case FRIEND:
                 return "好友对话";
-            case TICKET:
-                return "工单对话";
+            case TICKET_INTERNAL:
+                return "内部工单会话";
             case KBASE:
                 return "知识库对话";
             case KBDOC:
@@ -102,6 +103,8 @@ public enum ThreadTypeEnum {
                 return "统一客服入口";
             case HISTORY:
                 return "历史对话";
+            case TICKET_EXTERNAL:
+                return "外部工单会话";
             default:
                 return this.name();
         }

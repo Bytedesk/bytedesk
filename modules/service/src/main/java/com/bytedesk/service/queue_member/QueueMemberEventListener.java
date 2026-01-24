@@ -22,6 +22,8 @@ import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
@@ -103,6 +105,7 @@ public class QueueMemberEventListener {
      * 当某个会话关闭，则检查当前客服队列或所在工作组队列中是否有排队成员，如果有，则自动接入最前面的排队成员
      */
     @EventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onThreadCloseEvent(ThreadCloseEvent event) {
         ThreadEntity thread = event.getThread();
         if (thread == null || thread.getTopic() == null) {

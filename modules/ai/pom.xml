@@ -74,34 +74,22 @@
 
 		<!-- llm -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-openai -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-openai -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-		<!-- https://docs.spring.io/spring-ai/reference/api/chat/anthropic-chat.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-anthropic -->
+
+		<!-- openai sdk Official -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/openai-sdk-chat.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-openai-sdk -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-anthropic</artifactId>
+			<artifactId>spring-ai-starter-model-openai-sdk</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency> -->
-		<!-- https://docs.spring.io/spring-ai/reference/api/chat/vertexai-gemini-chat.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-vertex-ai-gemini -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-vertex-ai-gemini</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency> -->
-		<!-- https://docs.spring.io/spring-ai/reference/api/chat/google-genai-chat.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-google-genai -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-google-genai</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency> -->
+
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-ollama -->
 		<dependency>
@@ -109,9 +97,9 @@
 			<artifactId>spring-ai-starter-model-ollama</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat/deepseek-chat.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-deepseek -->
+		<!--https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-deepseek -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-deepseek</artifactId>
@@ -124,14 +112,38 @@
 			<artifactId>spring-ai-starter-model-minimax</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-zhipuai -->
+
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-zhipuai -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-zhipuai</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
-		
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/anthropic-chat.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-anthropic -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-anthropic</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/vertexai-gemini-chat.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-vertex-ai-gemini -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-vertex-ai-gemini</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/google-genai-chat.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-google-genai -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-google-genai</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency> -->
+
 		<!-- vector store -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/elasticsearch.html -->
 		<!--

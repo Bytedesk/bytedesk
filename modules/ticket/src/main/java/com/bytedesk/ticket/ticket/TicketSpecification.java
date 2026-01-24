@@ -37,10 +37,8 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            // 使用基类方法处理超级管理员权限和组织过滤
-            // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService)); // 基础查询条件
             
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
@@ -49,10 +47,7 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
-            // topic
-            if (StringUtils.hasText(request.getTopic())) {
-                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
-            }
+
             // ticket number
             if (StringUtils.hasText(request.getTicketNumber())) {
                 predicates.add(criteriaBuilder.equal(root.get("ticketNumber"), request.getTicketNumber()));
@@ -72,6 +67,10 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             // threadUid
             if (StringUtils.hasText(request.getThreadUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("threadUid"), request.getThreadUid()));
+            }
+            // threadTopic
+            if (StringUtils.hasText(request.getThreadTopic())) {
+                predicates.add(criteriaBuilder.equal(root.get("threadTopic"), request.getThreadTopic()));
             }
             // categoryUid
             if (StringUtils.hasText(request.getCategoryUid())) {

@@ -99,16 +99,15 @@ public class TicketSettingsEntity extends BaseEntity {
     private Boolean customFormEnabled = false;
 
     // 
-    // ====== 发布版本 ======
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity basicSettings;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private TicketCategorySettingsEntity categorySettings;
-
-    // ====== 草稿版本 ======
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketBasicSettingsEntity draftBasicSettings;
+
+    // 
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private TicketCategorySettingsEntity categorySettings;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketCategorySettingsEntity draftCategorySettings;

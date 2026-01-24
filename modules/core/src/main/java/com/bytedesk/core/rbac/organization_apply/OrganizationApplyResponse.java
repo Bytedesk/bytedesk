@@ -14,6 +14,11 @@
 package com.bytedesk.core.rbac.organization_apply;
 
 
+import java.time.ZonedDateTime;
+
+
+import com.bytedesk.core.rbac.user.UserResponseContact;
+
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -40,9 +45,16 @@ public class OrganizationApplyResponse extends BaseResponse {
 
     private String type;
 
-    private String color;
+    private String status;
 
-    private Integer order;
+    private String rejectReason;
+
+    private String handledByUid;
+
+    private ZonedDateTime handledAt;
+
+    // 申请人信息（管理员审核时展示）
+    private UserResponseContact user;
 
     // private ZonedDateTime createdAt;
 }

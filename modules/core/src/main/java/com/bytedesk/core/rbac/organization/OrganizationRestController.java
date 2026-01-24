@@ -39,6 +39,16 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
 
     private final OrganizationRestService organizationRestService;
 
+    /**
+     * 搜索组织（用于“申请加入组织”场景），允许用户在没有 currentOrganization 的情况下调用。
+     */
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> searchForJoin(OrganizationRequest request) {
+        Page<OrganizationResponseSimple> page = organizationRestService.searchForJoin(request);
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
     @ActionAnnotation(title = "组织", action = "组织查询", description = "query organization by org")
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override

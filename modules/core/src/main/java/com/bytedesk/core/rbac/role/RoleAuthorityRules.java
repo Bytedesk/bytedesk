@@ -84,6 +84,34 @@ public final class RoleAuthorityRules {
 
     public static final String DEPARTMENT_READ = "DEPARTMENT_READ";
 
+    // calendar (modules/core)
+    public static final String CALENDAR_READ = "CALENDAR_READ";
+    public static final String CALENDAR_CREATE = "CALENDAR_CREATE";
+    public static final String CALENDAR_UPDATE = "CALENDAR_UPDATE";
+    public static final String CALENDAR_DELETE = "CALENDAR_DELETE";
+    public static final String CALENDAR_EXPORT = "CALENDAR_EXPORT";
+
+    // task (modules/core)
+    public static final String TASK_READ = "TASK_READ";
+    public static final String TASK_CREATE = "TASK_CREATE";
+    public static final String TASK_UPDATE = "TASK_UPDATE";
+    public static final String TASK_DELETE = "TASK_DELETE";
+    public static final String TASK_EXPORT = "TASK_EXPORT";
+
+    // task_list (modules/core)
+    public static final String TASK_LIST_READ = "TASK_LIST_READ";
+    public static final String TASK_LIST_CREATE = "TASK_LIST_CREATE";
+    public static final String TASK_LIST_UPDATE = "TASK_LIST_UPDATE";
+    public static final String TASK_LIST_DELETE = "TASK_LIST_DELETE";
+    public static final String TASK_LIST_EXPORT = "TASK_LIST_EXPORT";
+
+    // task_comment (modules/core)
+    public static final String TASK_COMMENT_READ = "TASK_COMMENT_READ";
+    public static final String TASK_COMMENT_CREATE = "TASK_COMMENT_CREATE";
+    public static final String TASK_COMMENT_UPDATE = "TASK_COMMENT_UPDATE";
+    public static final String TASK_COMMENT_DELETE = "TASK_COMMENT_DELETE";
+    public static final String TASK_COMMENT_EXPORT = "TASK_COMMENT_EXPORT";
+
     // ticket (modules/ticket)
     // Keep as literals to avoid core -> ticket module dependency.
     public static final String TICKET_READ = "TICKET_READ";
@@ -144,6 +172,34 @@ public final class RoleAuthorityRules {
             THREAD_READ,
             THREAD_CREATE,
             THREAD_UPDATE,
+
+            // calendar
+            CALENDAR_READ,
+            CALENDAR_CREATE,
+            CALENDAR_UPDATE,
+            CALENDAR_DELETE,
+            CALENDAR_EXPORT,
+
+            // task
+            TASK_READ,
+            TASK_CREATE,
+            TASK_UPDATE,
+            TASK_DELETE,
+            TASK_EXPORT,
+
+            // task list
+            TASK_LIST_READ,
+            TASK_LIST_CREATE,
+            TASK_LIST_UPDATE,
+            TASK_LIST_DELETE,
+            TASK_LIST_EXPORT,
+
+            // task comment
+            TASK_COMMENT_READ,
+            TASK_COMMENT_CREATE,
+            TASK_COMMENT_UPDATE,
+            TASK_COMMENT_DELETE,
+            TASK_COMMENT_EXPORT,
             
             // ticket category
             CATEGORY_READ,

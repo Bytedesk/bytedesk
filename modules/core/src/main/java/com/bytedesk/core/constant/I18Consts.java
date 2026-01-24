@@ -23,6 +23,11 @@ public class I18Consts {
     public static final String I18N_PREFIX = "i18n.";
     public static final String I18N_DESCRIPTION_PREFIX = "i18n.description.";
 
+    // 城市导入/初始化相关（后端返回 i18n key，前端通过 translateString 翻译）
+    public static final String I18N_CITY_RESET_SUCCESS = I18N_PREFIX + "city.reset.success";
+    public static final String I18N_CITY_INIT_SCHEDULED = I18N_PREFIX + "city.init.scheduled";
+    public static final String I18N_CITY_INIT_SKIPPED = I18N_PREFIX + "city.init.skipped";
+
     // 角色描述（用于 RoleInitializer 默认角色 description，前端通过 translateString 翻译）
     public static final String I18N_ROLE_SUPER_DESCRIPTION = I18N_DESCRIPTION_PREFIX + "role.super";
     public static final String I18N_ROLE_ADMIN_DESCRIPTION = I18N_DESCRIPTION_PREFIX + "role.admin";
@@ -211,6 +216,7 @@ public class I18Consts {
     public static final String I18N_REQUEST_REJECTED = "请求被拒绝"; // 请求被拒绝
     public static final String I18N_ENTITY_NOT_FOUND = "实体未找到"; // 实体未找到
     public static final String I18N_INVALID_REQUEST_BODY = "请求体格式错误"; // 请求体格式错误（JSON 不合法/不完整）
+    public static final String I18N_OPERATION_NOT_SUPPORTED = "不支持的操作"; // 不支持的操作/功能暂未实现
     public static final String I18N_INTERNAL_SERVER_ERROR = "内部服务器错误"; // 内部服务器错误
 
     public static final String I18N_NO_ANSWER = "您的这个问题暂时无法回答，请提问其他问题。";
@@ -218,13 +224,13 @@ public class I18Consts {
 
     public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
     public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "请首先在管理后台配置大模型apiUrl和apiKey。如果已经配置，请检查大模型提供商账号是否欠费。"; // 服务暂时不可用，请稍后重试
-    public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体"; // 大模型配置提示
-    public static final String I18N_LLM_THREAD_INTENTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》意图识别"; // 会话意图识别大模型配置提示
-    public static final String I18N_LLM_THREAD_EMOTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》情绪分析"; // 情绪分析大模型配置提示
-    public static final String I18N_LLM_THREAD_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》会话总结"; // 工单大模型配置提示
-    public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》工单生成"; // 工单大模型配置提示
-    public static final String I18N_LLM_AGENT_INSPECTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》客服质检"; // 客服质检大模型配置提示
-    public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-机器人-》智能体-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
+    public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体"; // 大模型配置提示
+    public static final String I18N_LLM_THREAD_INTENTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》意图识别"; // 会话意图识别大模型配置提示
+    public static final String I18N_LLM_THREAD_EMOTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》情绪分析"; // 情绪分析大模型配置提示
+    public static final String I18N_LLM_THREAD_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》会话总结"; // 工单大模型配置提示
+    public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》工单生成"; // 工单大模型配置提示
+    public static final String I18N_LLM_AGENT_INSPECTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》客服质检"; // 客服质检大模型配置提示
+    public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
     
     // AI 服务相关常量
     public static final String I18N_THINKING = "正在思考中..."; // 正在思考中...

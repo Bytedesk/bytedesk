@@ -122,7 +122,7 @@ public class MemberEventListener {
     public void onMemberCreateEvent(MemberCreateEvent event) {
         MemberEntity member = event.getMember();
         UserEntity user = member.getUser();
-        log.info("member created: {}", event);
+        log.info("member created: {}", member.getUid());
         // 默认订阅成员主题
         String topic = TopicUtils.formatOrgMemberTopic(member.getUid());
         TopicRequest request = TopicRequest.builder()

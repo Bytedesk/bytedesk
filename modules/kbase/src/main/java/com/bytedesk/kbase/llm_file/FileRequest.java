@@ -46,6 +46,18 @@ public class FileRequest extends BaseRequest {
 
     private String fileType;
 
+    // 切块策略：TOKEN / CHARACTER / PARAGRAPH
+    @Builder.Default
+    private String chunkingStrategy = FileChunkingStrategyEnum.TOKEN.name();
+
+    // 切块大小（字符数），仅对 CHARACTER / PARAGRAPH 生效
+    @Builder.Default
+    private Integer chunkSize = FileChunkingConfig.DEFAULT_CHUNK_SIZE;
+
+    // 重叠大小（字符数），仅对 CHARACTER / PARAGRAPH 生效
+    @Builder.Default
+    private Integer chunkOverlap = FileChunkingConfig.DEFAULT_CHUNK_OVERLAP;
+
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
     

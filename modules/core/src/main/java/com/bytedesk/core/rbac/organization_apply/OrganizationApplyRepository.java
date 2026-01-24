@@ -24,5 +24,7 @@ public interface OrganizationApplyRepository extends JpaRepository<OrganizationA
 
     Boolean existsByUid(String uid);
 
+    Optional<OrganizationApplyEntity> findFirstByOrgUidAndUserUidAndStatusAndDeletedFalse(String orgUid, String userUid, String status);
+
     // Boolean existsByPlatform(String platform);
 }

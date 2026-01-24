@@ -349,6 +349,16 @@ public class FaqElasticService {
     }
 
     /**
+     * 搜索FAQ内容（可选限制返回数量）
+     *
+     * @param maxResults 最大结果数，为null则不限制
+     */
+    public List<FaqElasticSearchResult> searchFaq(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
+        log.info("全文搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
+        return searchFaqInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
+    }
+
+    /**
      * 用户在输入过程中，给出输入联想
      */
     public List<FaqElasticSearchResult> suggestFaq(FaqRequest request) {

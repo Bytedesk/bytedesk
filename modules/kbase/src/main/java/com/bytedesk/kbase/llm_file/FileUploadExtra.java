@@ -35,6 +35,15 @@ public class FileUploadExtra implements Serializable {
     // 使用 "true" 或 "false" 来表示布尔值
     private String autoLlmChunk;
 
+    // 切块策略：TOKEN / CHARACTER / PARAGRAPH
+    private String chunkingStrategy;
+
+    // 切块大小（字符数），仅对 CHARACTER / PARAGRAPH 生效
+    private Integer chunkSize;
+
+    // 重叠大小（字符数），仅对 CHARACTER / PARAGRAPH 生效
+    private Integer chunkOverlap;
+
     // 转换为布尔值
     public Boolean isAutoGenerateLlmQa() {
         return Boolean.parseBoolean(autoGenerateLlmQa);
@@ -43,6 +52,25 @@ public class FileUploadExtra implements Serializable {
     // 转换为布尔值
     public Boolean isAutoLlmChunk() {
         return Boolean.parseBoolean(autoLlmChunk);
+    }
+
+    public String getChunkingStrategyOrDefault() {
+        return (chunkingStrategy == null || chunkingStrategy.trim().isEmpty()) ? "TOKEN" : chunkingStrategy.trim();
+    }
+
+    public int getChunkSizeOrDefault(int defaultValue) {
+        if (chunkSize == null || chunkSize <= 0) {
+            return defaultValue;
+        }
+        return chunkSize;
+    }
+
+    public int getChunkOverlapOrDefault(int defaultValue, int maxChunkSize) {
+        int overlap = (chunkOverlap == null || chunkOverlap < 0) ? defaultValue : chunkOverlap;
+        if (overlap >= maxChunkSize) {
+            overlap = Math.max(0, maxChunkSize / 5);
+        }
+        return overlap;
     }
 
     // fromJson

@@ -23,9 +23,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
+import com.bytedesk.core.rbac.user.UserResponseContact;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +42,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class OrganizationApplyRestService extends BaseRestServiceWithExport<OrganizationApplyEntity, OrganizationApplyRequest, OrganizationApplyResponse, OrganizationApplyExcel> {
 
-    private final OrganizationApplyRepository organizationRepository;
+    private final OrganizationApplyRepository organizationApplyRepository;
+
+    private final OrganizationRepository organizationRepository;
 
     private final ModelMapper modelMapper;
 
@@ -43,11 +52,13 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     private final AuthService authService;
 
+    private final UserRepository userRepository;
+
     @Override
     public Page<OrganizationApplyEntity> queryByOrgEntity(OrganizationApplyRequest request) {
         Pageable pageable = request.getPageable();
         Specification<OrganizationApplyEntity> spec = OrganizationApplySpecification.search(request, authService);
-        return organizationRepository.findAll(spec, pageable);
+        return organizationApplyRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -67,18 +78,69 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     @Override
     public OrganizationApplyResponse queryByUid(OrganizationApplyRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
+        Optional<OrganizationApplyEntity> optional = findByUid(request.getUid());
+        if (optional.isPresent()) {
+            return convertToResponse(optional.get());
+        }
+        throw new NotFoundException("OrganizationApply not found");
     }
 
-    @Cacheable(value = "tag", key = "#uid", unless="#result==null")
+    @Cacheable(value = "organizationApply", key = "#uid", unless="#result==null")
     @Override
     public Optional<OrganizationApplyEntity> findByUid(String uid) {
-        return organizationRepository.findByUid(uid);
+        return organizationApplyRepository.findByUid(uid);
     }
 
     public Boolean existsByUid(String uid) {
-        return organizationRepository.existsByUid(uid);
+        return organizationApplyRepository.existsByUid(uid);
+    }
+
+    /**
+     * 用户提交“申请加入组织”
+     */
+    public OrganizationApplyResponse applyJoin(OrganizationApplyRequest request) {
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            throw new IllegalArgumentException("orgUid is required");
+        }
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new IllegalArgumentException("login required");
+        }
+        String userUid = user.getUid();
+
+        OrganizationEntity org = organizationRepository.findByUid(request.getOrgUid())
+                .orElseThrow(() -> new NotFoundException("Organization not found"));
+        if (Boolean.FALSE.equals(org.getEnabled())) {
+            throw new IllegalArgumentException("Organization is disabled");
+        }
+
+        Optional<OrganizationApplyEntity> existed = organizationApplyRepository
+                .findFirstByOrgUidAndUserUidAndStatusAndDeletedFalse(
+                        request.getOrgUid(),
+                        userUid,
+                        OrganizationApplyStatusEnum.PENDING.name());
+        if (existed.isPresent()) {
+            return convertToResponse(existed.get());
+        }
+
+        OrganizationApplyEntity entity = OrganizationApplyEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(request.getOrgUid())
+                .userUid(userUid)
+                // name 用于存储组织名称快照，便于前端列表展示
+                .name(StringUtils.hasText(request.getName()) ? request.getName() : org.getName())
+                // description 用于存储申请备注
+                .description(StringUtils.hasText(request.getDescription()) ? request.getDescription() : I18Consts.I18N_DESCRIPTION)
+                .type(StringUtils.hasText(request.getType()) ? request.getType() : OrganizationApplyTypeEnum.CUSTOMER.name())
+                .status(OrganizationApplyStatusEnum.PENDING.name())
+                .build();
+
+        OrganizationApplyEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create organization apply failed");
+        }
+        return convertToResponse(savedEntity);
     }
 
     @Override
@@ -100,21 +162,21 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
         // 
         OrganizationApplyEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create tag failed");
+            throw new RuntimeException("Create organizationApply failed");
         }
         return convertToResponse(savedEntity);
     }
 
     @Override
     public OrganizationApplyResponse update(OrganizationApplyRequest request) {
-        Optional<OrganizationApplyEntity> optional = organizationRepository.findByUid(request.getUid());
+        Optional<OrganizationApplyEntity> optional = organizationApplyRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             OrganizationApplyEntity entity = optional.get();
             modelMapper.map(request, entity);
             //
             OrganizationApplyEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update tag failed");
+                throw new RuntimeException("Update organizationApply failed");
             }
             return convertToResponse(savedEntity);
         }
@@ -125,20 +187,23 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     @Override
     protected OrganizationApplyEntity doSave(OrganizationApplyEntity entity) {
-        return organizationRepository.save(entity);
+        return organizationApplyRepository.save(entity);
     }
 
     @Override
     public OrganizationApplyEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, OrganizationApplyEntity entity) {
         try {
-            Optional<OrganizationApplyEntity> latest = organizationRepository.findByUid(entity.getUid());
+            Optional<OrganizationApplyEntity> latest = organizationApplyRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 OrganizationApplyEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
-                // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
-                return organizationRepository.save(latestEntity);
+                latestEntity.setDescription(entity.getDescription());
+                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setRejectReason(entity.getRejectReason());
+                latestEntity.setHandledByUid(entity.getHandledByUid());
+                latestEntity.setHandledAt(entity.getHandledAt());
+                return organizationApplyRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -149,7 +214,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<OrganizationApplyEntity> optional = organizationRepository.findByUid(uid);
+        Optional<OrganizationApplyEntity> optional = organizationApplyRepository.findByUid(uid);
         if (optional.isPresent()) {
             optional.get().setDeleted(true);
             save(optional.get());
@@ -167,7 +232,14 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     @Override
     public OrganizationApplyResponse convertToResponse(OrganizationApplyEntity entity) {
-        return modelMapper.map(entity, OrganizationApplyResponse.class);
+        OrganizationApplyResponse response = modelMapper.map(entity, OrganizationApplyResponse.class);
+        if (entity != null && StringUtils.hasText(entity.getUserUid())) {
+            userRepository.findByUid(entity.getUserUid()).ifPresent(user -> {
+                UserResponseContact userContact = modelMapper.map(user, UserResponseContact.class);
+                response.setUser(userContact);
+            });
+        }
+        return response;
     }
 
     @Override
@@ -182,7 +254,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     @Override
     protected Page<OrganizationApplyEntity> executePageQuery(Specification<OrganizationApplyEntity> spec, Pageable pageable) {
-        return organizationRepository.findAll(spec, pageable);
+        return organizationApplyRepository.findAll(spec, pageable);
     }
     
     

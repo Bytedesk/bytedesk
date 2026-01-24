@@ -14,7 +14,7 @@
 package com.bytedesk.ticket.ticket;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +39,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
@@ -80,6 +81,8 @@ public class TicketRestService
 
     private final ThreadRestService threadRestService;
 
+    private final MessageRepository messageRepository;
+
     private final UploadRestService uploadRestService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -88,7 +91,8 @@ public class TicketRestService
 
     private final TicketSettingsRestService ticketSettingsRestService;
 
-    @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
+    
+    // @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
     public Optional<TicketEntity> findByUid(String uid) {
         return ticketRepository.findByUid(uid);
@@ -132,6 +136,51 @@ public class TicketRestService
         return convertToResponse(ticket);
     }
 
+    /**
+     * 按工单会话 uid 查询工单（threadUid 与 ticket 一对一）。
+     */
+    public TicketResponse queryByThreadUid(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+        Assert.hasText(request.getThreadUid(), "thread uid required");
+
+        Optional<TicketEntity> ticketOptional = ticketRepository
+                .findFirstByOrgUidAndThreadUidOrderByCreatedAtDesc(request.getOrgUid(), request.getThreadUid());
+        if (ticketOptional.isEmpty()) {
+            throw new NotFoundException("ticket not found");
+        }
+
+        return convertToResponse(ticketOptional.get());
+    }
+
+    /**
+     * 按工单会话 topic 查询工单（可能多条）。
+     */
+    public Page<TicketResponse> queryByThreadTopic(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+        Assert.hasText(request.getThreadTopic(), "thread topic required");
+
+        Pageable pageable = request.getPageable();
+        Page<TicketEntity> page = ticketRepository.findByOrgUidAndThreadTopic(request.getOrgUid(),
+                request.getThreadTopic(), pageable);
+        return page.map(this::convertToResponse);
+    }
+
+    /**
+     * 按 visitorThreadUid 查询工单（可能多条，因为多个工单可绑定同一个访客会话）。
+     */
+    public Page<TicketResponse> queryByVisitorThreadUid(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+        Assert.hasText(request.getVisitorThreadUid(), "visitor thread uid required");
+
+        Pageable pageable = request.getPageable();
+        Page<TicketEntity> page = ticketRepository.findByOrgUidAndVisitorThreadUid(
+                request.getOrgUid(), request.getVisitorThreadUid(), pageable);
+        return page.map(this::convertToResponse);
+    }
+
     @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
@@ -151,19 +200,22 @@ public class TicketRestService
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setType(TicketTypeEnum.getNameFromValue(request.getType()));
         ticket.setUid(uidUtils.getUid());
-        // 工单处理人
-        ticket.setAssignee(request.getAssigneeJson());
+        // 工单处理人/办理人：仅在确实传入 uid 时写入
+        boolean hasAssignee = false;
+        try {
+            hasAssignee = StringUtils.hasText(request.getAssigneeJson())
+                    && request.getAssignee() != null
+                    && StringUtils.hasText(request.getAssignee().getUid());
+        } catch (Exception ignore) {
+            hasAssignee = false;
+        }
+        ticket.setAssignee(hasAssignee ? request.getAssigneeJson() : BytedeskConsts.EMPTY_JSON_STRING);
+
         // 工单创建人
         ticket.setReporter(request.getReporterJson());
-        //
-        if (StringUtils.hasText(request.getAssigneeJson()) 
-            && StringUtils.hasText(request.getAssignee().getUid())) {
-            // TODO: 需要通知被分配人员
-            ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
-        } else {
-            ticket.setStatus(TicketStatusEnum.NEW.name());
-        }
-        ticket.setReporter(request.getReporterJson());
+
+        // 状态：创建时根据是否指定 assignee 进行初始化
+        ticket.setStatus(hasAssignee ? TicketStatusEnum.ASSIGNED.name() : TicketStatusEnum.NEW.name());
         if (!StringUtils.hasText(ticket.getUserUid())) {
             String reporterUid = resolveReporterUid(request);
             if (StringUtils.hasText(reporterUid)) {
@@ -195,10 +247,10 @@ public class TicketRestService
         savedTicket.setAttachments(attachments);
 
         // 创建工单会话
-        ThreadEntity thread = createTicketThread(ticket);
+        ThreadEntity thread = createTicketThread(savedTicket);
         if (thread != null) {
-            ticket.setTopic(thread.getTopic());
-            ticket.setThreadUid(thread.getUid());
+            savedTicket.setThreadTopic(thread.getTopic());
+            savedTicket.setThreadUid(thread.getUid());
         }
 
         // 保存工单
@@ -242,6 +294,7 @@ public class TicketRestService
         ticket.setAssignee(request.getAssigneeJson());
         ticket.setReporter(request.getReporterJson());
         ticket.setDepartmentUid(request.getDepartmentUid());
+        ticket.setVisitorThreadUid(request.getVisitorThreadUid());
 
         // 处理附件更新
         if (request.getUploadUids() != null) {
@@ -249,11 +302,11 @@ public class TicketRestService
         }
 
         // 关联工单会话，如果不存在则创建，兼容旧数据
-        ThreadEntity thread = createTicketThread(ticket);
-        if (thread != null) {
-            ticket.setTopic(thread.getTopic());
-            ticket.setThreadUid(thread.getUid());
-        }
+        // ThreadEntity thread = createTicketThread(ticket);
+        // if (thread != null) {
+        // ticket.setThreadTopic(thread.getTopic());
+        // ticket.setThreadUid(thread.getUid());
+        // }
 
         // 保存更新后的工单
         ticket = ticketRepository.save(ticket);
@@ -319,25 +372,27 @@ public class TicketRestService
         return ticket;
     }
 
-    // 创建工单会话
+    /**
+     * 创建/获取工单会话。
+     * <p>
+     * 尝试绑定已有会话；否则走 topic 规则查找/创建。
+     */
     public ThreadEntity createTicketThread(TicketEntity ticket) {
+        TicketTypeEnum ticketType = TicketTypeEnum.fromValue(ticket.getType());
+
         // thread.user 赋值规则：
         // - 外部工单：使用提交工单人信息(ticket.reporter)
-        // - 内部工单：如果有关联 visitorThreadUid(访客会话)，使用关联会话 thread.user；否则使用 ticket.reporter
-        final TicketTypeEnum ticketType = TicketTypeEnum.fromValue(ticket.getType());
+        // - 内部工单：同样使用 ticket.reporter（会话内的消息可通过 MessageExtra.visibility 区分可见范围）
         String reporterUserJson = ticket.getReporterString();
         if (!StringUtils.hasText(reporterUserJson)) {
             reporterUserJson = BytedeskConsts.EMPTY_JSON_STRING;
         }
-        String ticketThreadUserJson = reporterUserJson;
-        if (TicketTypeEnum.INTERNAL == ticketType && StringUtils.hasText(ticket.getVisitorThreadUid())) {
-            Optional<ThreadEntity> visitorThreadOptional = threadRestService.findByUid(ticket.getVisitorThreadUid());
-            if (visitorThreadOptional.isPresent()) {
-                String visitorThreadUserJson = visitorThreadOptional.get().getUser();
-                if (StringUtils.hasText(visitorThreadUserJson)
-                        && !BytedeskConsts.EMPTY_JSON_STRING.equals(visitorThreadUserJson)) {
-                    ticketThreadUserJson = visitorThreadUserJson;
-                }
+
+        // 优先用前端传入的 threadUid 绑定已有会话
+        if (StringUtils.hasText(ticket.getThreadUid())) {
+            Optional<ThreadEntity> existingByUid = threadRestService.findByUid(ticket.getThreadUid());
+            if (existingByUid.isPresent()) {
+                return existingByUid.get();
             }
         }
 
@@ -353,27 +408,17 @@ public class TicketRestService
         } else {
             throw new IllegalArgumentException("ticket thread topic requires departmentUid/workgroupUid/orgUid");
         }
-        Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopic(topic);
-        if (threadOptional.isPresent()) {
-            ThreadEntity existing = threadOptional.get();
-            // 对历史数据/异常数据进行补写：若 thread.user 为空或不符合当前规则，则更新
-            String existingUserJson = existing.getUser();
-            boolean existingEmpty = !StringUtils.hasText(existingUserJson)
-                    || BytedeskConsts.EMPTY_JSON_STRING.equals(existingUserJson);
-            if (existingEmpty || (StringUtils.hasText(ticketThreadUserJson) && !ticketThreadUserJson.equals(existingUserJson))) {
-                existing.setUser(ticketThreadUserJson);
-                return threadRestService.save(existing);
-            }
-            return existing;
-        }
+
         // 创建工单会话
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
-                .type(ThreadTypeEnum.TICKET.name())
+                .type(ticketType == TicketTypeEnum.INTERNAL
+                        ? ThreadTypeEnum.TICKET_INTERNAL.name()
+                        : ThreadTypeEnum.TICKET_EXTERNAL.name())
                 .status(ThreadProcessStatusEnum.NEW.name())
                 .topic(topic)
-                .hide(TicketTypeEnum.INTERNAL == ticketType) // 内部工单暂时隐藏
-                .user(ticketThreadUserJson)
+                // .hide(TicketTypeEnum.INTERNAL == ticketType) // 暂时不隐藏
+                .user(reporterUserJson)
                 // .userUid(owner.getUid())
                 // .owner(owner)
                 .channel(ticket.getChannel())
@@ -424,19 +469,27 @@ public class TicketRestService
         ticket.setDeleted(true);
         save(ticket);
     }
-    
+
     public void deleteByVisitor(TicketRequest request) {
         deleteByUid(request.getUid());
     }
 
     @Override
     public TicketResponse convertToResponse(TicketEntity entity) {
-        return TicketConvertUtils.convertToResponse(entity);
+        TicketResponse response = TicketConvertUtils.convertToResponse(entity);
+        if (StringUtils.hasText(entity.getThreadUid())) {
+            long visitorUnreadCount = messageRepository.countVisitorUnreadByThreadUid(entity.getThreadUid());
+            response.setVisitorUnreadCount(Math.toIntExact(visitorUnreadCount));
+        } else {
+            response.setVisitorUnreadCount(0);
+        }
+        return response;
     }
 
     public void initTicketCategory(String orgUid) {
         log.info("initTicketCategory", orgUid);
-        List<CategoryTypeEnum> ticketCategoryTypes = List.of(CategoryTypeEnum.TICKET_INTERNAL, CategoryTypeEnum.TICKET_EXTERNAL);
+        List<CategoryTypeEnum> ticketCategoryTypes = List.of(CategoryTypeEnum.TICKET_INTERNAL,
+                CategoryTypeEnum.TICKET_EXTERNAL);
         for (String category : TicketCategories.getAllCategories()) {
             for (CategoryTypeEnum categoryType : ticketCategoryTypes) {
                 CategoryRequest categoryRequest = CategoryRequest.builder()
@@ -468,18 +521,65 @@ public class TicketRestService
         return ticketRepository.findAll(specification, pageable);
     }
 
+    public TicketStatusCountResponse countStatus(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+
+        String orgUid = request.getOrgUid();
+        String workgroupUid = request.getWorkgroupUid();
+        String departmentUid = request.getDepartmentUid();
+
+        String processingStatus = TicketStatusEnum.PROCESSING.name();
+        String pendingStatus = TicketStatusEnum.PENDING.name();
+        String reviewStatus = TicketStatusEnum.RESOLVED.name();
+
+        long processing;
+        long pending;
+        long review;
+
+        if (StringUtils.hasText(workgroupUid)) {
+            processing = ticketRepository.countByOrgUidAndWorkgroupUidAndStatusAndDeletedFalse(orgUid, workgroupUid,
+                    processingStatus);
+            pending = ticketRepository.countByOrgUidAndWorkgroupUidAndStatusAndDeletedFalse(orgUid, workgroupUid,
+                    pendingStatus);
+            review = ticketRepository.countByOrgUidAndWorkgroupUidAndStatusAndDeletedFalse(orgUid, workgroupUid,
+                    reviewStatus);
+        } else if (StringUtils.hasText(departmentUid)) {
+            processing = ticketRepository.countByOrgUidAndDepartmentUidAndStatusAndDeletedFalse(orgUid, departmentUid,
+                    processingStatus);
+            pending = ticketRepository.countByOrgUidAndDepartmentUidAndStatusAndDeletedFalse(orgUid, departmentUid,
+                    pendingStatus);
+            review = ticketRepository.countByOrgUidAndDepartmentUidAndStatusAndDeletedFalse(orgUid, departmentUid,
+                    reviewStatus);
+        } else {
+            processing = ticketRepository.countByOrgUidAndStatusAndDeletedFalse(orgUid, processingStatus);
+            pending = ticketRepository.countByOrgUidAndStatusAndDeletedFalse(orgUid, pendingStatus);
+            review = ticketRepository.countByOrgUidAndStatusAndDeletedFalse(orgUid, reviewStatus);
+        }
+
+        return TicketStatusCountResponse.builder()
+                .processing(processing)
+                .pending(pending)
+                .review(review)
+                .build();
+    }
+
     /**
      * 确保工单已分配唯一的 ticketNumber。
      * <p>
-     * 该方法会直接对入参 {@code ticket} 进行赋值：当生成到可用号码后，调用 {@code ticket.setTicketNumber(...)} 并返回。
+     * 该方法会直接对入参 {@code ticket} 进行赋值：当生成到可用号码后，调用
+     * {@code ticket.setTicketNumber(...)} 并返回。
      * <p>
      * 生成规则：
      * <ul>
-     *   <li>组织范围：优先使用 {@code request.orgUid}，为空则回退到 {@code BytedeskConsts.DEFAULT_ORGANIZATION_UID}</li>
-     *   <li>前缀：优先使用 {@code settings.basicSettings.numberPrefix}（trim + upper），否则默认 {@code TK}</li>
-     *   <li>长度：优先使用 {@code settings.basicSettings.numberLength}（需大于前缀长度），否则默认前缀长度 + 8；
-     *       数字部分长度最终限制在 [4, 32]</li>
-     *   <li>唯一性：最多尝试 5 次（prefix + 数字段），若仍冲突则使用 fallback（prefix + 完整 uid）再尝试 3 次</li>
+     * <li>组织范围：优先使用 {@code request.orgUid}，为空则回退到
+     * {@code BytedeskConsts.DEFAULT_ORGANIZATION_UID}</li>
+     * <li>前缀：优先使用 {@code settings.basicSettings.numberPrefix}（trim + upper），否则默认
+     * {@code TK}</li>
+     * <li>长度：优先使用 {@code settings.basicSettings.numberLength}（需大于前缀长度），否则默认前缀长度 +
+     * 8；
+     * 数字部分长度最终限制在 [4, 32]</li>
+     * <li>唯一性：最多尝试 5 次（prefix + 数字段），若仍冲突则使用 fallback（prefix + 完整 uid）再尝试 3 次</li>
      * </ul>
      *
      * @param ticket   需要写入 ticketNumber 的工单实体
@@ -550,8 +650,8 @@ public class TicketRestService
         Assert.notNull(request, "ticket request required");
 
         TicketSettingsEntity settings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
-                    .orElseThrow(() -> new NotFoundException(
-                            "ticket settings not found: " + request.getTicketSettingsUid()));
+                .orElseThrow(() -> new NotFoundException(
+                        "ticket settings not found: " + request.getTicketSettingsUid()));
         ticket.setTicketSettingsUid(request.getTicketSettingsUid());
 
         // 优先使用前端明确传入的流程 UID（便于草稿流程/自定义流程创建工单）

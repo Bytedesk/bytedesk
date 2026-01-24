@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/kbase")
+@RequestMapping("/module/kbase")
 @Description("Knowledge Base Route Controller - Knowledge base module route controller for handling knowledge base page requests")
 public class KbaseRouteController {
 
@@ -40,7 +40,7 @@ public class KbaseRouteController {
     @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
-    // http://127.0.0.1:9003/kbase/
+    // http://127.0.0.1:9003/module/kbase/
     @GetMapping({"", "/"})
     public String index(Model model) {
         if (!showDemo) {

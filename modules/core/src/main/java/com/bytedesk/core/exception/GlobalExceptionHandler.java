@@ -1,0 +1,346 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-04-26 09:31:29
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-09-12 15:42:43
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.core.exception;
+
+import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.upload.storage.UploadStorageException;
+import com.bytedesk.core.utils.JsonResult;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    /**
+     * 请求体不可读（常见于 JSON 不合法、被截断、Content-Type 与实际不符、或空 body 但声明了 JSON）
+     * 这类问题通常是客户端请求构造/网络中断导致，属于 4xx，不应打印 error 级别堆栈刷屏。
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                log.warn("HttpMessageNotReadable: method={} uri={} contentType={} contentLength={} msg={}",
+                        request.getMethod(),
+                        request.getRequestURI(),
+                        request.getContentType(),
+                        request.getContentLengthLong(),
+                        ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage());
+            } else {
+                log.warn("HttpMessageNotReadable: {}", ex.getMessage());
+            }
+        } catch (Exception ignore) {
+            log.warn("HttpMessageNotReadable (failed to log request context): {}", ex.getMessage());
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_INVALID_REQUEST_BODY, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(UploadStorageException.class)
+    public ResponseEntity<?> handleUploadStorageException(UploadStorageException e) {
+        // 上传失败通常属于客户端输入/文件问题（类型/大小/内容校验等），返回可读提示
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), e.getCode() == null ? 400 : e.getCode()));
+    }
+
+    @ExceptionHandler(UsernameExistsException.class)
+    public ResponseEntity<?> handleUsernameExistsException(UsernameExistsException e) {
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(EmailExistsException.class)
+    public ResponseEntity<?> handleEmailExistsException(EmailExistsException e) {
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(MobileExistsException.class)
+    public ResponseEntity<?> handleMobileExistsException(MobileExistsException e) {
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        // 登录/鉴权失败：返回 401，前端统一弹出提示并可引导去登录
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_USER_SIGNUP_FIRST, HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<?> handleEmailNotFoundException(EmailNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_EMAIL_SIGNUP_FIRST, HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @ExceptionHandler(MobileNotFoundException.class)
+    public ResponseEntity<?> handleMobileNotFoundException(MobileNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_MOBILE_SIGNUP_FIRST, HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_RESOURCE_NOT_FOUND, 404));
+    }
+
+    @ExceptionHandler(NotLoginException.class)
+    public ResponseEntity<?> handleNotLoginException(NotLoginException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_LOGIN_REQUIRED, HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @ExceptionHandler(UserDisabledException.class)
+    public ResponseEntity<?> handleUserDisabledException(UserDisabledException e) {
+        // 账号被禁用：返回 403（与 token 过期的 401 区分开）
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_USER_DISABLED, HttpStatus.FORBIDDEN.value()));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> handleForbiddenException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_FORBIDDEN_ACCESS, HttpStatus.FORBIDDEN.value()));
+    }
+
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<?> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException e) {
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USER_BLOCKED));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException e) {
+        if (e.getMessage().contains("/vip/")) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(JsonResult.error(I18Consts.I18N_VIP_REST_API, 405, false));
+        }
+        //
+        return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(e.getMessage(), 404));
+    }
+
+    @ExceptionHandler(ExistsException.class)
+    public ResponseEntity<?> handleExistsException(ExistsException e) {
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+        // 统一 not found：避免刷 error 堆栈，返回明确 404 code
+        if (e.getMessage() != null && e.getMessage().startsWith("Entity not found for UID:")) {
+            log.debug("Not found: {}", e.getMessage());
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(JsonResult.error(I18Consts.I18N_RESOURCE_NOT_FOUND, 404));
+        }
+        // 对于已知的业务异常类型，使用debug级别而不是error级别
+        if (e instanceof org.springframework.security.access.AccessDeniedException) {
+            log.debug("Access denied: {}", e.getMessage());
+        } else if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+            log.debug("Duplicate entry exception: {}", e.getMessage());
+        } else {
+            // 其他未显式处理的运行时异常
+            log.error("not handled exception", e);
+        }
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    /**
+     * 乐观锁冲突：返回 409，提示客户端重试或刷新
+     */
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<?> handleOptimisticLock(ObjectOptimisticLockingFailureException e) {
+        log.warn("Optimistic locking failure: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error("资源已被并发修改，请刷新后重试", 409));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        // 特别处理敏感词异常
+        if (e.getMessage() != null && e.getMessage().contains("敏感词")) {
+            log.warn("敏感词异常: {}", e.getMessage());
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
+        }
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    /**
+     * 不支持/未实现的操作：返回 501，避免落入 RuntimeException 兜底刷 error 堆栈。
+     */
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<?> handleUnsupportedOperationException(UnsupportedOperationException e) {
+        String message = e.getMessage();
+        if (message == null || message.isBlank()) {
+            message = I18Consts.I18N_OPERATION_NOT_SUPPORTED;
+        }
+        log.warn("UnsupportedOperationException: {}", message);
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(message, HttpStatus.NOT_IMPLEMENTED.value()));
+    }
+
+    // 添加对ListenerExecutionFailedException的处理
+    @ExceptionHandler(ListenerExecutionFailedException.class)
+    public ResponseEntity<?> handleListenerExecutionFailedException(ListenerExecutionFailedException e) {
+        log.error("JMS监听器执行失败: {}", e.getMessage());
+        // 检查是否是敏感词导致的异常
+        if (e.getCause() instanceof IllegalArgumentException &&
+                e.getCause().getMessage() != null &&
+                e.getCause().getMessage().contains("敏感词")) {
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
+        }
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_MESSAGE_PROCESSING_FAILED));
+    }
+
+    // 添加自定义TabooException处理
+    // 添加自定义TabooException处理
+    @ExceptionHandler(TabooException.class)
+    public ResponseEntity<?> handleTabooException(TabooException e) {
+        log.warn("敏感词异常: {}", e.getMessage());
+
+        // 获取当前请求
+        // HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+        //         .getRequest();
+        // String acceptHeader = request.getHeader("Accept");
+
+        // 检查是否是SSE请求，针对SSE请求返回text/event-stream类型
+        // if (acceptHeader != null && acceptHeader.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
+        //     // 对于SSE请求，使用text/event-stream媒体类型
+        //     String sseErrorData = "data: {\"error\":true,\"message\":\"" + I18Consts.I18N_SENSITIVE_CONTENT + "\"}\n\n";
+        //     return ResponseEntity
+        //             .status(HttpStatus.OK)
+        //             .contentType(MediaType.TEXT_EVENT_STREAM)
+        //             .body(sseErrorData);
+        // }
+
+        // 对于普通请求，使用JSON响应
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e) {
+        return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT));
+    }
+
+    @ExceptionHandler(value = NullPointerException.class)
+    public ResponseEntity<?> handleNullPointerException(NullPointerException ex) {
+        log.error("not handled exception 2:", ex);
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_NULL_POINTER_EXCEPTION));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_RESPONSE_STATUS_EXCEPTION));
+    }
+
+    @ExceptionHandler(WebSocketTimeoutException.class)
+    public ResponseEntity<?> handleWebSocketTimeoutException(WebSocketTimeoutException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_WEBSOCKET_TIMEOUT_EXCEPTION));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_HTTP_METHOD_NOT_SUPPORTED, 400));
+    }
+
+    @ExceptionHandler(value = AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(JsonResult.error(I18Consts.I18N_AUTHORIZATION_DENIED, 403));
+    }
+
+    @ExceptionHandler(value = RequestRejectedException.class)
+    public ResponseEntity<?> handleRequestRejectedException(RequestRejectedException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_REQUEST_REJECTED));
+    }
+
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    public ResponseEntity<?> handleMEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_ENTITY_NOT_FOUND, 400));
+    }
+
+    // 添加对异步请求不可用异常的处理
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public ResponseEntity<?> handleAsyncRequestNotUsableException(AsyncRequestNotUsableException ex) {
+        log.warn("AsyncRequestNotUsableException: SSE connection is no longer usable - {}", ex.getMessage());
+        
+        // 获取当前请求上下文
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                String acceptHeader = request.getHeader("Accept");
+                
+                // 检查是否是SSE请求
+                if (acceptHeader != null && acceptHeader.contains(MediaType.TEXT_EVENT_STREAM_VALUE)) {
+                    // 对于SSE请求，返回空响应或者适当的错误信息
+                    log.debug("SSE connection closed by client, not sending response");
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Unable to get request context: {}", e.getMessage());
+        }
+        
+        // 对于其他情况，返回正常的错误响应
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(JsonResult.error("Connection no longer available"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<?> handleException(Exception e) {
+        // if (bytedeskProperties.getDebug()) {
+        log.error("not handled exception 3:", e);
+        // }
+        return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_INTERNAL_SERVER_ERROR));
+    }
+}

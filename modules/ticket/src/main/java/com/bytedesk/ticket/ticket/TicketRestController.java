@@ -67,10 +67,24 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = "工单", action = "按主题查询", description = "query ticket by topic")
-    @GetMapping("/query/topic")
-    public ResponseEntity<?> queryByTopic(TicketRequest request) {
+    @GetMapping("/query/thread/topic")
+    public ResponseEntity<?> queryByThreadTopic(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketRestService.queryByOrg(request);
+        Page<TicketResponse> page = ticketRestService.queryByThreadTopic(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    /**
+     * 兼容旧接口：历史客户端使用 /query/topic。
+     * 实际语义为按 threadTopic 查询。
+     */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = "工单", action = "按主题查询(兼容)", description = "query ticket by topic (compat)")
+    @GetMapping("/query/topic")
+    public ResponseEntity<?> queryByTopicCompat(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketRestService.queryByThreadTopic(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -80,7 +94,17 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
 
-        Page<TicketResponse> page = ticketRestService.queryByOrg(request);
+        TicketResponse ticket = ticketRestService.queryByThreadUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(ticket));
+    }
+
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = "工单", action = "按访客会话查询", description = "query ticket by visitor thread uid")
+    @GetMapping("/query/visitor/thread/uid")
+    public ResponseEntity<?> queryByVisitorThreadUid(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketRestService.queryByVisitorThreadUid(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
@@ -130,6 +154,16 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
             "Ticket",
             "Ticket"
         );
+    }
+
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = "工单", action = "状态统计", description = "count ticket by status")
+    @GetMapping("/count/status")
+    public ResponseEntity<?> countStatus(TicketRequest request) {
+
+        TicketStatusCountResponse counts = ticketRestService.countStatus(request);
+
+        return ResponseEntity.ok(JsonResult.success(counts));
     }
 
 

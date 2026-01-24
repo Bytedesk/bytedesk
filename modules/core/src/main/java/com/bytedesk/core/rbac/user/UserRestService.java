@@ -33,7 +33,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
@@ -80,7 +82,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         if (optionalEntity.isPresent()) {
             return convertToResponse(optionalEntity.get());
         } else {
-            throw new RuntimeException("Entity not found for UID: " + request.getUid());
+            throw new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

@@ -41,7 +41,7 @@ public class BaiduApi {
     public static OpenAiApi create(String baseUrl, String apiKey) {
         // 百度API路径直接是/chat/completions，不需要v1前缀
         String chatCompletionsPath = "/chat/completions";
-        // String embeddingsPath = "/embeddings"; // 假设百度API也支持embeddings
+        String embeddingsPath = "/embeddings";
         
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         
@@ -49,7 +49,7 @@ public class BaiduApi {
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .completionsPath(chatCompletionsPath)
-                // .embeddingsPath(embeddingsPath)
+            .embeddingsPath(embeddingsPath)
                 .headers(headers)
                 .build();
     }

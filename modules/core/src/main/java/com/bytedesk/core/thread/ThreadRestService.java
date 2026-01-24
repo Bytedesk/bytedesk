@@ -786,9 +786,10 @@ public class ThreadRestService
                 content = I18Consts.I18N_AGENT_CLOSED;
             }
 
-            MessageTypeEnum mt = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)
-                    ? MessageTypeEnum.AUTO_CLOSED
-                    : MessageTypeEnum.AGENT_CLOSED;
+            MessageTypeEnum mt = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name()
+                    .equalsIgnoreCase(closeType)
+                            ? MessageTypeEnum.AUTO_CLOSED
+                            : MessageTypeEnum.AGENT_CLOSED;
             thread.setContent(ThreadContent.of(mt, content, content).toJson());
 
             ThreadEntity updateThread = save(thread);
@@ -982,7 +983,7 @@ public class ThreadRestService
         return null;
     }
 
-    @CacheEvict(value = "thread", key = "#uid")
+    @CacheEvict(value = "thread", key = "#topic")
     public void deleteByTopic(String topic) {
         List<ThreadEntity> threads = findListByTopic(topic);
         threads.forEach(thread -> {
@@ -1002,8 +1003,8 @@ public class ThreadRestService
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "thread", key = "#thread.uid"),
-            @CacheEvict(value = "thread", key = "#thread.topic")
+            @CacheEvict(value = "thread", key = "#p0.uid", condition = "#p0 != null && #p0.uid != null"),
+            @CacheEvict(value = "thread", key = "#p0.topic", condition = "#p0 != null && #p0.topic != null")
     })
     public void delete(@NonNull ThreadRequest entity) {
         deleteByUid(entity.getUid());

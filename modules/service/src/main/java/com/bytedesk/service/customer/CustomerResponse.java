@@ -18,6 +18,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.model.CustomFieldItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,6 @@ public class CustomerResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String nickname;
 
     private String email;
@@ -46,6 +46,9 @@ public class CustomerResponse extends BaseResponse {
 
     // 标签列表
     private List<String> tagList;
+
+    // 用户自定义字段：字段昵称/字段key/字段值
+    private List<CustomFieldItem> customFieldList;
 
     // 扩展信息，JSON格式
     @Builder.Default

@@ -214,7 +214,7 @@ public class TicketService {
             //     // 如果创建工单的时候没有绑定会话，则创建会话
             //     ThreadEntity thread = ticketRestService.createTicketThread(ticket);
             //     if (thread != null) {
-            //         ticket.setTopic(thread.getTopic());
+            //         ticket.setThreadTopic(thread.getTopic());
             //         ticket.setThreadUid(thread.getUid());
             //     }
             // }

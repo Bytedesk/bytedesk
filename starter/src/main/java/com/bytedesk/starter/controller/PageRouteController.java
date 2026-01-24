@@ -376,6 +376,42 @@ public class PageRouteController {
 		return "forward:/chat/iframe.html";
 	}
 
+	@GetMapping({
+			"/ticket",
+			"/ticket/",
+			"/ticket/{path:[^\\.]*}",
+			"/ticket/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/ticket/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/ticket/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String ticket() {
+		return "forward:/ticket/index.html";
+	}
+
+	@GetMapping({
+			"/video",
+			"/video/",
+			"/video/{path:[^\\.]*}",
+			"/video/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/video/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/video/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String video() {
+		return "forward:/video/index.html";
+	}
+
+	@GetMapping({
+			"/voc",
+			"/voc/",
+			"/voc/{path:[^\\.]*}",
+			"/voc/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/voc/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/voc/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String voc() {
+		return "forward:/voc/index.html";
+	}
+
 	// http://127.0.0.1:9003/workflow
 	@GetMapping({
 			"/workflow",

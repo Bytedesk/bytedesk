@@ -190,7 +190,17 @@ public class TextElasticService {
      */
     public List<TextElasticSearchResult> searchTexts(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("搜索Texts: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-        return searchTextsInternal(query, kbUid, categoryUid, orgUid, false, 10);
+        return searchTexts(query, kbUid, categoryUid, orgUid, 10);
+    }
+
+    /**
+     * 搜索Text内容（可选限制返回数量）
+     *
+     * @param maxResults 最大结果数，为null则不限制
+     */
+    public List<TextElasticSearchResult> searchTexts(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
+        log.info("搜索Texts: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
+        return searchTextsInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
     }
 
     /**

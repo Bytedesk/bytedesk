@@ -20,7 +20,9 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.CustomFieldItemListConverter;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.model.CustomFieldItem;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -51,8 +53,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Table(name = "bytedesk_service_customer")
 public class CustomerEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * Customer's display name or nickname
@@ -75,6 +77,40 @@ public class CustomerEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
     
+    /**
+     * Tags for customer categorization and search
+     */
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> tagList = new ArrayList<>();
+
+    /**
+     * 用户自定义字段：字段昵称/字段key/字段值（JSON）
+     */
+    @Builder.Default
+    @Convert(converter = CustomFieldItemListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<CustomFieldItem> customFieldList = new ArrayList<>();
+
+    /**
+     * Additional customer information stored as JSON format for extensibility
+     */
+	@Builder.Default
+	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
+    
+    /**
+     * Additional notes or comments about the customer
+     */
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String notes; // 备注信息
+
+    /**
+     * Associated visitor UID for tracking customer journey
+     */
+    private String visitorUid;
+
     // 个人基本信息
     // private String realname; // 真实姓名
     // private String avatar; // 头像URL
@@ -119,34 +155,4 @@ public class CustomerEntity extends BaseEntity {
     // private Double totalAmount; // 累计消费金额
     // private Integer dealCount; // 成交次数
     // private ZonedDateTime lastDealTime; // 最后成交时间
-
-    /**
-     * Tags for customer categorization and search
-     */
-    @Builder.Default
-    @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<String> tagList = new ArrayList<>();
-
-    /**
-     * Additional customer information stored as JSON format for extensibility
-     */
-	@Builder.Default
-	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String extra = BytedeskConsts.EMPTY_JSON_STRING;
-
-    // 自定义字段存储
-    // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    // private String customFields; // JSON格式存储自定义字段
-    
-    /**
-     * Additional notes or comments about the customer
-     */
-    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String notes; // 备注信息
-
-    /**
-     * Associated visitor UID for tracking customer journey
-     */
-    private String visitorUid;
 }

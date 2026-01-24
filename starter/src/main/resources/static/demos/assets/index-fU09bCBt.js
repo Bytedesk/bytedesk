@@ -1,0 +1,1 @@
+import{I as t}from"./index-BH8Tp5lJ.js";import o from"./index-C5FuShQA.js";async function a(i){return o("/visitor/api/v1/init",{method:"POST",data:{...i,client:t}})}async function e(i){return o("/visitor/api/v1/browse",{method:"POST",data:{...i,client:t}})}export{e as browse,a as initVisitor};

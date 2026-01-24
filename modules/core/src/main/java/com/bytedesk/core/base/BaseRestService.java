@@ -20,6 +20,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 
@@ -87,7 +89,7 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
         if (optionalEntity.isPresent()) {
             return convertToResponse(optionalEntity.get());
         } else {
-            throw new RuntimeException("Entity not found for UID: " + getUidFromRequest(request));
+            throw new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

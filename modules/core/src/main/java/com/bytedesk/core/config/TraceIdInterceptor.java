@@ -31,6 +31,12 @@ public class TraceIdInterceptor implements ClientHttpRequestInterceptor {
         String traceId = MDC.get(BytedeskConsts.TRACE_ID);
         if (traceId != null) {
             request.getHeaders().add(BytedeskConsts.TRACE_ID, traceId);
+            request.getHeaders().add(BytedeskConsts.TRACE_ID_HTTP_HEADER, traceId);
+        }
+
+        String requestId = MDC.get(BytedeskConsts.REQUEST_ID_MDC);
+        if (requestId != null) {
+            request.getHeaders().add(BytedeskConsts.REQUEST_ID, requestId);
         }
         return execution.execute(request, body);
     }

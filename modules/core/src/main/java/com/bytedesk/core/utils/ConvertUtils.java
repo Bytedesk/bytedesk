@@ -154,6 +154,8 @@ public class ConvertUtils {
                 .description(organization.getDescription())
                 .verifyStatus(organization.getVerifyStatus())
                 .enabled(organization.getEnabled())
+                .customServerEnabled(organization.getCustomServerEnabled())
+                .customServerHost(organization.getCustomServerHost())
                 .build();
 
         // owner user（OrganizationEntity.user 默认为 LAZY，未初始化时不强行触发加载）

@@ -64,6 +64,18 @@ public class FileEntity extends BaseEntity {
 
     private String fileType;
 
+    // 切块策略：TOKEN / CHARACTER / PARAGRAPH
+    @Builder.Default
+    private String chunkingStrategy = FileChunkingStrategyEnum.TOKEN.name();
+
+    // 切块大小（字符数），仅对 CHARACTER / PARAGRAPH 生效
+    @Builder.Default
+    private Integer chunkSize = FileChunkingConfig.DEFAULT_CHUNK_SIZE;
+
+    // 重叠大小（字符数），仅对 CHARACTER / PARAGRAPH 生效
+    @Builder.Default
+    private Integer chunkOverlap = FileChunkingConfig.DEFAULT_CHUNK_OVERLAP;
+
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -152,6 +164,20 @@ public class FileEntity extends BaseEntity {
         // 比较文件URL是否变化
         if ((fileUrl == null && request.getFileUrl() != null) ||
             (fileUrl != null && !fileUrl.equals(request.getFileUrl()))) {
+            return true;
+        }
+
+        // 切块配置
+        if ((chunkingStrategy == null && request.getChunkingStrategy() != null) ||
+            (chunkingStrategy != null && request.getChunkingStrategy() != null && !chunkingStrategy.equals(request.getChunkingStrategy()))) {
+            return true;
+        }
+        if ((chunkSize == null && request.getChunkSize() != null) ||
+            (chunkSize != null && request.getChunkSize() != null && !chunkSize.equals(request.getChunkSize()))) {
+            return true;
+        }
+        if ((chunkOverlap == null && request.getChunkOverlap() != null) ||
+            (chunkOverlap != null && request.getChunkOverlap() != null && !chunkOverlap.equals(request.getChunkOverlap()))) {
             return true;
         }
         

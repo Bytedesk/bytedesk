@@ -126,6 +126,25 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return queryByOrg(request);
     }
 
+    /**
+     * 搜索组织（用于“申请加入组织”场景）
+     *
+     * 说明：该场景下用户可能还没有 currentOrganization，因此不能复用 queryByUser/queryByUid 里
+     * 依赖 HAS_ORGANIZATION_* 权限的链路。
+     */
+    public Page<OrganizationResponseSimple> searchForJoin(OrganizationRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotLoginException("请先登录");
+        }
+
+        Pageable pageable = request.getPageable();
+        Specification<OrganizationEntity> spec = OrganizationSpecification.search(request, authService)
+                .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("enabled"), true));
+        Page<OrganizationEntity> page = organizationRepository.findAll(spec, pageable);
+        return page.map(entity -> modelMapper.map(entity, OrganizationResponseSimple.class));
+    }
+
     @Transactional
     @Override
     public OrganizationResponse create(OrganizationRequest request) {
@@ -268,6 +287,12 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setLogo(request.getLogo());
         organization.setCode(request.getCode());
         organization.setDescription(request.getDescription());
+        if (request.getCustomServerEnabled() != null) {
+            organization.setCustomServerEnabled(request.getCustomServerEnabled());
+        }
+        if (request.getCustomServerHost() != null) {
+            organization.setCustomServerHost(request.getCustomServerHost());
+        }
 
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
@@ -325,6 +350,12 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setLogo(request.getLogo());
         organization.setCode(request.getCode());
         organization.setDescription(request.getDescription());
+        if (request.getCustomServerEnabled() != null) {
+            organization.setCustomServerEnabled(request.getCustomServerEnabled());
+        }
+        if (request.getCustomServerHost() != null) {
+            organization.setCustomServerHost(request.getCustomServerHost());
+        }
         // 认证
         organization.setVerifiedType(request.getVerifiedType());
         organization.setIdentityType(request.getIdentityType());
@@ -455,6 +486,8 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 latestEntity.setLogo(organization.getLogo());
                 latestEntity.setCode(organization.getCode());
                 latestEntity.setDescription(organization.getDescription());
+                latestEntity.setCustomServerEnabled(organization.getCustomServerEnabled());
+                latestEntity.setCustomServerHost(organization.getCustomServerHost());
 
                 // 保存更新后的数据
                 return organizationRepository.save(latestEntity);
@@ -501,6 +534,8 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         response.setVip(organization.getVip());
         response.setVipExpireDate(organization.getVipExpireDate());
         response.setEnabled(organization.getEnabled());
+        response.setCustomServerEnabled(organization.getCustomServerEnabled());
+        response.setCustomServerHost(organization.getCustomServerHost());
         response.setCreatedAt(organization.getCreatedAt());
         response.setUpdatedAt(organization.getUpdatedAt());
         

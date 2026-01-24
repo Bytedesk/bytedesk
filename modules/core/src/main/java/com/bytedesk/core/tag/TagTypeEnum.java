@@ -15,6 +15,7 @@ package com.bytedesk.core.tag;
 
 public enum TagTypeEnum {
     THREAD,
+    VISITOR,
     CUSTOMER,
     TICKET
 }

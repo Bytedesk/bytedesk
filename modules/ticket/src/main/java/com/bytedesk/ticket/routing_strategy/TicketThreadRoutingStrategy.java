@@ -28,7 +28,9 @@ import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -50,6 +52,7 @@ import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup_routing.WorkgroupRoutingService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRepository;
+import com.bytedesk.ticket.ticket.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
@@ -292,6 +295,47 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         if (agentProtobuf == null || !StringUtils.hasText(agentProtobuf.getUid())) {
             log.warn("Selected agent has no uid for ticket {}, skip assignment", ticket.getUid());
             return latestThread;
+        }
+
+        // 同步工单 assignee/status：自动分配成功后，工单从 NEW/UNCLAIMED 进入 ASSIGNED
+        try {
+            boolean ticketHasAssignee = false;
+            try {
+                UserProtobuf existingAssignee = ticket.getAssignee();
+                ticketHasAssignee = existingAssignee != null && StringUtils.hasText(existingAssignee.getUid());
+            } catch (Exception ignore) {
+                ticketHasAssignee = false;
+            }
+
+            boolean wroteTicketAssignee = false;
+            if (!ticketHasAssignee) {
+                MemberEntity member = selectedAgent.getMember();
+                if (member != null && StringUtils.hasText(member.getUid())) {
+                    UserProtobuf assigneeMember = UserProtobuf.builder()
+                            .uid(member.getUid())
+                            .nickname(member.getNickname())
+                            .avatar(member.getAvatar())
+                            .type(UserTypeEnum.MEMBER.name())
+                            .build();
+                    ticket.setAssignee(assigneeMember.toJson());
+                    wroteTicketAssignee = true;
+                } else {
+                    log.warn("Selected agent {} has no member, skip syncing ticket assignee for ticket {}",
+                            selectedAgent.getUid(), ticket.getUid());
+                }
+            }
+
+            if (wroteTicketAssignee) {
+                String status = ticket.getStatus();
+                if (!StringUtils.hasText(status)
+                        || TicketStatusEnum.NEW.name().equalsIgnoreCase(status)
+                        || TicketStatusEnum.UNCLAIMED.name().equalsIgnoreCase(status)) {
+                    ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+                }
+                ticketRepository.save(ticket);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to sync ticket assignee/status for ticket {}: {}", ticket.getUid(), e.getMessage());
         }
 
         // 按 workgroup 路由策略写入 agent，并同步设置 userUid

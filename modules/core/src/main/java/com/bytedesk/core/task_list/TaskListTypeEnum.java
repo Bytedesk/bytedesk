@@ -14,7 +14,5 @@
 package com.bytedesk.core.task_list;
 
 public enum TaskListTypeEnum {
-    THREAD,
-    CUSTOMER,
-    TICKET
+    TASK
 }

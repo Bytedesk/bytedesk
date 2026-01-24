@@ -15,6 +15,9 @@ package com.bytedesk.core.rbac.organization_apply;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+
+import java.time.ZonedDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -39,7 +42,6 @@ public class OrganizationApplyEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     @Builder.Default
@@ -48,5 +50,22 @@ public class OrganizationApplyEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "apply_type")
     private String type = OrganizationApplyTypeEnum.CUSTOMER.name();
+
+    // 申请状态：PENDING/APPROVED/REJECTED/CANCELED
+    @Builder.Default
+    @Column(name = "apply_status")
+    private String status = OrganizationApplyStatusEnum.PENDING.name();
+
+    // 审核失败原因
+    @Column(name = "reject_reason")
+    private String rejectReason;
+
+    // 处理人 userUid（通常为组织管理员）
+    @Column(name = "handled_by_uid")
+    private String handledByUid;
+
+    // 处理时间
+    @Column(name = "handled_at")
+    private ZonedDateTime handledAt;
 
 }

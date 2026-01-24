@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ByteDesk Chat Example</title>
+</head>
+<body>
+  <h1>ByteDesk Chat Example</h1>
+  
+  <!-- 在网页底部添加以下代码 -->
+  <script>
+    // 配置聊天组件
+    window.BytedeskConfig = {
+      position: {
+        placement: 'bottom-right',
+        margin: {
+          bottom: 20,
+          right: 20
+        }
+      },
+      theme: {
+        preset: 'blue'
+      },
+      text: {
+        title: 'Hello there.',
+        subtitle: 'How can we help?'
+      },
+      tabs: {
+        home: true,
+        messages: true
+      },
+      chatConfig: {
+        org: 'your_org_id',
+        t: 0,
+        sid: 'your_agent_id'
+      }
+    };
+  </script>
+  <script src="/chat/bytedesk_embeded.js" async></script>
+</body>
+</html> 

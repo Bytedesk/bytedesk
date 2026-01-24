@@ -30,7 +30,7 @@ public interface SpringAIService {
      * @param robot 机器人实体
      * @param messageRequest 消息协议
      */
-    void sendWebsocketMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,  MessageProtobuf messageProtobufReply);
+    // void sendWebsocketMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,  MessageProtobuf messageProtobufReply);
     
     /**
      * 发送Sse消息

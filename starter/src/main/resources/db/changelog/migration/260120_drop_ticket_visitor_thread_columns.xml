@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Drop legacy visitor-thread columns from bytedesk_ticket after unifying ticket thread fields -->
+
+    <changeSet id="260120-drop-bytedesk-ticket-visitor-thread-topic" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ticket" />
+                <columnExists tableName="bytedesk_ticket" columnName="visitor_thread_topic" />
+            </and>
+        </preConditions>
+        <dropColumn tableName="bytedesk_ticket" columnName="visitor_thread_topic" />
+    </changeSet>
+
+    <changeSet id="260120-drop-bytedesk-ticket-visitor-thread-uid" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ticket" />
+                <columnExists tableName="bytedesk_ticket" columnName="visitor_thread_uid" />
+            </and>
+        </preConditions>
+        <dropColumn tableName="bytedesk_ticket" columnName="visitor_thread_uid" />
+    </changeSet>
+
+</databaseChangeLog>

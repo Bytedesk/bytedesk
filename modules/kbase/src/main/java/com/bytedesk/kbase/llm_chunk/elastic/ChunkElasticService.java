@@ -188,7 +188,17 @@ public class ChunkElasticService {
      */
     public List<ChunkElasticSearchResult> searchChunks(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("搜索Chunks: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-        return searchChunksInternal(query, kbUid, categoryUid, orgUid, false, 10);
+        return searchChunks(query, kbUid, categoryUid, orgUid, 10);
+    }
+
+    /**
+     * 搜索Chunk内容（可选限制返回数量）
+     *
+     * @param maxResults 最大结果数，为null则不限制
+     */
+    public List<ChunkElasticSearchResult> searchChunks(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
+        log.info("搜索Chunks: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
+        return searchChunksInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
     }
 
     /**

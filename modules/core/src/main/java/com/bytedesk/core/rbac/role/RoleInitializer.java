@@ -235,29 +235,5 @@ public class RoleInitializer {
                 .map(AuthorityEntity::getUid)
                 .ifPresent(authorityUids::add);
     }
-
-
-    // private void createDeptAdmin() {
-    //     RoleRequest roleRequest = RoleRequest.builder()
-    //             .uid(BytedeskConsts.DEFAULT_ROLE_DEPT_ADMIN_UID)
-    //             .name(RoleConsts.ROLE_DEPT_ADMIN)
-    //            .value(RoleConsts.ROLE_DEPT_ADMIN)
-    //             .description("Department Admin")
-    //             .level(LevelEnum.PLATFORM.name())
-    //             .system(true)
-    //             .build();
-    //     roleRestService.create(roleRequest);
-    // }
-
-    // private void createWorkgroupAdmin() {
-    //     RoleRequest roleRequest = RoleRequest.builder()
-    //             .uid(BytedeskConsts.DEFAULT_ROLE_WORKGROUP_ADMIN_UID)
-    //             .name(RoleConsts.ROLE_WORKGROUP_ADMIN)
-    //             .value(RoleConsts.ROLE_WORKGROUP_ADMIN)
-    //             .description("Workgroup Admin")
-    //             .level(LevelEnum.PLATFORM.name())
-    //             .system(true)
-    //             .build();
-    //     roleRestService.create(roleRequest);
-    // }
+    
 }

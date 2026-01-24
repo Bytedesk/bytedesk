@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.permission.PermissionService;
+// import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -46,7 +46,7 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
 
     private final AuthService authService;
     
-    private final PermissionService permissionService;
+    // private final PermissionService permissionService;
     
     @Override
     public Page<CalendarEntity> queryByOrgEntity(CalendarRequest request) {
@@ -121,9 +121,9 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
         }
         
         // 检查用户是否有权限创建该层级的数据
-        if (!skipPermissionCheck && !permissionService.canCreateAtLevel(CalendarPermissions.MODULE_NAME, level)) {
-            throw new RuntimeException("无权限创建该层级的标签数据");
-        }
+        // if (!skipPermissionCheck && !permissionService.canCreateAtLevel(CalendarPermissions.MODULE_NAME, level)) {
+        //     throw new RuntimeException("无权限创建该层级的日程数据");
+        // }
         
         // 
         CalendarEntity entity = modelMapper.map(request, CalendarEntity.class);
@@ -146,9 +146,9 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
             CalendarEntity entity = optional.get();
             
             // 检查用户是否有权限更新该实体
-            if (!permissionService.hasEntityPermission(CalendarPermissions.MODULE_NAME, "UPDATE", entity)) {
-                throw new RuntimeException("无权限更新该标签数据");
-            }
+            // if (!permissionService.hasEntityPermission(CalendarPermissions.MODULE_NAME, "UPDATE", entity)) {
+            //     throw new RuntimeException("无权限更新该标签数据");
+            // }
             
             modelMapper.map(request, entity);
             //
@@ -195,9 +195,9 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
             CalendarEntity entity = optional.get();
             
             // 检查用户是否有权限删除该实体
-            if (!permissionService.hasEntityPermission(CalendarPermissions.MODULE_NAME, "DELETE", entity)) {
-                throw new RuntimeException("无权限删除该标签数据");
-            }
+            // if (!permissionService.hasEntityPermission(CalendarPermissions.MODULE_NAME, "DELETE", entity)) {
+            //     throw new RuntimeException("无权限删除该标签数据");
+            // }
             
             entity.setDeleted(true);
             save(entity);

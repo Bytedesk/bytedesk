@@ -127,6 +127,9 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
             entity.setCategoryUid(request.getCategoryUid());
+            entity.setChunkingStrategy(request.getChunkingStrategy());
+            entity.setChunkSize(request.getChunkSize());
+            entity.setChunkOverlap(request.getChunkOverlap());
 
             //
             FileEntity savedEntity = save(entity);

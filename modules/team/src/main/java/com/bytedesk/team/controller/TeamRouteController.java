@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/team")
+@RequestMapping("/module/team")
 public class TeamRouteController {
 
     @Value("${bytedesk.custom.show-demo:true}")
@@ -38,7 +38,7 @@ public class TeamRouteController {
     @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
-    // http://127.0.0.1:9003/team/
+    // http://127.0.0.1:9003/module/team/
     @GetMapping({"", "/"})
     public String index(Model model) {
         if (!showDemo) {

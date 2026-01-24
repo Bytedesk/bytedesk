@@ -39,13 +39,13 @@ public class OrganizationApplyRequest extends BaseRequest {
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
-    // @Builder.Default
-    // private String type = OrganizationApplyTypeEnum.CUSTOMER.name();
+    // 申请状态：PENDING/APPROVED/REJECTED/CANCELED
+    private String status;
 
-    @Builder.Default
-    private String color = "red";
+    // 审核失败原因
+    private String rejectReason;
 
-    @Builder.Default
-    private Integer order = 0;
+    // 处理人 userUid
+    private String handledByUid;
 
 }

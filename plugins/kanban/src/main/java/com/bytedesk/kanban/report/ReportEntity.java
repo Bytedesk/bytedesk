@@ -40,7 +40,6 @@ public class ReportEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     @Builder.Default

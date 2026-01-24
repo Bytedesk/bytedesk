@@ -72,11 +72,11 @@ public class TaskListEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of task_list (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Type of task_list (TASK, etc.)
      */
     @Builder.Default
     @Column(name = "task_list_type")
-    private String type = TaskListTypeEnum.CUSTOMER.name();
+    private String type = TaskListTypeEnum.TASK.name();
 
     /**
      * Color theme for the task list display

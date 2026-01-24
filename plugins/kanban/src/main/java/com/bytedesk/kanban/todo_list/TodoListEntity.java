@@ -52,8 +52,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({TodoListEntityListener.class})
 @Table(name = "bytedesk_plugin_kanban_todo_list")
 public class TodoListEntity extends BaseEntity {
+    
     private static final long serialVersionUID = 1L;
-
 
     /**
      * Name of the todo list

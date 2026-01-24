@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/service")
+@RequestMapping("/module/service")
 @Description("Service Route Controller - Customer service module route controller for handling service-related page requests")
 public class ServiceRouteController {
 
@@ -40,7 +40,7 @@ public class ServiceRouteController {
     @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
-    // http://127.0.0.1:9003/service/
+    // http://127.0.0.1:9003/module/service/
     @GetMapping({"", "/"})
     public String index(Model model) {
         if (!showDemo) {

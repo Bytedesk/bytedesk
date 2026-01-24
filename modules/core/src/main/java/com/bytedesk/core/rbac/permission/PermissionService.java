@@ -103,9 +103,8 @@ public class PermissionService {
             LevelEnum.DEPARTMENT.name(),
             LevelEnum.WORKGROUP.name(),
             LevelEnum.AGENT.name(),
-            // LevelEnum.ROBOT.name(),
-            // LevelEnum.GROUP.name(),
-            // LevelEnum.USER.name()
+            LevelEnum.ROBOT.name(),
+            LevelEnum.USER.name()
         };
         
         int dataLevelIndex = indexOf(levelHierarchy, dataLevel);
@@ -120,6 +119,15 @@ public class PermissionService {
             if (authorities.contains(levelPermission)) {
                 return true;
             }
+        }
+
+        // 兼容“统一权限”（不在权限字符串中编码层级）的模块
+        // 例如：CALENDAR_CREATE / DEPARTMENT_READ
+        String unifiedPermission = module + "_" + action;
+        if (authorities.contains(unifiedPermission)) {
+            // 默认视为组织级可访问/可操作（及以下层级）
+            int organizationIndex = indexOf(levelHierarchy, LevelEnum.ORGANIZATION.name());
+            return organizationIndex != -1 && dataLevelIndex >= organizationIndex;
         }
         
         return false;
@@ -201,10 +209,9 @@ public class PermissionService {
                 LevelEnum.ORGANIZATION.name(),
                 LevelEnum.DEPARTMENT.name(),
                 LevelEnum.WORKGROUP.name(),
-                LevelEnum.AGENT.name()
-                // LevelEnum.ROBOT.name(),
-                // LevelEnum.GROUP.name(),
-                // LevelEnum.USER.name()
+                LevelEnum.AGENT.name(),
+                LevelEnum.ROBOT.name(),
+                LevelEnum.USER.name()
             ));
             return accessibleLevels;
         }
@@ -218,9 +225,8 @@ public class PermissionService {
             LevelEnum.DEPARTMENT.name(),
             LevelEnum.WORKGROUP.name(),
             LevelEnum.AGENT.name(),
-            // LevelEnum.ROBOT.name(),
-            // LevelEnum.GROUP.name(),
-            // LevelEnum.USER.name()
+            LevelEnum.ROBOT.name(),
+            LevelEnum.USER.name()
         };
         
         for (int i = 0; i < levels.length; i++) {

@@ -15,6 +15,8 @@ package com.bytedesk.service.visitor;
 
 import java.util.List;
 import java.util.ArrayList;
+
+import com.bytedesk.core.model.CustomFieldItem;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ChannelEnum;
@@ -90,6 +92,10 @@ public class VisitorRequest extends BaseRequest {
 	// 标签
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
+
+	// 用户自定义字段：字段昵称/字段key/字段值
+	@Builder.Default
+	private List<CustomFieldItem> customFieldList = new ArrayList<>();
 
 	// 商品信息
 	private String goodsInfo;

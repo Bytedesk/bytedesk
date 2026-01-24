@@ -49,6 +49,12 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class KnowledgeBaseSearchHelper {
 
+    private static final int DEFAULT_VECTOR_RECALL_LIMIT = 5;
+    private static final int MAX_VECTOR_RECALL_LIMIT = 50;
+
+    private static final int DEFAULT_FULLTEXT_RECALL_LIMIT = 10;
+    private static final int MAX_FULLTEXT_RECALL_LIMIT = 200;
+
     @Autowired
     private FaqElasticService faqElasticService;
     @Autowired
@@ -103,20 +109,20 @@ public class KnowledgeBaseSearchHelper {
         switch (RobotSearchTypeEnum.valueOf(searchType)) {
             case VECTOR:
                 log.info("使用向量搜索");
-                executeVectorSearchWithSources(query, robot.getKbUid(), searchResultList,
-                        sourceReferences);
+            executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
+                sourceReferences);
                 break;
             case MIXED:
                 log.info("使用混合搜索");
-                executeFulltextSearchWithSources(query, robot.getKbUid(), searchResultList,
+                executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
                         sourceReferences);
-                executeVectorSearchWithSources(query, robot.getKbUid(), searchResultList,
-                        sourceReferences);
+            executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
+                sourceReferences);
                 break;
             case FULLTEXT:
             default:
                 log.info("使用全文搜索");
-                executeFulltextSearchWithSources(query, robot.getKbUid(), searchResultList,
+                executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
                         sourceReferences);
                 break;
         }
@@ -203,10 +209,24 @@ public class KnowledgeBaseSearchHelper {
     /**
      * 执行全文搜索并填充结果与来源引用
      */
-    public void executeFulltextSearchWithSources(String query, String kbUid,
+    public void executeFulltextSearchWithSources(String query, RobotProtobuf robot, String kbUid,
             List<FaqProtobuf> searchResultList,
             List<RobotContent.SourceReference> sourceReferences) {
-        List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null);
+
+        int recallLimit = DEFAULT_FULLTEXT_RECALL_LIMIT;
+        try {
+            Integer topK = (robot != null && robot.getLlm() != null) ? robot.getLlm().getTopK() : null;
+            if (topK != null && topK > 0) {
+                recallLimit = Math.max(DEFAULT_FULLTEXT_RECALL_LIMIT, topK);
+            }
+        } catch (Exception ex) {
+            log.debug("Compute fulltext recall limit failed, use default", ex);
+        }
+        if (recallLimit > MAX_FULLTEXT_RECALL_LIMIT) {
+            recallLimit = MAX_FULLTEXT_RECALL_LIMIT;
+        }
+
+        List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null, recallLimit);
         for (FaqElasticSearchResult withScore : searchResults) {
             FaqElastic faq = withScore.getFaqElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
@@ -223,7 +243,7 @@ public class KnowledgeBaseSearchHelper {
             sourceReferences.add(sourceRef);
         }
 
-        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null);
+        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null, recallLimit);
         for (TextElasticSearchResult withScore : textResults) {
             TextElastic text = withScore.getTextElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
@@ -240,7 +260,7 @@ public class KnowledgeBaseSearchHelper {
             sourceReferences.add(sourceRef);
         }
 
-        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null);
+        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null, recallLimit);
         for (ChunkElasticSearchResult withScore : chunkResults) {
             ChunkElastic chunk = withScore.getChunkElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
@@ -260,7 +280,7 @@ public class KnowledgeBaseSearchHelper {
             sourceReferences.add(sourceRef);
         }
 
-        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null);
+        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null, recallLimit);
         for (WebpageElasticSearchResult withScore : webpageResults) {
             WebpageElastic webpage = withScore.getWebpageElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
@@ -281,12 +301,26 @@ public class KnowledgeBaseSearchHelper {
     /**
      * 执行向量搜索并填充结果与来源引用
      */
-    public void executeVectorSearchWithSources(String query, String kbUid,
+    public void executeVectorSearchWithSources(String query, RobotProtobuf robot, String kbUid,
             List<FaqProtobuf> searchResultList,
             List<RobotContent.SourceReference> sourceReferences) {
+
+        // Vector 召回数量：默认 5；若配置了 topK，则至少取 topK；并设置上限防止过大查询
+        int recallLimit = DEFAULT_VECTOR_RECALL_LIMIT;
+        try {
+            Integer configuredTopK = (robot != null && robot.getLlm() != null) ? robot.getLlm().getTopK() : null;
+            if (configuredTopK != null && configuredTopK > 0) {
+                recallLimit = Math.max(DEFAULT_VECTOR_RECALL_LIMIT, configuredTopK);
+            }
+        } catch (Exception ex) {
+            log.debug("Read robot topK failed, use default vector recall limit", ex);
+        }
+        recallLimit = Math.min(recallLimit, MAX_VECTOR_RECALL_LIMIT);
+
         if (faqVectorService != null) {
             try {
-                List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null, 5);
+                List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null,
+                        recallLimit);
                 for (FaqVectorSearchResult withScore : searchResults) {
                     FaqVector faqVector = withScore.getFaqVector();
                     FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
@@ -309,7 +343,8 @@ public class KnowledgeBaseSearchHelper {
 
         if (textVectorService != null) {
             try {
-                List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null, 5);
+                List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null,
+                        recallLimit);
                 for (TextVectorSearchResult withScore : textResults) {
                     TextVector textVector = withScore.getTextVector();
                     FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
@@ -332,7 +367,8 @@ public class KnowledgeBaseSearchHelper {
 
         if (chunkVectorService != null) {
             try {
-                List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null, null, 5);
+                List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null,
+                        null, recallLimit);
                 for (ChunkVectorSearchResult withScore : chunkResults) {
                     ChunkVector chunkVector = withScore.getChunkVector();
                     FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
@@ -358,7 +394,8 @@ public class KnowledgeBaseSearchHelper {
 
         if (webpageVectorService != null) {
             try {
-                List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid, null, null, 5);
+                List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid,
+                        null, null, recallLimit);
                 for (WebpageVectorSearchResult withScore : webpageResults) {
                     WebpageVector webpageVector = withScore.getWebpageVector();
                     FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);

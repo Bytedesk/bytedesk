@@ -62,18 +62,19 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
 
     // 注意：Spring Cache 对 Optional 返回值会进行“解包”，SpEL 中 #result 可能是实体而非 Optional。
     // 因此 unless 不能写 #result.isEmpty()，否则会触发 SpelEvaluationException。
-    @Cacheable(value = "provider", key = "#uid", unless = "#result == null")
+    // 使用位置参数避免依赖编译参数 `-parameters`（否则 #uid 可能解析为 null，导致 key 为 null 报错）
+    @Cacheable(value = "provider", key = "#root.args[0]", condition = "#root.args[0] != null", unless = "#result == null")
     @Override
     public Optional<LlmProviderEntity> findByUid(String uid) {
         return llmProviderRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "provider", key = "#type + '-' + #orgUid", unless = "#result == null")
+    @Cacheable(value = "provider", key = "#root.args[0] + '-' + #root.args[1]", condition = "#root.args[0] != null && #root.args[1] != null", unless = "#result == null")
     public Optional<LlmProviderEntity> findByTypeAndOrgUid(String type, String orgUid) {
         return llmProviderRepository.findByTypeAndLevelAndOrgUidAndDeletedFalse(type, LevelEnum.ORGANIZATION.name(), orgUid);
     }
 
-    @Cacheable(value = "provider", key = "#type + '-' + #level", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "provider", key = "#root.args[0] + '-' + #root.args[1]", condition = "#root.args[0] != null && #root.args[1] != null", unless = "#result == null || #result.isEmpty()")
     public List<LlmProviderEntity> findByType(String type, String level) {
         return llmProviderRepository.findByTypeAndLevelAndDeletedFalse(type, level);
     }

@@ -13,10 +13,7 @@
  */
 package com.bytedesk.core.member;
 
-
-// import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -34,20 +31,18 @@ public class MemberEntityListener {
 
     @PostPersist
     public void postPersist(MemberEntity member) {
-        MemberEntity clonedMember = SerializationUtils.clone(member);
-        log.info("postPersist member {}", clonedMember.getUid());
+        log.info("postPersist member {}", member.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new MemberCreateEvent(this, clonedMember));
+        bytedeskEventPublisher.publishEvent(new MemberCreateEvent(this, member));
     }
     
     @PostUpdate
     public void postUpdate(MemberEntity member) {
-        MemberEntity clonedMember = SerializationUtils.clone(member);
-        log.info("postUpdate member {}", clonedMember.getUid());
+        log.info("postUpdate member {}", member.getUid());
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new MemberUpdateEvent(this, clonedMember));
+        bytedeskEventPublisher.publishEvent(new MemberUpdateEvent(this, member));
     }
 
 

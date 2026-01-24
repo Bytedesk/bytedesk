@@ -53,11 +53,14 @@ public class TicketResponse extends BaseResponse {
     private String priority;
     private String type;
     // 
-    private String topic;
-    private String visitorThreadTopic;
+    private String threadTopic;
     // 工单对话
     private String threadUid;
-    // 关联访客对话
+
+    // 访客端未读消息数量（用于工单列表“对话”按钮角标显示）
+    private Integer visitorUnreadCount;
+
+    // 内部工单：关联的客服会话（非工单会话）
     private String visitorThreadUid;
     // 
     private String categoryUid;

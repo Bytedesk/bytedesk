@@ -24,8 +24,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import lombok.Data;
+
 /**
- * @deprecated 使用ZhipuaiEmbeddingConfig
  * https://open.bigmodel.cn/dev/api#sdk_install
  * https://github.com/MetaGLM/zhipuai-sdk-java-v4
  * 

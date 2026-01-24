@@ -156,6 +156,16 @@ public class WebpageElasticService {
         log.info("网页全文搜索: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         return searchWebpageInternal(query, kbUid, categoryUid, orgUid, false, null);
     }
+
+    /**
+     * 全文搜索网页（可选限制返回数量）
+     *
+     * @param maxResults 最大结果数，为null则不限制
+     */
+    public List<WebpageElasticSearchResult> searchWebpage(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
+        log.info("网页全文搜索: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
+        return searchWebpageInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
+    }
     
     /**
      * 网页输入联想

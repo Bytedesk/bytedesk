@@ -258,7 +258,6 @@
 			<version>5.1.1</version>
 		</dependency>
 
-
 		<!-- 上传图片到阿里云OSS -->
 		<!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
 		<dependency>
@@ -294,6 +293,20 @@
 			<artifactId>minio</artifactId>
 			<version>8.5.17</version>
 		</dependency>
+
+		<!-- for workflow execution -->
+		<!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
+        <!-- <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+			<version>1.5.2</version>
+        </dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.redisson/redisson-spring-boot-starter -->
+		<!-- <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+			<version>4.1.0</version>
+        </dependency> -->
 
 	</dependencies>
 

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/core")
+@RequestMapping("/module/core")
 @Description("Core Route Controller - Core module route controller for handling core-related page requests")
 public class CoreRouteController {
 
@@ -40,7 +40,7 @@ public class CoreRouteController {
     @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
-    // http://127.0.0.1:9003/core/
+    // http://127.0.0.1:9003/module/core/
     @GetMapping({"", "/"})
     public String index(Model model) {
         if (!showDemo) {

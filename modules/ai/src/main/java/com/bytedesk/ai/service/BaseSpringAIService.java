@@ -114,13 +114,13 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     // 1. 核心消息处理方法
-    @Override
-    public void sendWebsocketMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-            MessageProtobuf messageProtobufReply) {
-        // WebSocket 功能暂未启用，方法保留以满足接口约定
-        log.info("sendWebsocketMessage is disabled temporarily; skipping WebSocket handling.");
-        return;
-    }
+    // @Override
+    // public void sendWebsocketMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
+    //         MessageProtobuf messageProtobufReply) {
+    //     // WebSocket 功能暂未启用，方法保留以满足接口约定
+    //     log.info("sendWebsocketMessage is disabled temporarily; skipping WebSocket handling.");
+    //     return;
+    // }
 
     @Override
     public void sendSseMessage(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
@@ -487,14 +487,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     /**
-     * 结构化输出：在保留现有 prompt +（可选）知识库上下文拼装逻辑的前提下，
+     * 结构化输出：在保留现有 prompt 逻辑的前提下，
      * 通过 ChatClient.entity(outputClass) 直接将 LLM 输出转换为 POJO。
      *
      * <p>
      * 使用方需自行在 query 中加入 BeanOutputConverter.getFormat() 等格式约束。
      * </p>
      */
-    public <T> T processSyncRequest(String query, RobotProtobuf robot, boolean searchKnowledgeBase, Class<T> outputClass) {
+    public <T> T processSyncRequest(String query, RobotProtobuf robot, Class<T> outputClass) {
         Assert.hasText(query, "Query must not be empty");
         Assert.notNull(outputClass, "OutputClass must not be null");
 
@@ -505,45 +505,45 @@ public abstract class BaseSpringAIService implements SpringAIService {
         }
 
         String prompt = robot.getLlm().getPrompt();
-        log.info("处理直接LLM请求(结构化): query={}, prompt={}, robot={}, searchKnowledgeBase={}, outputClass={}",
-                query, prompt, robot.getUid(), searchKnowledgeBase, outputClass.getSimpleName());
-
-        List<FaqProtobuf> searchResultList = new ArrayList<>();
-
-        if (searchKnowledgeBase) {
-            searchResultList = knowledgeBaseSearchHelper.searchKnowledgeBase(query, robot);
-            log.info("processDirectLlmRequest(结构化) searchResultList {}", searchResultList);
-        } else {
-            log.info("跳过知识库查询，直接使用提示词处理(结构化)");
-        }
+        log.info("处理直接LLM请求(结构化): query={}, prompt={}, robot={}, outputClass={}",
+            query, prompt, robot.getUid(), outputClass.getSimpleName());
 
         StringBuilder aiPrompt = new StringBuilder();
         if (StringUtils.hasText(prompt)) {
             aiPrompt.append(prompt);
         } else {
             aiPrompt.append(I18Consts.I18N_CONTEXT_BASED_ANSWER);
+            aiPrompt.append(query);
         }
-
-        if (!searchResultList.isEmpty()) {
-            String context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
-            log.info("processDirectLlmRequest(结构化) context {}", context);
-            aiPrompt.append(I18Consts.I18N_CONTEXT_LABEL).append(context).append("\n\n");
-        }
-
-        aiPrompt.append(I18Consts.I18N_QUESTION_LABEL).append(query);
 
         try {
-            return processPromptSync(aiPrompt.toString(), robot, outputClass);
+            if (chatClientInfoService == null) {
+                throw new IllegalStateException("ChatClientInfoService is not available");
+            }
+
+            String provider = null;
+            if (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextProvider())) {
+                provider = robot.getLlm().getTextProvider();
+            }
+
+            ChatClient chatClient = StringUtils.hasText(provider)
+                    ? chatClientInfoService.getChatClientByProvider(provider)
+                    : null;
+            if (chatClient == null) {
+                chatClient = chatClientInfoService.getPrimaryChatClient();
+            }
+
+            if (chatClient == null) {
+                throw new IllegalStateException("ChatClient is not available for provider: " + provider);
+            }
+
+            Prompt structuredPrompt = new Prompt(new UserMessage(aiPrompt.toString()));
+            return chatClient.prompt(structuredPrompt).call().entity(outputClass);
         } catch (Exception e) {
             log.error("处理LLM请求失败(结构化)", e);
             return null;
         }
     }
-
-    // 带prompt参数的抽象方法重载
-    // protected abstract void processPromptWebsocket(Prompt prompt, RobotProtobuf robot,
-    //         MessageProtobuf messageProtobufQuery,
-    //         MessageProtobuf messageProtobufReply);
 
     protected abstract void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences,
@@ -551,53 +551,5 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     // 带prompt参数的抽象方法重载
     protected abstract String processPromptSync(String message, RobotProtobuf robot);
-
-    /**
-     * 结构化输出：直接通过 ChatClient 的 entity(clazz) 将 LLM 输出转换为 POJO。
-     *
-     * <p>
-     * 使用方需自行在 message/prompt 中加入 BeanOutputConverter.getFormat() 等格式约束。
-     * </p>
-     */
-    public <T> T processPromptSync(String message, RobotProtobuf robot, Class<T> outputClass) {
-        Assert.hasText(message, "Message must not be empty");
-        Assert.notNull(outputClass, "OutputClass must not be null");
-
-        if (chatClientInfoService == null) {
-            throw new IllegalStateException("ChatClientInfoService is not available");
-        }
-
-        String provider = null;
-        if (robot != null && robot.getLlm() != null && StringUtils.hasText(robot.getLlm().getTextProvider())) {
-            provider = robot.getLlm().getTextProvider();
-        }
-
-        return processPromptSync(message, provider, outputClass);
-    }
-
-    /**
-     * 结构化输出（显式指定 provider）：例如 provider="dashscope"。
-     */
-    public <T> T processPromptSync(String message, String provider, Class<T> outputClass) {
-        Assert.hasText(message, "Message must not be empty");
-        Assert.notNull(outputClass, "OutputClass must not be null");
-
-        if (chatClientInfoService == null) {
-            throw new IllegalStateException("ChatClientInfoService is not available");
-        }
-
-        ChatClient chatClient = StringUtils.hasText(provider) ? chatClientInfoService.getChatClientByProvider(provider)
-                : null;
-        if (chatClient == null) {
-            chatClient = chatClientInfoService.getPrimaryChatClient();
-        }
-
-        if (chatClient == null) {
-            throw new IllegalStateException("ChatClient is not available for provider: " + provider);
-        }
-
-        Prompt prompt = new Prompt(new UserMessage(message));
-        return chatClient.prompt(prompt).call().entity(outputClass);
-    }
 
 }

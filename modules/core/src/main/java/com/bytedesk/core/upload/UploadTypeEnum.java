@@ -32,6 +32,7 @@ public enum UploadTypeEnum {
     CHAT, // 聊天对话
     TICKET, // 工单
     BPMN, // 流程图
+    CUSTOMER, // 客户
     WORKFLOW, // 工作流
     ATTACHMENT; // 附件
 

@@ -41,13 +41,15 @@ public class ThreadEventListener {
             ThreadTypeEnum.WORKGROUP.name(),
             ThreadTypeEnum.MEMBER.name(),
             ThreadTypeEnum.GROUP.name(),
-            ThreadTypeEnum.TICKET.name());
+            ThreadTypeEnum.TICKET_INTERNAL.name(),
+            ThreadTypeEnum.TICKET_EXTERNAL.name());
 
     private static final Set<String> ADD_TOPIC_IMMEDIATE_SUBSCRIBE_TYPES = Set.of(
             ThreadTypeEnum.AGENT.name(),
             ThreadTypeEnum.WORKGROUP.name(),
             ThreadTypeEnum.MEMBER.name(),
-            ThreadTypeEnum.TICKET.name()
+            ThreadTypeEnum.TICKET_INTERNAL.name(),
+            ThreadTypeEnum.TICKET_EXTERNAL.name()
         );
 
     private final TopicCacheService topicCacheService;

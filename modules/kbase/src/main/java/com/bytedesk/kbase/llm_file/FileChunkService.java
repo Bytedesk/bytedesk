@@ -50,6 +50,39 @@ public class FileChunkService {
     private static final int MAX_DOCUMENT_SIZE = 30000; // 单个文档最大字符数
 
     /**
+     * 根据切块配置对文档进行分割。
+     * TOKEN: 使用 TokenTextSplitter（失败则 fallback 到字符切分）
+     * CHARACTER: 字符切分
+     * PARAGRAPH: 段落切分（必要时再按字符切分）
+     */
+    public List<Document> splitDocuments(List<Document> documents, FileChunkingConfig config) {
+        FileChunkingConfig normalized = FileChunkingConfig.normalize(config);
+        if (documents == null || documents.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        if (normalized.getStrategy() == FileChunkingStrategyEnum.CHARACTER) {
+            return fallbackSplitDocuments(documents, normalized.getChunkSize(), normalized.getChunkOverlap());
+        }
+
+        if (normalized.getStrategy() == FileChunkingStrategyEnum.PARAGRAPH) {
+            return paragraphSplitDocuments(documents, normalized.getChunkSize(), normalized.getChunkOverlap());
+        }
+
+        // 默认 TOKEN
+        try {
+            var tokenTextSplitter = new TokenTextSplitter();
+            return tokenTextSplitter.split(documents);
+        } catch (UnsupportedOperationException e) {
+            log.warn("TokenTextSplitter 分割失败，使用替代方案: {}", e.getMessage());
+            return fallbackSplitDocuments(documents, normalized.getChunkSize(), normalized.getChunkOverlap());
+        } catch (Exception e) {
+            log.error("文档分割过程中发生错误: {}", e.getMessage(), e);
+            return fallbackSplitDocuments(documents, normalized.getChunkSize(), normalized.getChunkOverlap());
+        }
+    }
+
+    /**
      * 处理文件chunk切分 - 同步版本
      * 直接处理文档，不进行大小判断
      */
@@ -117,28 +150,12 @@ public class FileChunkService {
      * 专注于核心的文档切分和存储逻辑
      */
     public List<String> processFileChunksInternal(List<Document> documents, FileResponse fileResponse) {
-        
-        // 使用更安全的文本分割逻辑
-        List<Document> docList = new ArrayList<>();
-        try {
-            // 继续原有的分割和存储逻辑，但添加错误处理
-            var tokenTextSplitter = new TokenTextSplitter();
-            docList = tokenTextSplitter.split(documents);
-            log.info("TokenTextSplitter 分割成功，生成 {} 个文档块", docList.size());
-        } catch (UnsupportedOperationException e) {
-            log.warn("TokenTextSplitter 分割失败，使用替代方案: {}", e.getMessage());
-            log.info("开始执行fallback分割，输入文档数量: {}", documents.size());
-            // 使用简单的字符数分割作为备选方案
-            docList = fallbackSplitDocuments(documents);
-            log.info("fallback分割执行完成");
-        } catch (Exception e) {
-            log.error("文档分割过程中发生错误: {}", e.getMessage(), e);
-            log.info("开始执行fallback分割，输入文档数量: {}", documents.size());
-            // 使用简单的字符数分割作为备选方案
-            docList = fallbackSplitDocuments(documents);
-            log.info("fallback分割执行完成");
-        }
-        log.info("最终生成 {} 个文档块", docList.size());
+
+        // 根据文件配置进行分割（默认 TOKEN）
+        FileChunkingConfig config = FileChunkingConfig.fromFileResponse(fileResponse);
+        List<Document> docList = splitDocuments(documents, config);
+        log.info("最终生成 {} 个文档块，strategy: {}, chunkSize: {}, overlap: {}",
+                docList.size(), config.getStrategy(), config.getChunkSize(), config.getChunkOverlap());
         
         // 创建chunk记录
         List<String> docIdList = new ArrayList<>();
@@ -169,14 +186,16 @@ public class FileChunkService {
     }
 
     /**
-     * 备选的文档分割方案 - 基于字符数的简单分割
-     * 当TokenTextSplitter失败时使用
+     * 备选的文档分割方案 - 基于字符数的简单分割（可配置）
      */
-    private List<Document> fallbackSplitDocuments(List<Document> documents) {
+    private List<Document> fallbackSplitDocuments(List<Document> documents, int maxChunkSize, int overlap) {
         log.info("开始执行fallback分割，输入文档数量: {}", documents.size());
         List<Document> result = new ArrayList<>();
-        int maxChunkSize = 1000; // 减小每个块的最大字符数，避免内存问题
-        int overlap = 100; // 减小重叠字符数
+        maxChunkSize = Math.max(200, maxChunkSize);
+        overlap = Math.max(0, overlap);
+        if (overlap >= maxChunkSize) {
+            overlap = Math.max(0, maxChunkSize / 5);
+        }
         
         int docIndex = 0;
         int totalChunks = 0;
@@ -227,6 +246,51 @@ public class FileChunkService {
         }
         
         log.info("fallback分割完成，总共处理 {} 个文档，生成 {} 个文档块", docIndex, result.size());
+        return result;
+    }
+
+    /**
+     * 段落切分：按空行分段；过长段落再按字符切分。
+     */
+    private List<Document> paragraphSplitDocuments(List<Document> documents, int maxChunkSize, int overlap) {
+        List<Document> result = new ArrayList<>();
+        if (documents == null || documents.isEmpty()) {
+            return result;
+        }
+
+        maxChunkSize = Math.max(200, maxChunkSize);
+        overlap = Math.max(0, overlap);
+        if (overlap >= maxChunkSize) {
+            overlap = Math.max(0, maxChunkSize / 5);
+        }
+
+        for (Document doc : documents) {
+            String text = doc.getText();
+            if (text == null || text.trim().isEmpty()) {
+                continue;
+            }
+
+            // 统一换行
+            String normalized = text.replace("\r\n", "\n").replace("\r", "\n");
+            String[] paragraphs = normalized.split("\\n\\s*\\n+");
+
+            for (String p : paragraphs) {
+                if (p == null) {
+                    continue;
+                }
+                String paragraph = cleanSpecialCharacters(p).trim();
+                if (paragraph.isEmpty()) {
+                    continue;
+                }
+
+                if (paragraph.length() <= maxChunkSize) {
+                    result.add(new Document(paragraph, doc.getMetadata()));
+                } else {
+                    result.addAll(splitSingleDocument(paragraph, doc.getMetadata(), maxChunkSize, overlap));
+                }
+            }
+        }
+
         return result;
     }
     

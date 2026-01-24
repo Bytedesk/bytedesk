@@ -110,6 +110,16 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
+    // 是否启用自定义服务器（域名/IP），用于私有化/自定义部署入口
+    @Builder.Default
+    @Column(name = "is_custom_server_enabled")
+    private Boolean customServerEnabled = false;
+
+    // 自定义服务器域名或 IP（如：im.example.com 或 10.0.0.8）
+    @Builder.Default
+    @Column(name = "custom_server_host")
+    private String customServerHost = BytedeskConsts.EMPTY_STRING;
+
     // 组织管理员
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

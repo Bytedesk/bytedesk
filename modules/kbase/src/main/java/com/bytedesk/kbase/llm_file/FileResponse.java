@@ -46,6 +46,15 @@ public class FileResponse extends BaseResponse {
 
     private String fileType;
 
+    // 切块策略：TOKEN / CHARACTER / PARAGRAPH
+    private String chunkingStrategy;
+
+    // 切块大小（字符数）
+    private Integer chunkSize;
+
+    // 重叠大小（字符数）
+    private Integer chunkOverlap;
+
     private String elasticStatus;
 
     private String vectorStatus;

@@ -26,6 +26,10 @@ public class BytedeskConsts {
     // bytedesk
     public static final String PLATFORM_BYTEDESK = "BYTEDESK";
     public static final String TRACE_ID = "traceId";
+    public static final String TRACE_ID_HTTP_HEADER = "X-Trace-Id";
+    // HTTP correlation id
+    public static final String REQUEST_ID = "X-Request-Id";
+    public static final String REQUEST_ID_MDC = "requestId";
     // 空字符串
     public static final String EMPTY_STRING = "";
     public static final String EMPTY_JSON_STRING = "{}";

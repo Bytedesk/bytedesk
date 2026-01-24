@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.slf4j.MDC;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -36,34 +38,42 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class TraceIdFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
         String traceId = httpRequest.getHeader(BytedeskConsts.TRACE_ID);
-        if (traceId == null) {
+        if (traceId == null || traceId.isBlank()) {
             traceId = UUID.randomUUID().toString();
         }
 
-        // 设置到ThreadLocal，方便后续在业务代码中获取
-        MDC.put(BytedeskConsts.TRACE_ID, traceId);
-
-        // 添加到响应头，便于下游服务获取
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpResponse.setHeader(BytedeskConsts.TRACE_ID, traceId);
-
-        chain.doFilter(request, response);
+        try {
+            MDC.put(BytedeskConsts.TRACE_ID, traceId);
+            httpResponse.setHeader(BytedeskConsts.TRACE_ID, traceId);
+            httpResponse.setHeader(BytedeskConsts.TRACE_ID_HTTP_HEADER, traceId);
+            exposeHeaderIfNeeded(httpResponse, BytedeskConsts.TRACE_ID);
+            exposeHeaderIfNeeded(httpResponse, BytedeskConsts.TRACE_ID_HTTP_HEADER);
+            chain.doFilter(request, response);
+        } finally {
+            MDC.remove(BytedeskConsts.TRACE_ID);
+        }
     }
-    
-    @Override
-    public void destroy() {
-        log.info("TraceIdFilter destroy");
-        // 请求处理完成后，清理ThreadLocal中存储的traceId
-        // MDC.clear();
-        MDC.remove(BytedeskConsts.TRACE_ID);
+
+    private static void exposeHeaderIfNeeded(HttpServletResponse response, String headerName) {
+        String existing = response.getHeader("Access-Control-Expose-Headers");
+        if (existing == null || existing.isBlank()) {
+            response.setHeader("Access-Control-Expose-Headers", headerName);
+            return;
+        }
+        String lc = existing.toLowerCase();
+        if (!lc.contains(headerName.toLowerCase())) {
+            response.setHeader("Access-Control-Expose-Headers", existing + ", " + headerName);
+        }
     }
-    
+
 }

@@ -14,21 +14,19 @@
 //  */
 package com.bytedesk.core.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.bytedesk.core.config.idempotency.IdempotencyInterceptor;
+// import com.bytedesk.core.config.idempotency.IdempotencyInterceptor;
 
 @Configuration
 @Description("Core Web MVC Configuration - 核心Web MVC配置类，配置静态资源等基础功能")
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Autowired(required = false)
-    private IdempotencyInterceptor idempotencyInterceptor;
+    // @Autowired(required = false)
+    // private IdempotencyInterceptor idempotencyInterceptor;
 
     // https://www.baeldung.com/spring-mvc-static-resources
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
@@ -50,39 +48,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        if (idempotencyInterceptor != null) {
-            registry.addInterceptor(idempotencyInterceptor)
-                    .addPathPatterns("/api/**");
-        }
-    }
-
     // @Override
-    // public void addFormatters(FormatterRegistry registry) {
-    //     // 兼容前端在 query 参数中传递 superUser=undefined 的情况。
-    //     // 这里将 "undefined"/"null"/空字符串 统一视为 false，避免参数绑定阶段报错。
-    //     registry.addConverter(new Converter<String, Boolean>() {
-    //         @Override
-    //         public Boolean convert(String source) {
-    //             if (source == null) {
-    //                 return null;
-    //             }
-    //             String value = source.trim();
-    //             if (value.isEmpty()) {
-    //                 return Boolean.FALSE;
-    //             }
-    //             value = value.toLowerCase(Locale.ROOT);
-    //             if ("undefined".equals(value) || "null".equals(value)) {
-    //                 return Boolean.FALSE;
-    //             }
-    //             return switch (value) {
-    //                 case "true", "on", "yes", "1" -> Boolean.TRUE;
-    //                 case "false", "off", "no", "0" -> Boolean.FALSE;
-    //                 default -> throw new IllegalArgumentException("Invalid boolean value [" + source + "]");
-    //             };
-    //         }
-    //     });
+    // public void addInterceptors(InterceptorRegistry registry) {
+    //     if (idempotencyInterceptor != null) {
+    //         registry.addInterceptor(idempotencyInterceptor)
+    //                 .addPathPatterns("/api/**");
+    //     }
     // }
 
 }

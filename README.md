@@ -15,10 +15,7 @@
 
 AI powered Omnichannel customer service With Team Cooperation
 
-## Language
-
-- [English](./readme.md)
-- [中文](./readme.zh.md)
+**Language:** [English](README.md) | [中文](README.zh.md)
 
 ## Admin Dashboard
 

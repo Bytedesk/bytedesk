@@ -74,6 +74,12 @@ public class OrganizationRequest extends BaseRequestNoOrg {
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
 
+    // 是否启用自定义服务器（域名/IP）
+    private Boolean customServerEnabled;
+
+    // 自定义服务器域名或 IP
+    private String customServerHost;
+
     // 组织管理员， 父类中已存在
     // private String userUid;
 

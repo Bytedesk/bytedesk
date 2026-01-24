@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/ticket")
+@RequestMapping("/module/ticket")
 @Description("Ticket Route Controller - Ticket module route controller for handling ticket-related page requests")
 public class TicketRouteController {
 
@@ -40,7 +40,7 @@ public class TicketRouteController {
     @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
-    // http://127.0.0.1:9003/ticket/
+    // http://127.0.0.1:9003/module/ticket/
     @GetMapping({"", "/"})
     public String index(Model model) {
         if (!showDemo) {

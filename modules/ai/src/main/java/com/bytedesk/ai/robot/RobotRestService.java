@@ -92,24 +92,29 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
     private final RobotSettingsRestService robotSettingsRestService;
 
-    // @Cacheable(value = CACHE_ENTITY, key = "'uid_' + #uid", condition = "#uid != null", unless = "T(org.springframework.util.ObjectUtils).isEmpty(#result)")
+    // @Cacheable(value = CACHE_ENTITY, key = "'uid_' + #uid", condition = "#uid !=
+    // null", unless = "T(org.springframework.util.ObjectUtils).isEmpty(#result)")
     @Override
     public Optional<RobotEntity> findByUid(String uid) {
         return robotRepository.findByUid(uid);
     }
 
     // 根据名称和组织id查询机器人，并且未删除
-    // @Cacheable(value = CACHE_NAME_ORG, key = "'name_org_' + #name + '_' + #orgUid", condition = "#name != null && #orgUid != null", unless = "T(org.springframework.util.ObjectUtils).isEmpty(#result)")
+    // @Cacheable(value = CACHE_NAME_ORG, key = "'name_org_' + #name + '_' +
+    // #orgUid", condition = "#name != null && #orgUid != null", unless =
+    // "T(org.springframework.util.ObjectUtils).isEmpty(#result)")
     public Optional<RobotEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid) {
         return robotRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
-    // @Cacheable(value = CACHE_EXISTS, key = "'exists_' + #uid", condition = "#uid != null", unless = "#result == null")
+    // @Cacheable(value = CACHE_EXISTS, key = "'exists_' + #uid", condition = "#uid
+    // != null", unless = "#result == null")
     public Boolean existsByUid(String uid) {
         return robotRepository.existsByUidAndDeleted(uid, false);
     }
 
-    // @Cacheable(value = CACHE_RESP, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", unless = "#result == null")
+    // @Cacheable(value = CACHE_RESP, key = "'uid_' + #request.uid", condition =
+    // "#request != null && #request.uid != null", unless = "#result == null")
     @Override
     public RobotResponse queryByUid(RobotRequest request) {
         Optional<RobotEntity> robotOptional = findByUid(request.getUid());
@@ -300,20 +305,18 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         if (!StringUtils.hasText(robotUid)) {
             throw new RuntimeException("robotUid is required");
         }
-        Optional<RobotEntity> robotOptional = findByUid(robotProtobuf.getUid());
-        //findByNameAndOrgUidAndDeletedFalse(robotName, owner.getOrgUid());
-        if (!robotOptional.isPresent()) {
-            throw new RuntimeException("robot " + robotUid + " not found");
-        }
-        // String robotUid = robotOptional.get().getUid();
-        // String topic = null;
-        // if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
-        //     // org/robot/robotUid/userUid
-        //     topic = TopicUtils.formatOrgRobotThreadTopic(robotUid, owner.getUid());
-        // } else {
+        //
+        Optional<RobotEntity> robotOptional = null;
+        String topic = null;
+        if (RobotConsts.ROBOT_NAME_AGENT_ASSISTANT.equals(robotUid)) {
+            robotOptional = findByNameAndOrgUidAndDeletedFalse(robotUid, owner.getOrgUid());
+            // 客服助手 org/robot/robotUid/userUid
+            topic = TopicUtils.formatOrgRobotThreadTopic(robotUid, owner.getUid());
+        } else {
+            robotOptional = findByUid(robotProtobuf.getUid());
             // org/robot/robotUid/userUid/randomUid
-        String topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
-        // }
+            topic = TopicUtils.formatOrgRobotLlmThreadTopic(robotUid, owner.getUid(), uidUtils.getUid());
+        }
         // 如果没有强制创建新会话，则尝试获取已存在的会话并返回该会话信息
         if (!request.getForceNew()) {
             Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicAndOwner(topic, owner);
@@ -321,7 +324,10 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 return threadRestService.convertToResponse(threadOptional.get());
             }
         }
-        // 
+        if (!robotOptional.isPresent()) {
+            throw new RuntimeException("robot " + robotUid + " not found");
+        }
+        //
         RobotEntity robotEntity = robotOptional.get();
 
         // 从 UserProtobuf 中获取昵称和头像，如果没有则使用机器人默认值
@@ -330,11 +336,11 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         String userAvatar = null;
         if (userProtobuf != null) {
             userNickname = StringUtils.hasText(userProtobuf.getNickname())
-                ? userProtobuf.getNickname()
-                : robotEntity.getNickname();
+                    ? userProtobuf.getNickname()
+                    : robotEntity.getNickname();
             userAvatar = StringUtils.hasText(userProtobuf.getAvatar())
-                ? userProtobuf.getAvatar()
-                : AvatarConsts.getLlmThreadDefaultAvatar();
+                    ? userProtobuf.getAvatar()
+                    : AvatarConsts.getLlmThreadDefaultAvatar();
         } else {
             userNickname = robotEntity.getNickname();
             userAvatar = AvatarConsts.getLlmThreadDefaultAvatar();
@@ -571,7 +577,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
             // 默认仅初始化简体中文机器人；多语言 Prompt 由 enterprise/ai 的 Prompt 初始化负责
             createRobotIfAbsent(robotJson, level, orgUid, categoryUid, persistedSettings,
-                robotJson.getName(), resolveLocale(robotJson, LanguageEnum.ZH_CN));
+                    robotJson.getName(), resolveLocale(robotJson, LanguageEnum.ZH_CN));
         }
     }
 

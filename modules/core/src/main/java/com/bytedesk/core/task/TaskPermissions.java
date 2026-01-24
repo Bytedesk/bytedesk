@@ -20,6 +20,9 @@ public class TaskPermissions extends BasePermissions {
     // 模块前缀
     public static final String TASK_PREFIX = "TASK_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "TASK";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String TASK_READ = "TASK_READ";
     public static final String TASK_CREATE = "TASK_CREATE";
@@ -28,10 +31,10 @@ public class TaskPermissions extends BasePermissions {
     public static final String TASK_EXPORT = "TASK_EXPORT";
 
     // 新 PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
-    public static final String HAS_TASK_READ = "hasAuthority('TASK_READ')";
-    public static final String HAS_TASK_CREATE = "hasAuthority('TASK_CREATE')";
-    public static final String HAS_TASK_UPDATE = "hasAuthority('TASK_UPDATE')";
-    public static final String HAS_TASK_DELETE = "hasAuthority('TASK_DELETE')";
-    public static final String HAS_TASK_EXPORT = "hasAuthority('TASK_EXPORT')";
+    public static final String HAS_TASK_READ = "hasAuthority('" + TASK_READ + "')";
+    public static final String HAS_TASK_CREATE = "hasAuthority('" + TASK_CREATE + "')";
+    public static final String HAS_TASK_UPDATE = "hasAuthority('" + TASK_UPDATE + "')";
+    public static final String HAS_TASK_DELETE = "hasAuthority('" + TASK_DELETE + "')";
+    public static final String HAS_TASK_EXPORT = "hasAuthority('" + TASK_EXPORT + "')";
 
 }

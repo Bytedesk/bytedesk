@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/social")
+@RequestMapping("/module/social")
 public class SocialRouteController {
 
     @Value("${bytedesk.custom.show-demo:true}")
@@ -38,7 +38,7 @@ public class SocialRouteController {
     @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
-    // http://127.0.0.1:9003/social/
+    // http://127.0.0.1:9003/module/social/
     @GetMapping({"", "/"})
     public String index(Model model) {
         if (!showDemo) {

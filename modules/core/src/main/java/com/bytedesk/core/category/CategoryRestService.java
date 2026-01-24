@@ -33,6 +33,8 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -288,7 +290,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                 // 其他字段...
                 return save(freshEntity);
             } else {
-                throw new RuntimeException("Entity not found for UID: " + entity.getUid());
+                throw new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND);
             }
         } catch (Exception ex) {
             throw new RuntimeException("Failed to handle optimistic locking failure", ex);

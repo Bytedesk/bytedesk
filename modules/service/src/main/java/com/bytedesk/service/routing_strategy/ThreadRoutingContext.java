@@ -171,6 +171,18 @@ public class ThreadRoutingContext {
     private void registerMissingStrategiesByBeanName() {
         for (ThreadTypeEnum type : ThreadTypeEnum.values()) {
             if (!strategyMap.containsKey(type)) {
+                // 特殊处理：TICKET_INTERNAL 和 TICKET_EXTERNAL 都使用 ticketThreadStrategy
+                if (type == ThreadTypeEnum.TICKET_INTERNAL || type == ThreadTypeEnum.TICKET_EXTERNAL) {
+                    try {
+                        AbstractThreadRoutingStrategy strategy = applicationContext.getBean("ticketThreadStrategy", AbstractThreadRoutingStrategy.class);
+                        strategyMap.put(type, strategy);
+                        log.debug("Registered missing strategy by bean name: {} -> ticketThreadStrategy", type);
+                    } catch (Exception e) {
+                        log.warn("Failed to register ticket thread strategy for type {}: {}", type, e.getMessage());
+                    }
+                    continue;
+                }
+                
                 String beanName = generateBeanName(type);
                 try {
                     AbstractThreadRoutingStrategy strategy = applicationContext.getBean(beanName, AbstractThreadRoutingStrategy.class);

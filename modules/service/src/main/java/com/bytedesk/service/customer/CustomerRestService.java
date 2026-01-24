@@ -111,6 +111,7 @@ public class CustomerRestService extends BaseRestServiceWithExport<CustomerEntit
             updatedEntity.setDescription(request.getDescription());
             updatedEntity.setNotes(request.getNotes());
             updatedEntity.setTagList(request.getTagList());
+            updatedEntity.setCustomFieldList(request.getCustomFieldList());
             updatedEntity.setExtra(request.getExtra());
             // 
             CustomerEntity savedEntity = doSave(updatedEntity);
@@ -138,6 +139,7 @@ public class CustomerRestService extends BaseRestServiceWithExport<CustomerEntit
                 latestEntity.setMobile(entity.getMobile());
                 latestEntity.setNotes(entity.getNotes());
                 latestEntity.setTagList(entity.getTagList());
+                latestEntity.setCustomFieldList(entity.getCustomFieldList());
                 latestEntity.setExtra(entity.getExtra());
                 latestEntity.setVisitorUid(entity.getVisitorUid());
                 // 合并需要保留的数据

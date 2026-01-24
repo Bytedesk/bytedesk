@@ -56,4 +56,10 @@
 
     <include file="db/changelog/migration/260117_add_message_agent_reply_fields.xml" />
 
+    <include file="db/changelog/migration/260120_drop_ticket_visitor_thread_columns.xml" />
+
+    <include file="db/changelog/migration/260121_add_ticket_visitor_thread_uid.xml" />
+
+    <include file="db/changelog/migration/260122_add_org_custom_server_fields.xml" />
+
 </databaseChangeLog>

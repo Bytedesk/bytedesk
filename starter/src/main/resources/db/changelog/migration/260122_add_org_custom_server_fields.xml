@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 为组织增加“自定义服务器”配置字段：是否启用 + 域名/IP -->
+    <changeSet id="260122-add-organization-custom-server-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_organization" />
+                <not>
+                    <columnExists tableName="bytedesk_core_organization" columnName="is_custom_server_enabled" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add custom server fields to organization.</comment>
+        <addColumn tableName="bytedesk_core_organization">
+            <column name="is_custom_server_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true" />
+            </column>
+            <column name="custom_server_host" type="VARCHAR(255)" defaultValue="">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_core_organization" columnName="custom_server_host" />
+            <dropColumn tableName="bytedesk_core_organization" columnName="is_custom_server_enabled" />
+        </rollback>
+    </changeSet>
+
+    <!-- 回填默认值（对于现有数据） -->
+    <changeSet id="260122-backfill-organization-custom-server-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_organization" />
+            <columnExists tableName="bytedesk_core_organization" columnName="is_custom_server_enabled" />
+            <columnExists tableName="bytedesk_core_organization" columnName="custom_server_host" />
+        </preConditions>
+        <comment>Backfill default values for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_core_organization
+            SET is_custom_server_enabled = false
+            WHERE is_custom_server_enabled IS NULL;
+        </sql>
+        <sql>
+            UPDATE bytedesk_core_organization
+            SET custom_server_host = ''
+            WHERE custom_server_host IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -16,6 +16,7 @@ package com.bytedesk.service.visitor;
 import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,6 +102,11 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
             if (StringUtils.hasText(request.getNote())) {
                 visitor.setNote(request.getNote());
             }
+
+            // 用户自定义字段：允许前端按需更新
+            if (request.getCustomFieldList() != null) {
+                visitor.setCustomFieldList(request.getCustomFieldList());
+            }
             // 对比ip是否有变化
             if (visitor.getIp() == null || !visitor.getIp().equals(request.getIp())) {
                 // 更新浏览信息
@@ -136,7 +143,18 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
         visitor.setDeviceInfo(device);
         //
-        VisitorEntity savedVisitor = save(visitor);
+        VisitorEntity savedVisitor;
+        try {
+            savedVisitor = save(visitor);
+        } catch (DataIntegrityViolationException e) {
+            // 并发场景：两个请求同时 create，同一个 visitorUid+orgUid，后写会触发唯一键冲突。
+            // 这里回查并返回已有记录，保证 visitor init 幂等。
+            Optional<VisitorEntity> existing = findByVisitorUidAndOrgUid(request.getVisitorUid(), orgUid);
+            if (existing.isPresent()) {
+                return convertToResponse(existing.get());
+            }
+            throw e;
+        }
         if (savedVisitor == null) {
             throw new RuntimeException("visitor not saved");
         }
@@ -158,6 +176,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         visitor.setMobile(request.getMobile());
         visitor.setEmail(request.getEmail());
         visitor.setNote(request.getNote());
+		visitor.setCustomFieldList(request.getCustomFieldList());
         // visitor.setTagList(request.getTagList()); // 标签列表不在这里更新，使用 updateTagList 方法更新
         // 
         VisitorEntity savedVisitor = save(visitor);
@@ -189,7 +208,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return threadRoutingContext.createCsThread(request);
     }
 
-    @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
+    @Cacheable(value = "visitor", key = "#uid", unless = "#result == null || #result.isEmpty()")
     @Override
     public Optional<VisitorEntity> findByUid(@NonNull String uid) {
         // 如果参数为空，则返回空
@@ -200,7 +219,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     }
     
     @Transactional
-    @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null")
+    @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null || #result.isEmpty()")
     public Optional<VisitorEntity> findByVisitorUidAndOrgUid(@NonNull String visitorUid, @NonNull String orgUid) {
         // 如果参数为空，则返回空
         if (!StringUtils.hasText(visitorUid) || !StringUtils.hasText(orgUid)) {
@@ -217,7 +236,10 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return visitorRepository.updateStatusByUid(uid, newStatus);
     }
 
-    @CachePut(value = "visitor", key = "#entity.uid", unless = "#entity == null")
+    @Caching(put = {
+            @CachePut(value = "visitor", key = "#entity.uid", unless = "#entity == null"),
+            @CachePut(value = "visitor", key = "#entity.visitorUid + '-' + #entity.orgUid", unless = "#entity == null")
+    })
     @Override
     protected VisitorEntity doSave(VisitorEntity entity) {
         return visitorRepository.save(entity);
@@ -258,6 +280,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
                 latestEntity.setNote(entity.getNote());
                 latestEntity.setExtra(entity.getExtra());
                 latestEntity.setDeviceInfo(entity.getDeviceInfo());
+				latestEntity.setCustomFieldList(entity.getCustomFieldList());
                 return visitorRepository.save(latestEntity);
             }
         } catch (Exception ex) {

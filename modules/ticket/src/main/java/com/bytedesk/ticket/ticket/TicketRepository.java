@@ -19,6 +19,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecificationExecutor<TicketEntity> {
 
@@ -33,6 +35,12 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
     boolean existsByOrgUidAndTicketNumber(String orgUid, String ticketNumber);
 
     Optional<TicketEntity> findByProcessInstanceId(String processInstanceId);
+
+    Optional<TicketEntity> findFirstByOrgUidAndThreadUidOrderByCreatedAtDesc(String orgUid, String threadUid);
+
+    Page<TicketEntity> findByOrgUidAndThreadTopic(String orgUid, String threadTopic, Pageable pageable);
+
+    Page<TicketEntity> findByOrgUidAndVisitorThreadUid(String orgUid, String visitorThreadUid, Pageable pageable);
 
     List<TicketEntity> findByWorkgroupUidContainingAndCreatedAtBetween(
         String workgroupUid, ZonedDateTime startTime, ZonedDateTime endTime);
@@ -49,4 +57,10 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
 
     long countByStatus(String status);
     long countByStatusNot(String status);
+
+    long countByOrgUidAndStatusAndDeletedFalse(String orgUid, String status);
+
+    long countByOrgUidAndWorkgroupUidAndStatusAndDeletedFalse(String orgUid, String workgroupUid, String status);
+
+    long countByOrgUidAndDepartmentUidAndStatusAndDeletedFalse(String orgUid, String departmentUid, String status);
 } 

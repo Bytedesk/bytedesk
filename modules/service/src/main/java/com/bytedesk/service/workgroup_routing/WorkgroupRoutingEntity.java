@@ -59,13 +59,6 @@ public class WorkgroupRoutingEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
 
-    /**
-     * Type of workgroup_routing (CUSTOMER, TICKET, ARTICLE, etc.)
-     */
-    // @Builder.Default
-    // @Column(name = "workgroup_routing_type")
-    // private String type = WorkgroupRoutingTypeEnum.CUSTOMER.name();
-
     // ==================== Routing State (Workgroup -> Next Agent) ====================
 
     /**

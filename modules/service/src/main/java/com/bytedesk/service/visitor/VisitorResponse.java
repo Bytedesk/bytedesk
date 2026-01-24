@@ -17,6 +17,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.model.CustomFieldItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -70,6 +71,9 @@ public class VisitorResponse extends BaseResponse {
 	private String status;
 
 	private List<String> tagList;
+
+	// 用户自定义字段：字段昵称/字段key/字段值
+	private List<CustomFieldItem> customFieldList;
 
 	private String extra;
 

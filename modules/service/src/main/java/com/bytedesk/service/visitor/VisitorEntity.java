@@ -20,9 +20,11 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.CustomFieldItemListConverter;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.model.CustomFieldItem;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -96,6 +98,12 @@ public class VisitorEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> tagList = new ArrayList<>();
+
+	// 用户自定义字段：字段昵称/字段key/字段值（JSON）
+	@Builder.Default
+	@Convert(converter = CustomFieldItemListConverter.class)
+	@Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+	private List<CustomFieldItem> customFieldList = new ArrayList<>();
 
 	// extra info，开发者自定义URL参数，使用json格式存储，便于扩展
 	@Builder.Default

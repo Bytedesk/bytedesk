@@ -31,12 +31,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class AbstractRobotService {
-    
+
     /**
      * 获取RobotRestService实例，由子类实现
      */
     protected abstract RobotRestService getRobotRestService();
-    
+
     /**
      * 获取SpringAIServiceRegistry实例，由子类实现
      */
@@ -60,11 +60,13 @@ public abstract class AbstractRobotService {
     /**
      * 通用的直接调用 LLM 方法，支持自定义错误消息和控制是否查询知识库
      */
-    protected String processSyncRequest(String robotName, String orgUid, String query, String errorMessage, boolean searchKnowledgeBase) {
-        log.info("processSyncRequest robotName: {}, orgUid: {}, query: {}, searchKnowledgeBase: {}", 
+    protected String processSyncRequest(String robotName, String orgUid, String query, String errorMessage,
+            boolean searchKnowledgeBase) {
+        log.info("processSyncRequest robotName: {}, orgUid: {}, query: {}, searchKnowledgeBase: {}",
                 robotName, orgUid, query, searchKnowledgeBase);
 
-        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
+        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName,
+                orgUid);
         if (robotOptional.isPresent()) {
             String provider;
             if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
@@ -75,7 +77,8 @@ public abstract class AbstractRobotService {
             log.info("processSyncRequest provider: {}", provider);
 
             try {
-                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
+                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry()
+                        .getServiceByProviderName(provider);
                 RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotOptional.get());
                 //
                 return service.processSyncRequest(query, robot, searchKnowledgeBase);
@@ -92,17 +95,20 @@ public abstract class AbstractRobotService {
      * 通用的直接调用 LLM 方法（结构化输出）。
      *
      * <p>
-     * 保持与 {@link #processSyncRequest(String, String, String, String, boolean)} 一致的机器人选择逻辑，
-     * 但通过 {@link BaseSpringAIService#processSyncRequest(String, RobotProtobuf, boolean, Class)}
+     * 保持与 {@link #processSyncRequest(String, String, String, String, boolean)}
+     * 一致的机器人选择逻辑，
+     * 但通过
+     * {@link BaseSpringAIService#processSyncRequest(String, RobotProtobuf, Class)}
      * 直接返回结构化对象。
      * </p>
      */
     protected <T> T processSyncRequest(String robotName, String orgUid, String query, String errorMessage,
-            boolean searchKnowledgeBase, Class<T> outputClass) {
-        log.info("processSyncRequest(结构化) robotName: {}, orgUid: {}, query: {}, searchKnowledgeBase: {}, outputClass: {}",
-                robotName, orgUid, query, searchKnowledgeBase, outputClass != null ? outputClass.getSimpleName() : null);
+            Class<T> outputClass) {
+        log.info("processSyncRequest(结构化) robotName: {}, orgUid: {}, query: {}, outputClass: {}",
+                robotName, orgUid, query, outputClass != null ? outputClass.getSimpleName() : null);
 
-        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
+        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName,
+                orgUid);
         if (robotOptional.isPresent()) {
             String provider;
             if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
@@ -113,9 +119,10 @@ public abstract class AbstractRobotService {
             log.info("processSyncRequest(结构化) provider: {}", provider);
 
             try {
-                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
+                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry()
+                        .getServiceByProviderName(provider);
                 RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotOptional.get());
-                return service.processSyncRequest(query, robot, searchKnowledgeBase, outputClass);
+                return service.processSyncRequest(query, robot, outputClass);
             } catch (IllegalArgumentException e) {
                 log.warn("Provider {} not found for structured request", provider);
                 throw new RuntimeException(errorMessage);
@@ -127,11 +134,14 @@ public abstract class AbstractRobotService {
     /**
      * 通用的多模态直接调用 LLM 方法，支持图片URL输入
      */
-    protected String processMultiModalSyncRequest(String robotName, String orgUid, String textQuery, String imageUrl, String errorMessage, boolean searchKnowledgeBase) {
-        log.info("processMultiModalSyncRequest robotName: {}, orgUid: {}, textQuery: {}, imageUrl: {}, searchKnowledgeBase: {}", 
+    protected String processMultiModalSyncRequest(String robotName, String orgUid, String textQuery, String imageUrl,
+            String errorMessage, boolean searchKnowledgeBase) {
+        log.info(
+                "processMultiModalSyncRequest robotName: {}, orgUid: {}, textQuery: {}, imageUrl: {}, searchKnowledgeBase: {}",
                 robotName, orgUid, textQuery, imageUrl, searchKnowledgeBase);
 
-        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
+        Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName,
+                orgUid);
         if (robotOptional.isPresent()) {
             String provider;
             if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
@@ -142,14 +152,14 @@ public abstract class AbstractRobotService {
             log.info("processMultiModalSyncRequest provider: {}", provider);
 
             try {
-                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry().getServiceByProviderName(provider);
+                BaseSpringAIService service = (BaseSpringAIService) getSpringAIServiceRegistry()
+                        .getServiceByProviderName(provider);
                 RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotOptional.get());
-                
+
                 // 如果服务支持多模态处理（如ZhipuMultiModelService），使用多模态方法
                 if (service instanceof com.bytedesk.ai.zhipuai.ZhipuaiMultiModelService) {
-                    com.bytedesk.ai.zhipuai.ZhipuaiMultiModelService multiModelService = 
-                        (com.bytedesk.ai.zhipuai.ZhipuaiMultiModelService) service;
-                    
+                    com.bytedesk.ai.zhipuai.ZhipuaiMultiModelService multiModelService = (com.bytedesk.ai.zhipuai.ZhipuaiMultiModelService) service;
+
                     // 创建包含图片的MessageProtobuf
                     MessageProtobuf imageMessage = createImageMessage(imageUrl, textQuery);
                     return multiModelService.processMultiModalSyncRequest(imageMessage, robot, searchKnowledgeBase);
@@ -173,12 +183,12 @@ public abstract class AbstractRobotService {
     private MessageProtobuf createImageMessage(String imageUrl, String textQuery) {
         try {
             // 创建ImageContent
-            com.bytedesk.core.message.content.ImageContent imageContent = 
-                com.bytedesk.core.message.content.ImageContent.builder()
+            com.bytedesk.core.message.content.ImageContent imageContent = com.bytedesk.core.message.content.ImageContent
+                    .builder()
                     .url(imageUrl)
                     .label(textQuery)
                     .build();
-            
+
             return MessageProtobuf.builder()
                     .type(MessageTypeEnum.IMAGE)
                     .content(imageContent.toJson())

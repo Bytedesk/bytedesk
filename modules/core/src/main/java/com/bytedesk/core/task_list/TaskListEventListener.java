@@ -14,11 +14,11 @@
 package com.bytedesk.core.task_list;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
+import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.event.MemberCreateEvent;
+import com.bytedesk.core.rbac.user.UserEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +28,40 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TaskListEventListener {
 
-    private final TaskListRestService task_listRestService;
+    private final TaskListRestService taskListRestService;
 
-    @Order(3)
     @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        task_listRestService.initTaskLists(orgUid);
+    public void onMemberCreateEvent(MemberCreateEvent event) {
+        MemberEntity member = event.getMember();
+        if (member == null) {
+            log.warn("MemberCreateEvent has null member, source={}", event.getSource());
+            return;
+        }
+
+        UserEntity user = member.getUser();
+        if (user != null && user.getUid() != null) {
+            String userUid = user.getUid();
+            log.info("Creating default task list for member user: {}", userUid);
+            
+            TaskListRequest request = TaskListRequest.builder()
+                    .name("My Tasks")
+                    .description("Default task list")
+                    .userUid(userUid)
+                    .type(TaskListTypeEnum.TASK.name())
+                    .color("blue")
+                    .order(0)
+                    .archived(false)
+                    .build();
+            
+            try {
+                taskListRestService.create(request);
+                log.info("Default task list created successfully for user: {}", userUid);
+            } catch (Exception e) {
+                log.error("Failed to create default task list for user: {}", userUid, e);
+            }
+        } else {
+            log.warn("Member {} has no associated user", member.getUid());
+        }
     }
 
  
