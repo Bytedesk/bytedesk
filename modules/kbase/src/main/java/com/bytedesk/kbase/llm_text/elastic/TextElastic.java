@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_text.TextEntity;
 
@@ -32,7 +33,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "bytedesk_kbase_llm_text")
+@Document(indexName = "bytedesk_kbase_text")
 public class TextElastic {
     
     @Id
@@ -66,7 +67,7 @@ public class TextElastic {
     private String categoryUid;
 
     @Field(type = FieldType.Keyword)
-    private String kbaseUid;
+    private String kbUid;
 
     @Field(type = FieldType.Keyword)
     private List<String> docIdList;
@@ -81,6 +82,11 @@ public class TextElastic {
         if (entity == null) {
             return null;
         }
+
+        String kbUid = (entity.getKbase() != null) ? entity.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for indexing text uid=" + entity.getUid());
+        }
         
         return TextElastic.builder()
                 .uid(entity.getUid())
@@ -93,7 +99,7 @@ public class TextElastic {
                 // .startDate(entity.getStartDate())
                 // .endDate(entity.getEndDate())
                 .categoryUid(entity.getCategoryUid())
-                .kbaseUid(entity.getKbase() != null ? entity.getKbase().getUid() : null)
+                .kbUid(kbUid)
                 .docIdList(entity.getDocIdList())
                 .build();
     }

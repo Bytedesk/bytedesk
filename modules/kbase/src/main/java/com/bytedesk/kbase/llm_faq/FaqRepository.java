@@ -18,6 +18,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecificationExecutor<FaqEntity> {
 
@@ -40,4 +43,20 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
      */
     @org.springframework.data.jpa.repository.Query(value = "SELECT * FROM faq WHERE deleted = false ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<FaqEntity> findRandomFaq(@org.springframework.data.repository.query.Param("limit") int limit);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.elasticStatus = :status where f.uid = :uid")
+    int updateElasticStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.vectorStatus = :status where f.uid = :uid")
+    int updateVectorStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.docIdList = :docIdList where f.uid = :uid")
+    int updateDocIdListByUid(@Param("uid") String uid, @Param("docIdList") List<String> docIdList);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.kbase = :kbase where f.uid = :uid")
+    int updateKbaseByUid(@Param("uid") String uid, @Param("kbase") com.bytedesk.kbase.kbase.KbaseEntity kbase);
 }

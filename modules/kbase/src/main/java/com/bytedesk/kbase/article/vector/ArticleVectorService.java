@@ -337,7 +337,9 @@ public class ArticleVectorService {
                 .contentHtml(contentHtml)
                 .tagList(tagList)
                 .orgUid((String) metadata.getOrDefault("orgUid", ""))
-                .kbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""))
+                .kbUid((String) metadata.getOrDefault(
+                    KbaseConst.KBASE_KB_UID,
+                    metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, "")))
                 .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
                 .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
                 .build();

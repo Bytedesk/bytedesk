@@ -20,6 +20,9 @@ public class OrganizationApplyPermissions extends BasePermissions {
 	// 模块前缀
 	public static final String ORGANIZATION_APPLY_PREFIX = "ORGANIZATION_APPLY_";
 
+	// 模块名称，用于权限检查
+	public static final String MODULE_NAME = "ORGANIZATION_APPLY";
+
 	// 统一权限（不在权限字符串中编码层级）
 	public static final String ORGANIZATION_APPLY_READ = "ORGANIZATION_APPLY_READ";
 	public static final String ORGANIZATION_APPLY_CREATE = "ORGANIZATION_APPLY_CREATE";
@@ -27,11 +30,11 @@ public class OrganizationApplyPermissions extends BasePermissions {
 	public static final String ORGANIZATION_APPLY_DELETE = "ORGANIZATION_APPLY_DELETE";
 	public static final String ORGANIZATION_APPLY_EXPORT = "ORGANIZATION_APPLY_EXPORT";
 
-	// PreAuthorize 表达式
-	public static final String HAS_ORGANIZATION_APPLY_READ = "hasAuthority('ORGANIZATION_APPLY_READ')";
-	public static final String HAS_ORGANIZATION_APPLY_CREATE = "hasAuthority('ORGANIZATION_APPLY_CREATE')";
-	public static final String HAS_ORGANIZATION_APPLY_UPDATE = "hasAuthority('ORGANIZATION_APPLY_UPDATE')";
-	public static final String HAS_ORGANIZATION_APPLY_DELETE = "hasAuthority('ORGANIZATION_APPLY_DELETE')";
-	public static final String HAS_ORGANIZATION_APPLY_EXPORT = "hasAuthority('ORGANIZATION_APPLY_EXPORT')";
+	// PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+	public static final String HAS_ORGANIZATION_APPLY_READ = "hasAuthority('" + ORGANIZATION_APPLY_READ + "')";
+	public static final String HAS_ORGANIZATION_APPLY_CREATE = "hasAuthority('" + ORGANIZATION_APPLY_CREATE + "')";
+	public static final String HAS_ORGANIZATION_APPLY_UPDATE = "hasAuthority('" + ORGANIZATION_APPLY_UPDATE + "')";
+	public static final String HAS_ORGANIZATION_APPLY_DELETE = "hasAuthority('" + ORGANIZATION_APPLY_DELETE + "')";
+	public static final String HAS_ORGANIZATION_APPLY_EXPORT = "hasAuthority('" + ORGANIZATION_APPLY_EXPORT + "')";
 
 }

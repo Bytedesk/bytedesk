@@ -28,6 +28,23 @@ public class SseMessageHelper {
     @Autowired
     private PromptHelper promptHelper;
 
+    private boolean shouldPersist(SseEmitter emitter) {
+        if (emitter instanceof SsePersistenceControl persistControl) {
+            return persistControl.isPersistenceEnabled();
+        }
+        return true;
+    }
+
+    private void notifyConsumer(SseEmitter emitter, String messageJson) {
+        if (emitter instanceof SseMessageJsonConsumer consumer) {
+            try {
+                consumer.acceptMessageJson(messageJson);
+            } catch (Exception e) {
+                log.debug("SseMessageJsonConsumer threw exception: {}", e.getMessage());
+            }
+        }
+    }
+
     public void sendStreamStartMessage(
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply,
@@ -48,6 +65,7 @@ public class SseMessageHelper {
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_START);
                 messageProtobufReply.setContent(streamContent.toJson());
                 String startJson = messageProtobufReply.toJson();
+                notifyConsumer(emitter, startJson);
                 emitter.send(SseEmitter.event().data(startJson).id(messageProtobufReply.getUid()).name("message"));
             }
         } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
@@ -132,9 +150,12 @@ public class SseMessageHelper {
 
             // 默认按照提供的 isUnanswered 进行持久化标记
             boolean unanswered = isUnanswered != null ? isUnanswered.booleanValue() : false;
-            messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, unanswered);
-
             String messageJson = messageProtobufReply.toJson();
+            notifyConsumer(emitter, messageJson);
+
+            if (shouldPersist(emitter)) {
+                messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, unanswered);
+            }
             emitter.send(SseEmitter.event().data(messageJson).id(messageProtobufReply.getUid()).name("message"));
 
             if (completeAfterSend && !isEmitterCompleted(emitter)) {
@@ -189,11 +210,12 @@ public class SseMessageHelper {
 
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_END);
                 messageProtobufReply.setContent(endContent.toJson());
-                if (persistMessage) {
+                if (persistMessage && shouldPersist(emitter)) {
                     messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, false,
                             promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
                 }
                 String messageJson = messageProtobufReply.toJson();
+                notifyConsumer(emitter, messageJson);
                 emitter.send(SseEmitter.event().data(messageJson).id(messageProtobufReply.getUid()).name("message"));
                 emitter.complete();
             }
@@ -267,8 +289,11 @@ public class SseMessageHelper {
                         .build();
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_ERROR);
                 messageProtobufReply.setContent(errorContent.toJson());
-                messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true);
                 String messageJson = messageProtobufReply.toJson();
+                notifyConsumer(emitter, messageJson);
+                if (shouldPersist(emitter)) {
+                    messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                }
                 try {
                     emitter.send(
                             SseEmitter.event().data(messageJson).id(messageProtobufReply.getUid()).name("message"));
@@ -289,7 +314,9 @@ public class SseMessageHelper {
                         .build();
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_ERROR);
                 messageProtobufReply.setContent(errorContent.toJson());
-                messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                if (shouldPersist(emitter)) {
+                    messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true);
+                }
             }
         } catch (Exception e) {
             log.error("Error handling SSE error", e);

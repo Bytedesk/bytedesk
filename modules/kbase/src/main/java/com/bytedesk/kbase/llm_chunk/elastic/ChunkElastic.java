@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 
@@ -36,7 +37,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "bytedesk_kbase_llm_chunk")
+@Document(indexName = "bytedesk_kbase_chunk")
 public class ChunkElastic {
     
     @Id
@@ -79,8 +80,7 @@ public class ChunkElastic {
     private String categoryUid;
     
     @Field(type = FieldType.Keyword)
-    private String kbaseUid;
-
+    private String kbUid;
 
     /**
      * 将单个 ChunkEntity 转换为 ChunkElastic
@@ -91,6 +91,11 @@ public class ChunkElastic {
     public static ChunkElastic fromEntity(ChunkEntity entity) {
         if (entity == null) {
             return null;
+        }
+
+        String kbUid = (entity.getKbase() != null) ? entity.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for indexing chunk uid=" + entity.getUid());
         }
         
         return ChunkElastic.builder()
@@ -107,7 +112,7 @@ public class ChunkElastic {
                 .fileName(entity.getFile() != null ? entity.getFile().getFileName() : null)
                 .fileUrl(entity.getFile() != null ? entity.getFile().getFileUrl() : null)
                 .categoryUid(entity.getCategoryUid())
-                .kbaseUid(entity.getKbase() != null ? entity.getKbase().getUid() : null)
+                .kbUid(kbUid)
                 .build();
     }
     

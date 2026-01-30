@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
@@ -86,6 +87,20 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         
         VisitorResponse visitorResponse = visitorRestService.queryByUid(request);
         //
+        return ResponseEntity.ok(JsonResult.success(visitorResponse));
+    }
+
+    @ActionAnnotation(title = "访客", action = "查询详情", description = "query visitor by visitorUid")
+    @Operation(summary = "根据 visitorUid 查询访客", description = "根据 visitorUid + orgUid 查询访客详情")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = VisitorResponse.class)))
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
+    @GetMapping("/query/visitorUid")
+    public ResponseEntity<?> queryByVisitorUid(@RequestParam("orgUid") String orgUid,
+            @RequestParam("visitorUid") String visitorUid) {
+        VisitorRequest request = VisitorRequest.builder().orgUid(orgUid).visitorUid(visitorUid).build();
+        VisitorResponse visitorResponse = visitorRestService.queryByVisitorUid(request);
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 

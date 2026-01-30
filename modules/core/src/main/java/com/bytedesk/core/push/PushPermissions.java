@@ -20,6 +20,9 @@ public class PushPermissions extends BasePermissions {
     // 模块前缀
     public static final String PUSH_PREFIX = "PUSH_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "PUSH";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String PUSH_READ = "PUSH_READ";
     public static final String PUSH_CREATE = "PUSH_CREATE";
@@ -27,11 +30,11 @@ public class PushPermissions extends BasePermissions {
     public static final String PUSH_DELETE = "PUSH_DELETE";
     public static final String PUSH_EXPORT = "PUSH_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_PUSH_READ = "hasAuthority('PUSH_READ')";
-    public static final String HAS_PUSH_CREATE = "hasAuthority('PUSH_CREATE')";
-    public static final String HAS_PUSH_UPDATE = "hasAuthority('PUSH_UPDATE')";
-    public static final String HAS_PUSH_DELETE = "hasAuthority('PUSH_DELETE')";
-    public static final String HAS_PUSH_EXPORT = "hasAuthority('PUSH_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_PUSH_READ = "hasAuthority('" + PUSH_READ + "')";
+    public static final String HAS_PUSH_CREATE = "hasAuthority('" + PUSH_CREATE + "')";
+    public static final String HAS_PUSH_UPDATE = "hasAuthority('" + PUSH_UPDATE + "')";
+    public static final String HAS_PUSH_DELETE = "hasAuthority('" + PUSH_DELETE + "')";
+    public static final String HAS_PUSH_EXPORT = "hasAuthority('" + PUSH_EXPORT + "')";
 
 }

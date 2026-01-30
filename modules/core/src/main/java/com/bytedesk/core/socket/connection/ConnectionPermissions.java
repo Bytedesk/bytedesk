@@ -20,6 +20,9 @@ public class ConnectionPermissions extends BasePermissions {
     // 模块前缀
     public static final String CONNECTION_PREFIX = "CONNECTION_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "CONNECTION";
+
     // 统一权限（不区分层级）
     public static final String CONNECTION_READ = "CONNECTION_READ";
     public static final String CONNECTION_CREATE = "CONNECTION_CREATE";
@@ -27,11 +30,11 @@ public class ConnectionPermissions extends BasePermissions {
     public static final String CONNECTION_DELETE = "CONNECTION_DELETE";
     public static final String CONNECTION_EXPORT = "CONNECTION_EXPORT";
 
-    // PreAuthorize 表达式 - 统一权限（不区分层级）
-    public static final String HAS_CONNECTION_READ = "hasAuthority('CONNECTION_READ')";
-    public static final String HAS_CONNECTION_CREATE = "hasAuthority('CONNECTION_CREATE')";
-    public static final String HAS_CONNECTION_UPDATE = "hasAuthority('CONNECTION_UPDATE')";
-    public static final String HAS_CONNECTION_DELETE = "hasAuthority('CONNECTION_DELETE')";
-    public static final String HAS_CONNECTION_EXPORT = "hasAuthority('CONNECTION_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_CONNECTION_READ = "hasAuthority('" + CONNECTION_READ + "')";
+    public static final String HAS_CONNECTION_CREATE = "hasAuthority('" + CONNECTION_CREATE + "')";
+    public static final String HAS_CONNECTION_UPDATE = "hasAuthority('" + CONNECTION_UPDATE + "')";
+    public static final String HAS_CONNECTION_DELETE = "hasAuthority('" + CONNECTION_DELETE + "')";
+    public static final String HAS_CONNECTION_EXPORT = "hasAuthority('" + CONNECTION_EXPORT + "')";
 
 }

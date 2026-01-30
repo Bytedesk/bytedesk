@@ -20,6 +20,9 @@ public class AnnouncementPermissions extends BasePermissions {
     // 模块前缀
     public static final String ANNOUNCEMENT_PREFIX = "ANNOUNCEMENT_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "ANNOUNCEMENT";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String ANNOUNCEMENT_READ = "ANNOUNCEMENT_READ";
     public static final String ANNOUNCEMENT_CREATE = "ANNOUNCEMENT_CREATE";
@@ -27,11 +30,11 @@ public class AnnouncementPermissions extends BasePermissions {
     public static final String ANNOUNCEMENT_DELETE = "ANNOUNCEMENT_DELETE";
     public static final String ANNOUNCEMENT_EXPORT = "ANNOUNCEMENT_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_ANNOUNCEMENT_READ = "hasAuthority('ANNOUNCEMENT_READ')";
-    public static final String HAS_ANNOUNCEMENT_CREATE = "hasAuthority('ANNOUNCEMENT_CREATE')";
-    public static final String HAS_ANNOUNCEMENT_UPDATE = "hasAuthority('ANNOUNCEMENT_UPDATE')";
-    public static final String HAS_ANNOUNCEMENT_DELETE = "hasAuthority('ANNOUNCEMENT_DELETE')";
-    public static final String HAS_ANNOUNCEMENT_EXPORT = "hasAuthority('ANNOUNCEMENT_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_ANNOUNCEMENT_READ = "hasAuthority('" + ANNOUNCEMENT_READ + "')";
+    public static final String HAS_ANNOUNCEMENT_CREATE = "hasAuthority('" + ANNOUNCEMENT_CREATE + "')";
+    public static final String HAS_ANNOUNCEMENT_UPDATE = "hasAuthority('" + ANNOUNCEMENT_UPDATE + "')";
+    public static final String HAS_ANNOUNCEMENT_DELETE = "hasAuthority('" + ANNOUNCEMENT_DELETE + "')";
+    public static final String HAS_ANNOUNCEMENT_EXPORT = "hasAuthority('" + ANNOUNCEMENT_EXPORT + "')";
 
 }

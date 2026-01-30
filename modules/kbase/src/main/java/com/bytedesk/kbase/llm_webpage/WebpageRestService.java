@@ -17,12 +17,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.uid.UidUtils;
@@ -62,8 +65,29 @@ public class WebpageRestService
         return webpageRepository.findByUid(uid);
     }
 
+    /**
+     * 获取包含 kbase 关联的网页实体（不走缓存，避免缓存/序列化导致的关联丢失）。
+     */
+    @Transactional(readOnly = true)
+    public Optional<WebpageEntity> findByUidWithKbaseNoCache(String uid) {
+        return webpageRepository.findByUidWithKbase(uid);
+    }
+
+    /**
+     * 直接从数据库读取（不经过缓存）。
+     */
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public Optional<WebpageEntity> findByUidNoCache(String uid) {
+        return webpageRepository.findByUid(uid);
+    }
+
     @Cacheable(value = "webpage", key = "#kbUid", unless = "#result==null")
     public List<WebpageEntity> findByKbUid(String kbUid) {
+        return webpageRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<WebpageEntity> findByKbUidNoCache(String kbUid) {
         return webpageRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
@@ -77,7 +101,7 @@ public class WebpageRestService
         if (kbase.isPresent()) {
             entity.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
 
         WebpageEntity savedEntity = save(entity);
@@ -106,6 +130,29 @@ public class WebpageRestService
 
     protected WebpageEntity doSave(WebpageEntity entity) {
         return webpageRepository.save(entity);
+    }
+
+    /**
+     * 清空 Webpage 相关缓存。
+     */
+    @CacheEvict(value = "webpage", allEntries = true)
+    public void evictWebpageCacheAllEntries() {
+        // no-op
+    }
+
+    @Transactional
+    public void updateElasticStatusOnly(String uid, String elasticStatus) {
+        webpageRepository.updateElasticStatusByUid(uid, elasticStatus);
+    }
+
+    @Transactional
+    public void updateVectorStatusOnly(String uid, String vectorStatus) {
+        webpageRepository.updateVectorStatusByUid(uid, vectorStatus);
+    }
+
+    @Transactional
+    public void updateDocIdListOnly(String uid, List<String> docIdList) {
+        webpageRepository.updateDocIdListByUid(uid, docIdList);
     }
 
     @Override

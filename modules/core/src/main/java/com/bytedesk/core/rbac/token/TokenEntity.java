@@ -110,6 +110,12 @@ public class TokenEntity extends BaseEntity {
         this.revoked = true;
     }
 
+    // 撤销token（带原因）
+    public void revoke(String reason) {
+        this.revoked = true;
+        this.revokeReason = reason;
+    }
+
     // 刷新token过期时间
     public void refresh(ZonedDateTime newExpiresAt) {
         this.expiresAt = newExpiresAt;

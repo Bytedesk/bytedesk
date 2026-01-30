@@ -53,6 +53,11 @@ public class CustomerSpecification extends BaseSpecification<CustomerEntity, Cus
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
 
+            // visitorUid（绑定访客 uid）
+            if (StringUtils.hasText(request.getVisitorUid())) {
+                predicates.add(criteriaBuilder.like(root.get("visitorUid"), "%" + request.getVisitorUid() + "%"));
+            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

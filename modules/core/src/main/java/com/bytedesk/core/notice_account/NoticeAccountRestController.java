@@ -29,8 +29,8 @@ import lombok.RequiredArgsConstructor;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/channel")
-// @Tag(name = "channel - 频道", description = "channel apis")
+@RequestMapping("/api/v1/notice/account")
+// @Tag(name = "notice_account - 通知账号", description = "notice account apis")
 public class NoticeAccountRestController extends BaseRestController<NoticeAccountRequest, NoticeAccountRestService> {
 
     private final NoticeAccountRestService channelService;

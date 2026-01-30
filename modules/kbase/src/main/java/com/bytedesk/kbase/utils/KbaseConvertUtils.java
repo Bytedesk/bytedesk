@@ -60,6 +60,10 @@ public class KbaseConvertUtils {
     public static FaqResponse convertToFaqResponse(FaqEntity entity) {
         FaqResponse response = getModelMapper().map(entity, FaqResponse.class);
 
+        if (entity.getKbase() != null) {
+            response.setKbUid(entity.getKbase().getUid());
+        }
+
         // 处理相关问题，避免循环依赖
         if (entity.getRelatedFaqs() != null) {
             List<FaqResponseSimple> simpleFaqs = entity.getRelatedFaqs().stream()

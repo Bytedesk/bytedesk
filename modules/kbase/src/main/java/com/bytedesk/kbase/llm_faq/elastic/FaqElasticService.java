@@ -16,6 +16,8 @@ package com.bytedesk.kbase.llm_faq.elastic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -30,6 +32,7 @@ import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.llm_faq.FaqRequest;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.FaqStatusEnum;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -51,11 +54,183 @@ public class FaqElasticService {
 
     private final FaqRestService faqRestService;
 
+    private final KbaseRestService kbaseRestService;
+
+    public Map<String, Object> queryElasticByUid(FaqRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
+        FaqElastic doc = null;
+        if (indexExists) {
+            doc = elasticsearchOperations.get(uid, FaqElastic.class);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("indexExists", indexExists);
+        result.put("exists", doc != null);
+        result.put("doc", doc);
+        return result;
+    }
+
+    private FaqEntity ensureFaqHasKbase(FaqEntity faq, String kbUidHint) {
+        if (faq.getKbase() != null && StringUtils.hasText(faq.getKbase().getUid())) {
+            return faq;
+        }
+
+        if (!StringUtils.hasText(kbUidHint)) {
+            return faq;
+        }
+
+        var kbaseOpt = kbaseRestService.findByUid(kbUidHint);
+        if (kbaseOpt.isEmpty()) {
+            return faq;
+        }
+
+        // 只更新关联，避免 save 整实体覆盖其他状态字段
+        faqRestService.updateKbaseOnly(faq.getUid(), kbaseOpt.get());
+        faq.setKbase(kbaseOpt.get());
+        faqRestService.evictFaqCacheAllEntries();
+        return faq;
+    }
+
+    /**
+     * 同步FAQ的Elasticsearch索引状态到数据库
+     * - 如果索引不存在或文档不存在：将 elasticStatus 置为 NEW
+     * - 如果文档存在：将 elasticStatus 置为 SUCCESS
+     */
+    public FaqEntity syncElasticStatus(FaqRequest request) {
+        Optional<FaqEntity> faqOpt = faqRestService.findByUidNoCache(request.getUid());
+        if (faqOpt.isEmpty()) {
+            throw new RuntimeException("FAQ not found with UID: " + request.getUid());
+        }
+
+        FaqEntity faq = faqOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
+        boolean docExists = indexExists && elasticsearchOperations.exists(faq.getUid(), FaqElastic.class);
+
+        String nextStatus = docExists ? FaqStatusEnum.SUCCESS.name() : FaqStatusEnum.NEW.name();
+        faqRestService.updateElasticStatusOnly(faq.getUid(), nextStatus);
+        faqRestService.evictFaqCacheAllEntries();
+
+        return faqRestService.findByUidNoCache(faq.getUid())
+                .orElseThrow(() -> new RuntimeException("FAQ not found with UID: " + faq.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步FAQ的Elasticsearch索引状态到数据库
+     */
+    public Map<String, Object> syncElasticStatusByKbUid(FaqRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
+
+        int successCount = 0;
+        int newCount = 0;
+
+        for (FaqEntity faq : faqList) {
+            boolean docExists = indexExists && elasticsearchOperations.exists(faq.getUid(), FaqElastic.class);
+            if (docExists) {
+                faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.SUCCESS.name());
+                successCount++;
+            } else {
+                faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+                newCount++;
+            }
+        }
+        faqRestService.evictFaqCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", faqList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("indexExists", indexExists);
+        return result;
+    }
+
+    /**
+     * 根据知识库kbUid一键删除Elasticsearch中的FAQ索引，并同步更新FAQ实体elasticStatus
+     */
+    public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(FaqRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
+
+        long deletedCount = 0;
+
+        if (indexExists) {
+            Query query = NativeQuery.builder()
+                    .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                    .build();
+            DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
+            var response = elasticsearchOperations.delete(deleteQuery, FaqElastic.class);
+            deletedCount = response.getDeleted();
+        }
+
+        // 无论索引是否存在，都把数据库状态同步为NEW（只改 elasticStatus）
+        for (FaqEntity faq : faqList) {
+            faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+        }
+        faqRestService.evictFaqCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", faqList.size());
+        result.put("indexExists", indexExists);
+        result.put("deletedCount", deletedCount);
+        return result;
+    }
+
+    /**
+     * 删除FAQ在Elasticsearch中的索引，并同步更新数据库状态
+     * - 删除成功/或文档不存在：elasticStatus 置为 NEW
+     * - 删除失败：elasticStatus 置为 ERROR
+     */
+    public Boolean deleteIndexAndSyncStatus(FaqRequest request) {
+        Optional<FaqEntity> faqOpt = faqRestService.findByUidNoCache(request.getUid());
+        if (faqOpt.isEmpty()) {
+            throw new RuntimeException("FAQ not found with UID: " + request.getUid());
+        }
+
+        FaqEntity faq = faqOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
+        if (!indexExists) {
+            faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+            faqRestService.evictFaqCacheAllEntries();
+            return true;
+        }
+
+        Boolean deleted = deleteFaq(request.getUid());
+
+        if (Boolean.TRUE.equals(deleted)) {
+            faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+        } else {
+            faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+        }
+        faqRestService.evictFaqCacheAllEntries();
+        return deleted;
+    }
+
     // update elasticsearch index
     public void updateIndex(FaqRequest request) {
-        Optional<FaqEntity> faqOpt = faqRestService.findByUid(request.getUid());
+        Optional<FaqEntity> faqOpt = faqRestService.findByUidNoCache(request.getUid());
         if (faqOpt.isPresent()) {
             FaqEntity faq = faqOpt.get();
+            faq = ensureFaqHasKbase(faq, request.getKbUid());
             indexFaq(faq);
         } else {
             throw new RuntimeException("FAQ not found with UID: " + request.getUid());
@@ -64,9 +239,14 @@ public class FaqElasticService {
 
     // update all elasticsearch index
     public void updateAllIndex(FaqRequest request) {
-        List<FaqEntity> faqList = faqRestService.findByKbUid(request.getKbUid());
+        if (!StringUtils.hasText(request.getKbUid())) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(request.getKbUid());
         faqList.forEach(faq -> {
-            indexFaq(faq);
+            FaqEntity fixed = ensureFaqHasKbase(faq, request.getKbUid());
+            indexFaq(fixed);
         });
     }
 
@@ -79,6 +259,17 @@ public class FaqElasticService {
         log.info("索引FAQ: uid={}, question={}", faq.getUid(), faq.getQuestion());
 
         try {
+            // kbUid 必填：避免写入 Elasticsearch 文档时 kbUid 为空
+            if (faq.getKbase() == null || !StringUtils.hasText(faq.getKbase().getUid())) {
+                faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+                faqRestService.evictFaqCacheAllEntries();
+                throw new RuntimeException("kbUid is required (faq.kbase is null), uid=" + faq.getUid());
+            }
+
+            // 先标记为处理中（即使后续失败，也不会误显示为SUCCESS）
+            faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.PROCESSING.name());
+            faqRestService.evictFaqCacheAllEntries();
+
             // 首先检查索引是否存在，如果不存在则创建
             boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
             if (!indexExists) {
@@ -92,13 +283,11 @@ public class FaqElasticService {
 
                 if (!(created && mapped)) {
                     log.error("索引创建失败，无法继续索引文档: {}", faq.getUid());
-                    return;
+                    faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+                    faqRestService.evictFaqCacheAllEntries();
+                    throw new RuntimeException("索引创建失败，无法继续索引文档: " + faq.getUid());
                 }
             }
-            
-            // 更新索引状态
-            faq.setElasticStatus(FaqStatusEnum.PROCESSING.name());
-            faqRestService.save(faq);
 
             // 转换为Elasticsearch文档
             FaqElastic faqElastic = FaqElastic.fromFaqEntity(faq);
@@ -106,12 +295,22 @@ public class FaqElasticService {
             elasticsearchOperations.save(faqElastic);
             
             // 更新索引状态
-            faq.setElasticSuccess();
-            faqRestService.save(faq);
+            faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.SUCCESS.name());
+            faqRestService.evictFaqCacheAllEntries();
 
             log.info("FAQ索引成功: uid={}", faq.getUid());
         } catch (Exception e) {
             log.error("FAQ索引失败: uid={}, error={}", faq.getUid(), e.getMessage(), e);
+
+            // 失败时明确落库为 ERROR，避免卡在 PROCESSING 或保留旧的 SUCCESS
+            try {
+                faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+                faqRestService.evictFaqCacheAllEntries();
+            } catch (Exception saveEx) {
+                log.error("FAQ索引失败后更新状态为ERROR也失败: uid={}, error={}", faq.getUid(), saveEx.getMessage(), saveEx);
+            }
+
+            throw new RuntimeException("FAQ索引失败: " + faq.getUid(), e);
         }
     }
 

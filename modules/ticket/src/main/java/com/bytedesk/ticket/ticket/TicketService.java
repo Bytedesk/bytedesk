@@ -416,6 +416,7 @@ public class TicketService {
         // 
         String assigneeUid = request.getAssignee().getUid();
         Assert.notNull(assigneeUid, "处理人uid不能为空");
+        String assigneeName = request.getAssignee().getNickname();
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
@@ -445,7 +446,8 @@ public class TicketService {
 
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
-                TicketStatusEnum.TRANSFERRED.name(), "工单被转派给 " + assigneeUid);
+            TicketStatusEnum.TRANSFERRED.name(),
+            "工单被转派给 " + (StringUtils.hasText(assigneeName) ? assigneeName : assigneeUid));
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
 

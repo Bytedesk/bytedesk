@@ -141,6 +141,38 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
 
+    // delete elasticsearch index
+    @ActionAnnotation(title = "知识库网页", action = "删除索引", description = "delete webpage elastic index")
+    @PostMapping("/deleteIndex")
+    public ResponseEntity<?> deleteIndex(@RequestBody WebpageRequest request) {
+        Boolean deleted = webpageElasticService.deleteIndexAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(deleted));
+    }
+
+    // sync elasticsearch index status
+    @ActionAnnotation(title = "知识库网页", action = "同步索引状态", description = "sync webpage elastic status")
+    @PostMapping("/syncIndexStatus")
+    public ResponseEntity<?> syncIndexStatus(@RequestBody WebpageRequest request) {
+        var webpage = webpageElasticService.syncElasticStatus(request);
+        return ResponseEntity.ok(JsonResult.success(webpage.getElasticStatus()));
+    }
+
+    // sync elasticsearch index status by kbUid
+    @ActionAnnotation(title = "知识库网页", action = "批量同步索引状态", description = "sync webpage elastic status by kb")
+    @PostMapping("/syncIndexStatusByKbUid")
+    public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody WebpageRequest request) {
+        var result = webpageElasticService.syncElasticStatusByKbUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    // delete all elasticsearch index by kbUid
+    @ActionAnnotation(title = "知识库网页", action = "知识库删除索引", description = "delete webpage elastic index by kb")
+    @PostMapping("/deleteAllIndexByKbUid")
+    public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody WebpageRequest request) {
+        var result = webpageElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
     // update elasticsearch vector index
     @ActionAnnotation(title = "知识库网页", action = "更新向量索引", description = "update webpage vector index")
     @PostMapping("/updateVectorIndex")
@@ -151,6 +183,56 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         }
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+    }
+
+    // delete vector index
+    @ActionAnnotation(title = "知识库网页", action = "删除向量索引", description = "delete webpage vector index")
+    @PostMapping("/deleteVectorIndex")
+    public ResponseEntity<?> deleteVectorIndex(@RequestBody WebpageRequest request) {
+        if (webpageVectorService != null) {
+            Boolean deleted = webpageVectorService.deleteVectorIndexAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(deleted));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    // sync vector status
+    @ActionAnnotation(title = "知识库网页", action = "同步向量状态", description = "sync webpage vector status")
+    @PostMapping("/syncVectorStatus")
+    public ResponseEntity<?> syncVectorStatus(@RequestBody WebpageRequest request) {
+        if (webpageVectorService != null) {
+            var webpage = webpageVectorService.syncVectorStatus(request);
+            return ResponseEntity.ok(JsonResult.success(webpage.getVectorStatus()));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    @ActionAnnotation(title = "知识库网页", action = "查询全文索引", description = "query webpage elastic by uid")
+    @PostMapping("/queryElasticByUid")
+    public ResponseEntity<?> queryElasticByUid(@RequestBody WebpageRequest request) {
+        var result = webpageElasticService.queryElasticByUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @ActionAnnotation(title = "知识库网页", action = "查询向量索引", description = "query webpage vector by uid")
+    @PostMapping("/queryVectorByUid")
+    public ResponseEntity<?> queryVectorByUid(@RequestBody WebpageRequest request) {
+        if (webpageVectorService != null) {
+            var result = webpageVectorService.queryVectorByUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    // sync vector status by kbUid
+    @ActionAnnotation(title = "知识库网页", action = "批量同步向量状态", description = "sync webpage vector status by kb")
+    @PostMapping("/syncVectorStatusByKbUid")
+    public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody WebpageRequest request) {
+        if (webpageVectorService != null) {
+            var result = webpageVectorService.syncVectorStatusByKbUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
     // update elasticsearch all index
@@ -173,6 +255,17 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         }
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getKbUid()));
+    }
+
+    // delete all vector index by kbUid
+    @ActionAnnotation(title = "知识库网页", action = "知识库删除向量索引", description = "delete webpage vector index by kb")
+    @PostMapping("/deleteAllVectorIndexByKbUid")
+    public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody WebpageRequest request) {
+        if (webpageVectorService != null) {
+            var result = webpageVectorService.deleteAllVectorIndexByKbUidAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
     
 }

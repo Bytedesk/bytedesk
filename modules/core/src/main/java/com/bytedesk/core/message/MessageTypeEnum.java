@@ -111,6 +111,18 @@ public enum MessageTypeEnum {
     ARTICLE, // 文章
     BLOG, // 博客
     // 
+    PAY, // 支付
+    PAY_SUCCESS, // 支付成功
+    PAY_FAILURE, // 支付失败
+    REFUND, // 退款
+    REFUND_SUCCESS, // 退款成功
+    REFUND_FAILURE, // 退款失败
+    // 
+    LOGISTICS, // 物流
+    LOGISTICS_UPDATE, // 物流更新
+    LOGISTICS_DELIVERED, // 物流送达
+    LOGISTICS_EXCEPTION, // 物流异常
+    // 
     RATE_INVITE, // 邀请评价
     RATE, // 访客主动评价
     RATE_SUBMIT, // 访客提交评价

@@ -14,6 +14,12 @@
 package com.bytedesk.ai.robot;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.time.ZonedDateTime;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -23,13 +29,19 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.segment.SegmentService;
+import com.bytedesk.ai.service.BaseSpringAIService;
 import com.bytedesk.ai.service.SseMessageHelper;
 import com.bytedesk.ai.service.SpringAIServiceRegistry;
+import com.bytedesk.ai.service.SseMessageJsonConsumer;
+import com.bytedesk.ai.service.SsePersistenceControl;
+import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -59,6 +71,186 @@ public class RobotService extends AbstractRobotService {
     @Override
     protected SpringAIServiceRegistry getSpringAIServiceRegistry() {
         return springAIServiceRegistry;
+    }
+
+    /**
+     * 用指定 RobotEntity.uid 直接同步调用大模型（适合外部平台：飞书/公众号等）。
+     *
+     * <p>这是“无 Thread 上下文”的简单入口；更复杂的上下文/消息落库可在后续对齐 Thread/Message 管线。</p>
+     */
+    public String processSyncTextByRobotUid(String robotUid, String orgUid, String query, boolean searchKnowledgeBase) {
+        Assert.hasText(robotUid, "robotUid is required");
+        Assert.hasText(orgUid, "orgUid is required");
+        Assert.hasText(query, "query is required");
+
+        Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
+        if (robotOptional.isEmpty()) {
+            throw new RuntimeException("robot not found by uid: " + robotUid);
+        }
+
+        RobotEntity robotEntity = robotOptional.get();
+        if (StringUtils.hasText(robotEntity.getOrgUid()) && !orgUid.equals(robotEntity.getOrgUid())) {
+            throw new RuntimeException("robot does not belong to orgUid: " + orgUid);
+        }
+
+        if (robotEntity.getSettings() == null || robotEntity.getLlm() == null
+                || !StringUtils.hasText(robotEntity.getLlm().getTextProvider())) {
+            throw new RuntimeException(I18Consts.I18N_LLM_CONFIG_TIP);
+        }
+
+        String provider = robotEntity.getLlm().getTextProvider();
+        BaseSpringAIService service = (BaseSpringAIService) springAIServiceRegistry.getServiceByProviderName(provider);
+        RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotEntity);
+        return service.processSyncRequest(query, robot, searchKnowledgeBase);
+    }
+
+    /**
+     * 用指定 RobotEntity.uid 流式生成并聚合为最终文本返回（适合外部平台：飞书/公众号等）。
+     *
+     * <p>内部复用现有 SSE 流式链路，但通过收集器聚合 ROBOT_STREAM 的 answer 分片，最终返回一段文本。</p>
+     */
+    public String processStreamTextByRobotUid(String robotUid, String orgUid, String query, boolean searchKnowledgeBase) {
+        Assert.hasText(robotUid, "robotUid is required");
+        Assert.hasText(orgUid, "orgUid is required");
+        Assert.hasText(query, "query is required");
+
+        Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
+        if (robotOptional.isEmpty()) {
+            throw new RuntimeException("robot not found by uid: " + robotUid);
+        }
+
+        RobotEntity robotEntity = robotOptional.get();
+        if (StringUtils.hasText(robotEntity.getOrgUid()) && !orgUid.equals(robotEntity.getOrgUid())) {
+            throw new RuntimeException("robot does not belong to orgUid: " + orgUid);
+        }
+
+        if (robotEntity.getSettings() == null || robotEntity.getLlm() == null
+                || !StringUtils.hasText(robotEntity.getLlm().getTextProvider())) {
+            throw new RuntimeException(I18Consts.I18N_LLM_CONFIG_TIP);
+        }
+
+        String provider = robotEntity.getLlm().getTextProvider();
+        BaseSpringAIService service = (BaseSpringAIService) springAIServiceRegistry.getServiceByProviderName(provider);
+        RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotEntity);
+
+        // 外部平台没有内部 thread 上下文，这里构造一个“虚拟 thread”，用于 prompt helper 读取历史消息时不 NPE。
+        String seed = UUID.randomUUID().toString();
+        ThreadProtobuf thread = ThreadProtobuf.builder()
+                .uid("external-" + seed)
+                .topic("external/" + orgUid + "/" + robotUid)
+                .build();
+
+        MessageProtobuf messageProtobufQuery = MessageProtobuf.builder()
+                .uid("q-" + seed)
+                .type(MessageTypeEnum.TEXT)
+                .content(query)
+                .thread(thread)
+                .createdAt(ZonedDateTime.now())
+                .build();
+
+        MessageProtobuf messageProtobufReply = MessageProtobuf.builder()
+                .uid("r-" + seed)
+                .type(MessageTypeEnum.ROBOT_STREAM)
+                .content("")
+                .thread(thread)
+                .createdAt(ZonedDateTime.now())
+                .build();
+
+        final long timeoutMs = 45_000L;
+        CollectingSseEmitter collectingEmitter = new CollectingSseEmitter(timeoutMs);
+
+        try {
+            service.sendSseMessage(query, robot, messageProtobufQuery, messageProtobufReply, collectingEmitter);
+            String aggregated = collectingEmitter.awaitText(timeoutMs);
+            if (StringUtils.hasText(aggregated)) {
+                return aggregated;
+            }
+            String errorText = collectingEmitter.getErrorText();
+            if (StringUtils.hasText(errorText)) {
+                return errorText;
+            }
+            // 兜底：流式未产出有效内容时回退同步
+            return service.processSyncRequest(query, robot, searchKnowledgeBase);
+        } catch (Exception e) {
+            log.warn("processStreamTextByRobotUid failed, fallback to sync: {}", e.getMessage());
+            return service.processSyncRequest(query, robot, searchKnowledgeBase);
+        }
+    }
+
+    private static class CollectingSseEmitter extends SseEmitter implements SseMessageJsonConsumer, SsePersistenceControl {
+
+        private final StringBuilder answerBuilder = new StringBuilder();
+        private final CountDownLatch doneLatch = new CountDownLatch(1);
+        private final AtomicReference<String> errorTextRef = new AtomicReference<>(null);
+
+        CollectingSseEmitter(long timeoutMs) {
+            super(timeoutMs);
+            this.onCompletion(doneLatch::countDown);
+            this.onTimeout(doneLatch::countDown);
+            this.onError((ex) -> {
+                if (ex != null && errorTextRef.get() == null) {
+                    errorTextRef.compareAndSet(null, ex.getMessage());
+                }
+                doneLatch.countDown();
+            });
+        }
+
+        @Override
+        public boolean isPersistenceEnabled() {
+            return false;
+        }
+
+        @Override
+        public void acceptMessageJson(String messageJson) {
+            if (!StringUtils.hasText(messageJson)) {
+                return;
+            }
+            try {
+                MessageProtobuf message = MessageProtobuf.fromJson(messageJson);
+                if (message == null || message.getType() == null) {
+                    return;
+                }
+
+                switch (message.getType()) {
+                    case ROBOT_STREAM -> {
+                        RobotContent rc = RobotContent.fromJson(message.getContent(), RobotContent.class);
+                        if (rc != null && StringUtils.hasText(rc.getAnswer())) {
+                            answerBuilder.append(rc.getAnswer());
+                        }
+                    }
+                    case ROBOT_STREAM_END -> doneLatch.countDown();
+                    case ROBOT_STREAM_ERROR -> {
+                        RobotContent rc = RobotContent.fromJson(message.getContent(), RobotContent.class);
+                        String err = rc != null ? rc.getAnswer() : null;
+                        if (!StringUtils.hasText(err)) {
+                            err = rc != null ? rc.getReasonContent() : null;
+                        }
+                        if (StringUtils.hasText(err)) {
+                            errorTextRef.compareAndSet(null, err);
+                        }
+                        doneLatch.countDown();
+                    }
+                    default -> {
+                        // ignore
+                    }
+                }
+            } catch (Exception ignore) {
+                // ignore parse errors
+            }
+        }
+
+        String awaitText(long timeoutMs) {
+            try {
+                doneLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return answerBuilder.toString();
+        }
+
+        String getErrorText() {
+            return errorTextRef.get();
+        }
     }
 
     // 处理内部成员SSE请求消息

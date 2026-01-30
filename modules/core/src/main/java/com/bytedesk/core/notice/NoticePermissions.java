@@ -20,6 +20,9 @@ public class NoticePermissions extends BasePermissions {
     // 模块前缀
     public static final String NOTICE_PREFIX = "NOTICE_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "NOTICE";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String NOTICE_READ = "NOTICE_READ";
     public static final String NOTICE_CREATE = "NOTICE_CREATE";
@@ -27,11 +30,11 @@ public class NoticePermissions extends BasePermissions {
     public static final String NOTICE_DELETE = "NOTICE_DELETE";
     public static final String NOTICE_EXPORT = "NOTICE_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_NOTICE_READ = "hasAuthority('NOTICE_READ')";
-    public static final String HAS_NOTICE_CREATE = "hasAuthority('NOTICE_CREATE')";
-    public static final String HAS_NOTICE_UPDATE = "hasAuthority('NOTICE_UPDATE')";
-    public static final String HAS_NOTICE_DELETE = "hasAuthority('NOTICE_DELETE')";
-    public static final String HAS_NOTICE_EXPORT = "hasAuthority('NOTICE_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_NOTICE_READ = "hasAuthority('" + NOTICE_READ + "')";
+    public static final String HAS_NOTICE_CREATE = "hasAuthority('" + NOTICE_CREATE + "')";
+    public static final String HAS_NOTICE_UPDATE = "hasAuthority('" + NOTICE_UPDATE + "')";
+    public static final String HAS_NOTICE_DELETE = "hasAuthority('" + NOTICE_DELETE + "')";
+    public static final String HAS_NOTICE_EXPORT = "hasAuthority('" + NOTICE_EXPORT + "')";
 
 }

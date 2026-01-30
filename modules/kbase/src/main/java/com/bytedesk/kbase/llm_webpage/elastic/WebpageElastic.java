@@ -21,6 +21,7 @@ import com.bytedesk.core.utils.BdDateUtils;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 
@@ -84,9 +85,9 @@ public class WebpageElastic {
     
     // 从WebpageEntity创建WebpageElastic的静态方法
     public static WebpageElastic fromWebpageEntity(WebpageEntity webpage) {
-        String kbUid = "";
-        if (webpage.getKbase() != null) {
-            kbUid = webpage.getKbase().getUid();
+        String kbUid = (webpage.getKbase() != null) ? webpage.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for indexing webpage uid=" + webpage.getUid());
         }
         
         return WebpageElastic.builder()

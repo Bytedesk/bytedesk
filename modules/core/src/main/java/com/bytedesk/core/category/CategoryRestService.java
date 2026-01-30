@@ -217,7 +217,10 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         // entity.setIcon(request.getIcon());
         entity.setType(request.getType());
         // entity.setPlatform(request.getPlatform());
-        // 更新父类：若传入 parentUid，则关联到该父类；不存在则报错，不创建占位
+        // 更新父类：
+        // - parentUid 有值：关联到该父类
+        // - parentUid 为空字符串：清空父级（移动到顶级）
+        // - parentUid 为 null：不修改父级（兼容老客户端仅更新 name/type）
         if (StringUtils.hasText(request.getParentUid())) {
             String parentUid = request.getParentUid();
             // 若父类发生变化或当前无父类
@@ -236,6 +239,12 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                 if (parent.getChildren() != null && !parent.getChildren().contains(entity)) {
                     parent.getChildren().add(entity);
                 }
+            }
+        } else if (request.getParentUid() != null) {
+            // 明确传入 parentUid 但为空（例如 ""），表示用户选择“顶级（无上级）”
+            if (entity.getParent() != null) {
+                entity.getParent().getChildren().remove(entity);
+                entity.setParent(null);
             }
         }
         //
@@ -328,6 +337,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                     .comparingInt(c -> c.getOrder() == null ? Integer.MAX_VALUE : c.getOrder());
             List<CategoryResponse> childResponses = entity.getChildren().stream()
                     .filter(Objects::nonNull)
+                    .filter(c -> !c.isDeleted())
                     .filter(c -> c.getUid() == null || !visited.contains(c.getUid()))
                     .sorted(byOrder.thenComparing(c -> StringUtils.hasText(c.getName()) ? c.getName() : ""))
                     .map(c -> convertToResponseRecursive(c, visited))

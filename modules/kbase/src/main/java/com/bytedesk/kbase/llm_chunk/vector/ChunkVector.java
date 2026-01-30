@@ -19,6 +19,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 
@@ -103,15 +104,15 @@ public class ChunkVector {
      * 注意：向量嵌入需要单独计算并设置
      */
     public static ChunkVector fromChunkEntity(ChunkEntity chunk) {
-        String kbUid = "";
-        String fileUid = "";
-        String fileName = "";
-        String fileUrl = "";
-        
-        if (chunk.getKbase() != null) {
-            kbUid = chunk.getKbase().getUid();
+        String kbUid = (chunk.getKbase() != null) ? chunk.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing chunk uid=" + chunk.getUid());
         }
-        
+
+        String fileUid = null;
+        String fileName = null;
+        String fileUrl = null;
+
         if (chunk.getFile() != null) {
             fileUid = chunk.getFile().getUid();
             fileName = chunk.getFile().getFileName();

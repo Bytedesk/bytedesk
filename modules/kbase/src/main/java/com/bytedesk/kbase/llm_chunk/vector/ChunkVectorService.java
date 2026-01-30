@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.llm_chunk.vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +25,9 @@ import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
@@ -51,6 +54,52 @@ public class ChunkVectorService {
     private final ElasticsearchVectorStore vectorStore;
     
     private final ChunkRestService chunkRestService;
+
+    public Map<String, Object> queryVectorByUid(ChunkRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "CHUNK")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(10)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Map<String, Object>> docMaps = new ArrayList<>();
+        if (docs != null) {
+            for (Document doc : docs) {
+                Map<String, Object> docMap = new HashMap<>();
+                docMap.put("id", doc.getId());
+                docMap.put("content", doc.getText());
+                Map<String, Object> metadata = new HashMap<>(doc.getMetadata());
+                if (!metadata.containsKey(KbaseConst.KBASE_KB_UID)
+                        && metadata.containsKey(KbaseConst.KBASE_KB_UID_LEGACY)) {
+                    metadata.put(KbaseConst.KBASE_KB_UID, metadata.get(KbaseConst.KBASE_KB_UID_LEGACY));
+                    metadata.remove(KbaseConst.KBASE_KB_UID_LEGACY);
+                }
+                docMap.put("metadata", metadata);
+                docMaps.add(docMap);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("exists", docs != null && !docs.isEmpty());
+        result.put("total", docMaps.size());
+        result.put("docs", docMaps);
+        if (docs == null || docs.isEmpty()) {
+            result.put("message", "未查询到相关向量化信息");
+        }
+        return result;
+    }
     
     /**
      * 将chunk内容添加到向量存储中
@@ -66,7 +115,9 @@ public class ChunkVectorService {
             String content = chunk.getContent();
             
             // 处理标签，将其转化为字符串便于索引
-            String tags = String.join(",", chunk.getTagList());
+                String tags = (chunk.getTagList() == null || chunk.getTagList().isEmpty())
+                    ? ""
+                    : String.join(",", chunk.getTagList());
             
             // 元数据
             Map<String, Object> metadata = new java.util.HashMap<>();
@@ -78,6 +129,8 @@ public class ChunkVectorService {
             metadata.put("enabled", Boolean.toString(chunk.getEnabled()));
             metadata.put("tags", tags);
             metadata.put("type", chunk.getType());
+            // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
+            metadata.put("sourceType", "CHUNK");
             metadata.put("docId", chunk.getDocId() != null ? chunk.getDocId() : "");
             metadata.put("fileUid", chunk.getFile() != null ? chunk.getFile().getUid() : "");
             metadata.put("fileName", chunk.getFile() != null ? chunk.getFile().getFileName() : "");
@@ -93,20 +146,17 @@ public class ChunkVectorService {
             // 添加新文档
             vectorStore.add(List.of(document));
             
-            // 3. 更新Chunk实体的状态
-            // 设置向量索引状态为成功
-            chunk.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-            
-            // 更新Chunk实体
-            chunkRestService.save(chunk);
+            // 3. 仅更新向量状态（避免 detached entity 的版本冲突）
+            chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.SUCCESS.name());
+            chunkRestService.evictChunkCacheAllEntries();
             
             log.info("Chunk向量索引成功: {}", chunk.getName());
         } catch (Exception e) {
             log.error("Chunk向量索引失败: {}, 错误: {}", chunk.getName(), e.getMessage());
             
-            // 设置向量索引状态为失败
-            chunk.setVectorStatus(ChunkStatusEnum.ERROR.name());
-            chunkRestService.save(chunk);
+            // 仅更新向量状态（避免 detached entity 的版本冲突）
+            chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
+            chunkRestService.evictChunkCacheAllEntries();
             
             throw e;
         }
@@ -116,13 +166,13 @@ public class ChunkVectorService {
      * 更新chunk的向量索引
      * @param request chunk请求对象
      */
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void updateVectorIndex(ChunkRequest request) {
         log.info("更新chunk向量索引: {}", request.getName());
         
         try {
             // 获取Chunk实体
-            Optional<ChunkEntity> chunkOpt = chunkRestService.findByUid(request.getUid());
+            Optional<ChunkEntity> chunkOpt = chunkRestService.findByUidNoCache(request.getUid());
             
             if (!chunkOpt.isPresent()) {
                 log.error("找不到要更新的chunk: {}", request.getUid());
@@ -163,9 +213,12 @@ public class ChunkVectorService {
                 
                 // 保存更新后的实体
                 chunkRestService.save(chunk);
+                chunkRestService.evictChunkCacheAllEntries();
                 
                 // 重新索引
-                indexChunkVector(chunk);
+                ChunkEntity latestChunk = chunkRestService.findByUidNoCache(chunk.getUid())
+                        .orElseThrow(() -> new RuntimeException("Chunk not found with UID: " + chunk.getUid()));
+                indexChunkVector(latestChunk);
             } else {
                 log.info("Chunk内容无变化，不更新向量索引: {}", chunk.getName());
             }
@@ -176,13 +229,214 @@ public class ChunkVectorService {
     }
     
     // update all elasticsearch vector index
-    public void updateAllVectorIndex(ChunkRequest request) {
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUid(request.getKbUid());
-        chunkList.forEach(chunk -> {
-            // TODO: Implement vector indexing logic here
-            log.info("Vector index functionality not implemented yet for Chunk: {}", chunk.getUid());
-        });
-        log.info("Vector indexing requested for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
+    public Map<String, Object> updateAllVectorIndex(ChunkRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+
+        int total = chunkList.size();
+        int successCount = 0;
+        int errorCount = 0;
+
+        for (ChunkEntity chunk : chunkList) {
+            try {
+                // 标记处理中（便于前端观察状态变化）
+                chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.PROCESSING.name());
+
+                // 逐条重新索引（内部会根据结果写入 SUCCESS / ERROR）
+                ChunkEntity latestChunk = chunkRestService.findByUidNoCache(chunk.getUid())
+                        .orElse(chunk);
+                indexChunkVector(latestChunk);
+                successCount++;
+            } catch (Exception e) {
+                errorCount++;
+                log.warn("批量更新Chunk向量索引失败: uid={}, name={}, error={}", chunk.getUid(), chunk.getName(), e.getMessage());
+                // indexChunkVector 内部已尽力更新 ERROR，这里不再抛出，继续处理其它 chunk
+            }
+        }
+
+        chunkRestService.evictChunkCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", total);
+        result.put("success", successCount);
+        result.put("error", errorCount);
+
+        log.info("Updated vector index for {} chunks from knowledge base: {}, success={}, error={}", total, kbUid, successCount, errorCount);
+        return result;
+    }
+
+    /**
+     * 同步Chunk向量索引状态到数据库
+     */
+    public ChunkEntity syncVectorStatus(ChunkRequest request) {
+        Optional<ChunkEntity> chunkOpt = chunkRestService.findByUidNoCache(request.getUid());
+        if (chunkOpt.isEmpty()) {
+            throw new RuntimeException("Chunk not found with UID: " + request.getUid());
+        }
+
+        ChunkEntity chunk = chunkOpt.get();
+
+        boolean exists;
+        try {
+            exists = existsVectorDocumentByUid(chunk.getUid(), chunk.getName());
+        } catch (Exception e) {
+            log.error("同步Chunk向量状态失败: uid={}, error={}", chunk.getUid(), e.getMessage(), e);
+            chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
+            chunkRestService.evictChunkCacheAllEntries();
+            return chunkRestService.findByUidNoCache(chunk.getUid())
+                    .orElseThrow(() -> new RuntimeException("Chunk not found with UID: " + chunk.getUid()));
+        }
+
+        String nextStatus = exists ? ChunkStatusEnum.SUCCESS.name() : ChunkStatusEnum.NEW.name();
+        chunkRestService.updateVectorStatusOnly(chunk.getUid(), nextStatus);
+        chunkRestService.evictChunkCacheAllEntries();
+        return chunkRestService.findByUidNoCache(chunk.getUid())
+                .orElseThrow(() -> new RuntimeException("Chunk not found with UID: " + chunk.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步Chunk向量索引状态到数据库
+     */
+    public Map<String, Object> syncVectorStatusByKbUid(ChunkRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+
+        int successCount = 0;
+        int newCount = 0;
+        int errorCount = 0;
+
+        for (ChunkEntity chunk : chunkList) {
+            try {
+                boolean exists = existsVectorDocumentByUid(chunk.getUid(), chunk.getName());
+                if (exists) {
+                    chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.SUCCESS.name());
+                    successCount++;
+                } else {
+                    chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+                    newCount++;
+                }
+            } catch (Exception e) {
+                chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
+                errorCount++;
+            }
+        }
+
+        chunkRestService.evictChunkCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", chunkList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 按知识库kbUid批量删除Chunk向量索引，并同步更新数据库状态
+     */
+    public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(ChunkRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        int total = chunkList.size();
+
+        List<String> docIdsToDelete = new ArrayList<>();
+        for (ChunkEntity chunk : chunkList) {
+            docIdsToDelete.add("chunk_" + chunk.getUid());
+        }
+
+        int successCount = 0;
+        int errorCount = 0;
+
+        try {
+            if (!docIdsToDelete.isEmpty()) {
+                vectorStore.delete(docIdsToDelete);
+            }
+            for (ChunkEntity chunk : chunkList) {
+                chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+            }
+            successCount = total;
+        } catch (Exception e) {
+            log.warn("批量删除Chunk向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+            for (ChunkEntity chunk : chunkList) {
+                try {
+                    vectorStore.delete(List.of("chunk_" + chunk.getUid()));
+                    chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+                    successCount++;
+                } catch (Exception ex) {
+                    chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
+                    errorCount++;
+                }
+            }
+        }
+
+        chunkRestService.evictChunkCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", total);
+        result.put("success", successCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 删除Chunk向量索引，并同步更新数据库状态
+     */
+    public Boolean deleteVectorIndexAndSyncStatus(ChunkRequest request) {
+        Optional<ChunkEntity> chunkOpt = chunkRestService.findByUidNoCache(request.getUid());
+        if (chunkOpt.isEmpty()) {
+            throw new RuntimeException("Chunk not found with UID: " + request.getUid());
+        }
+
+        ChunkEntity chunk = chunkOpt.get();
+
+        Boolean deleted;
+        try {
+            vectorStore.delete(List.of("chunk_" + chunk.getUid()));
+            deleted = true;
+        } catch (Exception e) {
+            log.warn("删除Chunk向量索引失败: uid={}, error={}", chunk.getUid(), e.getMessage());
+            deleted = false;
+        }
+
+        if (Boolean.TRUE.equals(deleted)) {
+            chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+        } else {
+            chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
+        }
+
+        chunkRestService.evictChunkCacheAllEntries();
+        return deleted;
+    }
+
+    private boolean existsVectorDocumentByUid(String uid, String queryHint) {
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "CHUNK")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query((queryHint == null || queryHint.isBlank()) ? "ping" : queryHint)
+                .filterExpression(expression)
+                .topK(1)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        return docs != null && !docs.isEmpty();
     }
     
     /**
@@ -240,9 +494,12 @@ public class ChunkVectorService {
             
             // 构建查询条件
             FilterExpressionBuilder.Op enabledOp = expressionBuilder.eq("enabled", "true");
+
+            // 强制限定数据源类型，避免跨类型（FAQ/TEXT/WEBPAGE）文档误召回
+            FilterExpressionBuilder.Op sourceTypeOp = expressionBuilder.eq("sourceType", "CHUNK");
             
             // 添加可选的过滤条件
-            FilterExpressionBuilder.Op finalOp = enabledOp;
+            FilterExpressionBuilder.Op finalOp = expressionBuilder.and(enabledOp, sourceTypeOp);
             
             if (kbUid != null && !kbUid.isEmpty()) {
                 FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
@@ -282,7 +539,9 @@ public class ChunkVectorService {
                 String name = (String) metadata.getOrDefault("name", "");
                 String content = doc.getText();
                 String type = (String) metadata.getOrDefault("type", "");
-                String kbaseUid = (String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, "");
+                String kbaseUid = (String) metadata.getOrDefault(
+                    KbaseConst.KBASE_KB_UID,
+                    metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, ""));
                 String catUid = (String) metadata.getOrDefault("categoryUid", "");
                 String organization = (String) metadata.getOrDefault("orgUid", "");
                 String document = (String) metadata.getOrDefault("docId", "");

@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 
@@ -102,9 +103,9 @@ public class FaqVector {
      * 注意：向量嵌入需要单独计算并设置
      */
     public static FaqVector fromFaqEntity(FaqEntity faq) {
-        String kbUid = "";
-        if (faq.getKbase() != null) {
-            kbUid = faq.getKbase().getUid();
+        String kbUid = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing faq uid=" + faq.getUid());
         }
         
         return FaqVector.builder()

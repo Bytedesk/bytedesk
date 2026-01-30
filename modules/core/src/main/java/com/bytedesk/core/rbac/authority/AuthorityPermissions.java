@@ -20,6 +20,9 @@ public class AuthorityPermissions extends BasePermissions {
 	// 模块前缀
 	public static final String AUTHORITY_PREFIX = "AUTHORITY_";
 
+	// 模块名称，用于权限检查
+	public static final String MODULE_NAME = "AUTHORITY";
+
 	// 统一权限（不再在权限字符串中编码层级）
 	public static final String AUTHORITY_READ = "AUTHORITY_READ";
 	public static final String AUTHORITY_CREATE = "AUTHORITY_CREATE";
@@ -27,11 +30,11 @@ public class AuthorityPermissions extends BasePermissions {
 	public static final String AUTHORITY_DELETE = "AUTHORITY_DELETE";
 	public static final String AUTHORITY_EXPORT = "AUTHORITY_EXPORT";
 
-	// PreAuthorize 表达式
-	public static final String HAS_AUTHORITY_READ = "hasAuthority('AUTHORITY_READ')";
-	public static final String HAS_AUTHORITY_CREATE = "hasAuthority('AUTHORITY_CREATE')";
-	public static final String HAS_AUTHORITY_UPDATE = "hasAuthority('AUTHORITY_UPDATE')";
-	public static final String HAS_AUTHORITY_DELETE = "hasAuthority('AUTHORITY_DELETE')";
-	public static final String HAS_AUTHORITY_EXPORT = "hasAuthority('AUTHORITY_EXPORT')";
+	// PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+	public static final String HAS_AUTHORITY_READ = "hasAuthority('" + AUTHORITY_READ + "')";
+	public static final String HAS_AUTHORITY_CREATE = "hasAuthority('" + AUTHORITY_CREATE + "')";
+	public static final String HAS_AUTHORITY_UPDATE = "hasAuthority('" + AUTHORITY_UPDATE + "')";
+	public static final String HAS_AUTHORITY_DELETE = "hasAuthority('" + AUTHORITY_DELETE + "')";
+	public static final String HAS_AUTHORITY_EXPORT = "hasAuthority('" + AUTHORITY_EXPORT + "')";
 
 }

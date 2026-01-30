@@ -22,6 +22,8 @@ public class SmsPermissions extends BasePermissions {
 
     public static final String SMS_PREFIX = "SMS_";
 
+    public static final String MODULE_NAME = "SMS";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String SMS_READ = "SMS_READ";
     public static final String SMS_CREATE = "SMS_CREATE";
@@ -29,10 +31,10 @@ public class SmsPermissions extends BasePermissions {
     public static final String SMS_DELETE = "SMS_DELETE";
     public static final String SMS_EXPORT = "SMS_EXPORT";
 
-    // PreAuthorize 表达式 - 统一权限（不区分层级）
-    public static final String HAS_SMS_READ = "hasAuthority('SMS_READ')";
-    public static final String HAS_SMS_CREATE = "hasAuthority('SMS_CREATE')";
-    public static final String HAS_SMS_UPDATE = "hasAuthority('SMS_UPDATE')";
-    public static final String HAS_SMS_DELETE = "hasAuthority('SMS_DELETE')";
-    public static final String HAS_SMS_EXPORT = "hasAuthority('SMS_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_SMS_READ = "hasAuthority('" + SMS_READ + "')";
+    public static final String HAS_SMS_CREATE = "hasAuthority('" + SMS_CREATE + "')";
+    public static final String HAS_SMS_UPDATE = "hasAuthority('" + SMS_UPDATE + "')";
+    public static final String HAS_SMS_DELETE = "hasAuthority('" + SMS_DELETE + "')";
+    public static final String HAS_SMS_EXPORT = "hasAuthority('" + SMS_EXPORT + "')";
 }

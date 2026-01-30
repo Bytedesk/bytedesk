@@ -29,11 +29,11 @@ public class MemberPermissions extends BasePermissions {
     public static final String MEMBER_DELETE = "MEMBER_DELETE";
     public static final String MEMBER_EXPORT = "MEMBER_EXPORT";
 
-    // PreAuthorize 表达式 - 统一权限（不区分层级）
-    public static final String HAS_MEMBER_READ = "hasAuthority('MEMBER_READ')";
-    public static final String HAS_MEMBER_CREATE = "hasAuthority('MEMBER_CREATE')";
-    public static final String HAS_MEMBER_UPDATE = "hasAuthority('MEMBER_UPDATE')";
-    public static final String HAS_MEMBER_DELETE = "hasAuthority('MEMBER_DELETE')";
-    public static final String HAS_MEMBER_EXPORT = "hasAuthority('MEMBER_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_MEMBER_READ = "hasAuthority('" + MEMBER_READ + "')";
+    public static final String HAS_MEMBER_CREATE = "hasAuthority('" + MEMBER_CREATE + "')";
+    public static final String HAS_MEMBER_UPDATE = "hasAuthority('" + MEMBER_UPDATE + "')";
+    public static final String HAS_MEMBER_DELETE = "hasAuthority('" + MEMBER_DELETE + "')";
+    public static final String HAS_MEMBER_EXPORT = "hasAuthority('" + MEMBER_EXPORT + "')";
 
 }

@@ -255,6 +255,27 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         return workgroupOptional;
     }
+
+    @Transactional(readOnly = true)
+    public List<WorkgroupEntity> findByOrgUid(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            return new ArrayList<>();
+        }
+        List<WorkgroupEntity> workgroups = workgroupRepository.findByOrgUidAndDeletedFalse(orgUid);
+        return workgroups != null ? workgroups : new ArrayList<>();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<WorkgroupEntity> findAnyByOrgUid(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            return Optional.empty();
+        }
+        List<WorkgroupEntity> workgroups = findByOrgUid(orgUid);
+        if (workgroups == null || workgroups.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(workgroups.get(0));
+    }
     
     @CachePut(value = "workgroup", key = "#entity.uid", unless = "#result == null")
     @Override

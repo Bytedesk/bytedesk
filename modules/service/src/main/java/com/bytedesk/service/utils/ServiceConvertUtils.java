@@ -37,16 +37,19 @@ import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
+import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue.QueueEntity;
 import com.bytedesk.service.queue.QueueResponse;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberResponse;
+import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorProtobuf;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorResponse;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupResponse;
+import com.bytedesk.service.workgroup_settings.WorkgroupSettingsEntity;
 import com.bytedesk.service.presence.PresenceFacadeService;
 
 @UtilityClass
@@ -266,6 +269,35 @@ public class ServiceConvertUtils {
         }
         ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
         resp.setQuickButtons(QuickButtonResponseVisitor.fromEntities(svc.getQuickButtons()));
+
+        // 留言方式配置下发（用于 visitor ChatBox 决策：表单留言 vs 对话框留言）
+        MessageLeaveSettingsEntity messageLeaveSettings = null;
+        if (settingsContainer instanceof AgentSettingsEntity agentSettings) {
+            if (debug && agentSettings.getDraftMessageLeaveSettings() != null) {
+                messageLeaveSettings = agentSettings.getDraftMessageLeaveSettings();
+            } else {
+                messageLeaveSettings = agentSettings.getMessageLeaveSettings();
+            }
+        } else if (settingsContainer instanceof WorkgroupSettingsEntity workgroupSettings) {
+            if (debug && workgroupSettings.getDraftMessageLeaveSettings() != null) {
+                messageLeaveSettings = workgroupSettings.getDraftMessageLeaveSettings();
+            } else {
+                messageLeaveSettings = workgroupSettings.getMessageLeaveSettings();
+            }
+        }
+
+        if (messageLeaveSettings != null) {
+            resp.setMessageLeaveFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveFormEnabled()));
+            resp.setMessageLeaveForm(messageLeaveSettings.getMessageLeaveForm());
+            resp.setMessageLeaveCustomFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveCustomFormEnabled()));
+            resp.setMessageLeaveFormUid(messageLeaveSettings.getMessageLeaveFormUid());
+        } else {
+            resp.setMessageLeaveFormEnabled(false);
+            resp.setMessageLeaveForm(null);
+            resp.setMessageLeaveCustomFormEnabled(false);
+            resp.setMessageLeaveFormUid(null);
+        }
+
         return resp;
     }
 

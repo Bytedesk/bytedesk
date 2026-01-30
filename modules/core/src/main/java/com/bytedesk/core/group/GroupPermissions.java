@@ -20,6 +20,9 @@ public class GroupPermissions extends BasePermissions {
     // 模块前缀
     public static final String GROUP_PREFIX = "GROUP_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "GROUP";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String GROUP_READ = "GROUP_READ";
     public static final String GROUP_CREATE = "GROUP_CREATE";
@@ -27,11 +30,11 @@ public class GroupPermissions extends BasePermissions {
     public static final String GROUP_DELETE = "GROUP_DELETE";
     public static final String GROUP_EXPORT = "GROUP_EXPORT";
 
-    // PreAuthorize 表达式 - 统一权限（不区分层级）
-    public static final String HAS_GROUP_READ = "hasAuthority('GROUP_READ')";
-    public static final String HAS_GROUP_CREATE = "hasAuthority('GROUP_CREATE')";
-    public static final String HAS_GROUP_UPDATE = "hasAuthority('GROUP_UPDATE')";
-    public static final String HAS_GROUP_DELETE = "hasAuthority('GROUP_DELETE')";
-    public static final String HAS_GROUP_EXPORT = "hasAuthority('GROUP_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_GROUP_READ = "hasAuthority('" + GROUP_READ + "')";
+    public static final String HAS_GROUP_CREATE = "hasAuthority('" + GROUP_CREATE + "')";
+    public static final String HAS_GROUP_UPDATE = "hasAuthority('" + GROUP_UPDATE + "')";
+    public static final String HAS_GROUP_DELETE = "hasAuthority('" + GROUP_DELETE + "')";
+    public static final String HAS_GROUP_EXPORT = "hasAuthority('" + GROUP_EXPORT + "')";
 
 }

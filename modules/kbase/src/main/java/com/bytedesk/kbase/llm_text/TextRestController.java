@@ -153,6 +153,42 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
 
+    // delete elasticsearch index
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "删除索引", description = "delete text elastic index")
+    @PostMapping("/deleteIndex")
+    public ResponseEntity<?> deleteIndex(@RequestBody TextRequest request) {
+        Boolean deleted = textElasticService.deleteIndexAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(deleted));
+    }
+
+    // sync elasticsearch index status
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "同步索引状态", description = "sync text elastic status")
+    @PostMapping("/syncIndexStatus")
+    public ResponseEntity<?> syncIndexStatus(@RequestBody TextRequest request) {
+        var text = textElasticService.syncElasticStatus(request);
+        return ResponseEntity.ok(JsonResult.success(text.getElasticStatus()));
+    }
+
+    // sync elasticsearch index status by kbUid
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "批量同步索引状态", description = "sync text elastic status by kb")
+    @PostMapping("/syncIndexStatusByKbUid")
+    public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody TextRequest request) {
+        var result = textElasticService.syncElasticStatusByKbUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    // delete all elasticsearch index by kbUid
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "知识库删除索引", description = "delete text elastic index by kb")
+    @PostMapping("/deleteAllIndexByKbUid")
+    public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody TextRequest request) {
+        var result = textElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
     // update elasticsearch vector index
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = "知识库文本", action = "更新向量索引", description = "update text vector index")
@@ -164,6 +200,61 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         }
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+    }
+
+    // delete vector index
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "删除向量索引", description = "delete text vector index")
+    @PostMapping("/deleteVectorIndex")
+    public ResponseEntity<?> deleteVectorIndex(@RequestBody TextRequest request) {
+        if (textVectorService != null) {
+            Boolean deleted = textVectorService.deleteVectorIndexAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(deleted));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    // sync vector status
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "同步向量状态", description = "sync text vector status")
+    @PostMapping("/syncVectorStatus")
+    public ResponseEntity<?> syncVectorStatus(@RequestBody TextRequest request) {
+        if (textVectorService != null) {
+            var text = textVectorService.syncVectorStatus(request);
+            return ResponseEntity.ok(JsonResult.success(text.getVectorStatus()));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    @PreAuthorize(TextPermissions.HAS_TEXT_READ)
+    @ActionAnnotation(title = "知识库文本", action = "查询全文索引", description = "query text elastic by uid")
+    @PostMapping("/queryElasticByUid")
+    public ResponseEntity<?> queryElasticByUid(@RequestBody TextRequest request) {
+        var result = textElasticService.queryElasticByUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @PreAuthorize(TextPermissions.HAS_TEXT_READ)
+    @ActionAnnotation(title = "知识库文本", action = "查询向量索引", description = "query text vector by uid")
+    @PostMapping("/queryVectorByUid")
+    public ResponseEntity<?> queryVectorByUid(@RequestBody TextRequest request) {
+        if (textVectorService != null) {
+            var result = textVectorService.queryVectorByUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    // sync vector status by kbUid
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "批量同步向量状态", description = "sync text vector status by kb")
+    @PostMapping("/syncVectorStatusByKbUid")
+    public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody TextRequest request) {
+        if (textVectorService != null) {
+            var result = textVectorService.syncVectorStatusByKbUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
     // update elasticsearch all index
@@ -188,6 +279,18 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         }
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getKbUid()));
+    }
+
+    // delete all vector index by kbUid
+    @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
+    @ActionAnnotation(title = "知识库文本", action = "知识库删除向量索引", description = "delete text vector index by kb")
+    @PostMapping("/deleteAllVectorIndexByKbUid")
+    public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody TextRequest request) {
+        if (textVectorService != null) {
+            var result = textVectorService.deleteAllVectorIndexByKbUidAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
     
 }

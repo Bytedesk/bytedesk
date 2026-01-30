@@ -15,6 +15,7 @@ package com.bytedesk.core.rbac.token;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,6 +93,23 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         String accessToken = tokenRestService.generateAccessToken(request);
 
         return ResponseEntity.ok(JsonResult.success("success", accessToken));
+    }
+
+    @PostMapping("/revoke")
+    @ActionAnnotation(title = "用户", action = "revoke_token", description = "Revoke Access Token")
+    public ResponseEntity<?> revoke(@RequestBody TokenRequest request) {
+
+        String reason = request.getRevokeReason();
+        if (StringUtils.hasText(request.getUid())) {
+            tokenRestService.revokeByUid(request.getUid(), reason);
+            return ResponseEntity.ok(JsonResult.success());
+        }
+        if (StringUtils.hasText(request.getAccessToken())) {
+            tokenRestService.revokeAccessToken(request.getAccessToken(), reason);
+            return ResponseEntity.ok(JsonResult.success());
+        }
+
+        return ResponseEntity.badRequest().body(JsonResult.error("uid or accessToken is required", 400));
     }
 
     

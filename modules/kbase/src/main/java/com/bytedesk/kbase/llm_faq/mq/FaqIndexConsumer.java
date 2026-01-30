@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.llm_faq.FaqRequest;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.llm_faq.vector.FaqVectorService;
@@ -376,7 +377,9 @@ public class FaqIndexConsumer {
     @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public Boolean processElasticDelete(String faqUid) {
         log.debug("在独立事务中处理全文索引删除: {}", faqUid);
-        return faqElasticService.deleteFaq(faqUid);
+        // 只删 ES 文档会导致数据库中的 elasticStatus 仍停留在 SUCCESS
+        // 这里统一走“删除 + 同步状态落库”的逻辑，确保前端状态展示正确
+        return faqElasticService.deleteIndexAndSyncStatus(FaqRequest.builder().uid(faqUid).build());
     }
     
     /**
@@ -391,7 +394,8 @@ public class FaqIndexConsumer {
         }
         
         log.debug("在独立事务中处理向量索引删除: {}", faq.getUid());
-        return faqVectorService.deleteFaqVector(faq);
+        // 同步更新 vectorStatus/docIdList，避免数据库状态残留为 SUCCESS
+        return faqVectorService.deleteVectorIndexAndSyncStatus(FaqRequest.builder().uid(faq.getUid()).build());
     }
     
     /**

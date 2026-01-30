@@ -115,11 +115,9 @@ public class VisitorRequest extends BaseRequest {
 	// 浏览的标题
 	private String title;
 	// 浏览的IP
-	// @Builder.Default
-	private String ip;// = "127.0.0.1";
+	private String ip;
 	// 浏览的IP位置
-	// @Builder.Default
-	private String ipLocation;// = "localhost";
+	private String ipLocation;
 
 	// 会员等级
 	@Builder.Default
@@ -133,6 +131,7 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Boolean draft = false;
 	private String settingsUid;
+
 	// 强制创建新会话，每次都创建新会话，主要用于测试
 	@Builder.Default
 	private Boolean forceNewThread = false;

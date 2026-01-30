@@ -20,6 +20,9 @@ public class BlackPermissions extends BasePermissions {
     // 模块前缀
     public static final String BLACK_PREFIX = "BLACK_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "BLACK";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String BLACK_READ = "BLACK_READ";
     public static final String BLACK_CREATE = "BLACK_CREATE";
@@ -27,11 +30,11 @@ public class BlackPermissions extends BasePermissions {
     public static final String BLACK_DELETE = "BLACK_DELETE";
     public static final String BLACK_EXPORT = "BLACK_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_BLACK_READ = "hasAuthority('BLACK_READ')";
-    public static final String HAS_BLACK_CREATE = "hasAuthority('BLACK_CREATE')";
-    public static final String HAS_BLACK_UPDATE = "hasAuthority('BLACK_UPDATE')";
-    public static final String HAS_BLACK_DELETE = "hasAuthority('BLACK_DELETE')";
-    public static final String HAS_BLACK_EXPORT = "hasAuthority('BLACK_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_BLACK_READ = "hasAuthority('" + BLACK_READ + "')";
+    public static final String HAS_BLACK_CREATE = "hasAuthority('" + BLACK_CREATE + "')";
+    public static final String HAS_BLACK_UPDATE = "hasAuthority('" + BLACK_UPDATE + "')";
+    public static final String HAS_BLACK_DELETE = "hasAuthority('" + BLACK_DELETE + "')";
+    public static final String HAS_BLACK_EXPORT = "hasAuthority('" + BLACK_EXPORT + "')";
 
 }

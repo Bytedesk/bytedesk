@@ -20,6 +20,9 @@ public class MessagePermissions extends BasePermissions {
     // 模块前缀
     public static final String MESSAGE_PREFIX = "MESSAGE_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "MESSAGE";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String MESSAGE_READ = "MESSAGE_READ";
     public static final String MESSAGE_CREATE = "MESSAGE_CREATE";
@@ -27,11 +30,11 @@ public class MessagePermissions extends BasePermissions {
     public static final String MESSAGE_DELETE = "MESSAGE_DELETE";
     public static final String MESSAGE_EXPORT = "MESSAGE_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_MESSAGE_READ = "hasAuthority('MESSAGE_READ')";
-    public static final String HAS_MESSAGE_CREATE = "hasAuthority('MESSAGE_CREATE')";
-    public static final String HAS_MESSAGE_UPDATE = "hasAuthority('MESSAGE_UPDATE')";
-    public static final String HAS_MESSAGE_DELETE = "hasAuthority('MESSAGE_DELETE')";
-    public static final String HAS_MESSAGE_EXPORT = "hasAuthority('MESSAGE_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_MESSAGE_READ = "hasAuthority('" + MESSAGE_READ + "')";
+    public static final String HAS_MESSAGE_CREATE = "hasAuthority('" + MESSAGE_CREATE + "')";
+    public static final String HAS_MESSAGE_UPDATE = "hasAuthority('" + MESSAGE_UPDATE + "')";
+    public static final String HAS_MESSAGE_DELETE = "hasAuthority('" + MESSAGE_DELETE + "')";
+    public static final String HAS_MESSAGE_EXPORT = "hasAuthority('" + MESSAGE_EXPORT + "')";
 
 }

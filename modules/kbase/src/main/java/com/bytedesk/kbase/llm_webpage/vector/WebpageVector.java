@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 
@@ -99,9 +100,9 @@ public class WebpageVector {
      * 注意：向量嵌入需要单独计算并设置
      */
     public static WebpageVector fromWebpageEntity(WebpageEntity webpage) {
-        String kbUid = "";
-        if (webpage.getKbase() != null) {
-            kbUid = webpage.getKbase().getUid();
+        String kbUid = (webpage.getKbase() != null) ? webpage.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing webpage uid=" + webpage.getUid());
         }
         
         return WebpageVector.builder()

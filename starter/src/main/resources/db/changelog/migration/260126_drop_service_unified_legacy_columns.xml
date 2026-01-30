@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Keep only fields currently present in UnifiedEntity:
+        - nickname
+        - avatar
+        - description
+        - unified_type
+        Plus BaseEntity columns.
+
+        Drop legacy columns:
+        - language
+        - welcome_tip
+        - routing_mode
+        - status
+        - name
+     -->
+
+    <changeSet id="260126-01-drop-unified-language" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_unified" />
+            <columnExists tableName="bytedesk_service_unified" columnName="language" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_unified" columnName="language" />
+    </changeSet>
+
+    <changeSet id="260126-02-drop-unified-welcome-tip" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_unified" />
+            <columnExists tableName="bytedesk_service_unified" columnName="welcome_tip" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_unified" columnName="welcome_tip" />
+    </changeSet>
+
+    <changeSet id="260126-03-drop-unified-routing-mode" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_unified" />
+            <columnExists tableName="bytedesk_service_unified" columnName="routing_mode" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_unified" columnName="routing_mode" />
+    </changeSet>
+
+    <changeSet id="260126-04-drop-unified-status" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_unified" />
+            <columnExists tableName="bytedesk_service_unified" columnName="status" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_unified" columnName="status" />
+    </changeSet>
+
+    <changeSet id="260126-05-drop-unified-name" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_unified" />
+            <columnExists tableName="bytedesk_service_unified" columnName="name" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_unified" columnName="name" />
+    </changeSet>
+
+    
+</databaseChangeLog>

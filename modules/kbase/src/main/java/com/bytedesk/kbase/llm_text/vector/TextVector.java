@@ -19,6 +19,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_text.TextEntity;
 
@@ -95,9 +96,9 @@ public class TextVector {
      * 注意：向量嵌入需要单独计算并设置
      */
     public static TextVector fromTextEntity(TextEntity text) {
-        String kbUid = "";
-        if (text.getKbase() != null) {
-            kbUid = text.getKbase().getUid();
+        String kbUid = (text.getKbase() != null) ? text.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing text uid=" + text.getUid());
         }
         
         return TextVector.builder()

@@ -13,9 +13,13 @@
  */
 package com.bytedesk.core.group_invite;
 
-public class GroupInvitePermissions {
+import com.bytedesk.core.base.BasePermissions;
+
+public class GroupInvitePermissions extends BasePermissions {
 
     public static final String GROUP_INVITE_PREFIX = "GROUP_INVITE_";
+
+    public static final String MODULE_NAME = "GROUP_INVITE";
 
     // 统一权限（不区分层级）
     public static final String GROUP_INVITE_READ = "GROUP_INVITE_READ";
@@ -24,11 +28,11 @@ public class GroupInvitePermissions {
     public static final String GROUP_INVITE_DELETE = "GROUP_INVITE_DELETE";
     public static final String GROUP_INVITE_EXPORT = "GROUP_INVITE_EXPORT";
 
-    // PreAuthorize 表达式 - 统一权限（不区分层级）
-    public static final String HAS_GROUP_INVITE_READ = "hasAuthority('GROUP_INVITE_READ')";
-    public static final String HAS_GROUP_INVITE_CREATE = "hasAuthority('GROUP_INVITE_CREATE')";
-    public static final String HAS_GROUP_INVITE_UPDATE = "hasAuthority('GROUP_INVITE_UPDATE')";
-    public static final String HAS_GROUP_INVITE_DELETE = "hasAuthority('GROUP_INVITE_DELETE')";
-    public static final String HAS_GROUP_INVITE_EXPORT = "hasAuthority('GROUP_INVITE_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_GROUP_INVITE_READ = "hasAuthority('" + GROUP_INVITE_READ + "')";
+    public static final String HAS_GROUP_INVITE_CREATE = "hasAuthority('" + GROUP_INVITE_CREATE + "')";
+    public static final String HAS_GROUP_INVITE_UPDATE = "hasAuthority('" + GROUP_INVITE_UPDATE + "')";
+    public static final String HAS_GROUP_INVITE_DELETE = "hasAuthority('" + GROUP_INVITE_DELETE + "')";
+    public static final String HAS_GROUP_INVITE_EXPORT = "hasAuthority('" + GROUP_INVITE_EXPORT + "')";
     
 }

@@ -14,6 +14,8 @@
 package com.bytedesk.kbase.llm_webpage.vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -25,11 +27,13 @@ import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +57,52 @@ public class WebpageVectorService {
 
     private final WebpageRestService webpageRestService;
 
+    public Map<String, Object> queryVectorByUid(WebpageRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "WEBPAGE")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(10)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Map<String, Object>> docMaps = new ArrayList<>();
+        if (docs != null) {
+            for (Document doc : docs) {
+                Map<String, Object> docMap = new HashMap<>();
+                docMap.put("id", doc.getId());
+                docMap.put("content", doc.getText());
+                Map<String, Object> metadata = new HashMap<>(doc.getMetadata());
+                if (!metadata.containsKey(KbaseConst.KBASE_KB_UID)
+                        && metadata.containsKey(KbaseConst.KBASE_KB_UID_LEGACY)) {
+                    metadata.put(KbaseConst.KBASE_KB_UID, metadata.get(KbaseConst.KBASE_KB_UID_LEGACY));
+                    metadata.remove(KbaseConst.KBASE_KB_UID_LEGACY);
+                }
+                docMap.put("metadata", metadata);
+                docMaps.add(docMap);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("exists", docs != null && !docs.isEmpty());
+        result.put("total", docMaps.size());
+        result.put("docs", docMaps);
+        if (docs == null || docs.isEmpty()) {
+            result.put("message", "未查询到相关向量化信息");
+        }
+        return result;
+    }
+
     /**
      * 将网页内容添加到向量存储中
      * 
@@ -63,7 +113,7 @@ public class WebpageVectorService {
         log.info("开始向量索引网页: {}, ID: {}", webpage.getTitle(), webpage.getUid());
 
         // 在处理前先获取最新的网页实体
-        Optional<WebpageEntity> currentWebpageOpt = webpageRestService.findByUid(webpage.getUid());
+        Optional<WebpageEntity> currentWebpageOpt = webpageRestService.findByUidWithKbaseNoCache(webpage.getUid());
         if (!currentWebpageOpt.isPresent()) {
             log.error("网页实体不存在，无法创建向量索引: {}", webpage.getUid());
             throw new RuntimeException("网页实体不存在: " + webpage.getUid());
@@ -91,7 +141,9 @@ public class WebpageVectorService {
                     "categoryUid", currentWebpage.getCategoryUid() != null ? currentWebpage.getCategoryUid() : "",
                     "orgUid", currentWebpage.getOrgUid(),
                     "enabled", Boolean.toString(currentWebpage.getEnabled()),
-                    "tags", tags);
+                    "tags", tags,
+                    // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
+                    "sourceType", "WEBPAGE");
 
             // 创建文档
             Document document = new Document(id, combinedContent, metadata);
@@ -113,24 +165,17 @@ public class WebpageVectorService {
 
             // 添加文档ID并更新状态
             docIdList.add(id);
-            currentWebpage.setDocIdList(docIdList);
-
-            // 设置向量索引状态为成功
-            currentWebpage.setVectorSuccess();
-
-            // 更新网页实体 - 使用明确的事务保证状态更新和保存原子性
-            log.info("准备保存网页实体更新，设置向量索引状态为成功: {}", currentWebpage.getUid());
-
-            webpageRestService.save(currentWebpage);
+            // 仅更新向量相关字段，避免保存整条实体导致 kbase 关联被置空
+            webpageRestService.updateDocIdListOnly(currentWebpage.getUid(), docIdList);
+            webpageRestService.updateVectorStatusOnly(currentWebpage.getUid(), ChunkStatusEnum.SUCCESS.name());
+            webpageRestService.evictWebpageCacheAllEntries();
 
         } catch (Exception e) {
             log.error("网页向量索引失败: {}, 错误: {}", currentWebpage.getTitle(), e.getMessage(), e);
 
-            // 设置向量索引状态为失败
-            currentWebpage.setVectorError();
             try {
-                log.info("保存网页实体更新，设置向量索引状态为失败: {}", currentWebpage.getUid());
-                webpageRestService.save(currentWebpage);
+                webpageRestService.updateVectorStatusOnly(currentWebpage.getUid(), ChunkStatusEnum.ERROR.name());
+                webpageRestService.evictWebpageCacheAllEntries();
             } catch (Exception saveEx) {
                 log.error("更新网页向量索引状态失败: {}, 错误: {}", currentWebpage.getUid(), saveEx.getMessage());
             }
@@ -145,7 +190,7 @@ public class WebpageVectorService {
      * @param request 网页请求对象
      */
     public void updateVectorIndex(WebpageRequest request) {
-        Optional<WebpageEntity> webpageOpt = webpageRestService.findByUid(request.getUid());
+        Optional<WebpageEntity> webpageOpt = webpageRestService.findByUidWithKbaseNoCache(request.getUid());
         if (webpageOpt.isPresent()) {
             WebpageEntity webpage = webpageOpt.get();
             // 删除旧的向量索引
@@ -177,6 +222,197 @@ public class WebpageVectorService {
     }
 
     /**
+     * 同步Webpage向量索引状态到数据库
+     */
+    public WebpageEntity syncVectorStatus(WebpageRequest request) {
+        Optional<WebpageEntity> webpageOpt = webpageRestService.findByUidNoCache(request.getUid());
+        if (webpageOpt.isEmpty()) {
+            throw new RuntimeException("Webpage not found with UID: " + request.getUid());
+        }
+
+        WebpageEntity webpage = webpageOpt.get();
+
+        boolean exists;
+        try {
+            exists = existsVectorDocumentByUid(webpage.getUid(), webpage.getTitle());
+        } catch (Exception e) {
+            log.error("同步Webpage向量状态失败: uid={}, error={}", webpage.getUid(), e.getMessage(), e);
+            webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.ERROR.name());
+            webpageRestService.evictWebpageCacheAllEntries();
+            return webpageRestService.findByUidNoCache(webpage.getUid())
+                    .orElseThrow(() -> new RuntimeException("Webpage not found with UID: " + webpage.getUid()));
+        }
+
+        String nextStatus = exists ? ChunkStatusEnum.SUCCESS.name() : ChunkStatusEnum.NEW.name();
+        webpageRestService.updateVectorStatusOnly(webpage.getUid(), nextStatus);
+        webpageRestService.evictWebpageCacheAllEntries();
+        return webpageRestService.findByUidNoCache(webpage.getUid())
+                .orElseThrow(() -> new RuntimeException("Webpage not found with UID: " + webpage.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步Webpage向量索引状态到数据库
+     */
+    public Map<String, Object> syncVectorStatusByKbUid(WebpageRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+
+        int successCount = 0;
+        int newCount = 0;
+        int errorCount = 0;
+
+        for (WebpageEntity webpage : webpageList) {
+            try {
+                boolean exists = existsVectorDocumentByUid(webpage.getUid(), webpage.getTitle());
+                if (exists) {
+                    webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.SUCCESS.name());
+                    successCount++;
+                } else {
+                    webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+                    newCount++;
+                }
+            } catch (Exception e) {
+                webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.ERROR.name());
+                errorCount++;
+            }
+        }
+
+        webpageRestService.evictWebpageCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", webpageList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 按知识库kbUid批量删除Webpage向量索引，并同步更新数据库状态
+     */
+    public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(WebpageRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+        int total = webpageList.size();
+
+        List<String> docIdsToDelete = new ArrayList<>();
+        for (WebpageEntity webpage : webpageList) {
+            List<String> sanitizedDocIds = sanitizeDocIds(webpage.getDocIdList());
+            if (sanitizedDocIds.isEmpty()) {
+                docIdsToDelete.add(buildDefaultVectorDocId(webpage.getUid()));
+            } else {
+                docIdsToDelete.addAll(sanitizedDocIds);
+            }
+        }
+
+        int successCount = 0;
+        int errorCount = 0;
+
+        try {
+            List<String> sanitizedToDelete = sanitizeDocIds(docIdsToDelete);
+            if (!sanitizedToDelete.isEmpty()) {
+                vectorStore.delete(sanitizedToDelete);
+            }
+            for (WebpageEntity webpage : webpageList) {
+                webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+                webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
+            }
+            successCount = total;
+        } catch (Exception e) {
+            log.warn("批量删除Webpage向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+            for (WebpageEntity webpage : webpageList) {
+                try {
+                    if (webpage.getDocIdList() == null || webpage.getDocIdList().isEmpty()) {
+                        vectorStore.delete(List.of(buildDefaultVectorDocId(webpage.getUid())));
+                        webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+                        webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
+                        successCount++;
+                        continue;
+                    }
+
+                    Boolean deleted = deleteWebpageVector(webpage);
+                    if (Boolean.TRUE.equals(deleted)) {
+                        webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+                        webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
+                        successCount++;
+                    } else {
+                        webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.ERROR.name());
+                        errorCount++;
+                    }
+                } catch (Exception ex) {
+                    webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.ERROR.name());
+                    errorCount++;
+                }
+            }
+        }
+
+        webpageRestService.evictWebpageCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", total);
+        result.put("success", successCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 删除Webpage向量索引，并同步更新数据库状态
+     */
+    public Boolean deleteVectorIndexAndSyncStatus(WebpageRequest request) {
+        Optional<WebpageEntity> webpageOpt = webpageRestService.findByUidNoCache(request.getUid());
+        if (webpageOpt.isEmpty()) {
+            throw new RuntimeException("Webpage not found with UID: " + request.getUid());
+        }
+
+        WebpageEntity webpage = webpageOpt.get();
+
+        if (webpage.getDocIdList() == null || webpage.getDocIdList().isEmpty()) {
+            try {
+                vectorStore.delete(List.of(buildDefaultVectorDocId(webpage.getUid())));
+            } catch (Exception e) {
+                log.warn("按默认docId删除向量索引失败（将继续走常规删除逻辑）: uid={}, error={}", webpage.getUid(), e.getMessage());
+            }
+        }
+
+        Boolean deleted = deleteWebpageVector(webpage);
+        if (Boolean.TRUE.equals(deleted)) {
+            webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+            webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
+        } else {
+            webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.ERROR.name());
+        }
+
+        webpageRestService.evictWebpageCacheAllEntries();
+        return deleted;
+    }
+
+    private boolean existsVectorDocumentByUid(String uid, String queryHint) {
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "WEBPAGE")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query((queryHint == null || queryHint.isBlank()) ? "ping" : queryHint)
+                .filterExpression(expression)
+                .topK(1)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        return docs != null && !docs.isEmpty();
+    }
+
+    /**
      * 从向量存储中删除网页向量文档
      * 修改为不更新实体的方式，只进行向量删除操作，避免实体并发修改冲突
      * 
@@ -188,9 +424,19 @@ public class WebpageVectorService {
         log.info("从向量索引中删除网页: {}, ID: {}", webpage.getTitle(), webpage.getUid());
         try {
             // 获取网页文档ID列表
-            List<String> docIdList = webpage.getDocIdList();
-            if (docIdList == null || docIdList.isEmpty()) {
-                log.info("网页没有关联的向量文档，无需删除: {}", webpage.getUid());
+            List<String> docIdList = sanitizeDocIds(webpage.getDocIdList());
+            if (docIdList.isEmpty()) {
+                String fallbackId = buildDefaultVectorDocId(webpage.getUid());
+                if (!StringUtils.hasText(fallbackId)) {
+                    log.info("网页没有有效的向量文档ID，无需删除: {}", webpage.getUid());
+                    return true;
+                }
+                try {
+                    log.info("网页文档ID列表为空/脏数据，尝试按默认docId删除: {}", fallbackId);
+                    vectorStore.delete(List.of(fallbackId));
+                } catch (Exception e) {
+                    log.warn("按默认docId删除向量索引失败（将忽略并返回成功）: uid={}, error={}", webpage.getUid(), e.getMessage());
+                }
                 return true;
             }
 
@@ -207,6 +453,31 @@ public class WebpageVectorService {
             log.error("删除网页向量索引失败: {}, 错误: {}", webpage.getTitle(), e.getMessage(), e);
             return false;
         }
+    }
+
+    private static String buildDefaultVectorDocId(String uid) {
+        if (!StringUtils.hasText(uid)) {
+            return "";
+        }
+        return "webpage_" + uid;
+    }
+
+    private static List<String> sanitizeDocIds(List<String> docIds) {
+        if (docIds == null || docIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        LinkedHashSet<String> unique = new LinkedHashSet<>();
+        for (String raw : docIds) {
+            if (!StringUtils.hasText(raw)) {
+                continue;
+            }
+            String trimmed = raw.trim();
+            if (StringUtils.hasText(trimmed)) {
+                unique.add(trimmed);
+            }
+        }
+        return new ArrayList<>(unique);
     }
 
     /**
@@ -233,8 +504,11 @@ public class WebpageVectorService {
         // 构建查询条件
         FilterExpressionBuilder.Op enabledOp = expressionBuilder.eq("enabled", "true");
 
+        // 强制限定数据源类型，避免跨类型（FAQ/TEXT/CHUNK）文档误召回
+        FilterExpressionBuilder.Op sourceTypeOp = expressionBuilder.eq("sourceType", "WEBPAGE");
+
         // 添加可选的过滤条件
-        FilterExpressionBuilder.Op finalOp = enabledOp;
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(enabledOp, sourceTypeOp);
 
         // 添加可选的过滤条件：知识库、分类、组织
         if (kbUid != null && !kbUid.isEmpty()) {
@@ -274,13 +548,23 @@ public class WebpageVectorService {
             String uid = (String) metadata.getOrDefault("uid", "");
 
             // 1. 通过UID查找对应的网页实体，以便获取完整信息
-            Optional<WebpageEntity> webpageEntityOpt = webpageRestService.findByUid(uid);
+            // 注意：findByUid 走缓存时可能出现 kbase 关联丢失（导致 kbUid 为空），从而 fallback 到简化 metadata 并丢掉 content。
+            // 这里改为直接查询包含 kbase 关联的实体，确保 answer/content 可用。
+            Optional<WebpageEntity> webpageEntityOpt = webpageRestService.findByUidWithKbaseNoCache(uid);
 
             if (webpageEntityOpt.isPresent()) {
                 WebpageEntity webpageEntity = webpageEntityOpt.get();
 
                 // 2. 将WebpageEntity转换为WebpageVector
-                WebpageVector webpageVector = WebpageVector.fromWebpageEntity(webpageEntity);
+                WebpageVector webpageVector;
+                try {
+                    webpageVector = WebpageVector.fromWebpageEntity(webpageEntity);
+                } catch (IllegalArgumentException ex) {
+                    // 兼容历史脏数据：entity 可能缺 kbUid 等关键字段，但向量文档 metadata 中通常包含 kbUid
+                    log.warn("WebpageVectorService search fallback to document metadata, uid={}, err={}", uid,
+                            ex.getMessage());
+                    webpageVector = createSimpleWebpageVectorFromDocument(doc);
+                }
 
                 // 3. 创建搜索结果对象
                 WebpageVectorSearchResult result = WebpageVectorSearchResult.builder()
@@ -319,11 +603,17 @@ public class WebpageVectorService {
     private WebpageVector createSimpleWebpageVectorFromDocument(Document doc) {
         Map<String, Object> metadata = doc.getMetadata();
         
+        String kbUid = (String) metadata.getOrDefault(
+                KbaseConst.KBASE_KB_UID,
+                metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, ""));
+
         return WebpageVector.builder()
             .uid((String) metadata.getOrDefault("uid", ""))
             .title((String) metadata.getOrDefault("title", ""))
             .url((String) metadata.getOrDefault("url", ""))
-            .kbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""))
+            // 向量库 Document 的 text 是 title + "\n" + content（索引时写入），用于兜底补齐 answer。
+            .content(doc.getText())
+            .kbUid(kbUid)
             .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
             .orgUid((String) metadata.getOrDefault("orgUid", ""))
             .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))

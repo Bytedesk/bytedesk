@@ -144,6 +144,9 @@ public class RobotContent extends BaseContent {
         
         // 内容摘要
         private String contentSummary;
+
+        // 检索通道（FULLTEXT/VECTOR 等）
+        private String searchChannel;
         
         // 相似度评分
         private Double score;

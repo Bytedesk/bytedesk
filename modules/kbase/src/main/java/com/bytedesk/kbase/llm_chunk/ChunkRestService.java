@@ -17,12 +17,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -71,9 +74,22 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
         return chunkRepository.findByUid(uid);
     }
 
+    /**
+     * 直接从数据库读取（不经过缓存）。
+     */
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public Optional<ChunkEntity> findByUidNoCache(String uid) {
+        return chunkRepository.findByUid(uid);
+    }
+
     // findByKbUid
     @Cacheable(value = "chunk", key = "#kbUid", unless = "#result==null")
     public List<ChunkEntity> findByKbUid(String kbUid) {
+        return chunkRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<ChunkEntity> findByKbUidNoCache(String kbUid) {
         return chunkRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
     
@@ -111,7 +127,7 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
         if (kbase.isPresent()) {
             entity.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         // 
         Optional<FileEntity> file = fileRepository.findByUid(request.getFileUid());
@@ -164,6 +180,29 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
     
     protected ChunkEntity doSave(ChunkEntity entity) {
         return chunkRepository.save(entity);
+    }
+
+    /**
+     * 清空 Chunk 相关缓存。
+     */
+    @CacheEvict(value = "chunk", allEntries = true)
+    public void evictChunkCacheAllEntries() {
+        // no-op
+    }
+
+    @Transactional
+    public void updateElasticStatusOnly(String uid, String elasticStatus) {
+        chunkRepository.updateElasticStatusByUid(uid, elasticStatus);
+    }
+
+    @Transactional
+    public void updateVectorStatusOnly(String uid, String vectorStatus) {
+        chunkRepository.updateVectorStatusByUid(uid, vectorStatus);
+    }
+
+    @Transactional
+    public void updateDocIdOnly(String uid, String docId) {
+        chunkRepository.updateDocIdByUid(uid, docId);
     }
 
     @Override
@@ -297,7 +336,7 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
         if (kbase.isPresent()) {
             chunk.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         //
         save(chunk);

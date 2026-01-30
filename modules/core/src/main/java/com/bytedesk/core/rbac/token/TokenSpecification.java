@@ -42,6 +42,14 @@ public class TokenSpecification extends BaseSpecification<TokenEntity, TokenRequ
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
+            // permanent
+            if (request.getPermanent() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("permanent"), request.getPermanent()));
+            }
+            // revoked
+            if (request.getRevoked() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("revoked"), request.getRevoked()));
+            }
             // userUid
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));

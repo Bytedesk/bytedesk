@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -155,8 +156,22 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         return faqRepository.findByUid(uid);
     }
 
+    /**
+     * 直接从数据库读取（不经过缓存）。
+     * 用于索引/向量状态同步等“只改部分字段”的场景，避免缓存陈旧实体导致覆盖其他字段。
+     */
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public Optional<FaqEntity> findByUidNoCache(String uid) {
+        return faqRepository.findByUid(uid);
+    }
+
     @Cacheable(value = "faq", key = "#kbUid", unless = "#result == null")
     public List<FaqEntity> findByKbUid(String kbUid) {
+        return faqRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<FaqEntity> findByKbUidNoCache(String kbUid) {
         return faqRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
@@ -212,7 +227,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             if (kbase.isPresent()) {
                 entity.setKbase(kbase.get());
             } else {
-                throw new RuntimeException("kbaseUid not found");
+                throw new RuntimeException("kbUid not found");
             }
 
             FaqEntity savedEntity = save(entity);
@@ -251,7 +266,6 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             entity.setImages(request.getImages());
             entity.setAttachments(request.getAttachments());
             entity.setAnswerList(request.getAnswerList());
-            entity.setElasticStatus(request.getElasticStatus());
             entity.setTagList(request.getTagList());
             entity.setType(request.getType());
             entity.setEnabled(request.getEnabled());
@@ -311,6 +325,34 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         return faqRepository.save(entity);
     }
 
+    /**
+     * 清空 FAQ 相关缓存（包含 uid/kbUid/question 等多种 key）。
+     */
+    @CacheEvict(value = "faq", allEntries = true)
+    public void evictFaqCacheAllEntries() {
+        // no-op
+    }
+
+    @Transactional
+    public void updateElasticStatusOnly(String uid, String elasticStatus) {
+        faqRepository.updateElasticStatusByUid(uid, elasticStatus);
+    }
+
+    @Transactional
+    public void updateVectorStatusOnly(String uid, String vectorStatus) {
+        faqRepository.updateVectorStatusByUid(uid, vectorStatus);
+    }
+
+    @Transactional
+    public void updateDocIdListOnly(String uid, List<String> docIdList) {
+        faqRepository.updateDocIdListByUid(uid, docIdList);
+    }
+
+    @Transactional
+    public void updateKbaseOnly(String uid, KbaseEntity kbase) {
+        faqRepository.updateKbaseByUid(uid, kbase);
+    }
+
     @Override
     public FaqEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             FaqEntity entity) {
@@ -328,6 +370,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             Optional<FaqEntity> latest = faqRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 FaqEntity latestEntity = latest.get();
+                
                 // 保持原有实体的部分属性
                 latestEntity.setQuestion(entity.getQuestion());
                 latestEntity.setAnswer(entity.getAnswer());
@@ -336,6 +379,11 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
                 latestEntity.setEnabled(entity.getEnabled());
                 latestEntity.setCategoryUid(entity.getCategoryUid());
                 // latestEntity.setKbUid(entity.getKbUid());
+
+                // 保留/更新知识库关联（否则在乐观锁冲突重试时可能丢失 kbase，导致 kbUid 为空）
+                if (entity.getKbase() != null && StringUtils.hasText(entity.getKbase().getUid())) {
+                    latestEntity.setKbase(entity.getKbase());
+                }
 
                 // 避免覆盖计数器类字段
                 // latestEntity.setViewCount(entity.getViewCount());
@@ -349,8 +397,17 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
                 }
 
                 // docIdList
-                latestEntity.setDocIdList(entity.getDocIdList());
-                latestEntity.setElasticStatus(entity.getElasticStatus());
+                if (entity.getDocIdList() != null) {
+                    latestEntity.setDocIdList(entity.getDocIdList());
+                }
+                // 合并索引状态：以本次要保存的 entity 为准（包括 NEW）
+                // 否则在“删除索引/同步状态”等场景下，NEW 会被错误忽略，导致界面仍显示 SUCCESS
+                if (StringUtils.hasText(entity.getElasticStatus())) {
+                    latestEntity.setElasticStatus(entity.getElasticStatus());
+                }
+                if (StringUtils.hasText(entity.getVectorStatus())) {
+                    latestEntity.setVectorStatus(entity.getVectorStatus());
+                }
 
                 // 尝试保存，可能会再次失败
                 try {
@@ -367,6 +424,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         throw new RuntimeException("无法解决实体版本冲突: " + entity.getUid());
     }
 
+    @CacheEvict(value = "faq", allEntries = true)
     public void save(List<FaqEntity> entities) {
         faqRepository.saveAll(entities);
     }
@@ -467,7 +525,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         if (kbase.isPresent()) {
             faq.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         //
         return faq;
@@ -527,7 +585,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
                     if (kbase.isPresent()) {
                         faq.setKbase(kbase.get());
                     } else {
-                        throw new RuntimeException("kbaseUid not found");
+                        throw new RuntimeException("kbUid not found");
                     }
 
                     save(faq);

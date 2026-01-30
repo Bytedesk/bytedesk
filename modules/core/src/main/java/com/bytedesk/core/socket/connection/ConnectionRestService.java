@@ -36,6 +36,7 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
 
 import static com.bytedesk.core.socket.connection.ConnectionStatusEnum.CONNECTED;
@@ -57,12 +58,16 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     private final AuthService authService;
 
+    private final UserRepository userRepository;
+
     private final PresenceTtlResolver presenceTtlResolver;
     private final ConnectionMetrics connectionMetrics;
 
     private final StringRedisTemplate stringRedisTemplate;
 
     private final CacheManager cacheManager;
+
+    private static final String USER_ORG_UID_CACHE = "userOrgUid";
 
     // 最小数据库写入间隔（毫秒）
     private static final long MIN_INTERVAL_MS = 5000L;
@@ -201,10 +206,11 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     @Transactional
     public void markConnected(String userUid, String orgUid, String clientId, String deviceUid, String protocol, String channel, String ip, String userAgent, Integer ttlSeconds) {
         long now = System.currentTimeMillis();
+        String resolvedOrgUid = resolveOrgUid(userUid, orgUid);
         ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
             .uid(uidUtils.getUid())
             .userUid(userUid)
-            .orgUid(orgUid)
+            .orgUid(resolvedOrgUid)
             .clientId(clientId)
             .deviceUid(deviceUid)
             .protocol(protocol)
@@ -212,9 +218,52 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             .ip(ip)
             .userAgent(userAgent)
             .build());
+        if (StringUtils.hasText(resolvedOrgUid) && !resolvedOrgUid.equals(entity.getOrgUid())) {
+            entity.setOrgUid(resolvedOrgUid);
+        }
         applyConnectedState(entity, protocol, ttlSeconds, now);
         save(entity);
         evictPresenceCaches(userUid);
+    }
+
+    private String resolveOrgUid(String userUid, String orgUid) {
+        if (StringUtils.hasText(orgUid)) {
+            return orgUid;
+        }
+        if (!StringUtils.hasText(userUid)) {
+            return null;
+        }
+        Cache cache = cacheManager != null ? cacheManager.getCache(USER_ORG_UID_CACHE) : null;
+        if (cache != null) {
+            try {
+                String cached = cache.get(userUid, String.class);
+                if (StringUtils.hasText(cached)) {
+                    return cached;
+                }
+            } catch (Exception ex) {
+                log.debug("resolveOrgUid cache get failed userUid={}", userUid, ex);
+            }
+        }
+        if (userRepository == null) {
+            return null;
+        }
+        try {
+            String resolved = userRepository.findByUidWithOrganizations(userUid)
+                    .map(UserEntity::getCurrentOrganization)
+                    .map(o -> o.getUid())
+                    .orElse(null);
+            if (StringUtils.hasText(resolved) && cache != null) {
+                try {
+                    cache.put(userUid, resolved);
+                } catch (Exception ex) {
+                    log.debug("resolveOrgUid cache put failed userUid={}", userUid, ex);
+                }
+            }
+            return resolved;
+        } catch (Exception ex) {
+            log.debug("resolveOrgUid db lookup failed userUid={}", userUid, ex);
+            return null;
+        }
     }
 
     /** Update heartbeat for a client connection */
@@ -286,9 +335,11 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             if (userUid == null) {
                 return false;
             }
+            String resolvedOrgUid = resolveOrgUid(userUid, null);
             ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
                     .uid(uidUtils.getUid())
                     .userUid(userUid)
+                    .orgUid(resolvedOrgUid)
                     .clientId(clientId)
                     .deviceUid(deviceUid)
                     .protocol(ConnectionProtocalEnum.MQTT.name())

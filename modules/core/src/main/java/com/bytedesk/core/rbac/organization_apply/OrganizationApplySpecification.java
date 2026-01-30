@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OrganizationApplySpecification extends BaseSpecification<OrganizationApplyEntity, OrganizationApplyRequest> {
     
     public static Specification<OrganizationApplyEntity> search(OrganizationApplyRequest request, AuthService authService) {
-        log.info("request: {}", request);
+        // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -53,6 +53,15 @@ public class OrganizationApplySpecification extends BaseSpecification<Organizati
             }
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+
+            // searchText: 支持按组织名称/备注模糊搜索
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText();
+                List<Predicate> orPredicates = new ArrayList<>();
+                orPredicates.add(criteriaBuilder.like(root.get("name"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

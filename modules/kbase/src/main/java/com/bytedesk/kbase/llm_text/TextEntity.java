@@ -53,7 +53,6 @@ public class TextEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-
     private String title;
 
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -64,9 +63,11 @@ public class TextEntity extends BaseEntity {
     @Column(name = "text_type")
     private String type = MessageTypeEnum.TEXT.name();
 
+    // 全文索引状态
     @Builder.Default
     private String elasticStatus = ChunkStatusEnum.NEW.name();
 
+    // 向量索引状态
     @Builder.Default
     private String vectorStatus = ChunkStatusEnum.NEW.name();
 

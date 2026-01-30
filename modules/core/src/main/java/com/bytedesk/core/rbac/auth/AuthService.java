@@ -24,10 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.ChannelEnum;
-import com.bytedesk.core.rbac.token.TokenEntity;
-import com.bytedesk.core.rbac.token.TokenRepository;
 import com.bytedesk.core.rbac.token.TokenRequest;
 import com.bytedesk.core.rbac.token.TokenTypeEnum;
+import com.bytedesk.core.rbac.token.TokenEntity;
+import com.bytedesk.core.rbac.token.TokenRepository;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
@@ -54,9 +54,9 @@ public class AuthService {
 
     private final ModelMapper modelMapper;
 
-    private final UidUtils uidUtils;
-    
     private final TokenRepository tokenRepository;
+
+    private final UidUtils uidUtils;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -152,30 +152,38 @@ public class AuthService {
             // 如果没有设备信息，使用一个描述性值
             device = "Unknown Device";
         }
+
+        String displayName = StringUtils.hasText(userDetails.getNickname()) ? userDetails.getNickname()
+            : userDetails.getUsername();
+        String account = StringUtils.hasText(userDetails.getMobile()) ? userDetails.getMobile()
+            : (StringUtils.hasText(userDetails.getEmail()) ? userDetails.getEmail() : userDetails.getUsername());
         
         // 使用create接口创建保存token
         TokenRequest tokenRequest = TokenRequest.builder()
-            .name("Login Token")
-            .description("login token")
+            .name(displayName + " Login Token")
+            .description(String.format("login token for %s(uid=%s, org=%s), platform=%s, channel=%s, device=%s",
+                    account,
+                    userDetails.getUid(),
+                    userDetails.getOrgUid(),
+                    userDetails.getPlatform(),
+                    channel,
+                    device))
             .accessToken(accessToken)
             .type(TokenTypeEnum.BEARER.name())
             .revoked(false)
             .channel(channel)
             .device(device)
             .userUid(userDetails.getUid())
+            .orgUid(userDetails.getOrgUid())
             .build();
-        
-        // 使用TokenRestService来创建token，它会统一处理过期时间
-        TokenEntity entity = modelMapper.map(tokenRequest, TokenEntity.class);
-        entity.setUid(uidUtils.getUid());
-        
-        // 统一设置过期时间，与JWT配置保持一致
-        entity.setExpiresAt(JwtUtils.calculateExpirationTime(channel));
-        
-        TokenEntity savedEntity = tokenRepository.save(entity);
-        if (savedEntity == null) {
-            throw new RuntimeException("Create token failed");
+
+        // 直接写 token 表，避免 AuthService <-> TokenRestService 循环依赖
+        TokenEntity tokenEntity = modelMapper.map(tokenRequest, TokenEntity.class);
+        tokenEntity.setUid(uidUtils.getUid());
+        if (!Boolean.TRUE.equals(tokenEntity.getPermanent()) && tokenEntity.getExpiresAt() == null) {
+            tokenEntity.setExpiresAt(JwtUtils.calculateExpirationTime(tokenRequest.getChannel()));
         }
+        tokenRepository.save(tokenEntity);
         
         return AuthResponse.builder()
                 .accessToken(accessToken)

@@ -16,8 +16,11 @@ package com.bytedesk.core.rbac.user;
 import java.util.Optional;
 
 // import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 /**
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
@@ -29,6 +32,20 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
 
     Optional<UserEntity> findByUid(String uid);
+
+    /**
+     * 用于 profile/前端组织展示：预加载组织 owner 信息，避免 LAZY 导致 owner 为空。
+     */
+    @EntityGraph(attributePaths = {
+            "currentOrganization",
+            "currentOrganization.user",
+            "userOrganizationRoles",
+            "userOrganizationRoles.organization",
+            "userOrganizationRoles.organization.user",
+            "userOrganizationRoles.roles"
+    })
+    @Query("select u from UserEntity u where u.uid = :uid")
+    Optional<UserEntity> findByUidWithOrganizations(@Param("uid") String uid);
 
     Optional<UserEntity> findByEmailAndPlatformAndDeletedFalse(String email, String platform);
 

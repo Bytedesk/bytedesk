@@ -18,12 +18,30 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface WebpageRepository extends JpaRepository<WebpageEntity, Long>, JpaSpecificationExecutor<WebpageEntity> {
 
     Optional<WebpageEntity> findByUid(String uid);
 
+    @Query("select w from WebpageEntity w left join fetch w.kbase where w.uid = :uid")
+    Optional<WebpageEntity> findByUidWithKbase(@Param("uid") String uid);
+
     // Boolean existsByPlatform(String platform);
 
     List<WebpageEntity> findByKbase_UidAndDeletedFalse(String kbUid);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update WebpageEntity w set w.elasticStatus = :status where w.uid = :uid")
+    int updateElasticStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update WebpageEntity w set w.vectorStatus = :status where w.uid = :uid")
+    int updateVectorStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update WebpageEntity w set w.docIdList = :docIdList where w.uid = :uid")
+    int updateDocIdListByUid(@Param("uid") String uid, @Param("docIdList") List<String> docIdList);
 }

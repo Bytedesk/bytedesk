@@ -14,7 +14,9 @@
 package com.bytedesk.kbase.llm_chunk.elastic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,11 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -47,6 +51,26 @@ public class ChunkElasticService {
 
     @Autowired
     private ChunkRestService chunkRestService;
+
+    public Map<String, Object> queryElasticByUid(ChunkRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+        ChunkElastic doc = null;
+        if (indexExists) {
+            doc = elasticsearchOperations.get(uid, ChunkElastic.class);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("indexExists", indexExists);
+        result.put("exists", doc != null);
+        result.put("doc", doc);
+        return result;
+    }
     
     // update elasticsearch index
     public void updateIndex(ChunkRequest request) {
@@ -66,6 +90,127 @@ public class ChunkElasticService {
             indexChunk(chunk);
         });
         log.info("Updated elasticsearch index for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
+    }
+
+    /**
+     * 同步Chunk的Elasticsearch索引状态到数据库
+     */
+    public ChunkEntity syncElasticStatus(ChunkRequest request) {
+        Optional<ChunkEntity> chunkOpt = chunkRestService.findByUidNoCache(request.getUid());
+        if (chunkOpt.isEmpty()) {
+            throw new RuntimeException("Chunk not found with UID: " + request.getUid());
+        }
+
+        ChunkEntity chunk = chunkOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+        boolean docExists = indexExists && elasticsearchOperations.exists(chunk.getUid(), ChunkElastic.class);
+
+        String nextStatus = docExists ? ChunkStatusEnum.SUCCESS.name() : ChunkStatusEnum.NEW.name();
+        chunkRestService.updateElasticStatusOnly(chunk.getUid(), nextStatus);
+        chunkRestService.evictChunkCacheAllEntries();
+
+        return chunkRestService.findByUidNoCache(chunk.getUid())
+                .orElseThrow(() -> new RuntimeException("Chunk not found with UID: " + chunk.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步Chunk的Elasticsearch索引状态到数据库
+     */
+    public Map<String, Object> syncElasticStatusByKbUid(ChunkRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+
+        int successCount = 0;
+        int newCount = 0;
+
+        for (ChunkEntity chunk : chunkList) {
+            boolean docExists = indexExists && elasticsearchOperations.exists(chunk.getUid(), ChunkElastic.class);
+            if (docExists) {
+                chunkRestService.updateElasticStatusOnly(chunk.getUid(), ChunkStatusEnum.SUCCESS.name());
+                successCount++;
+            } else {
+                chunkRestService.updateElasticStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+                newCount++;
+            }
+        }
+        chunkRestService.evictChunkCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", chunkList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("indexExists", indexExists);
+        return result;
+    }
+
+    /**
+     * 根据知识库kbUid一键删除Elasticsearch中的Chunk索引，并同步更新Chunk实体elasticStatus
+     */
+    public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(ChunkRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+
+        long deletedCount = 0;
+        if (indexExists) {
+                Query query = NativeQuery.builder()
+                    .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                    .build();
+            DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
+            var response = elasticsearchOperations.delete(deleteQuery, ChunkElastic.class);
+            deletedCount = response.getDeleted();
+        }
+
+        for (ChunkEntity chunk : chunkList) {
+            chunkRestService.updateElasticStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+        }
+        chunkRestService.evictChunkCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", chunkList.size());
+        result.put("indexExists", indexExists);
+        result.put("deletedCount", deletedCount);
+        return result;
+    }
+
+    /**
+     * 删除Chunk在Elasticsearch中的索引，并同步更新数据库状态
+     */
+    public Boolean deleteIndexAndSyncStatus(ChunkRequest request) {
+        Optional<ChunkEntity> chunkOpt = chunkRestService.findByUidNoCache(request.getUid());
+        if (chunkOpt.isEmpty()) {
+            throw new RuntimeException("Chunk not found with UID: " + request.getUid());
+        }
+
+        ChunkEntity chunk = chunkOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
+        if (!indexExists) {
+            chunkRestService.updateElasticStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+            chunkRestService.evictChunkCacheAllEntries();
+            return true;
+        }
+
+        Boolean deleted = deleteChunk(request.getUid());
+        if (Boolean.TRUE.equals(deleted)) {
+            chunkRestService.updateElasticStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+        } else {
+            chunkRestService.updateElasticStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
+        }
+        chunkRestService.evictChunkCacheAllEntries();
+        return deleted;
     }
     
     /**
@@ -148,18 +293,18 @@ public class ChunkElasticService {
     
     /**
      * 根据知识库UID删除所有相关Chunk索引
-     * @param kbaseUid 知识库UID
+     * @param kbUid 知识库UID
      * @return 是否删除成功
      */
-    public Boolean deleteByKbaseUid(String kbaseUid) {
-        log.info("删除知识库下所有Chunk索引: {}", kbaseUid);
+    public Boolean deleteByKbUid(String kbUid) {
+        log.info("删除知识库下所有Chunk索引: {}", kbUid);
         
         try {
             // 首先创建查询
             Query query = NativeQuery.builder()
                     .withQuery(QueryBuilders.term()
-                        .field("kbaseUid")
-                        .value(kbaseUid)
+                        .field("kbUid")
+                        .value(kbUid)
                         .build()._toQuery())
                     .build();
                     
@@ -173,7 +318,7 @@ public class ChunkElasticService {
             log.info("成功删除知识库下的Chunk索引数量: {}", response.getDeleted());
             return true;
         } catch (Exception e) {
-            log.error("删除知识库下的Chunk索引时发生错误: {}, 错误消息: {}", kbaseUid, e.getMessage(), e);
+            log.error("删除知识库下的Chunk索引时发生错误: {}, 错误消息: {}", kbUid, e.getMessage(), e);
             return false;
         }
     }
@@ -308,7 +453,7 @@ public class ChunkElasticService {
             
             // 添加可选的过滤条件：知识库、分类、组织
             if (kbUid != null && !kbUid.trim().isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("kbaseUid").value(kbUid).build()._toQuery());
+                boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
             }
             
             if (categoryUid != null && !categoryUid.trim().isEmpty()) {

@@ -39,6 +39,8 @@ import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.role.RoleResponseSimple;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
+import com.bytedesk.core.rbac.user.UserOrganizationRoleEntity;
+import com.bytedesk.core.rbac.user.UserOrganizationRoleResponse;
 import com.bytedesk.core.rbac.user.UserResponse;
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -79,8 +81,41 @@ public class ConvertUtils {
     }
 
     public static UserResponse convertToUserResponse(UserDetailsImpl userDetails) {
-        // 无需进行authorities转换，因为UserDetailsImpl中已经包含了authorities
-        return getModelMapper().map(userDetails, UserResponse.class);
+        if (userDetails == null) {
+            return null;
+        }
+
+        UserResponse userResponse = new UserResponse();
+
+        userResponse.setUid(userDetails.getUid());
+        userResponse.setOrgUid(userDetails.getOrgUid());
+        userResponse.setPlatform(userDetails.getPlatform());
+        userResponse.setCreatedAt(userDetails.getCreatedAt());
+        userResponse.setUpdatedAt(userDetails.getUpdatedAt());
+
+        userResponse.setUsername(userDetails.getUsername());
+        userResponse.setNickname(userDetails.getNickname());
+        userResponse.setEmail(userDetails.getEmail());
+        userResponse.setMobile(userDetails.getMobile());
+        userResponse.setCountry(userDetails.getCountry());
+        userResponse.setAvatar(userDetails.getAvatar());
+        userResponse.setDescription(userDetails.getDescription());
+        userResponse.setSex(parseUserSex(userDetails.getSex()));
+        userResponse.setEnabled(Boolean.TRUE.equals(userDetails.getEnabled()));
+        userResponse.setSuperUser(Boolean.TRUE.equals(userDetails.getSuperUser()));
+        userResponse.setEmailVerified(Boolean.TRUE.equals(userDetails.getEmailVerified()));
+        userResponse.setMobileVerified(Boolean.TRUE.equals(userDetails.getMobileVerified()));
+
+        userResponse.setCurrentOrganization(convertToOrganizationResponseSimple(userDetails.getCurrentOrganization()));
+        userResponse.setCurrentRoles(convertToRoleResponseSimples(userDetails.getCurrentRoles()));
+        userResponse.setUserOrganizationRoles(convertToUserOrganizationRoleResponses(userDetails.getUserOrganizationRoles()));
+
+        // UserDetailsImpl 已包含 authorities
+        if (userDetails.getAuthorities() != null) {
+            userResponse.setAuthorities(new HashSet<>(userDetails.getAuthorities()));
+        }
+
+        return userResponse;
     }
 
     public static UserResponse convertToUserResponse(UserEntity user) {
@@ -122,6 +157,9 @@ public class ConvertUtils {
         // currentRoles 手动映射（避免间接使用 getModelMapper）
         userResponse.setCurrentRoles(convertToRoleResponseSimples(user.getCurrentRoles()));
 
+        // userOrganizationRoles（多组织角色关系）
+        userResponse.setUserOrganizationRoles(convertToUserOrganizationRoleResponses(user.getUserOrganizationRoles()));
+
         // authorities
         userResponse.setAuthorities(filterUserGrantedAuthorities(user));
 
@@ -129,6 +167,56 @@ public class ConvertUtils {
         userResponse.setPasswordModifiedAt(user.getPasswordModifiedAtString());
 
         return userResponse;
+    }
+
+    private static Set<UserOrganizationRoleResponse> convertToUserOrganizationRoleResponses(Set<UserOrganizationRoleEntity> userOrganizationRoles) {
+        if (userOrganizationRoles == null) {
+            return null;
+        }
+
+        Set<UserOrganizationRoleResponse> responses = new HashSet<>();
+        for (UserOrganizationRoleEntity uor : userOrganizationRoles) {
+            if (uor == null || uor.getOrganization() == null) {
+                continue;
+            }
+
+            UserOrganizationRoleResponse resp = new UserOrganizationRoleResponse();
+            resp.setOrganization(convertToOrganizationResponseSimple(uor.getOrganization()));
+
+            // roles 是 LAZY；如果未初始化，不强制触发加载，避免 detached entity 场景抛 LazyInitializationException
+            if (Hibernate.isInitialized(uor.getRoles()) && uor.getRoles() != null) {
+                resp.setRoles(uor.getRoles().stream().map(ConvertUtils::convertToRoleResponseManual).collect(Collectors.toSet()));
+            } else {
+                resp.setRoles(null);
+            }
+
+            responses.add(resp);
+        }
+
+        return responses;
+    }
+
+    private static RoleResponse convertToRoleResponseManual(RoleEntity role) {
+        if (role == null) {
+            return null;
+        }
+
+        RoleResponse resp = new RoleResponse();
+        resp.setUid(role.getUid());
+        resp.setOrgUid(role.getOrgUid());
+        resp.setUserUid(role.getUserUid());
+        resp.setLevel(role.getLevel());
+        resp.setPlatform(role.getPlatform());
+        resp.setCreatedAt(role.getCreatedAt());
+        resp.setUpdatedAt(role.getUpdatedAt());
+
+        resp.setName(role.getName());
+        resp.setValue(role.getValue());
+        resp.setDescription(role.getDescription());
+        resp.setSystem(role.getSystem());
+        // authorities 不在这里展开（避免额外懒加载/体积膨胀）
+        resp.setAuthorities(null);
+        return resp;
     }
 
     private static UserEntity.Sex parseUserSex(String sexValue) {

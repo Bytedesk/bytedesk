@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
@@ -38,6 +39,22 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
     @PostMapping("/join")
     public ResponseEntity<?> applyJoin(@RequestBody OrganizationApplyRequest request) {
         OrganizationApplyResponse response = organizationRestService.applyJoin(request);
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @ActionAnnotation(title = "加入组织申请", action = "审批通过", description = "approve join organization apply")
+    @PreAuthorize(OrganizationApplyPermissions.HAS_ORGANIZATION_APPLY_UPDATE)
+    @PostMapping("/approve")
+    public ResponseEntity<?> approve(@RequestBody OrganizationApplyRequest request) {
+        OrganizationApplyResponse response = organizationRestService.approve(request);
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @ActionAnnotation(title = "加入组织申请", action = "审批拒绝", description = "reject join organization apply")
+    @PreAuthorize(OrganizationApplyPermissions.HAS_ORGANIZATION_APPLY_UPDATE)
+    @PostMapping("/reject")
+    public ResponseEntity<?> reject(@RequestBody OrganizationApplyRequest request) {
+        OrganizationApplyResponse response = organizationRestService.reject(request);
         return ResponseEntity.ok(JsonResult.success(response));
     }
 

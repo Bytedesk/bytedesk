@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -27,9 +28,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.config.KbaseConst;
-import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.llm_faq.FaqRequest;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
@@ -37,7 +39,6 @@ import com.bytedesk.kbase.llm_faq.FaqStatusEnum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-// import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 /**
  * FAQ向量检索服务
@@ -54,6 +55,280 @@ public class FaqVectorService {
     private final ElasticsearchVectorStore vectorStore;
 
     private final FaqRestService faqRestService;
+
+    private final KbaseRestService kbaseRestService;
+
+    public Map<String, Object> queryVectorByUid(FaqRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "FAQ")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(10)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Map<String, Object>> docMaps = new ArrayList<>();
+        if (docs != null) {
+            for (Document doc : docs) {
+                Map<String, Object> docMap = new HashMap<>();
+                docMap.put("id", doc.getId());
+                docMap.put("content", doc.getText());
+                Map<String, Object> metadata = new HashMap<>(doc.getMetadata());
+                if (!metadata.containsKey(KbaseConst.KBASE_KB_UID)
+                        && metadata.containsKey(KbaseConst.KBASE_KB_UID_LEGACY)) {
+                    metadata.put(KbaseConst.KBASE_KB_UID, metadata.get(KbaseConst.KBASE_KB_UID_LEGACY));
+                    metadata.remove(KbaseConst.KBASE_KB_UID_LEGACY);
+                }
+                docMap.put("metadata", metadata);
+                docMaps.add(docMap);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("exists", docs != null && !docs.isEmpty());
+        result.put("total", docMaps.size());
+        result.put("docs", docMaps);
+        if (docs == null || docs.isEmpty()) {
+            result.put("message", "未查询到相关向量化信息");
+        }
+        return result;
+    }
+
+    private FaqEntity ensureFaqHasKbase(FaqEntity faq, String kbUidHint) {
+        if (faq.getKbase() != null && StringUtils.hasText(faq.getKbase().getUid())) {
+            return faq;
+        }
+
+        if (!StringUtils.hasText(kbUidHint)) {
+            return faq;
+        }
+
+        var kbaseOpt = kbaseRestService.findByUid(kbUidHint);
+        if (kbaseOpt.isEmpty()) {
+            return faq;
+        }
+
+        // 只更新关联，避免 save 整实体覆盖 elasticStatus 等字段
+        faqRestService.updateKbaseOnly(faq.getUid(), kbaseOpt.get());
+        faq.setKbase(kbaseOpt.get());
+        faqRestService.evictFaqCacheAllEntries();
+        return faq;
+    }
+
+    /**
+     * 同步FAQ向量索引状态到数据库
+     * - 如果向量存储中存在该uid文档：vectorStatus 置为 SUCCESS
+     * - 否则：vectorStatus 置为 NEW
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public FaqEntity syncVectorStatus(FaqRequest request) {
+        Optional<FaqEntity> faqOpt = faqRestService.findByUidNoCache(request.getUid());
+        if (faqOpt.isEmpty()) {
+            throw new RuntimeException("FAQ not found with UID: " + request.getUid());
+        }
+
+        FaqEntity faq = faqOpt.get();
+
+        boolean exists;
+        try {
+            exists = existsVectorDocumentByUid(faq.getUid(), faq.getQuestion());
+        } catch (Exception e) {
+            log.error("同步FAQ向量状态失败: uid={}, error={}", faq.getUid(), e.getMessage(), e);
+            faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+            faqRestService.evictFaqCacheAllEntries();
+            return faqRestService.findByUidNoCache(faq.getUid())
+                    .orElseThrow(() -> new RuntimeException("FAQ not found with UID: " + faq.getUid()));
+        }
+
+        String nextStatus = exists ? FaqStatusEnum.SUCCESS.name() : FaqStatusEnum.NEW.name();
+        faqRestService.updateVectorStatusOnly(faq.getUid(), nextStatus);
+        faqRestService.evictFaqCacheAllEntries();
+        return faqRestService.findByUidNoCache(faq.getUid())
+                .orElseThrow(() -> new RuntimeException("FAQ not found with UID: " + faq.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步FAQ向量索引状态到数据库
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Map<String, Object> syncVectorStatusByKbUid(FaqRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+
+        int successCount = 0;
+        int newCount = 0;
+        int errorCount = 0;
+
+        for (FaqEntity faq : faqList) {
+            try {
+                boolean exists = existsVectorDocumentByUid(faq.getUid(), faq.getQuestion());
+                if (exists) {
+                    faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.SUCCESS.name());
+                    successCount++;
+                } else {
+                    faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+                    newCount++;
+                }
+            } catch (Exception e) {
+                faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+                errorCount++;
+            }
+        }
+
+        faqRestService.evictFaqCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", faqList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 按知识库kbUid批量删除FAQ向量索引，并同步更新数据库状态
+     * - 删除成功/或无文档：vectorStatus 置为 NEW，清空 docIdList
+     * - 删除失败：vectorStatus 置为 ERROR
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(FaqRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+        int total = faqList.size();
+
+        // 先尝试批量删除（更快）；失败时再回退到逐条删除以尽可能完成
+        List<String> docIdsToDelete = new ArrayList<>();
+        for (FaqEntity faq : faqList) {
+            List<String> docIdList = faq.getDocIdList();
+            if (docIdList == null || docIdList.isEmpty()) {
+                docIdsToDelete.add("faq_" + faq.getUid());
+            } else {
+                docIdsToDelete.addAll(docIdList);
+            }
+        }
+
+        int successCount = 0;
+        int errorCount = 0;
+
+        try {
+            if (!docIdsToDelete.isEmpty()) {
+                vectorStore.delete(docIdsToDelete);
+            }
+            for (FaqEntity faq : faqList) {
+                faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+                faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
+            }
+            successCount = total;
+        } catch (Exception e) {
+            log.warn("批量删除向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+            for (FaqEntity faq : faqList) {
+                try {
+                    // 兼容：docIdList 为空时也尝试默认 docId
+                    if (faq.getDocIdList() == null || faq.getDocIdList().isEmpty()) {
+                        vectorStore.delete(List.of("faq_" + faq.getUid()));
+                        faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+                        faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
+                        successCount++;
+                        continue;
+                    }
+
+                    Boolean deleted = deleteFaqVector(faq);
+                    if (Boolean.TRUE.equals(deleted)) {
+                        faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+                        faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
+                        successCount++;
+                    } else {
+                        faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+                        errorCount++;
+                    }
+                } catch (Exception ex) {
+                    faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+                    errorCount++;
+                }
+            }
+        }
+
+        faqRestService.evictFaqCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", total);
+        result.put("success", successCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 删除FAQ向量索引，并同步更新数据库状态
+     * - 删除成功/或无文档：vectorStatus 置为 NEW，清空 docIdList
+     * - 删除失败：vectorStatus 置为 ERROR
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Boolean deleteVectorIndexAndSyncStatus(FaqRequest request) {
+        Optional<FaqEntity> faqOpt = faqRestService.findByUidNoCache(request.getUid());
+        if (faqOpt.isEmpty()) {
+            throw new RuntimeException("FAQ not found with UID: " + request.getUid());
+        }
+
+        FaqEntity faq = faqOpt.get();
+
+        // 兼容历史数据：docIdList 为空时，按默认规则尝试删除 faq_<uid>
+        if (faq.getDocIdList() == null || faq.getDocIdList().isEmpty()) {
+            try {
+                String defaultDocId = "faq_" + faq.getUid();
+                vectorStore.delete(List.of(defaultDocId));
+            } catch (Exception e) {
+                log.warn("按默认docId删除向量索引失败（将继续走常规删除逻辑）: uid={}, error={}", faq.getUid(), e.getMessage());
+            }
+        }
+
+        Boolean deleted = deleteFaqVector(faq);
+        if (Boolean.TRUE.equals(deleted)) {
+            faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+            faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
+        } else {
+            faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+        }
+
+        faqRestService.evictFaqCacheAllEntries();
+        return deleted;
+    }
+
+    private boolean existsVectorDocumentByUid(String uid, String queryHint) {
+        // 通过 filterExpression 精确过滤 uid，再用任意query触发检索
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "FAQ")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query((queryHint == null || queryHint.isBlank()) ? "ping" : queryHint)
+                .filterExpression(expression)
+                .topK(1)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        return docs != null && !docs.isEmpty();
+    }
     
     /**
      * 将FAQ内容添加到向量存储中
@@ -70,8 +345,11 @@ public class FaqVectorService {
     public void indexFaqVector(FaqEntity faq) {
         log.info("开始向量索引FAQ: {}, ID: {}", faq.getQuestion(), faq.getUid());
 
+        // 尝试从入参携带的 kbase 取 kbUid 作为兜底（防止 DB 中关联缺失或保存时出现乐观锁冲突）
+        final String kbUidHint = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
+
         // 在处理前先获取最新的FAQ实体
-        Optional<FaqEntity> currentFaqOpt = faqRestService.findByUid(faq.getUid());
+        Optional<FaqEntity> currentFaqOpt = faqRestService.findByUidNoCache(faq.getUid());
         if (!currentFaqOpt.isPresent()) {
             log.error("FAQ实体不存在，无法创建向量索引: {}", faq.getUid());
             throw new RuntimeException("FAQ实体不存在: " + faq.getUid());
@@ -79,6 +357,37 @@ public class FaqVectorService {
 
         FaqEntity currentFaq = currentFaqOpt.get();
         log.info("获取到最新FAQ实体，当前向量状态: {}, ID: {}", currentFaq.getVectorStatus(), currentFaq.getUid());
+
+        // kbUid 必填：避免写入向量存储时 kb_uid 为空
+        String kbUid = (currentFaq.getKbase() != null) ? currentFaq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid) && StringUtils.hasText(kbUidHint)) {
+            // 优先使用提示 kbUid，尽量补齐数据库关联；补齐失败也不影响本次向量索引。
+            try {
+                currentFaq = ensureFaqHasKbase(currentFaq, kbUidHint);
+            } catch (Exception e) {
+                log.warn("补齐FAQ.kbase失败（将继续使用kbUidHint写入向量存储）: uid={}, kbUidHint={}, error={}",
+                        currentFaq.getUid(), kbUidHint, e.getMessage());
+            }
+            kbUid = (currentFaq.getKbase() != null) ? currentFaq.getKbase().getUid() : kbUidHint;
+        }
+
+        if (!StringUtils.hasText(kbUid)) {
+            try {
+                faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.ERROR.name());
+                faqRestService.evictFaqCacheAllEntries();
+            } catch (Exception saveEx) {
+                log.error("设置向量状态为ERROR失败: uid={}, error={}", currentFaq.getUid(), saveEx.getMessage());
+            }
+            throw new RuntimeException("kbUid is required (faq.kbase is null), uid=" + currentFaq.getUid());
+        }
+
+        // 标记为处理中，避免重建期间仍显示为SUCCESS
+        try {
+            faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.PROCESSING.name());
+            faqRestService.evictFaqCacheAllEntries();
+        } catch (Exception e) {
+            log.warn("设置向量状态为处理中失败（将继续尝试索引）: uid={}, error={}", currentFaq.getUid(), e.getMessage());
+        }
 
         try {
             // 1. 为问题和答案创建文档（带有元数据）
@@ -92,11 +401,13 @@ public class FaqVectorService {
             Map<String, Object> metadata = Map.of(
                     "uid", currentFaq.getUid(),
                     "question", currentFaq.getQuestion(),
-                    KbaseConst.KBASE_KB_UID, currentFaq.getKbase() != null ? currentFaq.getKbase().getUid() : "",
+                    "kbUid", kbUid,
                     "categoryUid", currentFaq.getCategoryUid() != null ? currentFaq.getCategoryUid() : "",
                     "orgUid", currentFaq.getOrgUid(),
                     "enabled", Boolean.toString(currentFaq.getEnabled()),
-                    "tags", tags);
+                    "tags", tags,
+                    // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
+                    "sourceType", "FAQ");
 
             // 创建文档
             Document document = new Document(id, content, metadata);
@@ -119,23 +430,18 @@ public class FaqVectorService {
             // 添加文档ID并更新状态
             docIdList.add(id);
             currentFaq.setDocIdList(docIdList);
-
-            // 设置向量索引状态为成功
-            currentFaq.setVectorStatus(FaqStatusEnum.SUCCESS.name());
-
-            // 更新FAQ实体 - 使用明确的事务保证状态更新和保存原子性
-            log.info("准备保存FAQ实体更新，设置向量索引状态为成功: {}", currentFaq.getUid());
-
-            faqRestService.save(currentFaq);
+            faqRestService.updateDocIdListOnly(currentFaq.getUid(), docIdList);
+            faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.SUCCESS.name());
+            faqRestService.evictFaqCacheAllEntries();
 
         } catch (Exception e) {
             log.error("FAQ向量索引失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage(), e);
 
             // 设置向量索引状态为失败
-            currentFaq.setVectorStatus(ChunkStatusEnum.ERROR.name());
             try {
                 log.info("保存FAQ实体更新，设置向量索引状态为失败: {}", currentFaq.getUid());
-                faqRestService.save(currentFaq);
+                faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.ERROR.name());
+                faqRestService.evictFaqCacheAllEntries();
             } catch (Exception saveEx) {
                 log.error("更新FAQ向量索引状态失败: {}, 错误: {}", currentFaq.getUid(), saveEx.getMessage());
             }
@@ -150,9 +456,12 @@ public class FaqVectorService {
      * @param request FAQ请求对象
      */
     public void updateVectorIndex(FaqRequest request) {
-        Optional<FaqEntity> faqOpt = faqRestService.findByUid(request.getUid());
+        Optional<FaqEntity> faqOpt = faqRestService.findByUidNoCache(request.getUid());
         if (faqOpt.isPresent()) {
-            FaqEntity faq = faqOpt.get();
+            FaqEntity faq = ensureFaqHasKbase(faqOpt.get(), request.getKbUid());
+            if (faq.getKbase() == null || !StringUtils.hasText(faq.getKbase().getUid())) {
+                throw new RuntimeException("kbUid is required");
+            }
             // 删除旧的向量索引
             deleteFaqVector(faq);
             // 创建新的向量索引
@@ -168,13 +477,21 @@ public class FaqVectorService {
      * @param request FAQ请求对象，包含知识库ID
      */
     public void updateAllVectorIndex(FaqRequest request) {
-        List<FaqEntity> faqList = faqRestService.findByKbUid(request.getKbUid());
+        if (!StringUtils.hasText(request.getKbUid())) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(request.getKbUid());
         faqList.forEach(faq -> {
             try {
+                FaqEntity fixed = ensureFaqHasKbase(faq, request.getKbUid());
+                if (fixed.getKbase() == null || !StringUtils.hasText(fixed.getKbase().getUid())) {
+                    throw new RuntimeException("kbUid is required");
+                }
                 // 删除旧的向量索引
-                deleteFaqVector(faq);
+                deleteFaqVector(fixed);
                 // 创建新的向量索引
-                indexFaqVector(faq);
+                indexFaqVector(fixed);
             } catch (Exception e) {
                 log.error("更新FAQ向量索引失败: {}, 错误: {}", faq.getQuestion(), e.getMessage());
             }
@@ -234,11 +551,14 @@ public class FaqVectorService {
         // 构建查询条件
         FilterExpressionBuilder.Op enabledOp = expressionBuilder.eq("enabled", "true");
 
+        // 强制限定数据源类型，避免跨类型（TEXT/CHUNK/WEBPAGE）文档误召回
+        FilterExpressionBuilder.Op sourceTypeOp = expressionBuilder.eq("sourceType", "FAQ");
+
         // 添加可选的过滤条件
-        FilterExpressionBuilder.Op finalOp = enabledOp;
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(enabledOp, sourceTypeOp);
 
         if (kbUid != null && !kbUid.isEmpty()) {
-            FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
+            FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq("kbUid", kbUid);
             finalOp = expressionBuilder.and(finalOp, kbUidOp);
         }
 
@@ -279,7 +599,15 @@ public class FaqVectorService {
                 FaqEntity faqEntity = faqEntityOpt.get();
 
                 // 2. 将FaqEntity转换为FaqVector
-                FaqVector faqVector = FaqVector.fromFaqEntity(faqEntity);
+                FaqVector faqVector;
+                try {
+                    faqVector = FaqVector.fromFaqEntity(faqEntity);
+                } catch (IllegalArgumentException ex) {
+                    // 兼容历史脏数据：entity 可能缺 kbUid，但向量文档 metadata 中通常包含 kbUid
+                    log.warn("FaqVectorService search fallback to document metadata, uid={}, err={}", uid,
+                            ex.getMessage());
+                    faqVector = createSimpleFaqVectorFromDocument(doc);
+                }
 
                 // 3. 创建搜索结果对象
                 FaqVectorSearchResult result = FaqVectorSearchResult.builder()
@@ -345,7 +673,9 @@ public class FaqVectorService {
                 .similarQuestions(new ArrayList<>()) // 空列表，因为文档中可能没有这个信息
                 .tagList(tagList)
                 .orgUid((String) metadata.getOrDefault("orgUid", ""))
-                .kbUid((String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, ""))
+                .kbUid((String) metadata.getOrDefault(
+                    KbaseConst.KBASE_KB_UID,
+                    metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, "")))
                 .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
                 .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
                 .build();

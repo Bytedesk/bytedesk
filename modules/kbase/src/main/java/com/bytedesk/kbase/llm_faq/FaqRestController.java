@@ -131,6 +131,12 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @Override
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
 
+        // 删除FAQ的同时，同步删除全文索引与向量索引（向量服务可选）
+        faqElasticService.deleteIndexAndSyncStatus(request);
+        if (faqVectorService != null) {
+            faqVectorService.deleteVectorIndexAndSyncStatus(request);
+        }
+
         faqRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
@@ -143,9 +149,28 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(@RequestBody FaqRequest request) {
 
+        // 删除全部FAQ前，同步删除全文索引与向量索引，并同步更新状态
+        faqElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
+        if (faqVectorService != null) {
+            faqVectorService.deleteAllVectorIndexByKbUidAndSyncStatus(request);
+        }
+
         faqRestService.delateAll(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @Operation(summary = "按知识库删除所有FAQ向量索引", description = "按kbUid一键删除当前知识库下FAQ的向量索引，并同步更新FAQ实体vectorStatus")
+    @ApiResponse(responseCode = "200", description = "删除成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "删除向量索引(知识库)", description = "delete faq vector index by kbUid")
+    @PostMapping("/deleteAllVectorIndexByKbUid")
+    public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody FaqRequest request) {
+        if (faqVectorService == null) {
+            return ResponseEntity.ok(JsonResult.error("vector store not enabled"));
+        }
+        var result = faqVectorService.deleteAllVectorIndexByKbUidAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(result));
     }
 
     @Operation(summary = "启用常见问题", description = "启用或禁用常见问题")
@@ -190,6 +215,46 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
 
+    @Operation(summary = "删除常见问题索引", description = "删除常见问题在Elasticsearch中的索引，并同步更新FAQ实体索引状态")
+    @ApiResponse(responseCode = "200", description = "删除成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "删除索引", description = "delete faq elastic index")
+    @PostMapping("/deleteIndex")
+    public ResponseEntity<?> deleteIndex(@RequestBody FaqRequest request) {
+        Boolean deleted = faqElasticService.deleteIndexAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(deleted));
+    }
+
+    @Operation(summary = "同步常见问题索引状态", description = "检查Elasticsearch中是否存在FAQ索引并同步更新FAQ实体elasticStatus")
+    @ApiResponse(responseCode = "200", description = "同步成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "同步索引状态", description = "sync faq elastic status")
+    @PostMapping("/syncIndexStatus")
+    public ResponseEntity<?> syncIndexStatus(@RequestBody FaqRequest request) {
+        var faq = faqElasticService.syncElasticStatus(request);
+        return ResponseEntity.ok(JsonResult.success(faq.getElasticStatus()));
+    }
+
+    @Operation(summary = "批量同步常见问题索引状态", description = "根据知识库kbUid批量检查Elasticsearch中是否存在FAQ索引并同步更新FAQ实体elasticStatus")
+    @ApiResponse(responseCode = "200", description = "同步成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "批量同步索引状态", description = "sync faq elastic status by kb")
+    @PostMapping("/syncIndexStatusByKbUid")
+    public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody FaqRequest request) {
+        var result = faqElasticService.syncElasticStatusByKbUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @Operation(summary = "知识库一键删除常见问题索引", description = "根据知识库kbUid一键删除Elasticsearch中的FAQ索引，并同步更新FAQ实体elasticStatus")
+    @ApiResponse(responseCode = "200", description = "删除成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "知识库删除索引", description = "delete faq elastic index by kb")
+    @PostMapping("/deleteAllIndexByKbUid")
+    public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody FaqRequest request) {
+        var result = faqElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
     @Operation(summary = "更新常见问题向量索引", description = "更新常见问题的向量索引")
     @ApiResponse(responseCode = "200", description = "更新成功")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
@@ -199,9 +264,79 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
         if (faqVectorService != null) {
             faqVectorService.updateVectorIndex(request);
+        } else {
+            return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
         }
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+    }
+
+    @Operation(summary = "删除常见问题向量索引", description = "删除常见问题在向量存储中的索引，并同步更新FAQ实体向量索引状态")
+    @ApiResponse(responseCode = "200", description = "删除成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "删除向量索引", description = "delete faq vector index")
+    @PostMapping("/deleteVectorIndex")
+    public ResponseEntity<?> deleteVectorIndex(@RequestBody FaqRequest request) {
+
+        if (faqVectorService != null) {
+            Boolean deleted = faqVectorService.deleteVectorIndexAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(deleted));
+        } else {
+            return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+        }
+    }
+
+    @Operation(summary = "同步常见问题向量状态", description = "检查向量存储中是否存在FAQ向量索引并同步更新FAQ实体vectorStatus")
+    @ApiResponse(responseCode = "200", description = "同步成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "同步向量状态", description = "sync faq vector status")
+    @PostMapping("/syncVectorStatus")
+    public ResponseEntity<?> syncVectorStatus(@RequestBody FaqRequest request) {
+        
+        if (faqVectorService != null) {
+            var faq = faqVectorService.syncVectorStatus(request);
+            return ResponseEntity.ok(JsonResult.success(faq.getVectorStatus()));
+        } else {
+            return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+        }
+    }
+
+    @Operation(summary = "查询常见问题全文索引", description = "根据FAQ UID查询Elasticsearch中的索引文档")
+    @ApiResponse(responseCode = "200", description = "查询成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
+    @ActionAnnotation(title = "常见问题", action = "查询全文索引", description = "query faq elastic by uid")
+    @PostMapping("/queryElasticByUid")
+    public ResponseEntity<?> queryElasticByUid(@RequestBody FaqRequest request) {
+        var result = faqElasticService.queryElasticByUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @Operation(summary = "查询常见问题向量索引", description = "根据FAQ UID查询向量存储中的索引文档")
+    @ApiResponse(responseCode = "200", description = "查询成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
+    @ActionAnnotation(title = "常见问题", action = "查询向量索引", description = "query faq vector by uid")
+    @PostMapping("/queryVectorByUid")
+    public ResponseEntity<?> queryVectorByUid(@RequestBody FaqRequest request) {
+        if (faqVectorService != null) {
+            var result = faqVectorService.queryVectorByUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    @Operation(summary = "批量同步常见问题向量状态", description = "根据知识库kbUid批量检查向量存储中是否存在FAQ向量索引并同步更新FAQ实体vectorStatus")
+    @ApiResponse(responseCode = "200", description = "同步成功")
+    @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
+    @ActionAnnotation(title = "常见问题", action = "批量同步向量状态", description = "sync faq vector status by kb")
+    @PostMapping("/syncVectorStatusByKbUid")
+    public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody FaqRequest request) {
+
+        if (faqVectorService != null) {
+            var result = faqVectorService.syncVectorStatusByKbUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        } else {
+            return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+        }
     }
 
     @Operation(summary = "更新所有常见问题索引", description = "更新所有常见问题的Elasticsearch索引")
@@ -225,20 +360,11 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
         if (faqVectorService != null) {
             faqVectorService.updateAllVectorIndex(request);
+        } else {
+            return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
         }
 
         return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getUid()));
     }
-
-    // ai 依赖于 kbase, 不能在此调用 ai，所以迁移到 ai 模块
-    // generateSimilarQuestions
-    // @ActionAnnotation(title = "常见问题", action = "生成相似问题", description = "generate similar questions")
-    // @PostMapping("/generateSimilarQuestions")
-    // public ResponseEntity<?> generateSimilarQuestions(@RequestBody FaqRequest request) {
-
-    //     List<String> similarQuestions = faqRestService.generateSimilarQuestions(request);
-
-    //     return ResponseEntity.ok(JsonResult.success(similarQuestions));
-    // }
 
 }

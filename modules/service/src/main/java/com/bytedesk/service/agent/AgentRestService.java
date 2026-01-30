@@ -150,6 +150,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setOrgUid(request.getOrgUid());
         agent.setMember(member);
         agent.setUserUid(user.getUid());
+        agent.setAgentNo(agent.getUid()); // 默认工号为uid
         //
         // 设置客服配置：如果指定了 settingsUid，使用指定的配置；否则使用默认配置
         if (StringUtils.hasText(request.getSettingsUid())) {

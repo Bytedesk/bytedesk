@@ -17,12 +17,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryEntity;
@@ -73,8 +76,31 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
         return textRepository.findByUid(uid);
     }
 
+    /**
+     * 直接从数据库读取（不经过缓存）。
+     * 用于索引/向量状态同步等“只改部分字段”的场景。
+     */
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public Optional<TextEntity> findByUidNoCache(String uid) {
+        return textRepository.findByUid(uid);
+    }
+
+    /**
+     * 直接从数据库读取并 join fetch kbase（不经过缓存）。
+     * 用于全文/向量索引等需要读取 kbase.uid 的场景，避免 LAZY + 缓存导致关联为空。
+     */
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public Optional<TextEntity> findByUidWithKbaseNoCache(String uid) {
+        return textRepository.findByUidWithKbase(uid);
+    }
+
     @Cacheable(value = "text", key = "#kbUid", unless = "#result==null")
     public List<TextEntity> findByKbUid(String kbUid) {
+        return textRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<TextEntity> findByKbUidNoCache(String kbUid) {
         return textRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
@@ -98,7 +124,7 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
         if (kbase.isPresent()) {
             entity.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         //
         TextEntity savedEntity = save(entity);
@@ -127,6 +153,16 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
             entity.setCategoryUid(request.getCategoryUid());
+
+            // 允许通过更新接口修复/调整知识库关联（兼容历史数据 kbase 为空导致全文检索 kbUid 为空）
+            if (org.springframework.util.StringUtils.hasText(request.getKbUid())) {
+                Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
+                if (kbase.isPresent()) {
+                    entity.setKbase(kbase.get());
+                } else {
+                    throw new RuntimeException("kbUid not found");
+                }
+            }
             // entity.setType(request.getType());
             // entity.setDocIdList(request.getDocIdList());
             entity.setElasticStatus(request.getElasticStatus());
@@ -144,6 +180,29 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
 
     protected TextEntity doSave(TextEntity entity) {
         return textRepository.save(entity);
+    }
+
+    /**
+     * 清空 Text 相关缓存。
+     */
+    @CacheEvict(value = "text", allEntries = true)
+    public void evictTextCacheAllEntries() {
+        // no-op
+    }
+
+    @Transactional
+    public void updateElasticStatusOnly(String uid, String elasticStatus) {
+        textRepository.updateElasticStatusByUid(uid, elasticStatus);
+    }
+
+    @Transactional
+    public void updateVectorStatusOnly(String uid, String vectorStatus) {
+        textRepository.updateVectorStatusByUid(uid, vectorStatus);
+    }
+
+    @Transactional
+    public void updateDocIdListOnly(String uid, List<String> docIdList) {
+        textRepository.updateDocIdListByUid(uid, docIdList);
     }
 
     public void save(List<TextEntity> entities) {
@@ -274,7 +333,7 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
         if (kbase.isPresent()) {
             text.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         //
         return text;
@@ -298,7 +357,7 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
         if (kbase.isPresent()) {
             text.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         text.setOrgUid(orgUid);
         save(text);

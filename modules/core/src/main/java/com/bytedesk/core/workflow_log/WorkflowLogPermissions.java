@@ -20,6 +20,9 @@ public class WorkflowLogPermissions extends BasePermissions {
     // 模块前缀
     public static final String WORKFLOW_LOG_PREFIX = "WORKFLOW_LOG_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "WORKFLOW_LOG";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String WORKFLOW_LOG_READ = "WORKFLOW_LOG_READ";
     public static final String WORKFLOW_LOG_CREATE = "WORKFLOW_LOG_CREATE";
@@ -27,11 +30,11 @@ public class WorkflowLogPermissions extends BasePermissions {
     public static final String WORKFLOW_LOG_DELETE = "WORKFLOW_LOG_DELETE";
     public static final String WORKFLOW_LOG_EXPORT = "WORKFLOW_LOG_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_WORKFLOW_LOG_READ = "hasAuthority('WORKFLOW_LOG_READ')";
-    public static final String HAS_WORKFLOW_LOG_CREATE = "hasAuthority('WORKFLOW_LOG_CREATE')";
-    public static final String HAS_WORKFLOW_LOG_UPDATE = "hasAuthority('WORKFLOW_LOG_UPDATE')";
-    public static final String HAS_WORKFLOW_LOG_DELETE = "hasAuthority('WORKFLOW_LOG_DELETE')";
-    public static final String HAS_WORKFLOW_LOG_EXPORT = "hasAuthority('WORKFLOW_LOG_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_WORKFLOW_LOG_READ = "hasAuthority('" + WORKFLOW_LOG_READ + "')";
+    public static final String HAS_WORKFLOW_LOG_CREATE = "hasAuthority('" + WORKFLOW_LOG_CREATE + "')";
+    public static final String HAS_WORKFLOW_LOG_UPDATE = "hasAuthority('" + WORKFLOW_LOG_UPDATE + "')";
+    public static final String HAS_WORKFLOW_LOG_DELETE = "hasAuthority('" + WORKFLOW_LOG_DELETE + "')";
+    public static final String HAS_WORKFLOW_LOG_EXPORT = "hasAuthority('" + WORKFLOW_LOG_EXPORT + "')";
 
 }

@@ -108,6 +108,7 @@ public class CustomerEntity extends BaseEntity {
 
     /**
      * Associated visitor UID for tracking customer journey
+     * 关联的访客 visitorEntity.uid（系统 uid）
      */
     private String visitorUid;
 

@@ -146,6 +146,42 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
 
+    // delete elasticsearch index
+    @ActionAnnotation(title = "文件分块", action = "删除索引", description = "delete chunk elastic index")
+    @PostMapping("/deleteIndex")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> deleteIndex(@RequestBody ChunkRequest request) {
+        Boolean deleted = chunkElasticService.deleteIndexAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(deleted));
+    }
+
+    // sync elasticsearch index status
+    @ActionAnnotation(title = "文件分块", action = "同步索引状态", description = "sync chunk elastic status")
+    @PostMapping("/syncIndexStatus")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> syncIndexStatus(@RequestBody ChunkRequest request) {
+        var chunk = chunkElasticService.syncElasticStatus(request);
+        return ResponseEntity.ok(JsonResult.success(chunk.getElasticStatus()));
+    }
+
+    // sync elasticsearch index status by kbUid
+    @ActionAnnotation(title = "文件分块", action = "批量同步索引状态", description = "sync chunk elastic status by kb")
+    @PostMapping("/syncIndexStatusByKbUid")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody ChunkRequest request) {
+        var result = chunkElasticService.syncElasticStatusByKbUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    // delete all elasticsearch index by kbUid
+    @ActionAnnotation(title = "文件分块", action = "知识库删除索引", description = "delete chunk elastic index by kb")
+    @PostMapping("/deleteAllIndexByKbUid")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody ChunkRequest request) {
+        var result = chunkElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
     // update elasticsearch vector index
     @ActionAnnotation(title = "文件分块", action = "更新向量索引", description = "update chunk vector index")
     @PostMapping("/updateVectorIndex")
@@ -157,6 +193,61 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         }
 
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
+    }
+
+    // delete vector index
+    @ActionAnnotation(title = "文件分块", action = "删除向量索引", description = "delete chunk vector index")
+    @PostMapping("/deleteVectorIndex")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> deleteVectorIndex(@RequestBody ChunkRequest request) {
+        if (chunkVectorService != null) {
+            Boolean deleted = chunkVectorService.deleteVectorIndexAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(deleted));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    // sync vector status
+    @ActionAnnotation(title = "文件分块", action = "同步向量状态", description = "sync chunk vector status")
+    @PostMapping("/syncVectorStatus")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> syncVectorStatus(@RequestBody ChunkRequest request) {
+        if (chunkVectorService != null) {
+            var chunk = chunkVectorService.syncVectorStatus(request);
+            return ResponseEntity.ok(JsonResult.success(chunk.getVectorStatus()));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
+    @ActionAnnotation(title = "知识库拆分", action = "查询全文索引", description = "query chunk elastic by uid")
+    @PostMapping("/queryElasticByUid")
+    public ResponseEntity<?> queryElasticByUid(@RequestBody ChunkRequest request) {
+        var result = chunkElasticService.queryElasticByUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
+    @ActionAnnotation(title = "知识库拆分", action = "查询向量索引", description = "query chunk vector by uid")
+    @PostMapping("/queryVectorByUid")
+    public ResponseEntity<?> queryVectorByUid(@RequestBody ChunkRequest request) {
+        if (chunkVectorService != null) {
+            var result = chunkVectorService.queryVectorByUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    // sync vector status by kbUid
+    @ActionAnnotation(title = "文件分块", action = "批量同步向量状态", description = "sync chunk vector status by kb")
+    @PostMapping("/syncVectorStatusByKbUid")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody ChunkRequest request) {
+        if (chunkVectorService != null) {
+            var result = chunkVectorService.syncVectorStatusByKbUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
     // update elasticsearch all index
@@ -177,9 +268,22 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ChunkRequest request) {
 
         if (chunkVectorService != null) {
-            chunkVectorService.updateAllVectorIndex(request);
+            var result = chunkVectorService.updateAllVectorIndex(request);
+            return ResponseEntity.ok(JsonResult.success(result));
         }
 
-        return ResponseEntity.ok(JsonResult.success("update all vector index success", request.getKbUid()));
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    // delete all vector index by kbUid
+    @ActionAnnotation(title = "文件分块", action = "知识库删除向量索引", description = "delete chunk vector index by kb")
+    @PostMapping("/deleteAllVectorIndexByKbUid")
+    @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody ChunkRequest request) {
+        if (chunkVectorService != null) {
+            var result = chunkVectorService.deleteAllVectorIndexByKbUidAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 }

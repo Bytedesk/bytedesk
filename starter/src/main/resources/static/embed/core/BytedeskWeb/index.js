@@ -1,7 +1,7 @@
 var H = Object.defineProperty;
 var P = (L, e, i) => e in L ? H(L, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : L[e] = i;
 var p = (L, e, i) => P(L, typeof e != "symbol" ? e + "" : e, i);
-import { BYTEDESK_UID as M, BYTEDESK_VISITOR_UID as U, BYTEDESK_BROWSE_LAST_TIMESTAMP as V, BYTEDESK_BROWSE_FAILED_TIMESTAMP as _, POST_MESSAGE_LOCALSTORAGE_RESPONSE as A, POST_MESSAGE_INVITE_VISITOR_REJECT as Y, POST_MESSAGE_INVITE_VISITOR_ACCEPT as N, POST_MESSAGE_INVITE_VISITOR as j, POST_MESSAGE_RECEIVE_MESSAGE as X, POST_MESSAGE_MINIMIZE_WINDOW as q, POST_MESSAGE_MAXIMIZE_WINDOW as G, POST_MESSAGE_CLOSE_CHAT_WINDOW as K } from "../../utils/constants/index.js";
+import { BYTEDESK_UID as M, BYTEDESK_VISITOR_UID as U, BYTEDESK_BROWSE_LAST_TIMESTAMP as V, BYTEDESK_BROWSE_FAILED_TIMESTAMP as z, POST_MESSAGE_LOCALSTORAGE_RESPONSE as A, POST_MESSAGE_INVITE_VISITOR_REJECT as Y, POST_MESSAGE_INVITE_VISITOR_ACCEPT as N, POST_MESSAGE_INVITE_VISITOR as j, POST_MESSAGE_RECEIVE_MESSAGE as X, POST_MESSAGE_MINIMIZE_WINDOW as q, POST_MESSAGE_MAXIMIZE_WINDOW as G, POST_MESSAGE_CLOSE_CHAT_WINDOW as K } from "../../utils/constants/index.js";
 import t, { setGlobalConfig as J } from "../../utils/logger/index.js";
 class te {
   constructor(e) {
@@ -182,7 +182,7 @@ class te {
       visitorUid: i
     }) : (t.debug("开始创建访客初始化Promise"), this.initVisitorPromise = import("../../apis/visitor/index.js").then(
       async ({ initVisitor: h }) => {
-        var c, l, g, f, u, x, m, w, C, B, E, W, I, D, b, k, T, S, y, F, O, $, z;
+        var c, l, g, b, u, x, m, w, T, B, E, W, I, D, f, k, C, S, y, F, O, $, _;
         try {
           const R = {
             uid: String(((c = this.config.chatConfig) == null ? void 0 : c.uid) || e || ""),
@@ -190,18 +190,18 @@ class te {
               ((l = this.config.chatConfig) == null ? void 0 : l.visitorUid) || i || ""
             ),
             orgUid: String(((g = this.config.chatConfig) == null ? void 0 : g.org) || ""),
-            nickname: String(((f = this.config.chatConfig) == null ? void 0 : f.name) || ""),
+            nickname: String(((b = this.config.chatConfig) == null ? void 0 : b.name) || ""),
             avatar: String(((u = this.config.chatConfig) == null ? void 0 : u.avatar) || ""),
             mobile: String(((x = this.config.chatConfig) == null ? void 0 : x.mobile) || ""),
             email: String(((m = this.config.chatConfig) == null ? void 0 : m.email) || ""),
             note: String(((w = this.config.chatConfig) == null ? void 0 : w.note) || ""),
-            extra: typeof ((C = this.config.chatConfig) == null ? void 0 : C.extra) == "string" ? this.config.chatConfig.extra : JSON.stringify(((B = this.config.chatConfig) == null ? void 0 : B.extra) || {}),
+            extra: typeof ((T = this.config.chatConfig) == null ? void 0 : T.extra) == "string" ? this.config.chatConfig.extra : JSON.stringify(((B = this.config.chatConfig) == null ? void 0 : B.extra) || {}),
             vipLevel: String(((E = this.config.chatConfig) == null ? void 0 : E.vipLevel) || ""),
             debug: ((W = this.config.chatConfig) == null ? void 0 : W.debug) || !1,
             settingsUid: ((I = this.config.chatConfig) == null ? void 0 : I.settingsUid) || "",
             loadHistory: ((D = this.config.chatConfig) == null ? void 0 : D.loadHistory) || !1
           }, v = await h(R);
-          return t.debug("访客初始化API响应:", v.data, R), ((b = v.data) == null ? void 0 : b.code) === 200 ? ((T = (k = v.data) == null ? void 0 : k.data) != null && T.uid && (localStorage.setItem(M, v.data.data.uid), t.debug("已保存uid到localStorage:", v.data.data.uid)), (y = (S = v.data) == null ? void 0 : S.data) != null && y.visitorUid && (localStorage.setItem(
+          return t.debug("访客初始化API响应:", v.data, R), ((f = v.data) == null ? void 0 : f.code) === 200 ? ((C = (k = v.data) == null ? void 0 : k.data) != null && C.uid && (localStorage.setItem(M, v.data.data.uid), t.debug("已保存uid到localStorage:", v.data.data.uid)), (y = (S = v.data) == null ? void 0 : S.data) != null && y.visitorUid && (localStorage.setItem(
             U,
             v.data.data.visitorUid
           ), t.debug(
@@ -211,7 +211,7 @@ class te {
             O,
             v.data.data.uid || "",
             v.data.data.visitorUid || ""
-          )), v.data.data) : (t.error("访客初始化失败:", (z = v.data) == null ? void 0 : z.message), null);
+          )), v.data.data) : (t.error("访客初始化失败:", (_ = v.data) == null ? void 0 : _.message), null);
         } catch (R) {
           return t.error("访客初始化出错:", R), null;
         } finally {
@@ -228,37 +228,37 @@ class te {
         V
       );
       if (n) {
-        const D = parseInt(n), b = Date.now(), k = 60 * 60 * 1e3;
-        if (!Number.isNaN(D) && b - D < k) {
-          const T = Math.ceil(
-            (k - (b - D)) / 1e3 / 60
+        const D = parseInt(n), f = Date.now(), k = 60 * 60 * 1e3;
+        if (!Number.isNaN(D) && f - D < k) {
+          const C = Math.ceil(
+            (k - (f - D)) / 1e3 / 60
           );
-          t.warn(`浏览记录1小时内最多发送一次，还需等待 ${T} 分钟`);
+          t.warn(`浏览记录1小时内最多发送一次，还需等待 ${C} 分钟`);
           return;
         }
       }
-      const a = localStorage.getItem(_);
+      const a = localStorage.getItem(z);
       if (a) {
-        const D = parseInt(a), b = Date.now(), k = 60 * 60 * 1e3;
-        if (b - D < k) {
-          const T = Math.ceil((k - (b - D)) / 1e3 / 60);
-          t.warn(`浏览记录发送失败后1小时内禁止发送，还需等待 ${T} 分钟`);
+        const D = parseInt(a), f = Date.now(), k = 60 * 60 * 1e3;
+        if (f - D < k) {
+          const C = Math.ceil((k - (f - D)) / 1e3 / 60);
+          t.warn(`浏览记录发送失败后1小时内禁止发送，还需等待 ${C} 分钟`);
           return;
         } else
-          localStorage.removeItem(_);
+          localStorage.removeItem(z);
       }
-      const d = window.location.href, r = document.title, h = document.referrer, c = navigator.userAgent, l = this.getBrowserInfo(c), g = this.getOSInfo(c), f = this.getDeviceInfo(c), u = `${screen.width}x${screen.height}`, x = new URLSearchParams(window.location.search), m = x.get("utm_source") || void 0, w = x.get("utm_medium") || void 0, C = x.get("utm_campaign") || void 0, B = localStorage.getItem(M), E = {
+      const d = window.location.href, r = document.title, h = document.referrer, c = navigator.userAgent, l = this.getBrowserInfo(c), g = this.getOSInfo(c), b = this.getDeviceInfo(c), u = `${screen.width}x${screen.height}`, x = new URLSearchParams(window.location.search), m = x.get("utm_source") || void 0, w = x.get("utm_medium") || void 0, T = x.get("utm_campaign") || void 0, B = localStorage.getItem(M), E = {
         url: d,
         title: r,
         referrer: h,
         userAgent: c,
         operatingSystem: g,
         browser: l,
-        deviceType: f,
+        deviceType: b,
         screenResolution: u,
         utmSource: m,
         utmMedium: w,
-        utmCampaign: C,
+        utmCampaign: T,
         status: "ONLINE",
         // 注意这里就是uid，不是visitorUid，使用访客系统生成uid
         visitorUid: String(
@@ -272,9 +272,9 @@ class te {
       }
       localStorage.setItem(V, Date.now().toString());
       const { browse: W } = await import("../../apis/visitor/index.js"), I = await W(E);
-      ((o = I.data) == null ? void 0 : o.code) === 200 ? localStorage.removeItem(_) : (t.error("浏览记录发送失败:", (s = I.data) == null ? void 0 : s.message), localStorage.setItem(_, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
+      ((o = I.data) == null ? void 0 : o.code) === 200 ? localStorage.removeItem(z) : (t.error("浏览记录发送失败:", (s = I.data) == null ? void 0 : s.message), localStorage.setItem(z, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
     } catch (n) {
-      t.error("发送浏览记录时出错:", n), localStorage.setItem(_, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
+      t.error("发送浏览记录时出错:", n), localStorage.setItem(z, Date.now().toString()), t.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
     }
   }
   // 获取浏览器信息
@@ -325,7 +325,7 @@ class te {
   }
   // 清除浏览记录发送失败的限制
   clearBrowseFailedLimit() {
-    localStorage.removeItem(_), localStorage.removeItem(V), t.info("已清除浏览记录发送失败的限制");
+    localStorage.removeItem(z), localStorage.removeItem(V), t.info("已清除浏览记录发送失败的限制");
   }
   // 清除本地访客信息，强制重新初始化
   clearVisitorInfo() {
@@ -397,7 +397,7 @@ class te {
     ), this.clearUnreadMessagesPromise);
   }
   createBubble() {
-    var l, g, f, u, x, m, w, C, B, E, W, I, D;
+    var l, g, b, u, x, m, w, T, B, E, W, I, D;
     if (this.bubble && document.body.contains(this.bubble)) {
       t.debug("createBubble: 气泡已存在，不重复创建");
       return;
@@ -418,7 +418,7 @@ class te {
     if ((l = this.config.bubbleConfig) != null && l.show) {
       i = document.createElement("div"), i.style.cssText = `
         background: ${((g = this.config.theme) == null ? void 0 : g.mode) === "dark" ? "#1f2937" : "white"};
-        color: ${((f = this.config.theme) == null ? void 0 : f.mode) === "dark" ? "#e5e7eb" : "#1f2937"};
+        color: ${((b = this.config.theme) == null ? void 0 : b.mode) === "dark" ? "#e5e7eb" : "#1f2937"};
         padding: 12px 16px;
         border-radius: 8px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -429,22 +429,22 @@ class te {
         transition: all 0.3s ease;
         position: relative;
       `;
-      const b = document.createElement("div");
-      b.style.cssText = `
+      const f = document.createElement("div");
+      f.style.cssText = `
         display: flex;
         align-items: center;
         gap: 8px;
         flex-direction: ${this.config.placement === "bottom-left" ? "row" : "row-reverse"};
-      `, b.setAttribute(
+      `, f.setAttribute(
         "data-placement",
         this.config.placement || "bottom-right"
       );
       const k = document.createElement("span");
-      k.textContent = ((u = this.config.bubbleConfig) == null ? void 0 : u.icon) || "", k.style.fontSize = "20px", b.appendChild(k);
-      const T = document.createElement("div"), S = document.createElement("div");
-      S.textContent = ((x = this.config.bubbleConfig) == null ? void 0 : x.title) || "", S.style.fontWeight = "bold", S.style.color = ((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#e5e7eb" : "#1f2937", S.style.marginBottom = "4px", S.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", T.appendChild(S);
+      k.textContent = ((u = this.config.bubbleConfig) == null ? void 0 : u.icon) || "", k.style.fontSize = "20px", f.appendChild(k);
+      const C = document.createElement("div"), S = document.createElement("div");
+      S.textContent = ((x = this.config.bubbleConfig) == null ? void 0 : x.title) || "", S.style.fontWeight = "bold", S.style.color = ((m = this.config.theme) == null ? void 0 : m.mode) === "dark" ? "#e5e7eb" : "#1f2937", S.style.marginBottom = "4px", S.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", C.appendChild(S);
       const y = document.createElement("div");
-      y.textContent = ((w = this.config.bubbleConfig) == null ? void 0 : w.subtitle) || "", y.style.fontSize = "0.9em", y.style.color = ((C = this.config.theme) == null ? void 0 : C.mode) === "dark" ? "#9ca3af" : "#4b5563", y.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", T.appendChild(y), b.appendChild(T), i.appendChild(b);
+      y.textContent = ((w = this.config.bubbleConfig) == null ? void 0 : w.subtitle) || "", y.style.fontSize = "0.9em", y.style.color = ((T = this.config.theme) == null ? void 0 : T.mode) === "dark" ? "#9ca3af" : "#4b5563", y.style.textAlign = this.config.placement === "bottom-left" ? "left" : "right", C.appendChild(y), f.appendChild(C), i.appendChild(f);
       const F = document.createElement("div");
       F.style.cssText = `
         position: absolute;
@@ -493,42 +493,42 @@ class te {
       justify-content: center;
       gap: 8px;
     `, o.icon) {
-      const b = document.createElement("span");
-      b.textContent = o.icon, b.style.fontSize = `${n * 0.4}px`, c.appendChild(b);
+      const f = document.createElement("span");
+      f.textContent = o.icon, f.style.fontSize = `${n * 0.4}px`, c.appendChild(f);
     } else {
-      const b = document.createElement("div");
-      b.innerHTML = `
+      const f = document.createElement("div");
+      f.innerHTML = `
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z" 
                 fill="white"/>
         </svg>
-      `, c.appendChild(b);
+      `, c.appendChild(f);
     }
     if (o.text) {
-      const b = document.createElement("span");
-      b.textContent = o.text, b.style.cssText = `
+      const f = document.createElement("span");
+      f.textContent = o.text, f.style.cssText = `
         color: ${((D = this.config.theme) == null ? void 0 : D.textColor) || "#ffffff"};
         font-size: ${n * 0.25}px;
         white-space: nowrap;
-      `, c.appendChild(b);
+      `, c.appendChild(f);
     }
     if (this.bubble.appendChild(c), this.bubble.addEventListener("mouseenter", () => {
       this.bubble.style.transform = "scale(1.1)";
     }), this.bubble.addEventListener("mouseleave", () => {
       this.bubble.style.transform = "scale(1)";
     }), e.appendChild(this.bubble), this.config.draggable) {
-      let b = 0, k = 0, T = 0, S = 0;
+      let f = 0, k = 0, C = 0, S = 0;
       this.bubble.addEventListener("mousedown", (y) => {
-        y.button === 0 && (this.isDragging = !0, b = y.clientX, k = y.clientY, T = e.offsetLeft, S = e.offsetTop, e.style.transition = "none");
+        y.button === 0 && (this.isDragging = !0, f = y.clientX, k = y.clientY, C = e.offsetLeft, S = e.offsetTop, e.style.transition = "none");
       }), document.addEventListener("mousemove", (y) => {
         if (!this.isDragging) return;
         y.preventDefault();
-        const F = y.clientX - b, O = y.clientY - k, $ = T + F, z = S + O, R = window.innerHeight - e.offsetHeight;
+        const F = y.clientX - f, O = y.clientY - k, $ = C + F, _ = S + O, R = window.innerHeight - e.offsetHeight;
         $ <= window.innerWidth / 2 ? (e.style.left = `${Math.max(0, $)}px`, e.style.right = "auto", e.style.alignItems = "flex-start", this.config.placement = "bottom-left") : (e.style.right = `${Math.max(
           0,
           window.innerWidth - $ - e.offsetWidth
         )}px`, e.style.left = "auto", e.style.alignItems = "flex-end", this.config.placement = "bottom-right"), e.style.bottom = `${Math.min(
-          Math.max(0, window.innerHeight - z - e.offsetHeight),
+          Math.max(0, window.innerHeight - _ - e.offsetHeight),
           R
         )}px`;
       }), document.addEventListener("mouseup", () => {
@@ -540,11 +540,11 @@ class te {
     this.bubble.addEventListener("click", () => {
       if (!this.isDragging) {
         t.debug("bubble click");
-        const b = this.bubble.messageElement;
-        b instanceof HTMLElement && (b.style.display = "none"), this.showChat();
+        const f = this.bubble.messageElement;
+        f instanceof HTMLElement && (f.style.display = "none"), this.showChat();
       }
-    }), this.bubble.messageElement = i, document.body.appendChild(e), this.bubble.addEventListener("contextmenu", (b) => {
-      this.showContextMenu(b);
+    }), this.bubble.messageElement = i, document.body.appendChild(e), this.bubble.addEventListener("contextmenu", (f) => {
+      this.showContextMenu(f);
     }), document.addEventListener("click", () => {
       this.hideContextMenu();
     });
@@ -568,12 +568,16 @@ class te {
         left: 0;
         bottom: 0;
         width: 100%;
-        height: 90vh;
+        height: 100vh;
+        height: 100dvh;
         display: none;
         z-index: 10000;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
         transition: all ${(h = this.config.animation) == null ? void 0 : h.duration}ms ${(c = this.config.animation) == null ? void 0 : c.type};
       ` : this.window.style.cssText = `
         position: fixed;
@@ -593,8 +597,8 @@ class te {
       width: 100%;
       height: 100%;
       border: none;
-      display: block; // 添加这一行
-      vertical-align: bottom; // 添加这一行
+      display: block;
+      vertical-align: bottom;
     `, a.src = this.generateChatUrl(), t.debug("iframe.src: ", a.src), this.window.appendChild(a), document.body.appendChild(this.window);
   }
   generateChatUrl(e = "messages") {
@@ -730,12 +734,15 @@ class te {
           left: "0",
           bottom: "0",
           width: "100%",
-          height: "90vh",
+          height: "100vh",
           borderTopLeftRadius: "12px",
           borderTopRightRadius: "12px",
           borderBottomLeftRadius: "0",
-          borderBottomRightRadius: "0"
-        });
+          borderBottomRightRadius: "0",
+          boxSizing: "border-box",
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)"
+        }), this.window.style.height = "100dvh";
       else {
         let r = this.windowState === "maximized" ? s : Math.min(
           ((a = this.config.window) == null ? void 0 : a.width) || s * 0.9,
@@ -788,12 +795,12 @@ class te {
       max-width: 300px;
       text-align: center;
     `, (r = this.config.inviteConfig) != null && r.icon) {
-      const f = document.createElement("div");
-      f.style.cssText = `
+      const b = document.createElement("div");
+      b.style.cssText = `
         font-size: 32px;
         margin-bottom: 12px;
         color: ${e ? "#e5e7eb" : "#333"};
-      `, f.textContent = this.config.inviteConfig.icon, this.inviteDialog.appendChild(f);
+      `, b.textContent = this.config.inviteConfig.icon, this.inviteDialog.appendChild(b);
     }
     const i = document.createElement("div");
     i.style.cssText = `
@@ -817,8 +824,8 @@ class te {
       border-radius: 4px;
       cursor: pointer;
     `, s.onclick = () => {
-      var f, u;
-      this.hideInviteDialog(), this.showChat(), (u = (f = this.config.inviteConfig) == null ? void 0 : f.onAccept) == null || u.call(f);
+      var b, u;
+      this.hideInviteDialog(), this.showChat(), (u = (b = this.config.inviteConfig) == null ? void 0 : b.onAccept) == null || u.call(b);
     };
     const a = document.createElement("button");
     a.textContent = ((g = this.config.inviteConfig) == null ? void 0 : g.rejectText) || "稍后再说", a.style.cssText = `
@@ -829,8 +836,8 @@ class te {
       border-radius: 4px;
       cursor: pointer;
     `, a.onclick = () => {
-      var f, u;
-      this.hideInviteDialog(), (u = (f = this.config.inviteConfig) == null ? void 0 : f.onReject) == null || u.call(f), this.handleInviteLoop();
+      var b, u;
+      this.hideInviteDialog(), (u = (b = this.config.inviteConfig) == null ? void 0 : b.onReject) == null || u.call(b), this.handleInviteLoop();
     }, o.appendChild(s), o.appendChild(a), this.inviteDialog.appendChild(o), document.body.appendChild(this.inviteDialog);
   }
   showInviteDialog() {
@@ -1131,9 +1138,9 @@ class te {
       const m = document.createRange();
       m.setStart(s.startContainer, s.startOffset);
       let w = s.startOffset;
-      const C = s.startContainer.textContent || "";
+      const T = s.startContainer.textContent || "";
       if (s.startContainer.nodeType === Node.TEXT_NODE) {
-        for (; w < Math.min(C.length, s.endOffset); ) {
+        for (; w < Math.min(T.length, s.endOffset); ) {
           const B = document.createRange();
           B.setStart(s.startContainer, s.startOffset), B.setEnd(s.startContainer, w + 1);
           const E = B.getBoundingClientRect(), W = m.getBoundingClientRect();
@@ -1157,7 +1164,7 @@ class te {
     });
     const a = 120, d = 40, r = 15, h = 5;
     let c = n.left + h, l = n.top - d - r;
-    const g = window.innerWidth, f = window.innerHeight, u = window.scrollX, x = window.scrollY;
+    const g = window.innerWidth, b = window.innerHeight, u = window.scrollX, x = window.scrollY;
     c < 10 && (c = 10), c + a > g - 10 && (c = g - a - 10), l < x + 10 && (l = n.bottom + r, this.config.isDebug && t.debug("BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方")), c += u, l += x, this.config.isDebug && t.debug("BytedeskWeb: 最终提示框位置:", {
       x: c,
       y: l,
@@ -1165,7 +1172,7 @@ class te {
       verticalOffset: r,
       horizontalOffset: h,
       选中区域: n,
-      视口信息: { viewportWidth: g, viewportHeight: f, scrollX: u, scrollY: x }
+      视口信息: { viewportWidth: g, viewportHeight: b, scrollX: u, scrollY: x }
     }), this.feedbackTooltip.style.position = "absolute", this.feedbackTooltip.style.left = c + "px", this.feedbackTooltip.style.top = l + "px", this.feedbackTooltip.style.display = "block", this.feedbackTooltip.style.visibility = "visible", this.feedbackTooltip.style.opacity = "0", this.feedbackTooltip.style.zIndex = "999999", this.config.isDebug && t.debug("BytedeskWeb: 提示框位置已设置，样式:", {
       position: this.feedbackTooltip.style.position,
       left: this.feedbackTooltip.style.left,
@@ -1369,11 +1376,11 @@ class te {
         </a>
       </div>
     `, e.addEventListener("click", (c) => {
-      var f, u;
+      var b, u;
       switch (c.target.getAttribute("data-action")) {
         case "close":
         case "cancel":
-          this.hideFeedbackDialog(), (u = (f = this.config.feedbackConfig) == null ? void 0 : f.onCancel) == null || u.call(f);
+          this.hideFeedbackDialog(), (u = (b = this.config.feedbackConfig) == null ? void 0 : b.onCancel) == null || u.call(b);
           break;
         case "submit":
           this.submitFeedback();
@@ -1383,8 +1390,8 @@ class te {
       var l, g;
       c.target === this.feedbackDialog && (this.hideFeedbackDialog(), (g = (l = this.config.feedbackConfig) == null ? void 0 : l.onCancel) == null || g.call(l));
     }), document.addEventListener("keydown", (c) => {
-      var l, g, f;
-      c.key === "Escape" && ((l = this.feedbackDialog) == null ? void 0 : l.style.display) === "flex" && (this.hideFeedbackDialog(), (f = (g = this.config.feedbackConfig) == null ? void 0 : g.onCancel) == null || f.call(g));
+      var l, g, b;
+      c.key === "Escape" && ((l = this.feedbackDialog) == null ? void 0 : l.style.display) === "flex" && (this.hideFeedbackDialog(), (b = (g = this.config.feedbackConfig) == null ? void 0 : g.onCancel) == null || b.call(g));
     }), document.body.appendChild(this.feedbackDialog);
   }
   /**
@@ -1654,7 +1661,7 @@ class te {
    * 提交反馈
    */
   async submitFeedback() {
-    var d, r, h, c, l, g, f;
+    var d, r, h, c, l, g, b;
     const e = (d = this.feedbackDialog) == null ? void 0 : d.querySelector("#bytedesk-feedback-text"), i = (e == null ? void 0 : e.value.trim()) || "";
     if (!i) {
       alert("请填写反馈内容"), e == null || e.focus();
@@ -1674,8 +1681,8 @@ class te {
       let m = [];
       if (x) {
         this.config.isDebug && t.debug("BytedeskWeb: 开始生成和上传截图"), n && (n.textContent = "正在生成截图...");
-        const C = await this.generateAndUploadScreenshot();
-        C && (m.push(C), this.config.isDebug && t.debug("BytedeskWeb: 截图上传成功:", C)), n && (n.textContent = "正在提交反馈...");
+        const T = await this.generateAndUploadScreenshot();
+        T && (m.push(T), this.config.isDebug && t.debug("BytedeskWeb: 截图上传成功:", T)), n && (n.textContent = "正在提交反馈...");
       }
       const w = {
         selectedText: this.selectedText,
@@ -1689,7 +1696,7 @@ class te {
         orgUid: ((g = this.config.chatConfig) == null ? void 0 : g.org) || "",
         ...o.length > 0 && { categoryNames: o.join(",") }
       };
-      (f = this.config.feedbackConfig) != null && f.onSubmit ? this.config.feedbackConfig.onSubmit(w) : await this.submitFeedbackToServer(w), this.showFeedbackSuccess(), setTimeout(() => {
+      (b = this.config.feedbackConfig) != null && b.onSubmit ? this.config.feedbackConfig.onSubmit(w) : await this.submitFeedbackToServer(w), this.showFeedbackSuccess(), setTimeout(() => {
         this.hideFeedbackDialog();
       }, 2e3);
     } catch (u) {

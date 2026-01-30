@@ -20,6 +20,9 @@ public class CategoryPermissions extends BasePermissions {
     // 模块前缀
     public static final String CATEGORY_PREFIX = "CATEGORY_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "CATEGORY";
+
     // 统一权限（不区分层级）
     public static final String CATEGORY_READ = "CATEGORY_READ";
     public static final String CATEGORY_CREATE = "CATEGORY_CREATE";
@@ -27,11 +30,11 @@ public class CategoryPermissions extends BasePermissions {
     public static final String CATEGORY_DELETE = "CATEGORY_DELETE";
     public static final String CATEGORY_EXPORT = "CATEGORY_EXPORT";
 
-    // PreAuthorize 表达式 - 统一权限（不区分层级）
-    public static final String HAS_CATEGORY_READ = "hasAuthority('CATEGORY_READ')";
-    public static final String HAS_CATEGORY_CREATE = "hasAuthority('CATEGORY_CREATE')";
-    public static final String HAS_CATEGORY_UPDATE = "hasAuthority('CATEGORY_UPDATE')";
-    public static final String HAS_CATEGORY_DELETE = "hasAuthority('CATEGORY_DELETE')";
-    public static final String HAS_CATEGORY_EXPORT = "hasAuthority('CATEGORY_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_CATEGORY_READ = "hasAuthority('" + CATEGORY_READ + "')";
+    public static final String HAS_CATEGORY_CREATE = "hasAuthority('" + CATEGORY_CREATE + "')";
+    public static final String HAS_CATEGORY_UPDATE = "hasAuthority('" + CATEGORY_UPDATE + "')";
+    public static final String HAS_CATEGORY_DELETE = "hasAuthority('" + CATEGORY_DELETE + "')";
+    public static final String HAS_CATEGORY_EXPORT = "hasAuthority('" + CATEGORY_EXPORT + "')";
 
 }

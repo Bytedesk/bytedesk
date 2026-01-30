@@ -88,7 +88,20 @@ public class KnowledgeBaseSearchHelper {
      * @param robot 机器人配置
      * @return 包含源引用信息的搜索结果
      */
-    protected SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot) {
+    public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot) {
+        return searchKnowledgeBaseWithSources(query, robot, null);
+    }
+
+    /**
+     * 搜索知识库并收集源引用信息（支持按数据源类型过滤）
+     * 
+     * @param query 查询内容
+     * @param robot 机器人配置
+     * @param sourceTypeFilter 数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
+     * @return 包含源引用信息的搜索结果
+     */
+    public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot,
+            String sourceTypeFilter) {
         // 如果知识库未启用，直接返回空结果
         if (!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) {
             log.info("知识库未启用或未指定知识库UID");
@@ -109,15 +122,15 @@ public class KnowledgeBaseSearchHelper {
         switch (RobotSearchTypeEnum.valueOf(searchType)) {
             case VECTOR:
                 log.info("使用向量搜索");
-            executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                sourceReferences);
+                    executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
+                            sourceReferences, sourceTypeFilter);
                 break;
             case MIXED:
                 log.info("使用混合搜索");
                 executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
                         sourceReferences);
-            executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                sourceReferences);
+                    executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
+                            sourceReferences, sourceTypeFilter);
                 break;
             case FULLTEXT:
             default:
@@ -125,6 +138,22 @@ public class KnowledgeBaseSearchHelper {
                 executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
                         sourceReferences);
                 break;
+        }
+
+        // 过滤数据源类型（ALL/空值不过滤）
+        if (StringUtils.hasText(sourceTypeFilter) && !"ALL".equalsIgnoreCase(sourceTypeFilter)) {
+            String normalized = sourceTypeFilter.trim().toUpperCase();
+            List<RobotContent.SourceReference> filtered = new ArrayList<>();
+            for (RobotContent.SourceReference s : sourceReferences) {
+                if (s == null || s.getSourceType() == null) {
+                    continue;
+                }
+                String typeName = s.getSourceType().name();
+                if (normalized.equals(typeName)) {
+                    filtered.add(s);
+                }
+            }
+            sourceReferences = filtered;
         }
 
         // 读取过滤参数：scoreThreshold、topP、topK（允许为空，使用安全默认）
@@ -144,14 +173,16 @@ public class KnowledgeBaseSearchHelper {
         // 1) 先对来源进行 uid 聚合：同一内容保留分数最高的一条
         Map<String, RobotContent.SourceReference> bestSrcByUid = new LinkedHashMap<>();
         for (RobotContent.SourceReference src : sourceReferences) {
-            if (src == null || !StringUtils.hasText(src.getSourceUid())) continue;
+            if (src == null || !StringUtils.hasText(src.getSourceUid()))
+                continue;
             RobotContent.SourceReference existing = bestSrcByUid.get(src.getSourceUid());
             double s = src.getScore() != null ? src.getScore() : 0.0;
             if (existing == null) {
                 bestSrcByUid.put(src.getSourceUid(), src);
             } else {
                 double old = existing.getScore() != null ? existing.getScore() : 0.0;
-                if (s > old) bestSrcByUid.put(src.getSourceUid(), src);
+                if (s > old)
+                    bestSrcByUid.put(src.getSourceUid(), src);
             }
         }
 
@@ -159,7 +190,8 @@ public class KnowledgeBaseSearchHelper {
         double maxScore = 0.0;
         for (RobotContent.SourceReference s : bestSrcByUid.values()) {
             double sc = s.getScore() != null ? s.getScore() : 0.0;
-            if (sc > maxScore) maxScore = sc;
+            if (sc > maxScore)
+                maxScore = sc;
         }
 
         double pCut = 0.0;
@@ -172,7 +204,8 @@ public class KnowledgeBaseSearchHelper {
         List<RobotContent.SourceReference> filteredSources = new ArrayList<>();
         for (RobotContent.SourceReference s : bestSrcByUid.values()) {
             double sc = s.getScore() != null ? s.getScore() : 0.0;
-            if (sc >= finalCut) filteredSources.add(s);
+            if (sc >= finalCut)
+                filteredSources.add(s);
         }
 
         // 3) 按分数降序排序
@@ -191,7 +224,8 @@ public class KnowledgeBaseSearchHelper {
         // 5) 构建 uid->Faq 的映射（保留首次出现）
         Map<String, FaqProtobuf> faqByUidFirst = new LinkedHashMap<>();
         for (FaqProtobuf faq : searchResultList) {
-            if (faq == null || !StringUtils.hasText(faq.getUid())) continue;
+            if (faq == null || !StringUtils.hasText(faq.getUid()))
+                continue;
             faqByUidFirst.putIfAbsent(faq.getUid(), faq);
         }
 
@@ -199,12 +233,17 @@ public class KnowledgeBaseSearchHelper {
         List<FaqProtobuf> filteredFaqs = new ArrayList<>();
         for (RobotContent.SourceReference s : filteredSources) {
             FaqProtobuf f = faqByUidFirst.get(s.getSourceUid());
-            if (f != null) filteredFaqs.add(f);
+            if (f != null) {
+                // 以来源类型为准，保证 searchResults.type 与 sourceReferences.sourceType 一致
+                if (s != null && s.getSourceType() != null) {
+                    f.setType(s.getSourceType().name());
+                }
+                filteredFaqs.add(f);
+            }
         }
 
         return new SearchResultWithSources(filteredFaqs, filteredSources);
     }
-
 
     /**
      * 执行全文搜索并填充结果与来源引用
@@ -237,13 +276,15 @@ public class KnowledgeBaseSearchHelper {
                     .sourceUid(faq.getUid())
                     .sourceName(faq.getQuestion())
                     .contentSummary(getContentSummary(faq.getAnswer(), 200))
+                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
                     .score((double) withScore.getScore())
                     .highlighted(false)
                     .build();
             sourceReferences.add(sourceRef);
         }
 
-        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null, recallLimit);
+        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null,
+                recallLimit);
         for (TextElasticSearchResult withScore : textResults) {
             TextElastic text = withScore.getTextElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
@@ -254,13 +295,15 @@ public class KnowledgeBaseSearchHelper {
                     .sourceUid(text.getUid())
                     .sourceName(text.getTitle())
                     .contentSummary(getContentSummary(text.getContent(), 200))
+                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
                     .score((double) withScore.getScore())
                     .highlighted(false)
                     .build();
             sourceReferences.add(sourceRef);
         }
 
-        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null, recallLimit);
+        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null,
+                recallLimit);
         for (ChunkElasticSearchResult withScore : chunkResults) {
             ChunkElastic chunk = withScore.getChunkElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
@@ -274,13 +317,15 @@ public class KnowledgeBaseSearchHelper {
                     .fileUrl(chunk.getFileUrl())
                     .fileUid(chunk.getFileUid())
                     .contentSummary(getContentSummary(chunk.getContent(), 200))
+                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
                     .score((double) withScore.getScore())
                     .highlighted(false)
                     .build();
             sourceReferences.add(sourceRef);
         }
 
-        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null, recallLimit);
+        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null,
+                recallLimit);
         for (WebpageElasticSearchResult withScore : webpageResults) {
             WebpageElastic webpage = withScore.getWebpageElastic();
             FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
@@ -291,6 +336,7 @@ public class KnowledgeBaseSearchHelper {
                     .sourceUid(webpage.getUid())
                     .sourceName(webpage.getTitle())
                     .contentSummary(getContentSummary(webpage.getContent(), 200))
+                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
                     .score((double) withScore.getScore())
                     .highlighted(false)
                     .build();
@@ -303,7 +349,15 @@ public class KnowledgeBaseSearchHelper {
      */
     public void executeVectorSearchWithSources(String query, RobotProtobuf robot, String kbUid,
             List<FaqProtobuf> searchResultList,
-            List<RobotContent.SourceReference> sourceReferences) {
+            List<RobotContent.SourceReference> sourceReferences,
+            String sourceTypeFilter) {
+
+        // 若指定了数据源类型，则只执行对应的向量检索（减少无谓召回）
+        boolean allowAll = !StringUtils.hasText(sourceTypeFilter) || "ALL".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowFaq = allowAll || "FAQ".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowText = allowAll || "TEXT".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowChunk = allowAll || "CHUNK".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowWebpage = allowAll || "WEBPAGE".equalsIgnoreCase(sourceTypeFilter);
 
         // Vector 召回数量：默认 5；若配置了 topK，则至少取 topK；并设置上限防止过大查询
         int recallLimit = DEFAULT_VECTOR_RECALL_LIMIT;
@@ -317,7 +371,7 @@ public class KnowledgeBaseSearchHelper {
         }
         recallLimit = Math.min(recallLimit, MAX_VECTOR_RECALL_LIMIT);
 
-        if (faqVectorService != null) {
+        if (allowFaq && faqVectorService != null) {
             try {
                 List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null,
                         recallLimit);
@@ -331,6 +385,7 @@ public class KnowledgeBaseSearchHelper {
                             .sourceUid(faqVector.getUid())
                             .sourceName(faqVector.getQuestion())
                             .contentSummary(getContentSummary(faqVector.getAnswer(), 200))
+                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
                             .score((double) withScore.getScore())
                             .highlighted(false)
                             .build();
@@ -341,7 +396,7 @@ public class KnowledgeBaseSearchHelper {
             }
         }
 
-        if (textVectorService != null) {
+        if (allowText && textVectorService != null) {
             try {
                 List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null,
                         recallLimit);
@@ -355,6 +410,7 @@ public class KnowledgeBaseSearchHelper {
                             .sourceUid(textVector.getUid())
                             .sourceName(textVector.getTitle())
                             .contentSummary(getContentSummary(textVector.getContent(), 200))
+                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
                             .score((double) withScore.getScore())
                             .highlighted(false)
                             .build();
@@ -365,7 +421,7 @@ public class KnowledgeBaseSearchHelper {
             }
         }
 
-        if (chunkVectorService != null) {
+        if (allowChunk && chunkVectorService != null) {
             try {
                 List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null,
                         null, recallLimit);
@@ -382,6 +438,7 @@ public class KnowledgeBaseSearchHelper {
                             .fileUrl(chunkVector.getFileUrl())
                             .fileUid(chunkVector.getFileUid())
                             .contentSummary(getContentSummary(chunkVector.getContent(), 200))
+                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
                             .score((double) withScore.getScore())
                             .highlighted(false)
                             .build();
@@ -392,7 +449,7 @@ public class KnowledgeBaseSearchHelper {
             }
         }
 
-        if (webpageVectorService != null) {
+        if (allowWebpage && webpageVectorService != null) {
             try {
                 List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid,
                         null, null, recallLimit);
@@ -406,6 +463,7 @@ public class KnowledgeBaseSearchHelper {
                             .sourceUid(webpageVector.getUid())
                             .sourceName(webpageVector.getTitle())
                             .contentSummary(getContentSummary(webpageVector.getContent(), 200))
+                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
                             .score((double) withScore.getScore())
                             .highlighted(false)
                             .build();
@@ -434,7 +492,8 @@ public class KnowledgeBaseSearchHelper {
 
         Map<String, Agg> aggMap = new LinkedHashMap<>();
         for (RobotContent.SourceReference src : raw.getSourceReferences()) {
-            if (src == null || !StringUtils.hasText(src.getSourceUid())) continue;
+            if (src == null || !StringUtils.hasText(src.getSourceUid()))
+                continue;
             Agg a = aggMap.computeIfAbsent(src.getSourceUid(), k -> {
                 Agg x = new Agg();
                 x.bestScore = 0.0;

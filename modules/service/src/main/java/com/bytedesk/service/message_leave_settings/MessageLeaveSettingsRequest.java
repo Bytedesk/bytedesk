@@ -70,9 +70,51 @@ public class MessageLeaveSettingsRequest extends BaseRequest {
     // @Builder.Default
     // private String messageLeaveNotifyTime = BytedeskConsts.EMPTY_STRING;
 
+    
+
+    /**
+     * 是否启用“留言表单”方式：
+     * - true: 访客端在会话中发送表单消息进行留言
+     * - false: 访客端使用对话框方式留言
+     */
+    @Builder.Default
+    private Boolean messageLeaveFormEnabled = false;
+
+    /**
+     * 是否使用自定义留言表单（关联 FormEntity.uid）：
+     * - true: 使用 messageLeaveFormUid 指定的自定义表单
+     * - false: 使用系统自带表单（由前端内置/写死 schema）
+     */
+    @Builder.Default
+    private Boolean messageLeaveCustomFormEnabled = false;
+
+    /**
+     * 自定义留言表单 uid（FormEntity.uid）
+     */
+    @Builder.Default
+    private String messageLeaveFormUid = BytedeskConsts.EMPTY_STRING;
+
     // 留言表单
     @Builder.Default
     private String messageLeaveForm = BytedeskConsts.EMPTY_JSON_STRING;
+
+    // ===== 备选接待（客服/工作组）=====
+
+    // 是否启用备选接待客服
+    @Builder.Default
+    private Boolean messageLeaveBackupAgentEnabled = false;
+
+    // 备选接待客服 uid（AgentEntity.uid）
+    @Builder.Default
+    private String messageLeaveBackupAgentUid = BytedeskConsts.EMPTY_STRING;
+
+    // 是否启用备选接待工作组
+    @Builder.Default
+    private Boolean messageLeaveBackupWorkgroupEnabled = false;
+
+    // 备选接待工作组 uid（WorkgroupEntity.uid）
+    @Builder.Default
+    private String messageLeaveBackupWorkgroupUid = BytedeskConsts.EMPTY_STRING;
 
     
 }

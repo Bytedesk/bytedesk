@@ -20,6 +20,9 @@ public class UserPermissions extends BasePermissions {
     // 模块前缀
     public static final String USER_PREFIX = "USER_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "USER";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String USER_READ = "USER_READ";
     public static final String USER_CREATE = "USER_CREATE";
@@ -27,11 +30,11 @@ public class UserPermissions extends BasePermissions {
     public static final String USER_DELETE = "USER_DELETE";
     public static final String USER_EXPORT = "USER_EXPORT";
 
-    // PreAuthorize 表达式 - 统一权限（不区分层级）
-    public static final String HAS_USER_READ = "hasAuthority('USER_READ')";
-    public static final String HAS_USER_CREATE = "hasAuthority('USER_CREATE')";
-    public static final String HAS_USER_UPDATE = "hasAuthority('USER_UPDATE')";
-    public static final String HAS_USER_DELETE = "hasAuthority('USER_DELETE')";
-    public static final String HAS_USER_EXPORT = "hasAuthority('USER_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_USER_READ = "hasAuthority('" + USER_READ + "')";
+    public static final String HAS_USER_CREATE = "hasAuthority('" + USER_CREATE + "')";
+    public static final String HAS_USER_UPDATE = "hasAuthority('" + USER_UPDATE + "')";
+    public static final String HAS_USER_DELETE = "hasAuthority('" + USER_DELETE + "')";
+    public static final String HAS_USER_EXPORT = "hasAuthority('" + USER_EXPORT + "')";
 
 }

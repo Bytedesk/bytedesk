@@ -47,7 +47,6 @@ public class CategoryEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     // this category type may be user defined, so it should use string type, not enum

@@ -3,7 +3,6 @@
  * 
  * 包含与FreeSWITCH数据库表对应的JPA实体类：
  * - CallEntity: 通话记录
- * - ChannelEntity: 通道信息
  * - AliasEntity: 别名配置
  * - CompleteEntity: 完成记录
  * - InterfaceEntity: 接口配置

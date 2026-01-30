@@ -57,5 +57,6 @@ public class CustomerRequest extends BaseRequest {
     // 备注信息
     private String notes;
 
+    // 关联的访客 visitorEntity.uid（系统 uid）
     private String visitorUid;
 }

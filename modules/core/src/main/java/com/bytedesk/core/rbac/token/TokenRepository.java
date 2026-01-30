@@ -34,6 +34,11 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
      * @return Optional<TokenEntity&amp;amp;gt;
      */
     Optional<TokenEntity> findFirstByAccessTokenAndRevokedFalseAndDeletedFalse(String accessToken);
+
+    /**
+     * 通过访问令牌查找Token实体（包含 revoked=true 的记录，用于判定“是否已撤销”）。
+     */
+    Optional<TokenEntity> findFirstByAccessTokenAndDeletedFalse(String accessToken);
     
     /**
      * 通过用户UID、类型、未撤销、未删除和过期时间查询有效令牌

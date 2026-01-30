@@ -97,7 +97,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         if (user == null) {
             throw new RuntimeException("User not found");
         }
-        Optional<UserEntity> userOptional = findByUid(user.getUid());
+        Optional<UserEntity> userOptional = userRepository.findByUidWithOrganizations(user.getUid());
         if (userOptional.isPresent()) {
             return convertToResponse(userOptional.get());
         } else {

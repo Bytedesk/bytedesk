@@ -18,6 +18,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ChunkRepository extends JpaRepository<ChunkEntity, Long>, JpaSpecificationExecutor<ChunkEntity> {
 
@@ -28,4 +31,16 @@ public interface ChunkRepository extends JpaRepository<ChunkEntity, Long>, JpaSp
     List<ChunkEntity> findByKbase_UidAndDeletedFalse(String kbUid);
     
     List<ChunkEntity> findByFile_UidAndDeletedFalse(String fileUid);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ChunkEntity c set c.elasticStatus = :status where c.uid = :uid")
+    int updateElasticStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ChunkEntity c set c.vectorStatus = :status where c.uid = :uid")
+    int updateVectorStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ChunkEntity c set c.docId = :docId where c.uid = :uid")
+    int updateDocIdByUid(@Param("uid") String uid, @Param("docId") String docId);
 }

@@ -95,7 +95,7 @@ public class I18Consts {
     // 评价提示
     public static final String I18N_INVITE_RATE_TIP = "邀请评价提示"; // 邀请评价提示
     // 统一
-    public static final String I18N_UNIFIED_NICKNAME = "统一昵称"; // 统一昵称
+    public static final String I18N_UNIFIED_NICKNAME = "统一入口"; // 统一入口
     public static final String I18N_UNIFIED_DESCRIPTION = "统一描述"; // 统一描述
     // 工作组
     public static final String I18N_WORKGROUP_NICKNAME = "默认工作组"; // 工作组昵称

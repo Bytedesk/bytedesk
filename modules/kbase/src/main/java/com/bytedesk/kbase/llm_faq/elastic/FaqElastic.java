@@ -20,6 +20,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 
@@ -82,9 +83,9 @@ public class FaqElastic {
     
     // 从FaqEntity创建FaqElastic的静态方法
     public static FaqElastic fromFaqEntity(FaqEntity faq) {
-        String kbUid = "";
-        if (faq.getKbase() != null) {
-            kbUid = faq.getKbase().getUid();
+        String kbUid = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for indexing faq uid=" + faq.getUid());
         }
         
         return FaqElastic.builder()

@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.llm_text.vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
@@ -52,6 +54,52 @@ public class TextVectorService {
     private final ElasticsearchVectorStore vectorStore;
     
     private final TextRestService textRestService;
+
+    public Map<String, Object> queryVectorByUid(TextRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "TEXT")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(10)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Map<String, Object>> docMaps = new ArrayList<>();
+        if (docs != null) {
+            for (Document doc : docs) {
+                Map<String, Object> docMap = new HashMap<>();
+                docMap.put("id", doc.getId());
+                docMap.put("content", doc.getText());
+                Map<String, Object> metadata = new HashMap<>(doc.getMetadata());
+                if (!metadata.containsKey(KbaseConst.KBASE_KB_UID)
+                        && metadata.containsKey(KbaseConst.KBASE_KB_UID_LEGACY)) {
+                    metadata.put(KbaseConst.KBASE_KB_UID, metadata.get(KbaseConst.KBASE_KB_UID_LEGACY));
+                    metadata.remove(KbaseConst.KBASE_KB_UID_LEGACY);
+                }
+                docMap.put("metadata", metadata);
+                docMaps.add(docMap);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("exists", docs != null && !docs.isEmpty());
+        result.put("total", docMaps.size());
+        result.put("docs", docMaps);
+        if (docs == null || docs.isEmpty()) {
+            result.put("message", "未查询到相关向量化信息");
+        }
+        return result;
+    }
     
     /**
      * 将文本内容添加到向量存储中
@@ -79,7 +127,9 @@ public class TextVectorService {
                 "orgUid", text.getOrgUid(),
                 "enabled", Boolean.toString(text.getEnabled()),
                 "tags", tags,
-                "type", text.getType()
+                "type", text.getType(),
+                // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
+                "sourceType", "TEXT"
             );
             
             // 创建文档
@@ -125,13 +175,22 @@ public class TextVectorService {
      * @param request 文本请求对象
      */
     public void updateVectorIndex(TextRequest request) {
-        Optional<TextEntity> textOpt = textRestService.findByUid(request.getUid());
+        Optional<TextEntity> textOpt = textRestService.findByUidNoCache(request.getUid());
         if (textOpt.isPresent()) {
             TextEntity text = textOpt.get();
-            // 删除旧的向量索引
-            deleteTextVector(text);
-            // 创建新的向量索引
-            indexTextVector(text);
+            textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.PROCESSING.name());
+            try {
+                // 删除旧的向量索引
+                deleteTextVector(text);
+                // 创建新的向量索引
+                indexTextVector(text);
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.SUCCESS.name());
+            } catch (Exception e) {
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+                throw e;
+            } finally {
+                textRestService.evictTextCacheAllEntries();
+            }
         } else {
             log.warn("未找到要更新向量索引的文本: {}", request.getUid());
         }
@@ -142,17 +201,213 @@ public class TextVectorService {
      * @param request 文本请求对象，包含知识库ID
      */
     public void updateAllVectorIndex(TextRequest request) {
-        List<TextEntity> textList = textRestService.findByKbUid(request.getKbUid());
+        List<TextEntity> textList = textRestService.findByKbUidNoCache(request.getKbUid());
         textList.forEach(text -> {
+            textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.PROCESSING.name());
             try {
                 // 删除旧的向量索引
                 deleteTextVector(text);
                 // 创建新的向量索引
                 indexTextVector(text);
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.SUCCESS.name());
             } catch (Exception e) {
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
                 log.error("更新文本向量索引失败: {}, 错误: {}", text.getTitle(), e.getMessage());
             }
         });
+        textRestService.evictTextCacheAllEntries();
+    }
+
+    /**
+     * 同步Text向量索引状态到数据库
+     * - 如果向量存储中存在该uid文档：vectorStatus 置为 SUCCESS
+     * - 否则：vectorStatus 置为 NEW
+     */
+    public TextEntity syncVectorStatus(TextRequest request) {
+        Optional<TextEntity> textOpt = textRestService.findByUidNoCache(request.getUid());
+        if (textOpt.isEmpty()) {
+            throw new RuntimeException("Text not found with UID: " + request.getUid());
+        }
+
+        TextEntity text = textOpt.get();
+
+        boolean exists;
+        try {
+            exists = existsVectorDocumentByUid(text.getUid(), text.getTitle());
+        } catch (Exception e) {
+            log.error("同步Text向量状态失败: uid={}, error={}", text.getUid(), e.getMessage(), e);
+            textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+            textRestService.evictTextCacheAllEntries();
+            return textRestService.findByUidNoCache(text.getUid())
+                    .orElseThrow(() -> new RuntimeException("Text not found with UID: " + text.getUid()));
+        }
+
+        String nextStatus = exists ? ChunkStatusEnum.SUCCESS.name() : ChunkStatusEnum.NEW.name();
+        textRestService.updateVectorStatusOnly(text.getUid(), nextStatus);
+        textRestService.evictTextCacheAllEntries();
+        return textRestService.findByUidNoCache(text.getUid())
+                .orElseThrow(() -> new RuntimeException("Text not found with UID: " + text.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步Text向量索引状态到数据库
+     */
+    public Map<String, Object> syncVectorStatusByKbUid(TextRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+
+        int successCount = 0;
+        int newCount = 0;
+        int errorCount = 0;
+
+        for (TextEntity text : textList) {
+            try {
+                boolean exists = existsVectorDocumentByUid(text.getUid(), text.getTitle());
+                if (exists) {
+                    textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.SUCCESS.name());
+                    successCount++;
+                } else {
+                    textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+                    newCount++;
+                }
+            } catch (Exception e) {
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+                errorCount++;
+            }
+        }
+
+        textRestService.evictTextCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", textList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 按知识库kbUid批量删除Text向量索引，并同步更新数据库状态
+     */
+    public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(TextRequest request) {
+        String kbUid = request.getKbUid();
+        if (kbUid == null || kbUid.isBlank()) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+        int total = textList.size();
+
+        List<String> docIdsToDelete = new ArrayList<>();
+        for (TextEntity text : textList) {
+            List<String> docIdList = text.getDocIdList();
+            if (docIdList == null || docIdList.isEmpty()) {
+                docIdsToDelete.add("text_" + text.getUid());
+            } else {
+                docIdsToDelete.addAll(docIdList);
+            }
+        }
+
+        int successCount = 0;
+        int errorCount = 0;
+
+        try {
+            if (!docIdsToDelete.isEmpty()) {
+                vectorStore.delete(docIdsToDelete);
+            }
+            for (TextEntity text : textList) {
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+                textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
+            }
+            successCount = total;
+        } catch (Exception e) {
+            log.warn("批量删除Text向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+            for (TextEntity text : textList) {
+                try {
+                    if (text.getDocIdList() == null || text.getDocIdList().isEmpty()) {
+                        vectorStore.delete(List.of("text_" + text.getUid()));
+                        textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+                        textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
+                        successCount++;
+                        continue;
+                    }
+
+                    Boolean deleted = deleteTextVector(text);
+                    if (Boolean.TRUE.equals(deleted)) {
+                        textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+                        textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
+                        successCount++;
+                    } else {
+                        textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+                        errorCount++;
+                    }
+                } catch (Exception ex) {
+                    textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+                    errorCount++;
+                }
+            }
+        }
+
+        textRestService.evictTextCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", total);
+        result.put("success", successCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 删除Text向量索引，并同步更新数据库状态
+     */
+    public Boolean deleteVectorIndexAndSyncStatus(TextRequest request) {
+        Optional<TextEntity> textOpt = textRestService.findByUidNoCache(request.getUid());
+        if (textOpt.isEmpty()) {
+            throw new RuntimeException("Text not found with UID: " + request.getUid());
+        }
+
+        TextEntity text = textOpt.get();
+
+        if (text.getDocIdList() == null || text.getDocIdList().isEmpty()) {
+            try {
+                vectorStore.delete(List.of("text_" + text.getUid()));
+            } catch (Exception e) {
+                log.warn("按默认docId删除向量索引失败（将继续走常规删除逻辑）: uid={}, error={}", text.getUid(), e.getMessage());
+            }
+        }
+
+        Boolean deleted = deleteTextVector(text);
+        if (Boolean.TRUE.equals(deleted)) {
+            textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+            textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
+        } else {
+            textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+        }
+
+        textRestService.evictTextCacheAllEntries();
+        return deleted;
+    }
+
+    private boolean existsVectorDocumentByUid(String uid, String queryHint) {
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.and(
+            expressionBuilder.eq("uid", uid),
+            expressionBuilder.eq("sourceType", "TEXT")).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query((queryHint == null || queryHint.isBlank()) ? "ping" : queryHint)
+                .filterExpression(expression)
+                .topK(1)
+                .build();
+
+        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        return docs != null && !docs.isEmpty();
     }
     
     /**
@@ -201,9 +456,12 @@ public class TextVectorService {
         
         // 构建查询条件
         FilterExpressionBuilder.Op enabledOp = expressionBuilder.eq("enabled", "true");
+
+        // 强制限定数据源类型，避免跨类型（FAQ/CHUNK/WEBPAGE）文档误召回
+        FilterExpressionBuilder.Op sourceTypeOp = expressionBuilder.eq("sourceType", "TEXT");
         
         // 添加可选的过滤条件
-        FilterExpressionBuilder.Op finalOp = enabledOp;
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(enabledOp, sourceTypeOp);
         
         if (kbUid != null && !kbUid.isEmpty()) {
             FilterExpressionBuilder.Op kbUidOp = expressionBuilder.eq(KbaseConst.KBASE_KB_UID, kbUid);
@@ -243,7 +501,9 @@ public class TextVectorService {
             String docTitle = (String) metadata.getOrDefault("title", "");
             String docContent = doc.getText();
             String docType = (String) metadata.getOrDefault("type", "");
-            String docKbUid = (String) metadata.getOrDefault(KbaseConst.KBASE_KB_UID, "");
+                String docKbUid = (String) metadata.getOrDefault(
+                    KbaseConst.KBASE_KB_UID,
+                    metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, ""));
             String docCategoryUid = (String) metadata.getOrDefault("categoryUid", "");
             String docOrgUid = (String) metadata.getOrDefault("orgUid", "");
             

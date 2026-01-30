@@ -228,6 +228,19 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return visitorRepository.findByVisitorUidAndOrgUidAndDeleted(visitorUid, orgUid, false);
     }
 
+    @Transactional(readOnly = true)
+    public VisitorResponse queryByVisitorUid(@NonNull VisitorRequest request) {
+        String orgUid = request.getOrgUid();
+        String visitorUid = request.getVisitorUid();
+        if (!StringUtils.hasText(orgUid) || !StringUtils.hasText(visitorUid)) {
+            throw new IllegalArgumentException("orgUid and visitorUid are required");
+        }
+
+        VisitorEntity entity = findByVisitorUidAndOrgUid(visitorUid, orgUid)
+                .orElseThrow(() -> new NotFoundException("visitor not found"));
+        return convertToResponse(entity);
+    }
+
     public List<VisitorEntity> findByStatus(@NonNull String status) {
         return visitorRepository.findByStatusAndDeleted(status, false);
     }

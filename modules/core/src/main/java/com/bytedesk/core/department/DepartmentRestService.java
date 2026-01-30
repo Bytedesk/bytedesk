@@ -70,6 +70,8 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return page.map(this::convertToResponse);
     }
 
+    // 注意：不要缓存“查不到”的结果，否则会出现“部门刚创建但仍查不到”的负缓存问题
+    // Spring Cache 对 Optional 返回值可能会做解包（empty -> null / present -> entity），因此这里只做 null 判断，避免对实体误调用 isEmpty()
     @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
     public Optional<DepartmentEntity> findByNameAndOrgUid(String name, String orgUid) {
         return departmentRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
@@ -88,6 +90,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return departmentRepository.existsByUid(uid);
     }
 
+    @CacheEvict(value = "department", allEntries = true)
     public DepartmentResponse create(DepartmentRequest request) {
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
@@ -125,6 +128,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return convertToResponse(createdDepartment);
     }
 
+    @CacheEvict(value = "department", allEntries = true)
     public DepartmentResponse update(DepartmentRequest request) {
         //
         Optional<DepartmentEntity> optional = findByUid(request.getUid());
@@ -160,7 +164,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return departmentRepository.save(entity);
     }
 
-    @CacheEvict(value = "department", key = "#uid")
+    @CacheEvict(value = "department", allEntries = true)
     @Override
     public void deleteByUid(String uid) {
         Optional<DepartmentEntity> optional = findByUid(uid);

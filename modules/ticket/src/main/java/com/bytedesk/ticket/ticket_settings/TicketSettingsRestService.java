@@ -272,10 +272,12 @@ public class TicketSettingsRestService extends
     /**
      * 根据 org + workgroup 获取设置；若未绑定则创建/获取组织默认设置并自动绑定该工作组。
      */
+    @Transactional
     public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid) {
         return getOrDefaultByWorkgroup(orgUid, workgroupUid, TicketTypeEnum.EXTERNAL.name());
     }
 
+    @Transactional
     public TicketSettingsResponse getOrDefaultByWorkgroup(String orgUid, String workgroupUid, String rawType) {
         String normalizedType = resolveSettingsType(rawType);
         // 1) 已绑定则直接返回

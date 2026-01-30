@@ -32,6 +32,8 @@ public class ConnectionRequest extends BaseRequest {
     private String clientId;
     private String deviceUid;
     private String protocol;
+    // CONNECTED / DISCONNECTED
+    private String status;
     private String ip;
     private String userAgent;
     private Integer ttlSeconds;

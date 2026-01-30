@@ -94,7 +94,7 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
         if (kbase.isPresent()) {
             entity.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         // 
         Optional<UploadEntity> upload = uploadRestService.findByUid(request.getUploadUid());

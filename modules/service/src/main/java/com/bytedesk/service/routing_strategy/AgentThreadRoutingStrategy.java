@@ -16,7 +16,9 @@ package com.bytedesk.service.routing_strategy;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -46,6 +48,11 @@ import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.agent_settings.AgentSettingsEntity;
+import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadContent;
@@ -79,6 +86,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
     private final TopicRestService topicRestService;
+    private final ObjectProvider<ThreadRoutingContext> threadRoutingContextProvider;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -274,7 +282,115 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             return routeOnlineAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
         } else {
             log.info("客服不可用，路由到离线处理 -  可用状态: {}", agentEntity.isAvailable());
+
+            // 离线时尝试切换到备选接待（备选客服 > 备选工作组）
+            MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, agentEntity);
+            if (backupResult != null) {
+                return backupResult;
+            }
             return handleOfflineAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
+        }
+    }
+
+    private MessageProtobuf tryRouteToBackup(VisitorRequest visitorRequest, AgentEntity agentEntity) {
+        if (visitorRequest == null || agentEntity == null) {
+            return null;
+        }
+        if (isBackupHopExceeded(visitorRequest)) {
+            return null;
+        }
+
+        MessageLeaveSettingsEntity settings = resolveEffectiveMessageLeaveSettings(visitorRequest, agentEntity);
+        if (settings == null) {
+            return null;
+        }
+
+        // 1) 备选客服
+        if (Boolean.TRUE.equals(settings.getMessageLeaveBackupAgentEnabled())
+                && StringUtils.hasText(settings.getMessageLeaveBackupAgentUid())
+                && !settings.getMessageLeaveBackupAgentUid().equals(agentEntity.getUid())) {
+            try {
+                Optional<AgentEntity> backupAgentOpt = agentRestService.findByUid(settings.getMessageLeaveBackupAgentUid());
+                if (backupAgentOpt.isPresent() && presenceFacadeService.isAgentOnlineAndAvailable(backupAgentOpt.get())) {
+                    VisitorRequest backupReq = buildBackupRequest(visitorRequest, settings.getMessageLeaveBackupAgentUid(), ThreadTypeEnum.AGENT);
+                    log.info("Agent offline, divert to backup agent - fromAgentUid: {}, backupAgentUid: {}", agentEntity.getUid(), settings.getMessageLeaveBackupAgentUid());
+                    return threadRoutingContextProvider.getObject().createCsThread(backupReq);
+                }
+            } catch (Exception e) {
+                log.warn("Divert to backup agent failed - backupAgentUid: {}, error: {}", settings.getMessageLeaveBackupAgentUid(), e.getMessage());
+            }
+        }
+
+        // 2) 备选工作组
+        if (Boolean.TRUE.equals(settings.getMessageLeaveBackupWorkgroupEnabled())
+                && StringUtils.hasText(settings.getMessageLeaveBackupWorkgroupUid())) {
+            try {
+                VisitorRequest backupReq = buildBackupRequest(visitorRequest, settings.getMessageLeaveBackupWorkgroupUid(), ThreadTypeEnum.WORKGROUP);
+                log.info("Agent offline, divert to backup workgroup - fromAgentUid: {}, backupWorkgroupUid: {}", agentEntity.getUid(), settings.getMessageLeaveBackupWorkgroupUid());
+                return threadRoutingContextProvider.getObject().createCsThread(backupReq);
+            } catch (Exception e) {
+                log.warn("Divert to backup workgroup failed - backupWorkgroupUid: {}, error: {}", settings.getMessageLeaveBackupWorkgroupUid(), e.getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    private MessageLeaveSettingsEntity resolveEffectiveMessageLeaveSettings(VisitorRequest visitorRequest, AgentEntity agentEntity) {
+        AgentSettingsEntity agentSettings = agentEntity.getSettings();
+        if (agentSettings == null) {
+            return null;
+        }
+        boolean useDraft = isDraftEnabled(visitorRequest);
+        if (useDraft && agentSettings.getDraftMessageLeaveSettings() != null) {
+            return agentSettings.getDraftMessageLeaveSettings();
+        }
+        if (agentSettings.getMessageLeaveSettings() != null) {
+            return agentSettings.getMessageLeaveSettings();
+        }
+        return agentSettings.getDraftMessageLeaveSettings();
+    }
+
+    private boolean isBackupHopExceeded(VisitorRequest visitorRequest) {
+        try {
+            String extra = visitorRequest.getExtra();
+            if (!StringUtils.hasText(extra)) {
+                return false;
+            }
+            JSONObject obj = JSON.parseObject(extra);
+            Integer hop = obj != null ? obj.getInteger("backupHop") : null;
+            return hop != null && hop >= 1;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private VisitorRequest buildBackupRequest(VisitorRequest original, String sid, ThreadTypeEnum type) {
+        VisitorRequest backup = new VisitorRequest();
+        BeanUtils.copyProperties(original, backup);
+        backup.setSid(sid);
+        backup.setForceNewThread(Boolean.TRUE);
+        // 防止循环备选：最多一跳
+        backup.setExtra(incrementBackupHop(original.getExtra()));
+        if (type == ThreadTypeEnum.AGENT) {
+            backup.setAgentType();
+        } else if (type == ThreadTypeEnum.WORKGROUP) {
+            backup.setWorkgroupType();
+        }
+        return backup;
+    }
+
+    private String incrementBackupHop(String extra) {
+        try {
+            JSONObject obj = StringUtils.hasText(extra) ? JSON.parseObject(extra) : new JSONObject();
+            if (obj == null) {
+                obj = new JSONObject();
+            }
+            Integer hop = obj.getInteger("backupHop");
+            obj.put("backupHop", hop == null ? 1 : hop + 1);
+            return obj.toJSONString();
+        } catch (Exception e) {
+            return extra;
         }
     }
 

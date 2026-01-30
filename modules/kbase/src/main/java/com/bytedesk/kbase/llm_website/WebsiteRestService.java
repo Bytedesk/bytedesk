@@ -86,7 +86,7 @@ public class WebsiteRestService
         if (kbase.isPresent()) {
             entity.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
 
         WebsiteEntity savedEntity = save(entity);

@@ -13,7 +13,11 @@
  */
 package com.bytedesk.core.rbac.organization_apply;
 
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,17 +26,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.MemberRepository;
+import com.bytedesk.core.member.MemberRequest;
+import com.bytedesk.core.member.MemberRestService;
+import com.bytedesk.core.member.MemberStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.rbac.user.UserResponseContact;
+import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +65,12 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
     private final AuthService authService;
 
     private final UserRepository userRepository;
+
+    private final UserService userService;
+
+    private final MemberRestService memberRestService;
+
+    private final MemberRepository memberRepository;
 
     @Override
     public Page<OrganizationApplyEntity> queryByOrgEntity(OrganizationApplyRequest request) {
@@ -141,6 +159,147 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
             throw new RuntimeException("Create organization apply failed");
         }
         return convertToResponse(savedEntity);
+    }
+
+    /**
+     * 组织管理员审批通过申请
+     * - 申请状态更新为 APPROVED
+     * - 将申请人默认组织切换为该组织
+     * - 将该组织写入用户的 userOrganizationRoles，并授予默认 ROLE_USER
+     * - 为用户在该组织下创建/激活 Member
+     */
+    @Transactional
+    public OrganizationApplyResponse approve(OrganizationApplyRequest request) {
+        if (!StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("uid is required");
+        }
+
+        OrganizationApplyEntity apply = organizationApplyRepository.findByUid(request.getUid())
+                .orElseThrow(() -> new NotFoundException("OrganizationApply not found"));
+        if (apply.isDeleted()) {
+            throw new NotFoundException("OrganizationApply not found");
+        }
+
+        if (!StringUtils.hasText(apply.getOrgUid())) {
+            throw new IllegalArgumentException("orgUid is required");
+        }
+        if (!StringUtils.hasText(apply.getUserUid())) {
+            throw new IllegalArgumentException("userUid is required");
+        }
+
+        UserEntity operator = authService.getUser();
+        if (operator == null) {
+            throw new IllegalArgumentException("login required");
+        }
+
+        OrganizationEntity org = organizationRepository.findByUid(apply.getOrgUid())
+                .orElseThrow(() -> new NotFoundException("Organization not found"));
+
+        // 仅允许组织 owner 审批（与 OrganizationEntity.user 语义一致）
+        if (org.getUser() == null || !StringUtils.hasText(org.getUser().getUid())
+                || !org.getUser().getUid().equals(operator.getUid())) {
+            throw new IllegalArgumentException("permission denied");
+        }
+
+        // 若已处理，直接返回
+        String currentStatus = StringUtils.hasText(apply.getStatus()) ? apply.getStatus() : OrganizationApplyStatusEnum.PENDING.name();
+        if (!OrganizationApplyStatusEnum.PENDING.name().equalsIgnoreCase(currentStatus)) {
+            return convertToResponse(apply);
+        }
+
+        apply.setStatus(OrganizationApplyStatusEnum.APPROVED.name());
+        apply.setRejectReason(null);
+        apply.setHandledByUid(operator.getUid());
+        apply.setHandledAt(ZonedDateTime.now());
+        OrganizationApplyEntity saved = save(apply);
+
+        UserEntity applicant = userRepository.findByUid(apply.getUserUid())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        // 1) 切换默认组织 + 写入组织角色（默认 ROLE_USER）
+        userService.ensureCurrentOrganization(applicant, org.getUid());
+        userService.updateUserRoles(applicant, new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_USER_UID)));
+
+        // 2) 创建/激活 Member
+        Optional<MemberEntity> existedMember = memberRepository.findByUserAndOrgUidAndDeletedFalse(applicant, org.getUid());
+        if (existedMember.isPresent()) {
+            MemberEntity member = existedMember.get();
+            if (!MemberStatusEnum.ACTIVE.name().equalsIgnoreCase(member.getStatus())) {
+                member.setStatus(MemberStatusEnum.ACTIVE.name());
+                memberRepository.save(member);
+            }
+        } else {
+            // MemberRestService.create 需要 email 或 mobile；若都没有则直接落库
+            if (StringUtils.hasText(applicant.getMobile()) || StringUtils.hasText(applicant.getEmail())) {
+                Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_USER_UID));
+                MemberRequest memberRequest = MemberRequest.builder()
+                        .nickname(StringUtils.hasText(applicant.getNickname()) ? applicant.getNickname() : applicant.getUsername())
+                        .email(applicant.getEmail())
+                        .mobile(applicant.getMobile())
+                        .status(MemberStatusEnum.ACTIVE.name())
+                        .roleUids(roleUids)
+                        .orgUid(org.getUid())
+                        .build();
+                memberRestService.create(memberRequest);
+            } else {
+                MemberEntity member = MemberEntity.builder()
+                        .uid(uidUtils.getUid())
+                        .nickname(StringUtils.hasText(applicant.getNickname()) ? applicant.getNickname() : applicant.getUsername())
+                        .email(applicant.getEmail())
+                        .mobile(applicant.getMobile())
+                        .status(MemberStatusEnum.ACTIVE.name())
+                        .orgUid(org.getUid())
+                        .user(applicant)
+                        .build();
+                memberRepository.save(member);
+            }
+        }
+
+        return convertToResponse(saved);
+    }
+
+    /**
+     * 组织管理员审批拒绝申请
+     */
+    @Transactional
+    public OrganizationApplyResponse reject(OrganizationApplyRequest request) {
+        if (!StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("uid is required");
+        }
+
+        OrganizationApplyEntity apply = organizationApplyRepository.findByUid(request.getUid())
+                .orElseThrow(() -> new NotFoundException("OrganizationApply not found"));
+        if (apply.isDeleted()) {
+            throw new NotFoundException("OrganizationApply not found");
+        }
+
+        UserEntity operator = authService.getUser();
+        if (operator == null) {
+            throw new IllegalArgumentException("login required");
+        }
+
+        OrganizationEntity org = organizationRepository.findByUid(apply.getOrgUid())
+                .orElseThrow(() -> new NotFoundException("Organization not found"));
+
+        if (org.getUser() == null || !StringUtils.hasText(org.getUser().getUid())
+                || !org.getUser().getUid().equals(operator.getUid())) {
+            throw new IllegalArgumentException("permission denied");
+        }
+
+        String currentStatus = StringUtils.hasText(apply.getStatus()) ? apply.getStatus() : OrganizationApplyStatusEnum.PENDING.name();
+        if (!OrganizationApplyStatusEnum.PENDING.name().equalsIgnoreCase(currentStatus)) {
+            return convertToResponse(apply);
+        }
+
+        apply.setStatus(OrganizationApplyStatusEnum.REJECTED.name());
+        if (StringUtils.hasText(request.getRejectReason())) {
+            apply.setRejectReason(request.getRejectReason());
+        }
+        apply.setHandledByUid(operator.getUid());
+        apply.setHandledAt(ZonedDateTime.now());
+
+        OrganizationApplyEntity saved = save(apply);
+        return convertToResponse(saved);
     }
 
     @Override

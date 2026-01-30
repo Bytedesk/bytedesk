@@ -14,7 +14,6 @@
 package com.bytedesk.core.socket.connection;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.socket.connection.event.ConnectionCreateEvent;
@@ -33,19 +32,17 @@ public class ConnectionEntityListener {
     @PostPersist
     public void onPostPersist(ConnectionEntity connection) {
         log.info("onPostPersist: {}", connection);
-        ConnectionEntity cloneConnection = SerializationUtils.clone(connection);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new ConnectionCreateEvent(cloneConnection));
+        bytedeskEventPublisher.publishEvent(new ConnectionCreateEvent(connection));
     }
 
     @PostUpdate
     public void onPostUpdate(ConnectionEntity connection) {
         log.info("onPostUpdate: {}", connection);
-        ConnectionEntity cloneConnection = SerializationUtils.clone(connection);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishEvent(new ConnectionUpdateEvent(cloneConnection));
+        bytedeskEventPublisher.publishEvent(new ConnectionUpdateEvent(connection));
     }
     
 }

@@ -378,6 +378,19 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         });
     }
 
+    private static String normalizeExcelText(String value) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        // 统一换行/制表符/不间断空格等，避免“看起来一样但匹配不上”的情况
+        String normalized = value
+                .replace('\u00A0', ' ') // nbsp
+                .replaceAll("[\\u0000-\\u001F\\u007F]", " ") // 控制字符
+                .replaceAll("\\s+", " ")
+                .trim();
+        return StringUtils.hasText(normalized) ? normalized : null;
+    }
+
     public MemberEntity convertExcelToMember(MemberExcelImport excel, String orgUid) {
         // 去重
         if (StringUtils.hasText(excel.getEmail()) && existsByEmailAndOrgUid(excel.getEmail(), orgUid)) {
@@ -386,25 +399,44 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (StringUtils.hasText(excel.getMobile()) && existsByMobileAndOrgUid(excel.getMobile(), orgUid)) {
             return null;
         }
-        Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_AGENT_UID));
+        // Excel 导入成员：默认仅赋予基础角色 ROLE_USER，避免误授予客服权限
+        Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_USER_UID));
         // 创建member
         MemberEntity member = modelMapper.map(excel, MemberEntity.class);
         member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
         // 
-        Optional<DepartmentEntity> departmentOptional = departmentRestService.findByNameAndOrgUid(excel.getDepartmentName(), orgUid);
-        if (departmentOptional.isPresent()) {
-            member.setDeptUid(departmentOptional.get().getUid());
+        String deptName = normalizeExcelText(excel.getDepartmentName());
+        if (StringUtils.hasText(deptName)) {
+            Optional<DepartmentEntity> departmentOptional = departmentRestService.findByNameAndOrgUid(deptName, orgUid);
+            if (departmentOptional.isPresent()) {
+                member.setDeptUid(departmentOptional.get().getUid());
+            } else {
+                // 部门不存在，尝试创建；若并发/重复导致创建失败，则回退到再次查询
+                DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                        .uid(uidUtils.getUid())
+                        .name(deptName)
+                        .description(deptName + " Description")
+                        .orgUid(orgUid)
+                        .build();
+                try {
+                    departmentRestService.create(departmentRequest);
+                    member.setDeptUid(departmentRequest.getUid());
+                } catch (RuntimeException ex) {
+                    Optional<DepartmentEntity> retry = departmentRestService.findByNameAndOrgUid(deptName, orgUid);
+                    if (retry.isPresent()) {
+                        member.setDeptUid(retry.get().getUid());
+                    } else {
+                        log.warn("Excel导入部门创建失败且无法回查: orgUid={}, deptName={}, err={}", orgUid, deptName, ex.getMessage());
+                    }
+                }
+            }
         } else {
-            // 部门不存在，创建部门
-            DepartmentRequest departmentRequest = DepartmentRequest.builder()
-                    .uid(uidUtils.getUid())
-                    .name(excel.getDepartmentName())
-                    .description("Description for " + excel.getDepartmentName())
-                    .orgUid(orgUid)
-                    .build();
-            departmentRestService.create(departmentRequest);
-            member.setDeptUid(departmentRequest.getUid());
+            log.warn("Excel导入成员缺少部门信息: orgUid={}, nickname={}, email={}, mobile={}",
+                    orgUid,
+                    excel.getNickname(),
+                    excel.getEmail(),
+                    excel.getMobile());
         }
         // 生成user
         // 尝试根据邮箱和平台查找用户
@@ -534,7 +566,39 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
     @Override
     public void delete(MemberRequest request) {
-        deleteByUid(request.getUid());
+        removeUserFromOrg(request);
+    }
+
+    /**
+     * 组织管理员从成员列表中移除用户：
+     * - 删除(软删) MemberEntity
+     * - 同步从 UserEntity.userOrganizationRoles 中移除该组织
+     * - 若用户当前组织为该组织且仍有其它组织，则切换 currentOrganization
+     */
+    @Transactional
+    public void removeUserFromOrg(MemberRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("member uid is required");
+        }
+
+        Optional<MemberEntity> memberOptional = findByUid(request.getUid());
+        if (memberOptional.isEmpty() || memberOptional.get().isDeleted()) {
+            throw new NotFoundException("Member not found");
+        }
+
+        MemberEntity member = memberOptional.get();
+        final String orgUid = StringUtils.hasText(request.getOrgUid()) ? request.getOrgUid() : member.getOrgUid();
+        if (StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(member.getOrgUid())
+                && !request.getOrgUid().equals(member.getOrgUid())) {
+            throw new RuntimeException("orgUid mismatch");
+        }
+
+        // 先处理 user 的组织归属关系，再软删 member
+        if (member.getUser() != null && StringUtils.hasText(orgUid)) {
+            userService.removeUserFromOrganization(member.getUser().getUid(), orgUid);
+        }
+
+        deleteByUid(member.getUid());
     }
 
     @Override

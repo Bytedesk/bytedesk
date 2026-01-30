@@ -106,14 +106,15 @@ public class FaqEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<FaqEntity> relatedFaqs = new ArrayList<>();
 
+    // 全文索引状态
     @Builder.Default
     private String elasticStatus = FaqStatusEnum.NEW.name();
 
+    // 向量索引状态
     @Builder.Default
     private String vectorStatus = FaqStatusEnum.NEW.name();
-    /**
-     * 标签列表
-     */
+
+    // 标签列表
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)

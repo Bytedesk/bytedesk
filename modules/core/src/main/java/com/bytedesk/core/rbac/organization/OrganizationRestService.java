@@ -313,7 +313,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         OrganizationEntity organization = organizationOptional.get();
 
         // 非平台管理员/超级管理员：只能查询自己创建的组织
-        assertOwnerOrPrivileged(organization);
+        // assertOwnerOrPrivileged(organization);
         return convertToResponse(organization);
     }
 

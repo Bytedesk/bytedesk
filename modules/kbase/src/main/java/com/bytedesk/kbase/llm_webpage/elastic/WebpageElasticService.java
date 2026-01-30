@@ -14,7 +14,9 @@
 package com.bytedesk.kbase.llm_webpage.elastic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -29,6 +31,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -48,6 +51,26 @@ public class WebpageElasticService {
     private final ElasticsearchOperations elasticsearchOperations;
     
     private final WebpageRestService webpageRestService;
+
+    public Map<String, Object> queryElasticByUid(WebpageRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        boolean indexExists = elasticsearchOperations.indexOps(WebpageElastic.class).exists();
+        WebpageElastic doc = null;
+        if (indexExists) {
+            doc = elasticsearchOperations.get(uid, WebpageElastic.class);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("indexExists", indexExists);
+        result.put("exists", doc != null);
+        result.put("doc", doc);
+        return result;
+    }
 
     /**
      * 更新单个网页的Elasticsearch索引
@@ -72,6 +95,135 @@ public class WebpageElasticService {
         webpageList.forEach(webpage -> {
             indexWebpage(webpage); 
         });
+    }
+
+    /**
+     * 同步Webpage的Elasticsearch索引状态到数据库
+     */
+    public WebpageEntity syncElasticStatus(WebpageRequest request) {
+        Optional<WebpageEntity> webpageOpt = webpageRestService.findByUidNoCache(request.getUid());
+        if (webpageOpt.isEmpty()) {
+            throw new RuntimeException("Webpage not found with UID: " + request.getUid());
+        }
+
+        WebpageEntity webpage = webpageOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(WebpageElastic.class).exists();
+        boolean docExists = indexExists && elasticsearchOperations.exists(webpage.getUid(), WebpageElastic.class);
+
+        String nextStatus = docExists ? ChunkStatusEnum.SUCCESS.name() : ChunkStatusEnum.NEW.name();
+        webpageRestService.updateElasticStatusOnly(webpage.getUid(), nextStatus);
+        webpageRestService.evictWebpageCacheAllEntries();
+
+        return webpageRestService.findByUidNoCache(webpage.getUid())
+                .orElseThrow(() -> new RuntimeException("Webpage not found with UID: " + webpage.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步Webpage的Elasticsearch索引状态到数据库
+     */
+    public Map<String, Object> syncElasticStatusByKbUid(WebpageRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(WebpageElastic.class).exists();
+
+        int successCount = 0;
+        int newCount = 0;
+
+        for (WebpageEntity webpage : webpageList) {
+            boolean docExists = indexExists && elasticsearchOperations.exists(webpage.getUid(), WebpageElastic.class);
+            if (docExists) {
+                webpageRestService.updateElasticStatusOnly(webpage.getUid(), ChunkStatusEnum.SUCCESS.name());
+                successCount++;
+            } else {
+                webpageRestService.updateElasticStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+                newCount++;
+            }
+        }
+        webpageRestService.evictWebpageCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", webpageList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("indexExists", indexExists);
+        return result;
+    }
+
+    /**
+     * 根据知识库kbUid一键删除Elasticsearch中的Webpage索引，并同步更新Webpage实体elasticStatus
+     */
+    public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(WebpageRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(WebpageElastic.class).exists();
+
+        long deletedCount = 0;
+        if (indexExists) {
+            Query query = NativeQuery.builder()
+                .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                .build();
+            DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
+            var response = elasticsearchOperations.delete(deleteQuery, WebpageElastic.class);
+            deletedCount = response.getDeleted();
+        }
+
+        for (WebpageEntity webpage : webpageList) {
+            webpageRestService.updateElasticStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+        }
+        webpageRestService.evictWebpageCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", webpageList.size());
+        result.put("indexExists", indexExists);
+        result.put("deletedCount", deletedCount);
+        return result;
+    }
+
+    /**
+     * 删除Webpage在Elasticsearch中的索引，并同步更新数据库状态
+     */
+    public Boolean deleteIndexAndSyncStatus(WebpageRequest request) {
+        Optional<WebpageEntity> webpageOpt = webpageRestService.findByUidNoCache(request.getUid());
+        if (webpageOpt.isEmpty()) {
+            throw new RuntimeException("Webpage not found with UID: " + request.getUid());
+        }
+
+        WebpageEntity webpage = webpageOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(WebpageElastic.class).exists();
+        if (!indexExists) {
+            webpageRestService.updateElasticStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+            webpageRestService.evictWebpageCacheAllEntries();
+            return true;
+        }
+
+        Boolean deleted = false;
+        try {
+            deleteWebpageIndex(webpage.getUid());
+            deleted = true;
+        } catch (Exception e) {
+            log.warn("删除Webpage索引失败: uid={}, error={}", webpage.getUid(), e.getMessage());
+            deleted = false;
+        }
+
+        if (Boolean.TRUE.equals(deleted)) {
+            webpageRestService.updateElasticStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+        } else {
+            webpageRestService.updateElasticStatusOnly(webpage.getUid(), ChunkStatusEnum.ERROR.name());
+        }
+        webpageRestService.evictWebpageCacheAllEntries();
+        return deleted;
     }
 
     /**

@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -81,17 +82,48 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      */
     @Cacheable(cacheNames = "token", key = "#accessToken", unless = "#result == null")
     public Optional<TokenEntity> findByAccessToken(String accessToken) {
-        return tokenRepository.findFirstByAccessTokenAndRevokedFalseAndDeletedFalse(accessToken);
+        // 不能在这里加 revoked=false 过滤：否则 revoke 后 findByAccessToken 会查不到，
+        // 鉴权链路也就无法判定其为 revoked，从而导致“改 TokenEntity 让 token 失效”不生效。
+        return tokenRepository.findFirstByAccessTokenAndDeletedFalse(accessToken);
+    }
+
+    /**
+     * 根据 accessToken 查找 Token（不走缓存）。
+     *
+     * 说明：如果直接在数据库里修改 TokenEntity（例如把 revoked=true），缓存无法感知，
+     * 鉴权链路必须使用无缓存查询，才能做到“改 TokenEntity 立即让 token 失效”。
+     */
+    public Optional<TokenEntity> findByAccessTokenNoCache(String accessToken) {
+        return tokenRepository.findFirstByAccessTokenAndDeletedFalse(accessToken);
     }
 
     @Override
     public TokenResponse create(TokenRequest request) {
         TokenEntity entity = modelMapper.map(request, TokenEntity.class);
         entity.setUid(uidUtils.getUid());
-        // 
-        UserEntity user = authService.getCurrentUser();
-        
-        entity.setUserUid(user.getUid());
+        // 尽量由 TokenRestService 统一填充默认值，减少调用方重复逻辑
+        UserEntity currentUser = authService.getCurrentUser();
+
+        // userUid/orgUid：优先使用 request 传入值；否则回退到当前登录用户
+        if (!StringUtils.hasText(entity.getUserUid()) && currentUser != null) {
+            entity.setUserUid(currentUser.getUid());
+        }
+        if (!StringUtils.hasText(entity.getOrgUid()) && currentUser != null) {
+            entity.setOrgUid(currentUser.getOrgUid());
+        }
+
+        // name/description：如果调用方未设置，提供可读默认值
+        if (!StringUtils.hasText(entity.getName())) {
+            String username = currentUser != null ? currentUser.getUsername() : null;
+            entity.setName(StringUtils.hasText(username) ? ("Token - " + username) : "Token");
+        }
+        if (!StringUtils.hasText(entity.getDescription())) {
+            String channel = request.getChannel();
+            String device = request.getDevice();
+            entity.setDescription(String.format("token(channel=%s, device=%s)",
+                    StringUtils.hasText(channel) ? channel : "unknown",
+                    StringUtils.hasText(device) ? device : "unknown"));
+        }
         
         // 非永久有效，且未设置过期时间，则根据channel设置默认过期时间
         if (!Boolean.TRUE.equals(entity.getPermanent()) && entity.getExpiresAt() == null) {
@@ -107,6 +139,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     }
 
     @Override
+    @CacheEvict(cacheNames = "token", allEntries = true)
     public TokenResponse update(TokenRequest request) {
         Optional<TokenEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
@@ -132,6 +165,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     }
 
     @Override
+    @CacheEvict(cacheNames = "token", allEntries = true)
     public void deleteByUid(String uid) {
         Optional<TokenEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
@@ -218,7 +252,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             }
 
             // 从数据库验证token是否有效（未被撤销且未过期）
-            Optional<TokenEntity> tokenOpt = findByAccessToken(accessToken);
+            Optional<TokenEntity> tokenOpt = findByAccessTokenNoCache(accessToken);
             if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
                 // 记录最近活跃时间（节流更新）
                 touchLastActiveAtIfNeeded(tokenOpt.get());
@@ -239,12 +273,28 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      * 
      * @param accessToken JWT访问令牌
      */
+    @CacheEvict(cacheNames = "token", allEntries = true)
     public void revokeAccessToken(@NonNull String accessToken, String reason) {
-        Optional<TokenEntity> optional = findByAccessToken(accessToken);
+        // 撤销后需要清理缓存（key 既有 uid 也有 accessToken，统一 allEntries 最简单可靠）
+        // 注意：必须加在 public 方法上，避免类内自调用导致 @CacheEvict 不生效。
+        Optional<TokenEntity> optional = findByAccessTokenNoCache(accessToken);
         if (optional.isPresent()) {
             TokenEntity entity = optional.get();
-            entity.setRevoked(true);
-            entity.setRevokeReason(reason);
+            entity.revoke(reason);
+            save(entity);
+        }
+    }
+
+    /**
+     * 撤销指定 uid 的 token，使其立即失效（适合后台管理界面按行操作）。
+     */
+    @CacheEvict(cacheNames = "token", allEntries = true)
+    public void revokeByUid(@NonNull String uid, String reason) {
+        // 同 revokeAccessToken：撤销后清理缓存
+        Optional<TokenEntity> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            TokenEntity entity = optional.get();
+            entity.revoke(reason);
             save(entity);
         }
     }

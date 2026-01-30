@@ -14,7 +14,9 @@
 package com.bytedesk.kbase.llm_text.elastic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -26,10 +28,11 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import com.bytedesk.kbase.llm_text.TextEntity;
 import com.bytedesk.kbase.llm_text.TextRequest;
 import com.bytedesk.kbase.llm_text.TextRestService;
-
+import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
@@ -48,10 +51,31 @@ public class TextElasticService {
 
     @Autowired
     private TextRestService textRestService;
+
+    public Map<String, Object> queryElasticByUid(TextRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+        TextElastic doc = null;
+        if (indexExists) {
+            doc = elasticsearchOperations.get(uid, TextElastic.class);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("indexExists", indexExists);
+        result.put("exists", doc != null);
+        result.put("doc", doc);
+        return result;
+    }
     
     // update elasticsearch index
     public void updateIndex(TextRequest request) {
-        Optional<TextEntity> textOpt = textRestService.findByUid(request.getUid());
+        // 索引时需要读取 kbase.uid（kbUid），不使用缓存以避免 LAZY 关联丢失
+        Optional<TextEntity> textOpt = textRestService.findByUidWithKbaseNoCache(request.getUid());
         if (textOpt.isPresent()) {
             TextEntity text = textOpt.get();
             indexText(text);
@@ -69,6 +93,129 @@ public class TextElasticService {
         log.info("Updated elasticsearch index for {} texts from knowledge base: {}", textList.size(), request.getKbUid());
     }
 
+    /**
+     * 同步Text的Elasticsearch索引状态到数据库
+     * - 如果索引不存在或文档不存在：elasticStatus 置为 NEW
+     * - 如果文档存在：elasticStatus 置为 SUCCESS
+     */
+    public TextEntity syncElasticStatus(TextRequest request) {
+        Optional<TextEntity> textOpt = textRestService.findByUidNoCache(request.getUid());
+        if (textOpt.isEmpty()) {
+            throw new RuntimeException("Text not found with UID: " + request.getUid());
+        }
+
+        TextEntity text = textOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+        boolean docExists = indexExists && elasticsearchOperations.exists(text.getUid(), TextElastic.class);
+
+        String nextStatus = docExists ? ChunkStatusEnum.SUCCESS.name() : ChunkStatusEnum.NEW.name();
+        textRestService.updateElasticStatusOnly(text.getUid(), nextStatus);
+        textRestService.evictTextCacheAllEntries();
+
+        return textRestService.findByUidNoCache(text.getUid())
+                .orElseThrow(() -> new RuntimeException("Text not found with UID: " + text.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步Text的Elasticsearch索引状态到数据库
+     */
+    public Map<String, Object> syncElasticStatusByKbUid(TextRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+
+        int successCount = 0;
+        int newCount = 0;
+
+        for (TextEntity text : textList) {
+            boolean docExists = indexExists && elasticsearchOperations.exists(text.getUid(), TextElastic.class);
+            if (docExists) {
+                textRestService.updateElasticStatusOnly(text.getUid(), ChunkStatusEnum.SUCCESS.name());
+                successCount++;
+            } else {
+                textRestService.updateElasticStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+                newCount++;
+            }
+        }
+        textRestService.evictTextCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", textList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("indexExists", indexExists);
+        return result;
+    }
+
+    /**
+     * 根据知识库kbUid一键删除Elasticsearch中的Text索引，并同步更新Text实体elasticStatus
+     */
+    public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(TextRequest request) {
+        String kbUid = request.getKbUid();
+        if (!StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+
+        long deletedCount = 0;
+        if (indexExists) {
+                Query query = NativeQuery.builder()
+                    .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                    .build();
+            DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
+            var response = elasticsearchOperations.delete(deleteQuery, TextElastic.class);
+            deletedCount = response.getDeleted();
+        }
+
+        for (TextEntity text : textList) {
+            textRestService.updateElasticStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+        }
+        textRestService.evictTextCacheAllEntries();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("total", textList.size());
+        result.put("indexExists", indexExists);
+        result.put("deletedCount", deletedCount);
+        return result;
+    }
+
+    /**
+     * 删除Text在Elasticsearch中的索引，并同步更新数据库状态
+     */
+    public Boolean deleteIndexAndSyncStatus(TextRequest request) {
+        Optional<TextEntity> textOpt = textRestService.findByUidNoCache(request.getUid());
+        if (textOpt.isEmpty()) {
+            throw new RuntimeException("Text not found with UID: " + request.getUid());
+        }
+
+        TextEntity text = textOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
+        if (!indexExists) {
+            textRestService.updateElasticStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+            textRestService.evictTextCacheAllEntries();
+            return true;
+        }
+
+        Boolean deleted = deleteText(request.getUid());
+        if (Boolean.TRUE.equals(deleted)) {
+            textRestService.updateElasticStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+        } else {
+            textRestService.updateElasticStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+        }
+        textRestService.evictTextCacheAllEntries();
+        return deleted;
+    }
+
     
     /**
      * 索引Text实体到Elasticsearch
@@ -76,6 +223,16 @@ public class TextElasticService {
      */
     public void indexText(TextEntity text) {
         try {
+            // 若事件/缓存传入的实体缺少 kbase 关联，则回源数据库（join fetch）补齐
+            if (text != null && text.getKbase() == null && StringUtils.hasText(text.getUid())) {
+                textRestService.findByUidWithKbaseNoCache(text.getUid()).ifPresent(textFromDb -> {
+                    // 仅在缺失时回填，避免覆盖调用方已持有的实体
+                    if (text.getKbase() == null) {
+                        text.setKbase(textFromDb.getKbase());
+                    }
+                });
+            }
+
             // 首先检查索引是否存在，如果不存在则创建
             boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
             if (!indexExists) {
@@ -103,6 +260,10 @@ public class TextElasticService {
             
             // 将TextEntity转换为TextElastic对象
             TextElastic textElastic = TextElastic.fromEntity(text);
+
+            if (textElastic != null && !StringUtils.hasText(textElastic.getKbUid())) {
+                log.warn("Text索引文档kbUid为空，可能导致按kbUid过滤搜索命中0: textUid={}, title={}", text.getUid(), text.getTitle());
+            }
             
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(textElastic);
@@ -150,18 +311,18 @@ public class TextElasticService {
     
     /**
      * 根据知识库UID删除所有相关Text索引
-     * @param kbaseUid 知识库UID
+     * @param kbUid 知识库UID
      * @return 是否删除成功
      */
-    public Boolean deleteByKbaseUid(String kbaseUid) {
-        log.info("删除知识库下所有Text索引: {}", kbaseUid);
+    public Boolean deleteByKbUid(String kbUid) {
+        log.info("删除知识库下所有Text索引: {}", kbUid);
         
         try {
             // 首先创建查询
             Query query = NativeQuery.builder()
                     .withQuery(QueryBuilders.term()
-                        .field("kbaseUid")
-                        .value(kbaseUid)
+                        .field("kbUid")
+                        .value(kbUid)
                         .build()._toQuery())
                     .build();
                     
@@ -175,7 +336,7 @@ public class TextElasticService {
             log.info("成功删除知识库下的Text索引数量: {}", response.getDeleted());
             return true;
         } catch (Exception e) {
-            log.error("删除知识库下的Text索引时发生错误: {}, 错误消息: {}", kbaseUid, e.getMessage(), e);
+            log.error("删除知识库下的Text索引时发生错误: {}, 错误消息: {}", kbUid, e.getMessage(), e);
             return false;
         }
     }
@@ -268,7 +429,7 @@ public class TextElasticService {
                     
                 // 在名称中查找前缀匹配
                 boolQueryBuilder.should(QueryBuilders.matchPhrasePrefix()
-                    .field("name")
+                    .field("title")
                     .query(query)
                     .boost(2.0f)
                     .build()._toQuery());
@@ -283,7 +444,7 @@ public class TextElasticService {
                 // 完整搜索模式 - 使用多字段匹配
                 MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
                     .query(query)
-                    .fields("content^3", "name^2")
+                    .fields("content^3", "title^2")
                     .fuzziness("AUTO")
                     .build();
                 boolQueryBuilder.must(multiMatchQuery._toQuery());
@@ -313,7 +474,7 @@ public class TextElasticService {
             
             // 添加可选的过滤条件：知识库、分类、组织
             if (kbUid != null && !kbUid.isEmpty()) {
-                boolQueryBuilder.filter(QueryBuilders.term().field("kbaseUid").value(kbUid).build()._toQuery());
+                boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
             }
             
             if (categoryUid != null && !categoryUid.isEmpty() && !isSuggest) {

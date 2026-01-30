@@ -48,6 +48,10 @@ public class VisitorSpecification extends BaseSpecification<VisitorEntity, Visit
             if (StringUtils.hasText(request.getNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));
             }
+            // visitorUid（用户自定义uid）
+            if (StringUtils.hasText(request.getVisitorUid())) {
+                predicates.add(criteriaBuilder.like(root.get("visitorUid"), "%" + request.getVisitorUid() + "%"));
+            }
             // vipLevel
             // if (StringUtils.hasText(request.getVipLevel())) {
             //     predicates.add(criteriaBuilder.equal(root.get("vipLevel"), request.getVipLevel()));

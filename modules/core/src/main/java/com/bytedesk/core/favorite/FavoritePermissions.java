@@ -20,6 +20,9 @@ public class FavoritePermissions extends BasePermissions {
     // 模块前缀
     public static final String FAVORITE_PREFIX = "FAVORITE_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "FAVORITE";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String FAVORITE_READ = "FAVORITE_READ";
     public static final String FAVORITE_CREATE = "FAVORITE_CREATE";
@@ -27,11 +30,11 @@ public class FavoritePermissions extends BasePermissions {
     public static final String FAVORITE_DELETE = "FAVORITE_DELETE";
     public static final String FAVORITE_EXPORT = "FAVORITE_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_FAVORITE_READ = "hasAuthority('FAVORITE_READ')";
-    public static final String HAS_FAVORITE_CREATE = "hasAuthority('FAVORITE_CREATE')";
-    public static final String HAS_FAVORITE_UPDATE = "hasAuthority('FAVORITE_UPDATE')";
-    public static final String HAS_FAVORITE_DELETE = "hasAuthority('FAVORITE_DELETE')";
-    public static final String HAS_FAVORITE_EXPORT = "hasAuthority('FAVORITE_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_FAVORITE_READ = "hasAuthority('" + FAVORITE_READ + "')";
+    public static final String HAS_FAVORITE_CREATE = "hasAuthority('" + FAVORITE_CREATE + "')";
+    public static final String HAS_FAVORITE_UPDATE = "hasAuthority('" + FAVORITE_UPDATE + "')";
+    public static final String HAS_FAVORITE_DELETE = "hasAuthority('" + FAVORITE_DELETE + "')";
+    public static final String HAS_FAVORITE_EXPORT = "hasAuthority('" + FAVORITE_EXPORT + "')";
 
 }

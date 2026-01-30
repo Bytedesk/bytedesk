@@ -16,6 +16,6 @@ package com.bytedesk.kbase.config;
 public class KbaseConst {
     private KbaseConst() {}
 
-    public static final String KBASE_FILE_UID = "file_uid";
-    public static final String KBASE_KB_UID = "kb_uid";
+    public static final String KBASE_KB_UID = "kbUid";
+    public static final String KBASE_KB_UID_LEGACY = "kb_uid";
 }

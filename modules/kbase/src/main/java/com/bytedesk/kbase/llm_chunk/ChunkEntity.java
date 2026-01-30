@@ -57,7 +57,6 @@ public class ChunkEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     // chunk 之后可能不需要这么长的 content，待优化

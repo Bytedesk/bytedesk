@@ -96,7 +96,6 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		return uploadRepository.findAll(spec, pageable);
 	}
 
-
 	@Override
 	public Optional<UploadEntity> findByUid(String uid) {
 		return uploadRepository.findByUid(uid);

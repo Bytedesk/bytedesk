@@ -41,7 +41,6 @@ import lombok.experimental.Accessors;
  * 
  * Database Table: bytedesk_service_message_leave
  * Purpose: Stores offline messages from customers when agents are unavailable
- * 
  */
 @Entity
 @Data

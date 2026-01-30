@@ -34,19 +34,19 @@ public class ConnectionSpecification extends BaseSpecification<ConnectionEntity,
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            // name
-            // if (StringUtils.hasText(request.getName())) {
-            //     predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
-            // }
-            // description
-            // if (StringUtils.hasText(request.getDescription())) {
-            //     predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
-            // }
-            // type
-            if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            // clientId (searchable in frontend)
+            if (StringUtils.hasText(request.getClientId())) {
+                predicates.add(criteriaBuilder.like(root.get("clientId"), "%" + request.getClientId() + "%"));
             }
-            // 
+            // protocol (searchable in frontend)
+            if (StringUtils.hasText(request.getProtocol())) {
+                predicates.add(criteriaBuilder.equal(root.get("protocol"), request.getProtocol()));
+            }
+            // status: CONNECTED / DISCONNECTED (searchable in frontend)
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
+            // userUid (may be used by API / advanced filters)
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }

@@ -39,6 +39,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -91,7 +92,6 @@ public class TicketRestService
 
     private final TicketSettingsRestService ticketSettingsRestService;
 
-    
     // @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
     public Optional<TicketEntity> findByUid(String uid) {
@@ -195,6 +195,7 @@ public class TicketRestService
     private TicketResponse createInternal(TicketRequest request, boolean skipLoginEnforce) {
         Assert.notNull(request, "ticket request required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
+        normalizeReporterType(request, skipLoginEnforce);
         Assert.hasText(request.getReporterJson(), "reporter info required");
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
@@ -268,6 +269,7 @@ public class TicketRestService
         Assert.notNull(request, "ticket request required");
         Assert.hasText(request.getUid(), "ticket uid required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
+        normalizeReporterType(request, false);
         Assert.hasText(request.getReporterJson(), "reporter info required");
 
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
@@ -683,6 +685,39 @@ public class TicketRestService
             return reporter.getUid();
         }
         return null;
+    }
+
+    /**
+     * 创建/更新工单时强制 reporter.type。
+     * <ul>
+     * <li>外部工单（登录用户）：USER</li>
+     * <li>外部工单（匿名访客）：VISITOR</li>
+     * <li>内部工单：MEMBER</li>
+     * </ul>
+     * 为兼容旧客户端：当未传 type 时自动补齐；当传入 type 与期望不一致时直接拒绝。
+     */
+    private void normalizeReporterType(TicketRequest request, boolean skipLoginEnforce) {
+        UserProtobuf reporter = request.getReporter();
+        Assert.notNull(reporter, "reporter required");
+        Assert.hasText(reporter.getUid(), "reporter.uid required");
+
+        TicketTypeEnum ticketType = TicketTypeEnum.fromValue(request.getType());
+        String expectedType;
+        if (ticketType == TicketTypeEnum.INTERNAL) {
+            expectedType = UserTypeEnum.MEMBER.name();
+        } else {
+            expectedType = skipLoginEnforce ? UserTypeEnum.VISITOR.name() : UserTypeEnum.USER.name();
+        }
+
+        if (!StringUtils.hasText(reporter.getType())) {
+            reporter.setType(expectedType);
+            return;
+        }
+
+        if (!expectedType.equalsIgnoreCase(reporter.getType())) {
+            throw new IllegalArgumentException(
+                    "invalid reporter.type: expected " + expectedType + ", actual " + reporter.getType());
+        }
     }
 
 }

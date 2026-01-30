@@ -89,7 +89,7 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
         if (kbase.isPresent()) {
             entity.setKbase(kbase.get());
         } else {
-            throw new RuntimeException("kbaseUid not found");
+            throw new RuntimeException("kbUid not found");
         }
         //
         ArticleEntity savedArticle = save(entity);

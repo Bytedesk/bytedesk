@@ -20,6 +20,9 @@ public class ThreadPermissions extends BasePermissions {
     // 模块前缀
     public static final String THREAD_PREFIX = "THREAD_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "THREAD";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String THREAD_READ = "THREAD_READ";
     public static final String THREAD_CREATE = "THREAD_CREATE";
@@ -27,11 +30,11 @@ public class ThreadPermissions extends BasePermissions {
     public static final String THREAD_DELETE = "THREAD_DELETE";
     public static final String THREAD_EXPORT = "THREAD_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_THREAD_READ = "hasAuthority('THREAD_READ')";
-    public static final String HAS_THREAD_CREATE = "hasAuthority('THREAD_CREATE')";
-    public static final String HAS_THREAD_UPDATE = "hasAuthority('THREAD_UPDATE')";
-    public static final String HAS_THREAD_DELETE = "hasAuthority('THREAD_DELETE')";
-    public static final String HAS_THREAD_EXPORT = "hasAuthority('THREAD_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_THREAD_READ = "hasAuthority('" + THREAD_READ + "')";
+    public static final String HAS_THREAD_CREATE = "hasAuthority('" + THREAD_CREATE + "')";
+    public static final String HAS_THREAD_UPDATE = "hasAuthority('" + THREAD_UPDATE + "')";
+    public static final String HAS_THREAD_DELETE = "hasAuthority('" + THREAD_DELETE + "')";
+    public static final String HAS_THREAD_EXPORT = "hasAuthority('" + THREAD_EXPORT + "')";
 
 }

@@ -487,6 +487,109 @@ public class UserService {
         return user;
     }
 
+    /**
+     * 将用户从指定组织中移除：
+     * - 移除 userOrganizationRoles 中该组织的关联
+     * - 若 currentOrganization 正好是该组织，则切换到用户仍然所属的其它组织（如有）
+     * - 同步 currentRoles 为新 currentOrganization 下的角色集合，并确保包含 ROLE_USER
+     */
+    @Transactional
+    public UserEntity removeUserFromOrganization(String userUid, String orgUid) {
+        if (!StringUtils.hasText(userUid)) {
+            throw new RuntimeException("userUid is required");
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+
+        // 预加载 userOrganizationRoles/organization/roles，避免懒加载导致删除不生效或 N+1
+        UserEntity managedUser = userRepository.findByUidWithOrganizations(userUid)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userUid));
+
+        // 兼容历史/脏数据
+        if (managedUser.getUserOrganizationRoles() != null) {
+            managedUser.getUserOrganizationRoles().removeIf(
+                    u -> u == null || u.getOrganization() == null || !StringUtils.hasText(u.getOrganization().getUid()));
+        }
+
+        boolean removedCurrentOrg = managedUser.getCurrentOrganization() != null
+                && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())
+                && orgUid.equals(managedUser.getCurrentOrganization().getUid());
+
+        // 1) 移除该组织的组织-角色关联（orphanRemoval=true 会级联删除关联表记录）
+        if (managedUser.getUserOrganizationRoles() != null) {
+            managedUser.getUserOrganizationRoles().removeIf(
+                    uor -> uor != null
+                            && uor.getOrganization() != null
+                            && StringUtils.hasText(uor.getOrganization().getUid())
+                            && orgUid.equals(uor.getOrganization().getUid()));
+        }
+
+        // 2) 若移除的是当前组织，则切换到剩余组织（如有）
+        if (removedCurrentOrg) {
+            String nextOrgUid = null;
+            if (managedUser.getUserOrganizationRoles() != null) {
+                for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
+                    if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                        continue;
+                    }
+                    nextOrgUid = uor.getOrganization().getUid();
+                    break;
+                }
+            }
+
+            if (StringUtils.hasText(nextOrgUid)) {
+                ensureCurrentOrganization(managedUser, nextOrgUid);
+            } else {
+                managedUser.setCurrentOrganization(null);
+            }
+        }
+
+        // 3) 同步 currentRoles
+        managedUser.getCurrentRoles().clear();
+        if (managedUser.getCurrentOrganization() != null && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
+            String currentOrgUid = managedUser.getCurrentOrganization().getUid();
+            if (managedUser.getUserOrganizationRoles() != null) {
+                for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
+                    if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                        continue;
+                    }
+                    if (currentOrgUid.equals(uor.getOrganization().getUid()) && uor.getRoles() != null) {
+                        managedUser.getCurrentRoles().addAll(uor.getRoles());
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 4) 强制确保 ROLE_USER（避免调用 addRoleUser 触发额外 save）
+        Optional<RoleEntity> roleUserOptional = roleRestService.findByNamePlatform(RoleConsts.ROLE_USER);
+        if (roleUserOptional.isPresent()) {
+            RoleEntity roleUser = roleUserOptional.get();
+            Long roleId = roleUser.getId();
+            if (roleId == null) {
+                throw new RuntimeException("Role id is null for ROLE_USER");
+            }
+            RoleEntity managedRoleUser = entityManager.find(RoleEntity.class, roleId);
+            if (managedRoleUser == null) {
+                throw new RuntimeException("Role not found by id: " + roleId);
+            }
+
+            if (managedUser.getCurrentOrganization() == null) {
+                boolean alreadyHas = managedUser.getCurrentRoles().stream()
+                        .anyMatch(r -> r != null && r.getId() != null && r.getId().equals(roleId));
+                if (!alreadyHas) {
+                    managedUser.getCurrentRoles().add(managedRoleUser);
+                }
+            } else {
+                managedUser.addOrganizationRole(managedRoleUser);
+            }
+        }
+
+        // 5) 持久化 + 刷新缓存
+        return save(managedUser);
+    }
+
     public UserEntity updateUserFromMember(UserEntity user, MemberRequest request) {
         return updateUserRoles(user, request.getRoleUids());
     }

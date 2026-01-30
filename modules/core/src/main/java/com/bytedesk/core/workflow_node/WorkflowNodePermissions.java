@@ -20,6 +20,9 @@ public class WorkflowNodePermissions extends BasePermissions {
     // 模块前缀
     public static final String WORKFLOW_NODE_PREFIX = "WORKFLOW_NODE_";
 
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "WORKFLOW_NODE";
+
     // 统一权限（不再在权限字符串中编码层级）
     public static final String WORKFLOW_NODE_READ = "WORKFLOW_NODE_READ";
     public static final String WORKFLOW_NODE_CREATE = "WORKFLOW_NODE_CREATE";
@@ -27,11 +30,11 @@ public class WorkflowNodePermissions extends BasePermissions {
     public static final String WORKFLOW_NODE_DELETE = "WORKFLOW_NODE_DELETE";
     public static final String WORKFLOW_NODE_EXPORT = "WORKFLOW_NODE_EXPORT";
 
-    // PreAuthorize 表达式
-    public static final String HAS_WORKFLOW_NODE_READ = "hasAuthority('WORKFLOW_NODE_READ')";
-    public static final String HAS_WORKFLOW_NODE_CREATE = "hasAuthority('WORKFLOW_NODE_CREATE')";
-    public static final String HAS_WORKFLOW_NODE_UPDATE = "hasAuthority('WORKFLOW_NODE_UPDATE')";
-    public static final String HAS_WORKFLOW_NODE_DELETE = "hasAuthority('WORKFLOW_NODE_DELETE')";
-    public static final String HAS_WORKFLOW_NODE_EXPORT = "hasAuthority('WORKFLOW_NODE_EXPORT')";
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_WORKFLOW_NODE_READ = "hasAuthority('" + WORKFLOW_NODE_READ + "')";
+    public static final String HAS_WORKFLOW_NODE_CREATE = "hasAuthority('" + WORKFLOW_NODE_CREATE + "')";
+    public static final String HAS_WORKFLOW_NODE_UPDATE = "hasAuthority('" + WORKFLOW_NODE_UPDATE + "')";
+    public static final String HAS_WORKFLOW_NODE_DELETE = "hasAuthority('" + WORKFLOW_NODE_DELETE + "')";
+    public static final String HAS_WORKFLOW_NODE_EXPORT = "hasAuthority('" + WORKFLOW_NODE_EXPORT + "')";
 
 }

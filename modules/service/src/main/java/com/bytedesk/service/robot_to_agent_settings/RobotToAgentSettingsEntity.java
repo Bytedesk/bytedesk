@@ -48,11 +48,6 @@ public class RobotToAgentSettingsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    // private static final int DEFAULT_MIN_CONFIDENCE = 65;
-    // private static final int DEFAULT_MAX_ROBOT_REPLIES = 3;
-    // private static final int DEFAULT_AUTO_TRANSFER_DELAY_SECONDS = 0;
-    // private static final int DEFAULT_COOLDOWN_SECONDS = 90;
-
     @Builder.Default
     private Boolean enabled = Boolean.TRUE;
 

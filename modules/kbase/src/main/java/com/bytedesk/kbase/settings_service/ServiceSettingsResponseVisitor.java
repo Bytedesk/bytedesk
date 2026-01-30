@@ -127,4 +127,26 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     // 工具栏显示控制（固定字段，未设置则默认为显示）
     private ToolbarSettings toolbar;
+
+    /**
+     * 留言方式配置：
+     * - true: 在会话中发送“留言表单”(MESSAGE_TYPE_FORM)
+     * - false: 使用对话框方式留言
+     */
+    private Boolean messageLeaveFormEnabled;
+
+    /**
+     * 留言表单 schema(JSON)，当 messageLeaveFormEnabled=true 时使用
+     */
+    private String messageLeaveForm;
+
+    /**
+     * 是否使用自定义留言表单（关联 FormEntity.uid）
+     */
+    private Boolean messageLeaveCustomFormEnabled;
+
+    /**
+     * 自定义留言表单 uid（FormEntity.uid）
+     */
+    private String messageLeaveFormUid;
 }

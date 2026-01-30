@@ -18,10 +18,16 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpecificationExecutor<TextEntity> {
 
     Optional<TextEntity> findByUid(String uid);
+
+    @Query("select t from TextEntity t left join fetch t.kbase where t.uid = :uid")
+    Optional<TextEntity> findByUidWithKbase(@Param("uid") String uid);
 
     // Boolean existsByPlatform(String platform);
 
@@ -36,4 +42,16 @@ public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpec
      * @return Text实体列表
      */
     List<TextEntity> findByElasticStatusAndVectorStatusNot(String elasticStatus, String vectorStatus);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update TextEntity t set t.elasticStatus = :status where t.uid = :uid")
+    int updateElasticStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update TextEntity t set t.vectorStatus = :status where t.uid = :uid")
+    int updateVectorStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update TextEntity t set t.docIdList = :docIdList where t.uid = :uid")
+    int updateDocIdListByUid(@Param("uid") String uid, @Param("docIdList") List<String> docIdList);
 }

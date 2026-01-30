@@ -66,6 +66,7 @@ public class UserResponse extends BaseResponse {
     //
     private OrganizationResponseSimple currentOrganization;
     private Set<RoleResponseSimple> currentRoles;
-    // private Set<UserOrganizationRoleResponse> userOrganizationRoles; // 多组织角色关系-暂不支持多组织，先行隐藏，后期扩展
+    // 多组织角色关系
+    private Set<UserOrganizationRoleResponse> userOrganizationRoles;
     private Set<GrantedAuthority> authorities;
 }
