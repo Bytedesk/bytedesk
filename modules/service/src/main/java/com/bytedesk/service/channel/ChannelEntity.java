@@ -15,6 +15,8 @@ package com.bytedesk.service.channel;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.ChannelEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
@@ -28,11 +30,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Channel entity for content categorization and organization
- * Provides channelging functionality for various system entities
- * 
- * Database Table: bytedesk_service_channel
- * Purpose: Stores channel definitions, colors, and organization settings
+ * 管理渠道信息，比如微信、抖音、小红书等社交媒体渠道
  */
 @Entity
 @Data
@@ -63,6 +61,6 @@ public class ChannelEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "channel_type")
-    private String type = ChannelTypeEnum.CUSTOMER.name();
+    private String type = ChannelEnum.WEB.name();
 
 }

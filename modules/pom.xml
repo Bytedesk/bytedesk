@@ -19,6 +19,7 @@
         <module>call</module>
         <module>conference</module>
         <module>core</module>
+        <module>crm</module>
         <module>forum</module>
         <module>kbase</module>
         <module>service</module>

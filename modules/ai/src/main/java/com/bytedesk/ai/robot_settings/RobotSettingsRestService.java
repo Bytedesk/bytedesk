@@ -14,9 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
@@ -37,6 +39,18 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class RobotSettingsRestService
         extends BaseRestService<RobotSettingsEntity, RobotSettingsRequest, RobotSettingsResponse> {
+
+    private static void syncOrgUser(BaseEntity target, String orgUid, String userUid) {
+        if (target == null) {
+            return;
+        }
+        if (StringUtils.hasText(orgUid)) {
+            target.setOrgUid(orgUid);
+        }
+        if (StringUtils.hasText(userUid)) {
+            target.setUserUid(userUid);
+        }
+    }
 
     private static final String CACHE_ROBOT_SETTINGS = "robotSettings";
     private static final String CACHE_ROBOT_ENTITY = "robot:entity";
@@ -72,17 +86,23 @@ public class RobotSettingsRestService
         RobotSettingsEntity entity = modelMapper.map(request, RobotSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
 
+        final String orgUid = StringUtils.hasText(entity.getOrgUid()) ? entity.getOrgUid() : request.getOrgUid();
+        final String userUid = StringUtils.hasText(entity.getUserUid()) ? entity.getUserUid() : request.getUserUid();
+
         // 使用静态工厂方法处理嵌套的 ServiceSettings,传入 modelMapper,null 检查已内置
         ServiceSettingsEntity svc = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
         // 创建时统一强制生成 uid
         svc.setUid(uidUtils.getUid());
+        syncOrgUser(svc, orgUid, userUid);
         entity.setServiceSettings(svc);
         ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
         draft.setUid(uidUtils.getUid());
+        syncOrgUser(draft, orgUid, userUid);
         entity.setDraftServiceSettings(draft);
 
         TriggerSettingsEntity trigger = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
         trigger.setUid(uidUtils.getUid());
+        syncOrgUser(trigger, orgUid, userUid);
         if (request.getTriggerSettings() != null) {
             triggerSettingsHelper.updateTriggerAssociationsIfPresent(trigger, request.getTriggerSettings());
         }
@@ -90,6 +110,7 @@ public class RobotSettingsRestService
         TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(),
                 modelMapper);
         triggerDraft.setUid(uidUtils.getUid());
+        syncOrgUser(triggerDraft, orgUid, userUid);
         if (request.getTriggerSettings() != null) {
             triggerSettingsHelper.updateTriggerAssociationsIfPresent(triggerDraft, request.getTriggerSettings());
         }
@@ -98,51 +119,63 @@ public class RobotSettingsRestService
         // 发布与草稿：邀请配置（统一使用 fromRequest，内部已处理 null）
         InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
         inv.setUid(uidUtils.getUid());
+        syncOrgUser(inv, orgUid, userUid);
         entity.setInviteSettings(inv);
         InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
         invDraft.setUid(uidUtils.getUid());
+        syncOrgUser(invDraft, orgUid, userUid);
         entity.setDraftInviteSettings(invDraft);
 
         // 发布与草稿：意图配置（统一使用 fromRequest，内部已处理 null）
         IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
         inte.setUid(uidUtils.getUid());
+        syncOrgUser(inte, orgUid, userUid);
         entity.setIntentionSettings(inte);
         IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(),
                 modelMapper);
         inteDraft.setUid(uidUtils.getUid());
+        syncOrgUser(inteDraft, orgUid, userUid);
         entity.setDraftIntentionSettings(inteDraft);
 
         // 发布与草稿：情绪配置（统一使用 fromRequest，内部已处理 null）
         EmotionSettingEntity emo = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
         emo.setUid(uidUtils.getUid());
+        syncOrgUser(emo, orgUid, userUid);
         entity.setEmotionSettings(emo);
         EmotionSettingEntity emoDraft = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
         emoDraft.setUid(uidUtils.getUid());
+        syncOrgUser(emoDraft, orgUid, userUid);
         entity.setDraftEmotionSettings(emoDraft);
 
         // 发布与草稿：会话小结配置（统一使用 fromRequest，内部已处理 null）
         SummarySettingsEntity sum = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
         sum.setUid(uidUtils.getUid());
+        syncOrgUser(sum, orgUid, userUid);
         entity.setSummarySettings(sum);
         SummarySettingsEntity sumDraft = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
         sumDraft.setUid(uidUtils.getUid());
+        syncOrgUser(sumDraft, orgUid, userUid);
         entity.setDraftSummarySettings(sumDraft);
 
         // 发布与草稿：差评配置（统一使用 fromRequest，内部已处理 null）
         RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
         r.setUid(uidUtils.getUid());
+        syncOrgUser(r, orgUid, userUid);
         entity.setRateDownSettings(r);
         RatedownSettingsEntity rd = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
         rd.setUid(uidUtils.getUid());
+        syncOrgUser(rd, orgUid, userUid);
         entity.setDraftRateDownSettings(rd);
 
         // 发布与草稿：Spring AI 工具配置
         RobotToolsSettingsEntity tools = RobotToolsSettingsEntity.fromRequest(request.getToolsSettings(), modelMapper);
         tools.setUid(uidUtils.getUid());
+        syncOrgUser(tools, orgUid, userUid);
         entity.setToolsSettings(tools);
         RobotToolsSettingsEntity toolsDraft = RobotToolsSettingsEntity.fromRequest(request.getToolsSettings(),
                 modelMapper);
         toolsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(toolsDraft, orgUid, userUid);
         entity.setDraftToolsSettings(toolsDraft);
 
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
@@ -433,69 +466,87 @@ public class RobotSettingsRestService
                 .orgUid(orgUid)
                 .build();
 
+            final String userUid = settings.getUserUid();
+
         // 参考 create() 的初始化逻辑：为各嵌套配置同时初始化“发布 + 草稿”两份，并分配独立 UID
         // Service settings
         ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
         published.setUid(uidUtils.getUid());
+        syncOrgUser(published, orgUid, userUid);
         ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
         draft.setUid(uidUtils.getUid());
+        syncOrgUser(draft, orgUid, userUid);
         settings.setServiceSettings(published);
         settings.setDraftServiceSettings(draft);
 
         // Trigger settings（发布 + 草稿）
         TriggerSettingsEntity triggerPublished = TriggerSettingsEntity.fromRequest(null, modelMapper);
         triggerPublished.setUid(uidUtils.getUid());
+        syncOrgUser(triggerPublished, orgUid, userUid);
         TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(null, modelMapper);
         triggerDraft.setUid(uidUtils.getUid());
+        syncOrgUser(triggerDraft, orgUid, userUid);
         settings.setTriggerSettings(triggerPublished);
         settings.setDraftTriggerSettings(triggerDraft);
 
         // Invite settings（发布 + 草稿）
         InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
         inv.setUid(uidUtils.getUid());
+        syncOrgUser(inv, orgUid, userUid);
         settings.setInviteSettings(inv);
         InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(null, modelMapper);
         invDraft.setUid(uidUtils.getUid());
+        syncOrgUser(invDraft, orgUid, userUid);
         settings.setDraftInviteSettings(invDraft);
 
         // Intention settings（发布 + 草稿）
         IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(null, modelMapper);
         inte.setUid(uidUtils.getUid());
+        syncOrgUser(inte, orgUid, userUid);
         settings.setIntentionSettings(inte);
         IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(null, modelMapper);
         inteDraft.setUid(uidUtils.getUid());
+        syncOrgUser(inteDraft, orgUid, userUid);
         settings.setDraftIntentionSettings(inteDraft);
 
         // 发布与草稿：情绪配置（统一使用 fromRequest，内部已处理 null）
         EmotionSettingEntity emo = EmotionSettingEntity.fromRequest(null, modelMapper);
         emo.setUid(uidUtils.getUid());
+        syncOrgUser(emo, orgUid, userUid);
         settings.setEmotionSettings(emo);
         EmotionSettingEntity emoDraft = EmotionSettingEntity.fromRequest(null, modelMapper);
         emoDraft.setUid(uidUtils.getUid());
+        syncOrgUser(emoDraft, orgUid, userUid);
         settings.setDraftEmotionSettings(emoDraft);
 
         // 发布与草稿：会话小结配置（统一使用 fromRequest，内部已处理 null）
         SummarySettingsEntity sum = SummarySettingsEntity.fromRequest(null, modelMapper);
         sum.setUid(uidUtils.getUid());
+        syncOrgUser(sum, orgUid, userUid);
         settings.setSummarySettings(sum);
         SummarySettingsEntity sumDraft = SummarySettingsEntity.fromRequest(null, modelMapper);
         sumDraft.setUid(uidUtils.getUid());
+        syncOrgUser(sumDraft, orgUid, userUid);
         settings.setDraftSummarySettings(sumDraft);
 
         // Ratedown settings（发布 + 草稿）
         RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(null, modelMapper);
         r.setUid(uidUtils.getUid());
+        syncOrgUser(r, orgUid, userUid);
         settings.setRateDownSettings(r);
         RatedownSettingsEntity rd = RatedownSettingsEntity.fromRequest(null, modelMapper);
         rd.setUid(uidUtils.getUid());
+        syncOrgUser(rd, orgUid, userUid);
         settings.setDraftRateDownSettings(rd);
 
         // Spring AI 工具（发布 + 草稿）
         RobotToolsSettingsEntity tools = RobotToolsSettingsEntity.fromRequest(null, modelMapper);
         tools.setUid(uidUtils.getUid());
+        syncOrgUser(tools, orgUid, userUid);
         settings.setToolsSettings(tools);
         RobotToolsSettingsEntity toolsDraft = RobotToolsSettingsEntity.fromRequest(null, modelMapper);
         toolsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(toolsDraft, orgUid, userUid);
         settings.setDraftToolsSettings(toolsDraft);
 
         // LLM settings（发布 + 草稿）

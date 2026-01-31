@@ -318,23 +318,68 @@ public abstract class AbstractThreadRoutingStrategy {
     protected <T> T executeWithExceptionHandling(String operation, String threadUid, 
             java.util.function.Supplier<T> action) {
         long startTime = System.currentTimeMillis();
-        try {
-            log.info("开始执行策略操作: {} - threadUid: {}", operation, threadUid);
-            T result = action.get();
-            long executionTime = System.currentTimeMillis() - startTime;
-            log.info("策略操作执行成功: {} - threadUid: {}, 耗时: {}ms", operation, threadUid, executionTime);
-            
-            // 如果执行时间超过5秒，记录警告
-            if (executionTime > 5000) {
-                log.warn("策略操作执行缓慢: {} - threadUid: {}, 耗时: {}ms", operation, threadUid, executionTime);
+        int attempt = 0;
+        int maxAttempts = 3;
+        while (true) {
+            try {
+                attempt++;
+                log.info("开始执行策略操作: {} - threadUid: {}, attempt={}", operation, threadUid, attempt);
+                T result = action.get();
+                long executionTime = System.currentTimeMillis() - startTime;
+                log.info("策略操作执行成功: {} - threadUid: {}, 耗时: {}ms", operation, threadUid, executionTime);
+
+                // 如果执行时间超过5秒，记录警告
+                if (executionTime > 5000) {
+                    log.warn("策略操作执行缓慢: {} - threadUid: {}, 耗时: {}ms", operation, threadUid, executionTime);
+                }
+
+                return result;
+            } catch (Exception e) {
+                if (attempt < maxAttempts && isTransientLockException(e)) {
+                    long backoffMs = 50L * attempt;
+                    log.warn("策略操作遭遇数据库锁冲突，准备重试: {} - threadUid: {}, attempt={}, backoff={}ms, error={}",
+                            operation, threadUid, attempt, backoffMs, e.getMessage());
+                    try {
+                        Thread.sleep(backoffMs);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw handleStrategyException(operation, e, threadUid);
+                    }
+                    continue;
+                }
+
+                long executionTime = System.currentTimeMillis() - startTime;
+                log.error("策略操作执行失败: {} - threadUid: {}, 耗时: {}ms, 错误: {}", 
+                        operation, threadUid, executionTime, e.getMessage(), e);
+                throw handleStrategyException(operation, e, threadUid);
             }
-            
-            return result;
-        } catch (Exception e) {
-            long executionTime = System.currentTimeMillis() - startTime;
-            log.error("策略操作执行失败: {} - threadUid: {}, 耗时: {}ms, 错误: {}", 
-                    operation, threadUid, executionTime, e.getMessage(), e);
-            throw handleStrategyException(operation, e, threadUid);
         }
+    }
+
+    private boolean isTransientLockException(Throwable error) {
+        Throwable current = error;
+        while (current != null) {
+            if (current instanceof org.springframework.dao.CannotAcquireLockException) {
+                return true;
+            }
+            if (current instanceof org.hibernate.exception.LockAcquisitionException) {
+                return true;
+            }
+            if (current instanceof java.sql.SQLTransactionRollbackException) {
+                return true;
+            }
+            // if (current instanceof com.mysql.cj.jdbc.exceptions.MySQLTransactionRollbackException) {
+            //     return true;
+            // }
+            if (current instanceof java.sql.SQLException sqlEx) {
+                String sqlState = sqlEx.getSQLState();
+                int errorCode = sqlEx.getErrorCode();
+                if ("40001".equals(sqlState) || errorCode == 1213 || errorCode == 1205) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 }

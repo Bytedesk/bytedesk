@@ -49,7 +49,6 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
-    // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(WorkflowRequest request) {
         

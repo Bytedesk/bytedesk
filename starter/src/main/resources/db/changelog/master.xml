@@ -64,6 +64,4 @@
 
     <include file="db/changelog/migration/260126_drop_service_unified_legacy_columns.xml" />
 
-    <include file="db/changelog/migration/260128_add_feishu_stream_enabled.xml" />
-
 </databaseChangeLog>

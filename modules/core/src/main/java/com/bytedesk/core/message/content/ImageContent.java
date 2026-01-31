@@ -42,6 +42,7 @@ public class ImageContent extends BaseContent {
     private String hash;          // 文件哈希值 (SHA256)
     private String thumbnail;     // 缩略图URL
     private String filename;      // 文件名
+    private String ocrText;       // OCR提取文字内容
 
     /**
      * 从JSON字符串反序列化为ImageContent对象

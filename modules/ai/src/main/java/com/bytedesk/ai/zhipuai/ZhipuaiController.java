@@ -37,7 +37,6 @@ import ai.z.openapi.service.model.FileUrl;
 import ai.z.openapi.service.model.ImageUrl;
 import ai.z.openapi.service.model.MessageContent;
 import ai.z.openapi.service.model.VideoUrl;
-
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -1034,6 +1033,7 @@ public class ZhipuaiController {
             return ResponseEntity.ok(JsonResult.error(response.getMsg()));
         }
     }
+
 
     /**
      * 在 Bean 销毁时关闭线程池

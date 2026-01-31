@@ -160,7 +160,7 @@ public class AuthService {
         
         // 使用create接口创建保存token
         TokenRequest tokenRequest = TokenRequest.builder()
-            .name(displayName + " Login Token")
+            .name(displayName)
             .description(String.format("login token for %s(uid=%s, org=%s), platform=%s, channel=%s, device=%s",
                     account,
                     userDetails.getUid(),

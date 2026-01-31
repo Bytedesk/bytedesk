@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
@@ -18,6 +19,7 @@ import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRepository;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
@@ -41,6 +43,18 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkgroupSettingsRestService
         extends BaseRestService<WorkgroupSettingsEntity, WorkgroupSettingsRequest, WorkgroupSettingsResponse> {
+
+    private static void syncOrgUser(BaseEntity target, String orgUid, String userUid) {
+        if (target == null) {
+            return;
+        }
+        if (StringUtils.hasText(orgUid)) {
+            target.setOrgUid(orgUid);
+        }
+        if (StringUtils.hasText(userUid)) {
+            target.setUserUid(userUid);
+        }
+    }
 
     private final WorkgroupSettingsRepository workgroupSettingsRepository;
 
@@ -69,21 +83,28 @@ public class WorkgroupSettingsRestService
         WorkgroupSettingsEntity entity = modelMapper.map(request, WorkgroupSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
 
+        final String orgUid = StringUtils.hasText(entity.getOrgUid()) ? entity.getOrgUid() : request.getOrgUid();
+        final String userUid = StringUtils.hasText(entity.getUserUid()) ? entity.getUserUid() : request.getUserUid();
+
         ServiceSettingsEntity service = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
         service.setUid(uidUtils.getUid());
+        syncOrgUser(service, orgUid, userUid);
         entity.setServiceSettings(service);
         ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
         draft.setUid(uidUtils.getUid());
+        syncOrgUser(draft, orgUid, userUid);
         entity.setDraftServiceSettings(draft);
 
         TriggerSettingsEntity trigger = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
         trigger.setUid(uidUtils.getUid());
+        syncOrgUser(trigger, orgUid, userUid);
         if (request.getTriggerSettings() != null) {
             triggerSettingsHelper.updateTriggerAssociationsIfPresent(trigger, request.getTriggerSettings());
         }
         entity.setTriggerSettings(trigger);
         TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
         triggerDraft.setUid(uidUtils.getUid());
+        syncOrgUser(triggerDraft, orgUid, userUid);
         if (request.getTriggerSettings() != null) {
             triggerSettingsHelper.updateTriggerAssociationsIfPresent(triggerDraft, request.getTriggerSettings());
         }
@@ -92,73 +113,91 @@ public class WorkgroupSettingsRestService
         // 发布与草稿：邀请配置（统一使用 fromRequest，外部不再判空）
         InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
         inv.setUid(uidUtils.getUid());
+        syncOrgUser(inv, orgUid, userUid);
         entity.setInviteSettings(inv);
         InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
         invDraft.setUid(uidUtils.getUid());
+        syncOrgUser(invDraft, orgUid, userUid);
         entity.setDraftInviteSettings(invDraft);
 
         // 发布与草稿：意图配置（统一使用 fromRequest，外部不再判空）
         IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
         inte.setUid(uidUtils.getUid());
+        syncOrgUser(inte, orgUid, userUid);
         entity.setIntentionSettings(inte);
         IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
         inteDraft.setUid(uidUtils.getUid());
+        syncOrgUser(inteDraft, orgUid, userUid);
         entity.setDraftIntentionSettings(inteDraft);
 
         // 发布与草稿：情绪配置（统一使用 fromRequest，外部不再判空）
         EmotionSettingEntity emo = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
         emo.setUid(uidUtils.getUid());
+        syncOrgUser(emo, orgUid, userUid);
         entity.setEmotionSettings(emo);
         EmotionSettingEntity emoDraft = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
         emoDraft.setUid(uidUtils.getUid());
+        syncOrgUser(emoDraft, orgUid, userUid);
         entity.setDraftEmotionSettings(emoDraft);
 
         // 发布与草稿：会话小结配置（统一使用 fromRequest，内部已处理 null）
         SummarySettingsEntity sum = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
         sum.setUid(uidUtils.getUid());
+        syncOrgUser(sum, orgUid, userUid);
         entity.setSummarySettings(sum);
         SummarySettingsEntity sumDraft = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
         sumDraft.setUid(uidUtils.getUid());
+        syncOrgUser(sumDraft, orgUid, userUid);
         entity.setDraftSummarySettings(sumDraft);
 
         // 发布与草稿：留言设置
         MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
         mls.setUid(uidUtils.getUid());
+        syncOrgUser(mls, orgUid, userUid);
         entity.setMessageLeaveSettings(mls);
         MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
         mlsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(mlsDraft, orgUid, userUid);
         entity.setDraftMessageLeaveSettings(mlsDraft);
 
         // 发布与草稿：工作时间设置
         WorktimeSettingEntity worktimePublished = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
         worktimePublished.setUid(uidUtils.getUid());
+        syncOrgUser(worktimePublished, orgUid, userUid);
         entity.setWorktimeSettings(worktimePublished);
         WorktimeSettingEntity worktimeDraft = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
         worktimeDraft.setUid(uidUtils.getUid());
+        syncOrgUser(worktimeDraft, orgUid, userUid);
         entity.setDraftWorktimeSettings(worktimeDraft);
 
         // create 场景：不将 robotUid 解析成 RobotEntity，统一使用 Entity.fromRequest 风格
         RobotRoutingSettingsEntity rrs = RobotRoutingSettingsEntity.fromRequest(request.getRobotRoutingSettings());
         rrs.setUid(uidUtils.getUid());
+        syncOrgUser(rrs, orgUid, userUid);
         entity.setRobotSettings(rrs);
         RobotRoutingSettingsEntity rrsDraft = RobotRoutingSettingsEntity.fromRequest( request.getRobotRoutingSettings());
         rrsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(rrsDraft, orgUid, userUid);
         entity.setDraftRobotSettings(rrsDraft);
 
         // 发布与草稿：排队设置
         QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
         qs.setUid(uidUtils.getUid());
+        syncOrgUser(qs, orgUid, userUid);
         entity.setQueueSettings(qs);
         QueueSettingsEntity qsDraft = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
         qsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(qsDraft, orgUid, userUid);
         entity.setDraftQueueSettings(qsDraft);
 
         // 发布与草稿：机器人转人工设置
         RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(), modelMapper);
         rtas.setUid(uidUtils.getUid());
+        syncOrgUser(rtas, orgUid, userUid);
         entity.setRobotToAgentSettings(rtas);
         RobotToAgentSettingsEntity rtasDraft = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(), modelMapper);
         rtasDraft.setUid(uidUtils.getUid());
+        syncOrgUser(rtasDraft, orgUid, userUid);
         entity.setDraftRobotToAgentSettings(rtasDraft);
 
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
@@ -471,91 +510,116 @@ public class WorkgroupSettingsRestService
                 .enabled(true)
                 .orgUid(orgUid)
                 .build();
+
+            final String userUid = settings.getUserUid();
+
         // 参考 create()：为各嵌套配置初始化“发布 + 草稿”并分配独立 UID
         // Service settings（发布 + 草稿）
         ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
         published.setUid(uidUtils.getUid());
+            syncOrgUser(published, orgUid, userUid);
         ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
         draft.setUid(uidUtils.getUid());
+            syncOrgUser(draft, orgUid, userUid);
         settings.setServiceSettings(published);
         settings.setDraftServiceSettings(draft);
 
         // Trigger settings（发布 + 草稿）
         TriggerSettingsEntity triggerPublished = TriggerSettingsEntity.fromRequest(null, modelMapper);
         triggerPublished.setUid(uidUtils.getUid());
+        syncOrgUser(triggerPublished, orgUid, userUid);
         TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(null, modelMapper);
         triggerDraft.setUid(uidUtils.getUid());
+        syncOrgUser(triggerDraft, orgUid, userUid);
         settings.setTriggerSettings(triggerPublished);
         settings.setDraftTriggerSettings(triggerDraft);
 
         // 邀请配置（发布 + 草稿）
         InviteSettingsEntity inv = InviteSettingsEntity.fromRequest(null, modelMapper);
         inv.setUid(uidUtils.getUid());
+        syncOrgUser(inv, orgUid, userUid);
         InviteSettingsEntity invDraft = InviteSettingsEntity.fromRequest(null, modelMapper);
         invDraft.setUid(uidUtils.getUid());
+        syncOrgUser(invDraft, orgUid, userUid);
         settings.setInviteSettings(inv);
         settings.setDraftInviteSettings(invDraft);
 
         // 意图配置（发布 + 草稿）
         IntentionSettingsEntity inte = IntentionSettingsEntity.fromRequest(null, modelMapper);
         inte.setUid(uidUtils.getUid());
+        syncOrgUser(inte, orgUid, userUid);
         IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(null, modelMapper);
         inteDraft.setUid(uidUtils.getUid());
+        syncOrgUser(inteDraft, orgUid, userUid);
         settings.setIntentionSettings(inte);
         settings.setDraftIntentionSettings(inteDraft);
 
         // 发布与草稿：情绪配置（统一使用 fromRequest，内部已处理 null）
         EmotionSettingEntity emo = EmotionSettingEntity.fromRequest(null, modelMapper);
         emo.setUid(uidUtils.getUid());
+        syncOrgUser(emo, orgUid, userUid);
         settings.setEmotionSettings(emo);
         EmotionSettingEntity emoDraft = EmotionSettingEntity.fromRequest(null, modelMapper);
         emoDraft.setUid(uidUtils.getUid());
+        syncOrgUser(emoDraft, orgUid, userUid);
         settings.setDraftEmotionSettings(emoDraft);
 
         // 发布与草稿：会话小结配置（统一使用 fromRequest，内部已处理 null）
         SummarySettingsEntity sum = SummarySettingsEntity.fromRequest(null, modelMapper);
         sum.setUid(uidUtils.getUid());
+        syncOrgUser(sum, orgUid, userUid);
         settings.setSummarySettings(sum);
         SummarySettingsEntity sumDraft = SummarySettingsEntity.fromRequest(null, modelMapper);
         sumDraft.setUid(uidUtils.getUid());
+        syncOrgUser(sumDraft, orgUid, userUid);
         settings.setDraftSummarySettings(sumDraft);
 
         // 留言设置（发布 + 草稿）
         MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
         mls.setUid(uidUtils.getUid());
+        syncOrgUser(mls, orgUid, userUid);
         MessageLeaveSettingsEntity mlsDraft = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
         mlsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(mlsDraft, orgUid, userUid);
         settings.setMessageLeaveSettings(mls);
         settings.setDraftMessageLeaveSettings(mlsDraft);
 
         // 工作时间设置（发布 + 草稿）
         WorktimeSettingEntity worktimePublished = WorktimeSettingEntity.fromRequest(null, modelMapper);
         worktimePublished.setUid(uidUtils.getUid());
+        syncOrgUser(worktimePublished, orgUid, userUid);
         WorktimeSettingEntity worktimeDraft = WorktimeSettingEntity.fromRequest(null, modelMapper);
         worktimeDraft.setUid(uidUtils.getUid());
+        syncOrgUser(worktimeDraft, orgUid, userUid);
         settings.setWorktimeSettings(worktimePublished);
         settings.setDraftWorktimeSettings(worktimeDraft);
 
         // 机器人路由设置（发布 + 草稿）
         RobotRoutingSettingsEntity rrs = RobotRoutingSettingsEntity.fromRequest(null);
         rrs.setUid(uidUtils.getUid());
+        syncOrgUser(rrs, orgUid, userUid);
         RobotRoutingSettingsEntity rrsDraft = RobotRoutingSettingsEntity.fromRequest(null);
         rrsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(rrsDraft, orgUid, userUid);
         settings.setRobotSettings(rrs);
         settings.setDraftRobotSettings(rrsDraft);
 
         // 排队设置（发布 + 草稿）
         QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(null, modelMapper);
         qs.setUid(uidUtils.getUid());
+        syncOrgUser(qs, orgUid, userUid);
         QueueSettingsEntity qsDraft = QueueSettingsEntity.fromRequest(null, modelMapper);
         qsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(qsDraft, orgUid, userUid);
         settings.setQueueSettings(qs);
         settings.setDraftQueueSettings(qsDraft);
 
         RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(null, modelMapper);
         rtas.setUid(uidUtils.getUid());
+        syncOrgUser(rtas, orgUid, userUid);
         RobotToAgentSettingsEntity rtasDraft = RobotToAgentSettingsEntity.fromRequest(null, modelMapper);
         rtasDraft.setUid(uidUtils.getUid());
+        syncOrgUser(rtasDraft, orgUid, userUid);
         settings.setRobotToAgentSettings(rtas);
         settings.setDraftRobotToAgentSettings(rtasDraft);
 

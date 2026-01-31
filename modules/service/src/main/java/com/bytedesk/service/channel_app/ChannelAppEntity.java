@@ -26,6 +26,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 管理属于某个渠道的应用信息，比如微信小程序、抖音小程序等
+ */
 @Entity
 @Data
 @SuperBuilder
