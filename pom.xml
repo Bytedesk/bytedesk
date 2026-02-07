@@ -37,7 +37,7 @@
         <jedis.version>6.0.0</jedis.version>
         <springdoc.version>2.8.8</springdoc.version>
         <spring-ai.version>1.1.2</spring-ai.version>
-		<spring-ai-alibaba.version>1.1.0.0</spring-ai-alibaba.version>
+		<spring-ai-alibaba.version>1.1.2.0</spring-ai-alibaba.version>
         <revision>1.3.5</revision>
     </properties>
 
