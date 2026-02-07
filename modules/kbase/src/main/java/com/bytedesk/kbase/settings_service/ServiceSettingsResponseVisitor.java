@@ -60,6 +60,11 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private Boolean showHistory;
 
     /**
+     * 访客端是否显示消息状态（送达/已读等）
+     */
+    private Boolean showMessageStatus;
+
+    /**
      * 访客发起咨询是否需要登录
      */
     private Boolean requireLogin;

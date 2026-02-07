@@ -67,4 +67,18 @@ public class MessageRequest extends BaseRequest {
     public boolean isGroupType() {
         return "GROUP".equals(threadType);
     }
+
+    /**
+     * 判断是否为渠道/系统通知会话
+     */
+    public boolean isNoticeAccountType() {
+        return "CHANNEL".equals(threadType);
+    }
+
+    /**
+     * 判断是否为助理会话
+     */
+    public boolean isAssistantType() {
+        return "ASSISTANT".equals(threadType);
+    }
 }

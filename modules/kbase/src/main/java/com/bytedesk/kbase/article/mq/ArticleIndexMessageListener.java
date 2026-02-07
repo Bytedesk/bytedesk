@@ -17,8 +17,9 @@ import java.util.Optional;
 
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import com.bytedesk.core.jms.JmsArtemisConsts;
+import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class ArticleIndexMessageListener {
 
     private final ArticleRestService articleRestService;

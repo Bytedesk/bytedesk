@@ -6,6 +6,7 @@
 package com.bytedesk.service.workgroup_settings;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
@@ -71,6 +72,12 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
      */
     @lombok.Builder.Default
     private String routingMode = com.bytedesk.service.workgroup_routing.WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
+
+    /**
+     * Manual routing waiting tip for visitors (used when routingMode=MANUAL)
+     */
+    @lombok.Builder.Default
+    private String manualRoutingTip = I18Consts.I18N_WORKGROUP_MANUAL_ROUTING_POOL_WAITING_TIP;
 
     /**
      * Message leave settings

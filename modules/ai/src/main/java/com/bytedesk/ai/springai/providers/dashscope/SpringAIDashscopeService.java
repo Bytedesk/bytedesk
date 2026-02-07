@@ -74,6 +74,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
             return DashScopeChatOptions.builder()
                     .model(llm.getTextModel())
                     .temperature(llm.getTemperature())
+                    .maxToken(llm.getMaxTokens())
                     .topP(llm.getTopP())
                     .build();
         } catch (Exception e) {

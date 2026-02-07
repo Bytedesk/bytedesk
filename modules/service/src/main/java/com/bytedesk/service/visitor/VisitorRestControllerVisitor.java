@@ -51,6 +51,10 @@ import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.ThreadSequenceResponse;
 import java.time.ZonedDateTime;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
+
+import java.util.Optional;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -80,6 +84,8 @@ public class VisitorRestControllerVisitor {
     private final IpService ipService;
 
     private final RobotService robotService;
+
+    private final AgentRestService agentRestService;
     
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -247,6 +253,51 @@ public class VisitorRestControllerVisitor {
         Page<ThreadResponse> threads = threadRestService.queryByVisitor(request);
         
         return ResponseEntity.ok(JsonResult.success("查询成功", threads));
+    }
+
+    /**
+     * 匿名查询客服信息（用于访客端展示客服工号等公开信息）
+     *
+     * 说明：
+     * - 该接口不需要登录授权
+     * - uid 既支持传 agent.uid（客服实体 uid），也支持传 userUid（消息中 user.uid）
+     */
+    @GetMapping("/agent/query/uid")
+    public ResponseEntity<?> queryAgentByUid(@RequestParam(value = "uid") String uid) {
+        if (!StringUtils.hasText(uid)) {
+            return ResponseEntity.ok(JsonResult.error("uid required"));
+        }
+
+        Optional<AgentEntity> agentOptional = agentRestService.findByUid(uid);
+        if (!agentOptional.isPresent()) {
+            agentOptional = agentRestService.findByUserUid(uid);
+        }
+        if (!agentOptional.isPresent()) {
+            return ResponseEntity.ok(JsonResult.error("agent not found"));
+        }
+
+        AgentEntity agent = agentOptional.get();
+        AgentPublicResponse response = new AgentPublicResponse(
+                agent.getUid(),
+                agent.getUserUid(),
+                agent.getNickname(),
+                agent.getAgentNo(),
+                agent.getAvatar(),
+                agent.getStatus());
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 访客端公开的客服信息（最小字段集）
+     */
+    public record AgentPublicResponse(
+            String uid,
+            String userUid,
+            String nickname,
+            String agentNo,
+            String avatar,
+            String status) {
     }
 
     // 访客发送http消息

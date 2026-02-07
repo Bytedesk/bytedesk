@@ -163,16 +163,19 @@ public class RobotLlm {
     @Column(name = "llm_do_sample")
     private Boolean doSample = true;
 
+    // 最大输出长度
     // 最大token数
     @Builder.Default
     @Column(name = "llm_max_tokens")
     private Integer maxTokens = 1024;
 
+    // 控制随机性
     // 温度越低，回答结果越固定，随机性越低
     @Builder.Default
     @Column(name = "llm_temperature")
     private Double temperature = 0.0;  // 从float改为Double
 
+    // 核采样参数
     @Builder.Default
     @Column(name = "llm_top_p")
     private Double topP = 0.7;  // 从float改为Double

@@ -18,6 +18,8 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -157,4 +159,10 @@ public class ThreadRequest extends BaseRequest {
 
     // 是否取消订阅topic
     private Boolean unsubscribe;
+
+    /**
+     * 按消息内容搜索：当该字段有值时，返回“消息 content 命中”的关联会话。
+     * 与 searchText（会话字段搜索）相互独立，客户端可根据搜索范围选择传哪个。
+     */
+    private String messageSearchText;
 }

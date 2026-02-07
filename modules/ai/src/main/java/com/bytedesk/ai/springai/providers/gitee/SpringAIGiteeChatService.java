@@ -67,6 +67,7 @@ public class SpringAIGiteeChatService extends BaseSpringAIService {
             return OpenAiChatOptions.builder()
                     .model(llm.getTextModel())
                     .temperature(llm.getTemperature())
+                    .maxTokens(llm.getMaxTokens())
                     .topP(llm.getTopP())
                     .build();
         } catch (Exception e) {

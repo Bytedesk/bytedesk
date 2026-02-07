@@ -22,6 +22,8 @@ import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
+import com.bytedesk.core.message.content.RoutingPoolContent;
+import com.bytedesk.core.message.content.RoutingPoolNotification;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -114,6 +116,31 @@ public class ThreadMessageUtil {
         return buildThreadQueueMessage(MessageTypeEnum.QUEUE, content, thread);
     }
 
+    /**
+     * 结构化 RoutingPoolContent 的路由池等待消息（访客侧）。
+     */
+    public static MessageProtobuf getThreadRoutingPoolMessage(RoutingPoolContent content, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String json = content != null ? content.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .type(MessageTypeEnum.ROUTING_POOL.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+    }
+
     public static MessageProtobuf getThreadQueueUpdateMessage(QueueContent content, ThreadEntity thread) {
         return buildThreadQueueMessage(MessageTypeEnum.QUEUE_UPDATE, content, thread);
     }
@@ -123,6 +150,32 @@ public class ThreadMessageUtil {
      */
     public static MessageProtobuf getAgentQueueNoticeMessage(QueueNotification payload, ThreadEntity thread) {
         return buildAgentQueueMessage(MessageTypeEnum.QUEUE_NOTICE, payload, thread);
+    }
+
+    /**
+     * 构造发送给客服通知线程的 ROUTING_POOL 消息（手动接入）。
+     */
+    public static MessageProtobuf getAgentRoutingPoolNoticeMessage(RoutingPoolNotification payload, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+
+        String json = payload != null ? payload.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .type(MessageTypeEnum.ROUTING_POOL.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     /**

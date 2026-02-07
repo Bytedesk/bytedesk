@@ -36,13 +36,11 @@ public enum WorkgroupRoutingModeEnum {
     CONSISTENT_HASH,
     // 最快响应时间, 选择响应最快的客服, 提高用户体验, 激励客服提高效率
     FASTEST_RESPONSE,
-    // 广播给所有客服，客服抢单
-    BROADCAST,
     // 熟客优先，最近会话优先分配
     RECENT,
     // 优先级分配
     // PRIORITY,
     // 由大模型决定：根据客服技能或历史数据，由大模型决定分配
     LLM,
-    MANUAL; // 人工手动接入
+    MANUAL; // 广播到客服端，由客服人工手动接入
 }

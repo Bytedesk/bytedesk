@@ -43,6 +43,11 @@ public class WorkgroupSettingsResponse extends BaseSettingsResponse {
     private String routingMode;
 
     /**
+     * Manual routing waiting tip for visitors (used when routingMode=MANUAL)
+     */
+    private String manualRoutingTip;
+
+    /**
      * Message leave settings (Workgroup-specific)
      */
     private MessageLeaveSettingsResponse messageLeaveSettings;

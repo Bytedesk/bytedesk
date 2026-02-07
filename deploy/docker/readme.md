@@ -19,7 +19,8 @@
 .
 ├── docker-compose-noai.yaml # 不使用ai，无机器人问答
 ├── docker-compose-ollama.yaml # 启动微语，同时启动mysql,redis,ollama,elasticsearch依赖和微语，内含ollama，默认使用ollama对话
-├── docker-compose.yaml # 启动微语，同时启动mysql,redis,elasticsearch依赖和微语，不内含ollama，默认使用zhipuai
+├── docker-compose-rabbitmq.yaml # 启动微语，同时启动mysql,redis,elasticsearch,rabbitmq依赖和微语，不内含ollama，默认使用zhipuai
+├── docker-compose.yaml # 启动微语，同时启动mysql,redis,elasticsearch,artemis依赖和微语，不内含ollama，默认使用zhipuai
 ```
 
 ## docker compose

@@ -19,9 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -66,41 +70,71 @@ public class WorktimeSettingEntity extends BaseEntity {
     private String holidays = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
+     * 非工作时间提示（用于引导访客留言/等待）
+     */
+    @Builder.Default
+    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private String nonWorktimeTip = I18Consts.I18N_DEFAULT_OFFLINE_MESSAGE;
+
+    /**
      * 检查当前时间是否在工作时间内
      * 
      * @return true 如果当前时间在工作时间内，false 如果不在
      */
     public Boolean isInWorktime() {
+        return isInWorktime(LocalDate.now(), LocalTime.now());
+    }
+
+    /**
+     * 指定日期/时间判断是否处于工作时间内。
+     * 语义：
+     * - enabled=false：不限制，恒为 true
+     * - holidays 命中：仅以 specialWorktimes 判定（可用于“节假日上班时段”）
+     * - holidays 未命中：以 regularWorktimes 判定；regular 为空则视为不限制（true）
+     */
+    public Boolean isInWorktime(LocalDate date, LocalTime time) {
         if (Boolean.FALSE.equals(enabled)) {
             return true;
         }
-
-        LocalDate today = LocalDate.now();
-
-        if (holidays != null && !"{}".equals(holidays) && holidays.contains(today.toString())) {
-            return isInSpecialWorktime(today);
-        }
-
-        if (isInSpecialWorktime(today)) {
+        if (date == null || time == null) {
             return true;
         }
 
-        return isInRegularWorktime(today);
+        if (isHoliday(date)) {
+            return isInSpecialWorktime(date, time);
+        }
+        return isInRegularWorktime(date, time);
     }
 
-    private Boolean isInSpecialWorktime(LocalDate date) {
-        if (specialWorktimes == null || specialWorktimes.isEmpty()) {
-            return true;
+    public boolean isHoliday(LocalDate date) {
+        if (date == null) {
+            return false;
         }
-        LocalTime now = LocalTime.now();
+        if (!StringUtils.hasText(holidays) || BytedeskConsts.EMPTY_JSON_STRING.equals(holidays)) {
+            return false;
+        }
+        try {
+            JSONObject obj = JSON.parseObject(holidays);
+            return obj != null && obj.containsKey(date.toString());
+        } catch (Exception ignored) {
+            // best-effort：保留旧格式（字符串包含）兼容
+            return holidays.contains(date.toString());
+        }
+    }
+
+    private Boolean isInSpecialWorktime(LocalDate date, LocalTime now) {
+        if (specialWorktimes == null || specialWorktimes.isEmpty()) {
+            // specialWorktimes 表示“节假日上班时段”：为空时应视为不开放
+            return false;
+        }
         return specialWorktimes.stream().anyMatch(slot -> slot.isActive(date, now));
     }
 
-    private Boolean isInRegularWorktime(LocalDate date) {
+    private Boolean isInRegularWorktime(LocalDate date, LocalTime now) {
         if (regularWorktimes == null || regularWorktimes.isEmpty()) {
+            // regularWorktimes 为空表示不限制
             return true;
         }
-        LocalTime now = LocalTime.now();
         return regularWorktimes.stream().anyMatch(slot -> slot.isActive(date, now));
     }
 

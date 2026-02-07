@@ -252,6 +252,12 @@ public class I18Consts {
     
     /** 默认离线消息 */
     public static final String I18N_DEFAULT_OFFLINE_MESSAGE = "您好，请留言，我们会尽快回复您";
+
+    /** 工作组离线消息（兼容旧逻辑的兜底文案） */
+    public static final String I18N_WORKGROUP_OFFLINE_FALLBACK_MESSAGE = "请稍后，客服会尽快回复您";
+
+    /** 工作组路由池（手动接入）等待提示 */
+    public static final String I18N_WORKGROUP_MANUAL_ROUTING_POOL_WAITING_TIP = "等待客服手动接入";
     
     /** 排队等待消息 - 下一个 */
     public static final String I18N_QUEUE_NEXT_MESSAGE = "请稍后，下一个就是您";

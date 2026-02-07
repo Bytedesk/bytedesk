@@ -223,9 +223,20 @@ public class TextElasticService {
      */
     public void indexText(TextEntity text) {
         try {
+            if (text == null) {
+                log.warn("索引Text时参数text为空，跳过索引");
+                return;
+            }
+
+            final String textUid = text.getUid();
+            if (!StringUtils.hasText(textUid)) {
+                log.warn("索引Text时uid为空，跳过索引: title={}", text.getTitle());
+                return;
+            }
+
             // 若事件/缓存传入的实体缺少 kbase 关联，则回源数据库（join fetch）补齐
-            if (text != null && text.getKbase() == null && StringUtils.hasText(text.getUid())) {
-                textRestService.findByUidWithKbaseNoCache(text.getUid()).ifPresent(textFromDb -> {
+            if (text.getKbase() == null) {
+                textRestService.findByUidWithKbaseNoCache(textUid).ifPresent(textFromDb -> {
                     // 仅在缺失时回填，避免覆盖调用方已持有的实体
                     if (text.getKbase() == null) {
                         text.setKbase(textFromDb.getKbase());
@@ -244,34 +255,34 @@ public class TextElasticService {
                 log.info("索引创建结果: {}, 映射创建结果: {}", created, mapped);
                 
                 if (!(created && mapped)) {
-                    log.error("索引创建失败，无法继续索引文档: {}", text.getUid());
+                    log.error("索引创建失败，无法继续索引文档: {}", textUid);
                     return;
                 }
             }
             
             // 检查文档是否已存在
-            boolean exists = elasticsearchOperations.exists(text.getUid(), TextElastic.class);
+            boolean exists = elasticsearchOperations.exists(textUid, TextElastic.class);
             
             if (exists) {
-                log.info("更新已存在的Text索引: {}", text.getUid());
+                log.info("更新已存在的Text索引: {}", textUid);
             } else {
-                log.info("为Text创建新索引: {}", text.getUid());
+                log.info("为Text创建新索引: {}", textUid);
             }
             
             // 将TextEntity转换为TextElastic对象
             TextElastic textElastic = TextElastic.fromEntity(text);
 
             if (textElastic != null && !StringUtils.hasText(textElastic.getKbUid())) {
-                log.warn("Text索引文档kbUid为空，可能导致按kbUid过滤搜索命中0: textUid={}, title={}", text.getUid(), text.getTitle());
+                log.warn("Text索引文档kbUid为空，可能导致按kbUid过滤搜索命中0: textUid={}, title={}", textUid, text.getTitle());
             }
             
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(textElastic);
             
             if (exists) {
-                log.info("Text索引更新成功: {}", text.getUid());
+                log.info("Text索引更新成功: {}", textUid);
             } else {
-                log.info("Text索引创建成功: {}", text.getUid());
+                log.info("Text索引创建成功: {}", textUid);
             }
 
             // 将索引结果保存到数据库中
@@ -279,7 +290,8 @@ public class TextElasticService {
             textRestService.save(text);
 
         } catch (Exception e) {
-            log.error("索引Text时发生错误: {}, 错误消息: {}", text.getUid(), e.getMessage(), e);
+            // 注意：这里不要再访问 text.getUid()，避免异常路径上出现额外NPE
+            log.error("索引Text时发生错误: {}, 错误消息: {}", (text == null ? null : text.getUid()), e.getMessage(), e);
         }
     }
     

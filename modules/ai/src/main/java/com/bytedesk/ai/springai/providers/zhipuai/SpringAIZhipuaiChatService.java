@@ -87,6 +87,7 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
             return ZhiPuAiChatOptions.builder()
                     .model(llm.getTextModel())
                     .temperature(llm.getTemperature())
+                    .maxTokens(llm.getMaxTokens())
                     .topP(llm.getTopP())
                     .build();
         } catch (Exception e) {

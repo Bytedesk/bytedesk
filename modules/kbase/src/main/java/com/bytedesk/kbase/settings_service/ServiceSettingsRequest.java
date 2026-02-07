@@ -80,6 +80,12 @@ public class ServiceSettingsRequest  implements Serializable {
     private Boolean showHistory = false;
 
     /**
+     * 访客端是否显示消息状态（送达/已读等）
+     */
+    @Builder.Default
+    private Boolean showMessageStatus = true;
+
+    /**
      * 访客发起咨询是否需要登录（未登录则应先登录再创建会话）
      */
     @Builder.Default

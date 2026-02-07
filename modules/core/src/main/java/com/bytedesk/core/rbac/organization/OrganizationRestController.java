@@ -33,7 +33,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/org")
+@RequestMapping("/api/v1/organization")
 @Tag(name = "Organization", description = "Organization management APIs")
 public class OrganizationRestController extends BaseRestController<OrganizationRequest, OrganizationRestService> {
 

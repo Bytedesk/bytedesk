@@ -50,6 +50,7 @@ import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
+import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -265,6 +266,17 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 加入队列
         QueueMemberEntity queueMemberEntity = queueService.enqueueAgent(thread, agentEntity.toUserProtobuf(), visitorRequest);
         QueueEntity agentQueue = queueMemberEntity.getAgentQueue();
+
+        // 工作时间判断：非工作时间统一按离线留言处理（可走备选）
+        boolean isInServiceTime = resolveIsInServiceTime(visitorRequest, agentEntity);
+        if (!isInServiceTime) {
+            log.info("不在服务时间内，按离线留言处理 - agentUid: {}, threadUid: {}", agentEntity.getUid(), thread.getUid());
+            MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, agentEntity);
+            if (backupResult != null) {
+                return backupResult;
+            }
+            return handleOfflineAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
+        }
 
         QueueSettingsEntity queueSettings = getAgentQueueSettings(visitorRequest, agentEntity);
         if (shouldForceLeaveMessage(agentQueue, queueSettings)) {
@@ -719,6 +731,14 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private String getAgentOfflineMessage(VisitorRequest visitorRequest, AgentEntity agent) {
         log.debug("获取客服离线消息 - agentUid: {}", agent.getUid());
 
+        // 非工作时间提示优先
+        if (!resolveIsInServiceTime(visitorRequest, agent)) {
+            WorktimeSettingEntity worktimeSettings = resolveEffectiveWorktimeSettings(visitorRequest, agent);
+            if (worktimeSettings != null && StringUtils.hasText(worktimeSettings.getNonWorktimeTip())) {
+                return worktimeSettings.getNonWorktimeTip();
+            }
+        }
+
         String customMessage = null;
         try {
             boolean useDraft = isDraftEnabled(visitorRequest);
@@ -740,6 +760,30 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         log.info("客服离线消息获取完成 - agentUid: {}, 最终消息长度: {}",
                 agent.getUid(), offlineMessage != null ? offlineMessage.length() : 0);
         return offlineMessage;
+    }
+
+    private boolean resolveIsInServiceTime(VisitorRequest visitorRequest, AgentEntity agentEntity) {
+        WorktimeSettingEntity effective = resolveEffectiveWorktimeSettings(visitorRequest, agentEntity);
+        if (effective != null) {
+            return Boolean.TRUE.equals(effective.isInWorktime());
+        }
+        return true;
+    }
+
+    private WorktimeSettingEntity resolveEffectiveWorktimeSettings(VisitorRequest visitorRequest, AgentEntity agentEntity) {
+        if (agentEntity == null || agentEntity.getSettings() == null) {
+            return null;
+        }
+        boolean useDraft = isDraftEnabled(visitorRequest);
+        WorktimeSettingEntity draft = agentEntity.getSettings().getDraftWorktimeSettings();
+        WorktimeSettingEntity published = agentEntity.getSettings().getWorktimeSettings();
+        if (useDraft && draft != null) {
+            return draft;
+        }
+        if (published != null) {
+            return published;
+        }
+        return draft;
     }
 
     /**

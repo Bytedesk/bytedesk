@@ -18,8 +18,9 @@ import java.util.Random;
 
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import com.bytedesk.core.jms.JmsArtemisConsts;
+import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
@@ -35,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class ChunkIndexConsumer {
 
     private final ChunkElasticService chunkElasticService;

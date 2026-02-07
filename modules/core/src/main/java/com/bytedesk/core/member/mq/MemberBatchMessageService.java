@@ -16,12 +16,17 @@ package com.bytedesk.core.member.mq;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.jms.JmsArtemisConsts;
+import com.bytedesk.core.mq.MqSendOptions;
+import com.bytedesk.core.mq.MqSender;
+import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.member.MemberExcelImport;
 
@@ -36,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberBatchMessageService {
 
     @Autowired
-    private JmsTemplate jmsTemplate;
+    private MqSender mqSender;
 
     /**
      * 发送批量导入消息
@@ -82,39 +87,16 @@ public class MemberBatchMessageService {
                         .createTimestamp(System.currentTimeMillis())
                         .build();
 
-                // 创建消息后置处理器，设置消息属性
-                org.springframework.jms.core.MessagePostProcessor postProcessor = jmsMessage -> {
-                    // 添加随机延迟，避免消息同时到达造成并发冲突
-                    // 每个消息间隔50-200ms，错峰处理
-                    long baseDelay = System.currentTimeMillis() + (currentIndex * 100L);
-                    long randomDelay = baseDelay + new java.util.Random().nextInt(150);
-                    jmsMessage.setLongProperty("_AMQ_SCHED_DELIVERY", randomDelay);
+                // 每个消息间隔50-200ms，错峰处理
+                long randomDelay = (currentIndex * 100L) + new Random().nextInt(150);
 
-                    // 设置消息的重试策略
-                    jmsMessage.setIntProperty("JMSXDeliveryCount", 0);
-                    jmsMessage.setBooleanProperty("_AMQ_ORIG_MESSAGE", true);
+                MqSendOptions options = MqSendOptions.builder()
+                        .delayMs(randomDelay)
+                        .priority(5)
+                        .headers(buildHeaders(batchUid, orgUid, currentIndex, total, isLastBatch, 0, "member-batch-" + batchUid))
+                        .build();
 
-                    // 设置消息分组，确保相同批次的消息按顺序处理
-                    jmsMessage.setStringProperty("JMSXGroupID", "member-batch-" + batchUid);
-
-                    // 设置消息优先级（正常优先级）
-                    jmsMessage.setJMSPriority(5);
-
-                    // 设置消息类型标识符
-                    jmsMessage.setStringProperty("_type", "memberBatchMessage");
-                    
-                    // 设置消息属性，便于监控和调试
-                    jmsMessage.setStringProperty("batchUid", batchUid);
-                    jmsMessage.setStringProperty("orgUid", orgUid);
-                    jmsMessage.setIntProperty("batchIndex", currentIndex);
-                    jmsMessage.setIntProperty("batchTotal", total);
-                    jmsMessage.setBooleanProperty("isLastBatch", isLastBatch);
-
-                    return jmsMessage;
-                };
-
-                // 发送消息到队列
-                jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, message, postProcessor);
+                mqSender.send(JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, message, options);
 
                 log.debug("Member批量导入消息已发送: 批次{}, 索引{}/{}", 
                          batchUid, currentIndex, total);
@@ -153,34 +135,20 @@ public class MemberBatchMessageService {
             Integer retryCount = originalMessage.getRetryCount();
             originalMessage.setRetryCount(retryCount != null ? retryCount + 1 : 1);
 
-            // 创建消息后置处理器
-            org.springframework.jms.core.MessagePostProcessor postProcessor = jmsMessage -> {
-                // 设置延迟投递
-                long deliveryTime = System.currentTimeMillis() + retryDelay;
-                jmsMessage.setLongProperty("_AMQ_SCHED_DELIVERY", deliveryTime);
+            MqSendOptions options = MqSendOptions.builder()
+                    .delayMs(retryDelay)
+                    .priority(3)
+                    .headers(buildHeaders(
+                            originalMessage.getBatchUid(),
+                            originalMessage.getOrgUid(),
+                            originalMessage.getBatchIndex(),
+                            originalMessage.getBatchTotal(),
+                            originalMessage.getIsLastBatch(),
+                            originalMessage.getRetryCount(),
+                            "member-batch-retry-" + originalMessage.getBatchUid()))
+                    .build();
 
-                // 更新重试相关属性
-                jmsMessage.setIntProperty("JMSXDeliveryCount", originalMessage.getRetryCount());
-                jmsMessage.setStringProperty("JMSXGroupID", "member-batch-retry-" + originalMessage.getBatchUid());
-
-                // 设置消息类型标识符
-                jmsMessage.setStringProperty("_type", "memberBatchMessage");
-                
-                // 降低重试消息的优先级
-                jmsMessage.setJMSPriority(3);
-                
-                // 重新设置所有必要的属性，确保它们在消费者端可用
-                jmsMessage.setStringProperty("batchUid", originalMessage.getBatchUid());
-                jmsMessage.setStringProperty("orgUid", originalMessage.getOrgUid());
-                jmsMessage.setIntProperty("batchIndex", originalMessage.getBatchIndex());
-                jmsMessage.setIntProperty("batchTotal", originalMessage.getBatchTotal());
-                jmsMessage.setBooleanProperty("isLastBatch", originalMessage.getIsLastBatch());
-
-                return jmsMessage;
-            };
-
-            // 重新发送到队列
-            jmsTemplate.convertAndSend(JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, originalMessage, postProcessor);
+            mqSender.send(JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, originalMessage, options);
 
             log.info("Member批量导入重试消息已发送: 批次{}, 索引{}, 重试次数{}, 延迟{}ms",
                     originalMessage.getBatchUid(), originalMessage.getBatchIndex(), 
@@ -190,5 +158,29 @@ public class MemberBatchMessageService {
             log.error("发送Member批量导入重试消息失败: 批次{}, 索引{}, 错误: {}",
                      originalMessage.getBatchUid(), originalMessage.getBatchIndex(), e.getMessage(), e);
         }
+    }
+
+    private Map<String, Object> buildHeaders(String batchUid, String orgUid, Integer batchIndex, Integer batchTotal,
+                                             Boolean isLastBatch, Integer deliveryCount, String groupId) {
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("_type", "memberBatchMessage");
+        headers.put("JMSXDeliveryCount", deliveryCount != null ? deliveryCount : 0);
+        headers.put("JMSXGroupID", groupId);
+        if (batchUid != null) {
+            headers.put("batchUid", batchUid);
+        }
+        if (orgUid != null) {
+            headers.put("orgUid", orgUid);
+        }
+        if (batchIndex != null) {
+            headers.put("batchIndex", batchIndex);
+        }
+        if (batchTotal != null) {
+            headers.put("batchTotal", batchTotal);
+        }
+        if (isLastBatch != null) {
+            headers.put("isLastBatch", isLastBatch);
+        }
+        return headers;
     }
 }

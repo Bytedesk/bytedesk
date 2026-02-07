@@ -51,8 +51,7 @@
 
 		<!-- rag -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html -->
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-advisors-vector-store</artifactId>
@@ -153,6 +152,24 @@
 			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
+
+
+		<!-- https://spring.io/blog/2025/12/11/spring-ai-tool-search-tools-tzolov -->
+		<!-- 智能工具选择：通过 Spring AI 的动态工具发现实现 34-64%的 Token 节省 -->
+		<!-- https://github.com/spring-ai-community/spring-ai-tool-search-tool/tree/1.0.x -->
+		<!-- https://mvnrepository.com/artifact/org.springaicommunity/tool-search-tool -->
+		<!-- <dependency>
+			<groupId>org.springaicommunity</groupId>
+			<artifactId>tool-search-tool</artifactId>
+			<version>1.0.1</version>
+		</dependency> -->
+		<!-- Choose a search strategy -->
+		<!-- https://mvnrepository.com/artifact/org.springaicommunity/tool-searcher-lucene -->
+		<!-- <dependency>
+			<groupId>org.springaicommunity</groupId>
+			<artifactId>tool-searcher-lucene</artifactId>
+			<version>1.0.1</version>
+		</dependency> -->
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 

@@ -57,6 +57,7 @@ import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
+import com.bytedesk.service.workgroup_routing.WorkgroupRoutingModeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -88,17 +89,49 @@ public class QueueMemberEventListener {
     @EventListener
     public void onThreadAcceptEvent(ThreadAcceptEvent event) {
         ThreadEntity thread = event.getThread();
+        if (thread == null || !StringUtils.hasText(thread.getUid())) {
+            return;
+        }
         log.info("queue member onThreadAcceptEvent: {}", thread.getUid());
         Optional<QueueMemberEntity> memberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+        QueueMemberEntity member = null;
+
         if (memberOptional.isPresent()) {
-            QueueMemberEntity member = memberOptional.get();
-            member.manualAcceptThread();
-            queueMemberRestService.saveAsyncBestEffort(member);
-            // 
-            handleQueueAcceptBroadcast(thread, member);
+            member = memberOptional.get();
         } else {
-            log.error("queue member onThreadAcceptEvent: member not found: {}", thread.getUid());
+            // 兜底：理论上所有会话都应在 queue_member 有唯一记录；若缺失则尝试补齐
+            log.warn("queue member onThreadAcceptEvent: member not found, try backfill - threadUid: {}",
+                    thread.getUid());
+
+            UserProtobuf agentProto = resolveAgentProtobuf(thread);
+            if (agentProto == null || !StringUtils.hasText(agentProto.getUid())) {
+                log.error("queue member onThreadAcceptEvent: backfill skipped, agent missing - threadUid: {}",
+                        thread.getUid());
+                return;
+            }
+
+            try {
+                if (isWorkgroupThread(thread)) {
+                    Optional<WorkgroupEntity> workgroupOpt = resolveWorkgroupEntity(thread);
+                    if (workgroupOpt.isEmpty()) {
+                        log.error("queue member onThreadAcceptEvent: backfill failed, workgroup missing - threadUid: {}",
+                                thread.getUid());
+                        return;
+                    }
+                    member = queueService.enqueueWorkgroup(thread, agentProto, workgroupOpt.get(), null);
+                } else {
+                    member = queueService.enqueueAgent(thread, agentProto, null);
+                }
+            } catch (Exception e) {
+                log.error("queue member onThreadAcceptEvent: backfill failed - threadUid: {}, error: {}",
+                        thread.getUid(), e.getMessage(), e);
+                return;
+            }
         }
+
+        member.manualAcceptThread();
+        queueMemberRestService.saveAsyncBestEffort(member);
+        handleQueueAcceptBroadcast(thread, member);
     }
 
     /**
@@ -277,6 +310,16 @@ public class QueueMemberEventListener {
 
     public boolean tryAssignFromWorkgroupQueue(UserProtobuf agentProto, ThreadEntity closedThread,
             QueueMemberEntity closingQueueMember) {
+        // MANUAL 模式：队列成员仅用于“手动接入等待列表”，不应触发自动接入
+        Optional<WorkgroupEntity> workgroupOpt = resolveWorkgroupEntity(closedThread);
+        if (workgroupOpt.isPresent()
+                && WorkgroupRoutingModeEnum.MANUAL.name().equalsIgnoreCase(workgroupOpt.get().getRoutingMode())) {
+            log.debug("queue member auto accept skipped for MANUAL routing mode: threadUid={} workgroupUid={}",
+                    closedThread != null ? closedThread.getUid() : null,
+                    workgroupOpt.get().getUid());
+            return false;
+        }
+
         Optional<QueueEntity> workgroupQueueOpt = resolveWorkgroupQueueEntity(closedThread, closingQueueMember);
         if (!workgroupQueueOpt.isPresent()) {
             return false;
@@ -543,9 +586,6 @@ public class QueueMemberEventListener {
     }
 
 
-    /**
-     * 
-     */
     @EventListener
     public void onMessageCreateEvent(MessageCreateEvent event) {
         MessageEntity message = event.getMessage();

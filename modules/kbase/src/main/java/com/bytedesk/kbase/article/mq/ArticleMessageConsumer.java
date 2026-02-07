@@ -18,8 +18,9 @@ import java.util.Random;
 
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import com.bytedesk.core.jms.JmsArtemisConsts;
+import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.elastic.ArticleElasticService;
@@ -34,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class ArticleMessageConsumer {
 
     private final ArticleElasticService articleElasticService;

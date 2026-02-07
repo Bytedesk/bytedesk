@@ -29,6 +29,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * 工作流执行日志实体类
+ */
 @Entity
 @Data
 @SuperBuilder

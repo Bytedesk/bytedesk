@@ -173,7 +173,11 @@ public class CustomerExcelListener extends AnalysisEventListener<Map<Integer, St
         if (!StringUtils.hasText(value)) {
             value = row.get(fallbackIndex2);
         }
-        return StringUtils.hasText(value) ? value.trim() : null;
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return StringUtils.hasText(trimmed) ? trimmed : null;
     }
 
     private String normalizeHeader(String header) {

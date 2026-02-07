@@ -20,6 +20,7 @@ import java.util.List;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
@@ -292,9 +293,43 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     // 未读消息数量
     public Integer getUnreadCount() {
+        // GROUP：当前不做“对我未读”统计，保持 0。
+        if (isGroup()) {
+            return 0;
+        }
+
+        // MEMBER：以 thread.owner 作为“我”，统计“非我发送”的未读消息。
+        // 前提：消息表中每个接收者对应独立消息记录（或 status 能反映对该 owner 的已读）。
+        if (isMember()) {
+            UserEntity owner = getOwner();
+            String ownerUid = owner != null ? owner.getUid() : null;
+            if (ownerUid == null) {
+                return 0;
+            }
+
+            int count = 0;
+            for (MessageEntity message : messages) {
+                if (message == null || message.isDeleted()) {
+                    continue;
+                }
+                if (!message.isUnread()) {
+                    continue;
+                }
+                // 自己发的消息不计入“对我未读”
+                if (ownerUid.equals(message.getUserUid())) {
+                    continue;
+                }
+                count++;
+            }
+            return count;
+        }
+
         // 遍历消息列表，统计未读消息数量
         int count = 0;
         for (MessageEntity message : messages) {
+            if (message == null || message.isDeleted()) {
+                continue;
+            }
             if (isCustomerService() && message.isFromVisitor() && message.isUnread()) {
                 // 客服未读消息数量
                 count++;
@@ -304,12 +339,6 @@ public class ThreadEntity extends AbstractThreadEntity {
             } else if (isAssistant() && message.isUnread()) {
                 // 助理未读消息数量
                 count++;
-            } else if (isMember() && message.isFromMember() && message.isUnread()) {
-                // TODO: 成员未读消息数量，统计对方发送，且未读。 通过 MessageUnreadEntity统计
-                return 0;
-            } else if (isGroup() && message.isUnread()) {
-                // TODO: 群未读消息数量，统计群内其他成员发送，且未读。 通过 MessageUnreadEntity统计
-                return 0;
             }
         }
         return count;
@@ -320,6 +349,9 @@ public class ThreadEntity extends AbstractThreadEntity {
         // 遍历消息列表，统计访客未读消息数量
         int count = 0;
         for (MessageEntity message : messages) {
+            if (message == null || message.isDeleted()) {
+                continue;
+            }
             if (message.isFromAgent() && message.isUnread()) {
                 count++;
             }

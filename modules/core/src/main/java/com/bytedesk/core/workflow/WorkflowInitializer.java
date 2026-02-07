@@ -36,6 +36,11 @@ public class WorkflowInitializer implements SmartInitializingSingleton {
         initDefaultWorkflow();
     }
 
+    private void initDefaultWorkflow() {
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        workflowRestService.initDefaultWorkflow(orgUid);
+    }
+
     private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {
             String permissionValue = WorkflowPermissions.WORKFLOW_PREFIX + permission.name();
@@ -43,9 +48,6 @@ public class WorkflowInitializer implements SmartInitializingSingleton {
         }
     }
 
-    private void initDefaultWorkflow() {
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        workflowRestService.initDefaultWorkflow(orgUid);
-    }
+    
 
 }

@@ -22,15 +22,68 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.auth.AuthService;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadRequest> {
+
+    private static void applyUpdatedAtRange(ThreadRequest request,
+            Root<ThreadEntity> root,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            List<Predicate> predicates) {
+        if (request == null) {
+            return;
+        }
+        ZonedDateTime startAt = request.getStartAt();
+        ZonedDateTime endAt = request.getEndAt();
+        if (startAt != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("updatedAt"), startAt));
+        }
+        if (endAt != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("updatedAt"), endAt));
+        }
+    }
+
+    private static Predicate buildMessageContentPredicate(ThreadRequest request,
+            String keyword,
+            Root<ThreadEntity> root,
+            jakarta.persistence.criteria.CriteriaQuery<?> query,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder) {
+        if (request == null || !StringUtils.hasText(keyword)) {
+            return null;
+        }
+
+        Subquery<Long> messageThreadIdSubquery = query.subquery(Long.class);
+        Root<MessageEntity> messageRoot = messageThreadIdSubquery.from(MessageEntity.class);
+
+        List<Predicate> messagePredicates = new ArrayList<>();
+        messagePredicates.add(criteriaBuilder.equal(messageRoot.get("deleted"), false));
+        messagePredicates.add(criteriaBuilder.like(messageRoot.get("content"), "%" + keyword + "%"));
+
+        // 如果设置了时间范围，同时约束消息的 createdAt（更贴近“按时间搜索消息”直觉）
+        ZonedDateTime startAt = request.getStartAt();
+        ZonedDateTime endAt = request.getEndAt();
+        if (startAt != null) {
+            messagePredicates.add(criteriaBuilder.greaterThanOrEqualTo(messageRoot.get("createdAt"), startAt));
+        }
+        if (endAt != null) {
+            messagePredicates.add(criteriaBuilder.lessThanOrEqualTo(messageRoot.get("createdAt"), endAt));
+        }
+
+        messageThreadIdSubquery
+                .select(messageRoot.get("thread").get("id"))
+                .distinct(true)
+                .where(criteriaBuilder.and(messagePredicates.toArray(new Predicate[0])));
+
+        return root.get("id").in(messageThreadIdSubquery);
+    }
 
     /**
      * User(登录) 侧客服会话查询：
@@ -103,6 +156,9 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                     .where(criteriaBuilder.and(subPredicates.toArray(new Predicate[0])));
             predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
 
+            // 时间范围过滤（按 updatedAt）
+            applyUpdatedAtRange(request, root, criteriaBuilder, predicates);
+
             // 基础筛选
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
@@ -126,12 +182,21 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
 
             if (StringUtils.hasText(request.getSearchText())) {
                 String searchText = request.getSearchText();
-                predicates.add(
-                        criteriaBuilder.or(
-                                criteriaBuilder.like(root.get("content"), "%" + searchText + "%"),
-                                criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
-                                criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
-                                criteriaBuilder.like(root.get("uid"), "%" + searchText + "%")));
+                Predicate threadMatch = criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("content"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"));
+                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query, criteriaBuilder);
+                predicates.add(messageMatch == null ? threadMatch : criteriaBuilder.or(threadMatch, messageMatch));
+            }
+
+            // 兼容：若只传 messageSearchText（旧用法），仅按消息内容过滤
+            if (!StringUtils.hasText(request.getSearchText()) && StringUtils.hasText(request.getMessageSearchText())) {
+                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root, query, criteriaBuilder);
+                if (messageOnly != null) {
+                    predicates.add(messageOnly);
+                }
             }
 
             query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
@@ -170,13 +235,17 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                 predicates.add(criteriaBuilder.equal(root.get("channel"), request.getChannel()));
             }
 
+            // 时间范围过滤（按 updatedAt）
+            applyUpdatedAtRange(request, root, criteriaBuilder, predicates);
+
             // visitor 侧 searchText：对齐旧实现（topic 或 uid 模糊匹配）
             if (StringUtils.hasText(request.getSearchText())) {
                 String searchText = request.getSearchText();
-                predicates.add(
-                        criteriaBuilder.or(
-                                criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
-                                criteriaBuilder.like(root.get("uid"), "%" + searchText + "%")));
+                Predicate threadMatch = criteriaBuilder.or(
+                    criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"));
+                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query, criteriaBuilder);
+                predicates.add(messageMatch == null ? threadMatch : criteriaBuilder.or(threadMatch, messageMatch));
             }
 
             query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
@@ -191,6 +260,9 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             List<Predicate> predicates = new ArrayList<>();
             // 基础过滤：deleted=false + 权限校验 + 组织过滤
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+
+            // 时间范围过滤（按 updatedAt）
+            applyUpdatedAtRange(request, root, criteriaBuilder, predicates);
 
             // 主题列表查询 - 支持批量查询指定的主题
             if (request.getTopicList() != null && !request.getTopicList().isEmpty()) {
@@ -265,11 +337,25 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                 orPredicates.add(criteriaBuilder.like(root.get("content"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + searchText + "%"));
 
+                // 同时搜索消息内容：message.content 命中则返回关联会话（并集）
+                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query, criteriaBuilder);
+                if (messageMatch != null) {
+                    orPredicates.add(messageMatch);
+                }
+
                 // 添加拼音搜索
                 // orPredicates.add(criteriaBuilder.like(root.get("contentPinyin"), "%" + pinyinText + "%"));
                 // orPredicates.add(criteriaBuilder.like(root.get("userPinyin"), "%" + pinyinText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
+            }
+
+            // 兼容：若只传 messageSearchText（旧用法），仅按消息内容过滤
+            if (!StringUtils.hasText(request.getSearchText()) && StringUtils.hasText(request.getMessageSearchText())) {
+                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root, query, criteriaBuilder);
+                if (messageOnly != null) {
+                    predicates.add(messageOnly);
+                }
             }
             
             //

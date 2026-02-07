@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 为客服会话统计增加机器人消息数：robot_message_count -->
+    <changeSet id="260204-add-service-statistic-robot-message-count" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_statistic" />
+            <not>
+                <columnExists tableName="bytedesk_service_statistic" columnName="robot_message_count" />
+            </not>
+        </preConditions>
+        <comment>Add robot_message_count to bytedesk_service_statistic.</comment>
+        <addColumn tableName="bytedesk_service_statistic">
+            <column name="robot_message_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_statistic" columnName="robot_message_count" />
+        </rollback>
+    </changeSet>
+
+    <!-- 回填默认值（对于现有数据） -->
+    <changeSet id="260204-backfill-service-statistic-robot-message-count" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_statistic" />
+            <columnExists tableName="bytedesk_service_statistic" columnName="robot_message_count" />
+        </preConditions>
+        <comment>Backfill default value for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_service_statistic
+            SET robot_message_count = 0
+            WHERE robot_message_count IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

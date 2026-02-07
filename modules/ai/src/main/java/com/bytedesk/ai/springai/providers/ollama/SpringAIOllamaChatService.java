@@ -76,6 +76,7 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
             return OllamaChatOptions.builder()
                     .model(llm.getTextModel())
                     .temperature(llm.getTemperature())
+                    .numPredict(llm.getMaxTokens())
                     .topP(llm.getTopP())
                     .topK(llm.getTopK())
                     .build();

@@ -41,6 +41,7 @@ public enum MessageTypeEnum {
     PHONE_NUMBER, // 电话号码
     EMAILL_ADDRESS, // 邮箱地址
     WECHAT_NUMBER, // 微信号
+    FORWARD, // 转发消息
     // 
     QUEUE, // 排队消息: 用户进入排队队列
     QUEUE_NOTICE, // 排队通知消息: 通知客服，用户进入排队队列，通知客服人员
@@ -48,6 +49,8 @@ public enum MessageTypeEnum {
     QUEUE_ACCEPT, // 排队接受消息：通知客服，用户已经被其他客服接入
     QUEUE_TIMEOUT, // 排队超时消息：用户排队超时未接入客服
     QUEUE_CANCEL, // 排队取消消息：用户取消排队或被移出排队队列
+    // 
+    ROUTING_POOL, // 路由池消息：系统根据路由池规则分配客服
     // 
     POLL, // 投票
     POLL_SUBMIT, // 投票提交

@@ -23,12 +23,6 @@ import lombok.NoArgsConstructor;
 public class ThreadContent {
 
 	/**
-	 * ThreadContent 版本号：用于后续字段演进
-	 */
-	@Builder.Default
-	private Integer v = 1;
-
-	/**
 	 * 最近一条消息的类型（MessageTypeEnum.name()）
 	 */
 	private String msgType;

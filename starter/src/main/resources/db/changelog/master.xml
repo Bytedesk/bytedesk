@@ -64,4 +64,8 @@
 
     <include file="db/changelog/migration/260126_drop_service_unified_legacy_columns.xml" />
 
+    <include file="db/changelog/migration/260204_add_show_message_status.xml" />
+
+    <include file="db/changelog/migration/260204_add_service_statistic_robot_message_count.xml" />
+
 </databaseChangeLog>

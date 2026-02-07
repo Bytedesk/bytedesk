@@ -58,7 +58,9 @@ public class RoleEntity extends BaseEntity {
 
 	@Builder.Default
 	@ManyToMany
-	@JoinTable(name = "bytedesk_core_role_authority", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
+	@JoinTable(name = "bytedesk_core_role_authority", 
+		joinColumns = @JoinColumn(name = "role_id"), 
+		inverseJoinColumns = @JoinColumn(name = "authority_id"))
 	private Set<AuthorityEntity> authorities = new HashSet<>();
 
 	public void addAuthority(AuthorityEntity authority) {

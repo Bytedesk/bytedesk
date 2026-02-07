@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -260,8 +261,23 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
 
         UserEntity userEntity = userOptional.get();
 
+        // username 更新：需要先校验新用户名是否已存在（platform 维度，忽略 deleted=true）
+        if (StringUtils.hasText(request.getUsername())
+                && !request.getUsername().equals(userEntity.getUsername())) {
+            String platformToCheck = StringUtils.hasText(request.getPlatform())
+                    ? request.getPlatform()
+                    : (StringUtils.hasText(userEntity.getPlatform()) ? userEntity.getPlatform() : PlatformEnum.BYTEDESK.name());
+
+            if (Boolean.TRUE.equals(userRepository.existsByUsernameAndPlatformAndDeletedFalse(request.getUsername(), platformToCheck))) {
+                throw new UsernameExistsException("Username " + request.getUsername() + " already exists..!!");
+            }
+        }
+
         // 非 super：仅允许修改自己的基础资料；敏感字段请走专用接口（changePassword/changeEmail/changeMobile）
         if (!authUser.isSuperUser()) {
+            if (StringUtils.hasText(request.getUsername())) {
+                userEntity.setUsername(request.getUsername());
+            }
             if (StringUtils.hasText(request.getNickname())) {
                 userEntity.setNickname(request.getNickname());
             }

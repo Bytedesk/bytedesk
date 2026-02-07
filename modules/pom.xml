@@ -16,6 +16,7 @@
 
     <modules>
         <module>ai</module>
+        <module>bi</module>
         <module>call</module>
         <module>conference</module>
         <module>core</module>
@@ -27,6 +28,7 @@
         <module>social</module>
         <module>team</module>
         <module>ticket</module>
+        <module>video</module>
         <module>voc</module>
     </modules>
 
@@ -88,6 +90,18 @@
 			<scope>provided</scope>
 		</dependency>
 
+        <!-- RabbitMQ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit</artifactId>
+            <scope>provided</scope>
+		</dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -99,6 +113,28 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- https://redisson.pro/docs/integration-with-spring/ -->
+        <!-- https://mvnrepository.com/artifact/org.redisson/redisson-spring-boot-starter -->
+		<!-- <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+			<version>4.1.0</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.redisson</groupId>
+                    <artifactId>redisson-spring-data-40</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency> -->
+        <!-- Source: https://mvnrepository.com/artifact/org.redisson/redisson-spring-data-35 -->
+        <!-- <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-data-35</artifactId>
+            <version>4.1.0</version>
+            <scope>provided</scope>
+        </dependency> -->
 
         <!-- 全文检索 -->
 		<dependency>

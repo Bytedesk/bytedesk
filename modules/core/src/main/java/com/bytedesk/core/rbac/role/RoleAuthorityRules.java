@@ -150,6 +150,10 @@ public final class RoleAuthorityRules {
     // Keep as literals to avoid core -> service module dependency.
     public static final String QUEUE_READ = "QUEUE_READ";
 
+    // 
+    public static final String ROUTING_POOL_READ = "ROUTING_POOL_READ";
+    public static final String ROUTING_POOL_UPDATE = "ROUTING_POOL_UPDATE";
+
     // workgroup (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String WORKGROUP_READ = "WORKGROUP_READ";
@@ -242,6 +246,8 @@ public final class RoleAuthorityRules {
             AGENT_STATUS_CREATE,
             QUEUE_READ,
             WORKGROUP_READ,
+            ROUTING_POOL_READ,
+            ROUTING_POOL_UPDATE,
 
             // 快捷回复：ROLE_AGENT 默认需要增删改
             QUICK_REPLY_CREATE,

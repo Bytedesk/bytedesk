@@ -14,6 +14,7 @@
 package com.bytedesk.core.exception;
 
 import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -209,6 +210,20 @@ public class GlobalExceptionHandler {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
         }
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<?> handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException e) {
+        Throwable cause = e.getCause();
+        String message = cause != null ? cause.getMessage() : e.getMessage();
+        if (message != null && message.contains("orgUid should not be null")) {
+            log.warn("InvalidDataAccessApiUsageException: {}", message);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(JsonResult.error(message, HttpStatus.BAD_REQUEST.value()));
+        }
+        log.error("InvalidDataAccessApiUsageException", e);
+        return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
     }
 
     /**

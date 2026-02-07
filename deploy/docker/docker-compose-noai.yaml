@@ -78,8 +78,12 @@ services:
       memlock:
         soft: -1
         hard: -1
+    entrypoint: ["bash", "-c", "if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then echo 'Installing IK plugin...'; if [ -f /tmp/elasticsearch-analysis-ik-8.18.0.zip ]; then /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; else curl -fsSL -o /tmp/elasticsearch-analysis-ik-8.18.0.zip https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip && /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; fi; fi; exec /usr/local/bin/docker-entrypoint.sh"]
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
+      # 默认安装 IK 分词插件（本地文件）
+      # 如无本地文件，将自动从 https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip 下载
+      - ./elasticsearch-analysis-ik-8.18.0.zip:/tmp/elasticsearch-analysis-ik-8.18.0.zip:ro
     ports:
       - "19200:9200"
       - "19300:9300"
@@ -316,8 +320,8 @@ services:
       BYTEDESK_CALL_FREESWITCH_WEBRTC_PORT: 7443
       BYTEDESK_CALL_FREESWITCH_WS_PORT: 5066
       BYTEDESK_CALL_FREESWITCH_CALL_TIMEOUT: 120
-      # Cluster config
-      BYTEDESK_CLUSTER_ENABLED: "false"
+      # 废弃 Cluster config
+      # BYTEDESK_CLUSTER_ENABLED: "false"
       # Push config
       # BYTEDESK_PUSH_APNS_BUNDLE_ID: com.kefux.im
       # BYTEDESK_PUSH_APNS_P12_URL: 123.p12
@@ -525,6 +529,7 @@ services:
       #阿里云短信服务的模板Code，可以在控制台找到
       ALIYUN_SMS_TEMPLATECODE: ''
       # Artemis JMS 配置
+      # SPRING_ARTEMIS_MODE: embedded
       SPRING_ARTEMIS_MODE: native
       SPRING_ARTEMIS_BROKER_URL: tcp://artemis-bytedesk:61616
       SPRING_ARTEMIS_USER: admin

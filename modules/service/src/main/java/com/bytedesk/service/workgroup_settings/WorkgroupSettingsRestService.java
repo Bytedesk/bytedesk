@@ -225,6 +225,7 @@ public class WorkgroupSettingsRestService
         entity.setIsDefault(request.getIsDefault());
         entity.setEnabled(request.getEnabled());
         entity.setRoutingMode(request.getRoutingMode());
+        entity.setManualRoutingTip(request.getManualRoutingTip());
 
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {

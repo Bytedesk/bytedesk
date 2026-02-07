@@ -275,7 +275,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         ex.getMessage());
             }
         }
-
         // 设置llm相关属性
         if (request.getLlm() != null) {
             robot.setLlm(request.getLlm());
@@ -389,13 +388,18 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
         ThreadEntity thread = threadOptional.get();
         //
-        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService
-                .findByUid(robotProtobuf.getLlm().getTextProviderUid());
-        if (!llmProviderOptional.isPresent()) {
-            throw new RuntimeException("llm provider not found");
+        if (robotProtobuf.getLlm() != null && StringUtils.hasText(robotProtobuf.getLlm().getTextProviderUid())) {
+            String providerUid = robotProtobuf.getLlm().getTextProviderUid();
+            Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(providerUid);
+            if (llmProviderOptional.isPresent()) {
+                robotProtobuf.setAvatar(llmProviderOptional.get().getLogo());
+                robotProtobuf.setNickname(llmProviderOptional.get().getNickname());
+            } else {
+                log.warn("llm provider not found, uid: {}", providerUid);
+            }
+        } else {
+            log.warn("skip provider lookup: textProviderUid is empty");
         }
-        robotProtobuf.setAvatar(llmProviderOptional.get().getLogo());
-        robotProtobuf.setNickname(llmProviderOptional.get().getNickname());
         thread.setAgent(robotProtobuf.toJson());
         thread.setRobot(robotProtobuf.toJson());
         thread.setUser(robotProtobuf.toJson());

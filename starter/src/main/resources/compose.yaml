@@ -1,4 +1,6 @@
 services:
+
+  # https://hub.docker.com/_/mysql
   bytedesk-mysql:
     image: mysql:latest
     container_name: mysql-bytedesk
@@ -21,6 +23,7 @@ services:
     #   timeout: 5s
     #   retries: 5
 
+  # https://hub.docker.com/_/redis
   bytedesk-redis:
     image: redis/redis-stack-server:latest
     container_name: redis-bytedesk
@@ -86,6 +89,8 @@ services:
       timeout: 10s
       retries: 5
 
+
+  # https://hub.docker.com/_/elasticsearch
   # ElasticSearch 向量数据库
   bytedesk-elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
@@ -103,8 +108,12 @@ services:
       memlock:
         soft: -1
         hard: -1
+    entrypoint: ["bash", "-c", "if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then echo 'Installing IK plugin...'; if [ -f /tmp/elasticsearch-analysis-ik-8.18.0.zip ]; then /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; else curl -fsSL -o /tmp/elasticsearch-analysis-ik-8.18.0.zip https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip && /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; fi; fi; exec /usr/local/bin/docker-entrypoint.sh"]
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
+      # 默认安装 IK 分词插件（本地文件）
+      # 如无本地文件，将自动从 https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip 下载
+      - ./elasticsearch-analysis-ik-8.18.0.zip:/tmp/elasticsearch-analysis-ik-8.18.0.zip:ro
     ports:
       - "19200:9200"
       - "19300:9300"
@@ -135,38 +144,38 @@ services:
 
   # etcd 分布式键值存储
   # http://localhost:12379 - etcd API
-  bytedesk-etcd:
-    image: quay.io/coreos/etcd:v3.5.5
-    container_name: etcd-bytedesk
-    restart: always
-    environment:
-      - ETCD_AUTO_COMPACTION_MODE=revision
-      - ETCD_AUTO_COMPACTION_RETENTION=1000
-      - ETCD_QUOTA_BACKEND_BYTES=4294967296
-      - ETCD_SNAPSHOT_COUNT=50000
-      - TZ=Asia/Shanghai
-    ports:
-      - "12379:2379"   # Client API
-      - "12380:2380"   # Peer communication
-    volumes:
-      - etcd_data:/etcd
-    command:
-      - /usr/local/bin/etcd
-      - --name=bytedesk-etcd-node
-      - --advertise-client-urls=http://bytedesk-etcd:2379
-      - --listen-client-urls=http://0.0.0.0:2379
-      - --initial-advertise-peer-urls=http://bytedesk-etcd:2380
-      - --listen-peer-urls=http://0.0.0.0:2380
-      - --initial-cluster=bytedesk-etcd-node=http://bytedesk-etcd:2380
-      - --initial-cluster-state=new
-      - --data-dir=/etcd
-    networks:
-      - bytedesk-network
-    healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # bytedesk-etcd:
+  #   image: quay.io/coreos/etcd:v3.5.5
+  #   container_name: etcd-bytedesk
+  #   restart: always
+  #   environment:
+  #     - ETCD_AUTO_COMPACTION_MODE=revision
+  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
+  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
+  #     - ETCD_SNAPSHOT_COUNT=50000
+  #     - TZ=Asia/Shanghai
+  #   ports:
+  #     - "12379:2379"   # Client API
+  #     - "12380:2380"   # Peer communication
+  #   volumes:
+  #     - etcd_data:/etcd
+  #   command:
+  #     - /usr/local/bin/etcd
+  #     - --name=bytedesk-etcd-node
+  #     - --advertise-client-urls=http://bytedesk-etcd:2379
+  #     - --listen-client-urls=http://0.0.0.0:2379
+  #     - --initial-advertise-peer-urls=http://bytedesk-etcd:2380
+  #     - --listen-peer-urls=http://0.0.0.0:2380
+  #     - --initial-cluster=bytedesk-etcd-node=http://bytedesk-etcd:2380
+  #     - --initial-cluster-state=new
+  #     - --data-dir=/etcd
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "etcdctl", "endpoint", "health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
 
   # MinIO 对象存储服务
   # http://localhost:19000 - MinIO Console
@@ -446,8 +455,8 @@ volumes:
     name: bytedesk_zipkin_data
   artemis_data:
     name: bytedesk_artemis_data
-  etcd_data:
-    name: bytedesk_etcd_data
+  # etcd_data:
+  #   name: bytedesk_etcd_data
   minio_data:
     name: bytedesk_minio_data
   freeswitch_config:

@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.jms.JmsArtemisConsts;
+import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
 

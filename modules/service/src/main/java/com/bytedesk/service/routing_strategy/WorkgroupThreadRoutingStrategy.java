@@ -25,6 +25,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
@@ -34,6 +35,8 @@ import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
+import com.bytedesk.core.message.content.RoutingPoolContent;
+import com.bytedesk.core.message.content.RoutingPoolNotification;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
@@ -66,6 +69,13 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.service.routing_pool.RoutingPoolRequest;
+import com.bytedesk.service.routing_pool.RoutingPoolResponse;
+import com.bytedesk.service.routing_pool.RoutingPoolRestService;
+import com.bytedesk.service.routing_pool.RoutingPoolStatusEnum;
+import com.bytedesk.service.routing_pool.RoutingPoolTypeEnum;
+import com.bytedesk.service.workgroup_routing.WorkgroupRoutingModeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,6 +119,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final TopicRestService topicRestService;
     private final ObjectProvider<ThreadRoutingContext> threadRoutingContextProvider;
     private final AgentRestService agentRestService;
+    private final RoutingPoolRestService routingPoolRestService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -255,6 +266,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private MessageProtobuf handleExistingQueuingWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
             WorkgroupEntity workgroup) {
 
+        // MANUAL 模式：排队态仅表示“等待手动接入”，不自动分配客服
+        if (WorkgroupRoutingModeEnum.MANUAL.name().equalsIgnoreCase(workgroup.getRoutingMode())) {
+            ThreadEntity latest = getThreadByUid(threadFromRequest.getUid());
+            return getWorkgroupRoutingPoolMessage(visitorRequest, latest);
+        }
+
         // 以最新线程状态为准，避免并发下重复接入
         ThreadEntity latestThread = getThreadByUid(threadFromRequest.getUid());
         if (!latestThread.isQueuing()) {
@@ -272,7 +289,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         // 不在服务时间内，保持当前排队（避免刷新时意外切换流程）
-        if (!resolveIsInServiceTime(workgroup)) {
+        if (!resolveIsInServiceTime(visitorRequest, workgroup)) {
             log.debug("不在服务时间内，继续返回排队消息 - threadUid: {}", latestThread.getUid());
             if (forceTransfer && queueMemberEntity != null) {
                 return handleQueuedWorkgroupWithoutAgent(visitorRequest, latestThread, workgroup, queueMemberEntity);
@@ -425,7 +442,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 检查机器人配置和服务时间
         boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
-        boolean isInServiceTime = resolveIsInServiceTime(workgroup);
+        boolean isInServiceTime = resolveIsInServiceTime(visitorRequest, workgroup);
 
         log.debug("路由决策参数 - 工作组离线状态: {}, 在服务时间内: {}",
                 isOffline, isInServiceTime);
@@ -480,7 +497,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 thread.getUid(), workgroup.getUid());
 
         // 检查是否在工作时间内
-        boolean isInServiceTime = resolveIsInServiceTime(workgroup);
+        boolean isInServiceTime = resolveIsInServiceTime(visitorRequest, workgroup);
         log.debug("服务时间检查 - 是否在服务时间内: {}", isInServiceTime);
 
         if (!isInServiceTime) {
@@ -497,6 +514,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private MessageProtobuf routeToAgentDuringServiceTime(VisitorRequest visitorRequest, ThreadEntity thread,
             WorkgroupEntity workgroup) {
         log.debug("在服务时间内，开始选择客服");
+
+        if (WorkgroupRoutingModeEnum.MANUAL.name().equalsIgnoreCase(workgroup.getRoutingMode())) {
+            log.info("Workgroup routingMode=MANUAL, divert to routing_pool - workgroupUid: {}, threadUid: {}",
+                    workgroup.getUid(), thread.getUid());
+            return routeToManualRoutingPool(visitorRequest, thread, workgroup);
+        }
 
         List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
         if (availableAgents.isEmpty()) {
@@ -552,6 +575,151 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         log.info("客服有接待名额，进入接待流程 - agentUid: {}, agentName {}", availableAgentWithCapacity.getUid(),
                 availableAgentWithCapacity.getNickname());
         return handleAvailableWorkgroup(visitorRequest, thread, availableAgentWithCapacity, queueMemberEntity);
+    }
+
+    /**
+     * MANUAL 模式：会话进入路由池等待客服手动接入。
+     */
+    private MessageProtobuf routeToManualRoutingPool(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
+            WorkgroupEntity workgroup) {
+
+        // 重新初始化会话 extra 等（保持与常规人工路径一致）
+        ThreadEntity thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, threadFromRequest, workgroup);
+
+        String tip = resolveManualRoutingTip(workgroup);
+
+        // 先写入 routing_pool（name 使用 threadUid，避免 name+orgUid+type 去重造成覆盖）
+        RoutingPoolRequest routingPoolRequest = RoutingPoolRequest.builder()
+                .name("manual_" + thread.getUid())
+                .description(tip)
+                .type(RoutingPoolTypeEnum.MANUAL_THREAD.name())
+                .status(RoutingPoolStatusEnum.WAITING.name())
+                .level(LevelEnum.ORGANIZATION.name())
+                .orgUid(thread.getOrgUid())
+                .workgroupUid(workgroup.getUid())
+                .threadUid(thread.getUid())
+                .threadTopic(thread.getTopic())
+                .userJson(thread.getUser() != null ? thread.getUser() : null)
+                .build();
+
+        RoutingPoolResponse routingPool = routingPoolRestService.createSystemRoutingPool(routingPoolRequest);
+
+        // 设置线程为 QUEUING（用于 acceptByAgent 校验）并写入结构化 ThreadContent
+        RoutingPoolContent content = RoutingPoolContent.builder()
+                .content(tip)
+                .routingPoolUid(routingPool != null ? routingPool.getUid() : null)
+                .threadUid(thread.getUid())
+                .serverTimestamp(System.currentTimeMillis())
+                .build();
+
+        thread.setQueuing().setContent(ThreadContent.of(MessageTypeEnum.ROUTING_POOL, tip, content.toJson()).toJson());
+        ThreadEntity savedThread = saveThread(thread);
+
+        // 保证所有会话 thread 在 queue_member 中都有唯一记录（MANUAL 路由池也必须存在 QueueMember）
+        try {
+            if (savedThread != null) {
+                queueService.enqueueWorkgroup(savedThread, null, workgroup, visitorRequest);
+            }
+        } catch (Exception e) {
+            log.warn("MANUAL routing pool enqueueWorkgroup failed - threadUid: {}, workgroupUid: {}, error: {}",
+                    savedThread != null ? savedThread.getUid() : null,
+                    workgroup != null ? workgroup.getUid() : null,
+                    e.getMessage(), e);
+        }
+
+        // 同步订阅 topic（含 internal），避免首条消息因订阅延迟而丢失
+        subscribeThreadTopics(savedThread, topicRestService);
+
+        // 发布事件
+        bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
+
+        // 发送访客侧“等待手动接入”消息
+        MessageProtobuf visitorMsg = ThreadMessageUtil.getThreadRoutingPoolMessage(content, savedThread);
+        messageSendService.sendProtobufMessage(visitorMsg);
+
+        // 通知工作组内所有在线可用客服
+        notifyAvailableAgentsOfRoutingPool(workgroup, savedThread, routingPool, content);
+
+        return visitorMsg;
+    }
+
+    private String resolveManualRoutingTip(WorkgroupEntity workgroup) {
+        if (workgroup != null && workgroup.getSettings() != null
+                && StringUtils.hasText(workgroup.getSettings().getManualRoutingTip())) {
+            return workgroup.getSettings().getManualRoutingTip();
+        }
+        return I18Consts.I18N_WORKGROUP_MANUAL_ROUTING_POOL_WAITING_TIP;
+    }
+
+    private void notifyAvailableAgentsOfRoutingPool(WorkgroupEntity workgroup, ThreadEntity thread,
+            RoutingPoolResponse routingPool, RoutingPoolContent content) {
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+        if (availableAgents == null || availableAgents.isEmpty()) {
+            log.debug("工作组暂无在线可用客服，不发送路由池通知 - workgroupUid: {}", workgroup.getUid());
+            return;
+        }
+
+        for (AgentEntity agent : availableAgents) {
+            try {
+                ThreadEntity agentNoticeThread = queueMemberRestService.createAgentQueueThread(agent);
+
+                try {
+                    subscribeThreadTopics(agentNoticeThread, topicRestService);
+                } catch (Exception e) {
+                    log.debug("Failed to subscribe agent notice thread topic - agentUid: {}, error: {}", agent.getUid(), e.getMessage());
+                }
+
+                UserProtobuf visitor = null;
+                try {
+                    if (StringUtils.hasText(thread.getUser())) {
+                        visitor = UserProtobuf.fromJson(thread.getUser());
+                    }
+                } catch (Exception ignore) {
+                    // ignore
+                }
+
+                RoutingPoolNotification payload = RoutingPoolNotification.builder()
+                        .routingPoolUid(routingPool != null ? routingPool.getUid() : (content != null ? content.getRoutingPoolUid() : null))
+                        .threadUid(thread.getUid())
+                        .threadTopic(thread.getTopic())
+                        .workgroupUid(workgroup.getUid())
+                        .serverTimestamp(System.currentTimeMillis())
+                        .user(visitor)
+                        .build();
+
+                MessageProtobuf agentNoticeMessage = ThreadMessageUtil.getAgentRoutingPoolNoticeMessage(payload, agentNoticeThread);
+                messageSendService.sendProtobufMessage(agentNoticeMessage);
+
+                log.info("工作组路由池通知已发送 - workgroupUid: {}, agentUid: {}, routingPoolUid: {}",
+                        workgroup.getUid(), agent.getUid(), payload.getRoutingPoolUid());
+            } catch (Exception e) {
+                log.error("工作组路由池通知发送失败 - workgroupUid: {}, agentUid: {}, error: {}",
+                        workgroup.getUid(), agent.getUid(), e.getMessage(), e);
+            }
+        }
+    }
+
+    private MessageProtobuf getWorkgroupRoutingPoolMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
+        RoutingPoolContent rpc = null;
+        try {
+            ThreadContent tc = ThreadContent.fromStored(thread.getContent());
+            String payload = tc != null ? tc.getPayload() : thread.getContent();
+            if (payload != null && payload.trim().startsWith("{")) {
+                rpc = JSON.parseObject(payload, RoutingPoolContent.class);
+            }
+        } catch (Exception e) {
+            log.debug("Parse routing pool content failed, fallback to text - threadUid: {}, error: {}", thread.getUid(), e.getMessage());
+        }
+        if (rpc == null) {
+            rpc = RoutingPoolContent.builder()
+                    .content(ThreadContent.fromStored(thread.getContent()) != null
+                            ? ThreadContent.fromStored(thread.getContent()).getDisplayText()
+                            : (thread.getContent() != null ? thread.getContent() : I18Consts.I18N_WORKGROUP_MANUAL_ROUTING_POOL_WAITING_TIP))
+                    .threadUid(thread.getUid())
+                    .serverTimestamp(System.currentTimeMillis())
+                    .build();
+        }
+        return ThreadMessageUtil.getThreadRoutingPoolMessage(rpc, thread);
     }
 
     private MessageProtobuf tryRouteToBackup(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
@@ -1068,6 +1236,14 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 获取工作组离线消息
      */
     private String getWorkgroupOfflineMessage(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
+        // 非工作时间提示优先（用于“营业时间外”场景）
+        if (!resolveIsInServiceTime(visitorRequest, workgroup)) {
+            WorktimeSettingEntity worktimeSettings = resolveEffectiveWorktimeSettings(visitorRequest, workgroup);
+            if (worktimeSettings != null && StringUtils.hasText(worktimeSettings.getNonWorktimeTip())) {
+                return worktimeSettings.getNonWorktimeTip();
+            }
+        }
+
         String customMessage = null;
         boolean useDraft = isDraftEnabled(visitorRequest);
         if (workgroup.getSettings() != null) {
@@ -1079,7 +1255,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             }
         }
         if (customMessage == null || customMessage.isEmpty()) {
-            customMessage = "请稍后，客服会尽快回复您";
+            customMessage = I18Consts.I18N_WORKGROUP_OFFLINE_FALLBACK_MESSAGE;
         }
         return customMessage;
     }
@@ -1192,31 +1368,28 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
     }
 
-    /**
-     * 发布工作组线程相关事件
-     */
-    // private void publishWorkgroupThreadEvents(ThreadEntity savedThread) {
-    //     try {
-    //         // 同步订阅 topic（含 internal），避免首条消息因订阅延迟而丢失
-    //         subscribeThreadTopics(savedThread, topicRestService);
-    //         // 
-    //         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
-    //         log.debug("Published workgroup thread events for thread: {}", savedThread.getUid());
-    //     } catch (Exception e) {
-    //         log.warn("Failed to publish thread events for workgroup thread {}: {}", savedThread.getUid(),
-    //                 e.getMessage());
-    //     }
-    // }
-
-    private boolean resolveIsInServiceTime(WorkgroupEntity workgroup) {
-        if (workgroup == null || workgroup.getSettings() == null) {
-            return true;
-        }
-        WorktimeSettingEntity published = workgroup.getSettings().getWorktimeSettings();
-        if (published != null) {
-            return Boolean.TRUE.equals(published.isInWorktime());
+    private boolean resolveIsInServiceTime(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
+        WorktimeSettingEntity effective = resolveEffectiveWorktimeSettings(visitorRequest, workgroup);
+        if (effective != null) {
+            return Boolean.TRUE.equals(effective.isInWorktime());
         }
         return true;
+    }
+
+    private WorktimeSettingEntity resolveEffectiveWorktimeSettings(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
+        if (workgroup == null || workgroup.getSettings() == null) {
+            return null;
+        }
+        boolean useDraft = isDraftEnabled(visitorRequest);
+        WorktimeSettingEntity draft = workgroup.getSettings().getDraftWorktimeSettings();
+        WorktimeSettingEntity published = workgroup.getSettings().getWorktimeSettings();
+        if (useDraft && draft != null) {
+            return draft;
+        }
+        if (published != null) {
+            return published;
+        }
+        return draft;
     }
 
     

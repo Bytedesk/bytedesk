@@ -108,7 +108,6 @@ public class ServiceSettingsEntity extends BaseEntity {
 
     //-----------------------------------------------------------------------------------
 
-    // 询前表单
     // 是否显示询前表单
     @NotNull
     @Builder.Default
@@ -129,6 +128,14 @@ public class ServiceSettingsEntity extends BaseEntity {
     @NotNull
     @Builder.Default
     private Boolean showHistory = false;
+
+    /**
+     * Whether visitor can see message status (e.g. delivered/read) on visitor side.
+     * Default: true (keep existing UX unless explicitly disabled).
+     */
+    @NotNull
+    @Builder.Default
+    private Boolean showMessageStatus = true;
 
     /**
      * 访客发起咨询是否需要登录（未登录则应先登录再创建会话）

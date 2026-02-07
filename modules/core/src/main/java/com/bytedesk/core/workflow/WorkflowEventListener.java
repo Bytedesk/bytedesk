@@ -32,16 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkflowEventListener {
     
     private final WorkflowRestService workflowRestService;
- 
-    // 监听上传工作流
-    @EventListener
-    public void onUploadCreateEvent(UploadCreateEvent event) {
-        UploadEntity upload = event.getUpload();
-        if (UploadTypeEnum.WORKFLOW.name().equalsIgnoreCase(upload.getType())) {
-            log.info("WorkflowEventListener.onUploadCreateEvent, upload: {}", upload.getFileName());
-            
-        }
-    }
 
     @Order(3)
     @EventListener
@@ -50,6 +40,16 @@ public class WorkflowEventListener {
         String orgUid = organization.getUid();
         log.info("workflow - organization created: {}", organization.getName());
         workflowRestService.initDefaultWorkflow(orgUid);
+    }
+
+    // 监听上传工作流
+    @EventListener
+    public void onUploadCreateEvent(UploadCreateEvent event) {
+        UploadEntity upload = event.getUpload();
+        if (UploadTypeEnum.WORKFLOW.name().equalsIgnoreCase(upload.getType())) {
+            log.info("WorkflowEventListener.onUploadCreateEvent, upload: {}", upload.getFileName());
+            
+        }
     }
 }
 

@@ -43,6 +43,11 @@ public class WorktimeSettingResponse extends BaseResponse {
 
     private String holidays;
 
+    /**
+     * 非工作时间提示
+     */
+    private String nonWorktimeTip;
+
     private String type;
 
 }

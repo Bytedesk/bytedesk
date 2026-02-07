@@ -53,6 +53,11 @@ public class WorktimeSettingRequest extends BaseRequest {
      */
     private String holidays;
 
+    /**
+     * 非工作时间提示（用于引导访客留言/等待）
+     */
+    private String nonWorktimeTip;
+
     // @Builder.Default
     // private String type = WorktimeSettingTypeEnum.CUSTOMER.name();
 

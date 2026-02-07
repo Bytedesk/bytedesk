@@ -14,6 +14,7 @@
 package com.bytedesk.core.base;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,8 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BytedeskConsts;
 // import com.bytedesk.core.enums.LevelEnum;
 // import com.bytedesk.core.enums.PlatformEnum;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -118,6 +121,16 @@ public abstract class BaseRequest implements Serializable, PageableRequest {
 
     // 
     private String searchText;
+
+    /**
+     * 通用时间范围过滤字段（由各模块 Specification 自行决定过滤哪个时间列）
+     * 前端建议传 ISO-8601 日期时间字符串（例如 2026-02-04T15:00:00.000Z）
+     */
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private ZonedDateTime startAt;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private ZonedDateTime endAt;
 
     /**
      * 获取分页对象

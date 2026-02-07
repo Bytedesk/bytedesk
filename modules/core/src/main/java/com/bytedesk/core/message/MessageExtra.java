@@ -40,8 +40,6 @@ public class MessageExtra extends BaseExtra {
     @Builder.Default
     private MessageVisibilityEnum visibility = MessageVisibilityEnum.PUBLIC;
 
-    private String translatedText; // 翻译后的文本
-
     // 敏感词替换前的原始内容（用于审计/回溯）
     private String tabooOriginalContent;
     
