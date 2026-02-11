@@ -1,1 +1,0 @@
-import{T as a}from"./index-BaRuqoFP.js";import r from"./index-IuLOGWV6.js";async function n(e){return r("/visitor/api/v1/message/unread/count",{method:"GET",params:{...e,client:a}})}async function o(e){return r("/visitor/api/v1/message/unread/clear",{method:"POST",data:{...e,client:a}})}export{o as clearUnreadMessages,n as getUnreadMessageCount};

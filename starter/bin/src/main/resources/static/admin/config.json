@@ -1,7 +1,0 @@
-{
-    "enabled": false,
-    "apiUrl": "http://127.0.0.1:9003",
-    "websocketUrl": "ws://127.0.0.1:9885/websocket",
-    "stompUrl": "ws://127.0.0.1:9003/stomp",
-    "htmlUrl": "http://127.0.0.1:9003"
-}
