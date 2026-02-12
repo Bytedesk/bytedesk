@@ -101,6 +101,11 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
     private List<AgentRightPanelTab> rightPanelTabs;
 
     /**
+     * Desktop quick reply buttons (draft updates)
+     */
+    private List<AgentQuickReplyButton> quickReplies;
+
+    /**
      * Agent uid (used for querying settings by agent)
      */
     private String agentUid;

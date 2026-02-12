@@ -14,6 +14,7 @@
 package com.bytedesk.core.rbac.organization;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.rbac.user.UserResponseSimple;
 
@@ -47,6 +48,12 @@ public class OrganizationResponseSimple implements Serializable {
 
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
+
+    // 会员截止日期
+    private ZonedDateTime vipExpireDate;
+
+    // 会员到期后是否禁止登录
+    private Boolean vipExpireLoginCheckEnabled;
 
     // 是否启用自定义服务器（域名/IP）
     private Boolean customServerEnabled;

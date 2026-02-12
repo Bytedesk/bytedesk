@@ -45,6 +45,8 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     List<AgentEntity> findByOrgUidAndDeletedFalse(String orgUid);
 
+    long countByOrgUidAndDeletedFalse(String orgUid);
+
     Boolean existsByUserUidAndOrgUidAndDeletedFalse(String userUid, String orgUid);
 
     

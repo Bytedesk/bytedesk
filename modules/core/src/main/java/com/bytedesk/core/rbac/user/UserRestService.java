@@ -40,7 +40,6 @@ import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
-import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -126,7 +125,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         if (managedUser.getCurrentOrganization() != null
                 && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
             OrganizationEntity org = managedUser.getCurrentOrganization();
-            result.put(org.getUid(), ConvertUtils.toOrganizationResponseSimple(org));
+            result.put(org.getUid(), UserConvertUtils.toOrganizationResponseSimple(org));
         }
 
         if (managedUser.getUserOrganizationRoles() != null) {
@@ -135,7 +134,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
                     continue;
                 }
                 OrganizationEntity org = uor.getOrganization();
-                result.putIfAbsent(org.getUid(), ConvertUtils.toOrganizationResponseSimple(org));
+                result.putIfAbsent(org.getUid(), UserConvertUtils.toOrganizationResponseSimple(org));
             }
         }
 
@@ -391,7 +390,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
 
     @Override
     public UserResponse convertToResponse(UserEntity entity) {
-        return ConvertUtils.convertToUserResponse(entity);
+        return UserConvertUtils.convertToUserResponse(entity);
     }
 
     public List<UserEntity> findAll(UserRequest request) {

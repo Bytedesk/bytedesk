@@ -37,6 +37,8 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.voc.feedback_settings.FeedbackSettingsEntity;
+import com.bytedesk.voc.feedback_settings.FeedbackSettingsRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,6 +56,8 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     private final AuthService authService;
 
     private final CategoryRestService categoryRestService;
+
+    private final FeedbackSettingsRepository feedbackSettingsRepository;
 
     @Override
     protected Specification<FeedbackEntity> createSpecification(FeedbackRequest request) {
@@ -83,6 +87,7 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
     @Transactional
     @Override
     public FeedbackResponse create(FeedbackRequest request) {
+        Integer resolvedScoreMax = normalizeAndValidate(request, null);
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
@@ -101,6 +106,7 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
         
         // 
         FeedbackEntity entity = modelMapper.map(request, FeedbackEntity.class);
+        entity.setScoreMax(resolvedScoreMax);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
@@ -118,6 +124,7 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
         Optional<FeedbackEntity> optional = feedbackRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             FeedbackEntity entity = optional.get();
+            normalizeAndValidate(request, entity);
             modelMapper.map(request, entity);
             //
             FeedbackEntity savedEntity = save(entity);
@@ -129,6 +136,49 @@ public class FeedbackRestService extends BaseRestServiceWithExport<FeedbackEntit
         else {
             throw new RuntimeException("Feedback not found");
         }
+    }
+
+    /**
+     * @return resolved score max used for validation and snapshot
+     */
+    private Integer normalizeAndValidate(FeedbackRequest request, FeedbackEntity existingEntity) {
+        if (request == null) {
+            throw new RuntimeException("Invalid request");
+        }
+
+        Integer scoreMax = resolveScoreMax(request.getFeedbackSettingsUid());
+        if (existingEntity != null && existingEntity.getScoreMax() != null) {
+            scoreMax = existingEntity.getScoreMax();
+        }
+        if (scoreMax == null || scoreMax <= 0) {
+            scoreMax = 10;
+        }
+
+        // Validate satisfaction score
+        if (request.getScore() != null) {
+            Integer score = request.getScore();
+            if (score < 0 || score > scoreMax) {
+                throw new RuntimeException("score must be between 0 and " + scoreMax);
+            }
+        }
+
+        // Limit reasons
+        if (request.getReasons() != null && request.getReasons().size() > 3) {
+            throw new RuntimeException("reasons size must be <= 3");
+        }
+
+        return scoreMax;
+    }
+
+    private Integer resolveScoreMax(String feedbackSettingsUid) {
+        if (!StringUtils.hasText(feedbackSettingsUid)) {
+            return 10;
+        }
+        Optional<FeedbackSettingsEntity> optional = feedbackSettingsRepository.findByUid(feedbackSettingsUid);
+        if (optional.isPresent() && optional.get().getScoreMax() != null) {
+            return optional.get().getScoreMax();
+        }
+        return 10;
     }
 
     @Override

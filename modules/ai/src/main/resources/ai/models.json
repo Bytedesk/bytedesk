@@ -230,7 +230,7 @@
             "type": "TEXT"
         }
     ],
-    "silicon": [
+    "siliconflow": [
         {
             "name": "Qwen/QwQ-32B",
             "nickname": "Qwen/QwQ-32B",

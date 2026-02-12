@@ -138,6 +138,20 @@ public class ServiceSettingsEntity extends BaseEntity {
     private Boolean showMessageStatus = true;
 
     /**
+     * Whether visitor can recall messages on visitor side.
+     */
+    @NotNull
+    @Builder.Default
+    private Boolean allowVisitorRecall = true;
+
+    /**
+     * Recall time window in minutes for visitor side.
+     */
+    @NotNull
+    @Builder.Default
+    private Integer visitorRecallMinutes = 5;
+
+    /**
      * 访客发起咨询是否需要登录（未登录则应先登录再创建会话）
      */
     @NotNull

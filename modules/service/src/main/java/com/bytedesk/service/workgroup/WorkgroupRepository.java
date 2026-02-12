@@ -33,6 +33,8 @@ public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long
 
     List<WorkgroupEntity> findByOrgUidAndDeletedFalse(String orgUid);
 
+    long countByOrgUidAndDeletedFalse(String orgUid);
+
     /**
      * 查找包含指定客服的所有工作组
      * 
@@ -49,4 +51,10 @@ public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long
      */
     @Query("SELECT w FROM WorkgroupEntity w JOIN w.agents a WHERE a.uid = :agentUid")
     List<WorkgroupEntity> findByAgentUid(@Param("agentUid") String agentUid);
+
+    /**
+     * 通过管理员客服UID查找其管理的工作组
+     */
+    @Query("SELECT w FROM WorkgroupEntity w JOIN w.admins a WHERE a.uid = :agentUid")
+    List<WorkgroupEntity> findByAdminAgentUid(@Param("agentUid") String agentUid);
 }

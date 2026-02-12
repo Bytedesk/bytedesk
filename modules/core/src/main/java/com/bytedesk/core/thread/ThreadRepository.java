@@ -35,6 +35,11 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         List<ThreadEntity> findByUidInAndDeletedFalse(List<String> uids);
 
+        List<ThreadEntity> findByOrgUidAndTypeAndStatusInAndDeletedFalseOrderByUpdatedAtDescCreatedAtDesc(
+                        String orgUid,
+                        String type,
+                        List<String> statuses);
+
         Boolean existsByUid(String uid);
 
         /** used for member thread type */

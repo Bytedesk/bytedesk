@@ -61,6 +61,18 @@ public class CustomerSpecification extends BaseSpecification<CustomerEntity, Cus
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
+
+            if (StringUtils.hasText(request.getShopInfo())) {
+                predicates.add(criteriaBuilder.like(root.get("shopInfo"), "%" + request.getShopInfo() + "%"));
+            }
+
+            if (StringUtils.hasText(request.getConsultContent())) {
+                predicates.add(criteriaBuilder.like(root.get("consultContent"), "%" + request.getConsultContent() + "%"));
+            }
+
+            if (request.getNeedFollowUp() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("needFollowUp"), request.getNeedFollowUp()));
+            }
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }

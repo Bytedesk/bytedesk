@@ -53,23 +53,29 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners({FeedbackEntityListener.class})
+@EntityListeners({ FeedbackEntityListener.class })
 @Table(name = "bytedesk_voc_feedback")
 public class FeedbackEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * Feedback title/subject
      */
     private String title;
-    
+
+    /**
+     * FeedbackSettings uid associated with this feedback
+     */
+    @Column(name = "feedback_settings_uid")
+    private String feedbackSettingsUid;
+
     /**
      * Feedback type - WORKGROUP, AGENT, CUSTOMER, etc.
      */
     @Builder.Default
     @Column(name = "feedback_type")
-    private String type = FeedbackTypeEnum.GENERAL.name();
+    private String type = FeedbackTypeEnum.FEEDBACK.name();
 
     /**
      * Main feedback content
@@ -92,9 +98,25 @@ public class FeedbackEntity extends BaseEntity {
     private String priority = PriorityEnum.MEDIUM.name();
 
     /**
-     * Feedback rating/score (1-5 stars)
+     * Satisfaction score (1-5/0-10)
      */
-    private Integer rating;
+    @Column(name = "feedback_score")
+    private Integer score;
+
+    /**
+     * Max score for this feedback (snapshot from FeedbackSettings at submit time)
+     */
+    @Builder.Default
+    @Column(name = "feedback_score_max")
+    private Integer scoreMax = 10;
+
+    /**
+     * Multi-select reasons (max 3 by default)
+     */
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "feedback_reasons", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> reasons = new ArrayList<>();
 
     /**
      * List of image URLs
@@ -165,7 +187,8 @@ public class FeedbackEntity extends BaseEntity {
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
-     * Robot information if feedback is related to robot interaction (stored as JSON)
+     * Robot information if feedback is related to robot interaction (stored as
+     * JSON)
      */
     @Builder.Default
     @Column(name = "feedback_robot", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -264,6 +287,18 @@ public class FeedbackEntity extends BaseEntity {
     private String channel;
 
     /**
+     * Visitor session id
+     */
+    // @Column(name = "visitor_sid")
+    // private String sid;
+
+    /**
+     * Source page url
+     */
+    @Column(name = "page_url", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String pageUrl;
+
+    /**
      * Customer device information
      */
     private String deviceInfo;
@@ -284,27 +319,6 @@ public class FeedbackEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "feedback_extra", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String extra = BytedeskConsts.EMPTY_JSON_STRING;
-
-    // Type checking methods
-    public Boolean isWorkgroupType() {
-        return FeedbackTypeEnum.WORKGROUP.name().equals(getType());
-    }
-
-    public Boolean isAgentType() {
-        return FeedbackTypeEnum.AGENT.name().equals(getType());
-    }
-
-    public Boolean isRobotType() {
-        return FeedbackTypeEnum.ROBOT.name().equals(getType());
-    }
-
-    public Boolean isSystemType() {
-        return FeedbackTypeEnum.SYSTEM.name().equals(getType());
-    }
-
-    public Boolean isGeneralType() {
-        return FeedbackTypeEnum.GENERAL.name().equals(getType());
-    }
 
     // Status checking methods
     public Boolean isPending() {
@@ -492,12 +506,6 @@ public class FeedbackEntity extends BaseEntity {
         this.priority = priorityEnum.name();
     }
 
-    public Boolean hasGoodRating() {
-        return rating != null && rating >= 4;
-    }
-
-    public Boolean hasPoorRating() {
-        return rating != null && rating <= 2;
-    }
+    
 
 }

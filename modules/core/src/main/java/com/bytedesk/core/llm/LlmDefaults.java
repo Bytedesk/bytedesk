@@ -15,45 +15,37 @@ package com.bytedesk.core.llm;
 
 /**
  * LLM 默认配置常量
- * api doc url: https://docs.bigmodel.cn/api-reference/%E6%A8%A1%E5%9E%8B-api/%E6%96%87%E6%9C%AC%E8%BD%AC%E8%AF%AD%E9%9F%B3
+ * https://bailian.console.aliyun.com/cn-beijing/?tab=model#/model-market/all
+ * 默认使用阿里云百炼DashScope模型
  */
 public class LlmDefaults {
     private LlmDefaults() {}
     
-    // 默认 智谱AI
-
     // 默认对话模型提供商
-    public static final String DEFAULT_CHAT_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认对话模型: glm-4.1v-thinking-flash 支持多模态，且免费
-    public static final String DEFAULT_CHAT_MODEL = "glm-4.1v-thinking-flash";
+    public static final String DEFAULT_CHAT_PROVIDER = LlmProviderConstants.DASHSCOPE;
+    public static final String DEFAULT_CHAT_MODEL = "qwen3-max";
     
     // 默认文字对话模型提供商
-    public static final String DEFAULT_TEXT_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认文字对话模型
-    public static final String DEFAULT_TEXT_MODEL = "glm-4.5-flash";
+    public static final String DEFAULT_TEXT_PROVIDER = LlmProviderConstants.DASHSCOPE;
+    public static final String DEFAULT_TEXT_MODEL = "qwen3-max";
     
     // 默认视觉对话模型提供商
-    public static final String DEFAULT_VISION_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认视觉对话模型
-    public static final String DEFAULT_VISION_MODEL = "glm-4.1v-thinking-flash";
+    public static final String DEFAULT_VISION_PROVIDER = LlmProviderConstants.DASHSCOPE;
+    public static final String DEFAULT_VISION_MODEL = "qwen3-vl-plus";
     
     // 默认文本转语音提供商
-    public static final String DEFAULT_AUDIO_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认文本转语音模型
-    public static final String DEFAULT_AUDIO_MODEL = "cogtts";
+    public static final String DEFAULT_AUDIO_PROVIDER = LlmProviderConstants.DASHSCOPE;
+    public static final String DEFAULT_AUDIO_MODEL = "qwen3-tts-instruct-flash-realtime";
     
     // 默认Embedding提供商
-    public static final String DEFAULT_EMBEDDING_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认Embedding模型
-    public static final String DEFAULT_EMBEDDING_MODEL = "embedding-2";
+    public static final String DEFAULT_EMBEDDING_PROVIDER = LlmProviderConstants.DASHSCOPE;
+    public static final String DEFAULT_EMBEDDING_MODEL = "text-embedding-v4";
     
     // 默认Rerank提供商
-    public static final String DEFAULT_RERANK_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认Rerank模型
-    public static final String DEFAULT_RERANK_MODEL = "rerank";
+    public static final String DEFAULT_RERANK_PROVIDER = LlmProviderConstants.DASHSCOPE;
+    public static final String DEFAULT_RERANK_MODEL = "qwen3-rerank";
     
     // 默认rewrite提供商
-    public static final String DEFAULT_REWRITE_PROVIDER = LlmProviderConstants.ZHIPUAI;
-    // 默认rewrite模型
-    public static final String DEFAULT_REWRITE_MODEL = "glm-4.5-flash";
+    public static final String DEFAULT_REWRITE_PROVIDER = LlmProviderConstants.DASHSCOPE;
+    public static final String DEFAULT_REWRITE_MODEL = "qwen3-max";
 }

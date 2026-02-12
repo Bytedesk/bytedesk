@@ -25,11 +25,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSpecificationExecutor<TokenEntity> {
-    
+
     Optional<TokenEntity> findByUid(String uid);
 
     /**
      * 通过访问令牌查找Token实体
+     * 
      * @param accessToken 访问令牌
      * @return Optional<TokenEntity&amp;amp;gt;
      */
@@ -39,30 +40,64 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
      * 通过访问令牌查找Token实体（包含 revoked=true 的记录，用于判定“是否已撤销”）。
      */
     Optional<TokenEntity> findFirstByAccessTokenAndDeletedFalse(String accessToken);
-    
+
     /**
      * 通过用户UID、类型、未撤销、未删除和过期时间查询有效令牌
+     * 
      * @param userUid 用户UID
-     * @param type 令牌类型
-     * @param now 当前时间
+     * @param type    令牌类型
+     * @param now     当前时间
      * @return 有效令牌列表
      */
-    List<TokenEntity> findByUserUidAndTypeAndRevokedFalseAndDeletedFalseAndExpiresAtAfter(String userUid, String type, ZonedDateTime now);
+    List<TokenEntity> findByUserUidAndTypeAndRevokedFalseAndDeletedFalseAndExpiresAtAfter(String userUid, String type,
+            ZonedDateTime now);
 
-        /**
-         * 原子更新 lastActiveAt（仅当超过阈值才更新），避免在高并发鉴权场景下对 detached entity 执行 merge 导致乐观锁异常。
-         *
-         * 注意：JPQL bulk update 会绕过 @Version 机制（不会递增 version），这里是刻意为之。
-         */
-        @Transactional
-        @Modifying
-        @Query("""
-                        update TokenEntity t
-                             set t.lastActiveAt = :now
-                         where t.id = :id
-                             and t.revoked = false
-                             and t.deleted = false
-                             and (t.lastActiveAt is null or t.lastActiveAt <= :threshold)
-                        """)
-        int updateLastActiveAtIfDue(@Param("id") Long id, @Param("now") ZonedDateTime now, @Param("threshold") ZonedDateTime threshold);
+    /**
+     * Count distinct active users (dedup by userUid) in an organization.
+     * Active = not revoked, not deleted, and (permanent or expiresAt after now).
+     */
+    @Query("""
+            select count(distinct t.userUid)
+                from TokenEntity t
+             where t.orgUid = :orgUid
+                 and t.userUid is not null
+                 and t.revoked = false
+                 and t.deleted = false
+                 and (t.permanent = true or (t.expiresAt is not null and t.expiresAt > :now))
+            """)
+    long countDistinctActiveUserUidsByOrgUid(@Param("orgUid") String orgUid, @Param("now") ZonedDateTime now);
+
+    /**
+     * Whether the user already has any active token in the organization.
+     * Used to dedupe multi-device logins (same user counts once).
+     */
+    @Query("""
+            select (count(t.id) > 0)
+                from TokenEntity t
+             where t.orgUid = :orgUid
+                 and t.userUid = :userUid
+                 and t.revoked = false
+                 and t.deleted = false
+                 and (t.permanent = true or (t.expiresAt is not null and t.expiresAt > :now))
+            """)
+    boolean existsActiveTokenByOrgUidAndUserUid(@Param("orgUid") String orgUid, @Param("userUid") String userUid,
+            @Param("now") ZonedDateTime now);
+
+    /**
+     * 原子更新 lastActiveAt（仅当超过阈值才更新），避免在高并发鉴权场景下对 detached entity 执行 merge 导致乐观锁异常。
+     *
+     * 注意：JPQL bulk update 会绕过 @Version 机制（不会递增 version），这里是刻意为之。
+     */
+    @Transactional
+    @Modifying
+    @Query("""
+            update TokenEntity t
+                 set t.lastActiveAt = :now
+             where t.id = :id
+                 and t.revoked = false
+                 and t.deleted = false
+                 and (t.lastActiveAt is null or t.lastActiveAt <= :threshold)
+            """)
+    int updateLastActiveAtIfDue(@Param("id") Long id, @Param("now") ZonedDateTime now,
+            @Param("threshold") ZonedDateTime threshold);
 }

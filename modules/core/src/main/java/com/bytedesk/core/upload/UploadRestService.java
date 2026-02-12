@@ -44,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserConvertUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
@@ -530,7 +531,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 					.avatar(request.getVisitorAvatar())
 					.build();
 			} else {
-				userProtobuf = ConvertUtils.convertToUserProtobuf(user);
+				userProtobuf = UserConvertUtils.convertToUserProtobuf(user);
 				request.setUserUid(user.getUid());
 				request.setOrgUid(user.getOrgUid());
 			}

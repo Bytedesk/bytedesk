@@ -120,6 +120,9 @@ public class CustomerRestService extends BaseRestServiceWithExport<CustomerEntit
             updatedEntity.setSource(request.getSource());
             updatedEntity.setDescription(request.getDescription());
             updatedEntity.setNotes(request.getNotes());
+            updatedEntity.setShopInfo(request.getShopInfo());
+            updatedEntity.setConsultContent(request.getConsultContent());
+            updatedEntity.setNeedFollowUp(request.getNeedFollowUp());
             updatedEntity.setTagList(request.getTagList());
             updatedEntity.setCustomFieldList(request.getCustomFieldList());
             updatedEntity.setExtra(request.getExtra());
@@ -152,6 +155,9 @@ public class CustomerRestService extends BaseRestServiceWithExport<CustomerEntit
                 latestEntity.setOwnerUserUid(entity.getOwnerUserUid());
                 latestEntity.setSource(entity.getSource());
                 latestEntity.setNotes(entity.getNotes());
+                latestEntity.setShopInfo(entity.getShopInfo());
+                latestEntity.setConsultContent(entity.getConsultContent());
+                latestEntity.setNeedFollowUp(entity.getNeedFollowUp());
                 latestEntity.setTagList(entity.getTagList());
                 latestEntity.setCustomFieldList(entity.getCustomFieldList());
                 latestEntity.setExtra(entity.getExtra());

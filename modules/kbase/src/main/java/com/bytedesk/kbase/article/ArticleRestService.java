@@ -28,10 +28,10 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.rbac.user.UserConvertUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRepository;
@@ -81,7 +81,7 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
         ArticleEntity entity = modelMapper.map(request, ArticleEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
-        UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
+        UserProtobuf userProtobuf = UserConvertUtils.convertToUserProtobuf(user);
         entity.setUser(userProtobuf.toJson());
         entity.setOrgUid(user.getOrgUid());
         //

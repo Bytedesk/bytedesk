@@ -28,10 +28,10 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.user.UserConvertUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 
@@ -71,7 +71,7 @@ public class KbaseCommentRestService extends BaseRestService<KbaseCommentEntity,
         KbaseCommentEntity entity = modelMapper.map(request, KbaseCommentEntity.class);
         entity.setUid(uidUtils.getUid());
         // 
-        UserProtobuf userProtobuf = ConvertUtils.convertToUserProtobuf(user);
+        UserProtobuf userProtobuf = UserConvertUtils.convertToUserProtobuf(user);
         entity.setUser(JSON.toJSONString(userProtobuf));
         entity.setOrgUid(user.getOrgUid());
 

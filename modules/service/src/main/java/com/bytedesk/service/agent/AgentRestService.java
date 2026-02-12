@@ -31,6 +31,9 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRestService;
+import com.bytedesk.core.thread.ThreadConvertUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponseSimple;
@@ -39,7 +42,6 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -73,6 +75,33 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     private final AgentSettingsRestService agentSettingsRestService;
 
     private final ModelMapper modelMapper;
+
+    private final OrganizationRestService organizationRestService;
+
+    private OrganizationEntity requireOrganization(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            throw new IllegalArgumentException("orgUid is required");
+        }
+        return organizationRestService.findByUid(orgUid)
+                .orElseThrow(() -> new RuntimeException("Organization with UID: " + orgUid + " not found."));
+    }
+
+    private int resolveMaxAgents(OrganizationEntity organization) {
+        return organization.getMaxAgents() != null ? organization.getMaxAgents() : 20;
+    }
+
+    private void assertAgentCapacityAvailable(String orgUid) {
+        UserEntity authUser = authService.getUser();
+        if (authUser != null && authUser.isSuperUser()) {
+            return;
+        }
+        OrganizationEntity organization = requireOrganization(orgUid);
+        int maxAgents = resolveMaxAgents(organization);
+        long current = agentRepository.countByOrgUidAndDeletedFalse(orgUid);
+        if (current >= maxAgents) {
+            throw new RuntimeException("Organization agent limit exceeded");
+        }
+    }
 
     @Override
     protected Specification<AgentEntity> createSpecification(AgentRequest request) {
@@ -129,6 +158,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         if (existsByUserUidAndOrgUid(memberOptional.get().getUser().getUid(), request.getOrgUid())) {
             throw new RuntimeException(I18ServiceConsts.I18N_AGENT_EXISTS);
         }
+        assertAgentCapacityAvailable(request.getOrgUid());
         //
         MemberEntity member = memberOptional.get();
         UserEntity user = member.getUser();
@@ -316,7 +346,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         bytedeskEventPublisher.publishEvent(new ThreadAddTopicEvent(this, updateThread));
         bytedeskEventPublisher.publishEvent(new ThreadAcceptEvent(this, updateThread));
         //
-        return ConvertUtils.convertToThreadResponseSimple(updateThread);
+        return ThreadConvertUtils.convertToThreadResponseSimple(updateThread);
     }
 
     @Transactional

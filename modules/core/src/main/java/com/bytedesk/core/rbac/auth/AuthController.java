@@ -24,6 +24,7 @@ import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.push.service.PushSendResult;
@@ -42,6 +43,7 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import org.springframework.util.StringUtils;
+import org.springframework.http.HttpStatus;
 
 @Slf4j
 @RestController
@@ -157,6 +159,11 @@ public class AuthController {
             // 格式化并返回成功响应
             AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
             return ResponseEntity.ok(JsonResult.success(authResponse));
+
+            } catch (OrgMaxMembersExceededException e) {
+                log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
             
         } catch (Exception e) {
             // Always log stacktrace for troubleshooting; do not include raw credential fields
@@ -255,9 +262,14 @@ public class AuthController {
                 authRequest.getChannel(),
                 authRequest.getDevice());
         //
-        AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
-
-        return ResponseEntity.ok(JsonResult.success(authResponse));
+        try {
+            AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
+            return ResponseEntity.ok(JsonResult.success(authResponse));
+        } catch (OrgMaxMembersExceededException e) {
+            log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
+        }
     }
 
     @PostMapping("/send/email")
@@ -319,9 +331,14 @@ public class AuthController {
                 authRequest.getChannel(),
                 authRequest.getDevice());
         //
-        AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
-
-        return ResponseEntity.ok(JsonResult.success(authResponse));
+        try {
+            AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
+            return ResponseEntity.ok(JsonResult.success(authResponse));
+        } catch (OrgMaxMembersExceededException e) {
+            log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
+        }
     }
 
     @PostMapping("/login/accessToken")
@@ -341,9 +358,14 @@ public class AuthController {
         Authentication authentication = authService.getAuthentication(request, subject);
         
         // Format response similar to other login methods
-        AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
-        
-        return ResponseEntity.ok(JsonResult.success(authResponse));
+        try {
+            AuthResponse authResponse = authService.formatResponse(authRequest, authentication);
+            return ResponseEntity.ok(JsonResult.success(authResponse));
+        } catch (OrgMaxMembersExceededException e) {
+            log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
+        }
     }
 
 

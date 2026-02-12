@@ -17,6 +17,7 @@
 
 ```bash
 .
+├── docker-compose-all.yaml # 包含ai、在线客服、呼叫中心、视频客服等全部内容
 ├── docker-compose-noai.yaml # 不使用ai，无机器人问答
 ├── docker-compose-ollama.yaml # 启动微语，内含ollama，默认使用ollama对话
 ├── docker-compose-rabbitmq.yaml # 启动微语，使用rabbitmq替换默认artemismq，不内含ollama，默认使用zhipuai

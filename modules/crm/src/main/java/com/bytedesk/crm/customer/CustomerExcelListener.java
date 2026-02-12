@@ -51,6 +51,9 @@ public class CustomerExcelListener extends AnalysisEventListener<Map<Integer, St
     private Integer descriptionIndex;
     private Integer extraIndex;
     private Integer notesIndex;
+    private Integer shopInfoIndex;
+    private Integer consultContentIndex;
+    private Integer needFollowUpIndex;
 
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
@@ -89,10 +92,24 @@ public class CustomerExcelListener extends AnalysisEventListener<Map<Integer, St
                 notesIndex = index;
                 continue;
             }
+            if (shopInfoIndex == null && isShopInfoHeader(header)) {
+                shopInfoIndex = index;
+                continue;
+            }
+            if (consultContentIndex == null && isConsultContentHeader(header)) {
+                consultContentIndex = index;
+                continue;
+            }
+            if (needFollowUpIndex == null && isNeedFollowUpHeader(header)) {
+                needFollowUpIndex = index;
+                continue;
+            }
         }
 
-        log.info("CustomerExcelListener headMap: nicknameIndex={}, emailIndex={}, mobileIndex={}, descriptionIndex={}, extraIndex={}, notesIndex={} headMap={}",
-                nicknameIndex, emailIndex, mobileIndex, descriptionIndex, extraIndex, notesIndex, headMap);
+        log.info(
+                "CustomerExcelListener headMap: nicknameIndex={}, emailIndex={}, mobileIndex={}, descriptionIndex={}, extraIndex={}, notesIndex={}, shopInfoIndex={}, consultContentIndex={}, needFollowUpIndex={} headMap={}",
+                nicknameIndex, emailIndex, mobileIndex, descriptionIndex, extraIndex, notesIndex, shopInfoIndex,
+                consultContentIndex, needFollowUpIndex, headMap);
     }
 
     @Override
@@ -133,6 +150,10 @@ public class CustomerExcelListener extends AnalysisEventListener<Map<Integer, St
             String description = getCell(row, descriptionIndex, 3, 4);
             String extra = getCell(row, extraIndex, 4, 5);
             String notes = getCell(row, notesIndex, 5, 6);
+            String shopInfo = getCell(row, shopInfoIndex, 6, 7);
+            String consultContent = getCell(row, consultContentIndex, 7, 8);
+            String needFollowUpText = getCell(row, needFollowUpIndex, 8, 9);
+            Boolean needFollowUp = parseNeedFollowUp(needFollowUpText);
 
             // 至少需要有一个可识别字段
             if (!StringUtils.hasText(nickname) && !StringUtils.hasText(mobile) && !StringUtils.hasText(email)) {
@@ -153,6 +174,9 @@ public class CustomerExcelListener extends AnalysisEventListener<Map<Integer, St
             entity.setDescription(StringUtils.hasText(description) ? description : I18Consts.I18N_DESCRIPTION);
             entity.setExtra(StringUtils.hasText(extra) ? extra : BytedeskConsts.EMPTY_JSON_STRING);
             entity.setNotes(notes);
+            entity.setShopInfo(shopInfo);
+            entity.setConsultContent(consultContent);
+            entity.setNeedFollowUp(needFollowUp);
             entities.add(entity);
         }
 
@@ -214,6 +238,38 @@ public class CustomerExcelListener extends AnalysisEventListener<Map<Integer, St
     private boolean isNotesHeader(String header) {
         String lower = header.toLowerCase(Locale.ROOT);
         return header.contains("备注") || header.contains("注释") || lower.contains("notes");
+    }
+
+    private boolean isShopInfoHeader(String header) {
+        String lower = header.toLowerCase(Locale.ROOT);
+        return header.contains("店铺") || header.contains("门店") || lower.contains("shop");
+    }
+
+    private boolean isConsultContentHeader(String header) {
+        String lower = header.toLowerCase(Locale.ROOT);
+        return header.contains("咨询") || header.contains("咨询内容") || header.contains("咨询信息") || header.contains("咨询描述")
+                || lower.contains("consult") || lower.contains("inquiry");
+    }
+
+    private boolean isNeedFollowUpHeader(String header) {
+        String lower = header.toLowerCase(Locale.ROOT);
+        return header.contains("跟进") || header.contains("是否需要跟进") || lower.contains("follow");
+    }
+
+    private Boolean parseNeedFollowUp(String text) {
+        if (!StringUtils.hasText(text)) {
+            return null;
+        }
+        String v = text.trim().toLowerCase(Locale.ROOT);
+        if ("1".equals(v) || "true".equals(v) || "yes".equals(v) || "y".equals(v) || "是".equals(text) || "需要".equals(text)
+                || text.contains("需要跟进") || text.contains("需跟进")) {
+            return true;
+        }
+        if ("0".equals(v) || "false".equals(v) || "no".equals(v) || "n".equals(v) || "否".equals(text) || "不需要".equals(text)
+                || text.contains("无需") || text.contains("不跟进")) {
+            return false;
+        }
+        return null;
     }
 
     private boolean isProbablyHeaderRow(String nickname, String email, String mobile) {

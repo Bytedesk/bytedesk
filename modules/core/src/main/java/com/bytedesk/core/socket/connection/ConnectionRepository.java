@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.socket.connection;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,6 +43,8 @@ public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Lo
     Optional<ConnectionEntity> findByClientIdForUpdate(@Param("clientId") String clientId);
 
     java.util.List<ConnectionEntity> findByUserUidAndDeletedFalse(String userUid);
+
+    java.util.List<ConnectionEntity> findByUserUidInAndStatusAndDeletedFalse(Collection<String> userUids, String status);
 
     long countByUserUidAndStatusAndDeletedFalse(String userUid, String status);
 

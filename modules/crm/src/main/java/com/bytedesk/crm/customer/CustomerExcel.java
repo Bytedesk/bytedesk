@@ -69,4 +69,16 @@ public class CustomerExcel extends BaseExcel {
     @ExcelProperty(value = "备注")
     @ColumnWidth(40)
     private String notes;
+
+    @ExcelProperty(value = "店铺信息")
+    @ColumnWidth(30)
+    private String shopInfo;
+
+    @ExcelProperty(value = "咨询内容")
+    @ColumnWidth(40)
+    private String consultContent;
+
+    @ExcelProperty(value = "是否需要跟进")
+    @ColumnWidth(15)
+    private Boolean needFollowUp;
 }

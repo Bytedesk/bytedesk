@@ -22,11 +22,14 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -105,6 +108,14 @@ public class AgentEntity extends BaseEntity {
     // org member
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
+
+    /**
+     * Workgroups that this agent administrates (monitoring / takeover permissions)
+     */
+    @Builder.Default
+    @JsonIgnore
+    @ManyToMany(mappedBy = "admins", fetch = FetchType.LAZY)
+    private java.util.List<WorkgroupEntity> adminWorkgroups = new java.util.ArrayList<>();
 
     public Boolean isAvailable() {
         return this.status.equals(AgentStatusEnum.AVAILABLE.name());

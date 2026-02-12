@@ -14,6 +14,7 @@
 package com.bytedesk.core.topic;
 
 import java.util.Optional;
+import java.util.Collection;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,8 @@ public interface TopicRepository extends JpaRepository<TopicEntity, Long>, JpaSp
     Optional<TopicEntity> findByUid(String uid);
     
     Optional<TopicEntity> findFirstByUserUid(String userUid);
+
+    Set<TopicEntity> findByUserUidInAndDeletedFalse(Collection<String> userUids);
 
     Boolean existsByUid(String uid);
 

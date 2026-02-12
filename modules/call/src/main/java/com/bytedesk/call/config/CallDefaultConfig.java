@@ -10,11 +10,12 @@
  */
 package com.bytedesk.call.config;
 
-import com.bytedesk.call.esl.client.inbound.Client;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.bytedesk.call.config.esl.client.inbound.Client;
 
 import lombok.extern.slf4j.Slf4j;
 

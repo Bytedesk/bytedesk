@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.organization;
 
+import java.util.Objects;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.ExistsException;
 import com.bytedesk.core.exception.ForbiddenException;
@@ -54,9 +57,62 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     private final OrganizationRepository organizationRepository;
 
+    private final BytedeskProperties bytedeskProperties;
+
     private final UidUtils uidUtils;
 
     private final ModelMapper modelMapper;
+
+    private boolean isDefaultOrganization(OrganizationEntity organization) {
+        return organization != null && BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid());
+    }
+    
+    private void applyOrganizationLimitsDefaults(OrganizationEntity organization) {
+        if (organization.getMaxMembers() == null) {
+            organization.setMaxMembers(resolveDefaultMaxMembers());
+        }
+        if (organization.getMaxAgents() == null) {
+            organization.setMaxAgents(resolveDefaultMaxAgents());
+        }
+        if (organization.getMaxWorkgroups() == null) {
+            organization.setMaxWorkgroups(resolveDefaultMaxWorkgroups());
+        }
+        if (organization.getVipExpireLoginCheckEnabled() == null) {
+            organization.setVipExpireLoginCheckEnabled(false);
+        }
+    }
+
+    private int resolveDefaultVipDays() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultVipDays();
+        if (configured == null || configured <= 0) {
+            return 365;
+        }
+        return configured;
+    }
+
+    private int resolveDefaultMaxMembers() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultMaxMembers();
+        if (configured == null || configured <= 0) {
+            return 20;
+        }
+        return configured;
+    }
+
+    private int resolveDefaultMaxAgents() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultMaxAgents();
+        if (configured == null || configured <= 0) {
+            return 20;
+        }
+        return configured;
+    }
+
+    private int resolveDefaultMaxWorkgroups() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultMaxWorkgroups();
+        if (configured == null || configured <= 0) {
+            return 20;
+        }
+        return configured;
+    }
 
     private boolean isPlatformSuper(UserEntity user) {
         if (user == null) {
@@ -169,9 +225,11 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setUid(orgUid);
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
+        int defaultVipDays = resolveDefaultVipDays();
         organization.setVip(true);
-        organization.setVipExpireDate(BdDateUtils.now().plusDays(30));
+        organization.setVipExpireDate(BdDateUtils.now().plusDays(defaultVipDays));
         organization.setLevel(LevelEnum.ORGANIZATION.name());
+        applyOrganizationLimitsDefaults(organization);
         //
         OrganizationEntity savedOrganization;
         try {
@@ -218,6 +276,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 
         OrganizationEntity organization = modelMapper.map(request, OrganizationEntity.class);
         organization.setUid(uidUtils.getUid());
+        int defaultVipDays = resolveDefaultVipDays();
+        if (organization.getVip() == null) {
+            organization.setVip(true);
+        }
+        if (Boolean.TRUE.equals(organization.getVip()) && organization.getVipExpireDate() == null) {
+            organization.setVipExpireDate(BdDateUtils.now().plusDays(defaultVipDays));
+        }
+        applyOrganizationLimitsDefaults(organization);
         // 使用 userUid 查询用户
         if (StringUtils.hasText(request.getUserUid())) {
             UserEntity user = userService.findByUid(request.getUserUid())
@@ -329,6 +395,23 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
         // 获取要更新的组织实体
         OrganizationEntity organization = organizationOptional.get();
+
+        // 默认组织：不允许设置“过期/禁用”相关字段（后端兜底）
+        if (isDefaultOrganization(organization)) {
+            boolean enabledChanged = request.getEnabled() != null && !Objects.equals(request.getEnabled(), organization.getEnabled());
+            boolean vipChanged = request.getVip() != null && !Objects.equals(request.getVip(), organization.getVip());
+            boolean vipExpireDateChanged = request.getVipExpireDate() != null
+                && !Objects.equals(request.getVipExpireDate(), organization.getVipExpireDate());
+            boolean vipExpireLoginCheckEnabledChanged = request.getVipExpireLoginCheckEnabled() != null
+                && !Objects.equals(request.getVipExpireLoginCheckEnabled(), organization.getVipExpireLoginCheckEnabled());
+
+            if (enabledChanged || vipChanged || vipExpireDateChanged || vipExpireLoginCheckEnabledChanged) {
+            throw new ForbiddenException("默认组织不支持设置过期或禁用");
+            }
+
+            // 历史数据兜底：确保默认组织始终启用
+            organization.setEnabled(true);
+        }
         
         // 检查 name 唯一性（排除当前组织）
         if (!organization.getName().equals(request.getName())) {
@@ -365,10 +448,24 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setVerifyStatus(request.getVerifyStatus());
         organization.setRejectReason(request.getRejectReason());
         // 
-        organization.setVip(request.getVip());
-        organization.setVipExpireDate(request.getVipExpireDate());
-        // 
-        organization.setEnabled(request.getEnabled());
+        if (!isDefaultOrganization(organization)) {
+            organization.setVip(request.getVip());
+            organization.setVipExpireDate(request.getVipExpireDate());
+            if (request.getVipExpireLoginCheckEnabled() != null) {
+                organization.setVipExpireLoginCheckEnabled(request.getVipExpireLoginCheckEnabled());
+            }
+            // 
+            organization.setEnabled(request.getEnabled());
+        }
+        if (request.getMaxMembers() != null) {
+            organization.setMaxMembers(request.getMaxMembers());
+        }
+        if (request.getMaxAgents() != null) {
+            organization.setMaxAgents(request.getMaxAgents());
+        }
+        if (request.getMaxWorkgroups() != null) {
+            organization.setMaxWorkgroups(request.getMaxWorkgroups());
+        }
         // 保存原先的用户引用，用于后续比较
         UserEntity originalUser = organization.getUser();
         
@@ -533,9 +630,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         response.setRejectReason(organization.getRejectReason());
         response.setVip(organization.getVip());
         response.setVipExpireDate(organization.getVipExpireDate());
+        response.setVipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled());
         response.setEnabled(organization.getEnabled());
         response.setCustomServerEnabled(organization.getCustomServerEnabled());
         response.setCustomServerHost(organization.getCustomServerHost());
+        response.setMaxMembers(organization.getMaxMembers());
+        response.setMaxAgents(organization.getMaxAgents());
+        response.setMaxWorkgroups(organization.getMaxWorkgroups());
         response.setCreatedAt(organization.getCreatedAt());
         response.setUpdatedAt(organization.getUpdatedAt());
         

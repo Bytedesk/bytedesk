@@ -24,6 +24,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
@@ -55,6 +56,13 @@ public class RoleEntity extends BaseEntity {
 	@Builder.Default
 	@Column(name = "is_system")
 	private Boolean system = false;
+
+	/**
+	 * 角色有效期（为空表示永久有效）。
+	 * 到期后该角色对应的权限在鉴权时自动失效。
+	 */
+	@Column(name = "expires_at")
+	private ZonedDateTime expiresAt;
 
 	@Builder.Default
 	@ManyToMany

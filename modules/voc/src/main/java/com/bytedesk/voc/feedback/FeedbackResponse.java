@@ -38,6 +38,20 @@ public class FeedbackResponse extends BaseResponse {
 
     private String title;
 
+    private String feedbackSettingsUid;
+
+    private Integer score;
+
+    private Integer scoreMax;
+
+    private List<String> reasons;
+
+    private String content;
+
+    private String sid;
+
+    private String pageUrl;
+
     // private String type;
 
     // private String content;

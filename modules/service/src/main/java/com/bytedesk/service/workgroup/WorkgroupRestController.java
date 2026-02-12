@@ -13,11 +13,15 @@
  */
 package com.bytedesk.service.workgroup;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -170,6 +174,50 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
             "工作组",
             "workgroup"
         );
+    }
+
+    @ActionAnnotation(title = "工作组", action = "查询管理员工作组", description = "query workgroup by admin agent uid")
+    @Operation(summary = "查询座席管理的工作组", description = "根据座席UID查询其作为管理员(监控/接管权限)的工作组列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = WorkgroupResponse.class)))
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
+    @GetMapping("/query/admin/agent")
+    public ResponseEntity<?> queryAdminWorkgroups(
+            @RequestParam("agentUid") String agentUid,
+            @RequestParam(value = "orgUid", required = false) String orgUid) {
+
+        List<WorkgroupResponse> workgroups = workgroupRestService.queryAdminWorkgroups(agentUid, orgUid);
+        return ResponseEntity.ok(JsonResult.success(workgroups));
+    }
+
+    @ActionAnnotation(title = "工作组", action = "查询管理员进行中会话", description = "query ongoing threads by admin workgroups")
+    @Operation(summary = "查询座席管理的工作组进行中会话", description = "根据座席UID查询其管理的工作组下进行中的会话")
+    @ApiResponse(responseCode = "200", description = "查询成功")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
+    @GetMapping("/query/admin/threads/ongoing")
+    public ResponseEntity<?> queryAdminOngoingThreads(
+            @RequestParam("agentUid") String agentUid,
+            @RequestParam("orgUid") String orgUid,
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+
+        Page<com.bytedesk.core.thread.ThreadResponse> threadPage = workgroupRestService.queryAdminOngoingThreads(
+            agentUid,
+            orgUid,
+            pageNumber,
+            pageSize);
+        return ResponseEntity.ok(JsonResult.success(threadPage));
+    }
+
+    @ActionAnnotation(title = "工作组", action = "批量设置管理员工作组", description = "batch update workgroups admin by agent")
+    @Operation(summary = "批量设置座席管理的工作组", description = "根据座席UID批量设置其作为管理员(监控/接管权限)的工作组列表，仅增删该座席关系，不影响其它管理员")
+    @ApiResponse(responseCode = "200", description = "更新成功")
+    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE)
+    @PostMapping("/update/admin/agent/workgroups")
+    public ResponseEntity<?> updateAdminWorkgroupsForAgent(@RequestBody WorkgroupAdminRequest request) {
+        Map<String, Object> result = workgroupRestService.updateAdminWorkgroupsForAgent(request);
+        return ResponseEntity.ok(JsonResult.success(result));
     }
 
     

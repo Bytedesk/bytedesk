@@ -16,6 +16,7 @@ package com.bytedesk.voc.feedback;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,6 +36,36 @@ public class FeedbackRequest extends BaseRequest {
 
 
     private String title;
+
+    /**
+        * FeedbackSettings uid associated with this feedback
+     */
+        private String feedbackSettingsUid;
+
+    /**
+     * Satisfaction score (0-10)
+     */
+    private Integer score;
+
+    /**
+     * Multi-select reasons (max 3 by default)
+     */
+    private List<String> reasons;
+
+    /**
+     * Free-form comment
+     */
+    private String content;
+
+    /**
+     * Visitor session id (optional)
+     */
+    private String sid;
+
+    /**
+     * Source page url (optional)
+     */
+    private String pageUrl;
 
     // @Builder.Default
     // private String type = FeedbackTypeEnum.CUSTOMER.name();

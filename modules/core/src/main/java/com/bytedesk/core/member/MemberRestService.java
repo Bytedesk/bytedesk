@@ -44,6 +44,7 @@ import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRestService;
 import com.bytedesk.core.rbac.role.RoleResponseSimple;
 import com.bytedesk.core.rbac.role.RoleRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -84,6 +85,33 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     private final ThreadRestService threadRestService;
 
     private final DepartmentRestService departmentRestService;
+
+    private final OrganizationRestService organizationRestService;
+
+    private OrganizationEntity requireOrganization(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            throw new IllegalArgumentException("orgUid is required");
+        }
+        return organizationRestService.findByUid(orgUid)
+                .orElseThrow(() -> new NotFoundException("Organization with UID: " + orgUid + " not found."));
+    }
+
+    private int resolveMaxMembers(OrganizationEntity organization) {
+        return organization.getMaxMembers() != null ? organization.getMaxMembers() : 20;
+    }
+
+    private void assertMemberCapacityAvailable(String orgUid) {
+        UserEntity authUser = authService.getUser();
+        if (authUser != null && authUser.isSuperUser()) {
+            return;
+        }
+        OrganizationEntity organization = requireOrganization(orgUid);
+        int maxMembers = resolveMaxMembers(organization);
+        long current = memberRepository.countByOrgUidAndDeletedFalse(orgUid);
+        if (current >= maxMembers) {
+            throw new RuntimeException("Organization member limit exceeded");
+        }
+    }
 
     public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getUser();
@@ -137,6 +165,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                 && existsByMobileAndOrgUid(request.getMobile(), request.getOrgUid())) {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
+        assertMemberCapacityAvailable(request.getOrgUid());
         //
         MemberEntity member = modelMapper.map(request, MemberEntity.class);
         if (StringUtils.hasText(request.getUid())) {
@@ -399,6 +428,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (StringUtils.hasText(excel.getMobile()) && existsByMobileAndOrgUid(excel.getMobile(), orgUid)) {
             return null;
         }
+        assertMemberCapacityAvailable(orgUid);
         // Excel 导入成员：默认仅赋予基础角色 ROLE_USER，避免误授予客服权限
         Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_USER_UID));
         // 创建member

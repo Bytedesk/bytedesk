@@ -51,7 +51,6 @@ import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -198,7 +197,7 @@ public class UserService {
         //
         user = save(user);
         user = addRoleUser(user);
-        return ConvertUtils.convertToUserResponse(user);
+        return UserConvertUtils.convertToUserResponse(user);
     }
 
     @Transactional
@@ -259,7 +258,7 @@ public class UserService {
                 throw new RuntimeException("User update failed..!!");
             }
 
-            return ConvertUtils.convertToUserResponse(user);
+            return UserConvertUtils.convertToUserResponse(user);
 
         } else {
             throw new RuntimeException("User not found..!!");
@@ -285,7 +284,7 @@ public class UserService {
                 user.setPasswordModifiedAt(BdDateUtils.now());
                 user = save(user); // 保存用户信息到数据库，假设save方法已经存在
                 //
-                return ConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
+                return UserConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
             } else {
                 // 旧密码验证失败，抛出异常或返回错误信息
                 throw new RuntimeException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG);
@@ -309,7 +308,7 @@ public class UserService {
             user.setPasswordModifiedAt(BdDateUtils.now());
             user = save(user); // 保存用户信息到数据库，假设save方法已经存在
             //
-            return ConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
+            return UserConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
         } else {
             throw new RuntimeException("User not found..!!");
         }
@@ -338,7 +337,7 @@ public class UserService {
             user.setEmailVerified(true);
             user = save(user);
             //
-            return ConvertUtils.convertToUserResponse(user);
+            return UserConvertUtils.convertToUserResponse(user);
         } else {
             throw new RuntimeException("User not found..!!");
         }
@@ -367,7 +366,7 @@ public class UserService {
             user.setMobileVerified(true);
             user = save(user);
 
-            return ConvertUtils.convertToUserResponse(user);
+            return UserConvertUtils.convertToUserResponse(user);
         } else {
             throw new RuntimeException("User not found..!!");
         }

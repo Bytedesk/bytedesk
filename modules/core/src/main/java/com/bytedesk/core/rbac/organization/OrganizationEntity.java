@@ -23,7 +23,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -102,8 +101,13 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Column(name = "is_vip")
     private Boolean vip = false;
 
-    // 会员截止日期
+    // 会员截止日期、组织有效期
     private ZonedDateTime vipExpireDate;
+
+    // 会员到期后是否禁止登录
+    @Builder.Default
+    @Column(name = "is_vip_expire_login_check_enabled")
+    private Boolean vipExpireLoginCheckEnabled = false;
 
     // 是否启用，状态：启用/禁用
     @Builder.Default
@@ -119,6 +123,21 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Builder.Default
     @Column(name = "custom_server_host")
     private String customServerHost = BytedeskConsts.EMPTY_STRING;
+
+    // 组织成员最大数
+    @Builder.Default
+    @Column(name = "max_members")
+    private Integer maxMembers = 20;
+
+    // 客服坐席最大数
+    @Builder.Default
+    @Column(name = "max_agents")
+    private Integer maxAgents = 20;
+
+    // 工作组最大数
+    @Builder.Default
+    @Column(name = "max_workgroups")
+    private Integer maxWorkgroups = 20;
 
     // 组织管理员
     @ManyToOne(fetch = FetchType.LAZY)

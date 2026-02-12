@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260208-add-role-expires-at" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_role" />
+                <not>
+                    <columnExists tableName="bytedesk_core_role" columnName="expires_at" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add expires_at column for role validity period (null = permanent).</comment>
+        <addColumn tableName="bytedesk_core_role">
+            <column name="expires_at" type="datetime" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_core_role" columnName="expires_at" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

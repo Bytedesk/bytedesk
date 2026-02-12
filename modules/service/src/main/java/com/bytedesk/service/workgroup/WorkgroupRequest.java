@@ -75,5 +75,10 @@ public class WorkgroupRequest extends BaseRequest {
     @Builder.Default
     private List<String> agentUids = new ArrayList<String>();
 
+    /**
+     * Workgroup administrators (monitoring / takeover permissions)
+     */
+    private List<String> adminUids;
+
     private String messageLeaveAgentUid;
 }

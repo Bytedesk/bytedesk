@@ -14,10 +14,13 @@
 package com.bytedesk.core.topic;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionEntity;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRepository;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -41,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest, TopicResponse> {
 
     private final TopicRepository topicRepository;
+    private final TopicSubscriptionRepository topicSubscriptionRepository;
     private final ModelMapper modelMapper;
     private final UidUtils uidUtils;
     private final AuthService authService;
@@ -73,9 +80,71 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         return topicRepository.findFirstByUserUid(userUid);
     }
 
-    @Cacheable(value = "topic", key = "#topic", unless = "#result==null")
+    // @Cacheable(value = "topic", key = "#topic", unless = "#result==null")
     public Set<TopicEntity> findByTopic(String topic) {
-        return topicRepository.findByTopicsContains(topic);
+        List<TopicSubscriptionEntity> subscriptions = topicSubscriptionRepository.findByTopicAndDeletedFalse(topic);
+        if (subscriptions == null || subscriptions.isEmpty()) {
+            return Set.of();
+        }
+
+        Set<String> userUids = subscriptions.stream()
+                .map(TopicSubscriptionEntity::getUserUid)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toSet());
+
+        if (userUids.isEmpty()) {
+            return Set.of();
+        }
+
+        return new HashSet<>(topicRepository.findByUserUidInAndDeletedFalse(userUids));
+    }
+
+    /**
+     * Subscription truth source: list subscriber userUids by exact topic.
+     */
+    @Transactional(readOnly = true)
+    public Set<String> findSubscriberUserUidsByTopic(String topic) {
+        if (!StringUtils.hasText(topic)) {
+            return Set.of();
+        }
+        List<TopicSubscriptionEntity> subscriptions = topicSubscriptionRepository.findByTopicAndDeletedFalse(topic);
+        if (subscriptions == null || subscriptions.isEmpty()) {
+            return Set.of();
+        }
+        return subscriptions.stream()
+                .map(TopicSubscriptionEntity::getUserUid)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    private void upsertTopicSubscription(String topic, String userUid) {
+        if (!StringUtils.hasText(topic) || !StringUtils.hasText(userUid)) {
+            return;
+        }
+
+        if (topicSubscriptionRepository.existsByUserUidAndTopicAndDeletedFalse(userUid, topic)) {
+            return;
+        }
+
+        TopicSubscriptionEntity entity = TopicSubscriptionEntity.builder()
+                .uid(uidUtils.getUid())
+                .userUid(userUid)
+                .topic(topic)
+                .build();
+        topicSubscriptionRepository.save(entity);
+    }
+
+    private void softDeleteTopicSubscription(String topic, String userUid) {
+        if (!StringUtils.hasText(topic) || !StringUtils.hasText(userUid)) {
+            return;
+        }
+        Optional<TopicSubscriptionEntity> optional = topicSubscriptionRepository
+                .findFirstByUserUidAndTopicAndDeletedFalse(userUid, topic);
+        if (optional.isPresent()) {
+            TopicSubscriptionEntity entity = optional.get();
+            entity.setDeleted(true);
+            topicSubscriptionRepository.save(entity);
+        }
     }
 
     public Boolean existsByUid(String uid) {
@@ -91,6 +160,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     }
 
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     @Override
     public TopicResponse create(TopicRequest request) {
         // 设置用户信息
@@ -120,6 +190,13 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             if (savedEntity == null) {
                 throw new RuntimeException("Update topic failed");
             }
+
+            if (request.getTopic() != null) {
+                upsertTopicSubscription(request.getTopic(), request.getUserUid());
+            }
+            if (request.getTopics() != null) {
+                request.getTopics().forEach(t -> upsertTopicSubscription(t, request.getUserUid()));
+            }
             return convertToResponse(savedEntity);
         }
 
@@ -138,10 +215,18 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         if (savedEntity == null) {
             throw new RuntimeException("Create topic failed");
         }
+
+        if (request.getTopic() != null) {
+            upsertTopicSubscription(request.getTopic(), request.getUserUid());
+        }
+        if (request.getTopics() != null) {
+            request.getTopics().forEach(t -> upsertTopicSubscription(t, request.getUserUid()));
+        }
         return convertToResponse(savedEntity);
     }
 
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     @Override
     public TopicResponse update(TopicRequest request) {
         Optional<TopicEntity> optional = findByUid(request.getUid());
@@ -163,6 +248,13 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             TopicEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update topic failed");
+            }
+
+            if (request.getTopic() != null) {
+                upsertTopicSubscription(request.getTopic(), entity.getUserUid());
+            }
+            if (request.getTopics() != null) {
+                request.getTopics().forEach(t -> upsertTopicSubscription(t, entity.getUserUid()));
             }
             return convertToResponse(savedEntity);
         } else {
@@ -194,6 +286,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         return null;
     }
 
+    @CacheEvict(value = "topic", allEntries = true)
     @Override
     public void deleteByUid(String uid) {
         Optional<TopicEntity> optional = findByUid(uid);
@@ -206,6 +299,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         }
     }
 
+    @CacheEvict(value = "topic", allEntries = true)
     @Override
     public void delete(TopicRequest request) {
         deleteByUid(request.getUid());
@@ -218,18 +312,15 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     public Boolean isSubscribed(TopicRequest request) {
         UserEntity user = authService.getUser();
-        // 
-        Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
-        if (topicOptional.isPresent()) {
-            TopicEntity topicEntity = topicOptional.get();
-            return topicEntity.getTopics().contains(request.getTopic());
-        } else {
-            return false;
+        if (user == null) {
+            throw new NotLoginException("User not authenticated");
         }
+        return topicSubscriptionRepository.existsByUserUidAndTopicAndDeletedFalse(user.getUid(), request.getTopic());
     }
 
     // 删除topic
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     public void remove(TopicRequest topicRequest) {
         Optional<TopicEntity> topicOptional = findByUserUid(topicRequest.getUserUid());
         if (topicOptional.isPresent()) {
@@ -237,10 +328,12 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             topicElement.getTopics().remove(topicRequest.getTopic());
             save(topicElement);
         }
+        softDeleteTopicSubscription(topicRequest.getTopic(), topicRequest.getUserUid());
     }
 
     // 删除topic
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     public void remove(String topic, String userUid) {
         Optional<TopicEntity> topicOptional = findByUserUid(userUid);
         if (topicOptional.isPresent()) {
@@ -252,10 +345,12 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             topicElement.getTopics().remove(topic);
             save(topicElement);
         }
+        softDeleteTopicSubscription(topic, userUid);
     }
 
     // 订阅topic
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     public void subscribe(String topic, String clientId) {
         // 用户clientId格式: uid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
@@ -263,10 +358,12 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             TopicEntity topicElement = topicOptional.get();
             if (topicElement.getTopics().contains(topic)) {
                 log.info("create: {}", topic);
+                upsertTopicSubscription(topic, topicElement.getUserUid());
                 return;
             }
             topicElement.getTopics().add(topic);
             save(topicElement);
+            upsertTopicSubscription(topic, topicElement.getUserUid());
         } else {
             // create
             final String uid = clientId.split("/")[0];
@@ -276,18 +373,24 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
                     .build();
             topicRequest.getClientIds().add(clientId);
             create(topicRequest);
+            upsertTopicSubscription(topic, uid);
         }
     }
 
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     public TopicResponse subscribe(TopicRequest request) {
         UserEntity user = authService.getUser();
-        
+        if (user == null) {
+            throw new NotLoginException("User not authenticated");
+        }
+
         String topic = request.getTopic();
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
         if (topicOptional.isPresent()) {
             TopicEntity topicEntity = topicOptional.get();
             if (topicEntity.getTopics().contains(topic)) {
+                upsertTopicSubscription(topic, user.getUid());
                 return convertToResponse(topicEntity);
             } else {
                 topicEntity.getTopics().add(topic);
@@ -296,6 +399,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             if (savedEntity == null) {
                 throw new RuntimeException("Update topic failed");
             }
+            upsertTopicSubscription(topic, user.getUid());
             return convertToResponse(savedEntity);
         } else {
             // create new topic
@@ -307,43 +411,50 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
     // 取消订阅topic
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     public void unsubscribe(String topic, String clientId) {
         // 用户clientId格式: userUid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
         if (topicOptional.isPresent()) {
             TopicEntity topicElement = topicOptional.get();
             if (topicElement.getTopics().contains(topic)) {
-                log.info("create: {}", topic);
-                return;
+                log.info("unsubscribe: {}", topic);
+                topicElement.getTopics().remove(topic);
+                save(topicElement);
             }
-            topicElement.getTopics().add(topic);
-            save(topicElement);
+            softDeleteTopicSubscription(topic, topicElement.getUserUid());
+        } else {
+            final String userUid = clientId.split("/")[0];
+            softDeleteTopicSubscription(topic, userUid);
         }
     }
 
-    public TopicResponse unsubscribe(TopicRequest request) { 
+    @CacheEvict(value = "topic", allEntries = true)
+    public TopicResponse unsubscribe(TopicRequest request) {
         UserEntity user = authService.getUser();
-        
+
         String topic = request.getTopic();
         Optional<TopicEntity> topicOptional = findByUserUid(user.getUid());
         if (topicOptional.isPresent()) {
             TopicEntity topicElement = topicOptional.get();
             if (!topicElement.getTopics().contains(topic)) {
+                softDeleteTopicSubscription(topic, user.getUid());
                 return convertToResponse(topicElement);
             }
             topicElement.getTopics().remove(topic);
-           TopicEntity savedEntity = save(topicElement);
+            TopicEntity savedEntity = save(topicElement);
             if (savedEntity == null) {
                 throw new RuntimeException("Update topic failed");
             }
+            softDeleteTopicSubscription(topic, user.getUid());
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Topic not found");
         }
     }
 
-
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     public void addClientId(String clientId) {
         // 用户clientId格式: userUid/client/deviceUid
         final String userUid = clientId.split("/")[0];
@@ -359,6 +470,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     }
 
     @Transactional
+    @CacheEvict(value = "topic", allEntries = true)
     public void removeClientId(String clientId) {
         // 用户clientId格式: userUid/client/deviceUid
         Optional<TopicEntity> topicOptional = findByClientId(clientId);
@@ -371,7 +483,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             }
         }
     }
-    
+
     /**
      * 查询所有的 TopicEntity
      * 
@@ -380,7 +492,5 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
     public List<TopicEntity> findAll() {
         return topicRepository.findAll();
     }
-
-    
 
 }

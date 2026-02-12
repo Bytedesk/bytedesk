@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Add per-organization limits for members, agents, and workgroups -->
+    <changeSet id="260207-add-organization-limits" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_organization" />
+                <not>
+                    <columnExists tableName="bytedesk_core_organization" columnName="max_members" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add organization limits for members, agents, and workgroups.</comment>
+        <addColumn tableName="bytedesk_core_organization">
+            <column name="max_members" type="INT" defaultValueNumeric="20">
+                <constraints nullable="true" />
+            </column>
+            <column name="max_agents" type="INT" defaultValueNumeric="20">
+                <constraints nullable="true" />
+            </column>
+            <column name="max_workgroups" type="INT" defaultValueNumeric="20">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_core_organization" columnName="max_workgroups" />
+            <dropColumn tableName="bytedesk_core_organization" columnName="max_agents" />
+            <dropColumn tableName="bytedesk_core_organization" columnName="max_members" />
+        </rollback>
+    </changeSet>
+
+    <!-- Backfill default values for existing rows -->
+    <changeSet id="260207-backfill-organization-limits" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_organization" />
+            <columnExists tableName="bytedesk_core_organization" columnName="max_members" />
+            <columnExists tableName="bytedesk_core_organization" columnName="max_agents" />
+            <columnExists tableName="bytedesk_core_organization" columnName="max_workgroups" />
+        </preConditions>
+        <comment>Backfill default values for existing organization rows.</comment>
+        <sql>
+            UPDATE bytedesk_core_organization
+            SET max_members = 20
+            WHERE max_members IS NULL;
+        </sql>
+        <sql>
+            UPDATE bytedesk_core_organization
+            SET max_agents = 20
+            WHERE max_agents IS NULL;
+        </sql>
+        <sql>
+            UPDATE bytedesk_core_organization
+            SET max_workgroups = 20
+            WHERE max_workgroups IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

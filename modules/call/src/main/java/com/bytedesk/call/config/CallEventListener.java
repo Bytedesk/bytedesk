@@ -1,9 +1,10 @@
 package com.bytedesk.call.config;
 
-import com.bytedesk.call.esl.client.internal.Context;
-import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+
+import com.bytedesk.call.config.esl.client.internal.Context;
+import com.bytedesk.call.config.esl.client.transport.event.EslEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class CallEventListener implements com.bytedesk.call.esl.client.inbound.IEslEventListener {
+public class CallEventListener implements com.bytedesk.call.config.esl.client.inbound.IEslEventListener {
 
     // 实现 IEslEventListener 的回调
     @Override

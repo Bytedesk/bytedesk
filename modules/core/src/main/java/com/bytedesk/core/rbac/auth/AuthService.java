@@ -24,19 +24,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.rbac.token.TokenRequest;
 import com.bytedesk.core.rbac.token.TokenTypeEnum;
 import com.bytedesk.core.rbac.token.TokenEntity;
 import com.bytedesk.core.rbac.token.TokenRepository;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserConvertUtils;
 import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
 import com.bytedesk.core.rbac.user.UserResponse;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.utils.PasswordCryptoUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +60,8 @@ public class AuthService {
     private final ModelMapper modelMapper;
 
     private final TokenRepository tokenRepository;
+
+    private final OrganizationRepository organizationRepository;
 
     private final UidUtils uidUtils;
 
@@ -129,7 +136,7 @@ public class AuthService {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        UserResponse userResponse = ConvertUtils.convertToUserResponse(userDetails);
+        UserResponse userResponse = UserConvertUtils.convertToUserResponse(userDetails);
 
         // 登录成功后，将生成的accessToken同时保存到数据库中
         String channel = authRequest.getChannel();
@@ -146,6 +153,9 @@ public class AuthService {
                 .user(userResponse)
                 .build();
         }
+
+        // --- Organization maxMembers login enforcement (dedupe multi-device by userUid) ---
+        enforceOrganizationMaxMembersIfNeeded(userDetails);
         
         String device = authRequest.getDevice();
         if (!StringUtils.hasText(device)) {
@@ -180,6 +190,7 @@ public class AuthService {
         // 直接写 token 表，避免 AuthService <-> TokenRestService 循环依赖
         TokenEntity tokenEntity = modelMapper.map(tokenRequest, TokenEntity.class);
         tokenEntity.setUid(uidUtils.getUid());
+        tokenEntity.setLastActiveAt(BdDateUtils.now());
         if (!Boolean.TRUE.equals(tokenEntity.getPermanent()) && tokenEntity.getExpiresAt() == null) {
             tokenEntity.setExpiresAt(JwtUtils.calculateExpirationTime(tokenRequest.getChannel()));
         }
@@ -189,6 +200,53 @@ public class AuthService {
                 .accessToken(accessToken)
                 .user(userResponse)
                 .build();
+    }
+
+    private void enforceOrganizationMaxMembersIfNeeded(UserDetailsImpl userDetails) {
+        if (userDetails == null) {
+            return;
+        }
+
+        // Super user should always be allowed to log in.
+        if (Boolean.TRUE.equals(userDetails.getSuperUser())) {
+            return;
+        }
+
+        final String orgUid = userDetails.getOrgUid();
+        final String userUid = userDetails.getUid();
+
+        if (!StringUtils.hasText(orgUid) || !StringUtils.hasText(userUid)) {
+            return;
+        }
+
+        // Default organization does not enforce member limits.
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return;
+        }
+
+        OrganizationEntity org = organizationRepository.findByUid(orgUid).orElse(null);
+        if (org == null) {
+            return;
+        }
+
+        Integer maxMembers = org.getMaxMembers();
+        if (maxMembers == null || maxMembers <= 0) {
+            return;
+        }
+
+        // If this user is already active in the org (e.g., multiple devices), do not count as new.
+        final var now = BdDateUtils.now();
+
+        boolean alreadyActive = tokenRepository.existsActiveTokenByOrgUidAndUserUid(orgUid, userUid, now);
+        if (alreadyActive) {
+            return;
+        }
+
+        long currentDistinctUsers = tokenRepository.countDistinctActiveUserUidsByOrgUid(orgUid, now);
+        if (currentDistinctUsers >= maxMembers.longValue()) {
+            String msg = String.format("当前组织允许同时登录的最大成员数为 %d，已达到上限（当前已登录：%d）。", maxMembers, currentDistinctUsers);
+            throw new OrgMaxMembersExceededException(orgUid, maxMembers, currentDistinctUsers, msg);
+        }
     }
 
     /**

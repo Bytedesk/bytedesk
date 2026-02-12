@@ -65,6 +65,16 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private Boolean showMessageStatus;
 
     /**
+     * 是否允许访客端撤回消息
+     */
+    private Boolean allowVisitorRecall;
+
+    /**
+     * 访客端撤回消息时限（分钟）
+     */
+    private Integer visitorRecallMinutes;
+
+    /**
      * 访客发起咨询是否需要登录
      */
     private Boolean requireLogin;

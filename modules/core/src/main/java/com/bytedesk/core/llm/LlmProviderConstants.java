@@ -25,7 +25,7 @@ public class LlmProviderConstants {
     public static final String ZHIPUAI = "zhipuai";
     public static final String DEEPSEEK = "deepseek";
     public static final String DASHSCOPE = "dashscope";
-    public static final String SILICONFLOW = "silicon";
+    public static final String SILICONFLOW = "siliconflow";
     public static final String GITEE = "gitee";
     public static final String TENCENT = "tencent";
     public static final String BAIDU = "baidu";

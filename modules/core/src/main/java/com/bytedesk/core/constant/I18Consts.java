@@ -94,6 +94,12 @@ public class I18Consts {
     public static final String I18N_AGENT_TIMEOUT_TIP = "超时未回复，请尽快回复客户"; // 超时未回复
     // 评价提示
     public static final String I18N_INVITE_RATE_TIP = "邀请评价提示"; // 邀请评价提示
+
+    // VOC 评价设置默认文案（FeedbackSettingsEntity 默认值）
+    public static final String I18N_FEEDBACK_SETTINGS_TITLE_DEFAULT = "请您对本次服务进行满意度评价";
+    public static final String I18N_FEEDBACK_SETTINGS_POSITIVE_QUESTION_DEFAULT = "您感到满意的原因是？";
+    public static final String I18N_FEEDBACK_SETTINGS_NEGATIVE_QUESTION_DEFAULT = "您在使用过程中遇到了哪些问题？";
+    public static final String I18N_FEEDBACK_SETTINGS_COMMENT_PLACEHOLDER_DEFAULT = "【使用场景】：\n【优化意见】：";
     // 统一
     public static final String I18N_UNIFIED_NICKNAME = "统一入口"; // 统一入口
     public static final String I18N_UNIFIED_DESCRIPTION = "统一描述"; // 统一描述

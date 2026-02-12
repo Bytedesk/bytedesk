@@ -60,7 +60,6 @@ import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -1011,7 +1010,7 @@ public class ThreadRestService
     }
 
     public ThreadResponse convertToResponse(ThreadEntity thread) {
-        return ConvertUtils.convertToThreadResponse(thread);
+        return ThreadConvertUtils.convertToThreadResponse(thread);
     }
 
     @Override

@@ -128,6 +128,25 @@ public class CustomerEntity extends BaseEntity {
     private String notes; // 备注信息
 
     /**
+     * 访客店铺信息（自由文本，便于后续扩展成结构化字段）
+     */
+    @Column(name = "shop_info", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String shopInfo;
+
+    /**
+     * 咨询内容（访客咨询/线索描述）
+     */
+    @Column(name = "consult_content", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String consultContent;
+
+    /**
+     * 是否需要跟进
+     */
+    @Builder.Default
+    @Column(name = "need_follow_up")
+    private Boolean needFollowUp = false;
+
+    /**
      * Associated visitor UID for tracking customer journey
      * 关联的访客 visitorEntity.uid（系统 uid）
      */

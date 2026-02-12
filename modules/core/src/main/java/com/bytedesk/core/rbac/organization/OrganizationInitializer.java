@@ -76,6 +76,10 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
         Optional<UserEntity> superOptional = userService.getSuper();
         if (superOptional.isPresent()) {
             UserEntity user = superOptional.get();
+                int defaultVipDays = resolveDefaultVipDays();
+                int defaultMaxMembers = resolveDefaultMaxMembers();
+                int defaultMaxAgents = resolveDefaultMaxAgents();
+                int defaultMaxWorkgroups = resolveDefaultMaxWorkgroups();
             //
             OrganizationEntity organization = OrganizationEntity.builder()
                     .uid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
@@ -83,7 +87,10 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
                     .code(bytedeskProperties.getOrganizationCode())
                     .description(bytedeskProperties.getOrganizationName() + " Description")
                     .vip(true)
-                    .vipExpireDate(BdDateUtils.now().plusDays(30))
+                    .vipExpireDate(BdDateUtils.now().plusDays(defaultVipDays))
+                    .maxMembers(defaultMaxMembers)
+                    .maxAgents(defaultMaxAgents)
+                    .maxWorkgroups(defaultMaxWorkgroups)
                     .user(user)
                     .build();
             //
@@ -104,6 +111,38 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
             String permissionValue = OrganizationPermissions.ORGANIZATION_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);
         }
+    }
+
+    private int resolveDefaultVipDays() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultVipDays();
+        if (configured == null || configured <= 0) {
+            return 365;
+        }
+        return configured;
+    }
+
+    private int resolveDefaultMaxMembers() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultMaxMembers();
+        if (configured == null || configured <= 0) {
+            return 20;
+        }
+        return configured;
+    }
+
+    private int resolveDefaultMaxAgents() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultMaxAgents();
+        if (configured == null || configured <= 0) {
+            return 20;
+        }
+        return configured;
+    }
+
+    private int resolveDefaultMaxWorkgroups() {
+        Integer configured = bytedeskProperties.getOrganization().getDefaultMaxWorkgroups();
+        if (configured == null || configured <= 0) {
+            return 20;
+        }
+        return configured;
     }
     
 

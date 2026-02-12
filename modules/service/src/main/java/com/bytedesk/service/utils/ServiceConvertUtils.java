@@ -16,9 +16,9 @@ package com.bytedesk.service.utils;
 import org.modelmapper.ModelMapper;
 import lombok.experimental.UtilityClass;
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.thread.ThreadConvertUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
-import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
@@ -117,7 +117,7 @@ public class ServiceConvertUtils {
     public static MessageProtobuf convertToMessageProtobuf(MessageEntity lastMessage, ThreadEntity thread) {
         //
         MessageProtobuf messageProtobuf = getModelMapper().map(lastMessage, MessageProtobuf.class);
-        messageProtobuf.setThread(ConvertUtils.convertToThreadProtobuf(thread));
+        messageProtobuf.setThread(ThreadConvertUtils.convertToThreadProtobuf(thread));
         //
         UserProtobuf user = JSON.parseObject(lastMessage.getUser(), UserProtobuf.class);
         if (user.getExtra() == null) {
@@ -244,6 +244,20 @@ public class ServiceConvertUtils {
                     .setAgents(new java.util.ArrayList<>())
                     .setMessageLeaveAgent(null);
             }
+
+            // workgroup admins uid list (monitor/takeover permissions)
+            if (workgroup != null && workgroup.getAdmins() != null) {
+                java.util.List<String> adminUids = new java.util.ArrayList<>();
+                for (AgentEntity admin : workgroup.getAdmins()) {
+                    if (admin == null) {
+                        continue;
+                    }
+                    adminUids.add(admin.getUid());
+                }
+                resp.setAdminUids(adminUids);
+            } else {
+                resp.setAdminUids(new java.util.ArrayList<>());
+            }
         } catch (Exception ignore) {
             // 如果 PresenceFacadeService 不可用，保持已有映射（可能在早期启动阶段）
         }
@@ -362,7 +376,7 @@ public class ServiceConvertUtils {
     public static QueueMemberResponse convertToQueueMemberResponse(QueueMemberEntity entity) {
         // 
         QueueMemberResponse response = getModelMapper().map(entity, QueueMemberResponse.class);
-        response.setThread(ConvertUtils.convertToThreadResponse(entity.getThread()));
+        response.setThread(ThreadConvertUtils.convertToThreadResponse(entity.getThread()));
         response.setStatus(entity.getStatus());
         
         // 设置首次响应时长

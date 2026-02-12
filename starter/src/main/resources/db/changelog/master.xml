@@ -66,6 +66,18 @@
 
     <include file="db/changelog/migration/260204_add_show_message_status.xml" />
 
+    <include file="db/changelog/migration/260212_add_visitor_recall_settings.xml" />
+
+    <include file="db/changelog/migration/260207_add_organization_limits.xml" />
+
+    <include file="db/changelog/migration/260923_add_org_vip_expire_login_check.xml" />
+
     <include file="db/changelog/migration/260204_add_service_statistic_robot_message_count.xml" />
+
+    <include file="db/changelog/migration/260208_add_role_expires_at.xml" />
+
+    <include file="db/changelog/migration/260208_add_workgroup_admins.xml" />
+
+    <include file="db/changelog/migration/260210_add_crm_customer_shop_consult_followup.xml" />
 
 </databaseChangeLog>

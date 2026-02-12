@@ -74,6 +74,15 @@ public class CustomerResponse extends BaseResponse {
     // 备注信息
     private String notes;
 
+    // 访客店铺信息（自由文本）
+    private String shopInfo;
+
+    // 咨询内容
+    private String consultContent;
+
+    // 是否需要跟进
+    private Boolean needFollowUp;
+
     // 关联的访客 visitorEntity.uid（系统 uid）
     private String visitorUid;
 }

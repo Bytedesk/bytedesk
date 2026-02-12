@@ -1,5 +1,7 @@
 package com.bytedesk.core.message.content;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseContent;
 
 import lombok.AllArgsConstructor;
@@ -26,6 +28,9 @@ public class TextContent extends BaseContent {
 
 	/** 翻译后的文本 */
 	private String translatedText;
+
+	/** URL 预览信息（用于 TEXT 内嵌链接卡片，避免重复解析加载） */
+	private List<UrlPreview> urlPreviews;
 
 	/**
 	 * 从JSON字符串反序列化为TextContent对象

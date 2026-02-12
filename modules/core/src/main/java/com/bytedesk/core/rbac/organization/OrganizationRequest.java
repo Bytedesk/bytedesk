@@ -71,6 +71,9 @@ public class OrganizationRequest extends BaseRequestNoOrg {
     // 会员截止日期
     private ZonedDateTime vipExpireDate;
 
+    // 会员到期后是否禁止登录
+    private Boolean vipExpireLoginCheckEnabled;
+
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
 
@@ -79,6 +82,15 @@ public class OrganizationRequest extends BaseRequestNoOrg {
 
     // 自定义服务器域名或 IP
     private String customServerHost;
+
+    // 组织成员最大数
+    private Integer maxMembers;
+
+    // 客服坐席最大数
+    private Integer maxAgents;
+
+    // 工作组最大数
+    private Integer maxWorkgroups;
 
     // 组织管理员， 父类中已存在
     // private String userUid;

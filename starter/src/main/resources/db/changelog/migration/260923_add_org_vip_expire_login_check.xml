@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260923-add-org-vip-expire-login-check" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_organization" />
+                <not>
+                    <columnExists tableName="bytedesk_core_organization" columnName="is_vip_expire_login_check_enabled" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add vip expire login check flag for organizations.</comment>
+        <addColumn tableName="bytedesk_core_organization">
+            <column name="is_vip_expire_login_check_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_core_organization" columnName="is_vip_expire_login_check_enabled" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

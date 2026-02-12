@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
+import com.bytedesk.core.rbac.authority.AuthorityResponse;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -41,8 +42,11 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +58,22 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Service
 public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, RoleResponse> {
+
+        private static final DateTimeFormatter LEGACY_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        private ZonedDateTime parseExpiresAt(String value) {
+                if (!StringUtils.hasText(value)) {
+                        return null;
+                }
+                // Prefer ISO-8601 (e.g. 2026-02-08T00:00:00.000Z)
+                try {
+                        return ZonedDateTime.parse(value.trim());
+                } catch (Exception ignore) {
+                        // fallback to legacy output format used by BaseResponse (yyyy-MM-dd HH:mm:ss)
+                }
+                LocalDateTime local = LocalDateTime.parse(value.trim(), LEGACY_DATETIME);
+                return local.atZone(BdDateUtils.getDisplayZoneId());
+        }
 
         private final RoleRepository roleRepository;
 
@@ -193,6 +213,15 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 // validateDelegableAuthorities(request.getAuthorityUids(), user);
 
                 RoleEntity role = modelMapper.map(request, RoleEntity.class);
+
+                                // expiresAt: null=not provided, blank=clear(permanent), value=parse
+                                if (request.getExpiresAt() != null) {
+                                        if (!StringUtils.hasText(request.getExpiresAt())) {
+                                                role.setExpiresAt(null);
+                                        } else {
+                                                role.setExpiresAt(parseExpiresAt(request.getExpiresAt()));
+                                        }
+                                }
                 if (StringUtils.hasText(request.getUid())) {
                         role.setUid(request.getUid());
                 } else {
@@ -238,6 +267,14 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         if (request.getDescription() != null) {
                                 role.setDescription(request.getDescription());
                         }
+						// expiresAt: null=not provided (do nothing), blank=clear(permanent), value=parse
+						if (request.getExpiresAt() != null) {
+							if (!StringUtils.hasText(request.getExpiresAt())) {
+								role.setExpiresAt(null);
+							} else {
+								role.setExpiresAt(parseExpiresAt(request.getExpiresAt()));
+							}
+						}
                         // 仅当请求明确携带 authorityUids 时，才重建关联；否则保持原权限不变
                         if (request.getAuthorityUids() != null) {
                                 role.getAuthorities().clear();
@@ -284,7 +321,14 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         @Override
         public RoleResponse convertToResponse(RoleEntity entity) {
-                return ConvertUtils.convertToRoleResponse(entity);
+                // return ConvertUtils.convertToRoleResponse(entity);
+                RoleResponse roleResponse = modelMapper.map(entity, RoleResponse.class);
+                // 将Set<AuthorityEntity> authorities转换为Set<AuthorityResponse> authorities
+                roleResponse.setAuthorities(
+                        entity.getAuthorities().stream()
+                                .map(authorityEntity -> modelMapper.map(authorityEntity, AuthorityResponse.class))
+                                .collect(Collectors.toSet()));
+                return roleResponse;
         }
 
         // @Override

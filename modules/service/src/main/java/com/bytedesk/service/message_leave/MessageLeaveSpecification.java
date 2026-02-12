@@ -15,18 +15,15 @@ package com.bytedesk.service.message_leave;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.ZonedDateTime;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.criteria.Predicate;
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEntity, MessageLeaveRequest> {
 
     public static Specification<MessageLeaveEntity> search(MessageLeaveRequest request, AuthService authService) {
@@ -61,26 +58,17 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
                 Predicate contentPredicate = criteriaBuilder.like(root.get("content"), searchText);
                 predicates.add(criteriaBuilder.or(contactPredicate, contentPredicate));
             }
-            // 时间范围过滤 - 使用BdDateUtils进行时间解析和转换
-            if (StringUtils.hasText(request.getCreatedAtStart())) {
-                try {
-                    java.time.ZonedDateTime startDateTime = BdDateUtils.parseStartDate(request.getCreatedAtStart());
-                    if (startDateTime != null) {
-                        predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDateTime));
-                    }
-                } catch (Exception e) {
-                    log.warn("Invalid createdAtStart format: {}", request.getCreatedAtStart());
-                }
-            }
+            // 时间范围过滤（统一使用 BaseRequest.startAt/endAt，按留言 createdAt 过滤）
+            if (request != null) {
+                ZonedDateTime startAt = request.getStartAt();
+                ZonedDateTime endAt = request.getEndAt();
 
-            if (StringUtils.hasText(request.getCreatedAtEnd())) {
-                try {
-                    java.time.ZonedDateTime endDateTime = BdDateUtils.parseEndDate(request.getCreatedAtEnd());
-                    if (endDateTime != null) {
-                        predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDateTime));
-                    }
-                } catch (Exception e) {
-                    log.warn("Invalid createdAtEnd format: {}", request.getCreatedAtEnd());
+                if (startAt != null) {
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startAt));
+                }
+
+                if (endAt != null) {
+                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endAt));
                 }
             }
             //

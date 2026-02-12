@@ -69,8 +69,6 @@ public class IpService {
         return false;
     }
 
-    
-
     // TODO: 昵称国际化：英语、中文、繁体、日文
     public String createVisitorNickname(HttpServletRequest request) {
         String ip = IpUtils.getIp(request);

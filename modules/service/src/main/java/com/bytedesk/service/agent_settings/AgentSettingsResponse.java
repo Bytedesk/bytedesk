@@ -128,4 +128,14 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
      * Desktop right panel dynamic tabs (draft)
      */
     private List<AgentRightPanelTab> draftRightPanelTabs;
+
+    /**
+     * Desktop quick reply buttons (published)
+     */
+    private List<AgentQuickReplyButton> quickReplies;
+
+    /**
+     * Desktop quick reply buttons (draft)
+     */
+    private List<AgentQuickReplyButton> draftQuickReplies;
 }

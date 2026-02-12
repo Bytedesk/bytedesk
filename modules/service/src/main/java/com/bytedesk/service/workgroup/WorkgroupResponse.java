@@ -52,6 +52,12 @@ public class WorkgroupResponse extends BaseResponse {
     // 
     private List<AgentResponse> agents;
 
+    /**
+     * Workgroup admins (monitor/takeover permissions).
+     * Only returns uid list to avoid exposing admin entity details.
+     */
+    private List<String> adminUids;
+
     private AgentResponse messageLeaveAgent;
 
     // agent connected count

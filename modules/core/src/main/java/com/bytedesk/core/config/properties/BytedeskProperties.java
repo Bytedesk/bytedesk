@@ -173,11 +173,9 @@ public class BytedeskProperties {
     //     if (!StringUtils.hasText(value)) {
     //         return value;
     //     }
-        
     //     if (value.length() <= 16) {
     //         return "*".repeat(value.length());
     //     }
-        
     //     // 显示前8个和后8个字符，便于对比验证
     //     return value.substring(0, 8) + "***[" + (value.length() - 16) + " chars]***" + value.substring(value.length() - 8);
     // }
@@ -322,6 +320,12 @@ public class BytedeskProperties {
     public static class Organization {
         private String name;
         private String code;
+        // default validity period (days) for new organizations
+        private Integer defaultVipDays = 365;
+        // default limits for new organizations
+        private Integer defaultMaxMembers = 20;
+        private Integer defaultMaxAgents = 20;
+        private Integer defaultMaxWorkgroups = 20;
     }
 
     @Getter

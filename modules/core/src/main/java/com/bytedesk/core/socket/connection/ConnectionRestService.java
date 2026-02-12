@@ -17,6 +17,9 @@ import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -462,6 +465,60 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             }
         }
         return count;
+    }
+
+    /**
+     * Batch list active clientIds for given userUids.
+     *
+     * NOTE: "active" means status=CONNECTED and heartbeat not expired by TTL.
+     */
+    @Transactional(readOnly = true)
+    public Set<String> listActiveClientIds(Collection<String> userUids) {
+        Set<String> result = new HashSet<>();
+        if (userUids == null || userUids.isEmpty()) {
+            return result;
+        }
+        long now = System.currentTimeMillis();
+        List<ConnectionEntity> list = connectionRepository.findByUserUidInAndStatusAndDeletedFalse(userUids, CONNECTED.name());
+        for (ConnectionEntity c : list) {
+            if (c == null) continue;
+            String clientId = c.getClientId();
+            if (!StringUtils.hasText(clientId)) continue;
+            Long last = c.getLastHeartbeatAt();
+            Integer ttl = c.getTtlSeconds();
+            if (last == null || ttl == null) continue;
+            if (last + ttl * 1000L >= now) {
+                result.add(clientId);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Batch list active clientIds grouped by userUid.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Set<String>> listActiveClientIdsByUserUid(Collection<String> userUids) {
+        Map<String, Set<String>> result = new HashMap<>();
+        if (userUids == null || userUids.isEmpty()) {
+            return result;
+        }
+        long now = System.currentTimeMillis();
+        List<ConnectionEntity> list = connectionRepository.findByUserUidInAndStatusAndDeletedFalse(userUids, CONNECTED.name());
+        for (ConnectionEntity c : list) {
+            if (c == null) continue;
+            String userUid = c.getUserUid();
+            if (!StringUtils.hasText(userUid)) continue;
+            String clientId = c.getClientId();
+            if (!StringUtils.hasText(clientId)) continue;
+            Long last = c.getLastHeartbeatAt();
+            Integer ttl = c.getTtlSeconds();
+            if (last == null || ttl == null) continue;
+            if (last + ttl * 1000L >= now) {
+                result.computeIfAbsent(userUid, k -> new HashSet<>()).add(clientId);
+            }
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)

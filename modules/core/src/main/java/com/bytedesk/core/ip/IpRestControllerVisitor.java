@@ -56,7 +56,7 @@ public class IpRestControllerVisitor {
      * location: "国家|区域|省份|城市|ISP"
      * location: "中国|0|湖北省|武汉市|联通"，缺省的地域信息默认是0。
      * 
-     * @param httpRequest
+     * @param request
      * @return
      */
     @Operation(summary = "Get IP Location", description = "Get location information for the client's IP address")
@@ -77,7 +77,7 @@ public class IpRestControllerVisitor {
     /**
      * http://127.0.0.1:9003/visitor/api/v1/ip/ip/location?ip=202.106.212.226
      * 
-     * @param httpRequest
+     * @param ip
      * @return
      */
     @Operation(summary = "Get Specific IP Location", description = "Get location information for a specific IP address")
@@ -138,25 +138,5 @@ public class IpRestControllerVisitor {
 
         return new JsonResult<>("ip nickname", 200, jsonObject);
     }
-
-    /**
-     * comment out for safety reason
-     * server host info
-     * http://127.0.0.1:9003/api/v1/ip/server
-     * 
-     * @return
-     */
-    // @GetMapping("/server")
-    // public JsonResult<?> ipServer() {
-
-    // String serverIp = IpUtils.getServerIp();
-    // String serverHostname = IpUtils.hostname();
-    // //
-    // JSONObject jsonObject = new JSONObject();
-    // jsonObject.put("ip", serverIp);
-    // jsonObject.put("hostname", serverHostname);
-    // //
-    // return new JsonResult<>("server info", 200, jsonObject);
-    // }
 
 }

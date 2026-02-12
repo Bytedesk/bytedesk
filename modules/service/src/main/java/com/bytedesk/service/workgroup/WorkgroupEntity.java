@@ -59,7 +59,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true, exclude = { "agents" })
+@EqualsAndHashCode(callSuper = true, exclude = { "agents", "admins" })
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(value = { WorkgroupEntityListener.class })
@@ -119,6 +119,20 @@ public class WorkgroupEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     // 为方便路由分配客服，特修改成list
     private List<AgentEntity> agents = new ArrayList<>();
+
+    /**
+     * Workgroup administrators (monitoring / takeover permissions)
+     * Separate from agents to allow a subset/superset of members.
+     */
+    @Builder.Default
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "bytedesk_service_workgroup_admins",
+        joinColumns = @JoinColumn(name = "workgroup_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "agent_id", referencedColumnName = "id")
+    )
+    private List<AgentEntity> admins = new ArrayList<>();
 
     /**
      * Agent responsible for handling offline messages

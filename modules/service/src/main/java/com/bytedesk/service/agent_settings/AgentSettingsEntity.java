@@ -122,6 +122,22 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     private List<AgentRightPanelTab> draftRightPanelTabs = new ArrayList<>();
 
     /**
+     * Desktop quick reply buttons (published)
+     */
+    @lombok.Builder.Default
+    @Convert(converter = AgentQuickReplyButtonListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<AgentQuickReplyButton> quickReplies = new ArrayList<>();
+
+    /**
+     * Desktop quick reply buttons (draft)
+     */
+    @lombok.Builder.Default
+    @Convert(converter = AgentQuickReplyButtonListConverter.class)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<AgentQuickReplyButton> draftQuickReplies = new ArrayList<>();
+
+    /**
      * Message leave settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })

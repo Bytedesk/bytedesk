@@ -46,7 +46,6 @@ public class VocCommentEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-
     private String title;
     
     // @Builder.Default

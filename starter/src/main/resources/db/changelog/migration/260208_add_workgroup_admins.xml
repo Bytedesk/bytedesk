@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260208-add-workgroup-admins" author="copilot">
+        <createTable tableName="bytedesk_service_workgroup_admins">
+            <column name="workgroup_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="agent_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+            tableName="bytedesk_service_workgroup_admins"
+            columnNames="workgroup_id,agent_id"
+            constraintName="pk_workgroup_admins"/>
+
+        <createIndex tableName="bytedesk_service_workgroup_admins" indexName="idx_wg_admins_workgroup">
+            <column name="workgroup_id"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_service_workgroup_admins" indexName="idx_wg_admins_agent">
+            <column name="agent_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_workgroup_admins"
+            baseColumnNames="workgroup_id"
+            referencedTableName="bytedesk_service_workgroup"
+            referencedColumnNames="id"
+            constraintName="fk_wg_admins_workgroup"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_workgroup_admins"
+            baseColumnNames="agent_id"
+            referencedTableName="bytedesk_service_agent"
+            referencedColumnNames="id"
+            constraintName="fk_wg_admins_agent"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

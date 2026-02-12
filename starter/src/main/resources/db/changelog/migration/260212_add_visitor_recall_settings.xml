@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Add visitor recall settings to service settings -->
+    <changeSet id="260212-add-visitor-recall-settings" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <not>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="allow_visitor_recall" />
+            </not>
+        </preConditions>
+        <comment>Add allow_visitor_recall and visitor_recall_minutes fields for visitor recall controls.</comment>
+        <addColumn tableName="bytedesk_kbase_service_settings">
+            <column name="allow_visitor_recall" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="true" />
+            </column>
+            <column name="visitor_recall_minutes" type="INT" defaultValueNumeric="5">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_kbase_service_settings" columnName="allow_visitor_recall" />
+            <dropColumn tableName="bytedesk_kbase_service_settings" columnName="visitor_recall_minutes" />
+        </rollback>
+    </changeSet>
+
+    <!-- Backfill default values for existing rows -->
+    <changeSet id="260212-backfill-visitor-recall-settings" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="allow_visitor_recall" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="visitor_recall_minutes" />
+        </preConditions>
+        <comment>Backfill default values for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_kbase_service_settings
+            SET allow_visitor_recall = true
+            WHERE allow_visitor_recall IS NULL;
+        </sql>
+        <sql>
+            UPDATE bytedesk_kbase_service_settings
+            SET visitor_recall_minutes = 5
+            WHERE visitor_recall_minutes IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -134,9 +134,4 @@ public class MessageLeaveRequest extends BaseRequest {
     // 拒绝相关字段
     private String rejectUser;
     private ZonedDateTime rejectedAt;
-
-
-    // 前端根据创建时间范围查询
-    private String createdAtStart;
-    private String createdAtEnd;
 }

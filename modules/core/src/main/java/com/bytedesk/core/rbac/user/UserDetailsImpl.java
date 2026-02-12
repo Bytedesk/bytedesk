@@ -23,12 +23,9 @@ import com.bytedesk.core.rbac.role.RoleEntity;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-// import java.time.ZonedDateTime;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Set;
-
-import com.bytedesk.core.utils.ConvertUtils;
 
 @Slf4j
 @Data
@@ -131,7 +128,7 @@ public class UserDetailsImpl implements UserDetails {
      */
     public static UserDetailsImpl build(UserEntity user) {
         //
-        Set<GrantedAuthority> authorities = ConvertUtils.filterUserGrantedAuthorities(user);
+        Set<GrantedAuthority> authorities = UserConvertUtils.filterUserGrantedAuthorities(user);
         // log.info("authorities: {}", authorities);
         // 
         return new UserDetailsImpl(user.getId(),

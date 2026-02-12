@@ -86,6 +86,18 @@ public class ServiceSettingsRequest  implements Serializable {
     private Boolean showMessageStatus = true;
 
     /**
+     * 是否允许访客端撤回消息
+     */
+    @Builder.Default
+    private Boolean allowVisitorRecall = true;
+
+    /**
+     * 访客端撤回消息时限（分钟）
+     */
+    @Builder.Default
+    private Integer visitorRecallMinutes = 5;
+
+    /**
      * 访客发起咨询是否需要登录（未登录则应先登录再创建会话）
      */
     @Builder.Default

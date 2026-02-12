@@ -13,13 +13,14 @@
  */
 package com.bytedesk.call.config;
 
-import com.bytedesk.call.esl.client.inbound.Client;
-import com.bytedesk.call.esl.client.inbound.InboundConnectionFailure;
-import com.bytedesk.call.esl.client.internal.IModEslApi;
 import java.net.InetSocketAddress;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.bytedesk.call.config.esl.client.inbound.Client;
+import com.bytedesk.call.config.esl.client.inbound.InboundConnectionFailure;
+import com.bytedesk.call.config.esl.client.internal.IModEslApi;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

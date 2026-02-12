@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260210-add-crm-customer-shop-info" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_crm_customer" />
+                <not>
+                    <columnExists tableName="bytedesk_crm_customer" columnName="shop_info" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add shop_info field to store visitor shop information.</comment>
+        <addColumn tableName="bytedesk_crm_customer">
+            <column name="shop_info" type="TEXT" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_crm_customer" columnName="shop_info" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260210-add-crm-customer-consult-content" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_crm_customer" />
+                <not>
+                    <columnExists tableName="bytedesk_crm_customer" columnName="consult_content" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add consult_content field to store consultation/inquiry content.</comment>
+        <addColumn tableName="bytedesk_crm_customer">
+            <column name="consult_content" type="TEXT" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_crm_customer" columnName="consult_content" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260210-add-crm-customer-need-follow-up" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_crm_customer" />
+                <not>
+                    <columnExists tableName="bytedesk_crm_customer" columnName="need_follow_up" />
+                </not>
+            </and>
+        </preConditions>
+        <comment>Add need_follow_up flag to indicate follow-up required.</comment>
+        <addColumn tableName="bytedesk_crm_customer">
+            <column name="need_follow_up" type="BOOLEAN" defaultValueBoolean="false" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_crm_customer" columnName="need_follow_up" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

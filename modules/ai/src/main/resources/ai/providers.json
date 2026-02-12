@@ -27,7 +27,7 @@
         "webUrl": "https://dashscope.aliyun.com/",
         "status": "PRODUCTION"
     },
-    "silicon": {
+    "siliconflow": {
         "nickname": "硅基流动",
         "logo": "silicon.png",
         "baseUrl": "https://api.siliconflow.cn",

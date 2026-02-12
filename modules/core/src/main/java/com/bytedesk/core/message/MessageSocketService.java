@@ -13,20 +13,23 @@
  */
 package com.bytedesk.core.message;
 
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.bytedesk.core.topic.TopicEntity;
 import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.socket.mqtt.MqttSession;
 import com.bytedesk.core.socket.mqtt.service.MqttMessageIdService;
 import com.bytedesk.core.socket.mqtt.service.MqttSessionService;
+import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 import com.bytedesk.core.socket.protobuf.model.ThreadProto;
 import com.bytedesk.core.socket.protobuf.model.UserProto;
@@ -54,6 +57,8 @@ public class MessageSocketService {
     private final MqttSessionService mqttSessionService;
 
     private final TopicRestService topicRestService;
+
+    private final ConnectionRestService connectionRestService;
 
     // 发送消息给stomp访客端
     public void sendStompMessage(@NonNull String messageJson) {
@@ -110,13 +115,26 @@ public class MessageSocketService {
 
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
         // log.debug("doSendToSubscribers: topic={}", topic);
-        Set<TopicEntity> topicSet = topicRestService.findByTopic(topic);
-        log.info("topicList size {}", topicSet.size());
-        topicSet.forEach(topicEntity -> {
-            Set<String> clientIdSet = topicEntity.getClientIds();
-            clientIdSet.forEach(clientId -> {
-                doSendMessage(topic, messageProto, clientId);
-            });
+        Set<String> subscriberUserUids = topicRestService.findSubscriberUserUidsByTopic(topic);
+        Map<String, Set<String>> clientIdsByUserUid = connectionRestService.listActiveClientIdsByUserUid(subscriberUserUids);
+
+        String subscriberDetails = subscriberUserUids.stream()
+                .sorted(Comparator.nullsLast(String::compareTo))
+                .map(userUid -> {
+                    Set<String> clientIds = clientIdsByUserUid.get(userUid);
+                    String clientIdsStr = clientIds == null
+                            ? ""
+                            : clientIds.stream().sorted().collect(Collectors.joining(","));
+                    return userUid + "->" + "[" + clientIdsStr + "]";
+                })
+                .collect(Collectors.joining(";"));
+
+        int activeClientCount = clientIdsByUserUid.values().stream().mapToInt(Set::size).sum();
+        log.info("topicList size {} topic {} subscribers {} activeClients {}", subscriberUserUids.size(), topic, subscriberDetails,
+                activeClientCount);
+
+        clientIdsByUserUid.values().forEach(clientIdSet -> {
+            clientIdSet.forEach(clientId -> doSendMessage(topic, messageProto, clientId));
         });
     }
 

@@ -48,6 +48,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
 
     Optional<MemberEntity> findByUserAndOrgUidAndDeletedFalse(UserEntity user, String orgUid);
 
+    long countByOrgUidAndDeletedFalse(String orgUid);
+
     Boolean existsByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);
 
     Boolean existsByMobileAndOrgUidAndDeletedFalse(String email, String orgUid);

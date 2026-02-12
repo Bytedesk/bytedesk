@@ -285,6 +285,10 @@ public class AgentSettingsRestService
         entity.setRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
         entity.setDraftRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
 
+        // Desktop quick reply buttons
+        entity.setQuickReplies(normalizeQuickReplies(request.getQuickReplies()));
+        entity.setDraftQuickReplies(normalizeQuickReplies(request.getQuickReplies()));
+
         AgentSettingsEntity saved = save(entity);
         return convertToResponse(saved);
     }
@@ -552,6 +556,12 @@ public class AgentSettingsRestService
         // Desktop right panel dynamic tabs (draft)
         if (request.getRightPanelTabs() != null) {
             entity.setDraftRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        // Desktop quick reply buttons (draft)
+        if (request.getQuickReplies() != null) {
+            entity.setDraftQuickReplies(normalizeQuickReplies(request.getQuickReplies()));
             entity.setHasUnpublishedChanges(true);
         }
 
@@ -957,6 +967,11 @@ public class AgentSettingsRestService
         if (entity.getDraftRightPanelTabs() != null) {
             entity.setRightPanelTabs(new ArrayList<>(entity.getDraftRightPanelTabs()));
         }
+
+        // Publish desktop quick reply buttons
+        if (entity.getDraftQuickReplies() != null) {
+            entity.setQuickReplies(new ArrayList<>(entity.getDraftQuickReplies()));
+        }
         
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
@@ -992,6 +1007,31 @@ public class AgentSettingsRestService
             out.add(AgentRightPanelTab.builder()
                     .title(hasTitle ? title : null)
                     .url(hasUrl ? url : null)
+                    .build());
+        }
+        return out;
+    }
+
+    private List<AgentQuickReplyButton> normalizeQuickReplies(List<AgentQuickReplyButton> input) {
+        if (input == null || input.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<AgentQuickReplyButton> out = new ArrayList<>();
+        for (AgentQuickReplyButton item : input) {
+            if (item == null) {
+                continue;
+            }
+            String code = item.getCode();
+            if (code != null) {
+                code = code.trim();
+            }
+            if (!StringUtils.hasText(code)) {
+                continue;
+            }
+            Boolean enabled = item.getEnabled();
+            out.add(AgentQuickReplyButton.builder()
+                    .code(code)
+                    .enabled(enabled == null ? Boolean.TRUE : enabled)
                     .build());
         }
         return out;

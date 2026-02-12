@@ -20,10 +20,12 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
+import com.bytedesk.core.utils.BdDateUtils;
 
 /**
  * @author bytedesk.com on 2019-06-24
@@ -46,5 +48,15 @@ public class RoleResponse extends BaseResponse {
 
     private Boolean system;
 
+    /**
+     * 角色有效期（为空表示永久有效）。
+     * 输出格式与 BaseResponse 时间字段一致（yyyy-MM-dd HH:mm:ss）。
+     */
+    private ZonedDateTime expiresAt;
+
     private Set<AuthorityResponse> authorities;
+
+    public String getExpiresAt() {
+        return BdDateUtils.formatDatetimeToString(expiresAt);
+    }
 }

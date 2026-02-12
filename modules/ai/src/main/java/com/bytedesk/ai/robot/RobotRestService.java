@@ -50,6 +50,7 @@ import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadConvertUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
@@ -59,7 +60,6 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.ConvertUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -410,7 +410,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             throw new RuntimeException("thread save failed");
         }
         //
-        return ConvertUtils.convertToThreadResponse(savedThread);
+        return ThreadConvertUtils.convertToThreadResponse(savedThread);
     }
 
     @Transactional
