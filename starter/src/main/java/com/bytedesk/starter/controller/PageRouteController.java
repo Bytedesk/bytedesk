@@ -53,6 +53,9 @@ public class PageRouteController {
     @Value("${bytedesk.custom.description:重复工作自动化}")
     private String customDescription;
 
+	@Value("${bytedesk.custom.doc-url:https://www.weiyuai.cn/docs/zh-CN/}")
+	private String docUrl;
+
 	/**
 	 * 微语首页
 	 * http://127.0.0.1:9003
@@ -262,14 +265,21 @@ public class PageRouteController {
 			@PathVariable(required = false) String lang,
 			@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
+		return "redirect:" + resolveDocUrl(lang);
+	}
 
-		// 如果指定了语言，则使用对应语言的入口页面
-		if (lang != null) {
-			return "forward:/docs/" + lang + "/index.html";
+	private String resolveDocUrl(String lang) {
+		String configuredDocUrl = (docUrl == null || docUrl.isBlank())
+				? "https://www.weiyuai.cn/docs/zh-CN/"
+				: docUrl;
+
+		if ("zh-TW".equals(lang)) {
+			return configuredDocUrl.replace("/zh-CN/", "/zh-TW/");
 		}
-
-		// 默认使用英文入口页面
-		return "forward:/docs/index.html";
+		if ("zh-CN".equals(lang)) {
+			return configuredDocUrl.replace("/zh-TW/", "/zh-CN/");
+		}
+		return configuredDocUrl;
 	}
 
 	/**
