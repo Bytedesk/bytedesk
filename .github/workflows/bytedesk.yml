@@ -32,10 +32,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       # https://github.com/actions/setup-java
-      - name: install JDK17
+      - name: install JDK21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
       # https://github.com/arduino/setup-protoc
