@@ -117,6 +117,60 @@ docker compose -p bytedesk -f docker-compose.yaml up -d
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 ```
 
+### Source startup dependencies (MySQL / PostgreSQL / Oracle selectable)
+
+When starting from source code, go to `starter/src/main/resources` and start dependency containers with scripts.
+
+```bash
+cd starter/src/main/resources
+
+# Artemis + MySQL (default)
+./compose-artemis.sh up -d
+
+# RabbitMQ + MySQL (default)
+./compose-rabbitmq.sh up -d
+
+# Artemis + PostgreSQL
+./compose-artemis.sh --db postgresql up -d
+
+# RabbitMQ + PostgreSQL
+./compose-rabbitmq.sh --db postgresql up -d
+
+# Artemis + Oracle
+./compose-artemis.sh --db oracle up -d
+
+# RabbitMQ + Oracle
+./compose-rabbitmq.sh --db oracle up -d
+
+# Or use environment variable (mysql/postgresql/oracle)
+BYTEDESK_DB=postgresql ./compose-artemis.sh up -d
+BYTEDESK_DB=postgresql ./compose-rabbitmq.sh up -d
+BYTEDESK_DB=oracle ./compose-artemis.sh up -d
+BYTEDESK_DB=oracle ./compose-rabbitmq.sh up -d
+```
+
+Equivalent native compose examples:
+
+```bash
+# Artemis + MySQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose.yaml up -d
+
+# Artemis + PostgreSQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose.yaml up -d
+
+# RabbitMQ + MySQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose-rabbitmq.yaml up -d
+
+# RabbitMQ + PostgreSQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose-rabbitmq.yaml up -d
+
+# Artemis + Oracle
+docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose.yaml up -d
+
+# RabbitMQ + Oracle
+docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose-rabbitmq.yaml up -d
+```
+
 ```bash
 # Please replace 127.0.0.1 with your server IP
 Access address: http://127.0.0.1:9003/
@@ -150,6 +204,8 @@ bytedesk/
 ## architecture
 
 - [architecture](https://www.weiyuai.cn/architecture.html)
+- [docs](https://www.weiyuai.cn/docs/)
+- [api docs](https://www.weiyuai.cn/apidocs/)
 
 ## Open Source Client
 
@@ -159,7 +215,8 @@ bytedesk/
 - [siphone](https://github.com/Bytedesk/bytedesk-phone)
 - [conference](https://github.com/Bytedesk/bytedesk-conference)
 - [freeswitch docker](https://github.com/Bytedesk/bytedesk-freeswitch)
-- [jitsi docker](https://github.com/Bytedesk/bytedesk-jitsi)
+- [janus docker](https://github.com/Bytedesk/bytedesk-janus)
+<!-- - [jitsi docker](https://github.com/Bytedesk/bytedesk-jitsi) -->
 
 ## Open Source Demo + SDK
 

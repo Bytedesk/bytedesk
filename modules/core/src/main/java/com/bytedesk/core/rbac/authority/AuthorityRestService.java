@@ -70,6 +70,7 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
         }
         // 
         AuthorityEntity authorityEntity = modelMapper.map(request, AuthorityEntity.class);
+        normalizeVipRequirement(authorityEntity);
         if (StringUtils.hasText(request.getUid())) {
             authorityEntity.setUid(request.getUid());
         } else {
@@ -91,6 +92,10 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
             // 
             optional.get().setName(request.getName());
             optional.get().setDescription(request.getDescription());
+            if (request.getVipLevel() != null) {
+                optional.get().setVipLevel(request.getVipLevel());
+            }
+            normalizeVipRequirement(optional.get());
             // 
             AuthorityEntity authorityEntity = save(optional.get());
             if (authorityEntity == null) {
@@ -206,6 +211,12 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
                 "settingsUpdated", settingsUpdated,
             "nonSettingsUpdated", nonSettingsUpdated,
             "descriptionUpdated", descriptionUpdated);
+    }
+
+    private void normalizeVipRequirement(AuthorityEntity authorityEntity) {
+        if (authorityEntity.getVipLevel() == null || authorityEntity.getVipLevel() < 0) {
+            authorityEntity.setVipLevel(0);
+        }
     }
 
 

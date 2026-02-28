@@ -15,7 +15,7 @@ package com.bytedesk.ai.springai.providers.deepseek;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
@@ -26,7 +26,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +59,8 @@ public class SpringAIDeepseekChatController {
     private ChatModel deepseekChatModel;
     // 
     private final SpringAIDeepseekChatService springAIDeepseekChatService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/deepseek/format?actor=
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -244,8 +244,6 @@ public class SpringAIDeepseekChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

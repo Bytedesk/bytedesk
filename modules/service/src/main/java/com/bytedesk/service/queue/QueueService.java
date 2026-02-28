@@ -362,9 +362,9 @@ public class QueueService {
      * @param agentUid 客服UID
      * @return 完整队列统计响应
      */
-    public AgentQueueStatsResponse getAgentQueueStats(String agentUid) {
+    public QueueAgentStatsResponse getAgentQueueStats(String agentUid) {
         if (!StringUtils.hasText(agentUid)) {
-            return AgentQueueStatsResponse.builder()
+            return QueueAgentStatsResponse.builder()
                     .agentUid(agentUid)
                     .build();
         }
@@ -378,7 +378,7 @@ public class QueueService {
 
         // 如果客服队列不存在，返回基础统计
         if (agentQueueOpt.isEmpty()) {
-            return AgentQueueStatsResponse.builder()
+            return QueueAgentStatsResponse.builder()
                     .agentUid(agentUid)
                     .queuingCount(queuingCount.totalQueuingCount())
                     .directQueuingCount(queuingCount.directQueuingCount())
@@ -388,8 +388,8 @@ public class QueueService {
 
         QueueEntity agentQueue = agentQueueOpt.get();
 
-        // 响应时长统计（基于 QueueMemberEntity 聚合）
-        var responseStats = queueMemberRestService.computeAgentResponseLengthStats(agentQueue.getUid());
+        // KPI 统计（基于 QueueMemberEntity 聚合）
+        var kpiStats = queueMemberRestService.computeAgentKpiStats(agentQueue.getUid());
 
         int totalCount = agentQueue.getTotalCount();
         int chattingCount = agentQueue.getChattingCount();
@@ -404,7 +404,7 @@ public class QueueService {
         // log.debug("客服队列统计 - agentUid: {}, 总人数: {}, 排队: {}, 接待: {}, 留言: {}, 转人工: {}",
         //         agentUid, totalCount, queuingCount.totalQueuingCount(), chattingCount, leaveMsgCount, robotToAgentCount);
 
-        return AgentQueueStatsResponse.builder()
+        return QueueAgentStatsResponse.builder()
                 .agentUid(agentUid)
                 .totalCount(totalCount)
                 .queuingCount(queuingCount.totalQueuingCount())
@@ -417,8 +417,13 @@ public class QueueService {
                 .robotToAgentCount(robotToAgentCount)
                 .robotingCount(robotingCount)
                 .agentServedCount(agentServedCount)
-            .agentFirstResponseLength(responseStats.agentFirstResponseLength())
-            .agentAvgResponseLength(responseStats.agentAvgResponseLength())
+                .agentFirstResponseLength(kpiStats.agentFirstResponseLength())
+                .agentAvgResponseLength(kpiStats.agentAvgResponseLength())
+                .answerRate30s(kpiStats.answerRate30s())
+                .agentReplyRate3m(kpiStats.agentReplyRate3m())
+                .inquiryConversionRate(kpiStats.inquiryConversionRate())
+                .dissatisfiedCount(kpiStats.dissatisfiedCount())
+                .dissatisfiedRate(kpiStats.dissatisfiedRate())
                 .threadsCountByHour(threadsCountByHour)
                 .build();
     }

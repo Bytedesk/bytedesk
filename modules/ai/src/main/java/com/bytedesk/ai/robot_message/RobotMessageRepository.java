@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface RobotMessageRepository extends JpaRepository<RobotMessageEntity, String>, JpaSpecificationExecutor<RobotMessageEntity> {
+public interface RobotMessageRepository extends JpaRepository<RobotMessageEntity, Long>, JpaSpecificationExecutor<RobotMessageEntity> {
     
     Optional<RobotMessageEntity> findByUid(String uid);
 

@@ -126,7 +126,7 @@ public class Ollama4jChatController {
         };
 
         // 在新线程中调用generate方法以避免阻塞
-        new Thread(() -> {
+        Thread.startVirtualThread(() -> {
             try {
                 // 发送开始事件
                 emitter.send(SseEmitter.event().data(JsonResult.success(
@@ -153,7 +153,7 @@ public class Ollama4jChatController {
                     log.debug("Failed to complete emitter with error: {}", completeException.getMessage());
                 }
             }
-        }).start();
+        });
 
         // 返回SseEmitter以开始发送事件
         return emitter;

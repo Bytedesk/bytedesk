@@ -56,7 +56,8 @@ import lombok.AllArgsConstructor;
     },
     indexes = {
         @jakarta.persistence.Index(name = "idx_ticket_thread_uid", columnList = "thread_uid"),
-        @jakarta.persistence.Index(name = "idx_ticket_visitor_thread_uid", columnList = "visitor_thread_uid")
+        @jakarta.persistence.Index(name = "idx_ticket_visitor_thread_uid", columnList = "visitor_thread_uid"),
+        @jakarta.persistence.Index(name = "idx_ticket_visitor_thread_topic", columnList = "visitor_thread_topic")
     }
 )
 @Entity(name = "bytedesk_ticket")
@@ -103,7 +104,6 @@ public class TicketEntity extends BaseEntity {
     /**
      * Human friendly ticket number generated from ticket settings
      */
-    @Column(name = "ticket_number", length = 64)
     private String ticketNumber;
 
     /**
@@ -117,14 +117,12 @@ public class TicketEntity extends BaseEntity {
      * Thread topic for online customer service session
      * 一对多：threadTopic -> 多条 ticket
      */
-    @Column(name = "thread_topic", length = 128)
     private String threadTopic;
 
     /**
      * Associated thread UID for ticket conversation
      * 一对一：threadUid -> 单条 ticket
      */
-    @Column(name = "thread_uid", length = 64)
     private String threadUid;
 
     /**
@@ -132,8 +130,14 @@ public class TicketEntity extends BaseEntity {
      * 用于记录内部工单创建时关联的客服会话 uid（非工单会话）
      * 一对多：visitorThreadUid -> 多条 ticket
      */
-    @Column(name = "visitor_thread_uid", length = 64)
     private String visitorThreadUid;
+
+    /**
+     * Visitor/customer-service thread topic associated when creating internal ticket in TicketInternalDrawer
+     * 用于记录内部工单创建时关联的客服会话 topic（非工单会话）
+     * 一对多：visitorThreadTopic -> 多条 ticket
+     */
+    private String visitorThreadTopic;
 
     /**
      * Associated category UID for ticket classification

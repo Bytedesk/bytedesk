@@ -105,6 +105,60 @@ docker compose -p bytedesk -f docker-compose.yaml up -d
 docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
 ```
 
+### 源码启动依赖（支持 MySQL / PostgreSQL / Oracle 三选一）
+
+源码启动时，进入 `starter/src/main/resources`，使用脚本启动依赖容器。
+
+```bash
+cd starter/src/main/resources
+
+# Artemis + MySQL（默认）
+./compose-artemis.sh up -d
+
+# RabbitMQ + MySQL（默认）
+./compose-rabbitmq.sh up -d
+
+# Artemis + PostgreSQL
+./compose-artemis.sh --db postgresql up -d
+
+# RabbitMQ + PostgreSQL
+./compose-rabbitmq.sh --db postgresql up -d
+
+# Artemis + Oracle
+./compose-artemis.sh --db oracle up -d
+
+# RabbitMQ + Oracle
+./compose-rabbitmq.sh --db oracle up -d
+
+# 或通过环境变量切换（mysql/postgresql/oracle）
+BYTEDESK_DB=postgresql ./compose-artemis.sh up -d
+BYTEDESK_DB=postgresql ./compose-rabbitmq.sh up -d
+BYTEDESK_DB=oracle ./compose-artemis.sh up -d
+BYTEDESK_DB=oracle ./compose-rabbitmq.sh up -d
+```
+
+等价的原生命令示例：
+
+```bash
+# Artemis + MySQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose.yaml up -d
+
+# Artemis + PostgreSQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose.yaml up -d
+
+# RabbitMQ + MySQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose-rabbitmq.yaml up -d
+
+# RabbitMQ + PostgreSQL
+docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose-rabbitmq.yaml up -d
+
+# Artemis + Oracle
+docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose.yaml up -d
+
+# RabbitMQ + Oracle
+docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose-rabbitmq.yaml up -d
+```
+
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
 - [源码启动](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/source)
@@ -143,6 +197,8 @@ bytedesk/
 ## 架构图
 
 - [架构图](https://www.weiyuai.cn/architecture.html)
+- [文档](https://www.weiyuai.cn/docs/zh-CN/)
+- [接口文档](https://www.weiyuai.cn/apidocs/)
 
 ## 开源客户端
 
@@ -151,8 +207,9 @@ bytedesk/
 - [移动客户端](https://github.com/Bytedesk/bytedesk-mobile)
 - [SipPhone](https://github.com/Bytedesk/bytedesk-phone)
 - [视频会议](https://github.com/Bytedesk/bytedesk-conference)
-- [Freeswitch Docker](https://github.com/Bytedesk/bytedesk-freeswitch)
-- [Jitsi Docker](https://github.com/Bytedesk/bytedesk-jitsi)
+- [呼叫中心Freeswitch](https://github.com/Bytedesk/bytedesk-freeswitch)
+- [视频客服Janus](https://github.com/Bytedesk/bytedesk-janus)
+<!-- - [Jitsi Docker](https://github.com/Bytedesk/bytedesk-jitsi) -->
 
 ## 开源Demo + SDK
 

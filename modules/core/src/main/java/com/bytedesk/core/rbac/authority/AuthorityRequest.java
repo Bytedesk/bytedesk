@@ -36,5 +36,7 @@ public class AuthorityRequest extends BaseRequestNoOrg {
     
     private String value;
 
+    private Integer vipLevel;
+
     private String description;
 }

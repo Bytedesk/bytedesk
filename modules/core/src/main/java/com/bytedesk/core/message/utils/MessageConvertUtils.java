@@ -33,8 +33,6 @@ public class MessageConvertUtils {
 
     public static MessageProto.Message toProtoBean(MessageProto.Message.Builder targetBuilder, String json)
             throws IOException {
-        // JsonFormat.parser().merge(json, targetBuilder);
-        // return targetBuilder.build();
         try {
             // Use the builder pattern correctly
             JsonFormat.parser().ignoringUnknownFields().merge(json, targetBuilder);

@@ -45,13 +45,19 @@ public class CustomWebSocketHandlerDecoratorFactory implements WebSocketHandlerD
             @Override
             public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
                 super.handleTransportError(session, exception);
-                log.debug("stomp Transport error: " + exception.getMessage());
+                log.debug("stomp Transport error session {} type {} msg {}",
+                        session.getId(),
+                        exception == null ? "unknown" : exception.getClass().getSimpleName(),
+                        exception == null ? "null" : exception.getMessage());
             }
 
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
                 super.afterConnectionClosed(session, closeStatus);
-                log.debug("stomp Connection closed: " + closeStatus.getReason());
+                log.debug("stomp Connection closed session {} code {} reason {}",
+                        session.getId(),
+                        closeStatus.getCode(),
+                        closeStatus.getReason());
             }
 
             @Override

@@ -22,6 +22,7 @@
 ```
 
 该脚本会自动检测：
+
 - ✅ 容器是否存在和运行
 - ✅ 健康状态检查
 - ✅ 端口映射情况
@@ -57,8 +58,8 @@ docker exec -it etcd-bytedesk etcdctl get "" --prefix
 # 查看 FreeSwitch 容器状态
 docker ps -a --filter "name=freeswitch-bytedesk"
 
-# 或使用 docker-compose
-docker-compose ps bytedesk-freeswitch
+# 或使用 docker compose（MySQL + Artemis 示例）
+docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose.yaml ps bytedesk-freeswitch
 ```
 
 ### 方法二：检查健康状态
@@ -181,6 +182,7 @@ chmod +x check_freeswitch.sh
 ### 常见问题排查
 
 #### 1. 容器启动失败
+
 ```bash
 # 查看启动错误日志
 docker logs freeswitch-bytedesk
@@ -190,6 +192,7 @@ docker inspect freeswitch-bytedesk | grep -A 10 "Mounts"
 ```
 
 #### 2. 健康检查失败
+
 ```bash
 # 查看健康检查日志
 docker inspect --format='{{json .State.Health.Log}}' freeswitch-bytedesk | jq
@@ -199,6 +202,7 @@ docker exec -it freeswitch-bytedesk fs_cli -p bytedesk123 -x "status"
 ```
 
 #### 3. 端口冲突
+
 ```bash
 # 检查端口占用
 lsof -i :15060
@@ -209,26 +213,55 @@ netstat -an | grep 15060
 ```
 
 #### 4. 网络连接问题
+
 ```bash
 # 检查网络配置
 docker network inspect bytedesk-network
 
-# 测试容器间网络连通性
+# 测试容器间网络连通性（MySQL 方案）
 docker exec -it freeswitch-bytedesk ping bytedesk-mysql
+
+# PostgreSQL 方案可改为：
+# docker exec -it freeswitch-bytedesk ping bytedesk-postgresql
 ```
 
 ## 启动所有服务
 
 ```bash
-# 启动所有服务
-docker-compose up -d
+# 推荐：使用脚本（默认 MySQL）
+./compose-artemis.sh up -d
+./compose-rabbitmq.sh up -d
+
+# 切换 PostgreSQL
+./compose-artemis.sh --db postgresql up -d
+./compose-rabbitmq.sh --db postgresql up -d
+
+# 切换 Oracle
+./compose-artemis.sh --db oracle up -d
+./compose-rabbitmq.sh --db oracle up -d
+
+# 等价原生命令示例
+# Artemis + MySQL
+# docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose.yaml up -d
+# Artemis + PostgreSQL
+# docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose.yaml up -d
+# RabbitMQ + MySQL
+# docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose-rabbitmq.yaml up -d
+# RabbitMQ + PostgreSQL
+# docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose-rabbitmq.yaml up -d
+# Artemis + Oracle
+# docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose.yaml up -d
+# RabbitMQ + Oracle
+# docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose-rabbitmq.yaml up -d
 
 # 查看所有服务状态
-docker-compose ps
+docker compose ps
 
 # 停止所有服务
-docker-compose down
+./compose-artemis.sh down
+./compose-rabbitmq.sh down
 
 # 停止并删除所有数据
-docker-compose down -v
+docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose.yaml down -v
+# PostgreSQL/Oracle 场景可将 compose-mysql.yaml 替换为 compose-postgresql.yaml 或 compose-oracle.yaml
 ```

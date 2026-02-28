@@ -79,13 +79,14 @@ public class UrlPreviewRestControllerAgent {
             return ResponseEntity.ok(JsonResult.success(textContent));
         }
 
-        UrlPreviewResponse previewResponse = null;
         boolean hasAnyPreviewField = StringUtils.hasText(request.getTitle())
                 || StringUtils.hasText(request.getDescription())
                 || StringUtils.hasText(request.getImageUrl())
                 || StringUtils.hasText(request.getSiteName());
+        UrlPreviewResponse previewResponse = UrlPreviewResponse.builder().url(normalizedUrl).build();
         if (!hasAnyPreviewField) {
-            previewResponse = urlPreviewService.preview(normalizedUrl);
+            previewResponse = Optional.ofNullable(urlPreviewService.preview(normalizedUrl))
+                .orElseGet(() -> UrlPreviewResponse.builder().url(normalizedUrl).build());
         }
 
         UrlPreview urlPreview = UrlPreview.builder()

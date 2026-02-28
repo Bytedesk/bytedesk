@@ -75,8 +75,9 @@ public class NamingThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        Thread thread = new Thread(r);
-        thread.setDaemon(this.daemon);
+        Thread thread = Boolean.TRUE.equals(this.daemon)
+            ? Thread.ofPlatform().daemon(true).unstarted(r)
+            : Thread.ofPlatform().unstarted(r);
 
         // If there is no specified name for thread, it will auto detect using the invoker classname instead.
         // Notice that auto detect may cause some performance overhead
@@ -93,7 +94,7 @@ public class NamingThreadFactory implements ThreadFactory {
             thread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
-                    log.error("unhandled exception in thread: " + t.getId() + ":" + t.getName(), e);
+                    log.error("unhandled exception in thread: " + t.threadId() + ":" + t.getName(), e);
                 }
             });
         }

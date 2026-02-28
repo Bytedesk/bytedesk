@@ -32,6 +32,11 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     Optional<AgentEntity> findByUserUid(String userUid);
 
+    /**
+     * 用于在 userUid 可能对应多个组织坐席时，避免 Optional 查询触发 NonUniqueResultException。
+     */
+    List<AgentEntity> findAllByUserUidAndDeletedFalse(String userUid);
+
     List<AgentEntity> findByOrgUid(String orgUid);
 
     Optional<AgentEntity> findByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);

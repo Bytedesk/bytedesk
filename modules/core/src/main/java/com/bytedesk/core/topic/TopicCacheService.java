@@ -63,7 +63,11 @@ public class TopicCacheService {
         push(topicRequestCacheKey, request.toJson());
     }
 
-    public void pushClientId(String clientId) {
+    public synchronized void pushClientId(String clientId) {
+        List<String> clientIdList = topicRequestCache.getIfPresent(clientIdCacheKey);
+        if (clientIdList != null && clientIdList.contains(clientId)) {
+            return;
+        }
         push(clientIdCacheKey, clientId);
     }
 
@@ -72,7 +76,7 @@ public class TopicCacheService {
     }
 
     // 模拟 push 操作：向列表中添加元素
-    private void push(String listKey, String cacheValue) {
+    private synchronized void push(String listKey, String cacheValue) {
         List<String> cachedList = topicRequestCache.getIfPresent(listKey);
         if (cachedList == null) {
             // 如果缓存中没有找到对应的键，则使用load方法初始化
@@ -83,7 +87,7 @@ public class TopicCacheService {
     }
 
     // remove 操作：从列表中移除元素
-    private void remove(String listKey, String cacheValue) {
+    private synchronized void remove(String listKey, String cacheValue) {
         List<String> cachedList = topicRequestCache.getIfPresent(listKey);
         if (cachedList != null) {
             cachedList.remove(cacheValue);
@@ -100,12 +104,13 @@ public class TopicCacheService {
         return getList(clientIdCacheKey);
     }
 
-    private List<String> getList(String listKey) {
+    private synchronized List<String> getList(String listKey) {
         List<String> cachedList = topicRequestCache.getIfPresent(listKey);
         if (cachedList != null && !cachedList.isEmpty()) {
+            List<String> snapshot = new ArrayList<>(cachedList);
             // 只需要返回一次即可
             remove(listKey);
-            return cachedList;
+            return snapshot;
         }
         return null;
     }

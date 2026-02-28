@@ -48,9 +48,10 @@ public class RoleEventListener {
 
     // 启动阶段延迟绑定：避免 role 未创建就绑定导致失败
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r, "role-authority-binder");
-        t.setDaemon(true);
-        return t;
+        return Thread.ofPlatform()
+                .name("role-authority-binder")
+                .daemon(true)
+                .unstarted(r);
     });
     private final AtomicInteger startupAttempts = new AtomicInteger(0);
     private final AtomicBoolean flushing = new AtomicBoolean(false);

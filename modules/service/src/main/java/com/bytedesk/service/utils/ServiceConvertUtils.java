@@ -167,7 +167,7 @@ public class ServiceConvertUtils {
         // 获取客服队列统计信息
         try {
             com.bytedesk.service.queue.QueueService queueService = ApplicationContextHolder.getBean(com.bytedesk.service.queue.QueueService.class);
-            com.bytedesk.service.queue.AgentQueueStatsResponse queueStats = queueService.getAgentQueueStats(agent.getUid());
+            com.bytedesk.service.queue.QueueAgentStatsResponse queueStats = queueService.getAgentQueueStats(agent.getUid());
             resp.setQueueStats(queueStats);
         } catch (Exception ignore) {
             // QueueService not ready; skip queue stats

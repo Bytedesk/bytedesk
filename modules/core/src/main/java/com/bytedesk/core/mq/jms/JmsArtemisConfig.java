@@ -14,6 +14,9 @@
 package com.bytedesk.core.mq.jms;
 
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
+import org.springframework.boot.autoconfigure.jms.artemis.ArtemisMode;
+import org.springframework.boot.autoconfigure.jms.artemis.ArtemisProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -25,14 +28,22 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import org.springframework.jms.support.destination.DynamicDestinationResolver;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
 import jakarta.jms.Session;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,6 +65,27 @@ import lombok.extern.slf4j.Slf4j;
 public class JmsArtemisConfig {
 
 	private final JmsErrorHandler jmsErrorHandler;
+
+	private final ArtemisClusterProperties artemisClusterProperties;
+
+	private final ArtemisProperties artemisProperties;
+
+	@Bean
+	@ConditionalOnProperty(name = "bytedesk.mq.artemis.cluster.enabled", havingValue = "true", matchIfMissing = false)
+	public ConnectionFactory artemisClusterConnectionFactory() {
+		if (!ArtemisMode.NATIVE.equals(artemisProperties.getMode())) {
+			throw new IllegalStateException(
+					"Artemis cluster config requires spring.artemis.mode=native");
+		}
+
+		String failoverBrokerUrl = buildClusterFailoverBrokerUrl();
+		log.info("Creating Artemis cluster ConnectionFactory with failover URL: {}", failoverBrokerUrl);
+
+		if (StringUtils.hasText(artemisProperties.getUser()) || StringUtils.hasText(artemisProperties.getPassword())) {
+			return new ActiveMQConnectionFactory(failoverBrokerUrl, artemisProperties.getUser(), artemisProperties.getPassword());
+		}
+		return new ActiveMQConnectionFactory(failoverBrokerUrl);
+	}
 
 	@Bean
 	public JmsListenerContainerFactory<?> jmsArtemisQueueFactory(ConnectionFactory connectionFactory,
@@ -155,6 +187,66 @@ public class JmsArtemisConfig {
 		jmsTemplate.setDeliveryMode(jakarta.jms.DeliveryMode.NON_PERSISTENT);
 		jmsTemplate.setExplicitQosEnabled(true);
 		return jmsTemplate;
+	}
+
+	private String buildClusterFailoverBrokerUrl() {
+		if (CollectionUtils.isEmpty(artemisClusterProperties.getNodes())) {
+			throw new IllegalStateException(
+					"Artemis cluster is enabled but bytedesk.mq.artemis.cluster.nodes is empty");
+		}
+
+		List<String> normalizedNodes = normalizeClusterNodes(artemisClusterProperties.getNodes());
+		String base = "failover:(" + String.join(",", normalizedNodes) + ")";
+
+		Map<String, String> options = new LinkedHashMap<>();
+		options.put("ha", String.valueOf(artemisClusterProperties.isHa()));
+		if (artemisClusterProperties.getRandomize() != null) {
+			options.put("randomize", String.valueOf(artemisClusterProperties.getRandomize()));
+		}
+		if (artemisClusterProperties.getReconnectAttempts() != null) {
+			options.put("reconnectAttempts", String.valueOf(artemisClusterProperties.getReconnectAttempts()));
+		}
+		if (artemisClusterProperties.getInitialConnectAttempts() != null) {
+			options.put("initialConnectAttempts", String.valueOf(artemisClusterProperties.getInitialConnectAttempts()));
+		}
+		if (artemisClusterProperties.getRetryInterval() != null) {
+			options.put("retryInterval", String.valueOf(artemisClusterProperties.getRetryInterval()));
+		}
+		if (artemisClusterProperties.getRetryIntervalMultiplier() != null) {
+			options.put("retryIntervalMultiplier", String.valueOf(artemisClusterProperties.getRetryIntervalMultiplier()));
+		}
+		if (artemisClusterProperties.getMaxRetryInterval() != null) {
+			options.put("maxRetryInterval", String.valueOf(artemisClusterProperties.getMaxRetryInterval()));
+		}
+
+		if (options.isEmpty()) {
+			return base;
+		}
+
+		String optionQuery = options.entrySet()
+				.stream()
+				.map(entry -> entry.getKey() + "=" + entry.getValue())
+				.collect(Collectors.joining("&"));
+		return base + "?" + optionQuery;
+	}
+
+	private List<String> normalizeClusterNodes(List<String> nodes) {
+		List<String> normalized = new ArrayList<>();
+		for (String node : nodes) {
+			if (!StringUtils.hasText(node)) {
+				continue;
+			}
+			String trimmed = node.trim();
+			if (!trimmed.startsWith("tcp://")) {
+				trimmed = "tcp://" + trimmed;
+			}
+			normalized.add(trimmed);
+		}
+		if (normalized.isEmpty()) {
+			throw new IllegalStateException(
+					"Artemis cluster is enabled but bytedesk.mq.artemis.cluster.nodes has no valid node");
+		}
+		return normalized;
 	}
 
 }

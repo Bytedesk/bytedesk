@@ -15,6 +15,7 @@ package com.bytedesk.ai.zhipuai;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
@@ -47,7 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -69,7 +69,8 @@ public class ZhipuaiController {
     private final BytedeskProperties bytedeskProperties;
     private final ZhipuaiMultiModelService zhipuaiMultiModelService;
     private final ZhipuaiChatService zhipuaiChatService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     /**
      * 同步调用 - 使用新的统一接口
@@ -1039,8 +1040,6 @@ public class ZhipuaiController {
      * 在 Bean 销毁时关闭线程池
      */
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

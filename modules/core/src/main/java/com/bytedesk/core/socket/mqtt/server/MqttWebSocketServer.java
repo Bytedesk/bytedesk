@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.socket.mqtt.server;
 
+import java.net.BindException;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -89,8 +91,19 @@ public class MqttWebSocketServer {
                 .childHandler(
                         new MqttWebSocketServerInitializer(null, protocolProcess, mqttProperties.getMaxPayloadSize()));
 
-        serverChannel = serverBootstrap.bind(mqttProperties.getHost(), mqttProperties.getWebsocketPort()).sync()
-                .channel();
+        try {
+            serverChannel = serverBootstrap.bind(mqttProperties.getHost(), mqttProperties.getWebsocketPort()).sync()
+                    .channel();
+        } catch (Exception exception) {
+            if (isAddressInUse(exception)) {
+                log.error(
+                        "Mqtt websocket transport bind failed, address already in use {}:{}; disabling mqtt websocket transport for this startup.",
+                        mqttProperties.getHost(), mqttProperties.getWebsocketPort());
+                shutdownEventLoops();
+                return;
+            }
+            throw exception;
+        }
 
         log.debug("Mqtt websocket transport started! {}:{}", mqttProperties.getHost(),
                 mqttProperties.getWebsocketPort());
@@ -98,14 +111,33 @@ public class MqttWebSocketServer {
 
     @PreDestroy
     public void shutdown() throws InterruptedException {
-        
+
         if (serverChannel != null) {
             try {
                 serverChannel.close().sync();
             } finally {
-                childEventLoopGroup.shutdownGracefully();
-                parentEventLoopGroup.shutdownGracefully();
+                shutdownEventLoops();
             }
+        }
+    }
+
+    private boolean isAddressInUse(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof BindException) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private void shutdownEventLoops() {
+        if (childEventLoopGroup != null) {
+            childEventLoopGroup.shutdownGracefully();
+        }
+        if (parentEventLoopGroup != null) {
+            parentEventLoopGroup.shutdownGracefully();
         }
     }
 

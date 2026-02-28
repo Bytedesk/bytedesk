@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.rbac.authority;
 
+import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -51,6 +52,20 @@ public class AuthorityEntity extends BaseEntityNoOrg {
 
     @Column(name = "authority_value")
     private String value;
+
+    // 权限要求的最低 VIP 等级：0=不限制，1及以上表示对应最低等级
+    @Builder.Default
+    @Column(name = "vip_level")
+    private Integer vipLevel = 0;
+
+    @PostLoad
+    @PrePersist
+    @PreUpdate
+    private void normalizeVipLevel() {
+        if (vipLevel == null || vipLevel < 0) {
+            vipLevel = 0;
+        }
+    }
     
     private String description;
 

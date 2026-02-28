@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260226-add-org-vip-level" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_organization" />
+                <not>
+                    <columnExists tableName="bytedesk_core_organization" columnName="vip_level" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_organization">
+            <column name="vip_level" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_core_organization" columnName="vip_level" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260226-add-authority-is-vip-only" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_authority" />
+                <not>
+                    <columnExists tableName="bytedesk_core_authority" columnName="is_vip_only" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_authority">
+            <column name="is_vip_only" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_core_authority" columnName="is_vip_only" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260226-add-authority-vip-level" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_authority" />
+                <not>
+                    <columnExists tableName="bytedesk_core_authority" columnName="vip_level" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_authority">
+            <column name="vip_level" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_core_authority" columnName="vip_level" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

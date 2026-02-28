@@ -49,6 +49,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class AgentSettingsRestService
         extends BaseRestService<AgentSettingsEntity, AgentSettingsRequest, AgentSettingsResponse> {
 
+    private List<AgentQuickReplyButton> defaultQuickReplies() {
+        List<AgentQuickReplyButton> defaults = new ArrayList<>();
+        defaults.add(AgentQuickReplyButton.builder().code("emoji").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("upload").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("speechInput").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("autoreply").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("RATE_INVITE").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("block").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("webrtc").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("screenshot").enabled(Boolean.TRUE).build());
+        return defaults;
+    }
+
     private static void syncOrgUser(BaseEntity target, String orgUid, String userUid) {
         if (target == null) {
             return;
@@ -171,7 +184,8 @@ public class AgentSettingsRestService
         }
         entity.setTriggerSettings(trigger);
 
-        TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
+        TriggerSettingsEntity triggerDraft = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(),
+                modelMapper);
         triggerDraft.setUid(uidUtils.getUid());
         syncOrgUser(triggerDraft, orgUid, userUid);
         if (request.getTriggerSettings() != null) {
@@ -194,7 +208,8 @@ public class AgentSettingsRestService
         inte.setUid(uidUtils.getUid());
         syncOrgUser(inte, orgUid, userUid);
         entity.setIntentionSettings(inte);
-        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
+        IntentionSettingsEntity inteDraft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(),
+                modelMapper);
         inteDraft.setUid(uidUtils.getUid());
         syncOrgUser(inteDraft, orgUid, userUid);
         entity.setDraftIntentionSettings(inteDraft);
@@ -232,12 +247,12 @@ public class AgentSettingsRestService
         entity.setDraftMessageLeaveSettings(mlsDraft);
 
         WorktimeSettingEntity worktimePublished = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(),
-            modelMapper);
+                modelMapper);
         worktimePublished.setUid(uidUtils.getUid());
         syncOrgUser(worktimePublished, orgUid, userUid);
         entity.setWorktimeSettings(worktimePublished);
         WorktimeSettingEntity worktimeDraft = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(),
-            modelMapper);
+                modelMapper);
         worktimeDraft.setUid(uidUtils.getUid());
         syncOrgUser(worktimeDraft, orgUid, userUid);
         entity.setDraftWorktimeSettings(worktimeDraft);
@@ -272,11 +287,13 @@ public class AgentSettingsRestService
         entity.setDraftRateDownSettings(rd);
 
         // 发布与草稿：客服状态设置（统一使用 fromRequest，内部已处理 null）
-        AgentStatusSettingEntity st = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
+        AgentStatusSettingEntity st = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(),
+                modelMapper);
         st.setUid(uidUtils.getUid());
         syncOrgUser(st, orgUid, userUid);
         entity.setAgentStatusSettings(st);
-        AgentStatusSettingEntity stDraft = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
+        AgentStatusSettingEntity stDraft = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(),
+                modelMapper);
         stDraft.setUid(uidUtils.getUid());
         syncOrgUser(stDraft, orgUid, userUid);
         entity.setDraftAgentStatusSettings(stDraft);
@@ -303,10 +320,18 @@ public class AgentSettingsRestService
         AgentSettingsEntity entity = optional.get();
         // 使用 ModelMapper 批量更新基础字段（非设置的通用元信息）
         // modelMapper.map(request, entity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription());
-        entity.setIsDefault(request.getIsDefault());
-        entity.setEnabled(request.getEnabled());
+        if (StringUtils.hasText(request.getName())) {
+            entity.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            entity.setDescription(request.getDescription());
+        }
+        if (request.getIsDefault() != null) {
+            entity.setIsDefault(request.getIsDefault());
+        }
+        if (request.getEnabled() != null) {
+            entity.setEnabled(request.getEnabled());
+        }
 
         // Agent meta fields（不属于嵌套 settings，需要在 update 中单独持久化）
         if (request.getMaxThreadCount() != null) {
@@ -338,8 +363,9 @@ public class AgentSettingsRestService
                 draft = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftServiceSettings(draft);
-                // 
-                ServiceSettingsEntity settings = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
+                //
+                ServiceSettingsEntity settings = ServiceSettingsEntity.fromRequest(request.getServiceSettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setServiceSettings(settings);
             } else {
@@ -360,7 +386,8 @@ public class AgentSettingsRestService
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftTriggerSettings(draft);
                 //
-                TriggerSettingsEntity settings = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(), modelMapper);
+                TriggerSettingsEntity settings = TriggerSettingsEntity.fromRequest(request.getTriggerSettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setTriggerSettings(settings);
 
@@ -378,8 +405,9 @@ public class AgentSettingsRestService
                 draft = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftMessageLeaveSettings(draft);
-                // 
-                MessageLeaveSettingsEntity settings = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(), modelMapper);
+                //
+                MessageLeaveSettingsEntity settings = MessageLeaveSettingsEntity
+                        .fromRequest(request.getMessageLeaveSettings(), modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setMessageLeaveSettings(settings);
             } else {
@@ -396,8 +424,9 @@ public class AgentSettingsRestService
                 draft = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftWorktimeSettings(draft);
-                // 
-                WorktimeSettingEntity settings = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(), modelMapper);
+                //
+                WorktimeSettingEntity settings = WorktimeSettingEntity.fromRequest(request.getWorktimeSettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setWorktimeSettings(settings);
             } else {
@@ -414,8 +443,9 @@ public class AgentSettingsRestService
                 draft = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftAutoReplySettings(draft);
-                // 
-                AutoReplySettingsEntity settings = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
+                //
+                AutoReplySettingsEntity settings = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setAutoReplySettings(settings);
             } else {
@@ -433,8 +463,9 @@ public class AgentSettingsRestService
                 draft = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftInviteSettings(draft);
-                // 
-                InviteSettingsEntity settings = InviteSettingsEntity.fromRequest(request.getInviteSettings(), modelMapper);
+                //
+                InviteSettingsEntity settings = InviteSettingsEntity.fromRequest(request.getInviteSettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setInviteSettings(settings);
             } else {
@@ -451,8 +482,9 @@ public class AgentSettingsRestService
                 draft = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftIntentionSettings(draft);
-                // 
-                IntentionSettingsEntity settings = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(), modelMapper);
+                //
+                IntentionSettingsEntity settings = IntentionSettingsEntity.fromRequest(request.getIntentionSettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setIntentionSettings(settings);
             } else {
@@ -469,8 +501,9 @@ public class AgentSettingsRestService
                 draft = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftEmotionSettings(draft);
-                // 
-                EmotionSettingEntity settings = EmotionSettingEntity.fromRequest(request.getEmotionSettings(), modelMapper);
+                //
+                EmotionSettingEntity settings = EmotionSettingEntity.fromRequest(request.getEmotionSettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setEmotionSettings(settings);
             } else {
@@ -487,8 +520,9 @@ public class AgentSettingsRestService
                 draft = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftSummarySettings(draft);
-                // 
-                SummarySettingsEntity settings = SummarySettingsEntity.fromRequest(request.getSummarySettings(), modelMapper);
+                //
+                SummarySettingsEntity settings = SummarySettingsEntity.fromRequest(request.getSummarySettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setSummarySettings(settings);
             } else {
@@ -505,7 +539,7 @@ public class AgentSettingsRestService
                 draft = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftQueueSettings(draft);
-                // 
+                //
                 QueueSettingsEntity settings = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setQueueSettings(settings);
@@ -523,8 +557,9 @@ public class AgentSettingsRestService
                 draft = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftRateDownSettings(draft);
-                // 
-                RatedownSettingsEntity settings = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
+                //
+                RatedownSettingsEntity settings = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(),
+                        modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setRateDownSettings(settings);
             } else {
@@ -541,8 +576,9 @@ public class AgentSettingsRestService
                 draft = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
                 draft.setUid(uidUtils.getUid());
                 entity.setDraftAgentStatusSettings(draft);
-                // 
-                AgentStatusSettingEntity settings = AgentStatusSettingEntity.fromRequest(request.getAgentStatusSettings(), modelMapper);
+                //
+                AgentStatusSettingEntity settings = AgentStatusSettingEntity
+                        .fromRequest(request.getAgentStatusSettings(), modelMapper);
                 settings.setUid(uidUtils.getUid());
                 entity.setAgentStatusSettings(settings);
             } else {
@@ -642,16 +678,16 @@ public class AgentSettingsRestService
                     .orgUid(orgUid)
                     .build();
 
-                    final String userUid = settings.getUserUid();
+            final String userUid = settings.getUserUid();
 
             // 参考 create()：为各嵌套配置初始化“发布 + 草稿”并分配独立 UID
             // Service settings（发布 + 草稿）
             ServiceSettingsEntity published = ServiceSettingsEntity.fromRequest(null, modelMapper);
             published.setUid(uidUtils.getUid());
-                    syncOrgUser(published, orgUid, userUid);
+            syncOrgUser(published, orgUid, userUid);
             ServiceSettingsEntity draft = ServiceSettingsEntity.fromRequest(null, modelMapper);
             draft.setUid(uidUtils.getUid());
-                    syncOrgUser(draft, orgUid, userUid);
+            syncOrgUser(draft, orgUid, userUid);
             settings.setServiceSettings(published);
             settings.setDraftServiceSettings(draft);
 
@@ -765,6 +801,10 @@ public class AgentSettingsRestService
             settings.setAgentStatusSettings(st);
             settings.setDraftAgentStatusSettings(stDraft);
 
+            // Desktop quick reply buttons（发布 + 草稿）默认项
+            settings.setQuickReplies(defaultQuickReplies());
+            settings.setDraftQuickReplies(defaultQuickReplies());
+
             return save(settings);
         } catch (Exception ex) {
             // 并发下若出现冲突，退避后返回现有默认配置
@@ -817,7 +857,7 @@ public class AgentSettingsRestService
         }
 
         AgentSettingsEntity entity = optional.get();
-        
+
         // 复制草稿到发布版本
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
@@ -842,7 +882,7 @@ public class AgentSettingsRestService
                 entity.setTriggerSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftMessageLeaveSettings() != null) {
             MessageLeaveSettingsEntity published = entity.getMessageLeaveSettings();
             if (published != null) {
@@ -866,7 +906,7 @@ public class AgentSettingsRestService
                 entity.setWorktimeSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftAutoReplySettings() != null) {
             AutoReplySettingsEntity published = entity.getAutoReplySettings();
             if (published != null) {
@@ -878,7 +918,7 @@ public class AgentSettingsRestService
                 entity.setAutoReplySettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftQueueSettings() != null) {
             QueueSettingsEntity published = entity.getQueueSettings();
             if (published != null) {
@@ -890,7 +930,7 @@ public class AgentSettingsRestService
                 entity.setQueueSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftRateDownSettings() != null) {
             RatedownSettingsEntity published = entity.getRateDownSettings();
             if (published != null) {
@@ -902,7 +942,7 @@ public class AgentSettingsRestService
                 entity.setRateDownSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
             if (published != null) {
@@ -914,7 +954,7 @@ public class AgentSettingsRestService
                 entity.setInviteSettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftIntentionSettings() != null) {
             IntentionSettingsEntity published = entity.getIntentionSettings();
             if (published != null) {
@@ -950,7 +990,7 @@ public class AgentSettingsRestService
                 entity.setSummarySettings(newPublished);
             }
         }
-        
+
         if (entity.getDraftAgentStatusSettings() != null) {
             AgentStatusSettingEntity published = entity.getAgentStatusSettings();
             if (published != null) {
@@ -970,12 +1010,12 @@ public class AgentSettingsRestService
 
         // Publish desktop quick reply buttons
         if (entity.getDraftQuickReplies() != null) {
-            entity.setQuickReplies(new ArrayList<>(entity.getDraftQuickReplies()));
+            entity.setQuickReplies(normalizeQuickReplies(entity.getDraftQuickReplies()));
         }
-        
+
         entity.setHasUnpublishedChanges(false);
         entity.setPublishedAt(java.time.ZonedDateTime.now());
-        
+
         AgentSettingsEntity updated = save(entity);
         return convertToResponse(updated);
     }
@@ -1014,9 +1054,11 @@ public class AgentSettingsRestService
 
     private List<AgentQuickReplyButton> normalizeQuickReplies(List<AgentQuickReplyButton> input) {
         if (input == null || input.isEmpty()) {
-            return new ArrayList<>();
+            return defaultQuickReplies();
         }
         List<AgentQuickReplyButton> out = new ArrayList<>();
+        boolean webrtcEnabled = false;
+        boolean hasWebrtc = false;
         for (AgentQuickReplyButton item : input) {
             if (item == null) {
                 continue;
@@ -1029,12 +1071,25 @@ public class AgentSettingsRestService
                 continue;
             }
             Boolean enabled = item.getEnabled();
+            if ("audio".equalsIgnoreCase(code) || "video".equalsIgnoreCase(code) || "webrtc".equalsIgnoreCase(code)) {
+                hasWebrtc = true;
+                if (enabled == null || Boolean.TRUE.equals(enabled)) {
+                    webrtcEnabled = true;
+                }
+                continue;
+            }
             out.add(AgentQuickReplyButton.builder()
                     .code(code)
                     .enabled(enabled == null ? Boolean.TRUE : enabled)
                     .build());
         }
-        return out;
+        if (hasWebrtc) {
+            out.add(AgentQuickReplyButton.builder()
+                    .code("webrtc")
+                    .enabled(webrtcEnabled)
+                    .build());
+        }
+        return out.isEmpty() ? defaultQuickReplies() : out;
     }
 
     @Override
@@ -1044,6 +1099,8 @@ public class AgentSettingsRestService
         if (resp.getAllowAgentCloseThread() == null) {
             resp.setAllowAgentCloseThread(true);
         }
+        resp.setQuickReplies(normalizeQuickReplies(resp.getQuickReplies()));
+        resp.setDraftQuickReplies(normalizeQuickReplies(resp.getDraftQuickReplies()));
         return resp;
     }
 
@@ -1051,11 +1108,14 @@ public class AgentSettingsRestService
     // 使用 Helper 类处理懒加载集合的正确复制
     private void copyPropertiesExcludingIds(Object source, Object target) {
         if (source instanceof ServiceSettingsEntity && target instanceof ServiceSettingsEntity) {
-            serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source, (ServiceSettingsEntity) target);
+            serviceSettingsHelper.copyServiceSettingsProperties((ServiceSettingsEntity) source,
+                    (ServiceSettingsEntity) target);
         } else if (source instanceof TriggerSettingsEntity && target instanceof TriggerSettingsEntity) {
-            // triggerSettingsHelper.copyTriggerSettingsProperties((TriggerSettingsEntity) source, (TriggerSettingsEntity) target);
+            // triggerSettingsHelper.copyTriggerSettingsProperties((TriggerSettingsEntity)
+            // source, (TriggerSettingsEntity) target);
         } else if (source instanceof MessageLeaveSettingsEntity && target instanceof MessageLeaveSettingsEntity) {
-            messageLeaveSettingsHelper.copyMessageLeaveSettingsProperties((MessageLeaveSettingsEntity) source, (MessageLeaveSettingsEntity) target);
+            messageLeaveSettingsHelper.copyMessageLeaveSettingsProperties((MessageLeaveSettingsEntity) source,
+                    (MessageLeaveSettingsEntity) target);
         } else {
             messageLeaveSettingsHelper.copyPropertiesExcludingIds(source, target);
         }

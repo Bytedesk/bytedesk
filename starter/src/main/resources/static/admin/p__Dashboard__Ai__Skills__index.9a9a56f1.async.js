@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[7762],{93860:function(n,e,i){i.r(e);var u=i(31549);e.default=function(){return(0,u.jsx)("div",{children:"AI Skills Component"})}}}]);

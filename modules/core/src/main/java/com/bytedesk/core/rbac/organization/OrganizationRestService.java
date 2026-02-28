@@ -80,6 +80,9 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (organization.getVipExpireLoginCheckEnabled() == null) {
             organization.setVipExpireLoginCheckEnabled(false);
         }
+        if (organization.getVipLevel() == null) {
+            organization.setVipLevel(Boolean.TRUE.equals(organization.getVip()) ? 1 : 0);
+        }
     }
 
     private int resolveDefaultVipDays() {
@@ -226,7 +229,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
         int defaultVipDays = resolveDefaultVipDays();
-        organization.setVip(true);
+        organization.setVipLevel(1);
         organization.setVipExpireDate(BdDateUtils.now().plusDays(defaultVipDays));
         organization.setLevel(LevelEnum.ORGANIZATION.name());
         applyOrganizationLimitsDefaults(organization);
@@ -277,11 +280,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         OrganizationEntity organization = modelMapper.map(request, OrganizationEntity.class);
         organization.setUid(uidUtils.getUid());
         int defaultVipDays = resolveDefaultVipDays();
-        if (organization.getVip() == null) {
-            organization.setVip(true);
+        if (request.getVip() == null && request.getVipLevel() == null) {
+            organization.setVipLevel(1);
         }
         if (Boolean.TRUE.equals(organization.getVip()) && organization.getVipExpireDate() == null) {
             organization.setVipExpireDate(BdDateUtils.now().plusDays(defaultVipDays));
+        }
+        if (organization.getVipLevel() == null) {
+            organization.setVipLevel(Boolean.TRUE.equals(organization.getVip()) ? 1 : 0);
         }
         applyOrganizationLimitsDefaults(organization);
         // 使用 userUid 查询用户
@@ -400,12 +406,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (isDefaultOrganization(organization)) {
             boolean enabledChanged = request.getEnabled() != null && !Objects.equals(request.getEnabled(), organization.getEnabled());
             boolean vipChanged = request.getVip() != null && !Objects.equals(request.getVip(), organization.getVip());
+            boolean vipLevelChanged = request.getVipLevel() != null && !Objects.equals(request.getVipLevel(), organization.getVipLevel());
             boolean vipExpireDateChanged = request.getVipExpireDate() != null
                 && !Objects.equals(request.getVipExpireDate(), organization.getVipExpireDate());
             boolean vipExpireLoginCheckEnabledChanged = request.getVipExpireLoginCheckEnabled() != null
                 && !Objects.equals(request.getVipExpireLoginCheckEnabled(), organization.getVipExpireLoginCheckEnabled());
 
-            if (enabledChanged || vipChanged || vipExpireDateChanged || vipExpireLoginCheckEnabledChanged) {
+            if (enabledChanged || vipChanged || vipLevelChanged || vipExpireDateChanged || vipExpireLoginCheckEnabledChanged) {
             throw new ForbiddenException("默认组织不支持设置过期或禁用");
             }
 
@@ -450,6 +457,12 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 
         if (!isDefaultOrganization(organization)) {
             organization.setVip(request.getVip());
+            if (request.getVipLevel() != null) {
+                organization.setVipLevel(Math.max(request.getVipLevel(), 0));
+            }
+            if (Boolean.FALSE.equals(organization.getVip())) {
+                organization.setVipLevel(0);
+            }
             organization.setVipExpireDate(request.getVipExpireDate());
             if (request.getVipExpireLoginCheckEnabled() != null) {
                 organization.setVipExpireLoginCheckEnabled(request.getVipExpireLoginCheckEnabled());
@@ -629,6 +642,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         response.setVerifyStatus(organization.getVerifyStatus());
         response.setRejectReason(organization.getRejectReason());
         response.setVip(organization.getVip());
+        response.setVipLevel(organization.getVipLevel());
         response.setVipExpireDate(organization.getVipExpireDate());
         response.setVipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled());
         response.setEnabled(organization.getEnabled());

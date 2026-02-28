@@ -96,10 +96,36 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     // 认证失败原因
     private String rejectReason;
 
-    // 是否付费会员
+    // 会员等级：0=非会员，1及以上为会员等级
     @Builder.Default
-    @Column(name = "is_vip")
-    private Boolean vip = false;
+    @Column(name = "vip_level")
+    private Integer vipLevel = 0;
+
+    public Boolean getVip() {
+        return vipLevel != null && vipLevel > 0;
+    }
+
+    public void setVip(Boolean vip) {
+        if (vip == null) {
+            return;
+        }
+        if (Boolean.TRUE.equals(vip)) {
+            if (vipLevel == null || vipLevel < 1) {
+                vipLevel = 1;
+            }
+            return;
+        }
+        vipLevel = 0;
+    }
+
+    @PostLoad
+    @PrePersist
+    @PreUpdate
+    private void normalizeVipLevel() {
+        if (vipLevel == null || vipLevel < 0) {
+            vipLevel = 0;
+        }
+    }
 
     // 会员截止日期、组织有效期
     private ZonedDateTime vipExpireDate;

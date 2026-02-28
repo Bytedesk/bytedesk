@@ -17,9 +17,41 @@
 	<description>https://ai.bytedesk.com</description>
 
 	<properties>
-
+		<!-- <wicket.version>10.8.0</wicket.version>
+		<wicketstuff.version>10.8.0</wicketstuff.version>
+		<wicket-bootstrap.version>7.0.14</wicket-bootstrap.version>
+		<openjpa.version>4.1.1</openjpa.version>
+		<openjson.version>1.0.13</openjson.version>
+		<apache.directory.api.version>2.1.7</apache.directory.api.version>
+		<jodconverter.version>4.4.11</jodconverter.version>
+		<tika.version>3.2.3</tika.version>
+		<ical4j.version>4.2.3</ical4j.version>
+		<commons-cli.version>1.11.0</commons-cli.version>
+		<commons-lang3.version>3.20.0</commons-lang3.version>
+		<asterisk-java.version>3.41.0</asterisk-java.version>
+		<jain-sip-ri.version>1.2.307</jain-sip-ri.version>
+		<kurento.version>7.3.0</kurento.version>
+		<caldav4j.version>1.0.5</caldav4j.version>
+		<io.prometheus.version>1.5.0</io.prometheus.version>
+		<cxf.version>4.2.0</cxf.version>
+		<totp.version>1.7.1</totp.version>
+		<jakarta.jws.version>3.0.0</jakarta.jws.version>
+		<jakarta.xml.ws.version>4.0.2</jakarta.xml.ws.version>
+		<osgi.annotation.versioning.version>1.1.2</osgi.annotation.versioning.version> -->
 	</properties>
 	<dependencies>
+
+		<!-- Spring Boot stack优先沿用；以下为 antmedia 拷贝代码所需依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
@@ -31,6 +63,15 @@
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+		<!-- Source: https://mvnrepository.com/artifact/org.red5/red5-server -->
+		<!-- Red5 is an open-source media server that supports RTMP, RTMPS, and RTMPE protocols for audio/video streaming, recording, and generic metadata handling. -->
+		<!-- <dependency>
+			<groupId>org.red5</groupId>
+			<artifactId>red5-server</artifactId>
+			<version>2.0.30</version>
+			<scope>compile</scope>
+		</dependency> -->
 
 	</dependencies>
 

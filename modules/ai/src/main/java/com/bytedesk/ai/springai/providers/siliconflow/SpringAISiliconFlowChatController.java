@@ -38,7 +38,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /** 
  * @author https://github.com/fzj111
@@ -57,7 +57,8 @@ import java.util.concurrent.Executors;
 public class SpringAISiliconFlowChatController {
     private final BytedeskProperties bytedeskProperties;
     private final SpringAISiliconFlowChatService springAISiliconFlowService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/siliconflow/format?actor=
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -240,8 +241,6 @@ public class SpringAISiliconFlowChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

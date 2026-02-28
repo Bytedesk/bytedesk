@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
+import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.role.RoleResponseSimple;
@@ -54,6 +55,23 @@ public class UserConvertUtils {
             return;
         }
         authorities.add(new SimpleGrantedAuthority(value.trim()));
+    }
+
+    private static boolean canUseAuthorityByVip(OrganizationEntity organization, AuthorityEntity authority) {
+        if (authority == null) {
+            return false;
+        }
+        int requiredVipLevel = authority.getVipLevel() == null ? 0 : Math.max(authority.getVipLevel(), 0);
+        if (requiredVipLevel <= 0) {
+            return true;
+        }
+
+        if (organization == null) {
+            return false;
+        }
+
+        int orgVipLevel = organization.getVipLevel() == null ? 0 : Math.max(organization.getVipLevel(), 0);
+        return orgVipLevel >= requiredVipLevel;
     }
 
     private static ModelMapper getModelMapper() {
@@ -323,6 +341,9 @@ public class UserConvertUtils {
                 if (role.getAuthorities() != null) {
                     role.getAuthorities().forEach(authority -> {
                         if (authority == null) {
+                            return;
+                        }
+                        if (!canUseAuthorityByVip(user.getCurrentOrganization(), authority)) {
                             return;
                         }
                         addGrantedAuthorityIfPresent(

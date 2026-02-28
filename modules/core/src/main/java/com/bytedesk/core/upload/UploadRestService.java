@@ -16,8 +16,8 @@ package com.bytedesk.core.upload;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 // import java.nio.file.Paths;
@@ -176,8 +176,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
             }
 
             // 下载并保存图片
-            URL imageUrl = new URL(url);
-            try (InputStream inputStream = imageUrl.openStream()) {
+			try (InputStream inputStream = URI.create(url).toURL().openStream()) {
                 Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
             }
 

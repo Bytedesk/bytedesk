@@ -42,6 +42,8 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
 
     Page<TicketEntity> findByOrgUidAndVisitorThreadUid(String orgUid, String visitorThreadUid, Pageable pageable);
 
+    Page<TicketEntity> findByOrgUidAndVisitorThreadTopic(String orgUid, String visitorThreadTopic, Pageable pageable);
+
     List<TicketEntity> findByWorkgroupUidContainingAndCreatedAtBetween(
         String workgroupUid, ZonedDateTime startTime, ZonedDateTime endTime);
         

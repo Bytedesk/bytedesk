@@ -46,6 +46,7 @@ public class ConvertUtils {
         
         // 明确设置Custom所有字段的值，确保从配置中获取
         if (bytedeskProperties.getCustom() != null) {
+            response.getCustom().setUploadApiUrl(bytedeskProperties.getCustom().getUploadApiUrl());
             response.getCustom().setMqttWebsocketUrl(bytedeskProperties.getCustom().getMqttWebsocketUrl());
             response.getCustom().setShowRightCornerChat(bytedeskProperties.getCustom().getShowRightCornerChat());
             response.getCustom().setLoginUsernameEnable(bytedeskProperties.getCustom().getLoginUsernameEnable());
@@ -66,6 +67,21 @@ public class ConvertUtils {
             response.getCustom().setAllowRegister(bytedeskProperties.getCustom().getAllowRegister());
             response.getCustom().setForceValidateMobile(bytedeskProperties.getCustom().getForceValidateMobile());
             response.getCustom().setForceValidateEmail(bytedeskProperties.getCustom().getForceValidateEmail());
+        }
+
+        // 明确设置Organization部分字段，确保从配置中获取
+        if (bytedeskProperties.getOrganization() != null) {
+            if (response.getOrganization() == null) {
+                response.setOrganization(new BytedeskPropertiesResponse.Organization());
+            }
+            response.getOrganization().setName(bytedeskProperties.getOrganization().getName());
+            response.getOrganization().setCode(bytedeskProperties.getOrganization().getCode());
+            response.getOrganization().setAllowCreateOrg(bytedeskProperties.getOrganization().getAllowCreateOrg());
+            response.getOrganization().setAllowJoinOrg(bytedeskProperties.getOrganization().getAllowJoinOrg());
+            response.getOrganization().setDefaultVipDays(bytedeskProperties.getOrganization().getDefaultVipDays());
+            response.getOrganization().setDefaultMaxMembers(bytedeskProperties.getOrganization().getDefaultMaxMembers());
+            response.getOrganization().setDefaultMaxAgents(bytedeskProperties.getOrganization().getDefaultMaxAgents());
+            response.getOrganization().setDefaultMaxWorkgroups(bytedeskProperties.getOrganization().getDefaultMaxWorkgroups());
         }
 
         return response;

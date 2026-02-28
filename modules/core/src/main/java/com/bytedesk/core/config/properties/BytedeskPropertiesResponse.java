@@ -32,6 +32,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Custom custom;
     private Features features;
     private Testing testing;
+    private Organization organization;
 
     @Getter
     @Setter
@@ -40,6 +41,10 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String name;
         private String logo;
         private String description;
+        /**
+         * 外网可访问的上传 API 地址（完整URL，不带上传路径），用于反向代理/多节点场景。
+         */
+        private String uploadApiUrl;
         /**
          * 外网可访问的 MQTT WebSocket 地址（完整URL），用于反向代理场景。
          */
@@ -87,6 +92,19 @@ public class BytedeskPropertiesResponse implements Serializable {
     public static class Features {
         // private Integer freeDays = 30;
         private String avatarBaseUrl;
+    }
+
+    @Getter
+    @Setter
+    public static class Organization {
+        private String name;
+        private String code;
+        private Boolean allowCreateOrg = true;
+        private Boolean allowJoinOrg = true;
+        private Integer defaultVipDays = 365;
+        private Integer defaultMaxMembers = 20;
+        private Integer defaultMaxAgents = 20;
+        private Integer defaultMaxWorkgroups = 20;
     }
     
 }

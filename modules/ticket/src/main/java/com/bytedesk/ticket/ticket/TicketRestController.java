@@ -75,20 +75,6 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    /**
-     * 兼容旧接口：历史客户端使用 /query/topic。
-     * 实际语义为按 threadTopic 查询。
-     */
-    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "按主题查询(兼容)", description = "query ticket by topic (compat)")
-    @GetMapping("/query/topic")
-    public ResponseEntity<?> queryByTopicCompat(TicketRequest request) {
-
-        Page<TicketResponse> page = ticketRestService.queryByThreadTopic(request);
-
-        return ResponseEntity.ok(JsonResult.success(page));
-    }
-
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = "工单", action = "按会话查询", description = "query ticket by thread uid")
     @GetMapping("/query/thread/uid")
@@ -105,6 +91,16 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     public ResponseEntity<?> queryByVisitorThreadUid(TicketRequest request) {
 
         Page<TicketResponse> page = ticketRestService.queryByVisitorThreadUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = "工单", action = "按访客会话主题查询", description = "query ticket by visitor thread topic")
+    @GetMapping("/query/visitor/thread/topic")
+    public ResponseEntity<?> queryByVisitorThreadTopic(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketRestService.queryByVisitorThreadTopic(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
     }

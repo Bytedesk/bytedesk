@@ -13,13 +13,19 @@
  */
 package com.bytedesk.core.message;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.util.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.goods.GoodsService;
+import com.bytedesk.core.order.OrderService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadContent;
@@ -39,6 +45,10 @@ public class MessagePersistService {
     private final ThreadRestService threadRestService;
 
     private final ModelMapper modelMapper;
+
+    private final Optional<GoodsService> goodsService;
+
+    private final Optional<OrderService> orderService;
 
     public void persist(String messageJSON) {
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJSON); 
@@ -141,11 +151,98 @@ public class MessagePersistService {
         message.setUserUid(messageProtobuf.getUser().getUid());
         
         MessageExtra extraObject = MessageExtra.fromJson(messageProtobuf.getExtra()); 
+        String orgUid = null;
         if (extraObject != null) {
-            String orgUid = extraObject.getOrgUid();
+            orgUid = extraObject.getOrgUid();
             message.setOrgUid(orgUid);
         }
         messageRestService.save(message);
+
+        persistBusinessPayload(type, messageProtobuf, messageJSON, orgUid);
+    }
+
+    private void persistBusinessPayload(MessageTypeEnum type, MessageProtobuf messageProtobuf, String messageJSON,
+            String orgUidFromExtra) {
+        if (!MessageTypeEnum.GOODS.equals(type) && !MessageTypeEnum.ORDER.equals(type)) {
+            return;
+        }
+        try {
+            JSONObject root = JSON.parseObject(messageJSON);
+            String orgUid = firstNonBlank(
+                    orgUidFromExtra,
+                    getString(root, "extra", "orgUid"));
+
+            String visitorUid = firstNonBlank(
+                    getString(root, "thread", "user", "visitorUid"),
+                    getString(root, "user", "visitorUid"),
+                    getString(root, "thread", "user", "uid"),
+                    messageProtobuf.getThread() != null && messageProtobuf.getThread().getUser() != null
+                            ? messageProtobuf.getThread().getUser().getUid()
+                            : null);
+
+            String visitorDbUid = firstNonBlank(
+                    getString(root, "thread", "user", "uid"),
+                    messageProtobuf.getThread() != null && messageProtobuf.getThread().getUser() != null
+                            ? messageProtobuf.getThread().getUser().getUid()
+                            : null,
+                    messageProtobuf.getUser() != null ? messageProtobuf.getUser().getUid() : null);
+
+            String threadUid = messageProtobuf.getThread() != null ? messageProtobuf.getThread().getUid() : null;
+            String sourceMessageUid = messageProtobuf.getUid();
+
+            if (MessageTypeEnum.GOODS.equals(type)) {
+                goodsService.ifPresent(service -> service.persistFromMessage(
+                        messageProtobuf,
+                        orgUid,
+                        visitorUid,
+                        visitorDbUid,
+                        threadUid,
+                        sourceMessageUid));
+            } else if (MessageTypeEnum.ORDER.equals(type)) {
+                orderService.ifPresent(service -> service.persistFromMessage(
+                        messageProtobuf,
+                        orgUid,
+                        visitorUid,
+                        visitorDbUid,
+                        threadUid,
+                        sourceMessageUid));
+            }
+        } catch (Exception e) {
+            log.warn("persistBusinessPayload failed for type={} uid={}, reason={}",
+                    type,
+                    messageProtobuf != null ? messageProtobuf.getUid() : null,
+                    e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String getString(JSONObject root, String... paths) {
+        if (root == null || paths == null || paths.length == 0) {
+            return null;
+        }
+        Object current = root;
+        for (String key : paths) {
+            if (!(current instanceof Map<?, ?> map)) {
+                return null;
+            }
+            current = ((Map<String, Object>) map).get(key);
+            if (current == null) {
+                return null;
+            }
+        }
+        return current instanceof String ? (String) current : String.valueOf(current);
+    }
+
+    private String firstNonBlank(String... values) {
+        if (values == null) {
+            return null;
+        }
+        for (String value : values) {
+            if (StringUtils.hasText(value)) {
+                return value;
+            }
+        }
+        return null;
     }
 
     private ThreadEntity updateThreadContent(ThreadEntity thread, MessageTypeEnum type, MessageProtobuf messageProtobuf) {
@@ -187,7 +284,9 @@ public class MessagePersistService {
         if (MessageTypeEnum.TYPING.equals(type)
                 || MessageTypeEnum.PROCESSING.equals(type)
                 || MessageTypeEnum.PREVIEW.equals(type)
-                || MessageTypeEnum.CONTINUE.equals(type)) {
+                || MessageTypeEnum.CONTINUE.equals(type)
+                // REACTION 仅用于通知前端刷新 UI，不作为独立聊天记录入库
+                || MessageTypeEnum.REACTION.equals(type)) {
             return true;
         }
 

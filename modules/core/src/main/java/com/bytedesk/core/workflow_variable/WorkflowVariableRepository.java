@@ -21,7 +21,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * 工作流变量仓库接口
  */
-public interface WorkflowVariableRepository extends JpaRepository<WorkflowVariableEntity, String> {
+public interface WorkflowVariableRepository extends JpaRepository<WorkflowVariableEntity, Long> {
 
     /**
      * 根据工作流UID查找变量列表

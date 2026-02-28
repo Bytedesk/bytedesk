@@ -14,7 +14,7 @@
 package com.bytedesk.starter;
 
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +110,7 @@ public class FlowableTests {
                 .build();
         
         // 从URL获取InputStream
-        InputStream inputStream = new URL(upload.getFileUrl()).openStream();
+        InputStream inputStream = URI.create(upload.getFileUrl()).toURL().openStream();
         
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()
@@ -356,7 +356,7 @@ public class FlowableTests {
                 .build();
         
         // 从URL获取InputStream
-        InputStream inputStream = new URL(upload.getFileUrl()).openStream();
+        InputStream inputStream = URI.create(upload.getFileUrl()).toURL().openStream();
         
         // 部署流程
         Deployment deployment = repositoryService.createDeployment()

@@ -34,5 +34,7 @@ public class AuthorityResponse extends BaseResponseNoOrg {
 
     private String value;
 
+    private Integer vipLevel;
+
     private String description;
 }

@@ -16,7 +16,7 @@ package com.bytedesk.service.agent;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.member.MemberProtobuf;
 import com.bytedesk.service.agent_settings.AgentSettingsResponse;
-import com.bytedesk.service.queue.AgentQueueStatsResponse;
+import com.bytedesk.service.queue.QueueAgentStatsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -64,7 +64,7 @@ public class AgentResponse extends BaseResponse {
     /**
      * Agent queue statistics (loaded from queue service)
      */
-    private AgentQueueStatsResponse queueStats;
+    private QueueAgentStatsResponse queueStats;
 
     private MemberProtobuf member;
 

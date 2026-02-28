@@ -80,4 +80,12 @@
 
     <include file="db/changelog/migration/260210_add_crm_customer_shop_consult_followup.xml" />
 
+    <include file="db/changelog/migration/260226_add_org_authority_vip_level_fields.xml" />
+
+    <include file="db/changelog/migration/260227_drop_authority_is_vip_only_column.xml" />
+
+    <include file="db/changelog/migration/260227_drop_org_is_vip_column.xml" />
+
+    <include file="db/changelog/migration/260227_service_settings_toolbar_prefix_columns.xml" />
+
 </databaseChangeLog>

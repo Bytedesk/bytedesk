@@ -58,7 +58,7 @@ public class VisitorEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
 
-	// 用户自定义uid，用于区别于自动生成uid
+	// 用户自定义uid，外部业务系统uid，用于区别于自动生成uid
 	@Column(name = "visitor_uid")
 	private String visitorUid;
 

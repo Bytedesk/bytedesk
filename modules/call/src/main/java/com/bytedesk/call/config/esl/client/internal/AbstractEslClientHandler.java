@@ -64,7 +64,7 @@ public abstract class AbstractEslClientHandler extends SimpleChannelInboundHandl
 
 	private final ConcurrentHashMap<String, CompletableFuture<EslEvent>> backgroundJobs =
 			new ConcurrentHashMap<>();
-	private final ExecutorService backgroundJobExecutor = Executors.newCachedThreadPool();
+	private final ExecutorService backgroundJobExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) throws Exception {

@@ -13,14 +13,14 @@
  */
 package com.bytedesk.starter.runner;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 
-import com.bytedesk.core.utils.NetworkUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -41,19 +41,30 @@ public class InitDataRunner implements ApplicationRunner {
         // 在应用的主类或配置类中
         // TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         // TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
-        String localIP = NetworkUtils.getFirstNonLoopbackIP();
-        List<String> allIPs = NetworkUtils.getLocalIPs();
+        // String localIP = NetworkUtils.getFirstNonLoopbackIP();
+        // List<String> allIPs = NetworkUtils.getLocalIPs();
 
+        log.info("InitDataRunner(ApplicationRunner) executing...");
         log.info("bytedesk.im v{} started at:", version);
         log.info("Local Access:  http://127.0.0.1:{}", port);
-        log.info("Network Access: http://{}:{}", localIP, port);
+        // log.info("Network Access: http://{}:{}", localIP, port);
         
-        if (allIPs.size() > 1) {
-            log.info("Other Network IPs:");
-            allIPs.stream()
-                .filter(ip -> !ip.equals(localIP))
-                .forEach(ip -> log.info("http://{}:{}", ip, port));
-        }
+        // if (allIPs.size() > 1) {
+        //     log.info("Other Network IPs:");
+        //     allIPs.stream()
+        //         .filter(ip -> !ip.equals(localIP))
+        //         .forEach(ip -> log.info("http://{}:{}", ip, port));
+        // }
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady(ApplicationReadyEvent event) {
+        log.info("ApplicationReadyEvent received. Application is fully started and ready to serve on port {}", port);
+    }
+
+    @EventListener(ContextClosedEvent.class)
+    public void onContextClosed(ContextClosedEvent event) {
+        log.warn("ContextClosedEvent received. Application context is shutting down.");
     }
 
 }

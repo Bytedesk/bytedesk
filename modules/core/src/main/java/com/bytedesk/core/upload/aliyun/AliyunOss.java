@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 /**
  * 阿里云OSS对象存储服务工具类
@@ -160,7 +160,7 @@ public class AliyunOss {
         String folder = "wechat/images/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -181,7 +181,7 @@ public class AliyunOss {
         String folder = "wechat/avatars/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -201,7 +201,7 @@ public class AliyunOss {
         String folder = "wechat/voices/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -221,7 +221,7 @@ public class AliyunOss {
         String folder = "wechat/videos/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -241,7 +241,7 @@ public class AliyunOss {
         String folder = "wechat/thumbs/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -254,7 +254,7 @@ public class AliyunOss {
         String folder = "wechat/files/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -290,7 +290,7 @@ public class AliyunOss {
         String folder = "school/logo/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -303,7 +303,7 @@ public class AliyunOss {
         String folder = "course/logo/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }

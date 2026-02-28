@@ -17,15 +17,21 @@ import java.util.Optional;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.WelcomeContent;
-import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadContent;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.topic.TopicUtils;
@@ -34,14 +40,14 @@ import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
+import com.bytedesk.service.utils.WelcomeContentUtils;
+import com.bytedesk.service.visitor.VisitorCallTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
+import com.bytedesk.video.webrtc.WebrtcService;
+import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
+
 import jakarta.annotation.Nonnull;
-
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadContent;
-import com.bytedesk.core.message.MessageTypeEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,6 +82,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final QueueMemberRestService queueMemberRestService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final MessageRestService messageRestService;
+    private final WebrtcService webrtcService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -95,21 +102,24 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * @return 消息协议对象
      */
     public MessageProtobuf createRobotThread(VisitorRequest request) {
+        VisitorCallTypeEnum callType = normalizeCallType(request);
+
         // 1. 验证和获取机器人配置
         RobotEntity robotEntity = getRobotEntity(request.getSid());
+        ensureRealtimeAudioCapabilityIfNeeded(robotEntity, callType);
 
         // 2. 生成会话主题并检查现有会话
         String visitorUidForTopic = resolveVisitorUidForThreadTopic(request);
         String topic = TopicUtils.formatOrgRobotThreadTopic(robotEntity.getUid(), visitorUidForTopic);
-        ThreadEntity thread = getOrCreateRobotThread(request, robotEntity, topic);
+        ThreadEntity thread = getOrCreateRobotThread(request, robotEntity, topic, callType);
 
         // 3. 处理现有活跃会话
         if (isExistingRobotThread(thread)) {
-            return handleExistingRobotThread(request, robotEntity, thread);
+            return handleExistingRobotThread(request, robotEntity, thread, callType);
         }
 
         // 4. 处理新会话或重新激活的会话
-        return processNewRobotThread(request, thread, robotEntity);
+        return processNewRobotThread(request, thread, robotEntity, callType);
     }
 
     /**
@@ -128,11 +138,14 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取或创建机器人会话
      */
-    private ThreadEntity getOrCreateRobotThread(VisitorRequest request, RobotEntity robotEntity, String topic) {
+    private ThreadEntity getOrCreateRobotThread(VisitorRequest request, RobotEntity robotEntity, String topic,
+            VisitorCallTypeEnum callType) {
         // 当强制新建会话时，直接创建新会话，跳过复用逻辑
         if (Boolean.TRUE.equals(request.getForceNewThread())) {
             log.debug("forceNewThread=true, creating new robot thread for topic: {}", topic);
-            return visitorThreadService.createRobotThread(request, robotEntity, topic);
+            ThreadEntity thread = visitorThreadService.createRobotThread(request, robotEntity, topic);
+            thread.setExtra(mergeCallTypeToExtra(thread.getExtra(), callType.name()));
+            return saveThread(thread);
         }
 
         Optional<ThreadEntity> threadOptional = threadRestService.findFirstByTopicNotClosed(topic);
@@ -142,17 +155,22 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             // 检查现有会话状态
             if (existingThread.isNew()) {
                 log.debug("Found new robot thread: {}", topic);
-                return existingThread;
+                existingThread.setExtra(mergeCallTypeToExtra(existingThread.getExtra(), callType.name()));
+                return saveThread(existingThread);
             } else if (existingThread.isRoboting()) {
                 log.debug("Found existing roboting thread: {}", topic);
                 // 重新初始化会话用于测试
-                return visitorThreadService.reInitRobotThreadExtra(request, existingThread, robotEntity);
+                ThreadEntity thread = visitorThreadService.reInitRobotThreadExtra(request, existingThread, robotEntity);
+                thread.setExtra(mergeCallTypeToExtra(thread.getExtra(), callType.name()));
+                return saveThread(thread);
             }
         }
 
         // 创建新会话
         log.debug("Creating new robot thread for topic: {}", topic);
-        return visitorThreadService.createRobotThread(request, robotEntity, topic);
+        ThreadEntity thread = visitorThreadService.createRobotThread(request, robotEntity, topic);
+        thread.setExtra(mergeCallTypeToExtra(thread.getExtra(), callType.name()));
+        return saveThread(thread);
     }
 
     /**
@@ -165,8 +183,10 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 处理现有的机器人会话
      */
-    private MessageProtobuf handleExistingRobotThread(VisitorRequest request, RobotEntity robotEntity, ThreadEntity thread) {
+    private MessageProtobuf handleExistingRobotThread(VisitorRequest request, RobotEntity robotEntity, ThreadEntity thread,
+            VisitorCallTypeEnum callType) {
         log.info("Continuing existing robot thread: {}", thread.getUid());
+        triggerAutoCallInviteIfNeeded(request, thread, robotEntity, callType);
         return getRobotContinueMessage(request, robotEntity, thread);
     }
 
@@ -174,7 +194,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 处理新的机器人会话
      */
     private MessageProtobuf processNewRobotThread(VisitorRequest request, ThreadEntity thread,
-            RobotEntity robotEntity) {
+            RobotEntity robotEntity, VisitorCallTypeEnum callType) {
         // 1. 加入队列
         UserProtobuf robotProtobuf = robotEntity.toUserProtobuf();
         QueueMemberEntity queueMemberEntity = queueService.enqueueRobot(thread, robotProtobuf, request);
@@ -191,6 +211,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         thread.setRobot(robotString);
 
         // 4. 保存线程
+        thread.setExtra(mergeCallTypeToExtra(thread.getExtra(), callType.name()));
         ThreadEntity savedThread = saveThread(thread);
 
         // 5. 更新队列状态
@@ -199,7 +220,8 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 6. 发布事件
         publishRobotThreadEvent(savedThread);
 
-        // 7. 创建并保存欢迎消息
+        // 7. 自动触发音视频邀请并创建欢迎消息
+        triggerAutoCallInviteIfNeeded(request, savedThread, robotEntity, callType);
         return createAndSaveWelcomeMessage(welcomeContent, savedThread);
     }
 
@@ -273,7 +295,8 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     /**
      * 获取机器人继续对话消息
      */
-    private MessageProtobuf getRobotContinueMessage(VisitorRequest request, RobotEntity robotEntity, @Nonnull ThreadEntity thread) {
+    private MessageProtobuf getRobotContinueMessage(VisitorRequest request, RobotEntity robotEntity,
+            @Nonnull ThreadEntity thread) {
         validateThread(thread, "get robot continue message");
 
         String tip = getRobotWelcomeMessage(request, robotEntity);
@@ -281,6 +304,92 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         MessageEntity message = ThreadMessageUtil.getThreadRobotWelcomeMessage(wc, thread);
 
         return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+    }
+
+    /**
+     * 统一规范 callType，并透传到 extra，便于后续机器人音视频链路扩展
+     */
+    private VisitorCallTypeEnum normalizeCallType(VisitorRequest visitorRequest) {
+        VisitorCallTypeEnum callType = visitorRequest != null
+                ? visitorRequest.formatCallType()
+                : VisitorCallTypeEnum.TEXT;
+        if (visitorRequest == null) {
+            return callType;
+        }
+        visitorRequest.setCallType(callType.name());
+        visitorRequest.setExtra(mergeCallTypeToExtra(visitorRequest.getExtra(), callType.name()));
+        return callType;
+    }
+
+    private String mergeCallTypeToExtra(String extra, String callType) {
+        try {
+            JSONObject obj = StringUtils.hasText(extra) ? JSON.parseObject(extra) : new JSONObject();
+            if (obj == null) {
+                obj = new JSONObject();
+            }
+            obj.put("callType", callType);
+            return obj.toJSONString();
+        } catch (Exception e) {
+            return extra;
+        }
+    }
+
+    /**
+     * 音视频/电话场景要求机器人已配置音频模型能力（作为 ASR/TTS 能力前置约束）
+     */
+    private void ensureRealtimeAudioCapabilityIfNeeded(RobotEntity robotEntity, VisitorCallTypeEnum callType) {
+        if (callType != VisitorCallTypeEnum.AUDIO
+                && callType != VisitorCallTypeEnum.VIDEO
+                && callType != VisitorCallTypeEnum.PHONE) {
+            return;
+        }
+
+        boolean audioEnabled = robotEntity != null
+                && robotEntity.getLlm() != null
+                && Boolean.TRUE.equals(robotEntity.getLlm().getAudioEnabled())
+                && StringUtils.hasText(robotEntity.getLlm().getAudioProvider())
+                && StringUtils.hasText(robotEntity.getLlm().getAudioModel());
+
+        if (!audioEnabled) {
+            throw new IllegalStateException(String.format(
+                    "Robot uid %s has no audio model configured. Realtime %s conversation requires ASR/TTS capability (llm.audioEnabled/audioProvider/audioModel)",
+                    robotEntity != null ? robotEntity.getUid() : "unknown", callType.name()));
+        }
+    }
+
+    /**
+     * 音视频接入意图：机器人会话建立/继续时自动发起邀请（失败不影响文本主流程）
+     */
+    private void triggerAutoCallInviteIfNeeded(VisitorRequest request, ThreadEntity thread,
+            RobotEntity robotEntity, VisitorCallTypeEnum callType) {
+        if (request == null || thread == null || robotEntity == null) {
+            return;
+        }
+        if (callType != VisitorCallTypeEnum.AUDIO && callType != VisitorCallTypeEnum.VIDEO) {
+            return;
+        }
+
+        String callerUid = resolveVisitorUidForThreadTopic(request);
+        String calleeUid = robotEntity.getUid();
+        if (!StringUtils.hasText(callerUid) || !StringUtils.hasText(calleeUid)) {
+            log.warn("skip robot auto call invite: invalid caller/callee, threadUid={}, callerUid={}, calleeUid={}",
+                    thread.getUid(), callerUid, calleeUid);
+            return;
+        }
+
+        try {
+            WebrtcInviteRequest inviteRequest = new WebrtcInviteRequest();
+            inviteRequest.setThreadUid(thread.getUid());
+            inviteRequest.setCallerUid(callerUid);
+            inviteRequest.setCalleeUid(calleeUid);
+            inviteRequest.setCallType(callType.name());
+            webrtcService.invite(inviteRequest);
+            log.info("robot auto call invite sent, threadUid={}, callType={}, callerUid={}, calleeUid={}",
+                    thread.getUid(), callType.name(), callerUid, calleeUid);
+        } catch (Exception e) {
+            log.warn("robot auto call invite failed, threadUid={}, callType={}, reason={}",
+                    thread.getUid(), callType.name(), e.getMessage());
+        }
     }
 
     // buildRobotWelcomeContent 已迁移至 WelcomeContentUtils.buildRobotWelcomeContent(robotEntity, tip)

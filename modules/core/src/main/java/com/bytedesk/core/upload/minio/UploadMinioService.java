@@ -15,7 +15,7 @@ package com.bytedesk.core.upload.minio;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
@@ -209,8 +209,7 @@ public class UploadMinioService {
             String contentType = getContentType(fileName);
 
             // 从 URL 下载文件并上传到 MinIO
-            URL fileUrl = new URL(url);
-            try (InputStream inputStream = fileUrl.openStream()) {
+            try (InputStream inputStream = URI.create(url).toURL().openStream()) {
                 minioClient.putObject(
                     PutObjectArgs.builder()
                         .bucket(bytedeskProperties.getMinioBucketName())

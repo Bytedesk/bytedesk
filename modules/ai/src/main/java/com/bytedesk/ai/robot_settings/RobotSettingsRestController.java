@@ -73,6 +73,24 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @Operation(summary = "启用机器人配置", description = "启用指定的机器人配置")
+    @ApiResponse(responseCode = "200", description = "启用成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
+    @RequestMapping("/enable")
+    public ResponseEntity<?> enable(@RequestBody RobotSettingsRequest request) {
+        RobotSettingsResponse resp = robotSettingsRestService.enable(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
+    @Operation(summary = "停用机器人配置", description = "停用指定的机器人配置")
+    @ApiResponse(responseCode = "200", description = "停用成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
+    @RequestMapping("/disable")
+    public ResponseEntity<?> disable(@RequestBody RobotSettingsRequest request) {
+        RobotSettingsResponse resp = robotSettingsRestService.disable(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
     @Operation(summary = "发布机器人配置", description = "将草稿版本发布为线上版本")
     @ApiResponse(responseCode = "200", description = "发布成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))

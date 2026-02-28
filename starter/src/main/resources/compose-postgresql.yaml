@@ -1,0 +1,28 @@
+# 用法：docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose.yaml up -d
+services:
+
+  # https://hub.docker.com/_/postgres
+  bytedesk-postgresql:
+    image: postgres:17
+    container_name: postgresql-bytedesk
+    restart: always
+    environment:
+      POSTGRES_DB: bytedesk
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: r8FqfdbWUaN3
+      TZ: Asia/Shanghai
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bytedesk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgresql_data:
+    name: bytedesk_postgresql_data

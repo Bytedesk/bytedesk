@@ -148,7 +148,7 @@ public class TicketEventListener {
     // 监听工单更新事件
     @EventListener
     public void handleTicketUpdateEvent(TicketUpdateEvent event) {
-        log.info("TicketEventListener handleTicketUpdateEvent: {}", event);
+        log.info("TicketEventListener handleTicketUpdateEvent: {}", event.getTicket().getUid());
         TicketEntity ticket = event.getTicket();
         // 判断是否删除
         if (ticket.isDeleted()) {

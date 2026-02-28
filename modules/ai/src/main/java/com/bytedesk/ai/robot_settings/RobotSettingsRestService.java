@@ -204,10 +204,18 @@ public class RobotSettingsRestService
         RobotSettingsEntity entity = optional.get();
         // 使用 ModelMapper 批量更新基础字段
         // modelMapper.map(request, entity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription());
-        entity.setIsDefault(request.getIsDefault());
-        entity.setEnabled(request.getEnabled());
+        if (StringUtils.hasText(request.getName())) {
+            entity.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            entity.setDescription(request.getDescription());
+        }
+        if (request.getIsDefault() != null) {
+            entity.setIsDefault(request.getIsDefault());
+        }
+        if (request.getEnabled() != null) {
+            entity.setEnabled(request.getEnabled());
+        }
 
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
@@ -427,6 +435,42 @@ public class RobotSettingsRestService
     @Override
     public void delete(RobotSettingsRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    @Transactional
+    @Caching(put = @CachePut(value = CACHE_ROBOT_SETTINGS, key = "#uid", unless = "#result == null"), evict = {
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
+    public RobotSettingsResponse enable(String uid) {
+        Optional<RobotSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("RobotSettings not found: " + uid);
+        }
+        RobotSettingsEntity entity = optional.get();
+        entity.setEnabled(true);
+        RobotSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
+    }
+
+    @Transactional
+    @Caching(put = @CachePut(value = CACHE_ROBOT_SETTINGS, key = "#uid", unless = "#result == null"), evict = {
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
+    public RobotSettingsResponse disable(String uid) {
+        Optional<RobotSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("RobotSettings not found: " + uid);
+        }
+        RobotSettingsEntity entity = optional.get();
+        entity.setEnabled(false);
+        RobotSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
     }
 
     @Override

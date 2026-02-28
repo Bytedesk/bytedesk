@@ -15,7 +15,7 @@ package com.bytedesk.ai.springai.providers.dashscope;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -26,7 +26,6 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +59,8 @@ public class SpringAIDashscopeChatController {
     private ChatModel bytedeskDashscopeChatModel;
     private final ChatClient bytedeskDashscopeChatClient;
     private final SpringAIDashscopeChatService springAIDashscopeService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/dashscope/format?actor=
 	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -325,8 +325,6 @@ public class SpringAIDashscopeChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

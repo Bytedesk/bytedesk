@@ -1,0 +1,25 @@
+# 用法：docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose.yaml up -d
+services:
+
+  # https://hub.docker.com/r/gvenzl/oracle-free
+  bytedesk-oracle:
+    image: gvenzl/oracle-free:23-slim
+    container_name: oracle-bytedesk
+    restart: always
+    environment:
+      ORACLE_PASSWORD: r8FqfdbWUaN3
+      APP_USER: bytedesk
+      APP_USER_PASSWORD: r8FqfdbWUaN3
+      ORACLE_DATABASE: bytedesk
+      TZ: Asia/Shanghai
+    ports:
+      - "11521:1521"
+      - "15500:5500"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    networks:
+      - bytedesk-network
+
+volumes:
+  oracle_data:
+    name: bytedesk_oracle_data

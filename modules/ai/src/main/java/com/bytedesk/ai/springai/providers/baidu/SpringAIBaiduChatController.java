@@ -15,7 +15,7 @@ package com.bytedesk.ai.springai.providers.baidu;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
@@ -54,7 +54,8 @@ public class SpringAIBaiduChatController {
 
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIBaiduChatService springAIBaiduService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/baidu/format?actor=
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -251,8 +252,6 @@ public class SpringAIBaiduChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

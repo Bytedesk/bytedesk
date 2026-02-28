@@ -37,7 +37,8 @@ public enum MessageTypeEnum {
     SHORTCUT, // 快捷路径
     URL, // 网址消息
     GOODS, // 商品消息
-    ORDER, // 订单
+    ORDER, // 订单消息
+    
     PHONE_NUMBER, // 电话号码
     EMAILL_ADDRESS, // 邮箱地址
     WECHAT_NUMBER, // 微信号
@@ -71,7 +72,9 @@ public enum MessageTypeEnum {
     CUSTOMER_SUBMIT, // 客户留资提交
     SYSTEM_ALARM, // 系统报警
     // 
-    TICKET, // 工单消息
+    THREAD, // 会话消息，在聊天记录中发送某条会话，可点击查看会话详情
+    // 
+    TICKET, // 工单消息，在聊天记录中发送某条工单消息，可点击查看工单详情
     TICKET_SUBMIT, // 工单提交
     // 
     STICKER, // 贴纸
@@ -83,6 +86,7 @@ public enum MessageTypeEnum {
     TYPING, // 正在输入: 客服输入状态发送给访客
     PREVIEW, // 消息预知：访客输入内容预览发送给客服
     PROCESSING, // 正在处理，等待大模型回复中
+    REACTION, // 消息表情回复更新：用于广播某条消息的 reactions/content 已变更
     // 
     RECALL, // 撤回
     DELIVERED, // 回执: 已送达
@@ -172,14 +176,17 @@ public enum MessageTypeEnum {
     INVITE_ORGANIZATION_TIMEOUT,
     INVITE_ORGANIZATION_CANCEL,
     // 
-    WEBRTC_AUDIO_INVITE,
-    WEBRTC_VIDEO_INVITE,
-    WEBRTC_AUDIO_INVITE_REJECT,
-    WEBRTC_VIDEO_INVITE_REJECT,
-    WEBRTC_AUDIO_INVITE_ACCEPT,
-    WEBRTC_VIDEO_INVITE_ACCEPT,
-    WEBRTC_AUDIO_INVITE_CANCEL,
-    WEBRTC_VIDEO_INVITE_CANCEL,
+    INVITE_AUDIO,
+    INVITE_AUDIO_ACCEPT,
+    INVITE_AUDIO_REJECT,
+    INVITE_AUDIO_CANCEL,
+    INVITE_AUDIO_TIMEOUT,
+    // 
+    INVITE_VIDEO,
+    INVITE_VIDEO_REJECT,
+    INVITE_VIDEO_ACCEPT,
+    INVITE_VIDEO_CANCEL,
+    INVITE_VIDEO_TIMEOUT,
     // 
     GROUP_CREATE,
     GROUP_INVITE,

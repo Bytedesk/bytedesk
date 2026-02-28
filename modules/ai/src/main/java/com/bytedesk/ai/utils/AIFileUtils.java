@@ -15,7 +15,7 @@ package com.bytedesk.ai.utils;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 
@@ -87,9 +87,9 @@ public class AIFileUtils {
      */
     public static boolean isLocalLoopbackHttpUrl(String url) {
         try {
-            URL u = new URL(url);
+            var u = URI.create(url);
             String host = u.getHost();
-            String protocol = u.getProtocol();
+            String protocol = u.getScheme();
             if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
                 return false;
             }
@@ -107,8 +107,7 @@ public class AIFileUtils {
     public static String fetchHttpAsBase64(String url, int maxBytes) {
         HttpURLConnection conn = null;
         try {
-            URL u = new URL(url);
-            conn = (HttpURLConnection) u.openConnection();
+            conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
             conn.setConnectTimeout(3000);
             conn.setReadTimeout(5000);
             conn.setInstanceFollowRedirects(true);

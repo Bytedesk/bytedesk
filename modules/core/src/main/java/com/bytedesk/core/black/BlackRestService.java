@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
@@ -175,6 +176,39 @@ public class BlackRestService extends BaseRestServiceWithExport<BlackEntity, Bla
     @Override
     public BlackExcel convertToExcel(BlackEntity entity) {
         return modelMapper.map(entity, BlackExcel.class);
+    }
+
+    public BlackResponse createFromExcelRow(BlackExcel row, String orgUid) {
+        if (row == null) {
+            throw new RuntimeException("Black import row is null");
+        }
+        String blackUid = row.getBlackUid();
+        if (!StringUtils.hasText(blackUid)) {
+            throw new RuntimeException("Black import blackUid is required");
+        }
+        BlackRequest request = BlackRequest.builder()
+            .blackUid(blackUid)
+                .blackNickname(row.getBlackNickname())
+                .reason(row.getReason())
+                .blockIp(parseBlockIp(row.getBlockIp()))
+                .userNickname(row.getUserNickname())
+                .startTime(row.getStartTime())
+                .endTime(row.getEndTime())
+                .build();
+        request.setOrgUid(orgUid);
+        return create(request);
+    }
+
+    private Boolean parseBlockIp(String value) {
+        if (!StringUtils.hasText(value)) {
+            return false;
+        }
+        String normalized = value.trim().toLowerCase();
+        return "true".equals(normalized)
+                || "1".equals(normalized)
+                || "yes".equals(normalized)
+                || "y".equals(normalized)
+                || "是".equals(value.trim());
     }
 
     

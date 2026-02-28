@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentStatusEnum;
+import com.bytedesk.service.visitor.VisitorCallTypeEnum;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import lombok.AllArgsConstructor;
@@ -43,6 +45,30 @@ public class PresenceFacadeService {
         return isAgentOnline(agent) && agent != null && agent.isAvailable();
     }
 
+    /** 坐席是否在线且可接待指定 callType */
+    public boolean isAgentOnlineAndAvailableForCallType(AgentEntity agent, VisitorCallTypeEnum callType) {
+        if (!isAgentOnline(agent) || agent == null) {
+            return false;
+        }
+        AgentStatusEnum status;
+        try {
+            status = AgentStatusEnum.fromValue(agent.getStatus());
+        } catch (Exception e) {
+            return false;
+        }
+
+        VisitorCallTypeEnum resolvedCallType = callType == null ? VisitorCallTypeEnum.TEXT : callType;
+        if (status == AgentStatusEnum.AVAILABLE) {
+            return true;
+        }
+        return switch (resolvedCallType) {
+            case AUDIO -> status == AgentStatusEnum.AVAILABLE_AUDIO;
+            case VIDEO -> status == AgentStatusEnum.AVAILABLE_VIDEO;
+            case PHONE -> status == AgentStatusEnum.AVAILABLE_PHONE;
+            case TEXT -> false;
+        };
+    }
+
     /** 计算工作组是否有任意在线坐席 */
     public boolean isWorkgroupOnline(WorkgroupEntity workgroup) {
         if (workgroup == null || workgroup.getAgents() == null || workgroup.getAgents().isEmpty()) {
@@ -64,6 +90,20 @@ public class PresenceFacadeService {
         }
         for (AgentEntity agent : workgroup.getAgents()) {
             if (isAgentOnlineAndAvailable(agent)) {
+                result.add(agent);
+            }
+        }
+        return result;
+    }
+
+    /** 获取在线且可接待指定 callType 的坐席列表 */
+    public List<AgentEntity> getAvailableAgentsForCallType(WorkgroupEntity workgroup, VisitorCallTypeEnum callType) {
+        List<AgentEntity> result = new ArrayList<>();
+        if (workgroup == null || workgroup.getAgents() == null) {
+            return result;
+        }
+        for (AgentEntity agent : workgroup.getAgents()) {
+            if (isAgentOnlineAndAvailableForCallType(agent, callType)) {
                 result.add(agent);
             }
         }

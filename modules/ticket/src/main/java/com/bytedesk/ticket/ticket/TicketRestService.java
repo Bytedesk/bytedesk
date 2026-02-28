@@ -181,6 +181,20 @@ public class TicketRestService
         return page.map(this::convertToResponse);
     }
 
+    /**
+     * 按 visitorThreadTopic 查询工单（可能多条，因为多个工单可绑定同一个访客会话topic）。
+     */
+    public Page<TicketResponse> queryByVisitorThreadTopic(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+        Assert.hasText(request.getVisitorThreadTopic(), "visitor thread topic required");
+
+        Pageable pageable = request.getPageable();
+        Page<TicketEntity> page = ticketRepository.findByOrgUidAndVisitorThreadTopic(
+                request.getOrgUid(), request.getVisitorThreadTopic(), pageable);
+        return page.map(this::convertToResponse);
+    }
+
     @Transactional
     @Override
     public TicketResponse create(TicketRequest request) {
@@ -297,6 +311,7 @@ public class TicketRestService
         ticket.setReporter(request.getReporterJson());
         ticket.setDepartmentUid(request.getDepartmentUid());
         ticket.setVisitorThreadUid(request.getVisitorThreadUid());
+        ticket.setVisitorThreadTopic(request.getVisitorThreadTopic());
 
         // 处理附件更新
         if (request.getUploadUids() != null) {

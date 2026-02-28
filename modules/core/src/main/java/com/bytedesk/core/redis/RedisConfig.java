@@ -13,15 +13,22 @@
  */
 package com.bytedesk.core.redis;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,6 +44,9 @@ public class RedisConfig {
 
     @Autowired
     private JedisPoolProperties jedisPoolProperties;
+
+    @Autowired
+    private RedisClusterSwitchProperties redisClusterSwitchProperties;
     
     @Autowired
     @Qualifier("redisObjectMapper")
@@ -48,7 +58,9 @@ public class RedisConfig {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxIdle(jedisPoolProperties.getMaxIdle());
         poolConfig.setMaxTotal(jedisPoolProperties.getMaxTotal());
-        poolConfig.setMinIdle(jedisPoolProperties.getMaxIdle());
+        poolConfig.setMinIdle(jedisPoolProperties.getMinIdle());
+        poolConfig.setMaxWait(Duration.ofMillis(jedisPoolProperties.getMaxWaitMillis()));
+        poolConfig.setBlockWhenExhausted(jedisPoolProperties.isBlockWhenExhausted());
         return poolConfig;
     }
 
@@ -60,13 +72,44 @@ public class RedisConfig {
     // https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
-        // TODO: add RedisSentinelConfiguration
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
+        JedisClientConfiguration clientConfiguration = JedisClientConfiguration.builder()
+                .usePooling()
+                .poolConfig(jedisPoolConfig())
+                .build();
+
+        if (isClusterEnabled()) {
+            RedisClusterConfiguration clusterConfiguration = buildClusterConfiguration();
+            return new JedisConnectionFactory(clusterConfiguration, clientConfiguration);
+        }
+
+        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(
                 jedisProperties.getHost(), jedisProperties.getPort());
-        redisStandaloneConfiguration.setPassword(jedisProperties.getPassword());
-        redisStandaloneConfiguration.setDatabase(jedisProperties.getDatabase());
-        // 
-        return new JedisConnectionFactory(redisStandaloneConfiguration);
+        if (StringUtils.hasText(jedisProperties.getPassword())) {
+            standaloneConfiguration.setPassword(RedisPassword.of(jedisProperties.getPassword()));
+        }
+        standaloneConfiguration.setDatabase(jedisProperties.getDatabase());
+        return new JedisConnectionFactory(standaloneConfiguration, clientConfiguration);
+    }
+
+    private boolean isClusterEnabled() {
+        return redisClusterSwitchProperties.isEnabled()
+                || !CollectionUtils.isEmpty(jedisProperties.getCluster().getNodes());
+    }
+
+    private RedisClusterConfiguration buildClusterConfiguration() {
+        if (CollectionUtils.isEmpty(jedisProperties.getCluster().getNodes())) {
+            throw new IllegalStateException(
+                    "Redis cluster mode is enabled but spring.data.redis.cluster.nodes is empty");
+        }
+
+        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(jedisProperties.getCluster().getNodes());
+        if (StringUtils.hasText(jedisProperties.getPassword())) {
+            clusterConfiguration.setPassword(RedisPassword.of(jedisProperties.getPassword()));
+        }
+        if (jedisProperties.getCluster().getMaxRedirects() != null) {
+            clusterConfiguration.setMaxRedirects(jedisProperties.getCluster().getMaxRedirects());
+        }
+        return clusterConfiguration;
     }
 
     @Bean

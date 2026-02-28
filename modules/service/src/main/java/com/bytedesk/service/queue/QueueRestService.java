@@ -121,9 +121,22 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         UserEntity user = authService.getUser();
         // 设置查询条件：状态为排队中
         request.setStatus(ThreadProcessStatusEnum.QUEUING.name());
+
+        // topicList 在反序列化/手动构造时可能被置空，做一次兜底
+        if (request.getTopicList() == null) {
+            request.setTopicList(new ArrayList<>());
+        }
         
         // 通过user.uid查询相应的agent
-        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(user.getUid());
+        String orgUid = user != null ? user.getOrgUid() : null;
+        if (!StringUtils.hasText(orgUid)) {
+            orgUid = request.getOrgUid();
+        }
+
+        String userUid = user != null ? user.getUid() : request.getUserUid();
+        Optional<AgentEntity> agentOptional = (StringUtils.hasText(orgUid) && StringUtils.hasText(userUid))
+                ? agentRestService.findByUserUidAndOrgUid(userUid, orgUid)
+                : Optional.empty();
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             // 将agent.uid添加到topicList中
@@ -196,7 +209,14 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
      */
     public Page<ThreadResponse> queryUnreplied(ThreadRequest request) {
         UserEntity user = authService.getUser();
-        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(user.getUid());
+        String orgUid = user != null ? user.getOrgUid() : null;
+        if (!StringUtils.hasText(orgUid)) {
+            orgUid = request.getOrgUid();
+        }
+        String userUid = user != null ? user.getUid() : request.getUserUid();
+        Optional<AgentEntity> agentOptional = (StringUtils.hasText(orgUid) && StringUtils.hasText(userUid))
+                ? agentRestService.findByUserUidAndOrgUid(userUid, orgUid)
+                : Optional.empty();
         if (agentOptional.isEmpty()) {
             return Page.empty();
         }
@@ -426,7 +446,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
      * @param agentUid 客服UID
      * @return 完整队列统计响应
      */
-    public AgentQueueStatsResponse getAgentQueueStats(String agentUid) {
+    public QueueAgentStatsResponse getAgentQueueStats(String agentUid) {
         return queueService.getAgentQueueStats(agentUid);
     }
 }

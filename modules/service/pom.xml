@@ -30,13 +30,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-crm</artifactId>
-			<version>${revision}</version>
-			<scope>provided</scope>
-		</dependency> -->
-
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-kbase</artifactId>
@@ -47,6 +40,13 @@
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-ai</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-video</artifactId>
 			<version>${revision}</version>
 			<scope>provided</scope>
 		</dependency>

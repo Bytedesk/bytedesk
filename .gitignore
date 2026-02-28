@@ -124,3 +124,5 @@ javadocs/
 deploy/server/
 bin/
 /starter/src/main/resources/static/docs/
+local/
+prod/

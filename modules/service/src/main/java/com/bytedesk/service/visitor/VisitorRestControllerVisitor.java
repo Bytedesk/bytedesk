@@ -15,8 +15,7 @@ package com.bytedesk.service.visitor;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -87,7 +86,8 @@ public class VisitorRestControllerVisitor {
 
     private final AgentRestService agentRestService;
     
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     @ApiRateLimiter(value = 1, timeout = 1)
     @PostMapping("/init")
@@ -263,14 +263,24 @@ public class VisitorRestControllerVisitor {
      * - uid 既支持传 agent.uid（客服实体 uid），也支持传 userUid（消息中 user.uid）
      */
     @GetMapping("/agent/query/uid")
-    public ResponseEntity<?> queryAgentByUid(@RequestParam(value = "uid") String uid) {
+    public ResponseEntity<?> queryAgentByUid(
+            @RequestParam(value = "uid") String uid,
+            @RequestParam(value = "orgUid", required = false) String orgUid) {
         if (!StringUtils.hasText(uid)) {
             return ResponseEntity.ok(JsonResult.error("uid required"));
         }
 
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(uid);
         if (!agentOptional.isPresent()) {
-            agentOptional = agentRestService.findByUserUid(uid);
+            if (StringUtils.hasText(orgUid)) {
+                agentOptional = agentRestService.findByUserUidAndOrgUid(uid, orgUid);
+            } else {
+                try {
+                    agentOptional = agentRestService.findByUserUid(uid);
+                } catch (IllegalStateException e) {
+                    return ResponseEntity.ok(JsonResult.error("multiple agents found, please provide orgUid"));
+                }
+            }
         }
         if (!agentOptional.isPresent()) {
             return ResponseEntity.ok(JsonResult.error("agent not found"));
@@ -312,6 +322,8 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
+    // @BlackIpFilter(title = "black", action = "sendSseMemberMessage")
+    // @BlackUserFilter(title = "black", action = "sendSseMemberMessage")
     @TabooJsonFilter(title = "敏感词", action = "sendSseMemberMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

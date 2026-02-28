@@ -57,7 +57,7 @@ public class Client implements IModEslApi {
 	private boolean authenticated;
 	private CommandResponse authenticationResponse;
 	private Optional<Context> clientContext = Optional.empty();
-	private ExecutorService callbackExecutor = Executors.newSingleThreadExecutor();
+	private ExecutorService callbackExecutor = Executors.newSingleThreadExecutor(Thread.ofVirtual().factory());
 
 	public void addEventListener(IEslEventListener listener) {
 		if (listener != null) {

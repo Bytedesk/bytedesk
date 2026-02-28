@@ -13,7 +13,7 @@ import com.bytedesk.call.config.esl.client.transport.message.EslFrameDecoder;
 public class OutboundChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final IClientHandlerFactory clientHandlerFactory;
-    private ExecutorService callbackExecutor = Executors.newSingleThreadExecutor();
+    private ExecutorService callbackExecutor = Executors.newSingleThreadExecutor(Thread.ofVirtual().factory());
 
     public OutboundChannelInitializer(IClientHandlerFactory clientHandlerFactory) {
         this.clientHandlerFactory = clientHandlerFactory;

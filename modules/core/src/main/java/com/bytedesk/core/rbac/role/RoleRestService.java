@@ -35,6 +35,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.authority.AuthorityResponse;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.base.BaseRestService;
@@ -229,13 +230,9 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 }
                 //
                 if (request.getAuthorityUids() != null) {
-                        for (String authorityUid : request.getAuthorityUids()) {
-                                Optional<AuthorityEntity> authorityOptional = authorityRestService
-                                                .findByUid(authorityUid);
-                                if (authorityOptional.isPresent()) {
-                                        role.addAuthority(authorityOptional.get());
-                                }
-                        }
+                        Set<AuthorityEntity> authoritiesToBind = resolveAuthoritiesByUids(request.getAuthorityUids());
+                        assertAuthoritiesVipAssignable(authoritiesToBind, user);
+                        authoritiesToBind.forEach(role::addAuthority);
                 }
                 //
                 RoleEntity savedEntity = save(role);
@@ -278,11 +275,9 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         // 仅当请求明确携带 authorityUids 时，才重建关联；否则保持原权限不变
                         if (request.getAuthorityUids() != null) {
                                 role.getAuthorities().clear();
-                                for (String authorityUid : request.getAuthorityUids()) {
-                                        Optional<AuthorityEntity> authorityOptional = authorityRestService
-                                                        .findByUid(authorityUid);
-                                        authorityOptional.ifPresent(role::addAuthority);
-                                }
+                                Set<AuthorityEntity> authoritiesToBind = resolveAuthoritiesByUids(request.getAuthorityUids());
+                                assertAuthoritiesVipAssignable(authoritiesToBind, user);
+                                authoritiesToBind.forEach(role::addAuthority);
                         }
                         //
                         RoleEntity savedRole = save(role);
@@ -323,12 +318,31 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         public RoleResponse convertToResponse(RoleEntity entity) {
                 // return ConvertUtils.convertToRoleResponse(entity);
                 RoleResponse roleResponse = modelMapper.map(entity, RoleResponse.class);
+                UserEntity currentUser = authService.getUser();
+                OrganizationEntity currentOrganization = currentUser == null ? null : currentUser.getCurrentOrganization();
+                boolean isSuperUser = currentUser != null && currentUser.isSuperUser();
                 // 将Set<AuthorityEntity> authorities转换为Set<AuthorityResponse> authorities
                 roleResponse.setAuthorities(
                         entity.getAuthorities().stream()
+                                .filter(authorityEntity -> isSuperUser || canUseAuthorityByVip(currentOrganization, authorityEntity))
                                 .map(authorityEntity -> modelMapper.map(authorityEntity, AuthorityResponse.class))
                                 .collect(Collectors.toSet()));
                 return roleResponse;
+        }
+
+        private boolean canUseAuthorityByVip(OrganizationEntity organization, AuthorityEntity authority) {
+                if (authority == null) {
+                        return false;
+                }
+                int requiredVipLevel = authority.getVipLevel() == null ? 0 : Math.max(authority.getVipLevel(), 0);
+                if (requiredVipLevel <= 0) {
+                        return true;
+                }
+                if (organization == null) {
+                        return false;
+                }
+                int orgVipLevel = organization.getVipLevel() == null ? 0 : Math.max(organization.getVipLevel(), 0);
+                return orgVipLevel >= requiredVipLevel;
         }
 
         // @Override
@@ -464,6 +478,8 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         selectedAuthorities = allActive;
                 }
 
+                assertAuthoritiesVipAssignable(selectedAuthorities, authService.getUser());
+
                 // 重置默认系统角色描述为 i18n key（与 RoleInitializer 保持一致）
                 if (BytedeskConsts.DEFAULT_ROLE_SUPER_UID.equals(roleUid)) {
                         role.setName(RoleConsts.ROLE_SUPER);
@@ -572,11 +588,11 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         }
 
                         if (request.getAuthorityUids() != null) {
-                                for (String authorityUid : request.getAuthorityUids()) {
-                                        Optional<AuthorityEntity> authorityOptional = authorityRestService
-                                                        .findByUid(authorityUid);
-                                        authorityOptional.ifPresent(role::addAuthority);
+                                Set<AuthorityEntity> authoritiesToBind = resolveAuthoritiesByUids(request.getAuthorityUids());
+                                if (!systemContext) {
+                                        assertAuthoritiesVipAssignable(authoritiesToBind, user);
                                 }
+                                authoritiesToBind.forEach(role::addAuthority);
                         }
                         //
                         RoleEntity savedRole = save(role);
@@ -639,6 +655,33 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         String value = authorityOptional.get().getValue();
                         if (StringUtils.hasText(value) && !currentAuthorities.contains(value)) {
                                 throw new AccessDeniedException("No permission to delegate authority: " + value);
+                        }
+                }
+        }
+
+        private Set<AuthorityEntity> resolveAuthoritiesByUids(Set<String> authorityUids) {
+                Set<AuthorityEntity> authorities = new HashSet<>();
+                if (authorityUids == null || authorityUids.isEmpty()) {
+                        return authorities;
+                }
+                for (String authorityUid : authorityUids) {
+                        authorityRestService.findByUid(authorityUid).ifPresent(authorities::add);
+                }
+                return authorities;
+        }
+
+        private void assertAuthoritiesVipAssignable(Set<AuthorityEntity> authorities, UserEntity user) {
+                if (authorities == null || authorities.isEmpty()) {
+                        return;
+                }
+                if (user == null || user.isSuperUser()) {
+                        return;
+                }
+                OrganizationEntity currentOrganization = user.getCurrentOrganization();
+                for (AuthorityEntity authority : authorities) {
+                        if (!canUseAuthorityByVip(currentOrganization, authority)) {
+                                String authorityValue = authority == null ? "UNKNOWN" : authority.getValue();
+                                throw new AccessDeniedException("No permission to assign VIP authority: " + authorityValue);
                         }
                 }
         }

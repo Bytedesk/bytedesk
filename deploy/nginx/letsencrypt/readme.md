@@ -62,6 +62,7 @@ Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Please enter the domain name(s) you would like on your certificate (comma and/or
 <!-- 注意：添加多个域名，支持2级、3级通配符域名 -->
 space separated) (Enter 'c' to cancel): weiyuai.cn,*.weiyuai.cn
+<!-- sudo certbot certonly --manual --preferred-challenges dns-01 -d bytedesk.com -d '*.bytedesk.com' -->
 bytedesk.com,*.bytedesk.com
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

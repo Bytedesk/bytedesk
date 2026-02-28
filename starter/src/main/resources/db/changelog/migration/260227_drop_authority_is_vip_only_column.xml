@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260227-drop-authority-is-vip-only-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_authority" />
+                <columnExists tableName="bytedesk_core_authority" columnName="is_vip_only" />
+            </and>
+        </preConditions>
+
+        <dropColumn tableName="bytedesk_core_authority" columnName="is_vip_only" />
+
+        <rollback>
+            <addColumn tableName="bytedesk_core_authority">
+                <column name="is_vip_only" type="BOOLEAN" defaultValueBoolean="false">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+            <sql>
+                UPDATE bytedesk_core_authority
+                SET is_vip_only = CASE
+                    WHEN vip_level IS NOT NULL AND vip_level &gt; 0 THEN 1
+                    ELSE 0
+                END
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

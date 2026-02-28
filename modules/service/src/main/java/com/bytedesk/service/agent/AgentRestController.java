@@ -14,7 +14,7 @@
 package com.bytedesk.service.agent;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -60,7 +60,8 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
 
     private final RobotService robotService;
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // @PreAuthorize(AgentPermissions.HAS_AGENT_READ) 前端很多地方需要查询，所以不需要权限
     @ActionAnnotation(title = "客服", action = "组织查询", description = "query agent by org")
@@ -278,9 +279,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 
 }

@@ -29,7 +29,7 @@
     },
     "siliconflow": {
         "nickname": "硅基流动",
-        "logo": "silicon.png",
+        "logo": "siliconflow.png",
         "baseUrl": "https://api.siliconflow.cn",
         "webUrl": "https://www.siliconflow.cn/",
         "status": "PRODUCTION"

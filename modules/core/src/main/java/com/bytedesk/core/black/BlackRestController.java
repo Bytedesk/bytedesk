@@ -13,14 +13,22 @@
  */
 package com.bytedesk.core.black;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.read.listener.PageReadListener;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -176,6 +184,23 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
             "黑名单",
             "black"
         );
+    }
+
+    @Operation(summary = "导入黑名单", description = "通过Excel导入黑名单数据")
+    @PostMapping("/import")
+    public ResponseEntity<?> importExcel(@RequestPart("file") MultipartFile file,
+            @RequestParam("orgUid") String orgUid) {
+        List<BlackResponse> imported = new ArrayList<>();
+        try {
+            EasyExcel.read(file.getInputStream(), BlackExcel.class, new PageReadListener<BlackExcel>(rows -> {
+                for (BlackExcel row : rows) {
+                    imported.add(blackRestService.createFromExcelRow(row, orgUid));
+                }
+            })).sheet().doRead();
+            return ResponseEntity.ok(JsonResult.success(imported));
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error("Import black failed: " + e.getMessage()));
+        }
     }
     
 

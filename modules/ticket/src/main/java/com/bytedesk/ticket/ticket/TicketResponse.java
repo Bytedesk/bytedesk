@@ -62,6 +62,8 @@ public class TicketResponse extends BaseResponse {
 
     // 内部工单：关联的客服会话（非工单会话）
     private String visitorThreadUid;
+    // 内部工单：关联的客服会话topic（非工单会话）
+    private String visitorThreadTopic;
     // 
     private String categoryUid;
     private String workgroupUid;

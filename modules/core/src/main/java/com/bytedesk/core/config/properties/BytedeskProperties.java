@@ -252,6 +252,11 @@ public class BytedeskProperties {
         private String logo;
         private String description;
         /**
+         * 外网可访问的上传 API 地址（完整URL，不带上传路径），用于反向代理/多节点场景。
+         * 例如：https://upload.example.com
+         */
+        private String uploadApiUrl;
+        /**
          * 外网可访问的 MQTT WebSocket 地址（完整URL），用于反向代理场景。
          * 例如：wss://api.example.com/websocket
          */
@@ -320,6 +325,10 @@ public class BytedeskProperties {
     public static class Organization {
         private String name;
         private String code;
+        // when user has no organization after login, allow creating a new organization
+        private Boolean allowCreateOrg = true;
+        // when user has no organization after login, allow applying to join an existing organization
+        private Boolean allowJoinOrg = true;
         // default validity period (days) for new organizations
         private Integer defaultVipDays = 365;
         // default limits for new organizations

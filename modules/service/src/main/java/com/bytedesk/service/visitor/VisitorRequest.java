@@ -58,9 +58,6 @@ public class VisitorRequest extends BaseRequest {
 
 	@Builder.Default
 	private String lang = LanguageEnum.ZH_CN.name();
-
-	// @Builder.Default
-	// private String type = VisitorTypeEnum.ANONYMOUS.name();
 	
 	// device info
 	private String browser;
@@ -81,6 +78,10 @@ public class VisitorRequest extends BaseRequest {
 
 	// for visitor thread list filter
 	private String topic;
+
+	// 会话接入意图（TEXT/AUDIO/VIDEO/PHONE），不替代 BaseRequest.type 的路由语义
+	@Builder.Default
+	private String callType = VisitorCallTypeEnum.TEXT.name();
 
 	// 强制转人工服务，默认false
 	@Builder.Default
@@ -202,6 +203,22 @@ public class VisitorRequest extends BaseRequest {
 			typeInt = 0;
 		}
 		return ThreadTypeEnum.fromValue(typeInt);
+	}
+
+	public VisitorCallTypeEnum formatCallType() {
+		return VisitorCallTypeEnum.fromValue(this.callType);
+	}
+
+	public boolean isWebrtcAudioType() {
+		return VisitorCallTypeEnum.AUDIO == formatCallType();
+	}
+
+	public boolean isWebrtcVideoType() {
+		return VisitorCallTypeEnum.VIDEO == formatCallType();
+	}
+
+	public boolean isWebrtcPhoneType() {
+		return VisitorCallTypeEnum.PHONE == formatCallType();
 	}
 
 	

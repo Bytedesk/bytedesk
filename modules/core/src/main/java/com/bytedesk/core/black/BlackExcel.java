@@ -32,9 +32,9 @@ public class BlackExcel  extends BaseExcel {
     
     private static final long serialVersionUID = 1L;
 
-    // @ExcelProperty(value = "黑名单用户ID")
-    // @ColumnWidth(20)
-    // private String blackUid;
+    @ExcelProperty(value = "黑名单用户UID")
+    @ColumnWidth(25)
+    private String blackUid;
 
     @ExcelProperty(value = "黑名单用户昵称")
     @ColumnWidth(25)

@@ -131,10 +131,10 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
     @Operation(summary = "获取客服队列统计", description = "获取客服的完整队列统计信息，包括今日服务人数、排队人数、接待人数、留言数、转人工数等")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = AgentQueueStatsResponse.class)))
+        schema = @Schema(implementation = QueueAgentStatsResponse.class)))
     public ResponseEntity<?> getAgentQueueStats(@RequestParam String agentUid) {
         
-        AgentQueueStatsResponse stats = queueRestService.getAgentQueueStats(agentUid);
+        QueueAgentStatsResponse stats = queueRestService.getAgentQueueStats(agentUid);
         
         return ResponseEntity.ok(JsonResult.success(stats));
     }

@@ -21,8 +21,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.bytedesk.core.converter.StringListConverter;
 
 @Getter
@@ -38,48 +36,48 @@ public class ToolbarSettings implements Serializable {
 
     // 默认显示（未设置则显示）
     @Builder.Default
+    @Column(name = "toolbar_smile")
     private Boolean smile = true;
 
     // 机器人接待时是否显示上传按钮（用于发送图片/文件）
     // - 默认显示（true）
-    // - 仅在机器人接待场景生效，人工接待仍由 upload/image/file 控制
+    // - 仅在机器人接待场景生效，人工接待由 upload 控制
     @Builder.Default
+    @Column(name = "toolbar_upload_robot")
     private Boolean uploadRobot = true;
 
-    // 合并 image/file 为 upload
-    // - 新版本统一使用 upload
-    // - 兼容旧数据/旧请求：image/file 仍可写入，但不会输出到响应
-    @Getter(AccessLevel.NONE)
+    // 语音转文字输入按钮
     @Builder.Default
-    private Boolean upload = null;
+    @Column(name = "toolbar_speech_input")
+    private Boolean speechInput = true;
+
+    // 上传按钮（已统一替代 image/file）
+    @Builder.Default
+    @Column(name = "toolbar_upload")
+    private Boolean upload = true;
 
     @Builder.Default
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Boolean image = true;
-
-    @Builder.Default
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Boolean file = true;
-
-    @Builder.Default
+    @Column(name = "toolbar_rate")
     private Boolean rate = true;
 
     @Builder.Default
+    @Column(name = "toolbar_leavemsg")
     private Boolean leavemsg = true;
 
     @Builder.Default
+    @Column(name = "toolbar_order_selector")
     private Boolean orderSelector = true;
 
     @Builder.Default
+    @Column(name = "toolbar_ticket")
     private Boolean ticket = true;
 
     @Builder.Default
-    private Boolean audio = true;
+    @Column(name = "toolbar_webrtc")
+    private Boolean webrtc = true;
 
     @Builder.Default
-    private Boolean video = true;
-
-    @Builder.Default
+    @Column(name = "toolbar_tel")
     private Boolean tel = true;
 
     // 工具栏排列顺序（从左到右），未设置则按默认顺序
@@ -93,37 +91,9 @@ public class ToolbarSettings implements Serializable {
 
     @Getter(AccessLevel.NONE)
     private List<String> order = Arrays.asList(
-        "smile", "upload", "rate", "leavemsg",
-        "orderSelector", "ticket", "audio", "video", "tel"
+        "smile", "upload", "speechInput", "rate", "leavemsg",
+        "orderSelector", "ticket", "webrtc", "tel"
     );
-
-    public Boolean getUpload() {
-        if (upload != null) {
-            return upload;
-        }
-        if (image == null && file == null) {
-            return true;
-        }
-        return Boolean.TRUE.equals(image) || Boolean.TRUE.equals(file);
-    }
-
-    public void setUpload(Boolean upload) {
-        this.upload = upload;
-        if (upload != null) {
-            this.image = upload;
-            this.file = upload;
-        }
-    }
-
-    public void setImage(Boolean image) {
-        this.image = image;
-        this.upload = (Boolean.TRUE.equals(this.image) || Boolean.TRUE.equals(this.file));
-    }
-
-    public void setFile(Boolean file) {
-        this.file = file;
-        this.upload = (Boolean.TRUE.equals(this.image) || Boolean.TRUE.equals(this.file));
-    }
 
     public List<String> getOrder() {
         return normalizeOrder(this.order);
@@ -136,8 +106,8 @@ public class ToolbarSettings implements Serializable {
     private List<String> normalizeOrder(List<String> raw) {
         if (raw == null || raw.isEmpty()) {
             return Arrays.asList(
-                "smile", "upload", "rate", "leavemsg",
-                "orderSelector", "ticket", "audio", "video", "tel"
+                "smile", "upload", "speechInput", "rate", "leavemsg",
+                "orderSelector", "ticket", "webrtc", "tel"
             );
         }
         final List<String> out = new ArrayList<>();
@@ -148,6 +118,8 @@ public class ToolbarSettings implements Serializable {
             String key = k.trim();
             if ("image".equals(key) || "file".equals(key)) {
                 key = "upload";
+            } else if ("audio".equals(key) || "video".equals(key)) {
+                key = "webrtc";
             }
             if (!out.contains(key)) {
                 out.add(key);

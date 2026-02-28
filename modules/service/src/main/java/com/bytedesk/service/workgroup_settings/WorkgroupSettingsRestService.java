@@ -220,12 +220,24 @@ public class WorkgroupSettingsRestService
         WorkgroupSettingsEntity entity = optional.get();
         // 使用 ModelMapper 批量更新基础字段
         // modelMapper.map(request, entity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription());
-        entity.setIsDefault(request.getIsDefault());
-        entity.setEnabled(request.getEnabled());
-        entity.setRoutingMode(request.getRoutingMode());
-        entity.setManualRoutingTip(request.getManualRoutingTip());
+        if (StringUtils.hasText(request.getName())) {
+            entity.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            entity.setDescription(request.getDescription());
+        }
+        if (request.getIsDefault() != null) {
+            entity.setIsDefault(request.getIsDefault());
+        }
+        if (request.getEnabled() != null) {
+            entity.setEnabled(request.getEnabled());
+        }
+        if (request.getRoutingMode() != null) {
+            entity.setRoutingMode(request.getRoutingMode());
+        }
+        if (request.getManualRoutingTip() != null) {
+            entity.setManualRoutingTip(request.getManualRoutingTip());
+        }
 
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
@@ -455,6 +467,30 @@ public class WorkgroupSettingsRestService
     @Override
     public void delete(WorkgroupSettingsRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    @Transactional
+    public WorkgroupSettingsResponse enable(String uid) {
+        Optional<WorkgroupSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("WorkgroupSettings not found: " + uid);
+        }
+        WorkgroupSettingsEntity entity = optional.get();
+        entity.setEnabled(true);
+        WorkgroupSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
+    }
+
+    @Transactional
+    public WorkgroupSettingsResponse disable(String uid) {
+        Optional<WorkgroupSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("WorkgroupSettings not found: " + uid);
+        }
+        WorkgroupSettingsEntity entity = optional.get();
+        entity.setEnabled(false);
+        WorkgroupSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
     }
 
     @Override

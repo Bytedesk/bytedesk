@@ -305,13 +305,14 @@ public class PageRouteController {
 			@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
 
-		// 如果指定了语言，则使用对应语言的入口页面
-		if (lang != null) {
-			return "forward:/apidocs/" + lang + "/index.html";
-		}
+		return "redirect:https://www.weiyuai.cn/apidocs/";
 
-		// 默认使用英文入口页面
-		return "forward:/apidocs/index.html";
+		// 如果指定了语言，则使用对应语言的入口页面
+		// if (lang != null) {
+		// 	return "forward:/apidocs/" + lang + "/index.html";
+		// }
+		// // 默认使用英文入口页面
+		// return "forward:/apidocs/index.html";
 	}
 
 	/**

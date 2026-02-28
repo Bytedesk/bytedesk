@@ -86,7 +86,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
                     .name(bytedeskProperties.getOrganizationName())
                     .code(bytedeskProperties.getOrganizationCode())
                     .description(bytedeskProperties.getOrganizationName() + " Description")
-                    .vip(true)
+                    .vipLevel(1)
                     .vipExpireDate(BdDateUtils.now().plusDays(defaultVipDays))
                     .maxMembers(defaultMaxMembers)
                     .maxAgents(defaultMaxAgents)

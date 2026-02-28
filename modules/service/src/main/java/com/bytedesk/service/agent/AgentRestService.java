@@ -316,18 +316,28 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public ThreadResponseSimple acceptByAgent(ThreadRequest threadRequest) {
-        //
-        UserEntity user = authService.getUser();
-        Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
-        if (!agentOptional.isPresent()) {
-            throw new RuntimeException("agent not found");
-        }
-        //
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadRequest.getUid());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
         }
         ThreadEntity thread = threadOptional.get();
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new IllegalStateException("User not authenticated");
+        }
+        String orgUid = thread.getOrgUid();
+        if (!StringUtils.hasText(orgUid) && user != null) {
+            orgUid = user.getOrgUid();
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            throw new IllegalStateException("orgUid required for accepting thread");
+        }
+
+        Optional<AgentEntity> agentOptional = agentRepository.findByUserUidAndOrgUidAndDeletedFalse(user.getUid(), orgUid);
+        if (agentOptional.isEmpty()) {
+            throw new RuntimeException("agent not found for userUid=" + user.getUid() + ", orgUid=" + orgUid);
+        }
         // 若会话非QUEUING（已存在接待坐席），则不允许重复接入
         if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
             throw new IllegalStateException("thread already accepted: " + thread.getStatus());
@@ -461,14 +471,24 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     // @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
     public Optional<AgentEntity> findByUserUid(String userUid) {
-        Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(userUid);
-        // 确保所有延迟加载的关联都被初始化，以便正确缓存
-        agentOptional.ifPresent(agent -> {
-            if (agent.getMember() != null) {
-                agent.getMember().getUser(); // 触发加载
-            }
-        });
-        return agentOptional;
+        if (!StringUtils.hasText(userUid)) {
+            return Optional.empty();
+        }
+
+        List<AgentEntity> agents = agentRepository.findAllByUserUidAndDeletedFalse(userUid);
+        if (agents == null || agents.isEmpty()) {
+            return Optional.empty();
+        }
+        if (agents.size() > 1) {
+            throw new IllegalStateException(
+                    "Multiple agents found for userUid=" + userUid + ", please specify orgUid");
+        }
+
+        AgentEntity agent = agents.get(0);
+        if (agent != null && agent.getMember() != null) {
+            agent.getMember().getUser();
+        }
+        return Optional.ofNullable(agent);
     }
 
     // @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")

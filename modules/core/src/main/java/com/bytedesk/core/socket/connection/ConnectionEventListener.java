@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.socket.connection;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -28,15 +30,29 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ConnectionEventListener {
 
+    private static final long CONNECT_DEDUP_WINDOW_MS = 3000L;
+    private static final long CONNECT_DEDUP_CLEANUP_MS = 30000L;
+
+    private final ConcurrentHashMap<String, Long> recentConnectedAt = new ConcurrentHashMap<>();
+
     private final ConnectionRestService connectionRestService;
 
     @EventListener
     public void onMqttConnectedEvent(MqttConnectedEvent event) {
         String clientId = event.getClientId();
+        long now = System.currentTimeMillis();
+        Long previous = recentConnectedAt.put(clientId, now);
+        if (previous != null && now - previous < CONNECT_DEDUP_WINDOW_MS) {
+            log.debug("skip duplicated onMqttConnectedEvent clientId {}", clientId);
+            return;
+        }
+        if (recentConnectedAt.size() > 1000) {
+            recentConnectedAt.entrySet().removeIf(entry -> now - entry.getValue() > CONNECT_DEDUP_CLEANUP_MS);
+        }
         // 用户clientId格式: uid/client/deviceUid
         final String userUid = clientId.split("/")[0];
         final String deviceUid = clientId.contains("/") && clientId.split("/").length > 2 ? clientId.split("/")[2] : null;
-        log.info("user onMqttConnectedEvent uid {}, clientId {}", userUid, clientId);
+        log.debug("user onMqttConnectedEvent uid {}, clientId {}", userUid, clientId);
         // 标记连接（使用 ConnectionEntity 支持多端在线）
         // 无法从事件中获取更多上下文，使用协议 MQTT，其它信息置空/默认
         connectionRestService.markConnected(userUid, null, clientId, deviceUid,
@@ -48,7 +64,7 @@ public class ConnectionEventListener {
         String clientId = event.getClientId();
         // 用户clientId格式: uid/client/deviceUid
         final String userUid = clientId.split("/")[0];
-        log.info("user onMqttDisconnectedEvent uid {}, clientId {}", userUid, clientId);
+        log.debug("user onMqttDisconnectedEvent uid {}, clientId {}", userUid, clientId);
         // 先标记该 client 断开
         connectionRestService.markDisconnected(clientId);
     }

@@ -24,7 +24,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
-@ComponentScan("com.bytedesk")
+// , "io.antmedia", "org.red5", "org.webrtc"
+@ComponentScan(basePackages = {"com.bytedesk"})
 @EnableJpaRepositories(basePackages = "com.bytedesk")
 @EntityScan(basePackages = "com.bytedesk")
 @SpringBootApplication

@@ -30,14 +30,14 @@ public class TicketEntityListener {
 
     @PostPersist
     public void onPostPersist(TicketEntity ticket) {
-        log.info("onPostPersist: {}", ticket);
+        log.info("onPostPersist: {}", ticket.getUid());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishEvent(new TicketCreateEvent(ticket));
     }
 
     @PostUpdate
     public void onPostUpdate(TicketEntity ticket) {
-        log.info("onPostUpdate: {}", ticket);
+        log.info("onPostUpdate: {}", ticket.getUid());
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishEvent(new TicketUpdateEvent(ticket));
     }

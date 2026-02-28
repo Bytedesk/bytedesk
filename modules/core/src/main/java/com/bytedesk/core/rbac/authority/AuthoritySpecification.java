@@ -21,6 +21,8 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.user.UserEntity;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +61,23 @@ public class AuthoritySpecification extends BaseSpecification<AuthorityEntity, A
                 orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
+            }
+
+            UserEntity user = authService.getUser();
+            if (user != null && !user.isSuperUser()) {
+                OrganizationEntity currentOrganization = user.getCurrentOrganization();
+                int orgVipLevel = (currentOrganization != null && currentOrganization.getVipLevel() != null)
+                    ? Math.max(currentOrganization.getVipLevel(), 0)
+                    : 0;
+
+                Predicate noVipRequirement = criteriaBuilder.or(
+                    criteriaBuilder.isNull(root.get("vipLevel")),
+                    criteriaBuilder.lessThanOrEqualTo(root.get("vipLevel"), 0)
+                );
+
+                Predicate vipAllowedByLevel = criteriaBuilder.lessThanOrEqualTo(root.get("vipLevel"), orgVipLevel);
+
+                predicates.add(criteriaBuilder.or(noVipRequirement, vipAllowedByLevel));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

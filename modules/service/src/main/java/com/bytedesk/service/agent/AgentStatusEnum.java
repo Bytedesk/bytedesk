@@ -15,6 +15,9 @@ package com.bytedesk.service.agent;
 
 public enum AgentStatusEnum {
     AVAILABLE, // 接待状态
+    AVAILABLE_AUDIO, // 仅接待音频会话
+    AVAILABLE_VIDEO, // 仅接待视频会话
+    AVAILABLE_PHONE, // 仅接待电话会话
     AWAY, // 离开状态
     REST, // 休息状态
     BUSY, // 挂起/忙碌状态

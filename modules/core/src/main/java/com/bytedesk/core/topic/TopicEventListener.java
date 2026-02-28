@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.topic;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,18 +61,20 @@ public class TopicEventListener {
         // 定时刷新缓存中的topic事件到数据库中
         List<String> topicRequestList = topicCacheService.getTopicRequestList();
         if (topicRequestList != null) {
-            topicRequestList.forEach(item -> {
+            List<String> topicRequestsSnapshot = new ArrayList<>(topicRequestList);
+            for (String item : topicRequestsSnapshot) {
                 // log.info("topic onQuartzFiveSecondEvent {}", item);
                 TopicRequest topicRequest = JSON.parseObject(item, TopicRequest.class);
                 topicRestService.create(topicRequest);
-            });
+            }
         }
         List<String> clientIdList = topicCacheService.getClientIdList();
         if (clientIdList!= null) {
-            clientIdList.forEach(item -> {
+            List<String> clientIdsSnapshot = new ArrayList<>(clientIdList);
+            for (String item : clientIdsSnapshot) {
                 // log.info("topic onQuartzFiveSecondEvent {}", item);
                 topicRestService.addClientId(item);
-            });
+            }
         }
     }
 

@@ -56,9 +56,12 @@ import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
+import com.bytedesk.service.visitor.VisitorCallTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
+import com.bytedesk.video.webrtc.WebrtcService;
+import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
@@ -120,6 +123,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final ObjectProvider<ThreadRoutingContext> threadRoutingContextProvider;
     private final AgentRestService agentRestService;
     private final RoutingPoolRestService routingPoolRestService;
+    private final WebrtcService webrtcService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -140,8 +144,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     public MessageProtobuf createWorkgroupThread(VisitorRequest visitorRequest) {
         long startTime = System.currentTimeMillis();
-        log.info("开始创建工作组线程 - visitorUid: {}, workgroupUid: {}, forceAgent: {}",
-                visitorRequest.getUid(), visitorRequest.getSid(), visitorRequest.getForceAgent());
+        VisitorCallTypeEnum callType = normalizeCallType(visitorRequest);
+        log.info("开始创建工作组线程 - visitorUid: {}, workgroupUid: {}, forceAgent: {}, callType: {}",
+            visitorRequest.getUid(), visitorRequest.getSid(), visitorRequest.getForceAgent(), callType.name());
 
         // 1. 验证和获取工作组信息
         log.debug("步骤1: 开始获取工作组信息 - workgroupUid: {}", visitorRequest.getSid());
@@ -160,7 +165,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 3. 处理现有活跃会话
         log.debug("步骤3: 检查是否为现有活跃会话");
-        MessageProtobuf existingThreadResult = handleExistingWorkgroupThread(visitorRequest, thread, workgroup);
+        MessageProtobuf existingThreadResult = handleExistingWorkgroupThread(visitorRequest, thread, workgroup,
+            callType);
         if (existingThreadResult != null) {
             log.info("检测到现有活跃会话，直接返回 - threadUid: {}, 总耗时: {}ms",
                     thread.getUid(), System.currentTimeMillis() - startTime);
@@ -169,7 +175,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 4. 新会话路由决策
         log.debug("步骤4: 开始新会话路由决策");
-        MessageProtobuf result = routeNewWorkgroupThread(visitorRequest, thread, workgroup);
+        MessageProtobuf result = routeNewWorkgroupThread(visitorRequest, thread, workgroup, callType);
         log.info("创建工作组线程完成 - threadUid: {}, 总耗时: {}ms",
                 thread.getUid(), System.currentTimeMillis() - startTime);
         return result;
@@ -228,7 +234,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * @return 如果是现有活跃会话则返回相应消息，否则返回null继续新会话流程
      */
     private MessageProtobuf handleExistingWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread,
-            WorkgroupEntity workgroup) {
+            WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
         log.debug("开始处理现有工作组会话 - threadUid: {}, 状态: {}", thread.getUid(), thread.getStatus());
 
         if (thread.isNew()) {
@@ -248,12 +255,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         if (thread.isQueuing()) {
             log.info("发现现有排队会话，检查是否可直接接入空闲客服");
-            return handleExistingQueuingWorkgroupThread(visitorRequest, thread, workgroup);
+            return handleExistingQueuingWorkgroupThread(visitorRequest, thread, workgroup, callType);
         }
 
         if (thread.isOffline()) {
             log.info("发现现有离线会话，进入离线处理流程");
-            return handleExistingOfflineThread(visitorRequest, thread, workgroup);
+            return handleExistingOfflineThread(visitorRequest, thread, workgroup, callType);
         }
 
         log.debug("线程状态不匹配任何已知处理流程，继续新会话流程 - 状态: {}", thread.getStatus());
@@ -264,7 +271,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 处理现有排队会话：刷新/重入时，如果此刻存在空闲客服则直接接入，否则继续排队。
      */
     private MessageProtobuf handleExistingQueuingWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
-            WorkgroupEntity workgroup) {
+            WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
 
         // MANUAL 模式：排队态仅表示“等待手动接入”，不自动分配客服
         if (WorkgroupRoutingModeEnum.MANUAL.name().equalsIgnoreCase(workgroup.getRoutingMode())) {
@@ -277,7 +285,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         if (!latestThread.isQueuing()) {
             log.info("排队线程状态已变化，按最新状态返回 - threadUid: {}, status: {}",
                     latestThread.getUid(), latestThread.getStatus());
-            return handleExistingWorkgroupThread(visitorRequest, latestThread, workgroup);
+            return handleExistingWorkgroupThread(visitorRequest, latestThread, workgroup, callType);
         }
 
         // 关键词触发/强制转人工：需要确保该线程真实入队并对客服端可见
@@ -297,7 +305,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             return getWorkgroupQueueMessage(visitorRequest, latestThread);
         }
 
-        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgentsForCallType(workgroup, callType);
         if (availableAgents == null || availableAgents.isEmpty()) {
             log.debug("当前无在线可用客服，继续排队 - threadUid: {}", latestThread.getUid());
             if (forceTransfer && queueMemberEntity != null) {
@@ -389,11 +397,12 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 处理现有离线会话
      */
     private MessageProtobuf handleExistingOfflineThread(VisitorRequest visitorRequest, ThreadEntity thread,
-            WorkgroupEntity workgroup) {
+            WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
         log.info("Found existing offline thread");
 
         // 如果没有可用客服，继续使用现有离线会话
-        if (presenceFacadeService.getAvailableAgents(workgroup).isEmpty()) {
+        if (presenceFacadeService.getAvailableAgentsForCallType(workgroup, callType).isEmpty()) {
             return null; // 继续使用现有会话
         }
         return null; // 有可用客服时重新路由
@@ -403,17 +412,18 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 路由新工作组会话
      */
     private MessageProtobuf routeNewWorkgroupThread(VisitorRequest visitorRequest, ThreadEntity thread,
-            WorkgroupEntity workgroup) {
+            WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
         log.debug("开始新工作组会话路由决策 - threadUid: {}, workgroupUid: {}",
                 thread.getUid(), workgroup.getUid());
 
         // 决定路由方向：机器人 or 人工
-        boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup);
+        boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup, callType);
         if (shouldUseRobot) {
             // 规则：无客服在线时优先使用留言设置中的备选客服/备选工作组，仅当备选都不可用时才启用机器人
             boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
             if (isOffline) {
-                MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, workgroup);
+                MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, workgroup, callType);
                 if (backupResult != null) {
                     log.info("Robot routing eligible but diverted to backup first - workgroupUid: {}", workgroup.getUid());
                     return backupResult;
@@ -424,15 +434,22 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             return routeToRobot(visitorRequest, thread, workgroup);
         } else {
             log.info("路由到人工客服处理");
-            return routeToAgent(visitorRequest, thread, workgroup);
+            return routeToAgent(visitorRequest, thread, workgroup, callType);
         }
     }
 
     /**
      * 判断是否应该路由到机器人
      */
-    private boolean shouldRouteToRobot(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
+    private boolean shouldRouteToRobot(VisitorRequest visitorRequest, WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
         log.debug("开始机器人路由决策判断");
+
+        if (callType == VisitorCallTypeEnum.AUDIO
+                || callType == VisitorCallTypeEnum.VIDEO
+                || callType == VisitorCallTypeEnum.PHONE) {
+            return false;
+        }
 
         // 强制转人工
         if (visitorRequest.getForceAgent()) {
@@ -492,7 +509,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 路由到人工客服
      */
     private MessageProtobuf routeToAgent(VisitorRequest visitorRequest, ThreadEntity thread,
-            WorkgroupEntity workgroup) {
+            WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
         log.debug("开始路由到人工客服 - threadUid: {}, workgroupUid: {}",
                 thread.getUid(), workgroup.getUid());
 
@@ -505,26 +523,27 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             return routeToOfflineMessage(visitorRequest, thread, workgroup);
         }
 
-        return routeToAgentDuringServiceTime(visitorRequest, thread, workgroup);
+        return routeToAgentDuringServiceTime(visitorRequest, thread, workgroup, callType);
     }
 
     /**
      * 在服务时间内分配客服并根据在线/负载状态进行路由
      */
     private MessageProtobuf routeToAgentDuringServiceTime(VisitorRequest visitorRequest, ThreadEntity thread,
-            WorkgroupEntity workgroup) {
+            WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
         log.debug("在服务时间内，开始选择客服");
 
         if (WorkgroupRoutingModeEnum.MANUAL.name().equalsIgnoreCase(workgroup.getRoutingMode())) {
             log.info("Workgroup routingMode=MANUAL, divert to routing_pool - workgroupUid: {}, threadUid: {}",
                     workgroup.getUid(), thread.getUid());
-            return routeToManualRoutingPool(visitorRequest, thread, workgroup);
+            return routeToManualRoutingPool(visitorRequest, thread, workgroup, callType);
         }
 
-        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgentsForCallType(workgroup, callType);
         if (availableAgents.isEmpty()) {
             log.info("无在线客服可用，降级为离线留言");
-            MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, workgroup);
+            MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, workgroup, callType);
             if (backupResult != null) {
                 return backupResult;
             }
@@ -581,7 +600,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * MANUAL 模式：会话进入路由池等待客服手动接入。
      */
     private MessageProtobuf routeToManualRoutingPool(VisitorRequest visitorRequest, ThreadEntity threadFromRequest,
-            WorkgroupEntity workgroup) {
+            WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
 
         // 重新初始化会话 extra 等（保持与常规人工路径一致）
         ThreadEntity thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, threadFromRequest, workgroup);
@@ -638,7 +658,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         messageSendService.sendProtobufMessage(visitorMsg);
 
         // 通知工作组内所有在线可用客服
-        notifyAvailableAgentsOfRoutingPool(workgroup, savedThread, routingPool, content);
+        notifyAvailableAgentsOfRoutingPool(workgroup, savedThread, routingPool, content, callType);
 
         return visitorMsg;
     }
@@ -652,8 +672,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     }
 
     private void notifyAvailableAgentsOfRoutingPool(WorkgroupEntity workgroup, ThreadEntity thread,
-            RoutingPoolResponse routingPool, RoutingPoolContent content) {
-        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+            RoutingPoolResponse routingPool, RoutingPoolContent content, VisitorCallTypeEnum callType) {
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgentsForCallType(workgroup, callType);
         if (availableAgents == null || availableAgents.isEmpty()) {
             log.debug("工作组暂无在线可用客服，不发送路由池通知 - workgroupUid: {}", workgroup.getUid());
             return;
@@ -722,7 +742,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         return ThreadMessageUtil.getThreadRoutingPoolMessage(rpc, thread);
     }
 
-    private MessageProtobuf tryRouteToBackup(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
+        private MessageProtobuf tryRouteToBackup(VisitorRequest visitorRequest, WorkgroupEntity workgroup,
+            VisitorCallTypeEnum callType) {
         if (visitorRequest == null || workgroup == null) {
             return null;
         }
@@ -739,7 +760,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 && StringUtils.hasText(settings.getMessageLeaveBackupAgentUid())) {
             try {
                 Optional<AgentEntity> backupAgentOpt = agentRestService.findByUid(settings.getMessageLeaveBackupAgentUid());
-                if (backupAgentOpt.isPresent() && presenceFacadeService.isAgentOnlineAndAvailable(backupAgentOpt.get())) {
+                if (backupAgentOpt.isPresent()
+                    && presenceFacadeService.isAgentOnlineAndAvailableForCallType(backupAgentOpt.get(), callType)) {
                     VisitorRequest backupReq = buildBackupRequest(visitorRequest, settings.getMessageLeaveBackupAgentUid(), ThreadTypeEnum.AGENT);
                     log.info("Workgroup all offline, divert to backup agent - fromWorkgroupUid: {}, backupAgentUid: {}",
                             workgroup.getUid(), settings.getMessageLeaveBackupAgentUid());
@@ -912,7 +934,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadQueueMessage(queueContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
-        notifyAvailableAgentsOfQueue(workgroup, savedThread, queueMemberEntity, queuingCount, waitSeconds);
+        notifyAvailableAgentsOfQueue(workgroup, savedThread, queueMemberEntity, queuingCount, waitSeconds,
+            visitorRequest.formatCallType());
 
         return messageProtobuf;
     }
@@ -921,8 +944,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      * 向工作组内在线可用客服广播排队通知
      */
     private void notifyAvailableAgentsOfQueue(WorkgroupEntity workgroup, ThreadEntity queuedThread,
-            QueueMemberEntity queueMemberEntity, int queuingCount, int waitSeconds) {
-        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgents(workgroup);
+            QueueMemberEntity queueMemberEntity, int queuingCount, int waitSeconds,
+            VisitorCallTypeEnum callType) {
+        List<AgentEntity> availableAgents = presenceFacadeService.getAvailableAgentsForCallType(workgroup, callType);
         if (availableAgents == null || availableAgents.isEmpty()) {
             log.debug("工作组暂无在线可用客服，不发送排队通知 - workgroupUid: {}", workgroup.getUid());
             return;
@@ -1046,7 +1070,64 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, savedThread);
         messageSendService.sendProtobufMessage(messageProtobuf);
 
+        // 音视频接入意图：客服接入成功后自动发起邀请（失败不影响文本会话主流程）
+        triggerAutoCallInviteIfNeeded(visitorRequest, savedThread, agentEntity);
+
         return messageProtobuf;
+    }
+
+    private VisitorCallTypeEnum normalizeCallType(VisitorRequest visitorRequest) {
+        VisitorCallTypeEnum callType = visitorRequest != null ? visitorRequest.formatCallType() : VisitorCallTypeEnum.TEXT;
+        if (visitorRequest == null) {
+            return callType;
+        }
+        visitorRequest.setCallType(callType.name());
+        visitorRequest.setExtra(mergeCallTypeToExtra(visitorRequest.getExtra(), callType.name()));
+        return callType;
+    }
+
+    private String mergeCallTypeToExtra(String extra, String callType) {
+        try {
+            JSONObject obj = StringUtils.hasText(extra) ? JSON.parseObject(extra) : new JSONObject();
+            if (obj == null) {
+                obj = new JSONObject();
+            }
+            obj.put("callType", callType);
+            return obj.toJSONString();
+        } catch (Exception e) {
+            return extra;
+        }
+    }
+
+    private void triggerAutoCallInviteIfNeeded(VisitorRequest visitorRequest, ThreadEntity thread, AgentEntity agent) {
+        if (visitorRequest == null || thread == null || agent == null) {
+            return;
+        }
+        VisitorCallTypeEnum callType = visitorRequest.formatCallType();
+        if (callType != VisitorCallTypeEnum.AUDIO && callType != VisitorCallTypeEnum.VIDEO) {
+            return;
+        }
+
+        String callerUid = resolveVisitorUidForThreadTopic(visitorRequest);
+        if (!StringUtils.hasText(callerUid) || !StringUtils.hasText(agent.getUid())) {
+            log.warn("skip workgroup auto call invite: invalid caller/callee, threadUid={}, callerUid={}, calleeUid={}",
+                    thread.getUid(), callerUid, agent.getUid());
+            return;
+        }
+
+        try {
+            WebrtcInviteRequest inviteRequest = new WebrtcInviteRequest();
+            inviteRequest.setThreadUid(thread.getUid());
+            inviteRequest.setCallerUid(callerUid);
+            inviteRequest.setCalleeUid(agent.getUid());
+            inviteRequest.setCallType(callType.name());
+            webrtcService.invite(inviteRequest);
+            log.info("workgroup auto call invite sent, threadUid={}, callType={}, callerUid={}, calleeUid={}",
+                    thread.getUid(), callType.name(), callerUid, agent.getUid());
+        } catch (Exception e) {
+            log.warn("workgroup auto call invite failed, threadUid={}, callType={}, reason={}",
+                    thread.getUid(), callType.name(), e.getMessage());
+        }
     }
 
     /**

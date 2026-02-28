@@ -545,7 +545,13 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             return new ArrayList<>();
         }
 
-        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(userUid);
+        Optional<AgentEntity> agentOptional;
+        try {
+            agentOptional = agentRestService.findByUserUid(userUid);
+        } catch (IllegalStateException e) {
+            log.warn("findWorkgroupUidsByUserUid skipped: {}, userUid={}", e.getMessage(), userUid);
+            return new ArrayList<>();
+        }
         if (!agentOptional.isPresent()) {
             return new ArrayList<>();
         }

@@ -395,36 +395,62 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     }
 
     /**
-     * 聚合统计某个客服队列(按天)的首次/平均响应时长（秒）。
-     * - 首次响应：对 visitorFirstMessageAt 与 agentFirstResponseAt 均非空的会话计算 Duration
-     * - 平均响应：使用会话内已维护的 agentAvgResponseLength（>0 才计入）
+     * 聚合统计某个客服队列(按天) KPI：
+     * - 首次/平均响应时长
+     * - 30秒应答率
+     * - 3分钟人工回复率
+     * - 询单转化率（当前口径：有访客消息会话中已解决占比）
+     * - 不满意会话数（满意度评分≤3）
+     * - 不满意会话率（不满意会话数 / 已评分会话数）
      */
-    public AgentResponseLengthStats computeAgentResponseLengthStats(String agentQueueUid) {
+    public AgentKpiStats computeAgentKpiStats(String agentQueueUid) {
         if (!StringUtils.hasText(agentQueueUid)) {
-            return new AgentResponseLengthStats(0, 0);
+            return new AgentKpiStats(0, 0, 0D, 0D, 0D, 0, 0D);
         }
 
-        List<Object[]> rows = queueMemberRepository.findAgentResponseStatsRows(agentQueueUid);
+        List<Object[]> rows = queueMemberRepository.findAgentKpiStatsRows(agentQueueUid);
         if (rows == null || rows.isEmpty()) {
-            return new AgentResponseLengthStats(0, 0);
+            return new AgentKpiStats(0, 0, 0D, 0D, 0D, 0, 0D);
         }
 
         long firstSum = 0;
         int firstCount = 0;
         long avgSum = 0;
         int avgCount = 0;
+        int responseEligibleCount = 0;
+        int answerIn30sCount = 0;
+        int answerIn3mCount = 0;
+        int inquiryCount = 0;
+        int convertedCount = 0;
+        int dissatisfiedCount = 0;
+        int ratedCount = 0;
 
         for (Object[] row : rows) {
-            // row[0]=visitorFirstMessageAt, row[1]=agentFirstResponseAt, row[2]=agentAvgResponseLength
+            // row[0]=visitorFirstMessageAt, row[1]=agentFirstResponseAt, row[2]=agentAvgResponseLength,
+            // row[3]=rated, row[4]=rateScore, row[5]=resolved, row[6]=visitorMessageCount
             ZonedDateTime visitorFirstMessageAt = (ZonedDateTime) row[0];
             ZonedDateTime agentFirstResponseAt = (ZonedDateTime) row[1];
             Integer agentAvgResponseLength = (Integer) row[2];
+            Boolean rated = (Boolean) row[3];
+            Integer rateScore = (Integer) row[4];
+            Boolean resolved = (Boolean) row[5];
+            Integer visitorMessageCount = (Integer) row[6];
+
+            if (visitorFirstMessageAt != null) {
+                responseEligibleCount += 1;
+            }
 
             if (visitorFirstMessageAt != null && agentFirstResponseAt != null) {
                 long seconds = Duration.between(visitorFirstMessageAt, agentFirstResponseAt).getSeconds();
                 if (seconds >= 0) {
                     firstSum += seconds;
                     firstCount += 1;
+                    if (seconds <= 30) {
+                        answerIn30sCount += 1;
+                    }
+                    if (seconds <= 180) {
+                        answerIn3mCount += 1;
+                    }
                 }
             }
 
@@ -432,12 +458,62 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                 avgSum += agentAvgResponseLength;
                 avgCount += 1;
             }
+
+            if (visitorMessageCount != null && visitorMessageCount > 0) {
+                inquiryCount += 1;
+                if (Boolean.TRUE.equals(resolved)) {
+                    convertedCount += 1;
+                }
+            }
+
+            if (rateScore != null && (rated == null || rated)) {
+                ratedCount += 1;
+                if (rateScore <= 3) {
+                    dissatisfiedCount += 1;
+                }
+            }
         }
 
         int firstAvg = firstCount == 0 ? 0 : (int) Math.round((double) firstSum / firstCount);
         int avgAvg = avgCount == 0 ? 0 : (int) Math.round((double) avgSum / avgCount);
+        double answerRate30s = calculatePercentage(answerIn30sCount, responseEligibleCount);
+        double replyRate3m = calculatePercentage(answerIn3mCount, responseEligibleCount);
+        double inquiryConversionRate = calculatePercentage(convertedCount, inquiryCount);
+        double dissatisfiedRate = calculatePercentage(dissatisfiedCount, ratedCount);
 
-        return new AgentResponseLengthStats(firstAvg, avgAvg);
+        return new AgentKpiStats(
+                firstAvg,
+                avgAvg,
+                answerRate30s,
+                replyRate3m,
+                inquiryConversionRate,
+            dissatisfiedCount,
+            dissatisfiedRate);
+    }
+
+    private double calculatePercentage(int numerator, int denominator) {
+        if (denominator <= 0) {
+            return 0D;
+        }
+        return Math.round((numerator * 10000D) / denominator) / 100D;
+    }
+
+    /**
+     * 兼容旧调用：仅返回首次/平均响应时长。
+     */
+    public AgentResponseLengthStats computeAgentResponseLengthStats(String agentQueueUid) {
+        AgentKpiStats stats = computeAgentKpiStats(agentQueueUid);
+        return new AgentResponseLengthStats(stats.agentFirstResponseLength(), stats.agentAvgResponseLength());
+    }
+
+    public record AgentKpiStats(
+            int agentFirstResponseLength,
+            int agentAvgResponseLength,
+            double answerRate30s,
+            double agentReplyRate3m,
+            double inquiryConversionRate,
+                int dissatisfiedCount,
+            double dissatisfiedRate) {
     }
 
     public record AgentResponseLengthStats(int agentFirstResponseLength, int agentAvgResponseLength) {

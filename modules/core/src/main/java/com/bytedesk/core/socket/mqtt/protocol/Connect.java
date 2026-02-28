@@ -94,6 +94,8 @@ public class Connect {
             return;
         }
 
+        boolean duplicateConnectOnSameChannel = false;
+
         // 如果会话中已存储这个新连接的clientId, 就关闭之前该clientId的连接
         if (mqttSessionService.containsKey(clientId)) {
             // log.debug("clientId {} already exist", clientId);
@@ -102,9 +104,12 @@ public class Connect {
                 // FIXME: java.lang.NullPointerException: null
                 final Channel previous = sessionStore.getChannel();
                 final Boolean cleanSession = sessionStore.getCleanSession();
+                if (previous != null && previous.id().equals(channel.id())) {
+                    duplicateConnectOnSameChannel = true;
+                }
                 // 一个账号可以同时登录多个不同客户端，但同一个客户端同时仅能够登录一个，
                 // 多余需要踢掉线（不同终端后不会互踢，但是两个相同终端（例如两个 iOS 端登录）会互踢。）
-                if (cleanSession.booleanValue()) {
+                if (Boolean.TRUE.equals(cleanSession)) {
                     mqttSessionService.remove(clientId);
                     // mqttSubscribeStoreService.removeForClient(clientId);
                     // topicService.removeClientId(clientId);
@@ -121,7 +126,9 @@ public class Connect {
                 // MqttConnAckVariableHeader(MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD,
                 // false), null);
                 // previous.writeAndFlush(connAckMessage);
-                previous.close();
+                if (!duplicateConnectOnSameChannel && previous != null && previous.isActive()) {
+                    previous.close();
+                }
             }
         }
 
@@ -165,7 +172,11 @@ public class Connect {
         // 至此存储会话消息及返回接受客户端连接
         mqttSessionService.put(clientId, mqttSession);
         // 存储clientId
-        mqttService.publishMqttConnectedEvent(clientId);
+        if (!duplicateConnectOnSameChannel) {
+            mqttService.publishMqttConnectedEvent(clientId);
+        } else {
+            log.debug("skip duplicate mqtt connected event on same channel, clientId {}", clientId);
+        }
 
         // 用户clientId格式: uid/client/deviceUid
         // final String uid = clientId.split("/")[0];

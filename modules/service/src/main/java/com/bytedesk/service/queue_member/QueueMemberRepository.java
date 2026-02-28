@@ -33,12 +33,13 @@ public interface QueueMemberRepository
                 extends JpaRepository<QueueMemberEntity, Long>, JpaSpecificationExecutor<QueueMemberEntity> {
 
         /**
-         * 仅查询用于“客服响应时长统计”的必要字段，避免加载完整实体。
+         * 查询客服 KPI 统计所需字段，避免加载完整实体。
          */
-        @Query("SELECT qm.visitorFirstMessageAt, qm.agentFirstResponseAt, qm.agentAvgResponseLength " +
+        @Query("SELECT qm.visitorFirstMessageAt, qm.agentFirstResponseAt, qm.agentAvgResponseLength, " +
+               "qm.rated, qm.rateScore, qm.resolved, qm.visitorMessageCount " +
                "FROM QueueMemberEntity qm " +
                "WHERE qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false")
-        List<Object[]> findAgentResponseStatsRows(@Param("agentQueueUid") String agentQueueUid);
+        List<Object[]> findAgentKpiStatsRows(@Param("agentQueueUid") String agentQueueUid);
 
         Optional<QueueMemberEntity> findByUid(String uid);
 
