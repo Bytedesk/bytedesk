@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.springai.providers.openrouter;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIOpenrouterRestService {
 
     private static final String DEFAULT_OPENROUTER_API_URL = "https://openrouter.ai/api/v1";
+    private static final String ALLOWED_OPENROUTER_HOST = "openrouter.ai";
 
     /**
      * 获取可用模型列表
@@ -49,9 +51,7 @@ public class SpringAIOpenrouterRestService {
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getModels(OpenrouterRequest request) {
         try {
-            String apiUrl = StringUtils.hasText(request.getApiUrl())
-                    ? request.getApiUrl()
-                    : DEFAULT_OPENROUTER_API_URL;
+            String apiUrl = resolveSafeApiUrl(request);
 
             String modelsUrl = apiUrl + "/models";
 
@@ -94,6 +94,33 @@ public class SpringAIOpenrouterRestService {
             log.error("Failed to get OpenRouter models: {}", e.getMessage(), e);
             // 作为备用方案，返回一些常用模型
             return List.of();
+        }
+    }
+
+    private String resolveSafeApiUrl(OpenrouterRequest request) {
+        if (!StringUtils.hasText(request.getApiUrl())) {
+            return DEFAULT_OPENROUTER_API_URL;
+        }
+
+        try {
+            URI uri = URI.create(request.getApiUrl().trim());
+            String scheme = uri.getScheme();
+            String host = uri.getHost();
+
+            if (!"https".equalsIgnoreCase(scheme)) {
+                log.warn("Rejected OpenRouter apiUrl due to non-https scheme: {}", request.getApiUrl());
+                return DEFAULT_OPENROUTER_API_URL;
+            }
+
+            if (host == null || !ALLOWED_OPENROUTER_HOST.equalsIgnoreCase(host)) {
+                log.warn("Rejected OpenRouter apiUrl due to disallowed host: {}", request.getApiUrl());
+                return DEFAULT_OPENROUTER_API_URL;
+            }
+
+            return request.getApiUrl().trim().replaceAll("/+$", "");
+        } catch (Exception ex) {
+            log.warn("Rejected OpenRouter apiUrl due to parse error: {}", request.getApiUrl());
+            return DEFAULT_OPENROUTER_API_URL;
         }
     }
 

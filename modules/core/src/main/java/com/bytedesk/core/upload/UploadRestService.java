@@ -268,6 +268,14 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
     // 文件类型白名单校验 - 使用配置化的安全策略
     private boolean isAllowedFileType(String fileName, String contentType) {
         String ext = getFileExt(fileName);
+
+		// 主动内容文件（尤其是 SVG）存在脚本执行风险，禁止通过上传链路直接落盘
+		if ("svg".equalsIgnoreCase(ext) || "svgz".equalsIgnoreCase(ext)) {
+			return false;
+		}
+		if (contentType != null && contentType.toLowerCase().contains("image/svg")) {
+			return false;
+		}
         
         // 检查扩展名
         if (!uploadSecurityConfig.isExtensionAllowed(ext)) {
