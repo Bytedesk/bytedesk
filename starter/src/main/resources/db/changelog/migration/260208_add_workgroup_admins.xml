@@ -5,6 +5,13 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="260208-add-workgroup-admins" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup"/>
+                <tableExists tableName="bytedesk_service_agent"/>
+            </and>
+        </preConditions>
+
         <createTable tableName="bytedesk_service_workgroup_admins">
             <column name="workgroup_id" type="BIGINT">
                 <constraints nullable="false"/>

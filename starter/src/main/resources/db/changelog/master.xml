@@ -88,4 +88,6 @@
 
     <include file="db/changelog/migration/260227_service_settings_toolbar_prefix_columns.xml" />
 
+    <include file="db/changelog/migration/260304_add_toolbar_goods_and_backfill.xml" />
+
 </databaseChangeLog>

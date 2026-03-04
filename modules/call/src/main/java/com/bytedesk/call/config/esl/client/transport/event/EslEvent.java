@@ -120,6 +120,15 @@ public class EslEvent {
 	/**
 	 * Convenience method.
 	 *
+	 * @return the string value of the event header "Event-Subclass"
+	 */
+	public String getEventSubclass() {
+		return getEventHeaders().get("Event-Subclass");
+	}
+
+	/**
+	 * Convenience method.
+	 *
 	 * @return long value of the event header "Event-Date-Timestamp"
 	 */
 	public long getEventDateTimestamp() {

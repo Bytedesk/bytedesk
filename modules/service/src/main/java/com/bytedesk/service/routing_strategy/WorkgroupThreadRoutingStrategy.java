@@ -60,7 +60,7 @@ import com.bytedesk.service.visitor.VisitorCallTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
-import com.bytedesk.video.webrtc.WebrtcService;
+import com.bytedesk.video.webrtc.IWebrtcService;
 import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -123,7 +123,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final ObjectProvider<ThreadRoutingContext> threadRoutingContextProvider;
     private final AgentRestService agentRestService;
     private final RoutingPoolRestService routingPoolRestService;
-    private final WebrtcService webrtcService;
+    private final IWebrtcService webrtcService;
 
     @Override
     protected ThreadRestService getThreadRestService() {

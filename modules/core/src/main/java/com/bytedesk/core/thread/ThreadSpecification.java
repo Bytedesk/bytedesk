@@ -212,16 +212,30 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
      * - 通过 thread_user(JSON) 中包含 visitorUid 来过滤
      * - 与历史 native query 行为对齐：updatedAt 倒序
      */
-    public static Specification<ThreadEntity> searchForVisitor(ThreadRequest request, String visitorUid) {
+    public static Specification<ThreadEntity> searchForVisitor(ThreadRequest request, String uid, String visitorUid) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
 
-            // visitorUid 为空时不应返回任何数据（避免匿名全量查询）
-            if (!StringUtils.hasText(visitorUid)) {
+            // 访客侧必须携带 orgUid，并按组织隔离，避免跨组织会话泄露
+            if (!StringUtils.hasText(request.getOrgUid())) {
                 return criteriaBuilder.disjunction();
             }
-            predicates.add(criteriaBuilder.like(root.get("user"), "%" + visitorUid + "%"));
+            predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+
+            // uid 与 visitorUid 都为空时不应返回任何数据（避免匿名全量查询）
+            if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {
+                return criteriaBuilder.disjunction();
+            }
+
+            List<Predicate> identityPredicates = new ArrayList<>();
+            if (StringUtils.hasText(uid)) {
+                identityPredicates.add(criteriaBuilder.like(root.get("user"), "%" + uid + "%"));
+            }
+            if (StringUtils.hasText(visitorUid)) {
+                identityPredicates.add(criteriaBuilder.like(root.get("user"), "%" + visitorUid + "%"));
+            }
+            predicates.add(criteriaBuilder.or(identityPredicates.toArray(new Predicate[0])));
 
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));

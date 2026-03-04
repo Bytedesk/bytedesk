@@ -12,17 +12,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.bytedesk.call.config.CallEventListener;
+import com.bytedesk.call.config.CallFreeswitchProperties;
 import com.bytedesk.call.config.esl.client.inbound.Client;
+import com.bytedesk.call.config.esl.client.inbound.InboundConnectionFailure;
 import com.bytedesk.call.config.esl.client.internal.IModEslApi;
 import com.bytedesk.call.config.esl.client.transport.CommandResponse;
 import com.bytedesk.call.config.esl.client.transport.message.EslHeaders;
 import com.bytedesk.call.config.esl.client.transport.message.EslMessage;
 
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
@@ -31,6 +39,11 @@ import java.util.concurrent.CompletableFuture;
 public class EslService {
 
     private final Client eslClient;
+    private final CallFreeswitchProperties callFreeswitchProperties;
+    private final CallEventListener callEventListener;
+
+    private final Object connectLock = new Object();
+    private final AtomicBoolean listenerRegistered = new AtomicBoolean(false);
 
     /**
      * 将 EslMessage 统一转换为 Map 结果
@@ -87,6 +100,153 @@ public class EslService {
         return res;
     }
 
+    private <T> T executeWithReconnect(String action, Supplier<T> operation) {
+        ensureConnected();
+        try {
+            return operation.get();
+        } catch (RuntimeException ex) {
+            if (!isConnectionError(ex)) {
+                throw ex;
+            }
+            log.warn("ESL action={} 执行时检测到连接问题，尝试重连后重试: {}", action, ex.getMessage());
+            reconnect();
+            return operation.get();
+        }
+    }
+
+    private boolean isConnectionError(Throwable ex) {
+        String message = ex == null ? null : ex.getMessage();
+        if (message == null) {
+            return false;
+        }
+        String lower = message.toLowerCase();
+        return lower.contains("not connected")
+                || lower.contains("connection")
+                || lower.contains("channel")
+                || lower.contains("closed");
+    }
+
+    private void reconnect() {
+        synchronized (connectLock) {
+            connectAndInitSubscriptions(true);
+        }
+    }
+
+    private void ensureConnected() {
+        if (eslClient.canSend()) {
+            return;
+        }
+        synchronized (connectLock) {
+            if (eslClient.canSend()) {
+                return;
+            }
+            connectAndInitSubscriptions(false);
+        }
+    }
+
+    private void connectAndInitSubscriptions(boolean forceReconnect) {
+        if (!forceReconnect && eslClient.canSend()) {
+            return;
+        }
+        int maxRetries = Math.max(1, callFreeswitchProperties.getMaxRetries());
+        int retryDelayMs = Math.max(500, callFreeswitchProperties.getRetryDelayMs());
+        Throwable lastError = null;
+
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                if (forceReconnect && eslClient.canSend()) {
+                    try {
+                        eslClient.close();
+                    } catch (Exception closeEx) {
+                        log.debug("ESL close during reconnect ignored: {}", closeEx.getMessage());
+                    }
+                }
+
+                eslClient.connect(
+                        new InetSocketAddress(callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort()),
+                        callFreeswitchProperties.getEslPassword(),
+                        callFreeswitchProperties.getConnectTimeoutSeconds());
+
+                if (listenerRegistered.compareAndSet(false, true)) {
+                    eslClient.addEventListener(callEventListener);
+                }
+
+                String subscriptions = callFreeswitchProperties.getEventSubscriptions();
+                CommandResponse subscriptionResp = eslClient.setEventSubscriptions(
+                        IModEslApi.EventFormat.PLAIN,
+                        StringUtils.hasText(subscriptions) ? subscriptions.trim() : "all");
+                logCommandResponse("setEventSubscriptions", subscriptionResp);
+                registerEventFilters();
+
+                log.info("ESL连接可用: {}:{}", callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
+                return;
+            } catch (InboundConnectionFailure | RuntimeException ex) {
+                lastError = ex;
+                log.warn("ESL重连失败 attempt={}/{}: {}", attempt, maxRetries, ex.getMessage());
+                if (attempt < maxRetries) {
+                    try {
+                        Thread.sleep(retryDelayMs);
+                    } catch (InterruptedException interruptedException) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException("ESL重连被中断", interruptedException);
+                    }
+                    retryDelayMs = retryDelayMs * 2;
+                }
+            }
+        }
+        throw new IllegalStateException("ESL连接失败，已达到最大重试次数", lastError);
+    }
+
+    private void registerEventFilters() {
+        if (!callFreeswitchProperties.isEnableEventFilters()) {
+            return;
+        }
+        List<String> eventNameFilters = callFreeswitchProperties.getEventNameFilters();
+        if (eventNameFilters != null) {
+            for (String eventName : eventNameFilters) {
+                if (!StringUtils.hasText(eventName)) {
+                    continue;
+                }
+                CommandResponse response = eslClient.addEventFilter("Event-Name", eventName.trim());
+                logCommandResponse("filter Event-Name=" + eventName, response);
+            }
+        }
+        List<String> eventSubclassFilters = callFreeswitchProperties.getEventSubclassFilters();
+        if (eventSubclassFilters != null) {
+            for (String eventSubclass : eventSubclassFilters) {
+                if (!StringUtils.hasText(eventSubclass)) {
+                    continue;
+                }
+                CommandResponse response = eslClient.addEventFilter("Event-Subclass", eventSubclass.trim());
+                logCommandResponse("filter Event-Subclass=" + eventSubclass, response);
+            }
+        }
+    }
+
+    private void logCommandResponse(String action, CommandResponse response) {
+        if (response == null) {
+            log.warn("ESL action={} 返回空响应", action);
+            return;
+        }
+        if (response.isOk()) {
+            log.info("ESL action={} 成功: {}", action, response.getReplyText());
+        } else {
+            log.warn("ESL action={} 失败: {}", action, response.getReplyText());
+        }
+    }
+
+    public Map<String, Object> connectionState() {
+        Map<String, Object> state = new HashMap<>();
+        state.put("connected", eslClient.canSend());
+        state.put("server", callFreeswitchProperties.getServer());
+        state.put("port", callFreeswitchProperties.getEslPort());
+        state.put("eventSubscriptions", callFreeswitchProperties.getEventSubscriptions());
+        state.put("eventFiltersEnabled", callFreeswitchProperties.isEnableEventFilters());
+        state.put("eventNameFilters", new ArrayList<>(callFreeswitchProperties.getEventNameFilters()));
+        state.put("eventSubclassFilters", new ArrayList<>(callFreeswitchProperties.getEventSubclassFilters()));
+        return state;
+    }
+
     /**
      * 执行同步 API 命令
      * @param command FreeSWITCH API 命令（如 reloadxml、sofia、uuid_bridge 等）
@@ -94,8 +254,21 @@ public class EslService {
      * @return 标准化结果 Map
      */
     public Map<String, Object> api(String command, String args) {
-        EslMessage msg = eslClient.sendApiCommand(command, args == null ? "" : args);
-        return toResult(msg);
+        return executeWithReconnect("api", () -> {
+            EslMessage msg = eslClient.sendApiCommand(command, args == null ? "" : args);
+            return toResult(msg);
+        });
+    }
+
+    /**
+     * 执行原生命令（等同 fs_cli 输入命令，不自动追加 api/bgapi 前缀）
+     * 例如：event plain all / noevents / filter Event-Name CHANNEL_CREATE
+     */
+    public Map<String, Object> command(String command) {
+        return executeWithReconnect("command", () -> {
+            CommandResponse response = eslClient.sendCommand(command);
+            return toResult(response);
+        });
     }
 
     /**
@@ -104,14 +277,48 @@ public class EslService {
      * @param args    命令参数
      */
     public CompletableFuture<Map<String, Object>> bgapi(String command, String args) {
+        ensureConnected();
         return eslClient.sendBackgroundApiCommand(command, args == null ? "" : args)
-                .thenApply(event -> {
-                    Map<String, Object> res = new HashMap<>();
-                    res.put("eventName", event.getEventName());
-                    res.put("headers", event.getEventHeaders());
-                    res.put("bodyLines", event.getEventBodyLines());
-                    return res;
-                });
+            .thenApply(event -> {
+                Map<String, Object> res = new HashMap<>();
+                res.put("eventName", event.getEventName());
+                res.put("headers", event.getEventHeaders());
+                res.put("bodyLines", event.getEventBodyLines());
+                return res;
+            });
+    }
+
+    /** 取消全部事件订阅（noevents） */
+    public Map<String, Object> noEvents() {
+        return executeWithReconnect("noevents", () -> {
+            CommandResponse response = eslClient.cancelEventSubscriptions();
+            return toResult(response);
+        });
+    }
+
+    /** 设置事件订阅（event plain ...） */
+    public Map<String, Object> eventSubscriptions(String events) {
+        return executeWithReconnect("eventSubscriptions", () -> {
+            String value = StringUtils.hasText(events) ? events.trim() : "all";
+            CommandResponse response = eslClient.setEventSubscriptions(IModEslApi.EventFormat.PLAIN, value);
+            return toResult(response);
+        });
+    }
+
+    /** 添加过滤器（filter Event-Name CHANNEL_CREATE） */
+    public Map<String, Object> addEventFilter(String eventHeader, String valueToFilter) {
+        return executeWithReconnect("addEventFilter", () -> {
+            CommandResponse response = eslClient.addEventFilter(eventHeader, valueToFilter);
+            return toResult(response);
+        });
+    }
+
+    /** 删除过滤器（filter delete Event-Name CHANNEL_CREATE） */
+    public Map<String, Object> deleteEventFilter(String eventHeader, String valueToFilter) {
+        return executeWithReconnect("deleteEventFilter", () -> {
+            CommandResponse response = eslClient.deleteEventFilter(eventHeader, valueToFilter);
+            return toResult(response);
+        });
     }
 
     // ===================== 基础维护类 =====================

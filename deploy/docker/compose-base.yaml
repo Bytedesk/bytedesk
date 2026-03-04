@@ -1,0 +1,123 @@
+services:
+  bytedesk-redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis-bytedesk
+    ports:
+      - "16379:6379"
+    environment:
+      - REDIS_ARGS=--requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  bytedesk-ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-bytedesk
+    ports:
+      - "21434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=qwen3:0.6b
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      
+  # ElasticSearch 向量数据库
+  bytedesk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    container_name: elasticsearch-bytedesk
+    environment:
+      - node.name=bytedesk-es01
+      - cluster.name=bytedesk-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    entrypoint: ["bash", "-c", "if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then echo 'Installing IK plugin...'; if [ -f /tmp/elasticsearch-analysis-ik-8.18.0.zip ]; then /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; else curl -fsSL -o /tmp/elasticsearch-analysis-ik-8.18.0.zip https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip && /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; fi; fi; exec /usr/local/bin/docker-entrypoint.sh"]
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      # 默认安装 IK 分词插件（本地文件）
+      # 如无本地文件，将自动从 https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip 下载
+      - ./elasticsearch-analysis-ik-8.18.0.zip:/tmp/elasticsearch-analysis-ik-8.18.0.zip:ro
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+
+  # Zipkin 分布式追踪系统- Spring Ai Observability
+  bytedesk-zipkin:
+    image: 'openzipkin/zipkin:latest'
+    container_name: zipkin-bytedesk
+    ports:
+      - '19411:9411'
+    volumes:
+      - zipkin_data:/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO Console
+  # http://localhost:19001 - MinIO API
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  redis_data:
+    name: bytedesk_redis_data
+  ollama_models:
+    name: bytedesk_ollama_models
+  elasticsearch_data:
+    name: bytedesk_elasticsearch_data
+  zipkin_data:
+    name: bytedesk_zipkin_data
+  minio_data:
+    name: bytedesk_minio_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

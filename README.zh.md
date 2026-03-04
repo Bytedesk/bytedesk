@@ -97,67 +97,11 @@
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
-# 默认不使用AI
-docker compose -p bytedesk -f docker-compose-noai.yaml up -d
-# 或 默认使用 智谱AI，需要配置 智谱ai key
-docker compose -p bytedesk -f docker-compose.yaml up -d
-# 或 默认使用 ollama
-docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
+# 默认启动（MySQL + Artemis + standard，仅中间件）
+./start.sh mysql artemis standard middleware
 ```
 
-### 源码启动依赖（支持 MySQL / PostgreSQL / Oracle 三选一）
-
-源码启动时，进入 `starter/src/main/resources`，使用脚本启动依赖容器。
-
-```bash
-cd starter/src/main/resources
-
-# Artemis + MySQL（默认）
-./compose-artemis.sh up -d
-
-# RabbitMQ + MySQL（默认）
-./compose-rabbitmq.sh up -d
-
-# Artemis + PostgreSQL
-./compose-artemis.sh --db postgresql up -d
-
-# RabbitMQ + PostgreSQL
-./compose-rabbitmq.sh --db postgresql up -d
-
-# Artemis + Oracle
-./compose-artemis.sh --db oracle up -d
-
-# RabbitMQ + Oracle
-./compose-rabbitmq.sh --db oracle up -d
-
-# 或通过环境变量切换（mysql/postgresql/oracle）
-BYTEDESK_DB=postgresql ./compose-artemis.sh up -d
-BYTEDESK_DB=postgresql ./compose-rabbitmq.sh up -d
-BYTEDESK_DB=oracle ./compose-artemis.sh up -d
-BYTEDESK_DB=oracle ./compose-rabbitmq.sh up -d
-```
-
-等价的原生命令示例：
-
-```bash
-# Artemis + MySQL
-docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose.yaml up -d
-
-# Artemis + PostgreSQL
-docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose.yaml up -d
-
-# RabbitMQ + MySQL
-docker compose -p bytedesk -f compose.common.yaml -f compose-mysql.yaml -f compose-rabbitmq.yaml up -d
-
-# RabbitMQ + PostgreSQL
-docker compose -p bytedesk -f compose.common.yaml -f compose-postgresql.yaml -f compose-rabbitmq.yaml up -d
-
-# Artemis + Oracle
-docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose.yaml up -d
-
-# RabbitMQ + Oracle
-docker compose -p bytedesk -f compose.common.yaml -f compose-oracle.yaml -f compose-rabbitmq.yaml up -d
-```
+更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、call、全量启动）请参考 `deploy/docker/readme.zh.md`。
 
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
@@ -213,21 +157,21 @@ bytedesk/
 
 ## 开源Demo + SDK
 
-| Project     | Description           | Forks          | Stars             |
-|-------------|-----------------------|----------------|-------------------|
-| [iOS](https://github.com/bytedesk/bytedesk-swift) | iOS  | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-swift) | ![GitHub Repo stars](https://img.shields.io/github/stars/Bytedesk/bytedesk-swift)                 |
-| [Android](https://github.com/bytedesk/bytedesk-android) | Android | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-android) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-android)  |
-| [Flutter](https://github.com/bytedesk/bytedesk-flutter) | Flutter | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-flutter)| ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-flutter) |
-| [UniApp](https://github.com/bytedesk/bytedesk-uniapp) | Uniapp | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp) |
-| [Web](https://github.com/bytedesk/bytedesk-web) | Vue/React/Angular/Next.js/JQuery/... | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web) |
-| [Wordpress](https://github.com/bytedesk/bytedesk-wordpress) | Wordpress | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-wordpress) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-wordpress) |
-| [Woocommerce](https://github.com/bytedesk/bytedesk-woocommerce) | woocommerce | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-woocommerce) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-woocommerce) |
-<!-- | [Magento](https://github.com/bytedesk/bytedesk-magento) | Magento | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-magento) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-magento) |
-| [Prestashop](https://github.com/bytedesk/bytedesk-prestashop) | Prestashop | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-prestashop) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-prestashop) |
-| [Shopify](https://github.com/bytedesk/bytedesk-shopify) | Shopify | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-shopify) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-shopify) |
-| [Opencart](https://github.com/bytedesk/bytedesk-opencart) | Opencart | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-opencart) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-opencart) |
-| [Laravel](https://github.com/bytedesk/bytedesk-laravel) | Laravel | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-laravel) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-laravel) |
-| [Django](https://github.com/bytedesk/bytedesk-django) | Django | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-django) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-django) | -->
+|Project|Description|Forks|Stars|
+|---|---|---|---|
+|[iOS](https://github.com/bytedesk/bytedesk-swift)|iOS|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-swift)|![GitHub Repo stars](https://img.shields.io/github/stars/Bytedesk/bytedesk-swift)|
+|[Android](https://github.com/bytedesk/bytedesk-android)|Android|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-android)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-android)|
+|[Flutter](https://github.com/bytedesk/bytedesk-flutter)|Flutter|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-flutter)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-flutter)|
+|[UniApp](https://github.com/bytedesk/bytedesk-uniapp)|Uniapp|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp)|
+|[Web](https://github.com/bytedesk/bytedesk-web)|Vue/React/Angular/Next.js/JQuery/...|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web)|
+|[Wordpress](https://github.com/bytedesk/bytedesk-wordpress)|Wordpress|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-wordpress)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-wordpress)|
+|[Woocommerce](https://github.com/bytedesk/bytedesk-woocommerce)|woocommerce|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-woocommerce)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-woocommerce)|
+<!-- |[Magento](https://github.com/bytedesk/bytedesk-magento)|Magento|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-magento)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-magento)|
+|[Prestashop](https://github.com/bytedesk/bytedesk-prestashop)|Prestashop|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-prestashop)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-prestashop)|
+|[Shopify](https://github.com/bytedesk/bytedesk-shopify)|Shopify|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-shopify)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-shopify)|
+|[Opencart](https://github.com/bytedesk/bytedesk-opencart)|Opencart|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-opencart)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-opencart)|
+|[Laravel](https://github.com/bytedesk/bytedesk-laravel)|Laravel|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-laravel)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-laravel)|
+|[Django](https://github.com/bytedesk/bytedesk-django)|Django|![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-django)|![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-django)| -->
 
 ## 链接
 

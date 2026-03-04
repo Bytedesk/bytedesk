@@ -13,6 +13,9 @@
  */
 package com.bytedesk.call.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +48,57 @@ public class CallFreeswitchProperties {
      * ESL密码
      */
     private String eslPassword = "bytedesk123";
+
+        /**
+         * ESL连接超时（秒）
+         */
+        private int connectTimeoutSeconds = 30;
+
+        /**
+         * ESL连接重试次数
+         */
+        private int maxRetries = 5;
+
+        /**
+         * ESL连接初始重试间隔（毫秒）
+         */
+        private int retryDelayMs = 3000;
+
+        /**
+         * ESL事件订阅参数，对应 event plain {subscriptions}
+         * 默认 all，可配置为 "CHANNEL_CREATE CHANNEL_DESTROY ..."
+         */
+        private String eventSubscriptions = "all";
+
+        /**
+         * 是否启用Event-Name过滤器
+         */
+        private boolean enableEventFilters = true;
+
+        /**
+         * Event-Name 过滤列表（FusionPBX风格：event plain all + filter Event-Name xxx）
+         */
+        private List<String> eventNameFilters = new ArrayList<>(List.of(
+            "CHANNEL_CREATE",
+            "CHANNEL_ANSWER",
+            "CHANNEL_HANGUP",
+            "CHANNEL_HANGUP_COMPLETE",
+            "CHANNEL_DESTROY",
+            "CHANNEL_EXECUTE",
+            "CHANNEL_EXECUTE_COMPLETE",
+            "CHANNEL_STATE",
+            "CHANNEL_CALLSTATE",
+            "DTMF",
+            "PRESENCE_IN",
+            "CUSTOM",
+            "API",
+            "BACKGROUND_JOB"
+        ));
+
+        /**
+         * Event-Subclass 过滤列表（例如 conference::maintenance、sofia::register）
+         */
+        private List<String> eventSubclassFilters = new ArrayList<>();
     
     /**
      * SIP端口

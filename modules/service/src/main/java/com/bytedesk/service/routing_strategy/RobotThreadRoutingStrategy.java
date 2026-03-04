@@ -44,7 +44,7 @@ import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.service.visitor.VisitorCallTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
-import com.bytedesk.video.webrtc.WebrtcService;
+import com.bytedesk.video.webrtc.IWebrtcService;
 import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
 
 import jakarta.annotation.Nonnull;
@@ -82,7 +82,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final QueueMemberRestService queueMemberRestService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final MessageRestService messageRestService;
-    private final WebrtcService webrtcService;
+    private final IWebrtcService webrtcService;
 
     @Override
     protected ThreadRestService getThreadRestService() {

@@ -1,0 +1,32 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-scenario-standard.yaml up -d
+services:
+  bytedesk-db:
+    image: postgres:17
+    container_name: postgresql-bytedesk
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bytedesk}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "${POSTGRES_HOST_PORT:-15432}:${POSTGRES_PORT:-5432}"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-bytedesk}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bytedesk:
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${FREESWITCH_DB_HOST:-bytedesk-db}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-bytedesk}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+volumes:
+  postgresql_data:
+    name: bytedesk_postgresql_data

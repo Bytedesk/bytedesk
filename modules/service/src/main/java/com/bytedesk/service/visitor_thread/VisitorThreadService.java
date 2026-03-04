@@ -209,7 +209,7 @@ public class VisitorThreadService
         // 考虑到客服信息发生变化，更新客服信息
         UserProtobuf agentProtobuf = effectiveAgent.toUserProtobuf();
         // 访客信息
-        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
         String extra = buildAgentExtra(visitorRequest, effectiveAgent);
         //
@@ -222,7 +222,7 @@ public class VisitorThreadService
                 .agent(agentProtobuf.toJson())
                 .userUid(effectiveAgent.getUid()) // 客服uid
                 .owner(owner)
-                .user(visitor)
+                .user(user)
                 .extra(extra)
                 .channel(visitorRequest.getChannel())
                 .orgUid(orgUid)
@@ -260,7 +260,7 @@ public class VisitorThreadService
     public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
         // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
         String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robot);
-        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
         String extra = buildRobotExtra(visitorRequest, robot);
         //
@@ -271,7 +271,7 @@ public class VisitorThreadService
                 // .agent(robotString) // 人工客服
                 .robot(robotString) // 机器人
                 .userUid(robot.getUid()) // 机器人uid
-                .user(visitor)
+                .user(user)
                 .channel(visitorRequest.getChannel())
                 .orgUid(robot.getOrgUid())
                 .extra(extra)
@@ -303,7 +303,7 @@ public class VisitorThreadService
     public ThreadEntity createWorkflowThread(VisitorRequest visitorRequest, WorkflowEntity workflow, String topic) {
         //
         String workflowString = ServiceConvertUtils.convertToWorkflowProtobufString(workflow);
-        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（工作流暂时不支持 debug 预览）
         String extra = buildWorkflowExtra(visitorRequest, workflow);
         //
@@ -313,7 +313,7 @@ public class VisitorThreadService
                 .type(ThreadTypeEnum.WORKFLOW.name())
                 .workflow(workflowString) // 工作流
                 .userUid(workflow.getUid()) // 工作流uid
-                .user(visitor)
+                .user(user)
                 .channel(visitorRequest.getChannel())
                 .orgUid(workflow.getOrgUid())
                 .extra(extra)

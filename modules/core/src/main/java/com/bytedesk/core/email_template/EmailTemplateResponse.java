@@ -53,7 +53,7 @@ public class EmailTemplateResponse extends BaseResponse {
 
     private String description;
 
-    private List<String> tagList;
+    private List<String> email_templateList;
 
     private Boolean enabled;
 

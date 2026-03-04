@@ -1448,7 +1448,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("call-ivr-apis")
                 .displayName("CallIvr Management APIs")
-                .pathsToMatch("/api/v1/call/ivr/**")
+                .pathsToMatch("/api/v1/call/ivr/menu/**")
                 .build();
     }
 

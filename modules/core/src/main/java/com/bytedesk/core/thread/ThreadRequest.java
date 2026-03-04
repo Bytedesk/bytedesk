@@ -144,6 +144,9 @@ public class ThreadRequest extends BaseRequest {
 
     private String ownerUid;
 
+    // 访客唯一标识（与 uid 区分：uid 常用于实体主键；visitorUid 用于跨会话稳定识别）
+    private String visitorUid;
+
     // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
     private String agent;
 

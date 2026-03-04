@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.Valid;
@@ -28,9 +30,11 @@ import java.util.concurrent.CompletableFuture;
 public class EslController {
 
     private final EslService eslService;
+    private final EslEventStreamService eslEventStreamService;
 
-    public EslController(EslService eslService) {
+    public EslController(EslService eslService, EslEventStreamService eslEventStreamService) {
         this.eslService = eslService;
+        this.eslEventStreamService = eslEventStreamService;
     }
 
     // 健康与通用
@@ -42,10 +46,24 @@ public class EslController {
         return ResponseEntity.ok(JsonResult.success("ok", res));
     }
 
+    /** ESL连接与订阅状态（可观测性） */
+    @GetMapping("/state")
+    public ResponseEntity<JsonResult<?>> state() {
+        Map<String, Object> state = eslService.connectionState();
+        return ResponseEntity.ok(JsonResult.success("ok", state));
+    }
+
     /** 通用同步 API（等同 fs_cli 中的 api 命令） */
     @PostMapping("/api")
     public ResponseEntity<JsonResult<?>> api(@RequestBody @Valid ApiRequest req) {
         Map<String, Object> res = eslService.api(req.getCommand(), req.getArgs());
+        return ResponseEntity.ok(JsonResult.success("ok", res));
+    }
+
+    /** 原生命令入口（不自动追加 api/bgapi 前缀） */
+    @PostMapping("/command")
+    public ResponseEntity<JsonResult<?>> command(@RequestBody @Valid CommandRequest req) {
+        Map<String, Object> res = eslService.command(req.getCommand());
         return ResponseEntity.ok(JsonResult.success("ok", res));
     }
 
@@ -54,6 +72,57 @@ public class EslController {
     public CompletableFuture<ResponseEntity<JsonResult<?>>> bgapi(@RequestBody @Valid ApiRequest req) {
         return eslService.bgapi(req.getCommand(), req.getArgs())
                 .thenApply(data -> ResponseEntity.ok(JsonResult.success("accepted", data)));
+    }
+
+    /** 设置事件订阅（event plain ...） */
+    @PostMapping("/events/subscriptions")
+    public ResponseEntity<JsonResult<?>> eventSubscriptions(@RequestBody(required = false) EventSubscriptionRequest req) {
+        String events = req == null ? null : req.getEvents();
+        return ResponseEntity.ok(JsonResult.success("event subscriptions", eslService.eventSubscriptions(events)));
+    }
+
+    /** 取消事件订阅（noevents） */
+    @DeleteMapping("/events/subscriptions")
+    public ResponseEntity<JsonResult<?>> noEvents() {
+        return ResponseEntity.ok(JsonResult.success("noevents", eslService.noEvents()));
+    }
+
+    /** 增加事件过滤器（filter Event-Name CHANNEL_CREATE） */
+    @PostMapping("/events/filters")
+    public ResponseEntity<JsonResult<?>> addEventFilter(@RequestBody @Valid EventFilterRequest req) {
+        return ResponseEntity.ok(JsonResult.success("event filter add",
+                eslService.addEventFilter(req.getEventHeader(), req.getValueToFilter())));
+    }
+
+    /** 删除事件过滤器（filter delete Event-Name CHANNEL_CREATE） */
+    @DeleteMapping("/events/filters")
+    public ResponseEntity<JsonResult<?>> deleteEventFilter(@RequestBody @Valid EventFilterRequest req) {
+        return ResponseEntity.ok(JsonResult.success("event filter delete",
+                eslService.deleteEventFilter(req.getEventHeader(), req.getValueToFilter())));
+    }
+
+    /** 获取最近ESL事件（用于排查事件链路） */
+    @GetMapping("/events/recent")
+    public ResponseEntity<JsonResult<?>> recentEvents(
+            @RequestParam(defaultValue = "100") int limit,
+            @RequestParam(required = false) String eventName,
+            @RequestParam(required = false) String eventSubclass) {
+        return ResponseEntity.ok(JsonResult.success("recent events",
+                eslEventStreamService.recentEvents(limit, eventName, eventSubclass)));
+    }
+
+    /** 订阅ESL事件流（SSE） */
+    @GetMapping(value = "/events/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamEvents(
+            @RequestParam(required = false) String eventName,
+            @RequestParam(required = false) String eventSubclass) {
+        return eslEventStreamService.subscribe(eventName, eventSubclass);
+    }
+
+    /** 事件流运行状态 */
+    @GetMapping("/events/stream/state")
+    public ResponseEntity<JsonResult<?>> streamState() {
+        return ResponseEntity.ok(JsonResult.success("stream state", eslEventStreamService.streamState()));
     }
 
     // 配置相关
@@ -186,6 +255,31 @@ public class EslController {
         @NotBlank
         private String command;
         private String args;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommandRequest {
+        @NotBlank
+        private String command;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EventSubscriptionRequest {
+        private String events;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EventFilterRequest {
+        @NotBlank
+        private String eventHeader;
+        @NotBlank
+        private String valueToFilter;
     }
 
     @Data

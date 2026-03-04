@@ -1,0 +1,7 @@
+# 用法：与 compose-scenario-call.yaml 搭配使用，为 FreeSWITCH 注入 PostgreSQL DSN
+# Usage: use with compose-scenario-call.yaml to inject PostgreSQL DSN for FreeSWITCH
+services:
+  bytedesk-freeswitch:
+    environment:
+      FS_CORE_DB_MODULE: mod_pgsql
+      FS_CORE_DB_DSN: "pgsql://host=${FREESWITCH_DB_HOST:-bytedesk-db} dbname=${POSTGRES_DB:-bytedesk} user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD} options='-c client_min_messages=NOTICE'"

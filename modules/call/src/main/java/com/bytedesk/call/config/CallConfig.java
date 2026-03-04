@@ -14,6 +14,8 @@
 package com.bytedesk.call.config;
 
 import java.net.InetSocketAddress;
+import java.util.List;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import com.bytedesk.call.config.esl.client.inbound.Client;
 import com.bytedesk.call.config.esl.client.inbound.InboundConnectionFailure;
 import com.bytedesk.call.config.esl.client.internal.IModEslApi;
+import com.bytedesk.call.config.esl.client.transport.CommandResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +55,8 @@ public class CallConfig {
         Client inboundClient = new Client();
         
         // 连接重试配置
-        int maxRetries = 5;
-        int retryDelayMs = 3000;
+        int maxRetries = Math.max(1, callFreeswitchProperties.getMaxRetries());
+        int retryDelayMs = Math.max(500, callFreeswitchProperties.getRetryDelayMs());
         
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
@@ -67,16 +70,24 @@ public class CallConfig {
                         callFreeswitchProperties.getEslPort()
                     ),
                     callFreeswitchProperties.getEslPassword(),
-                    30
-                ); // 增加超时时间到30秒
+                    callFreeswitchProperties.getConnectTimeoutSeconds()
+                );
                     
                 // 验证连接是否真正建立
                 if (inboundClient.canSend()) {
                     // 注册事件监听器
                     inboundClient.addEventListener(callEventListener);
                     
-                    // 订阅所有事件
-                    inboundClient.setEventSubscriptions(IModEslApi.EventFormat.PLAIN, "all");
+                    // 订阅事件（默认 all）
+                    String subscriptions = callFreeswitchProperties.getEventSubscriptions();
+                    CommandResponse subscriptionResp = inboundClient.setEventSubscriptions(
+                            IModEslApi.EventFormat.PLAIN,
+                            subscriptions == null || subscriptions.isBlank() ? "all" : subscriptions
+                    );
+                    logCommandResponse("setEventSubscriptions", subscriptionResp);
+
+                    // FusionPBX风格过滤器：event plain all + filter Event-Name/Event-Subclass
+                    registerEventFilters(inboundClient);
                     
                     log.info("Call ESL连接成功，服务器: {}:{}", 
                             callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
@@ -130,6 +141,47 @@ public class CallConfig {
         }
         
         return inboundClient;
+    }
+
+    private void registerEventFilters(Client inboundClient) {
+        if (!callFreeswitchProperties.isEnableEventFilters()) {
+            log.info("跳过ESL事件过滤器注册（bytedesk.call.freeswitch.enableEventFilters=false）");
+            return;
+        }
+
+        List<String> eventNameFilters = callFreeswitchProperties.getEventNameFilters();
+        if (eventNameFilters != null) {
+            for (String eventName : eventNameFilters) {
+                if (eventName == null || eventName.isBlank()) {
+                    continue;
+                }
+                CommandResponse resp = inboundClient.addEventFilter("Event-Name", eventName.trim());
+                logCommandResponse("filter Event-Name=" + eventName, resp);
+            }
+        }
+
+        List<String> eventSubclassFilters = callFreeswitchProperties.getEventSubclassFilters();
+        if (eventSubclassFilters != null) {
+            for (String eventSubclass : eventSubclassFilters) {
+                if (eventSubclass == null || eventSubclass.isBlank()) {
+                    continue;
+                }
+                CommandResponse resp = inboundClient.addEventFilter("Event-Subclass", eventSubclass.trim());
+                logCommandResponse("filter Event-Subclass=" + eventSubclass, resp);
+            }
+        }
+    }
+
+    private void logCommandResponse(String action, CommandResponse response) {
+        if (response == null) {
+            log.warn("ESL action={} 返回空响应", action);
+            return;
+        }
+        if (response.isOk()) {
+            log.info("ESL action={} 成功: {}", action, response.getReplyText());
+        } else {
+            log.warn("ESL action={} 失败: {}", action, response.getReplyText());
+        }
     }
 
 }

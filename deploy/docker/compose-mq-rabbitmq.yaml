@@ -1,0 +1,28 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql|oracle>.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-<standard|noai|call>.yaml up -d
+services:
+  # RabbitMQ 消息队列
+  # https://hub.docker.com/_/rabbitmq
+  # http://localhost:15673 (管理后台)
+  bytedesk-mq:
+    image: rabbitmq:4.2.3-management
+    container_name: rabbitmq-bytedesk
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - TZ=Asia/Shanghai
+    ports:
+      - "5673:5672"     # AMQP
+      - "15673:15672"   # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  rabbitmq_data:
+    name: bytedesk_rabbitmq_data

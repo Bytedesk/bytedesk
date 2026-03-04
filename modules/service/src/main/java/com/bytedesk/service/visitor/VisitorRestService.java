@@ -74,16 +74,12 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     @Transactional
     @Override
     public VisitorResponse create(VisitorRequest request) {
-        // 
-        String visitorUid = request.getVisitorUid();
-        // 不能去掉，否则会不断生成新访客
-        if (!StringUtils.hasText(visitorUid)) {
-            visitorUid = request.getUid();
-        }
+        String visitorUid = StringUtils.hasText(request.getVisitorUid()) ? request.getVisitorUid().trim() : null;
         String orgUid = request.getOrgUid();
-        // 
         log.info("visitor init, visitorUid: {}, orgUid: {}", visitorUid, orgUid);
-        Optional<VisitorEntity> visitorOptional = findByVisitorUidAndOrgUid(visitorUid, orgUid);
+        Optional<VisitorEntity> visitorOptional = StringUtils.hasText(visitorUid)
+                ? findByVisitorUidAndOrgUid(visitorUid, orgUid)
+                : Optional.empty();
         if (visitorOptional.isPresent()) {
             VisitorEntity visitor = visitorOptional.get();
             // 如果访客信息已存在，则更新访客信息
@@ -135,8 +131,10 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         // uid使用自动生成的uid，防止前端uid冲突
         request.setUid(uidUtils.getUid());
         // 如果前端没有传递visitorUid，则使用uid作为visitorUid
-        if (!StringUtils.hasText(request.getVisitorUid())) {
+        if (!StringUtils.hasText(visitorUid)) {
             request.setVisitorUid(request.getUid());
+        } else {
+            request.setVisitorUid(visitorUid);
         }
         // log.info("request {}", request);
         VisitorEntity visitor = modelMapper.map(request, VisitorEntity.class);

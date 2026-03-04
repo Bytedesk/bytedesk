@@ -8,7 +8,7 @@ import com.bytedesk.video.janus.client.plugins.videoroom.models.CreateRoomRespon
 import com.bytedesk.video.janus.client.plugins.videoroom.models.VideoRoom;
 import com.bytedesk.video.janus.utils.ServerInfo;
 
-public class JanusGatewayServiceImpl implements JanusGatewayService {
+public class JanusGatewayServiceImpl implements IJanusGatewayService {
 
     @Override
     public ServerInfo info() {

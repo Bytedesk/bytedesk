@@ -1,0 +1,10 @@
+services:
+  bytedesk:
+    environment:
+      BYTEDESK_MQ_TYPE: artemis
+      BYTEDESK_MQ_RABBITMQ_ENABLED: "false"
+      SPRING_ARTEMIS_MODE: native
+      SPRING_ARTEMIS_BROKER_URL: tcp://bytedesk-mq:61616
+      SPRING_ARTEMIS_USER: ${ARTEMIS_USER}
+      SPRING_ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD}
+      SPRING_JMS_CACHE_ENABLED: "true"

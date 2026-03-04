@@ -61,7 +61,9 @@ public class Client implements IModEslApi {
 
 	public void addEventListener(IEslEventListener listener) {
 		if (listener != null) {
-			eventListeners.add(listener);
+			if (!eventListeners.contains(listener)) {
+				eventListeners.add(listener);
+			}
 		}
 	}
 
@@ -159,6 +161,22 @@ public class Client implements IModEslApi {
 	 * @param arg     command arguments
 	 * @return an {@link EslMessage} containing command results
 	 */
+		public CommandResponse sendCommand(String command) {
+			checkConnected();
+			EslMessage response = clientContext.get().sendCommand(command);
+			return new CommandResponse(command, response);
+		}
+
+		/**
+		 * Sends a FreeSWITCH API command to the server and blocks, waiting for an immediate response from the
+		 * server.
+		 * <p/>
+		 * The outcome of the command from the server is retured in an {@link EslMessage} object.
+		 *
+		 * @param command API command to send
+		 * @param arg     command arguments
+		 * @return an {@link EslMessage} containing command results
+		 */
 	@Override
 	public EslMessage sendApiCommand(String command, String arg) {
 		checkConnected();

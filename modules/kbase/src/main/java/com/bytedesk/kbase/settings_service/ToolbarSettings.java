@@ -65,6 +65,10 @@ public class ToolbarSettings implements Serializable {
     private Boolean leavemsg = true;
 
     @Builder.Default
+    @Column(name = "toolbar_goods")
+    private Boolean goods = true;
+
+    @Builder.Default
     @Column(name = "toolbar_order_selector")
     private Boolean orderSelector = true;
 
@@ -91,7 +95,7 @@ public class ToolbarSettings implements Serializable {
 
     @Getter(AccessLevel.NONE)
     private List<String> order = Arrays.asList(
-        "smile", "upload", "speechInput", "rate", "leavemsg",
+        "smile", "upload", "speechInput", "rate", "leavemsg", "goods",
         "orderSelector", "ticket", "webrtc", "tel"
     );
 
@@ -106,7 +110,7 @@ public class ToolbarSettings implements Serializable {
     private List<String> normalizeOrder(List<String> raw) {
         if (raw == null || raw.isEmpty()) {
             return Arrays.asList(
-                "smile", "upload", "speechInput", "rate", "leavemsg",
+                "smile", "upload", "speechInput", "rate", "leavemsg", "goods",
                 "orderSelector", "ticket", "webrtc", "tel"
             );
         }

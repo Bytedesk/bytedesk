@@ -25,6 +25,7 @@
         <module>kbase</module>
         <module>marketing</module>
         <module>opinion</module>
+        <module>pan</module>
         <module>service</module>
         <module>remote</module>
         <module>social</module>

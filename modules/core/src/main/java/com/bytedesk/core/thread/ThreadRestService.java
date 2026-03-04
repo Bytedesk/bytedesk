@@ -184,11 +184,20 @@ public class ThreadRestService
      * 访客端-根据访客UID分页查询其相关的会话列表（支持基础筛选）
      */
     public Page<ThreadResponse> queryByVisitor(ThreadRequest request) {
-        if (request == null || !StringUtils.hasText(request.getUid())) {
+        if (request == null) {
             return Page.empty();
         }
 
-        String visitorUid = request.getUid();
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            throw new IllegalArgumentException("orgUid is required");
+        }
+
+        String uid = request.getUid();
+        String visitorUid = request.getVisitorUid();
+        if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {
+            return Page.empty();
+        }
+
         Pageable pageable = request.getPageable();
 
         // visitor(匿名)侧：统一走 Specification 查询，避免 repository native query 的列名/排序兼容问题
@@ -196,7 +205,7 @@ public class ThreadRestService
                 ? Pageable.unpaged()
                 : PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
 
-        Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, visitorUid);
+        Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, uid, visitorUid);
         Page<ThreadEntity> threadPage = threadRepository.findAll(specs, effectivePageable);
         return threadPage.map(this::convertToResponse);
     }

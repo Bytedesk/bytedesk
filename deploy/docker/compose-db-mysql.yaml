@@ -1,0 +1,27 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-scenario-standard.yaml up -d
+services:
+  bytedesk-db:
+    image: mysql:latest
+    container_name: mysql-bytedesk
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bytedesk}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_HOST_PORT:-13306}:${MYSQL_PORT:-3306}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      bytedesk-network:
+        aliases:
+          - bytedesk-mysql
+
+  bytedesk:
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${FREESWITCH_DB_HOST:-bytedesk-db}:${MYSQL_PORT:-3306}/${MYSQL_DATABASE:-bytedesk}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_ROOT_USER:-root}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+volumes:
+  mysql_data:
+    name: bytedesk_mysql_data

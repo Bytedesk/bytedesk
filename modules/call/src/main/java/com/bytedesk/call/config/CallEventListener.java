@@ -1,8 +1,12 @@
 package com.bytedesk.call.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.call.config.esl.CallSwitchEvent;
+import com.bytedesk.call.config.esl.EslEventNames;
+import com.bytedesk.call.config.esl.client.inbound.IEslEventListener;
 import com.bytedesk.call.config.esl.client.internal.Context;
 import com.bytedesk.call.config.esl.client.transport.event.EslEvent;
 
@@ -16,52 +20,60 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class CallEventListener implements com.bytedesk.call.config.esl.client.inbound.IEslEventListener {
+public class CallEventListener implements IEslEventListener {
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     // 实现 IEslEventListener 的回调
     @Override
     public void onEslEvent(Context ctx, EslEvent eslEvent) {
         String eventName = eslEvent.getEventName();
+        if (eventName == null || eventName.isBlank()) {
+            log.debug("收到空事件名事件: headers={}", eslEvent.getEventHeaders());
+            return;
+        }
+
+        publishSwitchEvent(eslEvent);
         // log.info("收到Call事件: {}", eventName); // HEARTBEAT/RE_SCHEDULE
 
         switch (eventName) {
-            case "CHANNEL_CREATE":
+            case EslEventNames.CHANNEL_CREATE:
                 handleChannelCreate(eslEvent);
                 break;
-            case "CHANNEL_ANSWER":
+            case EslEventNames.CHANNEL_ANSWER:
                 handleChannelAnswer(eslEvent);
                 break;
-            case "CHANNEL_HANGUP":
+            case EslEventNames.CHANNEL_HANGUP:
                 handleChannelHangup(eslEvent);
                 break;
-            case "CHANNEL_HANGUP_COMPLETE":
+            case EslEventNames.CHANNEL_HANGUP_COMPLETE:
                 handleChannelHangupComplete(eslEvent);
                 break;
-            case "CHANNEL_DESTROY":
+            case EslEventNames.CHANNEL_DESTROY:
                 handleChannelDestroy(eslEvent);
                 break;
-            case "DTMF":
+            case EslEventNames.DTMF:
                 handleDtmf(eslEvent);
                 break;
-            case "CUSTOM":
+            case EslEventNames.CUSTOM:
                 handleCustomEvent(eslEvent);
                 break;
-            case "CHANNEL_EXECUTE":
+            case EslEventNames.CHANNEL_EXECUTE:
                 handleChannelExecute(eslEvent);
                 break;
-            case "CHANNEL_EXECUTE_COMPLETE":
+            case EslEventNames.CHANNEL_EXECUTE_COMPLETE:
                 handleChannelExecuteComplete(eslEvent);
                 break;
-            case "CHANNEL_STATE":
+            case EslEventNames.CHANNEL_STATE:
                 handleChannelState(eslEvent);
                 break;
-            case "CHANNEL_CALLSTATE":
+            case EslEventNames.CHANNEL_CALLSTATE:
                 handleChannelCallState(eslEvent);
                 break;
-            case "PRESENCE_IN":
+            case EslEventNames.PRESENCE_IN:
                 handlePresenceIn(eslEvent);
                 break;
-            case "API":
+            case EslEventNames.API:
                 handleApiEvent(eslEvent);
                 break;
             default:
@@ -315,6 +327,20 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
             // }
         } catch (Exception e) {
             log.error("更新用户在线状态失败: {} - {}", username, e.getMessage(), e);
+        }
+    }
+
+    private void publishSwitchEvent(EslEvent eslEvent) {
+        try {
+            CallSwitchEvent event = new CallSwitchEvent(
+                    eslEvent.getEventName(),
+                    eslEvent.getEventSubclass(),
+                    eslEvent.getEventHeaders(),
+                    eslEvent.getEventBodyLines()
+            );
+            applicationEventPublisher.publishEvent(event);
+        } catch (Exception e) {
+            log.warn("发布CallSwitchEvent失败: {}", e.getMessage(), e);
         }
     }
 

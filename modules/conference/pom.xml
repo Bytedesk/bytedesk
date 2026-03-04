@@ -32,6 +32,13 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-call</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-video</artifactId>
 			<version>${revision}</version>
 			<scope>provided</scope>

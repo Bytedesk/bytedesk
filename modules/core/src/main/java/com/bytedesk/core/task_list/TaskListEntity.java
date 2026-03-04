@@ -48,10 +48,10 @@ import lombok.experimental.SuperBuilder;
 @Table(
     name = "bytedesk_core_task_list",
     indexes = {
-        @Index(name = "idx_task_list_uid", columnList = "uuid"),
-        @Index(name = "idx_task_list_org_uid", columnList = "org_uid"),
-        @Index(name = "idx_task_list_user_uid", columnList = "user_uid"),
-        @Index(name = "idx_task_list_type", columnList = "task_list_type")
+        @Index(name = "idx_core_task_list_uuid", columnList = "uuid"),
+        @Index(name = "idx_core_task_list_org_uid", columnList = "org_uid"),
+        @Index(name = "idx_core_task_list_user_uid", columnList = "user_uid"),
+        @Index(name = "idx_core_task_list_type", columnList = "task_list_type")
     }
 )
 public class TaskListEntity extends BaseEntity {

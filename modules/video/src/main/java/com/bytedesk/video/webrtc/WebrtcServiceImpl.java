@@ -10,7 +10,7 @@ import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
 import com.bytedesk.video.webrtc.dto.WebrtcRecordingResponse;
 
 @Service
-public class WebrtcServiceImpl implements WebrtcService {
+public class WebrtcServiceImpl implements IWebrtcService {
 
     @Override
     public WebrtcResponse invite(WebrtcInviteRequest request) {

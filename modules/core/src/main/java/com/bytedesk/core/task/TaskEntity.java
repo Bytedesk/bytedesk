@@ -62,7 +62,7 @@ import lombok.experimental.SuperBuilder;
         @Index(name = "idx_task_org_uid", columnList = "org_uid"),
         @Index(name = "idx_task_user_uid", columnList = "user_uid"),
         @Index(name = "idx_task_type", columnList = "task_type"),
-        @Index(name = "idx_task_list_uid", columnList = "task_list_uid"),
+        @Index(name = "idx_task_task_list_uid", columnList = "task_list_uid"),
         @Index(name = "idx_task_due_at", columnList = "due_at")
     }
 )

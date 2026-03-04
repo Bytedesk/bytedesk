@@ -8,7 +8,7 @@
         {
             "uid": "faq_002",
             "question": "如何快速使用Docker部署微语系统？",
-            "answer": "使用Docker部署微语系统非常简单，只需要两步：1. 克隆项目并启动：执行命令 'git clone https://gitee.com/270580156/weiyu.git && cd weiyu/deploy/docker && docker compose -p weiyu -f docker-compose.yaml up -d'；2. 修改配置文件中的服务器IP，将docker-compose.yaml中的127.0.0.1替换为你的服务器IP，主要是BYTEDESK_UPLOAD_URL和BYTEDESK_KBASE_API_URL这两个配置项。"
+            "answer": "使用Docker部署微语系统非常简单，只需要两步：1. 克隆项目并启动：执行命令 'git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && ./start.sh mysql artemis standard all'；2. 修改配置文件中的服务器IP，将deploy/docker/compose-app-bytedesk.yaml中的127.0.0.1替换为你的服务器IP，主要是BYTEDESK_UPLOAD_URL和BYTEDESK_KBASE_API_URL这两个配置项。"
         },
         {
             "uid": "faq_003",

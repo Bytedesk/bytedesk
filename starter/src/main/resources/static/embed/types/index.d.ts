@@ -108,6 +108,7 @@ declare class BytedeskWeb {
     private setupMessageListener;
     private handleLocalStorageData;
     sendMessageToIframe(message: any): void;
+    resetAnonymousVisitor(): void;
     showChat(config?: Partial<BytedeskConfig>): void;
     hideChat(): void;
     private minimizeWindow;

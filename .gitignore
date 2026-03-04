@@ -126,3 +126,6 @@ bin/
 /starter/src/main/resources/static/docs/
 local/
 prod/
+!deploy/freeswitch/bin/
+!deploy/freeswitch/bin/**
+

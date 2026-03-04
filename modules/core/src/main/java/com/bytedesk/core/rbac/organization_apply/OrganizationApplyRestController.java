@@ -29,7 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/org/apply")
+@RequestMapping("/api/v1/organization/apply")
 @AllArgsConstructor
 public class OrganizationApplyRestController extends BaseRestController<OrganizationApplyRequest, OrganizationApplyRestService> {
 

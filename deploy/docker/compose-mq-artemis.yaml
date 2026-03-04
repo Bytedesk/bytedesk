@@ -1,0 +1,32 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql|oracle>.yaml -f compose-mq-artemis.yaml -f compose-scenario-<standard|noai|call>.yaml up -d
+services:
+  # ActiveMQ Artemis 消息队列
+  # http://localhost:18161/console，使用 admin/admin 作为登录凭据
+  bytedesk-mq:
+    image: apache/activemq-artemis:latest
+    container_name: artemis-bytedesk
+    environment:
+      - ARTEMIS_USER=${ARTEMIS_USER}
+      - ARTEMIS_PASSWORD=${ARTEMIS_PASSWORD}
+      - ANONYMOUS_LOGIN=false
+      - EXTRA_ARGS=--http-host 0.0.0.0 --relax-jolokia
+    ports:
+      - "16161:61616"   # JMS
+      - "16162:61617"   # AMQP
+      - "18161:8161"    # Web Console
+      - "15672:5672"    # AMQP
+      - "16163:61613"   # STOMP
+      - "11883:1883"    # MQTT
+    volumes:
+      - artemis_data:/var/lib/artemis/data
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -u ${ARTEMIS_USER}:${ARTEMIS_PASSWORD} http://localhost:8161/console/jolokia/ >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  artemis_data:
+    name: bytedesk_artemis_data

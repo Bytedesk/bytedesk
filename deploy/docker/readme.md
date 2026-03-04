@@ -17,11 +17,22 @@
 
 ```bash
 .
-├── docker-compose-all.yaml # 包含ai、在线客服、呼叫中心、视频客服等全部内容
-├── docker-compose-noai.yaml # 不使用ai，在线客服
-├── docker-compose-ollama.yaml # 在线客服，同时启动mysql,redis,ollama,elasticsearch依赖和微语，内含ollama，默认使用ollama对话
-├── docker-compose-rabbitmq.yaml # 在线客服，同时启动mysql,redis,elasticsearch,rabbitmq依赖和微语，不内含ollama，默认使用zhipuai
-├── docker-compose.yaml # 在线客服，同时启动mysql,redis,elasticsearch,artemis依赖和微语，不内含ollama，默认使用zhipuai
+├── compose-base.yaml # 公共基础中间件服务（不含 bytedesk 镜像）
+├── compose-db-mysql.yaml # MySQL 数据库覆盖（默认）
+├── compose-db-postgresql.yaml # PostgreSQL 数据库覆盖
+├── compose-db-oracle.yaml # Oracle 数据库覆盖
+├── compose-mq-artemis.yaml # Artemis MQ 组件覆盖（默认）
+├── compose-mq-rabbitmq.yaml # RabbitMQ MQ 组件覆盖
+├── compose-app-bytedesk.yaml # bytedesk 镜像服务（已从 base 拆分）
+├── compose-app-mq-artemis.yaml # bytedesk 的 Artemis 配置覆盖
+├── compose-app-mq-rabbitmq.yaml # bytedesk 的 RabbitMQ 配置覆盖
+├── compose-scenario-call.yaml # 呼叫中心场景扩展（coturn/freeswitch/janus）
+├── compose-call-db-mysql.yaml # call 场景下 FreeSWITCH 的 MySQL DSN 覆盖
+├── compose-call-db-postgresql.yaml # call 场景下 FreeSWITCH 的 PostgreSQL DSN 覆盖
+├── compose-scenario-noai.yaml # 不使用 AI 的场景覆盖
+├── compose-scenario-standard.yaml # 标准场景覆盖
+├── start.sh # 组合启动脚本：start.sh <db> <mq> <scenario> [all|middleware]
+└── stop.sh # 组合停止脚本：stop.sh <db> <mq> <scenario> [stop|down] [all|middleware]
 ```
 
 ## docker compose
@@ -34,23 +45,127 @@ git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
 # configure environment variables, modify as needed
 cp .env.example .env
+# IMPORTANT: all sensitive values are now centralized in .env
+# (passwords/api keys/jwt/redis/minio/mq/oracle/call credentials)
+# start.sh/stop.sh automatically load deploy/docker/.env via --env-file
 # start docker compose container, -f flag to specify file path, -d flag to start container in background mode
-# start mysql, redis, elasticsearch dependencies and weiyu
-docker compose -p bytedesk -f docker-compose.yaml up -d
-# start mysql, redis, ollama, elasticsearch dependencies and weiyu, with ollama
-docker compose -p bytedesk -f docker-compose-ollama.yaml up -d
-# start without ai
-docker compose -p bytedesk -f docker-compose-noai.yaml up -d
+# note: ollama is part of compose-base.yaml now
+# middleware only (for source startup)
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml up -d
+
+# full stack (middleware + bytedesk image)
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+
+# database switch examples
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+
+# script examples (recommended)
+# format:
+# start.sh <db> <mq> <scenario> <target>
+# stop.sh  <db> <mq> <scenario> <action> <target>
+
+# local testing (middleware only)
+# 1) MySQL + Artemis + standard (local source development)
+./start.sh mysql artemis standard middleware
+./stop.sh mysql artemis standard stop middleware
+./stop.sh mysql artemis standard down middleware
+
+# 2) MySQL + RabbitMQ + standard (MQ switch integration)
+./start.sh mysql rabbitmq standard middleware
+./stop.sh mysql rabbitmq standard stop middleware
+./stop.sh mysql rabbitmq standard down middleware
+
+# 3) PostgreSQL + Artemis + standard (DB switch verification)
+./start.sh postgresql artemis standard middleware
+./stop.sh postgresql artemis standard stop middleware
+./stop.sh postgresql artemis standard down middleware
+
+# 4) PostgreSQL + RabbitMQ + noai (without AI dependencies)
+./start.sh postgresql rabbitmq noai middleware
+./stop.sh postgresql rabbitmq noai stop middleware
+./stop.sh postgresql rabbitmq noai down middleware
+
+# 5) Oracle + Artemis + noai (recommended for local source startup)
+./start.sh oracle artemis noai middleware
+./stop.sh oracle artemis noai stop middleware
+./stop.sh oracle artemis noai down middleware
+
+# 6) Call-center middleware scenarios
+./start.sh mysql artemis call middleware
+./stop.sh mysql artemis call stop middleware
+./stop.sh mysql artemis call down middleware
+
+./start.sh mysql rabbitmq call middleware
+./stop.sh mysql rabbitmq call stop middleware
+./stop.sh mysql rabbitmq call down middleware
+
+./start.sh postgresql rabbitmq call middleware
+./stop.sh postgresql rabbitmq call stop middleware
+./stop.sh postgresql rabbitmq call down middleware
+
+# production release (all: middleware + bytedesk app image)
+# 1) MySQL + Artemis + standard (default release combination)
+./start.sh mysql artemis standard all
+./stop.sh mysql artemis standard stop all
+./stop.sh mysql artemis standard down all
+
+# 2) PostgreSQL + RabbitMQ + standard (RabbitMQ release scenario)
+./start.sh postgresql rabbitmq standard all
+./stop.sh postgresql rabbitmq standard stop all
+./stop.sh postgresql rabbitmq standard down all
+
+# 3) MySQL + RabbitMQ + call (call-center release)
+./start.sh mysql rabbitmq call all
+./stop.sh mysql rabbitmq call stop all
+./stop.sh mysql rabbitmq call down all
+
+# 4) PostgreSQL + RabbitMQ + call (call-center release)
+./start.sh postgresql rabbitmq call all
+./stop.sh postgresql rabbitmq call stop all
+./stop.sh postgresql rabbitmq call down all
+
+# quick reference:
+# db: mysql | postgresql | oracle
+# mq: artemis | rabbitmq
+# scenario: standard | noai | call
+# note: call scenario supports mysql and postgresql (oracle is not verified)
+# target: middleware | all
+# action: stop (stop containers) | down (remove containers, keep volumes)
+
+# composition guide (quick keep)
+# defaults when args are omitted:
+# start.sh == ./start.sh mysql artemis standard all
+# stop.sh  == ./stop.sh  mysql artemis standard stop all
+# db alias supported: pg -> postgresql
+# override compose project name via env var (default: bytedesk):
+# PROJECT_NAME=bytedesk-dev ./start.sh mysql artemis standard middleware
+
 # chat model
 docker exec ollama-bytedesk ollama pull qwen3:0.6b
 # embedding model
 docker exec ollama-bytedesk ollama pull bge-m3:latest
 # rerank model
 docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
-# stop container
-docker compose -p bytedesk -f docker-compose.yaml stop
-# stop ollama
-docker compose -p bytedesk -f docker-compose-ollama.yaml stop
+# stop standard stack
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
+# stop call-center stack
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
+```
+
+## Sensitive variables (centralized in `.env`)
+
+At minimum, set these before startup:
+
+- DB/MQ: `MYSQL_ROOT_PASSWORD`, `POSTGRES_PASSWORD`, `ORACLE_PASSWORD`, `ORACLE_APP_USER_PASSWORD`, `ARTEMIS_PASSWORD`, `RABBITMQ_DEFAULT_PASS`
+- Middleware: `REDIS_PASSWORD`, `ELASTIC_PASSWORD`, `MINIO_ROOT_PASSWORD`
+- App auth: `BYTEDESK_ADMIN_PASSWORD`, `BYTEDESK_ADMIN_VALIDATE_CODE`, `BYTEDESK_MEMBER_PASSWORD`, `BYTEDESK_JWT_SECRET_KEY`
+- Call scenario: `COTURN_PASS`, `FREESWITCH_ESL_PASSWORD`
+- Optional API keys: `SPRING_AI_*_API_KEY`, `BYTEDESK_TRANSLATE_BAIDU_*`, `BYTEDESK_LICENSE_KEY`
 
 ## Secrets & Jasypt (optional)
 
@@ -60,10 +175,9 @@ Some docker compose entries may be stored as `ENC(...)`. Only when you actually 
 # 1. Add the password to .env so compose picks it up (never commit real secrets).
 echo 'JASYPT_ENCRYPTOR_PASSWORD=please-change-me' >> .env
 
-# 2. Start any compose stack as usual. The Bytedesk service will read the env var.
-docker compose -p bytedesk -f docker-compose.yaml up -d
+# 2. Start any full stack as usual. The Bytedesk service will read the env var.
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 ```
 
 - Leave `JASYPT_ENCRYPTOR_PASSWORD` blank (or remove the line) when no encrypted values are in use—startup will fall back to plain text.
 - You can also override algorithms or iterations with additional variables (for example `BYTEDESK_SECURITY_JASYPT_ALGORITHM=PBEWITHHMACSHA512ANDAES_256`).
-```

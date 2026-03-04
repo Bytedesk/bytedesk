@@ -43,7 +43,7 @@ public class ConnectionEventListener {
         long now = System.currentTimeMillis();
         Long previous = recentConnectedAt.put(clientId, now);
         if (previous != null && now - previous < CONNECT_DEDUP_WINDOW_MS) {
-            log.debug("skip duplicated onMqttConnectedEvent clientId {}", clientId);
+            // log.debug("skip duplicated onMqttConnectedEvent clientId {}", clientId);
             return;
         }
         if (recentConnectedAt.size() > 1000) {

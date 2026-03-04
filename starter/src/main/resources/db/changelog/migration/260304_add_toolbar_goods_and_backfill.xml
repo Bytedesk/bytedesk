@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260304-add-toolbar-goods" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <not>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="toolbar_goods" />
+            </not>
+        </preConditions>
+        <comment>Add toolbar_goods field to control goods button visibility.</comment>
+        <addColumn tableName="bytedesk_kbase_service_settings">
+            <column name="toolbar_goods" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260304-backfill-toolbar-goods" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="toolbar_goods" />
+        </preConditions>
+        <comment>Backfill toolbar_goods for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_kbase_service_settings
+            SET toolbar_goods = true
+            WHERE toolbar_goods IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="260304-backfill-toolbar-order-goods" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="toolbar_order" />
+        </preConditions>
+        <comment>Append goods to toolbar_order when missing to keep legacy rows consistent.</comment>
+        <sql>
+            UPDATE bytedesk_kbase_service_settings
+            SET toolbar_order = CASE
+                WHEN toolbar_order IS NULL OR TRIM(toolbar_order) = '' THEN 'smile,upload,speechInput,rate,leavemsg,goods,orderSelector,ticket,webrtc,tel'
+                WHEN CONCAT(',', toolbar_order, ',') NOT LIKE '%,goods,%' THEN CONCAT(toolbar_order, ',goods')
+                ELSE toolbar_order
+            END;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

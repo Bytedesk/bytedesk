@@ -14,6 +14,7 @@
 package com.bytedesk.service.utils;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.util.StringUtils;
 import lombok.experimental.UtilityClass;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.thread.ThreadConvertUtils;
@@ -76,6 +77,9 @@ public class ServiceConvertUtils {
     public static VisitorProtobuf convertToVisitorProtobuf(VisitorRequest visitorRequest) {
         VisitorProtobuf userProtobuf = getModelMapper().map(visitorRequest, VisitorProtobuf.class);
         userProtobuf.setType(UserTypeEnum.VISITOR.name());
+        if (!StringUtils.hasText(userProtobuf.getVisitorUid())) {
+            userProtobuf.setVisitorUid(userProtobuf.getUid());
+        }
         return userProtobuf;
     }
 
