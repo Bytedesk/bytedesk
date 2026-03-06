@@ -92,7 +92,7 @@ thread_summary/
 thread_rating/
 transfer_keyword/
 rating/
-taboo/
+# taboo/
 taboo_message/
 unified/
 # agent_status/
