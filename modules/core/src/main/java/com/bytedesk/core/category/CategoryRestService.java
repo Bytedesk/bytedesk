@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
@@ -133,7 +132,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         return new PageImpl<>(content, pageable, uniqueUids.size());
     }
 
-    @Cacheable(value = "category", key = "#uid", unless = "#result == null")
+    // @Cacheable(value = "category", key = "#uid", unless = "#result == null")
     @Override
     public Optional<CategoryEntity> findByUid(String uid) {
         return categoryRepository.findByUid(uid);
@@ -271,11 +270,31 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<CategoryEntity> category = findByUid(uid);
-        if (category.isPresent()) {
-            category.get().setDeleted(true);
-            save(category.get());
+        if (!StringUtils.hasText(uid)) {
+            throw new IllegalArgumentException("category uid is required");
         }
+
+        Optional<CategoryEntity> category = findByUid(uid);
+        if (!category.isPresent() || category.get().isDeleted()) {
+            throw new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND);
+        }
+
+        CategoryEntity entity = category.get();
+        markDeletedRecursively(entity);
+        save(entity);
+    }
+
+    private void markDeletedRecursively(CategoryEntity entity) {
+        entity.setDeleted(true);
+
+        if (entity.getChildren() == null || entity.getChildren().isEmpty()) {
+            return;
+        }
+
+        entity.getChildren().stream()
+                .filter(Objects::nonNull)
+                .filter(child -> !child.isDeleted())
+                .forEach(this::markDeletedRecursively);
     }
 
     @Override
@@ -296,6 +315,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                 freshEntity.setType(entity.getType());
                 // freshEntity.setOrder(entity.getOrder());
                 freshEntity.setKbUid(entity.getKbUid());
+                freshEntity.setDeleted(entity.isDeleted());
                 // 其他字段...
                 return save(freshEntity);
             } else {
@@ -342,9 +362,9 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                     .sorted(byOrder.thenComparing(c -> StringUtils.hasText(c.getName()) ? c.getName() : ""))
                     .map(c -> convertToResponseRecursive(c, visited))
                     .collect(Collectors.toList());
-            if (!childResponses.isEmpty()) {
-                response.setChildren(childResponses);
-            }
+            response.setChildren(childResponses);
+        } else {
+            response.setChildren(List.of());
         }
         return response;
     }

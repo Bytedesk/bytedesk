@@ -42,6 +42,11 @@ public class WorkgroupResponse extends BaseResponse {
 
     private String description;
 
+    /**
+     * Workgroup business type for scenario classification.
+     */
+    private String type;
+
     private String status;
 
     /**

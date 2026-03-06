@@ -32,6 +32,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.SuperBuilder;
 import lombok.experimental.Accessors;
+import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 
 
 @Slf4j
@@ -195,14 +197,23 @@ public class VisitorRequest extends BaseRequest {
 	}
 
 	public ThreadTypeEnum formatType() {
-		int typeInt;
-		try {
-			typeInt = Integer.parseInt(super.type);
-		} catch (NumberFormatException e) {
-			log.error("VisitorRequest formatType parse failed: {}", super.type, e);
-			typeInt = 0;
+		if (!StringUtils.hasText(super.type)) {
+			return ThreadTypeEnum.AGENT;
 		}
-		return ThreadTypeEnum.fromValue(typeInt);
+
+		String normalized = super.type.trim();
+		try {
+			return ThreadTypeEnum.fromValue(Integer.parseInt(normalized));
+		} catch (NumberFormatException ignored) {
+			// Fallback to enum literal names, e.g. WORKGROUP/AGENT/ROBOT from frontend.
+		}
+
+		try {
+			return ThreadTypeEnum.valueOf(normalized.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			log.error("VisitorRequest formatType parse failed: {}", super.type, e);
+			return ThreadTypeEnum.AGENT;
+		}
 	}
 
 	public VisitorCallTypeEnum formatCallType() {
@@ -219,6 +230,11 @@ public class VisitorRequest extends BaseRequest {
 
 	public boolean isWebrtcPhoneType() {
 		return VisitorCallTypeEnum.PHONE == formatCallType();
+	}
+
+	@Override
+	public Pageable getPageable() {
+		return super.getPageable();
 	}
 
 	

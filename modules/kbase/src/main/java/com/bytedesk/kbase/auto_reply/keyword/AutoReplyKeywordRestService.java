@@ -16,7 +16,6 @@ package com.bytedesk.kbase.auto_reply.keyword;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.ArrayList;
 
 import org.modelmapper.ModelMapper;
@@ -58,6 +57,8 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExport<AutoR
 
     private final AuthService authService;
 
+    private final AutoReplyKeywordService autoReplyKeywordService;
+
     @Override
     protected Specification<AutoReplyKeywordEntity> createSpecification(AutoReplyKeywordRequest request) {
         return AutoReplyKeywordSpecification.search(request, authService);
@@ -76,28 +77,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExport<AutoR
     }
 
     public String getKeywordReply(String keyword, String kbUid, String orgUid) {
-        AutoReplyKeywordRequest request = AutoReplyKeywordRequest.builder().build();
-        request.getKeywordList().add(keyword);
-        request.setKbUid(kbUid);
-        request.setOrgUid(orgUid);
-        //
-        Specification<AutoReplyKeywordEntity> spec = AutoReplyKeywordSpecification.search(request, authService);
-        List<AutoReplyKeywordEntity> keywordObjects = autoReplyKeywordRepository.findAll(spec);
-        if (keywordObjects.isEmpty()) {
-            return null;
-        }
-        // 使用第一条返回结果, TODO: 后续需要优化
-        AutoReplyKeywordEntity keywordObject = keywordObjects.get(0);
-        //
-        // 随机选择一个回复
-        Random random = new Random();
-        String reply = null;
-        if (!keywordObject.getReplyList().isEmpty()) {
-            int randomIndex = random.nextInt(keywordObject.getReplyList().size());
-            reply = keywordObject.getReplyList().get(randomIndex);
-        }
-        // 
-        return reply;
+        return autoReplyKeywordService.getKeywordReply(keyword, kbUid);
     }
 
     @Override

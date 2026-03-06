@@ -162,6 +162,8 @@ services:
       # bytedesk config
       BYTEDESK_DEBUG: "false"
       BYTEDESK_VERSION: 1.0.0
+      # open profile 数据源类型：mysql / postgresql / oracle / kingbase / h2
+      BYTEDESK_DATASOURCE_ACTIVE: mysql
       # 申请licenseKey
       # https://www.weiyuai.cn/docs/zh-CN/docs/faq#%E9%97%AE%E9%A2%9813%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E8%AF%95%E7%94%A8%E7%89%88license
       BYTEDESK_LICENSE_KEY: 
@@ -535,8 +537,8 @@ services:
       #阿里云短信服务的模板Code，可以在控制台找到
       ALIYUN_SMS_TEMPLATECODE: ''
       # Artemis JMS 配置
-      # SPRING_ARTEMIS_MODE: embedded
-      SPRING_ARTEMIS_MODE: native
+      SPRING_ARTEMIS_MODE: embedded
+      # SPRING_ARTEMIS_MODE: native
       SPRING_ARTEMIS_BROKER_URL: tcp://artemis-bytedesk:61616
       SPRING_ARTEMIS_USER: admin
       SPRING_ARTEMIS_PASSWORD: admin

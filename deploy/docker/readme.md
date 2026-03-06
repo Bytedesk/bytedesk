@@ -21,6 +21,7 @@
 ├── compose-db-mysql.yaml # MySQL 数据库覆盖（默认）
 ├── compose-db-postgresql.yaml # PostgreSQL 数据库覆盖
 ├── compose-db-oracle.yaml # Oracle 数据库覆盖
+├── compose-db-kingbase9.yaml # KingbaseES V9 数据库覆盖
 ├── compose-mq-artemis.yaml # Artemis MQ 组件覆盖（默认）
 ├── compose-mq-rabbitmq.yaml # RabbitMQ MQ 组件覆盖
 ├── compose-app-bytedesk.yaml # bytedesk 镜像服务（已从 base 拆分）
@@ -63,6 +64,7 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f
 # database switch examples
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-kingbase9.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
 
 # script examples (recommended)
 # format:
@@ -95,7 +97,12 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 ./stop.sh oracle artemis noai stop middleware
 ./stop.sh oracle artemis noai down middleware
 
-# 6) Call-center middleware scenarios
+# 6) Kingbase9 + Artemis + standard
+./start.sh kingbase9 artemis standard middleware
+./stop.sh kingbase9 artemis standard stop middleware
+./stop.sh kingbase9 artemis standard down middleware
+
+# 7) Call-center middleware scenarios
 ./start.sh mysql artemis call middleware
 ./stop.sh mysql artemis call stop middleware
 ./stop.sh mysql artemis call down middleware
@@ -129,11 +136,16 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 ./stop.sh postgresql rabbitmq call stop all
 ./stop.sh postgresql rabbitmq call down all
 
+# 5) Kingbase9 + Artemis + standard
+./start.sh kingbase9 artemis standard all
+./stop.sh kingbase9 artemis standard stop all
+./stop.sh kingbase9 artemis standard down all
+
 # quick reference:
-# db: mysql | postgresql | oracle
+# db: mysql | postgresql | oracle | kingbase9
 # mq: artemis | rabbitmq
 # scenario: standard | noai | call
-# note: call scenario supports mysql and postgresql (oracle is not verified)
+# note: call scenario supports mysql and postgresql (oracle/kingbase9 are not verified)
 # target: middleware | all
 # action: stop (stop containers) | down (remove containers, keep volumes)
 
@@ -141,9 +153,10 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 # defaults when args are omitted:
 # start.sh == ./start.sh mysql artemis standard all
 # stop.sh  == ./stop.sh  mysql artemis standard stop all
-# db alias supported: pg -> postgresql
+# db alias supported: pg -> postgresql, kingbase -> kingbase9
 # override compose project name via env var (default: bytedesk):
 # PROJECT_NAME=bytedesk-dev ./start.sh mysql artemis standard middleware
+# for kingbase9: start.sh will auto ensure KINGBASE_DATABASE exists (create if missing)
 
 # chat model
 docker exec ollama-bytedesk ollama pull qwen3:0.6b
@@ -161,7 +174,7 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f
 
 At minimum, set these before startup:
 
-- DB/MQ: `MYSQL_ROOT_PASSWORD`, `POSTGRES_PASSWORD`, `ORACLE_PASSWORD`, `ORACLE_APP_USER_PASSWORD`, `ARTEMIS_PASSWORD`, `RABBITMQ_DEFAULT_PASS`
+- DB/MQ: `MYSQL_ROOT_PASSWORD`, `POSTGRES_PASSWORD`, `ORACLE_PASSWORD`, `ORACLE_APP_USER_PASSWORD`, `KINGBASE_DB_PASSWORD`, `KINGBASE_SYSTEM_PWD`, `KINGBASE_LICENSE_FILE`, `ARTEMIS_PASSWORD`, `RABBITMQ_DEFAULT_PASS`
 - Middleware: `REDIS_PASSWORD`, `ELASTIC_PASSWORD`, `MINIO_ROOT_PASSWORD`
 - App auth: `BYTEDESK_ADMIN_PASSWORD`, `BYTEDESK_ADMIN_VALIDATE_CODE`, `BYTEDESK_MEMBER_PASSWORD`, `BYTEDESK_JWT_SECRET_KEY`
 - Call scenario: `COTURN_PASS`, `FREESWITCH_ESL_PASSWORD`

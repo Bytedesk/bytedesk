@@ -57,4 +57,7 @@ public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long
      */
     @Query("SELECT w FROM WorkgroupEntity w JOIN w.admins a WHERE a.uid = :agentUid")
     List<WorkgroupEntity> findByAdminAgentUid(@Param("agentUid") String agentUid);
+
+    @Query("SELECT w.uid FROM WorkgroupEntity w WHERE w.settings.uid = :settingsUid AND w.deleted = false")
+    List<String> findUidsBySettingsUid(@Param("settingsUid") String settingsUid);
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260306-add-workgroup-type-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_workgroup" />
+            <not>
+                <columnExists tableName="bytedesk_service_workgroup" columnName="workgroup_type" />
+            </not>
+        </preConditions>
+        <comment>Add workgroup_type column for workgroup business scenario classification.</comment>
+        <addColumn tableName="bytedesk_service_workgroup">
+            <column name="workgroup_type" type="VARCHAR(64)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260306-backfill-workgroup-type-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_workgroup" />
+            <columnExists tableName="bytedesk_service_workgroup" columnName="workgroup_type" />
+        </preConditions>
+        <comment>Backfill legacy rows with GENERAL type when workgroup_type is null or empty.</comment>
+        <sql>
+            UPDATE bytedesk_service_workgroup
+            SET workgroup_type = 'GENERAL'
+            WHERE workgroup_type IS NULL OR TRIM(workgroup_type) = '';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

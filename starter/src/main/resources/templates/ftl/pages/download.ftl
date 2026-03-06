@@ -42,19 +42,6 @@ Listed course START -->
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="/assets/images/element/coding.svg" alt="<@t key='alt.download.serverIcon'>服务器端下载图标</@t>">
-					</div>
-					<!-- Title -->
-						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-server.zip" class="stretched-link" target="_blank"><@t key="page.download.server">服务器端</@t></a></h5>
-					<#--  <span class="mb-0">即将开放下载</span>  -->
-				</div>
-			</div>
-
-			<!-- Item -->
-			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
-					<!-- Image -->
-					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/data-science.svg" alt="<@t key='alt.download.windowsIcon'>Windows客户端下载图标</@t>">
 					</div>
 					<!-- Title -->
@@ -81,11 +68,13 @@ Listed course START -->
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="/assets/images/element/profit.svg" alt="<@t key='alt.download.linuxIcon'>Linux客户端下载图标</@t>">
+						<img src="/assets/images/element/profit.svg" alt="<@t key='alt.download.miniappIcon'>微信小程序图标</@t>">
 					</div>
 					<!-- Title -->
-						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-x86_64.AppImage" class="stretched-link" target="_blank"><@t key="page.download.linux">Linux客户端</@t></a></h5>
-					<#--  <span class="mb-0">即将开放下载.</span>  -->
+					<h5 class="mb-1"><a href="#" class="stretched-link" target="_blank"><@t key="page.download.miniapp">微信小程序</@t></a></h5>
+					<a href="/assets/qr/qr_miniapp.jpg" target="_blank">
+						<img src="/assets/qr/qr_miniapp.jpg" style="height: 100px" alt="<@t key='alt.download.miniappQR'>微信小程序二维码</@t>"/>
+					</a>
 				</div>
 			</div>
 
@@ -97,7 +86,7 @@ Listed course START -->
 						<img src="/assets/images/element/engineering.svg" alt="<@t key='alt.download.androidIcon'>Android安卓版本下载图标</@t>">
 					</div>
 					<!-- Title -->
-						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-android.apk" class="stretched-link" target="_blank"><@t key="page.download.android">Android安卓</@t></a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-android.apk" class="stretched-link" target="_blank"><@t key="page.download.android">Android安卓</@t></a></h5>
 					<a href="/assets/qr/qr_android.png" target="_blank">
 						<img src="/assets/qr/qr_android.png" style="height: 100px" alt="<@t key='alt.download.androidQR'>Android安卓版本下载二维码</@t>"/>
 					</a>
@@ -110,8 +99,7 @@ Listed course START -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/profit.svg" alt="<@t key='alt.download.iosIcon'>iPhone苹果版本下载图标</@t>">
 					</div>
-						<h5 class="mb-1"><a href="https://apps.apple.com/cn/app/%E5%BE%AE%E8%AF%AD/id6470106586" class="stretched-link" target="_blank"><@t key="page.download.ios">iPhone苹果</@t></a></h5>
-					<#--  <span class="mb-0">即将开放下载</span>  -->
+					<h5 class="mb-1"><a href="https://apps.apple.com/cn/app/%E5%BE%AE%E8%AF%AD/id6470106586" class="stretched-link" target="_blank"><@t key="page.download.ios">iPhone苹果</@t></a></h5>
 					<a href="/assets/qr/qr_ios.png" target="_blank">
 						<img src="/assets/qr/qr_ios.png" style="height: 100px" alt="<@t key='alt.download.iosQR'>iPhone苹果版本下载二维码</@t>"/>
 					</a>
@@ -130,6 +118,19 @@ Listed course START -->
 					<a href="/assets/qr/qr_softphone.png" target="_blank">
 						<img src="/assets/qr/qr_softphone.png" style="height: 100px" alt="<@t key='alt.download.softphoneQR'>微语软电话下载二维码</@t>"/>
 					</a>
+				</div>
+			</div>
+
+			<!-- Item -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="/assets/images/element/coding.svg" alt="<@t key='alt.download.serverIcon'>服务器端下载图标</@t>">
+					</div>
+					<!-- Title -->
+						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-server.zip" class="stretched-link" target="_blank"><@t key="page.download.server">服务器端</@t></a></h5>
+					<#--  <span class="mb-0">即将开放下载</span>  -->
 				</div>
 			</div>
 

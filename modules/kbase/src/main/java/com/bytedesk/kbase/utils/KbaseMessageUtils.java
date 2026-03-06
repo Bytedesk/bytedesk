@@ -1,15 +1,19 @@
 package com.bytedesk.kbase.utils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.FaqContent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.kbase.llm_faq.FaqMessageExtra;
 import com.bytedesk.kbase.llm_faq.FaqResponse;
 
 import lombok.experimental.UtilityClass;
@@ -18,14 +22,9 @@ import lombok.experimental.UtilityClass;
 public class KbaseMessageUtils {
     
     public static MessageEntity getFaqQuestionMessage(FaqResponse faqResponse, ThreadEntity threadEntity) {
-        // 
-        FaqMessageExtra questionExtra = FaqMessageExtra.builder()
-                .faqUid(faqResponse.getUid())
-                .build();
-        //
         String content = faqResponse.getQuestion();
-        String extra = questionExtra.toJson();
         String user = threadEntity.getUser();
+        MessageExtra messageExtra = MessageExtra.fromOrgUid(threadEntity.getOrgUid());
         //
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
@@ -38,27 +37,39 @@ public class KbaseMessageUtils {
                 .createdAt(BdDateUtils.now())
                 .updatedAt(BdDateUtils.now())
                 .thread(threadEntity)
-                .extra(extra)
+                .extra(messageExtra.toJson())
                 .build();
 
         return message;
     }
 
     public static MessageEntity getFaqAnswerMessage(FaqResponse faqResponse, ThreadEntity threadEntity) {
-        // 
-        FaqMessageExtra answerExtra = FaqMessageExtra.builder()
-                        .faqUid(faqResponse.getUid())
-                        .images(faqResponse.getImages())
-                        .attachments(faqResponse.getAttachments())
-                        .answerList(faqResponse.getAnswerList())
-                        .relatedFaqs(faqResponse.getRelatedFaqs())
-                        .build();
-        // 
-        String content = faqResponse.getAnswer();
+        String answerContent = faqResponse.getAnswer();
         if (StringUtils.hasText(faqResponse.getAnswerHtml())) {
-            content = faqResponse.getAnswerHtml();
+            answerContent = faqResponse.getAnswerHtml();
         }
-        String extra = answerExtra.toJson();
+
+        List<Object> answerList = faqResponse.getAnswerList() == null
+            ? null
+            : faqResponse.getAnswerList().stream().map(item -> (Object) item).collect(Collectors.toList());
+
+        List<Object> relatedFaqs = faqResponse.getRelatedFaqs() == null
+            ? null
+            : faqResponse.getRelatedFaqs().stream().map(item -> (Object) item).collect(Collectors.toList());
+
+        FaqContent faqContent = FaqContent.builder()
+            .faqUid(faqResponse.getUid())
+            .question(faqResponse.getQuestion())
+            .answer(answerContent)
+            .content(answerContent)
+            .images(faqResponse.getImages())
+            .attachments(faqResponse.getAttachments())
+            .answerList(answerList)
+            .relatedFaqs(relatedFaqs)
+            .build();
+
+        String content = faqContent.toJson();
+        MessageExtra messageExtra = MessageExtra.fromOrgUid(threadEntity.getOrgUid());
         // 插入答案消息
         String answerUser = threadEntity.getRobot();
         if (threadEntity.isAgentType()) {
@@ -78,7 +89,7 @@ public class KbaseMessageUtils {
                 .createdAt(BdDateUtils.now())
                 .updatedAt(BdDateUtils.now())
                 .thread(threadEntity)
-                .extra(extra)
+                .extra(messageExtra.toJson())
                 .build();
 
         return message;

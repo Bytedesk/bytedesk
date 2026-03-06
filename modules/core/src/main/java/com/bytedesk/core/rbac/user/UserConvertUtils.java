@@ -22,11 +22,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.StringUtils;
+import com.bytedesk.core.rbac.authority.AuthorityRepository;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 import com.bytedesk.core.rbac.authority.AuthorityEntity;
 import com.bytedesk.core.rbac.role.RoleEntity;
+import com.bytedesk.core.rbac.role.RoleRepository;
 import com.bytedesk.core.rbac.role.RoleResponse;
 import com.bytedesk.core.rbac.role.RoleResponseSimple;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -37,6 +39,8 @@ import java.time.ZonedDateTime;
 
 @UtilityClass
 public class UserConvertUtils {
+
+    private static final String ROLE_PREFIX = "ROLE_";
 
     private static String firstNonBlank(String... candidates) {
         if (candidates == null) {
@@ -55,6 +59,50 @@ public class UserConvertUtils {
             return;
         }
         authorities.add(new SimpleGrantedAuthority(value.trim()));
+    }
+
+    private static void addRoleAliasAuthorities(Set<GrantedAuthority> authorities, String roleName) {
+        if (!StringUtils.hasText(roleName)) {
+            return;
+        }
+
+        String normalized = roleName.trim();
+        addGrantedAuthorityIfPresent(authorities, normalized);
+
+        if (normalized.startsWith(ROLE_PREFIX)) {
+            addGrantedAuthorityIfPresent(authorities, normalized.substring(ROLE_PREFIX.length()));
+            return;
+        }
+        addGrantedAuthorityIfPresent(authorities, ROLE_PREFIX + normalized);
+    }
+
+    private static void grantAllAuthoritiesForSuperUser(Set<GrantedAuthority> authorities) {
+        try {
+            AuthorityRepository authorityRepository = ApplicationContextHolder.getBean(AuthorityRepository.class);
+            authorityRepository.findByDeletedFalse().forEach(authority -> {
+                if (authority == null) {
+                    return;
+                }
+                addGrantedAuthorityIfPresent(authorities, firstNonBlank(authority.getValue(), authority.getUid()));
+            });
+        } catch (Exception ignored) {
+            // Keep authentication flow resilient when repository/context is unavailable.
+        }
+
+        try {
+            RoleRepository roleRepository = ApplicationContextHolder.getBean(RoleRepository.class);
+            roleRepository.findAll().forEach(role -> {
+                if (role == null || role.isDeleted()) {
+                    return;
+                }
+                addRoleAliasAuthorities(authorities, firstNonBlank(role.getName(), role.getValue(), role.getUid()));
+            });
+        } catch (Exception ignored) {
+            // Keep authentication flow resilient when repository/context is unavailable.
+        }
+
+        // Hard guarantee for role checks written as hasRole('SUPER') or hasAuthority('SUPER').
+        addRoleAliasAuthorities(authorities, "SUPER");
     }
 
     private static boolean canUseAuthorityByVip(OrganizationEntity organization, AuthorityEntity authority) {
@@ -309,6 +357,17 @@ public class UserConvertUtils {
     public static Set<GrantedAuthority> filterUserGrantedAuthorities(UserEntity user) {
         // 添加用户的权限，使用方式，如：@PreAuthorize("hasAnyAuthority('SUPER', 'ADMIN')")
         Set<GrantedAuthority> authorities = new HashSet<>();
+
+        if (user == null) {
+            return authorities;
+        }
+
+        // 超级管理员拥有全量权限与角色别名，不再受单项权限校验限制。
+        if (user.isSuperUser()) {
+            grantAllAuthoritiesForSuperUser(authorities);
+            return authorities;
+        }
+
         // Set<GrantedAuthority> authorities = user.getUserOrganizationRoles().stream()
         //         .filter(uor -> uor.getOrganization().equals(user.getCurrentOrganization())) // 过滤步骤
         //         .flatMap(uor -> uor.getRoles().stream()
@@ -356,16 +415,6 @@ public class UserConvertUtils {
                 addGrantedAuthorityIfPresent(authorities, firstNonBlank(role.getValue(), role.getUid()));
             });
         }
-
-        // 兼容处理：
-        // - 旧格式：MODULE_LEVEL_ACTION（例如 TAG_PLATFORM_READ）
-        // - 新格式：MODULE_ACTION（例如 TAG_READ）
-        //
-        // 目标：系统内部不再依赖权限字符串中的层级，但要保证旧数据/旧 @PreAuthorize 仍可临时工作。
-        // 策略：
-        // 1) 如果存在旧格式权限，归一化出 MODULE_ACTION 追加进去。
-        // 2) 如果存在新格式权限，派生出旧格式 MODULE_LEVEL_ACTION 追加进去（仅作为别名）。
-        // expandAndNormalizePermissionAuthorities(authorities);
 
         return authorities;
     }

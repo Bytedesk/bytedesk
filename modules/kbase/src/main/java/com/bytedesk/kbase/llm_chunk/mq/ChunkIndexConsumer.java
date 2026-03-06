@@ -41,17 +41,18 @@ public class ChunkIndexConsumer {
 
     private final ChunkElasticService chunkElasticService;
     private final ChunkRestService chunkRestService;
+    private final ChunkVectorService chunkVectorService;
     private final Random random = new Random();
-    
-    @Autowired(required = false)
-    private ChunkVectorService chunkVectorService;
     
     @Autowired
     private org.springframework.jms.core.JmsTemplate jmsTemplate;
 
-    public ChunkIndexConsumer(ChunkElasticService chunkElasticService, ChunkRestService chunkRestService) {
+    public ChunkIndexConsumer(ChunkElasticService chunkElasticService,
+            ChunkRestService chunkRestService,
+            @Autowired(required = false) ChunkVectorService chunkVectorService) {
         this.chunkElasticService = chunkElasticService;
         this.chunkRestService = chunkRestService;
+        this.chunkVectorService = chunkVectorService;
         
         // 在构造函数中检查并记录向量服务状态
         if (chunkVectorService == null) {

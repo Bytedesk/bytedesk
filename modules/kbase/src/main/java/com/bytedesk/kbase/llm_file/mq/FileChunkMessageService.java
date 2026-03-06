@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.llm_file.mq;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,13 @@ public class FileChunkMessageService {
 
     @Autowired
     private JmsTemplate jmsTemplate;
+
+    @Value("${bytedesk.mq.type:artemis}")
+    private String mqType;
+
+    private boolean isArtemisEnabled() {
+        return "artemis".equalsIgnoreCase(mqType);
+    }
     
     /**
      * 发送文件chunk处理请求到队列
@@ -38,6 +46,10 @@ public class FileChunkMessageService {
      * @param fileUid 文件UID
      */
     public void sendChunkProcessMessage(String fileUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS 文件Chunk处理消息发送: {}", mqType, fileUid);
+            return;
+        }
         try {
             log.debug("发送文件chunk处理请求: {}", fileUid);
             
@@ -63,6 +75,10 @@ public class FileChunkMessageService {
      * @param errorMessage 错误消息
      */
     public void sendChunkRetryMessage(String fileUid, Integer documentIndex, String errorMessage) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS 文件Chunk重试消息发送: {}", mqType, fileUid);
+            return;
+        }
         try {
             log.debug("发送chunk重试消息: fileUid={}, documentIndex={}", fileUid, documentIndex);
             
@@ -102,6 +118,10 @@ public class FileChunkMessageService {
      * @param chunkCount 生成的chunk数量
      */
     public void sendChunkProcessCompleteMessage(String fileUid, Integer chunkCount) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS 文件Chunk完成消息发送: {}", mqType, fileUid);
+            return;
+        }
         try {
             log.debug("发送chunk处理完成通知: fileUid={}, chunkCount={}", fileUid, chunkCount);
             
@@ -127,6 +147,10 @@ public class FileChunkMessageService {
      * @param chunkUids chunk UID列表
      */
     public void batchSendChunkIndexMessages(Iterable<String> chunkUids) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS Chunk批量索引消息发送", mqType);
+            return;
+        }
         try {
             log.debug("批量发送chunk索引消息");
             

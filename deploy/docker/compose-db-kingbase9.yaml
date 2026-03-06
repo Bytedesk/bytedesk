@@ -1,0 +1,43 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-kingbase9.yaml -f compose-scenario-standard.yaml up -d
+services:
+  bytedesk-db:
+    image: ${KINGBASE_IMAGE:-kingbase_v009r001c010b0004_single_arm:v1}
+    container_name: kingbase9-bytedesk
+    environment:
+      SYSTEM_PWD: ${KINGBASE_SYSTEM_PWD:-SYSTEM}
+      # 可选值：mysql | postgresql | oracle | sqlserver（默认 mysql）
+      DB_MODE: ${KINGBASE_DB_MODE:-mysql}
+      ENABLE_CI: ${KINGBASE_ENABLE_CI:-yes}
+      NEED_START: ${KINGBASE_NEED_START:-yes}
+      DB_USER: ${KINGBASE_DB_USER:-root}
+      DB_PASSWORD: ${KINGBASE_DB_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "${KINGBASE_HOST_PORT:-54321}:${KINGBASE_PORT:-54321}"
+    volumes:
+      - kingbase_data:/opt/kingbase/data
+      - ${KINGBASE_LICENSE_FILE:-../kingbase/license_V009R001C-专业版.dat}:/opt/kingbase/Server/bin/license.dat:ro
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "printf \"%s\\n\" \"${KINGBASE_DB_PASSWORD}\" | /home/kingbase/install/kingbase/bin/ksql -h 127.0.0.1 -p ${KINGBASE_PORT:-54321} -U ${KINGBASE_DB_USER:-root} -d kingbase -W -c 'select 1' >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+  bytedesk:
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:kingbase8://${FREESWITCH_DB_HOST:-bytedesk-db}:${KINGBASE_PORT:-54321}/${KINGBASE_DATABASE:-bytedesk}?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&options=-c%20default_tablespace=sys_default
+      SPRING_DATASOURCE_USERNAME: ${KINGBASE_DB_USER:-root}
+      SPRING_DATASOURCE_PASSWORD: ${KINGBASE_DB_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.kingbase8.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_QUARTZ_JDBC_PLATFORM: postgres
+      SPRING_BATCH_JDBC_PLATFORM: postgres
+      SPRING_BATCH_DATABASE_TYPE: POSTGRES
+      FLOWABLE_DATABASE_TYPE: postgres
+      SPRING_LIQUIBASE_ENABLED: "false"
+
+volumes:
+  kingbase_data:
+    name: bytedesk_kingbase_data

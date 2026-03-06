@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -53,7 +54,13 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
         // 
         StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
         if (headerAccessor == null) {
-            log.info("stomp connection without headerAccessor");
+            Object connectMessage = event.getMessage().getHeaders().get("simpConnectMessage");
+            if (connectMessage instanceof Message<?> message) {
+                headerAccessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+            }
+        }
+        if (headerAccessor == null) {
+            log.debug("stomp connection without headerAccessor");
             return;
         }
         String uid = headerAccessor.getLogin();

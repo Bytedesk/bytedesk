@@ -23,8 +23,8 @@ public enum MessageTypeEnum {
     IMAGE, // 图片消息
     FILE, // 文件消息
     DOCUMENT, // 文档消息
-    AUDIO, // 音频消息
-    VOICE, // 语音消息
+    AUDIO, // 音频消息，语音文件，用户上传或客服上传语音文件发送
+    VOICE, // 语音消息，语音输入，用户使用按住说话录音功能发送的消息
     VIDEO, // 视频消息
     MUSIC, // 音乐消息
     LOCATION, // 位置消息
@@ -94,6 +94,7 @@ public enum MessageTypeEnum {
     QUOTATION, // 引用消息
     KICKOFF, // kickoff other clients
     SHAKE, // shake window
+    // 
     FAQ, // 常见问题
     FAQ_QUESTION, // 常见问题问题
     FAQ_ANSWER, // 常见问题答案

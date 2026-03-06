@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260306-add-robot-routing-auto-reply-enabled" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot_routing_settings" />
+            <not>
+                <columnExists tableName="bytedesk_ai_robot_routing_settings" columnName="auto_reply_enabled" />
+            </not>
+        </preConditions>
+        <comment>Add auto_reply_enabled switch for robot routing auto reply.</comment>
+        <addColumn tableName="bytedesk_ai_robot_routing_settings">
+            <column name="auto_reply_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260306-backfill-robot-routing-auto-reply-enabled" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot_routing_settings" />
+            <columnExists tableName="bytedesk_ai_robot_routing_settings" columnName="auto_reply_enabled" />
+        </preConditions>
+        <comment>Backfill auto_reply_enabled to false for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_ai_robot_routing_settings
+            SET auto_reply_enabled = false
+            WHERE auto_reply_enabled IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="260306-add-robot-routing-auto-reply-kb-uid" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot_routing_settings" />
+            <not>
+                <columnExists tableName="bytedesk_ai_robot_routing_settings" columnName="auto_reply_kb_uid" />
+            </not>
+        </preConditions>
+        <comment>Add auto_reply_kb_uid for linked knowledge base uid.</comment>
+        <addColumn tableName="bytedesk_ai_robot_routing_settings">
+            <column name="auto_reply_kb_uid" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

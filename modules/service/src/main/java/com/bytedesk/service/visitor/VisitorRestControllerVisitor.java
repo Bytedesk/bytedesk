@@ -40,6 +40,7 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.kbase.taboo.TabooRestService;
 import com.bytedesk.core.message_unread.MessageUnreadRequest;
 import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.message_unread.MessageUnreadRestService;
@@ -85,7 +86,9 @@ public class VisitorRestControllerVisitor {
     private final RobotService robotService;
 
     private final AgentRestService agentRestService;
-    
+
+    private final TabooRestService tabooRestService;
+
     @Qualifier("virtualAsyncExecutor")
     private final ExecutorService executorService;
 
@@ -202,16 +205,16 @@ public class VisitorRestControllerVisitor {
         }
         // ThreadResponse response;
         // if (StringUtils.hasText(request.getUid())) {
-        //     response = threadRestService.closeByUid(request);
-        //     // 从排队中退出（若存在）
-        //     queueMemberRestService.visitorExitQueue(request.getUid());
+        // response = threadRestService.closeByUid(request);
+        // // 从排队中退出（若存在）
+        // queueMemberRestService.visitorExitQueue(request.getUid());
         // } else if (StringUtils.hasText(request.getTopic())) {
-        //     response = threadRestService.closeByTopic(request);
-        //     if (response != null && StringUtils.hasText(response.getUid())) {
-        //         queueMemberRestService.visitorExitQueue(response.getUid());
-        //     }
+        // response = threadRestService.closeByTopic(request);
+        // if (response != null && StringUtils.hasText(response.getUid())) {
+        // queueMemberRestService.visitorExitQueue(response.getUid());
+        // }
         // } else {
-        //     return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
+        // return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
         // }
         return ResponseEntity.ok(JsonResult.success("close success"));
     }
@@ -221,9 +224,13 @@ public class VisitorRestControllerVisitor {
      */
     @GetMapping("/thread/report/close-type")
     public ResponseEntity<?> queryCloseType(@RequestParam(value = "start", required = false) Long startEpoch,
-                                             @RequestParam(value = "end", required = false) Long endEpoch) {
-        ZonedDateTime end = endEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(endEpoch), java.time.ZoneId.systemDefault()) : ZonedDateTime.now();
-        ZonedDateTime start = startEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(startEpoch), java.time.ZoneId.systemDefault()) : end.minusDays(1);
+            @RequestParam(value = "end", required = false) Long endEpoch) {
+        ZonedDateTime end = endEpoch != null
+                ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(endEpoch), java.time.ZoneId.systemDefault())
+                : ZonedDateTime.now();
+        ZonedDateTime start = startEpoch != null
+                ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(startEpoch), java.time.ZoneId.systemDefault())
+                : end.minusDays(1);
         Map<String, Long> data = threadRestService.queryClosedByCloseType(start, end);
         return ResponseEntity.ok(JsonResult.success("report success", data));
     }
@@ -251,7 +258,7 @@ public class VisitorRestControllerVisitor {
     public ResponseEntity<?> queryVisitorThreads(ThreadRequest request) {
 
         Page<ThreadResponse> threads = threadRestService.queryByVisitor(request);
-        
+
         return ResponseEntity.ok(JsonResult.success("查询成功", threads));
     }
 
@@ -320,6 +327,27 @@ public class VisitorRestControllerVisitor {
         messageSendService.sendJsonMessage(json);
 
         return ResponseEntity.ok(JsonResult.success(json));
+    }
+
+    /**
+     * 访客发送机器人 SSE 消息前先做敏感词预检：
+     * - hit=true: 直接落库访客问题(敏感词替换后)和机器人回复，并返回消息实体给前端直接展示
+     * - hit=false: 前端继续走 sendSseMessage
+     */
+    @PostMapping("/message/taboo/check")
+    public ResponseEntity<?> checkTabooBeforeSse(@RequestBody VisitorTabooCheckRequest request) {
+        if (request == null || !StringUtils.hasText(request.messageJson())) {
+            return ResponseEntity.ok(JsonResult.error("messageJson required"));
+        }
+
+        try {
+            TabooRestService.VisitorTabooCheckResult result = tabooRestService.checkVisitorTabooBeforeSse(
+                    request.messageJson(),
+                    request.orgUid());
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
     }
 
     // @BlackIpFilter(title = "black", action = "sendSseMemberMessage")
@@ -462,6 +490,7 @@ public class VisitorRestControllerVisitor {
         }
     }
 
-    
+    public record VisitorTabooCheckRequest(String messageJson, String orgUid) {
+    }
 
 }

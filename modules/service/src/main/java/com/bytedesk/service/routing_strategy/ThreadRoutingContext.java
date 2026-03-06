@@ -152,6 +152,14 @@ public class ThreadRoutingContext {
     private void registerStrategy(AbstractThreadRoutingStrategy strategy) {
         try {
             String beanName = getBeanName(strategy);
+
+            // 特殊处理：ticketThreadStrategy 同时服务于 TICKET_INTERNAL/TICKET_EXTERNAL
+            if ("ticketThreadStrategy".equals(beanName)) {
+                strategyMap.put(ThreadTypeEnum.TICKET_INTERNAL, strategy);
+                strategyMap.put(ThreadTypeEnum.TICKET_EXTERNAL, strategy);
+                return;
+            }
+
             ThreadTypeEnum type = extractTypeFromBeanName(beanName);
             
             if (type != null) {

@@ -96,6 +96,13 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
+    /**
+     * Business type of workgroup for different service scenarios.
+     */
+    @Builder.Default
+    @Column(name = "workgroup_type", length = 64)
+    private String type = WorkgroupTypeEnum.GENERAL.name();
+
     // 路由模式迁移至 WorkgroupSettingsEntity
     // 为保持兼容性，保留委托型 getter，从 settings 读取；空值使用默认
 
@@ -187,6 +194,13 @@ public class WorkgroupEntity extends BaseEntity {
             return this.settings.getRoutingMode();
         }
         return WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
+    }
+
+    /**
+     * Backward compatible getter for legacy rows without type value.
+     */
+    public String getType() {
+        return WorkgroupTypeEnum.normalize(this.type);
     }
 
     // agent connected count

@@ -57,6 +57,8 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoRep
 
     private final AuthService authService;
 
+    private final AutoReplyFixedService autoReplyFixedService;
+
     @Override
     protected Specification<AutoReplyFixedEntity> createSpecification(AutoReplyFixedRequest request) {
         return AutoReplyFixedSpecification.search(request, authService);
@@ -269,6 +271,13 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoRep
 
         // 保存所有数据
         save(autoReplyList);
+    }
+
+    /**
+     * 根据知识库 UID 获取一条可用固定回复内容。
+     */
+    public String getFixedReply(String kbUid) {
+        return autoReplyFixedService.getFixedReply(kbUid);
     }
 
     

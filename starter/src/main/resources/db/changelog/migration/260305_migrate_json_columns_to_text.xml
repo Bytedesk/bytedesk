@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- bytedesk_ai_prompt -->
+    <changeSet id="260305-migrate-ai-prompt-variables-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_ai_prompt"/>
+            <columnExists tableName="bytedesk_ai_prompt" columnName="variables"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_ai_prompt'
+                      AND column_name = 'variables'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_ai_prompt" columnName="variables" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_ai_prompt" columnName="variables" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260305-migrate-ai-prompt-tags-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_ai_prompt"/>
+            <columnExists tableName="bytedesk_ai_prompt" columnName="tags"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_ai_prompt'
+                      AND column_name = 'tags'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_ai_prompt" columnName="tags" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_ai_prompt" columnName="tags" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260305-migrate-ai-prompt-metadata-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_ai_prompt"/>
+            <columnExists tableName="bytedesk_ai_prompt" columnName="metadata"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_ai_prompt'
+                      AND column_name = 'metadata'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_ai_prompt" columnName="metadata" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_ai_prompt" columnName="metadata" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260305-migrate-ai-prompt-score-result-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_ai_prompt"/>
+            <columnExists tableName="bytedesk_ai_prompt" columnName="score_result"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_ai_prompt'
+                      AND column_name = 'score_result'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_ai_prompt" columnName="score_result" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_ai_prompt" columnName="score_result" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260305-migrate-ai-prompt-optimization-metadata-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_ai_prompt"/>
+            <columnExists tableName="bytedesk_ai_prompt" columnName="optimization_metadata"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_ai_prompt'
+                      AND column_name = 'optimization_metadata'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_ai_prompt" columnName="optimization_metadata" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_ai_prompt" columnName="optimization_metadata" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <!-- bytedesk_core_workflow_edge -->
+    <changeSet id="260305-migrate-workflow-edge-edge-data-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_core_workflow_edge"/>
+            <columnExists tableName="bytedesk_core_workflow_edge" columnName="edge_data"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_core_workflow_edge'
+                      AND column_name = 'edge_data'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_core_workflow_edge" columnName="edge_data" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_core_workflow_edge" columnName="edge_data" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260305-migrate-workflow-edge-execution-result-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_core_workflow_edge"/>
+            <columnExists tableName="bytedesk_core_workflow_edge" columnName="execution_result"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_core_workflow_edge'
+                      AND column_name = 'execution_result'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_core_workflow_edge" columnName="execution_result" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_core_workflow_edge" columnName="execution_result" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260305-migrate-workflow-edge-style-config-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_core_workflow_edge"/>
+            <columnExists tableName="bytedesk_core_workflow_edge" columnName="style_config"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_core_workflow_edge'
+                      AND column_name = 'style_config'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_core_workflow_edge" columnName="style_config" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_core_workflow_edge" columnName="style_config" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <!-- bytedesk_core_workflow_node -->
+    <changeSet id="260305-migrate-workflow-node-node-data-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_core_workflow_node"/>
+            <columnExists tableName="bytedesk_core_workflow_node" columnName="node_data"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_core_workflow_node'
+                      AND column_name = 'node_data'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_core_workflow_node" columnName="node_data" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_core_workflow_node" columnName="node_data" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260305-migrate-workflow-node-execution-result-json-to-text" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <dbms type="mysql,mariadb"/>
+            <tableExists tableName="bytedesk_core_workflow_node"/>
+            <columnExists tableName="bytedesk_core_workflow_node" columnName="execution_result"/>
+            <sqlCheck expectedResult="1"><![CDATA[
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = 'bytedesk_core_workflow_node'
+                      AND column_name = 'execution_result'
+                      AND data_type = 'json'
+                ) THEN 1 ELSE 0 END
+            ]]></sqlCheck>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_core_workflow_node" columnName="execution_result" newDataType="TEXT"/>
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_core_workflow_node" columnName="execution_result" newDataType="JSON"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

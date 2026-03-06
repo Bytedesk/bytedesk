@@ -21,6 +21,8 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.util.Locale;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,8 +78,26 @@ public class BinaryWebSocketFrameHandler extends SimpleChannelInboundHandler<Bin
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("BinaryWebSocketFrameHandler exceptionCaught", cause);
+        if (isExpectedDisconnect(cause)) {
+            log.debug("BinaryWebSocketFrameHandler remote peer disconnected: {}", cause.toString());
+        } else {
+            log.error("BinaryWebSocketFrameHandler exceptionCaught", cause);
+        }
         ctx.close();
+    }
+
+    private boolean isExpectedDisconnect(Throwable cause) {
+        if (cause instanceof SocketException || cause instanceof IOException) {
+            String message = cause.getMessage();
+            if (message == null) {
+                return true;
+            }
+            String normalized = message.toLowerCase(Locale.ROOT);
+            return normalized.contains("connection reset")
+                    || normalized.contains("broken pipe")
+                    || normalized.contains("forcibly closed");
+        }
+        return false;
     }
 
     @Override

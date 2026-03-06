@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.article.mq;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,13 @@ public class ArticleMessageService {
 
     @Autowired
     private JmsTemplate jmsTemplate;
+
+    @Value("${bytedesk.mq.type:artemis}")
+    private String mqType;
+
+    private boolean isArtemisEnabled() {
+        return "artemis".equalsIgnoreCase(mqType);
+    }
     
     /**
      * 发送文章到索引队列，用于创建或更新索引
@@ -39,6 +47,10 @@ public class ArticleMessageService {
      * @param articleUid 文章的唯一标识
      */
     public void sendToIndexQueue(String articleUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS 文章索引发送: {}", mqType, articleUid);
+            return;
+        }
         try {
             log.debug("发送文章到索引队列: {}", articleUid);
             
@@ -83,6 +95,10 @@ public class ArticleMessageService {
      * @param articleUid 文章的唯一标识
      */
     public void sendToDeleteQueue(String articleUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS 文章删除发送: {}", mqType, articleUid);
+            return;
+        }
         try {
             log.debug("发送文章删除请求到索引队列: {}", articleUid);
             
@@ -131,6 +147,10 @@ public class ArticleMessageService {
      * @param articleUids 文章唯一标识列表
      */
     public void batchSendToIndexQueue(Iterable<String> articleUids) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS 文章批量索引发送", mqType);
+            return;
+        }
         try {
             log.debug("批量发送文章到索引队列");
             

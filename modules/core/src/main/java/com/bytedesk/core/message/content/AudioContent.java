@@ -23,6 +23,7 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * 音频消息内容类
+ * 用户上传或客服上传语音文件发送
  */
 @Getter
 @Setter

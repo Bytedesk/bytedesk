@@ -12,10 +12,11 @@ MODE="${4:-stop}"
 TARGET="${5:-all}"
 
 case "${DB}" in
-  mysql|postgresql|oracle) ;;
+  mysql|postgresql|oracle|kingbase9) ;;
   pg) DB="postgresql" ;;
+  kingbase) DB="kingbase9" ;;
   *)
-    echo "[ERROR] Unsupported db: ${DB}. Allowed: mysql|postgresql|oracle|pg"
+    echo "[ERROR] Unsupported db: ${DB}. Allowed: mysql|postgresql|oracle|kingbase9|kingbase|pg"
     exit 1
     ;;
 esac
@@ -65,8 +66,8 @@ if [[ "${SCENARIO}" == "call" ]]; then
     mysql|postgresql)
       CALL_DB_FILE="${SCRIPT_DIR}/compose-call-db-${DB}.yaml"
       ;;
-    oracle)
-      echo "[ERROR] call scenario does not support oracle. Allowed db for call: mysql|postgresql"
+    oracle|kingbase9)
+      echo "[ERROR] call scenario does not support ${DB}. Allowed db for call: mysql|postgresql"
       exit 1
       ;;
   esac

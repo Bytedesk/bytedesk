@@ -50,6 +50,13 @@ public class RobotRoutingSettingsRequest extends BaseRequest {
     @Builder.Default
     private Boolean nonWorktimeRobot = false;
 
+    /** 是否启用自动回复前置匹配（固定回复 -> 关键词回复） */
+    @Builder.Default
+    private Boolean autoReplyEnabled = false;
+
+    /** 自动回复关联知识库 UID */
+    private String autoReplyKbUid;
+
     @Builder.Default
     private Boolean queueRobot = false;
     

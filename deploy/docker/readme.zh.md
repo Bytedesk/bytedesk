@@ -21,6 +21,7 @@
 ├── compose-db-mysql.yaml # MySQL 数据库覆盖（默认）
 ├── compose-db-postgresql.yaml # PostgreSQL 数据库覆盖
 ├── compose-db-oracle.yaml # Oracle 数据库覆盖
+├── compose-db-kingbase9.yaml # KingbaseES V9 数据库覆盖
 ├── compose-mq-artemis.yaml # Artemis MQ 组件覆盖（默认）
 ├── compose-mq-rabbitmq.yaml # RabbitMQ MQ 组件覆盖
 ├── compose-app-bytedesk.yaml # bytedesk 镜像服务（已从 base 拆分）
@@ -62,6 +63,7 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f
 # 切换数据库示例
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-kingbase9.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
 
 # 脚本方式（推荐）
 # 参数格式：
@@ -84,6 +86,10 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 ./stop.sh postgresql artemis standard stop middleware
 ./stop.sh postgresql artemis standard down middleware
 
+./start.sh postgresql rabbitmq standard middleware
+./stop.sh postgresql rabbitmq standard stop middleware
+./stop.sh postgresql rabbitmq standard down middleware
+
 # 4) PostgreSQL + RabbitMQ + noai（禁用 AI 依赖）
 ./start.sh postgresql rabbitmq noai middleware
 ./stop.sh postgresql rabbitmq noai stop middleware
@@ -94,7 +100,16 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 ./stop.sh oracle artemis noai stop middleware
 ./stop.sh oracle artemis noai down middleware
 
-# 6) 呼叫中心中间件场景
+# 6) Kingbase9 + Artemis + standard
+./start.sh kingbase9 artemis standard middleware
+./stop.sh kingbase9 artemis standard stop middleware
+./stop.sh kingbase9 artemis standard down middleware
+
+./start.sh kingbase9 rabbitmq standard middleware
+./stop.sh kingbase9 rabbitmq standard stop middleware
+./stop.sh kingbase9 rabbitmq standard down middleware
+
+# 7) 呼叫中心中间件场景
 ./start.sh mysql artemis call middleware
 ./stop.sh mysql artemis call stop middleware
 ./stop.sh mysql artemis call down middleware
@@ -102,6 +117,10 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 ./start.sh mysql rabbitmq call middleware
 ./stop.sh mysql rabbitmq call stop middleware
 ./stop.sh mysql rabbitmq call down middleware
+
+./start.sh postgresql artemis call middleware
+./stop.sh postgresql artemis call stop middleware
+./stop.sh postgresql artemis call down middleware
 
 ./start.sh postgresql rabbitmq call middleware
 ./stop.sh postgresql rabbitmq call stop middleware
@@ -128,11 +147,16 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 ./stop.sh postgresql rabbitmq call stop all
 ./stop.sh postgresql rabbitmq call down all
 
+# 5) Kingbase9 + Artemis + 标准场景
+./start.sh kingbase9 artemis standard all
+./stop.sh kingbase9 artemis standard stop all
+./stop.sh kingbase9 artemis standard down all
+
 # 参数速查：
-# db: mysql | postgresql | oracle
+# db: mysql | postgresql | oracle | kingbase9
 # mq: artemis | rabbitmq
 # scenario: standard | noai | call
-# 注意：call 场景支持 mysql 与 postgresql（oracle 尚未验证）
+# 注意：call 场景支持 mysql 与 postgresql（oracle/kingbase9 尚未验证）
 # target: middleware | all
 # action: stop(停止容器) | down(删除容器，保留卷)
 
@@ -140,9 +164,11 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f com
 # 默认值（缺省参数时）：
 # start.sh 等价于：./start.sh mysql artemis standard all
 # stop.sh  等价于：./stop.sh  mysql artemis standard stop all
-# db 也支持别名：pg -> postgresql
+# db 也支持别名：pg -> postgresql，kingbase -> kingbase9
 # 可通过环境变量自定义 compose 项目名（默认 bytedesk）：
 # PROJECT_NAME=bytedesk-dev ./start.sh mysql artemis standard middleware
+# mysql/postgresql/oracle/kingbase9 场景下：start.sh 会自动确保对应数据库存在（不存在则创建）
+# 默认数据库变量分别为：MYSQL_DATABASE / POSTGRES_DB / ORACLE_DATABASE / KINGBASE_DATABASE
 
 # 拉取ollama模型
 # 对话模型
@@ -163,7 +189,7 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f comp
 
 启动前至少配置以下变量：
 
-- 数据库与消息队列：`MYSQL_ROOT_PASSWORD`、`POSTGRES_PASSWORD`、`ORACLE_PASSWORD`、`ORACLE_APP_USER_PASSWORD`、`ARTEMIS_PASSWORD`、`RABBITMQ_DEFAULT_PASS`
+- 数据库与消息队列：`MYSQL_ROOT_PASSWORD`、`POSTGRES_PASSWORD`、`ORACLE_PASSWORD`、`ORACLE_APP_USER_PASSWORD`、`KINGBASE_DB_PASSWORD`、`KINGBASE_SYSTEM_PWD`、`KINGBASE_LICENSE_FILE`、`ARTEMIS_PASSWORD`、`RABBITMQ_DEFAULT_PASS`
 - 中间件：`REDIS_PASSWORD`、`ELASTIC_PASSWORD`、`MINIO_ROOT_PASSWORD`
 - 应用认证：`BYTEDESK_ADMIN_PASSWORD`、`BYTEDESK_ADMIN_VALIDATE_CODE`、`BYTEDESK_MEMBER_PASSWORD`、`BYTEDESK_JWT_SECRET_KEY`
 - 呼叫场景：`COTURN_PASS`、`FREESWITCH_ESL_PASSWORD`
@@ -225,13 +251,15 @@ FREESWITCH_DB_HOST=bytedesk-db
 
 ### 常见问题排查
 
-1) 报错 `CORE DATABASE INITIALIZATION FAILURE`：
+```bash
+cd deploy/docker
+./stop.sh postgresql artemis call down middleware
+./start.sh postgresql artemis call middleware
+docker inspect --format 'Status={{.State.Status}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} RestartCount={{.RestartCount}}' freeswitch-bytedesk
+docker logs --tail 200 freeswitch-bytedesk 2>&1 | grep -E "NO SUITABLE DATABASE INTERFACE|Cannot load modules" || true
+```
 
-- 优先检查当前数据库场景是否挂载了对应的 `switch.conf.*.xml` 与 `modules/pre_load` 覆盖文件。
-
-1) 从 PostgreSQL 切到 MySQL（或反向切换）后仍连接旧库：
-
-- 建议使用 `--remove-orphans` 重新创建容器，避免旧容器/网络别名残留。
+- 预期结果：`Health=healthy`，且日志不再出现上述错误关键字。
 
 ```bash
 docker compose -p bytedesk \

@@ -18,6 +18,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 
+import java.io.IOException;
+import java.net.SocketException;
+import java.util.Locale;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -66,8 +70,26 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("TextWebSocketFrameHandler exceptionCaught", cause);
+        if (isExpectedDisconnect(cause)) {
+            log.debug("TextWebSocketFrameHandler remote peer disconnected: {}", cause.toString());
+        } else {
+            log.error("TextWebSocketFrameHandler exceptionCaught", cause);
+        }
         ctx.close();
+    }
+
+    private boolean isExpectedDisconnect(Throwable cause) {
+        if (cause instanceof SocketException || cause instanceof IOException) {
+            String message = cause.getMessage();
+            if (message == null) {
+                return true;
+            }
+            String normalized = message.toLowerCase(Locale.ROOT);
+            return normalized.contains("connection reset")
+                    || normalized.contains("broken pipe")
+                    || normalized.contains("forcibly closed");
+        }
+        return false;
     }
 
     @Override

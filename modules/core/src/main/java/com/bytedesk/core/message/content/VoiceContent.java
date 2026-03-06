@@ -23,6 +23,7 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * 语音消息内容类
+ * 用户使用按住说话录音功能发送的消息
  */
 @Getter
 @Setter
@@ -32,9 +33,19 @@ import lombok.experimental.SuperBuilder;
 public class VoiceContent extends BaseContent {
     
     private static final long serialVersionUID = 1L;
+
     private String url;       // 语音文件URL
     private String duration;  // 语音时长（秒）
     private String format;    // 文件格式（如ogg, mp3）
     private String caption;   // 语音说明文字
     private String label;     // 语音标签
+
+    /**
+     * 从JSON字符串反序列化为VoiceContent对象
+     * @param json JSON字符串
+     * @return VoiceContent对象，如果解析失败返回null
+     */
+    public static VoiceContent fromJson(String json) {
+        return BaseContent.fromJson(json, VoiceContent.class);
+    }
 }

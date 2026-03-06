@@ -20,13 +20,13 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsService;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.segment.SegmentService;
 import com.bytedesk.ai.service.BaseSpringAIService;
@@ -35,7 +35,6 @@ import com.bytedesk.ai.service.SpringAIServiceRegistry;
 import com.bytedesk.ai.service.SseMessageJsonConsumer;
 import com.bytedesk.ai.service.SsePersistenceControl;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -45,6 +44,8 @@ import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedService;
+import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,9 @@ public class RobotService extends AbstractRobotService {
     private final RobotRestService robotRestService;
     private final SegmentService segmentService;
     private final SseMessageHelper sseMessageHelper;
+    private final AutoReplyFixedService autoReplyFixedService;
+    private final AutoReplyKeywordService autoReplyKeywordService;
+    private final RobotRoutingSettingsService workgroupAutoReplyConfigService;
 
     @Override
     protected RobotRestService getRobotRestService() {
@@ -301,9 +305,13 @@ public class RobotService extends AbstractRobotService {
             robot,
             validationResult.getMessageProtobuf());
 
-        if (shouldBypassRobotReply(threadEntity)) {
+        if (RobotUtils.shouldBypassRobotReply(threadEntity)) {
             log.info("Thread {} is transferring to agent, skip robot stream response", threadEntity.getUid());
             sendTransferInterceptionResponse(validationResult, messageProtobufReply, emitter);
+            return;
+        }
+
+        if (trySendWorkgroupAutoReply(validationResult, threadEntity, messageProtobufReply, emitter)) {
             return;
         }
 
@@ -328,6 +336,73 @@ public class RobotService extends AbstractRobotService {
         // 处理LLM消息（统一走fallback逻辑）
         processAIWithFallback(finalQuery, robot, validationResult.getMessageProtobuf(),
                 messageProtobufReply, emitter);
+    }
+
+    private boolean trySendWorkgroupAutoReply(
+            MessageValidationResult validationResult,
+            ThreadEntity threadEntity,
+            MessageProtobuf messageProtobufReply,
+            SseEmitter emitter) {
+        if (validationResult == null || threadEntity == null || messageProtobufReply == null || emitter == null) {
+            return false;
+        }
+
+        String workgroupUid = RobotUtils.extractWorkgroupUidFromTopic(validationResult.getThreadTopic());
+        if (!StringUtils.hasText(workgroupUid)) {
+            return false;
+        }
+
+        RobotRoutingSettingsService.WorkgroupAutoReplyConfig config = workgroupAutoReplyConfigService.findByWorkgroupUid(workgroupUid);
+        if (config == null) {
+            return false;
+        }
+
+        String queryText = RobotUtils.extractTextQuery(validationResult.getQuery());
+        if (!StringUtils.hasText(queryText)) {
+            return false;
+        }
+
+        String matchedReply = null;
+        if (Boolean.TRUE.equals(config.autoReplyEnabled()) && StringUtils.hasText(config.autoReplyKbUid())) {
+            matchedReply = autoReplyFixedService.getFixedReply(config.autoReplyKbUid());
+            // 固定回复命中后，仍允许关键词规则覆盖，保持原有优先级行为。
+            if (StringUtils.hasText(matchedReply)) {
+                log.info("robot pre-match hit fixed reply, workgroupUid={}, kbUid={}", workgroupUid, config.autoReplyKbUid());
+            }
+
+            matchedReply = autoReplyKeywordService.getKeywordReply(
+                    queryText,
+                    config.autoReplyKbUid());
+            if (StringUtils.hasText(matchedReply)) {
+                log.info("robot pre-match hit keyword reply, workgroupUid={}, kbUid={}", workgroupUid, config.autoReplyKbUid());
+            }
+        }
+
+        if (!StringUtils.hasText(matchedReply)) {
+            return false;
+        }
+
+        sseMessageHelper.sendStreamMessage(
+                validationResult.getMessageProtobuf(),
+                messageProtobufReply,
+                emitter,
+                matchedReply,
+                null,
+                null,
+                false,
+                false,
+                false);
+        sseMessageHelper.sendStreamEndMessage(
+                validationResult.getMessageProtobuf(),
+                messageProtobufReply,
+                emitter,
+                0,
+                0,
+                0,
+                null,
+                "AUTO_REPLY",
+                "workgroup-pre-match");
+        return true;
     }
 
     // 处理访客端同步请求消息，机器人设置为stream=false的情况，用于微信公众号等平台
@@ -359,8 +434,8 @@ public class RobotService extends AbstractRobotService {
         // } catch (Exception e) {
         //     log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
         // }
-        List<String> tokens = preprocessAndSegment(rewritten);
-        String finalQuery = buildExpandedQuery(rewritten, tokens);
+        List<String> tokens = RobotUtils.preprocessAndSegment(rewritten, segmentService);
+        String finalQuery = RobotUtils.buildExpandedQuery(rewritten, tokens);
 
         // 使用公共方法处理AI消息（统一走fallback逻辑）
         String aiResponse = processSyncAIWithFallback(finalQuery, robot,
@@ -372,34 +447,6 @@ public class RobotService extends AbstractRobotService {
     }
 
     // ==================== Pipeline 风格接口已移除：逻辑已并入访客接口 ====================
-
-    private List<String> preprocessAndSegment(String content) {
-        if (content == null || content.isBlank()) {
-            return List.of();
-        }
-        // 使用 SegmentService 进行分词，并过滤标点符号，最小长度 1
-        List<String> words = segmentService.segmentWords(content);
-        return segmentService.filterWords(words, true, 1);
-    }
-
-    /**
-     * 基于分词结果构建扩展查询，提升召回。
-     * - 去重
-     * - 限制最大拼接词数，避免过长
-     */
-    private String buildExpandedQuery(String base, List<String> tokens) {
-        if (tokens == null || tokens.isEmpty()) {
-            return base;
-        }
-        // 去重并限制最多 8 个词
-        List<String> uniq = tokens.stream().distinct().limit(8).collect(Collectors.toList());
-        String extra = String.join(" ", uniq);
-        if (extra.isBlank()) {
-            return base;
-        }
-        // 简单拼接，保留原文，提高召回（必要时可改为加权语法由底层模型/检索解析）
-        return base + " " + extra;
-    }
 
     /**
      * 消息验证和解析的通用方法
@@ -498,28 +545,6 @@ public class RobotService extends AbstractRobotService {
         return robotBasic;
     }
 
-    private boolean shouldBypassRobotReply(ThreadEntity thread) {
-        if (thread == null || !thread.isWorkgroupType()) {
-            return false;
-        }
-        if (hasAgentAssigned(thread)) {
-            return true;
-        }
-        // String transferStatus = thread.getTransferStatus();
-        // boolean transferActive = StringUtils.hasText(transferStatus)
-        //         && !ThreadTransferStatusEnum.NONE.name().equals(transferStatus);
-        // return transferActive || !thread.isRoboting();
-        return !thread.isRoboting();
-    }
-
-    private boolean hasAgentAssigned(ThreadEntity thread) {
-        if (thread == null) {
-            return false;
-        }
-        String agentJson = thread.getAgent();
-        return StringUtils.hasText(agentJson) && !BytedeskConsts.EMPTY_JSON_STRING.equals(agentJson);
-    }
-
     private void sendTransferInterceptionResponse(
             MessageValidationResult validationResult,
             MessageProtobuf messageProtobufReply,
@@ -552,23 +577,12 @@ public class RobotService extends AbstractRobotService {
     }
 
     /**
-     * AI提供商选择和处理的公共方法
-     */
-    private String getAIProviderName(RobotProtobuf robot) {
-        String provider = LlmProviderConstants.ZHIPUAI;
-        if (robot.getLlm() != null) {
-            provider = robot.getLlm().getTextProvider().toLowerCase();
-        }
-        return provider;
-    }
-
-    /**
      * 通用的AI消息处理方法，包含fallback逻辑
      */
     private void processAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
 
-        String provider = getAIProviderName(robot);
+        String provider = RobotUtils.getAIProviderName(robot);
 
         try {
             // 使用SpringAIServiceRegistry获取对应的服务
@@ -593,7 +607,7 @@ public class RobotService extends AbstractRobotService {
     private String processSyncAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
 
-        String provider = getAIProviderName(robot);
+        String provider = RobotUtils.getAIProviderName(robot);
 
         try {
             // 使用SpringAIServiceRegistry获取对应的服务进行同步处理

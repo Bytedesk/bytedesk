@@ -29,7 +29,7 @@ public class TypeConsts {
     public static final String REGION_TYPE_TOWN = "town";
     //
     public static final String COLUMN_TYPE_TEXT = "TEXT"; // length = 65534
-    public static final String COLUMN_TYPE_JSON = "json"; // replace with jsonb?
+    public static final String COLUMN_TYPE_JSON = COLUMN_TYPE_TEXT; // 暂时不考虑性能，优先考虑兼容，后期可扩展为json
 
     // 
     public static final String COMPONENT_TYPE_TEAM = "team";

@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsService;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
@@ -80,6 +81,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
     private final OrganizationRestService organizationRestService;
+
+    private final RobotRoutingSettingsService workgroupAutoReplyConfigService;
 
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {
@@ -134,6 +137,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         } else {
             workgroup.setUid(request.getUid());
         }
+        workgroup.setType(WorkgroupTypeEnum.normalize(request.getType()));
         workgroup.setOrgUid(request.getOrgUid());
         //
         // 绑定工作组配置：优先使用请求中的 settingsUid，否则使用组织默认配置
@@ -202,6 +206,9 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setNickname(request.getNickname());
         workgroup.setAvatar(request.getAvatar());
         workgroup.setDescription(request.getDescription());
+        if (request.getType() != null) {
+            workgroup.setType(WorkgroupTypeEnum.normalize(request.getType()));
+        }
         // workgroup.setRoutingMode(request.getRoutingMode());
         workgroup.setStatus(request.getStatus());
         //
@@ -380,12 +387,19 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         if (savedEntity.getAdmins() != null) {
             savedEntity.getAdmins().size();
         }
+
+        if (StringUtils.hasText(savedEntity.getUid())) {
+            workgroupAutoReplyConfigService.evictByWorkgroupUid(savedEntity.getUid());
+        }
         
         return savedEntity;
     }
 
     @CacheEvict(value = "workgroup", key = "#uid")
     public void deleteByUid(String uid) {
+        if (StringUtils.hasText(uid)) {
+            workgroupAutoReplyConfigService.evictByWorkgroupUid(uid);
+        }
         Optional<WorkgroupEntity> workgroupOptional = findByUid(uid);
         workgroupOptional.ifPresent(workgroup -> {
             workgroup.setDeleted(true);
