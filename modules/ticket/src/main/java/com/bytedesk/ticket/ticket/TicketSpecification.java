@@ -39,6 +39,11 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService)); // 基础查询条件
+
+            // 组织隔离：按 orgUid 限定查询范围，避免跨组织数据泄露
+            if (StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
             
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));

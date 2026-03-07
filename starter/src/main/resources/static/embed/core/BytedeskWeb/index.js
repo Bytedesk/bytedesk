@@ -594,7 +594,7 @@ class ie {
         transition: all ${(r = this.config.animation) == null ? void 0 : r.duration}ms ${(g = this.config.animation) == null ? void 0 : g.type};
       `;
     const a = document.createElement("iframe");
-    a.style.cssText = `
+    a.setAttribute("allow", "microphone *; camera *; autoplay *; clipboard-write *"), a.style.cssText = `
       width: 100%;
       height: 100%;
       border: none;

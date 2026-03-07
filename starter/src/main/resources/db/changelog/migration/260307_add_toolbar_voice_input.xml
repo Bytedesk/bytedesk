@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 添加 toolbar_voice_input 字段：控制访客端输入框语音输入能力 -->
+    <changeSet id="260307-add-toolbar-voice-input" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <not>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="toolbar_voice_input" />
+            </not>
+        </preConditions>
+        <comment>Add toolbar_voice_input field to control voice input (recorder) availability on visitor chat composer.</comment>
+        <addColumn tableName="bytedesk_kbase_service_settings">
+            <column name="toolbar_voice_input" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_kbase_service_settings" columnName="toolbar_voice_input" />
+        </rollback>
+    </changeSet>
+
+    <!-- 回填默认值（对于现有数据） -->
+    <changeSet id="260307-backfill-toolbar-voice-input" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="toolbar_voice_input" />
+        </preConditions>
+        <comment>Backfill default value for existing rows.</comment>
+        <sql>
+            UPDATE bytedesk_kbase_service_settings
+            SET toolbar_voice_input = true
+            WHERE toolbar_voice_input IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

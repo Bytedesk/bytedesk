@@ -31,6 +31,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -224,6 +225,15 @@ public class GlobalExceptionHandler {
         }
         log.error("InvalidDataAccessApiUsageException", e);
         return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<?> handleResourceAccessException(ResourceAccessException e) {
+        // 典型场景：第三方 OAuth/HTTP 接口瞬时网络抖动，按 503 返回并降级日志级别
+        log.warn("Upstream resource access failed: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error("外部服务暂时不可用，请稍后重试", HttpStatus.SERVICE_UNAVAILABLE.value()));
     }
 
     /**

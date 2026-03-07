@@ -114,7 +114,7 @@ var BytedeskWeb=function(){"use strict";var Dn=Object.defineProperty;var vn=(z,H
         overflow: hidden;
         z-index: 10000;
         transition: all ${(h=this.config.animation)==null?void 0:h.duration}ms ${(p=this.config.animation)==null?void 0:p.type};
-      `;const r=document.createElement("iframe");r.style.cssText=`
+      `;const r=document.createElement("iframe");r.setAttribute("allow","microphone *; camera *; autoplay *; clipboard-write *"),r.style.cssText=`
       width: 100%;
       height: 100%;
       border: none;

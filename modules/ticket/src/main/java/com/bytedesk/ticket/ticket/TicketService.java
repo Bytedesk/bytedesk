@@ -121,6 +121,7 @@ public class TicketService {
      */
     @Transactional
     public TicketResponse claimTicket(TicketRequest request) {
+        Assert.notNull(request.getAssignee(), "处理人不能为空");
         log.info("开始认领工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
         // 
@@ -153,12 +154,23 @@ public class TicketService {
             }
         }
 
-        // 2. 查询任务
-        Task task = taskService.createTaskQuery()
+        // 2. 查询任务：同一流程实例可能存在多个活动任务，不能使用 singleResult()
+        List<Task> candidateTasks = taskService.createTaskQuery()
                 .processInstanceId(ticket.getProcessInstanceId()) // 使用processInstanceId查询
                 .taskDefinitionKey(TicketConsts.TICKET_USER_TASK_ASSIGN_TO_GROUP)
                 .active() // 只查询活动的任务
-                .singleResult();
+            .list();
+
+        Task task = candidateTasks.stream()
+            // 优先选择未认领任务；若已被本人认领，也允许继续处理
+            .filter(t -> !StringUtils.hasText(t.getAssignee()) || assigneeUid.equals(t.getAssignee()))
+            .findFirst()
+            .orElse(null);
+
+        if (candidateTasks.size() > 1) {
+            log.warn("认领工单存在多个活动任务，已选择首个可认领任务: processInstanceId={}, taskCount={}, assigneeUid={}",
+                ticket.getProcessInstanceId(), candidateTasks.size(), assigneeUid);
+        }
 
         log.info("查询到的任务: task={}, processInstanceId={}", task, ticket.getProcessInstanceId());
 

@@ -51,6 +51,11 @@ public class ToolbarSettings implements Serializable {
     @Column(name = "toolbar_speech_input")
     private Boolean speechInput = true;
 
+    // 语音输入按钮（输入框右侧录音能力）
+    @Builder.Default
+    @Column(name = "toolbar_voice_input")
+    private Boolean voiceInput = true;
+
     // 上传按钮（已统一替代 image/file）
     @Builder.Default
     @Column(name = "toolbar_upload")

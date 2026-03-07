@@ -75,5 +75,6 @@
     <include file="db/changelog/migration/260305_migrate_json_columns_to_text.xml" />
     <include file="db/changelog/migration/260306_add_robot_routing_auto_reply_fields.xml" />
     <include file="db/changelog/migration/260306_add_workgroup_type_column.xml" />
+    <include file="db/changelog/migration/260307_add_toolbar_voice_input.xml" />
 
 </databaseChangeLog>

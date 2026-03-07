@@ -299,9 +299,35 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public AgentResponse updateStatus(AgentRequest request) {
-        // agentRepository.updateStatusByUid(request.getStatus(), request.getUid());
-        AgentEntity agent = findByUid(request.getUid())
-                .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        Optional<AgentEntity> agentOptional = Optional.empty();
+
+        // 优先按 uid 精确更新
+        if (StringUtils.hasText(request.getUid())) {
+            agentOptional = findByUid(request.getUid());
+        }
+
+        // uid 为空时，按 userUid + orgUid 兜底定位当前座席
+        if (agentOptional.isEmpty()) {
+            String orgUid = request.getOrgUid();
+            String userUid = request.getUserUid();
+
+            UserEntity authUser = authService.getUser();
+            if (!StringUtils.hasText(userUid) && authUser != null) {
+                userUid = authUser.getUid();
+            }
+            if (!StringUtils.hasText(orgUid) && authUser != null) {
+                orgUid = authUser.getOrgUid();
+            }
+
+            if (StringUtils.hasText(userUid) && StringUtils.hasText(orgUid)) {
+                agentOptional = findByUserUidAndOrgUid(userUid, orgUid);
+            } else if (StringUtils.hasText(userUid)) {
+                agentOptional = findByUserUid(userUid);
+            }
+        }
+
+        AgentEntity agent = agentOptional
+                .orElseThrow(() -> new RuntimeException("agent not found for uid/userUid/orgUid"));
         agent.setStatus(request.getStatus()); // 更新接待状态
         //
         AgentEntity updatedAgent = save(agent);
@@ -361,8 +387,35 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public AgentResponse updateAutoReply(AgentRequest request) {
-        AgentEntity agent = findByUid(request.getUid())
-                .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        Optional<AgentEntity> agentOptional = Optional.empty();
+
+        // 优先按 uid 精确定位
+        if (StringUtils.hasText(request.getUid())) {
+            agentOptional = findByUid(request.getUid());
+        }
+
+        // uid 缺失或未命中时，按 userUid + orgUid 兜底
+        if (agentOptional.isEmpty()) {
+            String orgUid = request.getOrgUid();
+            String userUid = request.getUserUid();
+
+            UserEntity authUser = authService.getUser();
+            if (!StringUtils.hasText(userUid) && authUser != null) {
+                userUid = authUser.getUid();
+            }
+            if (!StringUtils.hasText(orgUid) && authUser != null) {
+                orgUid = authUser.getOrgUid();
+            }
+
+            if (StringUtils.hasText(userUid) && StringUtils.hasText(orgUid)) {
+                agentOptional = findByUserUidAndOrgUid(userUid, orgUid);
+            } else if (StringUtils.hasText(userUid)) {
+                agentOptional = findByUserUid(userUid);
+            }
+        }
+
+        AgentEntity agent = agentOptional
+                .orElseThrow(() -> new RuntimeException("agent not found for uid/userUid/orgUid"));
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {

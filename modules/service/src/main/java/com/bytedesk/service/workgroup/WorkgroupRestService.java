@@ -42,6 +42,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRepository;
@@ -113,9 +114,18 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         WorkgroupEntity workgroup = findByUid(request.getUid())
                 .orElseThrow(() -> new RuntimeException("workgroup not found with uid: " + request.getUid()));
 
-        // 安全兜底：若请求携带 orgUid，则强制校验资源归属组织，避免凭 UID 跨组织探测
-        if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(workgroup.getOrgUid())) {
-            throw new RuntimeException("workgroup org mismatch");
+        // 安全兜底：优先使用请求 orgUid，未携带时回退登录态 orgUid；跨组织时按“未找到”处理，避免 500 噪音
+        String expectedOrgUid = request.getOrgUid();
+        if (!StringUtils.hasText(expectedOrgUid)) {
+            UserEntity authUser = authService.getUser();
+            if (authUser != null) {
+                expectedOrgUid = authUser.getOrgUid();
+            }
+        }
+        if (StringUtils.hasText(expectedOrgUid) && !expectedOrgUid.equals(workgroup.getOrgUid())) {
+            log.warn("workgroup org mismatch: workgroupUid={}, requestOrgUid={}, resourceOrgUid={}",
+                    request.getUid(), expectedOrgUid, workgroup.getOrgUid());
+            return null;
         }
 
         return convertToResponse(workgroup);
