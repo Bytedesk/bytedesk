@@ -13,7 +13,6 @@
  */
 package com.bytedesk.service.agent_settings;
 
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingResponse;
@@ -82,15 +81,6 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
      * Draft worktime settings reference (Agent-specific)
      */
     private WorktimeSettingResponse draftWorktimeSettings;
-
-    /**
-     * Auto-reply settings (Agent-specific)
-     */
-    private AutoReplySettingsResponse autoReplySettings;
-    /**
-     * Draft auto-reply settings (Agent-specific)
-     */
-    private AutoReplySettingsResponse draftAutoReplySettings;
 
     /**
      * Queue settings (Agent-specific)

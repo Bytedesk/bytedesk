@@ -15,6 +15,7 @@ package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.member.MemberProtobuf;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.service.agent_settings.AgentSettingsResponse;
 import com.bytedesk.service.queue.QueueAgentStatsResponse;
 
@@ -60,6 +61,11 @@ public class AgentResponse extends BaseResponse {
      * Agent settings (loaded from settings entity)
      */
     private AgentSettingsResponse settings;
+
+    /**
+     * Per-agent auto-reply settings.
+     */
+    private AutoReplySettingsResponse autoReplySettings;
 
     /**
      * Agent queue statistics (loaded from queue service)

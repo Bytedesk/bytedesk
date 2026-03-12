@@ -26,7 +26,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.bytedesk.ai.robot.settings.RobotRoutingSettingsService;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.segment.SegmentService;
 import com.bytedesk.ai.service.BaseSpringAIService;
@@ -44,8 +43,6 @@ import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedService;
-import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,9 +60,6 @@ public class RobotService extends AbstractRobotService {
     private final RobotRestService robotRestService;
     private final SegmentService segmentService;
     private final SseMessageHelper sseMessageHelper;
-    private final AutoReplyFixedService autoReplyFixedService;
-    private final AutoReplyKeywordService autoReplyKeywordService;
-    private final RobotRoutingSettingsService workgroupAutoReplyConfigService;
 
     @Override
     protected RobotRestService getRobotRestService() {
@@ -311,10 +305,6 @@ public class RobotService extends AbstractRobotService {
             return;
         }
 
-        if (trySendWorkgroupAutoReply(validationResult, threadEntity, messageProtobufReply, emitter)) {
-            return;
-        }
-
         // TODO: 影响回答速度，待完善后开启
         // 查询重写 + 分词扩展查询（原 Pipeline 逻辑合并至访客接口）
         // String rewritten = query;
@@ -336,73 +326,6 @@ public class RobotService extends AbstractRobotService {
         // 处理LLM消息（统一走fallback逻辑）
         processAIWithFallback(finalQuery, robot, validationResult.getMessageProtobuf(),
                 messageProtobufReply, emitter);
-    }
-
-    private boolean trySendWorkgroupAutoReply(
-            MessageValidationResult validationResult,
-            ThreadEntity threadEntity,
-            MessageProtobuf messageProtobufReply,
-            SseEmitter emitter) {
-        if (validationResult == null || threadEntity == null || messageProtobufReply == null || emitter == null) {
-            return false;
-        }
-
-        String workgroupUid = RobotUtils.extractWorkgroupUidFromTopic(validationResult.getThreadTopic());
-        if (!StringUtils.hasText(workgroupUid)) {
-            return false;
-        }
-
-        RobotRoutingSettingsService.WorkgroupAutoReplyConfig config = workgroupAutoReplyConfigService.findByWorkgroupUid(workgroupUid);
-        if (config == null) {
-            return false;
-        }
-
-        String queryText = RobotUtils.extractTextQuery(validationResult.getQuery());
-        if (!StringUtils.hasText(queryText)) {
-            return false;
-        }
-
-        String matchedReply = null;
-        if (Boolean.TRUE.equals(config.autoReplyEnabled()) && StringUtils.hasText(config.autoReplyKbUid())) {
-            matchedReply = autoReplyFixedService.getFixedReply(config.autoReplyKbUid());
-            // 固定回复命中后，仍允许关键词规则覆盖，保持原有优先级行为。
-            if (StringUtils.hasText(matchedReply)) {
-                log.info("robot pre-match hit fixed reply, workgroupUid={}, kbUid={}", workgroupUid, config.autoReplyKbUid());
-            }
-
-            matchedReply = autoReplyKeywordService.getKeywordReply(
-                    queryText,
-                    config.autoReplyKbUid());
-            if (StringUtils.hasText(matchedReply)) {
-                log.info("robot pre-match hit keyword reply, workgroupUid={}, kbUid={}", workgroupUid, config.autoReplyKbUid());
-            }
-        }
-
-        if (!StringUtils.hasText(matchedReply)) {
-            return false;
-        }
-
-        sseMessageHelper.sendStreamMessage(
-                validationResult.getMessageProtobuf(),
-                messageProtobufReply,
-                emitter,
-                matchedReply,
-                null,
-                null,
-                false,
-                false,
-                false);
-        sseMessageHelper.sendStreamEndMessage(
-                validationResult.getMessageProtobuf(),
-                messageProtobufReply,
-                emitter,
-                0,
-                0,
-                0,
-                null,
-                "AUTO_REPLY",
-                "workgroup-pre-match");
-        return true;
     }
 
     // 处理访客端同步请求消息，机器人设置为stream=false的情况，用于微信公众号等平台

@@ -43,6 +43,7 @@ public class AudioContent extends BaseContent {
     private String hash;          // 文件哈希值 (SHA256)
     private String filename;      // 文件名
     private String caption;       // 音频说明文字
+    private Boolean played;       // 是否已播放
 
     /**
      * 从JSON字符串反序列化为AudioContent对象

@@ -197,13 +197,21 @@ public class CallEventListener implements IEslEventListener {
      * 处理自定义事件
      */
     private void handleCustomEvent(EslEvent eslEvent) {
-        // String eventSubclass = eslEvent.getEventSubclass();
-        log.info("自定义事件: {}", eslEvent.getEventHeaders());
+        var headers = eslEvent.getEventHeaders();
+        String eventSubclass = eslEvent.getEventSubclass();
 
-        // if ("bytedesk::custom".equals(eventSubclass)) {
-        // // 处理自定义事件
-        // log.info("自定义事件: {}", eslEvent.getEventHeaders());
-        // }
+        // sofia::register 是高频注册心跳类事件，默认降到 DEBUG，避免刷屏。
+        if ("sofia::register".equals(eventSubclass)) {
+            log.debug("自定义事件(注册): subclass={} fromUser={} toUser={} status={} contact={}",
+                    eventSubclass,
+                    headers.get("from-user"),
+                    headers.get("to-user"),
+                    headers.get("status"),
+                    headers.get("contact"));
+            return;
+        }
+
+        log.info("自定义事件: subclass={} headers={}", eventSubclass, headers);
     }
 
     /**
@@ -290,6 +298,13 @@ public class CallEventListener implements IEslEventListener {
         var headers = eslEvent.getEventHeaders();
         String cmd = headers.get("API-Command");
         String arg = headers.get("API-Command-Argument");
+
+        // status 是高频轮询命令，默认降到 DEBUG。
+        if ("status".equalsIgnoreCase(cmd)) {
+            log.debug("API事件(状态): command={} arg={}", cmd, arg);
+            return;
+        }
+
         log.info("API事件: command={} arg={} headers={}", cmd, arg, headers);
     }
 

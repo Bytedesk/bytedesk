@@ -286,7 +286,9 @@ public class MessagePersistService {
                 || MessageTypeEnum.PREVIEW.equals(type)
                 || MessageTypeEnum.CONTINUE.equals(type)
                 // REACTION 仅用于通知前端刷新 UI，不作为独立聊天记录入库
-                || MessageTypeEnum.REACTION.equals(type)) {
+                || MessageTypeEnum.REACTION.equals(type)
+                // PLAYBACK 仅用于通知前端刷新 UI，不作为独立聊天记录入库
+                || MessageTypeEnum.PLAYBACK.equals(type)) {
             return true;
         }
 

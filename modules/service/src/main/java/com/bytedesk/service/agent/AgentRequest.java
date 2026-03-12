@@ -16,6 +16,7 @@ package com.bytedesk.service.agent;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -79,4 +80,9 @@ public class AgentRequest extends BaseRequest {
     
     // used for client query
     private String componentType;
+
+    /**
+     * Per-agent auto reply settings payload for /api/v1/agent/update/autoreply.
+     */
+    private AutoReplySettingsRequest autoReplySettings;
 }

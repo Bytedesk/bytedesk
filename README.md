@@ -113,7 +113,7 @@ cd bytedesk/deploy/docker
 ./start.sh mysql artemis standard middleware
 ```
 
-For more startup/stop combinations (PostgreSQL, Oracle, RabbitMQ, noai, call, full stack), see `deploy/docker/readme.md`.
+For more startup/stop combinations (PostgreSQL, Oracle, RabbitMQ, noai, call, full stack), see [docker readme](deploy/docker/readme.md).
 
 ```bash
 # Please replace 127.0.0.1 with your server IP

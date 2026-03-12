@@ -120,4 +120,7 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
      * Check if any non-deleted agent references the given AgentSettings uid
      */
     Boolean existsBySettings_UidAndDeletedFalse(String settingsUid);
+
+    Boolean existsByAutoReplySettings_IdAndUidNotAndDeletedFalse(Long autoReplySettingsId, String uid);
+
 }

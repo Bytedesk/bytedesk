@@ -65,7 +65,7 @@
 在同目录提供了基于 Spring 的对外接口封装：
 
 - `EslService`：封装常见 ESL 命令（api/bgapi、reloadxml/acl、status/show、sofia、originate、uuid_*、conference 等）
-- `EslController`：暴露 REST 接口，前缀 `/freeswitch/api/v1/esl`
+- `EslController`：暴露 REST 接口，前缀 `/api/v1/freeswitch/esl`
 - `xmlcurl/XmlCurlController` + `XmlCurlService`：提供最小可用的 mod_xml_curl HTTP 服务端（演示版）
 
 启用条件：
@@ -75,27 +75,27 @@
 
 常用端点：
 
-- GET `/freeswitch/api/v1/esl/status`：等价 `status`
-- POST `/freeswitch/api/v1/esl/api`：通用 API，Body: `{ "command":"reloadxml", "args":"" }`
-- POST `/freeswitch/api/v1/esl/bgapi`：通用 BGAPI，返回 BACKGROUND_JOB 事件数据
-- POST `/freeswitch/api/v1/esl/reloadxml`、`/reloadacl`
-- GET `/freeswitch/api/v1/esl/show/{what}`：`what` 取值如 `channels/calls/registrations`
-- GET `/freeswitch/api/v1/esl/sofia/status`
-- POST `/freeswitch/api/v1/esl/sofia/profile/{profile}/{action}`：`action` 如 `rescan/restart/start/stop`
-- POST `/freeswitch/api/v1/esl/xml_flush_cache`：清空 XML 缓存（常与 xml_curl 配合）
+- GET `/api/v1/freeswitch/esl/status`：等价 `status`
+- POST `/api/v1/freeswitch/esl/api`：通用 API，Body: `{ "command":"reloadxml", "args":"" }`
+- POST `/api/v1/freeswitch/esl/bgapi`：通用 BGAPI，返回 BACKGROUND_JOB 事件数据
+- POST `/api/v1/freeswitch/esl/reloadxml`、`/reloadacl`
+- GET `/api/v1/freeswitch/esl/show/{what}`：`what` 取值如 `channels/calls/registrations`
+- GET `/api/v1/freeswitch/esl/sofia/status`
+- POST `/api/v1/freeswitch/esl/sofia/profile/{profile}/{action}`：`action` 如 `rescan/restart/start/stop`
+- POST `/api/v1/freeswitch/esl/xml_flush_cache`：清空 XML 缓存（常与 xml_curl 配合）
 - 呼叫控制：
-  - POST `/freeswitch/api/v1/esl/originate` Body: `{ "args":"{ignore_early_media=true}sofia/gateway/gw/1001 &park" }`
-  - POST `/freeswitch/api/v1/esl/uuid/answer/{uuid}`
-  - POST `/freeswitch/api/v1/esl/uuid/kill/{uuid}?cause=USER_BUSY`
-  - POST `/freeswitch/api/v1/esl/uuid/transfer` Body: `{ "uuid":"...", "dest":"1000", "dialplan":"XML", "context":"default", "leg":"-bleg" }`
-  - POST `/freeswitch/api/v1/esl/uuid/bridge` Body: `{ "uuidA":"...", "uuidB":"..." }`
-  - POST `/freeswitch/api/v1/esl/uuid/broadcast` Body: `{ "uuid":"...", "file":"/path/file.wav", "legs":"both" }`
-  - POST `/freeswitch/api/v1/esl/uuid/record` Body: `{ "uuid":"...", "action":"start|stop", "path":"/path/rec.wav" }`
-  - POST `/freeswitch/api/v1/esl/uuid/setvar` Body: `{ "uuid":"...", "var":"X", "value":"Y" }`
-  - GET `/freeswitch/api/v1/esl/uuid/getvar?uuid=...&var=...`
-  - POST `/freeswitch/api/v1/esl/uuid/dtmf` Body: `{ "uuid":"...", "dtmf":"1234#" }`
+  - POST `/api/v1/freeswitch/esl/originate` Body: `{ "args":"{ignore_early_media=true}sofia/gateway/gw/1001 &park" }`
+  - POST `/api/v1/freeswitch/esl/uuid/answer/{uuid}`
+  - POST `/api/v1/freeswitch/esl/uuid/kill/{uuid}?cause=USER_BUSY`
+  - POST `/api/v1/freeswitch/esl/uuid/transfer` Body: `{ "uuid":"...", "dest":"1000", "dialplan":"XML", "context":"default", "leg":"-bleg" }`
+  - POST `/api/v1/freeswitch/esl/uuid/bridge` Body: `{ "uuidA":"...", "uuidB":"..." }`
+  - POST `/api/v1/freeswitch/esl/uuid/broadcast` Body: `{ "uuid":"...", "file":"/path/file.wav", "legs":"both" }`
+  - POST `/api/v1/freeswitch/esl/uuid/record` Body: `{ "uuid":"...", "action":"start|stop", "path":"/path/rec.wav" }`
+  - POST `/api/v1/freeswitch/esl/uuid/setvar` Body: `{ "uuid":"...", "var":"X", "value":"Y" }`
+  - GET `/api/v1/freeswitch/esl/uuid/getvar?uuid=...&var=...`
+  - POST `/api/v1/freeswitch/esl/uuid/dtmf` Body: `{ "uuid":"...", "dtmf":"1234#" }`
 - 会议控制：
-  - POST `/freeswitch/api/v1/esl/conference` Body: `{ "room":"9000", "subCommand":"list" }`
+  - POST `/api/v1/freeswitch/esl/conference` Body: `{ "room":"9000", "subCommand":"list" }`
   - 例如踢人：`{ "room":"9000", "subCommand":"kick", "args":"<uuid>" }`
 
 返回结果说明：
@@ -114,8 +114,8 @@
 服务端（本项目）：
 
 - 开启 `bytedesk.call.freeswitch.xmlcurl.enabled=true` 后，提供 HTTP 端点：
-  - GET `/freeswitch/xmlcurl?type=directory&user=1000&domain=default`
-  - GET `/freeswitch/xmlcurl?type=dialplan&context=default&dest=1000`
+  - GET `/freeswitch/api/v1/xmlcurl?type=directory&user=1000&domain=default`
+  - GET `/freeswitch/api/v1/xmlcurl?type=dialplan&context=default&dest=1000`
   - 返回 `application/xml`，示例实现见 `XmlCurlService`，生产应改为从数据库/配置中心读取
 
 FreeSWITCH 侧配置要点（参考）：

@@ -14,6 +14,7 @@
 package com.bytedesk.service.workgroup_settings;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;
@@ -66,6 +67,11 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
      * Queue settings (Workgroup-specific)
      */
     private QueueSettingsRequest queueSettings;
+
+    /**
+     * Auto reply settings (Workgroup-specific)
+     */
+    private AutoReplySettingsRequest autoReplySettings;
 
     /**
      * Robot to agent transition settings (Workgroup-specific)

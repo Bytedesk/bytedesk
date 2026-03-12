@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260310-add-shop-industry" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="industry"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="industry" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-phone" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="phone"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="phone" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-address" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="address"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="address" type="VARCHAR(500)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-logo" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="logo"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="logo" type="VARCHAR(500)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-business-hours" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="business_hours"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="business_hours" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-business-start-time" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="business_start_time"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="business_start_time" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-business-end-time" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="business_end_time"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="business_end_time" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-status" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="shop_status"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="shop_status" type="VARCHAR(64)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-billing-type" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="billing_type"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="billing_type" type="VARCHAR(64)" defaultValue="FREE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-expire-at" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="expire_at"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="expire_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-renewal-type" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="renewal_type"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="renewal_type" type="VARCHAR(64)" defaultValue="MANUAL">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-renewal-at" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="renewal_at"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="renewal_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="is_enabled"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-detail" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="detail"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="detail" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-backfill-shop-detail" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <columnExists tableName="bytedesk_core_shop" columnName="detail"/>
+            </and>
+        </preConditions>
+        <sql>
+            UPDATE bytedesk_core_shop
+            SET detail = '{}'
+            WHERE detail IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

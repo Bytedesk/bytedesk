@@ -164,4 +164,14 @@ public class ServiceSettingsResponseVisitor implements Serializable {
      * 自定义留言表单 uid（FormEntity.uid）
      */
     private String messageLeaveFormUid;
+
+    /**
+     * 访客发消息前自动回复开关（工作组）
+     */
+    private Boolean autoReplyEnabled;
+
+    /**
+     * 自动回复设置 UID（AutoReplySettingsEntity.uid）
+     */
+    private String autoReplySettingsUid;
 }

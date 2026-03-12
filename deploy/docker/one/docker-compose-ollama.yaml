@@ -181,7 +181,7 @@ services:
       SERVER_PORT: 9003
       # bytedesk config
       BYTEDESK_DEBUG: "false"
-      BYTEDESK_VERSION: 1.0.0
+      BYTEDESK_VERSION: 1.5.0
       # open profile 数据源类型：mysql / postgresql / oracle / kingbase / h2
       BYTEDESK_DATASOURCE_ACTIVE: mysql
       # 申请licenseKey

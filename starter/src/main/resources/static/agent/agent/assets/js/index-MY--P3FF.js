@@ -1,0 +1,1 @@
+import{I as t}from"./index-B8-1htb2.js";import o from"./index-D3baElLt.js";async function a(i){return o("/visitor/api/v1/init",{method:"POST",data:{...i,client:t}})}async function e(i){return o("/visitor/api/v1/browse",{method:"POST",data:{...i,client:t}})}export{e as browse,a as initVisitor};

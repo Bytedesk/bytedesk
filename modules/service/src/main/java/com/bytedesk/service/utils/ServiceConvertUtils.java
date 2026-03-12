@@ -23,6 +23,7 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsResponseVisitor;
@@ -314,6 +315,23 @@ public class ServiceConvertUtils {
             resp.setMessageLeaveForm(null);
             resp.setMessageLeaveCustomFormEnabled(false);
             resp.setMessageLeaveFormUid(null);
+        }
+
+        // 工作组自动回复设置（用于 visitor 发送前预检）
+        AutoReplySettingsEntity autoReplySettings = null;
+        if (settingsContainer instanceof WorkgroupSettingsEntity workgroupSettings) {
+            if (debug && workgroupSettings.getDraftAutoReplySettings() != null) {
+                autoReplySettings = workgroupSettings.getDraftAutoReplySettings();
+            } else {
+                autoReplySettings = workgroupSettings.getAutoReplySettings();
+            }
+        }
+        if (autoReplySettings != null) {
+            resp.setAutoReplyEnabled(Boolean.TRUE.equals(autoReplySettings.getAutoReplyEnabled()));
+            resp.setAutoReplySettingsUid(autoReplySettings.getUid());
+        } else {
+            resp.setAutoReplyEnabled(false);
+            resp.setAutoReplySettingsUid(null);
         }
 
         return resp;

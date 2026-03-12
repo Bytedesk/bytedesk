@@ -14,6 +14,7 @@
 package com.bytedesk.service.workgroup_settings;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
@@ -82,6 +83,15 @@ public class WorkgroupSettingsResponse extends BaseSettingsResponse {
      * Draft queue settings (Workgroup-specific)
      */
     private QueueSettingsResponse draftQueueSettings;
+
+    /**
+     * Auto reply settings (Workgroup-specific)
+     */
+    private AutoReplySettingsResponse autoReplySettings;
+    /**
+     * Draft auto reply settings (Workgroup-specific)
+     */
+    private AutoReplySettingsResponse draftAutoReplySettings;
 
     /**
      * Robot to agent transition settings (Workgroup-specific)

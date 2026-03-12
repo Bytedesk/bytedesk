@@ -1,0 +1,59 @@
+:root {
+  --brand-1: #ffffff;
+  --brand-2: #ffffff;
+  --brand-3: #ffffff;
+  --white: #9b9b9b;
+  --gray-1: #ffffff;
+  --gray-2: #ffffff;
+  --gray-3: #4a4a4a;
+  --blue: #4a90e2;
+  --orange: #f5a623;
+  --red: #d0021b;
+  --yellow: #f8e71c;
+  --marked-color: #ffffff;
+  --marked-bg-color: #4a4a4a;
+  --btn-primary-color: #111;
+}
+.ChatApp,
+.MessageContainer,
+.Navbar,
+.Message .Bubble,
+.QuickReplies,
+.ChatFooter {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.ChatApp {
+  background-color: #000000;
+}
+.Notice {
+  background-color: #000000;
+}
+.Navbar {
+  background-color: #000000;
+  border: 0;
+  box-shadow: none;
+}
+.Navbar .IconBtn {
+  color: #ffffff;
+}
+.Navbar-title {
+  color: #fff;
+}
+.Message.left .Bubble {
+  background-color: #4a4a4a;
+  color: #fff;
+}
+.Message.right .Bubble {
+  background-color: #7ed321;
+  color: #000000;
+}
+.QuickReply.highlight {
+  background-color: #4a4a4a;
+  color: #fff;
+  border-color: rgba(0, 0, 0, 0);
+}
+.QuickReplies,
+.ChatFooter {
+  background-color: #000000;
+}

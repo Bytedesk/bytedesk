@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +19,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class XmlCurlService {
+
+    private final ObjectProvider<XmlCurlDirectoryProvider> directoryProvider;
+
+    public XmlCurlService(ObjectProvider<XmlCurlDirectoryProvider> directoryProvider) {
+        this.directoryProvider = directoryProvider;
+    }
 
     // 开关：默认全部关闭，仅在联调或按需开启对应 section 的动态返回
     private static final boolean ENABLE_DIALPLAN       = boolEnv("XMLCURL_ENABLE_DIALPLAN", false);
@@ -68,10 +75,6 @@ public class XmlCurlService {
     }
 
     public byte[] handleDirectory(Map<String, String> p) {
-        if (!ENABLE_DIRECTORY) {
-            logDisabled("directory", "XMLCURL_ENABLE_DIRECTORY");
-            return resultNotFound();
-        }
         String user = pick(p, "user", "User", "login", "variable_user_name", "Caller-Username");
         String domain = pick(p, "domain", "Domain", "variable_domain_name", "sip_from_host");
         if (domain == null || domain.isBlank()) domain = "default";
@@ -79,6 +82,22 @@ public class XmlCurlService {
             logNotFound("directory", "missing user");
             return resultNotFound();
         }
+
+        XmlCurlDirectoryProvider provider = directoryProvider.getIfAvailable();
+        if (provider != null) {
+            Optional<String> xml = provider.provideDirectoryXml(user.trim(), domain.trim(), p);
+            if (xml.isPresent()) {
+                return xml.get().getBytes(StandardCharsets.UTF_8);
+            }
+            logNotFound("directory", "provider returned empty for user=" + user + " domain=" + domain);
+            return resultNotFound();
+        }
+
+        if (!ENABLE_DIRECTORY) {
+            logDisabled("directory", "XMLCURL_ENABLE_DIRECTORY");
+            return resultNotFound();
+        }
+
         String key = (user + "@" + domain).toLowerCase(Locale.ROOT);
         String pwd = DIRECTORY_USERS.get(key);
         if (pwd == null) {

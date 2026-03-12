@@ -4,4 +4,4 @@ services:
   bytedesk-freeswitch:
     environment:
       FS_CORE_DB_MODULE: mod_mariadb
-      FS_CORE_DB_DSN: "mariadb://Server=${FREESWITCH_DB_HOST:-bytedesk-db};Port=${MYSQL_PORT:-3306};Database=${MYSQL_DATABASE:-bytedesk};Uid=${MYSQL_ROOT_USER:-root};Pwd=${MYSQL_ROOT_PASSWORD};"
+      FS_CORE_DB_DSN: "mariadb://Server=${FREESWITCH_DB_HOST:-bytedesk-db};Port=${MYSQL_PORT:-3306};Database=${FREESWITCH_DATABASE:-bytedesk_freeswitch};Uid=${MYSQL_ROOT_USER:-root};Pwd=${MYSQL_ROOT_PASSWORD};"

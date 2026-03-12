@@ -39,6 +39,8 @@ public class VoiceContent extends BaseContent {
     private String format;    // 文件格式（如ogg, mp3）
     private String caption;   // 语音说明文字
     private String label;     // 语音标签
+    private String text;      // 语音转文字结果
+    private Boolean played;   // 是否已播放
 
     /**
      * 从JSON字符串反序列化为VoiceContent对象

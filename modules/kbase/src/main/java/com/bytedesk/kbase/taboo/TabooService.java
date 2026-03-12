@@ -13,115 +13,31 @@
  */
 package com.bytedesk.kbase.taboo;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.Optional;
 
-import org.springframework.stereotype.Service;
-
-import com.bytedesk.core.exception.TabooException;
-
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+import com.bytedesk.core.message.MessageResponse;
 
 /**
- * Service for handling sensitive word filtering
+ * 企业版敏感词服务接口。
+ *
+ * modules/kbase 仅提供空实现；enterprise/kbase 提供真实实现。
  */
-@Slf4j
-@Service
-public class TabooService {
+public interface TabooService {
 
-    // 敏感词集合
-    private final Set<String> tabooWords = ConcurrentHashMap.newKeySet();
-    
-    /**
-     * Initialize with some default sensitive words
-     */
-    @PostConstruct
-    public void init() {
-        // 初始化默认敏感词，实际项目中可以从数据库或配置文件加载
-        tabooWords.add("暴力");
-        tabooWords.add("色情");
-        tabooWords.add("赌博");
-        tabooWords.add("毒品");
-        // log.info("敏感词过滤器初始化完成，共加载 {} 个敏感词", tabooWords.size());
-    }
-    
-    /**
-     * Add a new sensitive word
-     * 
-     * @param word the word to add
-     */
-    public void addTabooWord(String word) {
-        tabooWords.add(word);
-    }
-    
-    /**
-     * Remove a sensitive word
-     * 
-     * @param word the word to remove
-     */
-    public void removeTabooWord(String word) {
-        tabooWords.remove(word);
-    }
-    
-    /**
-     * Check if a string contains sensitive words
-     * 
-     * @param content the content to check
-     * @return true if contains sensitive words
-     */
-    public Boolean containsTabooWords(String content) {
-        if (content == null || content.isEmpty()) {
-            return false;
-        }
-        
-        for (String word : tabooWords) {
-            if (content.contains(word)) {
-                log.warn("检测到敏感词: {}", word);
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    /**
-     * Filter sensitive words from content (replace with *)
-     * 
-     * @param content the content to filter
-     * @return filtered content
-     */
-    public String filterTabooWords(String content) {
-        if (content == null || content.isEmpty()) {
-            return content;
-        }
-        
-        String result = content;
-        for (String word : tabooWords) {
-            if (result.contains(word)) {
-                String replacement = "*".repeat(word.length());
-                result = result.replace(word, replacement);
-            }
-        }
-        
-        return result;
-    }
-    
-    /**
-     * Filter content, either throw exception or replace sensitive words
-     * 
-     * @param content the content to filter
-     * @param throwException whether to throw exception
-     * @return filtered content if not throwing exception
-     */
-    public String processContent(String content, boolean throwException) {
-        if (containsTabooWords(content)) {
-            if (throwException) {
-                throw new TabooException("内容包含敏感词: " + content);
-            } else {
-                return filterTabooWords(content);
-            }
-        }
-        return content;
+    Boolean existsByContent(String content, String orgUid);
+
+    List<String> listEnabledWordsWithSynonyms(String orgUid);
+
+    Optional<String> resolveReplyForContent(String orgUid, String content);
+
+    VisitorTabooCheckResult checkVisitorTabooBeforeSse(String messageJson, String fallbackOrgUid);
+
+    record VisitorTabooCheckResult(
+            boolean hit,
+            String filteredContent,
+            String reply,
+            MessageResponse questionMessage,
+            MessageResponse answerMessage) {
     }
 } 

@@ -41,9 +41,12 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -144,6 +147,12 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
                     throw new RuntimeException("Failed to insert answer message");
                 }
                 faqResponse.setAnswerMessage(ConvertUtils.convertToMessageResponse(savedAnswerMessage));
+
+                // 仅在已对接人工客服时广播FAQ问答消息，确保desktop客服端实时同步展示。
+                if (shouldBroadcastFaqToAgent(threadEntity)) {
+                    publishMessageJsonEvent(faqResponse.getQuestionMessage());
+                    publishMessageJsonEvent(faqResponse.getAnswerMessage());
+                }
             }
             //
             return faqResponse;
@@ -677,6 +686,26 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             }
         }
         return relatedFaqs;
+    }
+
+    private boolean shouldBroadcastFaqToAgent(ThreadEntity threadEntity) {
+        if (threadEntity == null || !threadEntity.isChatting()) {
+            return false;
+        }
+        try {
+            return threadEntity.getAgentProtobuf() != null
+                    && UserTypeEnum.AGENT.name().equals(threadEntity.getAgentProtobuf().getType());
+        } catch (Exception e) {
+            log.warn("判断FAQ消息是否需要广播失败, threadUid={}, reason={}", threadEntity.getUid(), e.getMessage());
+            return false;
+        }
+    }
+
+    private void publishMessageJsonEvent(MessageResponse messageResponse) {
+        if (messageResponse == null) {
+            return;
+        }
+        bytedeskEventPublisher.publishEvent(new MessageJsonEvent(this, messageResponse.toJson()));
     }
 
 }

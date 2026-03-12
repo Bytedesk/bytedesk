@@ -87,6 +87,7 @@ public enum MessageTypeEnum {
     PREVIEW, // 消息预知：访客输入内容预览发送给客服
     PROCESSING, // 正在处理，等待大模型回复中
     REACTION, // 消息表情回复更新：用于广播某条消息的 reactions/content 已变更
+    PLAYBACK, // 媒体播放状态更新：用于广播某条 AUDIO/VOICE 消息 content 已变更
     // 
     RECALL, // 撤回
     DELIVERED, // 回执: 已送达

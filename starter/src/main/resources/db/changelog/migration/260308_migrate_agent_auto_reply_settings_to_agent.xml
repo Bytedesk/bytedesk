@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260308-add-agent-auto-reply-settings-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent" />
+            <not>
+                <columnExists tableName="bytedesk_service_agent" columnName="auto_reply_settings_id" />
+            </not>
+        </preConditions>
+        <comment>Add per-agent auto-reply settings relation column.</comment>
+        <addColumn tableName="bytedesk_service_agent">
+            <column name="auto_reply_settings_id" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260308-init-agent-auto-reply-settings-null" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_service_agent" columnName="auto_reply_settings_id" />
+        </preConditions>
+        <comment>Keep per-agent auto-reply mapping empty after migration; each agent will set its own settings on updateAutoReply.</comment>
+        <sql>
+            UPDATE bytedesk_service_agent a
+            SET auto_reply_settings_id = NULL
+            WHERE a.auto_reply_settings_id IS NOT NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="260308-add-agent-auto-reply-settings-unique" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent" />
+            <columnExists tableName="bytedesk_service_agent" columnName="auto_reply_settings_id" />
+            <not>
+                <uniqueConstraintExists tableName="bytedesk_service_agent" constraintName="uq_service_agent_auto_reply_settings_id" />
+            </not>
+        </preConditions>
+        <addUniqueConstraint
+            tableName="bytedesk_service_agent"
+            columnNames="auto_reply_settings_id"
+            constraintName="uq_service_agent_auto_reply_settings_id" />
+    </changeSet>
+
+    <changeSet id="260308-add-agent-auto-reply-settings-fk" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent" />
+            <tableExists tableName="bytedesk_kbase_auto_reply_settings" />
+            <columnExists tableName="bytedesk_service_agent" columnName="auto_reply_settings_id" />
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_service_agent_auto_reply_settings" />
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_agent"
+            baseColumnNames="auto_reply_settings_id"
+            referencedTableName="bytedesk_kbase_auto_reply_settings"
+            referencedColumnNames="id"
+            constraintName="fk_service_agent_auto_reply_settings"
+            onDelete="SET NULL" />
+    </changeSet>
+
+</databaseChangeLog>

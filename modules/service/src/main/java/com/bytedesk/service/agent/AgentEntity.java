@@ -21,6 +21,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +32,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -92,6 +95,17 @@ public class AgentEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private AgentSettingsEntity settings;
 
+    /**
+     * Per-agent auto-reply settings.
+     * This is intentionally kept on AgentEntity instead of shared settings
+     * template.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
+            jakarta.persistence.CascadeType.PERSIST,
+            jakarta.persistence.CascadeType.MERGE })
+    @JoinColumn(name = "auto_reply_settings_id", unique = true)
+    private AutoReplySettingsEntity autoReplySettings;
+
     // 以下设置项已迁移至 AgentSettingsEntity
     // 为保持兼容性，保留委托型 getter，以 settings 中的值为准
 
@@ -135,11 +149,11 @@ public class AgentEntity extends BaseEntity {
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
-            .uid(this.getUid())
-            .nickname(this.getNickname())
-            .avatar(this.getAvatar())
-            .type(UserTypeEnum.AGENT.name())
-            .build();
+                .uid(this.getUid())
+                .nickname(this.getNickname())
+                .avatar(this.getAvatar())
+                .type(UserTypeEnum.AGENT.name())
+                .build();
     }
 
     /**
@@ -178,4 +192,3 @@ public class AgentEntity extends BaseEntity {
     }
 
 }
-

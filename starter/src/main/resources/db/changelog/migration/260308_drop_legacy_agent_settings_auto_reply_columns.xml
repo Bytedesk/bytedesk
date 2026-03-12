@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260308-drop-legacy-agent-settings-autoreply-fk-main" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_settings" />
+            <foreignKeyConstraintExists foreignKeyName="FKtbfifu8itktbqw5yp380s13go" />
+        </preConditions>
+        <dropForeignKeyConstraint
+            baseTableName="bytedesk_service_agent_settings"
+            constraintName="FKtbfifu8itktbqw5yp380s13go" />
+    </changeSet>
+
+    <changeSet id="260308-drop-legacy-agent-settings-autoreply-fk-draft" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_settings" />
+            <foreignKeyConstraintExists foreignKeyName="FKm7r3miwnqlw16fs8rwesaptbm" />
+        </preConditions>
+        <dropForeignKeyConstraint
+            baseTableName="bytedesk_service_agent_settings"
+            constraintName="FKm7r3miwnqlw16fs8rwesaptbm" />
+    </changeSet>
+
+    <changeSet id="260308-drop-legacy-agent-settings-autoreply-column-main" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_settings" />
+            <columnExists tableName="bytedesk_service_agent_settings" columnName="auto_reply_settings_id" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_agent_settings" columnName="auto_reply_settings_id" />
+    </changeSet>
+
+    <changeSet id="260308-drop-legacy-agent-settings-autoreply-column-draft" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_settings" />
+            <columnExists tableName="bytedesk_service_agent_settings" columnName="draft_auto_reply_settings_id" />
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_agent_settings" columnName="draft_auto_reply_settings_id" />
+    </changeSet>
+
+</databaseChangeLog>

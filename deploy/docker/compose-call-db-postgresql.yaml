@@ -4,4 +4,4 @@ services:
   bytedesk-freeswitch:
     environment:
       FS_CORE_DB_MODULE: mod_pgsql
-      FS_CORE_DB_DSN: "pgsql://host=${FREESWITCH_DB_HOST:-bytedesk-db} dbname=${POSTGRES_DB:-bytedesk} user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD} options='-c client_min_messages=NOTICE'"
+      FS_CORE_DB_DSN: "pgsql://host=${FREESWITCH_DB_HOST:-bytedesk-db} dbname=${FREESWITCH_DATABASE:-bytedesk_freeswitch} user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD} options='-c client_min_messages=NOTICE'"

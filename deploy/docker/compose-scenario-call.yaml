@@ -40,6 +40,7 @@ services:
       start_period: 15s
 
   # FreeSwitch 语音通话服务
+  # 本地镜像Dockerfile地址：/Users/ningjinpeng/Desktop/git/github/bytedesk-freeswitch/docker/Dockerfile
   # https://hub.docker.com/r/bytedesk/freeswitch
   # https://github.com/Bytedesk/bytedesk-freeswitch
   # 使用自定义构建的 FreeSWITCH 镜像（支持 ARM64/AMD64）
@@ -55,7 +56,26 @@ services:
     environment:
       TZ: Asia/Shanghai
       DISABLE_IPV6: "true"
+      # ESL 入站口令（与 vars.xml 的 esl_password 对应）
       FREESWITCH_ESL_PASSWORD: ${FREESWITCH_ESL_PASSWORD}
+      # xml_cdr Basic 凭据密码
+      FREESWITCH_CDR_PASSWORD: ${FREESWITCH_CDR_PASSWORD:-bytedesk123}
+      # mod_xml_curl 鉴权 token（需与应用侧配置一致）
+      FREESWITCH_XML_CURL_TOKEN: ${FREESWITCH_XML_CURL_TOKEN:-change_me_in_production}
+      # mod_xml_curl 回源地址（与 XmlCurlController 统一：/freeswitch/api/v1/xmlcurl）
+      FREESWITCH_XML_CURL_GATEWAY_URL: ${FREESWITCH_XML_CURL_GATEWAY_URL:-http://host.docker.internal:9003/freeswitch/api/v1/xmlcurl}
+      # 应用基础地址（用于 cdr_url/user_lookup_url 等派生）
+      FREESWITCH_API_BASE_URL: ${FREESWITCH_API_BASE_URL:-http://host.docker.internal:9003}
+      # FreeSWITCH 数据库连接参数
+      FREESWITCH_DB_HOST: ${FREESWITCH_DB_HOST:-bytedesk-db}
+      FREESWITCH_DB_PORT: ${FREESWITCH_DB_PORT:-3306}
+      FREESWITCH_DB_NAME: ${FREESWITCH_DB_NAME:-bytedesk_freeswitch}
+      FREESWITCH_DB_USERNAME: ${FREESWITCH_DB_USERNAME:-root}
+      FREESWITCH_DB_PASSWORD: ${FREESWITCH_DB_PASSWORD:-r8FqfdbWUaN3}
+      # WebRTC / RTP 参数（默认使用 compose 内 coturn 服务）
+      FREESWITCH_STUN_SERVER: ${FREESWITCH_STUN_SERVER:-stun:bytedesk-coturn:3478}
+      FREESWITCH_RTP_START_PORT: ${FREESWITCH_RTP_START_PORT:-16384}
+      FREESWITCH_RTP_END_PORT: ${FREESWITCH_RTP_END_PORT:-32768}
     ports:
       - "15060:5060/tcp"
       - "15060:5060/udp"
@@ -78,8 +98,11 @@ services:
       - ../freeswitch/recordings:/usr/local/freeswitch/recordings
       - ../freeswitch/etc/odbc.ini:/etc/odbc.ini:ro
       - ../freeswitch/etc/odbcinst.ini:/etc/odbcinst.ini:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - bytedesk-db
+      bytedesk-db:
+        condition: service_healthy
     networks:
       - bytedesk-network
     healthcheck:

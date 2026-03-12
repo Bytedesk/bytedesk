@@ -49,22 +49,6 @@ cp .env.example .env
 # IMPORTANT: all sensitive values are now centralized in .env
 # (passwords/api keys/jwt/redis/minio/mq/oracle/call credentials)
 # start.sh/stop.sh automatically load deploy/docker/.env via --env-file
-# start docker compose container, -f flag to specify file path, -d flag to start container in background mode
-# note: ollama is part of compose-base.yaml now
-# middleware only (for source startup)
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml up -d
-
-# full stack (middleware + bytedesk image)
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
-
-# database switch examples
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-kingbase9.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
 
 # script examples (recommended)
 # format:
@@ -157,6 +141,25 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-kingbase9.yaml -f 
 # override compose project name via env var (default: bytedesk):
 # PROJECT_NAME=bytedesk-dev ./start.sh mysql artemis standard middleware
 # for kingbase9: start.sh will auto ensure KINGBASE_DATABASE exists (create if missing)
+# for mysql+call: when FREESWITCH_DATABASE is empty, start.sh auto imports deploy/sql/freeswitch-1.10.12.sql;
+#                 if tables already exist, initialization is skipped to avoid re-running DROP TABLE statements.
+
+# start docker compose container, -f flag to specify file path, -d flag to start container in background mode
+# note: ollama is part of compose-base.yaml now
+# middleware only (for source startup)
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml up -d
+
+# full stack (middleware + bytedesk image)
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+
+# database switch examples
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-oracle.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-kingbase9.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
 
 # chat model
 docker exec ollama-bytedesk ollama pull qwen3:0.6b

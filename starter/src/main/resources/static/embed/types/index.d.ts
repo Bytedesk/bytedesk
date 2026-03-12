@@ -263,6 +263,7 @@ declare interface ChatConfig {
     mobile?: string;
     email?: string;
     note?: string;
+    channel?: string;
     goodsInfo?: string;
     orderInfo?: string;
     extra?: string;

@@ -40,7 +40,8 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.kbase.taboo.TabooRestService;
+import com.bytedesk.kbase.taboo.TabooService;
+import com.bytedesk.kbase.auto_reply.AutoReplyService;
 import com.bytedesk.core.message_unread.MessageUnreadRequest;
 import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.message_unread.MessageUnreadRestService;
@@ -87,7 +88,9 @@ public class VisitorRestControllerVisitor {
 
     private final AgentRestService agentRestService;
 
-    private final TabooRestService tabooRestService;
+    private final TabooService tabooService;
+
+    private final AutoReplyService autoReplyService;
 
     @Qualifier("virtualAsyncExecutor")
     private final ExecutorService executorService;
@@ -341,9 +344,31 @@ public class VisitorRestControllerVisitor {
         }
 
         try {
-            TabooRestService.VisitorTabooCheckResult result = tabooRestService.checkVisitorTabooBeforeSse(
+            TabooService.VisitorTabooCheckResult result = tabooService.checkVisitorTabooBeforeSse(
                     request.messageJson(),
                     request.orgUid());
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 访客发送机器人 SSE 消息前自动回复预检：
+     * - hit=true: 前端直接展示自动回复并跳过 SSE
+     * - hit=false: 前端继续走 sendSseMessage
+     */
+    @PostMapping("/message/autoreply/check")
+    public ResponseEntity<?> checkAutoReplyBeforeSse(@RequestBody VisitorAutoReplyCheckRequest request) {
+        if (request == null || !StringUtils.hasText(request.messageJson())) {
+            return ResponseEntity.ok(JsonResult.error("messageJson required"));
+        }
+
+        try {
+            AutoReplyService.VisitorAutoReplyCheckResult result = autoReplyService.checkVisitorAutoReplyBeforeSse(
+                    request.messageJson(),
+                    request.orgUid(),
+                    request.autoReplySettingsUid());
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -491,6 +516,9 @@ public class VisitorRestControllerVisitor {
     }
 
     public record VisitorTabooCheckRequest(String messageJson, String orgUid) {
+    }
+
+    public record VisitorAutoReplyCheckRequest(String messageJson, String orgUid, String autoReplySettingsUid) {
     }
 
 }

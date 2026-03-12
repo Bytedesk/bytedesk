@@ -42,6 +42,8 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -416,12 +418,59 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
         AgentEntity agent = agentOptional
                 .orElseThrow(() -> new RuntimeException("agent not found for uid/userUid/orgUid"));
+
+        AutoReplySettingsRequest autoReplySettingsRequest = request.getAutoReplySettings();
+        if (autoReplySettingsRequest == null) {
+            throw new RuntimeException("autoReplySettings is required");
+        }
+
+        AutoReplySettingsEntity autoReplySettings = agent.getAutoReplySettings();
+        if (autoReplySettings == null) {
+            autoReplySettings = AutoReplySettingsEntity.fromRequest(autoReplySettingsRequest, modelMapper);
+            autoReplySettings.setUid(uidUtils.getUid());
+            autoReplySettings.setOrgUid(agent.getOrgUid());
+            autoReplySettings.setUserUid(agent.getUserUid());
+            agent.setAutoReplySettings(autoReplySettings);
+        } else {
+            boolean referencedByOtherAgent = autoReplySettings.getId() != null
+                && agentRepository.existsByAutoReplySettings_IdAndUidNotAndDeletedFalse(autoReplySettings.getId(),
+                    agent.getUid());
+
+            // Defensive split: if legacy data points multiple agents to one settings row,
+            // clone it before update so each agent keeps an isolated auto-reply config.
+            if (referencedByOtherAgent) {
+                autoReplySettings = cloneAutoReplySettings(autoReplySettings, agent);
+                agent.setAutoReplySettings(autoReplySettings);
+            }
+            String originalUid = autoReplySettings.getUid();
+            modelMapper.map(autoReplySettingsRequest, autoReplySettings);
+            autoReplySettings.setUid(originalUid);
+            autoReplySettings.setOrgUid(agent.getOrgUid());
+            autoReplySettings.setUserUid(agent.getUserUid());
+        }
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
         }
         return convertToResponse(updatedAgent);
+    }
+
+    private AutoReplySettingsEntity cloneAutoReplySettings(AutoReplySettingsEntity source, AgentEntity agent) {
+        AutoReplySettingsEntity cloned = AutoReplySettingsEntity.builder()
+                .autoReplyEnabled(source.getAutoReplyEnabled())
+                .autoReplyType(source.getAutoReplyType())
+                .autoReplyContentType(source.getAutoReplyContentType())
+                .autoReplyUid(source.getAutoReplyUid())
+                .autoReplyContent(source.getAutoReplyContent())
+                .kbUid(source.getKbUid())
+                // .takeoverEnabled(source.getTakeoverEnabled())
+                // .robotUid(source.getRobotUid())
+                .build();
+        cloned.setUid(uidUtils.getUid());
+        cloned.setOrgUid(agent.getOrgUid());
+        cloned.setUserUid(agent.getUserUid());
+        return cloned;
     }
 
     @Cacheable(value = "agent", key = "#entity.uid", unless = "#result == null")

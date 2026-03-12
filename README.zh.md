@@ -101,7 +101,7 @@ cd bytedesk/deploy/docker
 ./start.sh mysql artemis standard middleware
 ```
 
-更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、call、全量启动）请参考 `deploy/docker/readme.zh.md`。
+更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、call、全量启动）请参考 [docker readme](deploy/docker/readme.zh.md)。
 
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)

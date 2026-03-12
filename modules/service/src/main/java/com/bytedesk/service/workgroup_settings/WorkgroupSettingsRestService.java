@@ -30,6 +30,7 @@ import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
 import com.bytedesk.kbase.settings_summary.SummarySettingsEntity;
 import com.bytedesk.kbase.settings_trigger.TriggerSettingsEntity;
 import com.bytedesk.kbase.settings_trigger.TriggerSettingsHelper;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
@@ -197,6 +198,16 @@ public class WorkgroupSettingsRestService
         qsDraft.setUid(uidUtils.getUid());
         syncOrgUser(qsDraft, orgUid, userUid);
         entity.setDraftQueueSettings(qsDraft);
+
+        // 发布与草稿：自动回复设置
+        AutoReplySettingsEntity ars = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
+        ars.setUid(uidUtils.getUid());
+        syncOrgUser(ars, orgUid, userUid);
+        entity.setAutoReplySettings(ars);
+        AutoReplySettingsEntity arsDraft = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
+        arsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(arsDraft, orgUid, userUid);
+        entity.setDraftAutoReplySettings(arsDraft);
 
         // 发布与草稿：机器人转人工设置
         RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(request.getRobotToAgentSettings(), modelMapper);
@@ -435,6 +446,24 @@ public class WorkgroupSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
+        if (request.getAutoReplySettings() != null) {
+            AutoReplySettingsEntity draft = entity.getDraftAutoReplySettings();
+            if (draft == null) {
+                draft = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
+                draft.setUid(uidUtils.getUid());
+                entity.setDraftAutoReplySettings(draft);
+                //
+                AutoReplySettingsEntity settings = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setAutoReplySettings(settings);
+            } else {
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getAutoReplySettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
         if (request.getRobotToAgentSettings() != null) {
             RobotToAgentSettingsEntity draft = entity.getDraftRobotToAgentSettings();
             if (draft == null) {
@@ -665,6 +694,16 @@ public class WorkgroupSettingsRestService
         settings.setQueueSettings(qs);
         settings.setDraftQueueSettings(qsDraft);
 
+        // 自动回复设置（发布 + 草稿）
+        AutoReplySettingsEntity ars = AutoReplySettingsEntity.fromRequest(null, modelMapper);
+        ars.setUid(uidUtils.getUid());
+        syncOrgUser(ars, orgUid, userUid);
+        AutoReplySettingsEntity arsDraft = AutoReplySettingsEntity.fromRequest(null, modelMapper);
+        arsDraft.setUid(uidUtils.getUid());
+        syncOrgUser(arsDraft, orgUid, userUid);
+        settings.setAutoReplySettings(ars);
+        settings.setDraftAutoReplySettings(arsDraft);
+
         RobotToAgentSettingsEntity rtas = RobotToAgentSettingsEntity.fromRequest(null, modelMapper);
         rtas.setUid(uidUtils.getUid());
         syncOrgUser(rtas, orgUid, userUid);
@@ -760,6 +799,18 @@ public class WorkgroupSettingsRestService
                 copyPropertiesExcludingIds(entity.getDraftQueueSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
                 entity.setQueueSettings(newPublished);
+            }
+        }
+
+        if (entity.getDraftAutoReplySettings() != null) {
+            AutoReplySettingsEntity published = entity.getAutoReplySettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftAutoReplySettings(), published);
+            } else {
+                AutoReplySettingsEntity newPublished = new AutoReplySettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftAutoReplySettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setAutoReplySettings(newPublished);
             }
         }
 
@@ -919,6 +970,26 @@ public class WorkgroupSettingsRestService
         } else {
             resp.setDraftRobotToAgentSettings(modelMapper.map(RobotToAgentSettingsEntity.builder().uid(uidUtils.getUid()).build(), 
                 com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsResponse.class));
+        }
+
+        if (entity.getAutoReplySettings() != null) {
+            resp.setAutoReplySettings(modelMapper.map(entity.getAutoReplySettings(),
+                    com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse.class));
+        } else {
+            AutoReplySettingsEntity defaultAutoReply = AutoReplySettingsEntity.builder().build();
+            defaultAutoReply.setUid(uidUtils.getUid());
+            resp.setAutoReplySettings(modelMapper.map(defaultAutoReply,
+                    com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse.class));
+        }
+
+        if (entity.getDraftAutoReplySettings() != null) {
+            resp.setDraftAutoReplySettings(modelMapper.map(entity.getDraftAutoReplySettings(),
+                    com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse.class));
+        } else {
+            AutoReplySettingsEntity defaultDraftAutoReply = AutoReplySettingsEntity.builder().build();
+            defaultDraftAutoReply.setUid(uidUtils.getUid());
+            resp.setDraftAutoReplySettings(modelMapper.map(defaultDraftAutoReply,
+                    com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse.class));
         }
 
         return resp;

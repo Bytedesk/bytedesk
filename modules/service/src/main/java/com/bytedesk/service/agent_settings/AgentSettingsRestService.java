@@ -22,7 +22,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
@@ -257,16 +256,6 @@ public class AgentSettingsRestService
         syncOrgUser(worktimeDraft, orgUid, userUid);
         entity.setDraftWorktimeSettings(worktimeDraft);
 
-        AutoReplySettingsEntity ars = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
-        ars.setUid(uidUtils.getUid());
-        syncOrgUser(ars, orgUid, userUid);
-        entity.setAutoReplySettings(ars);
-        AutoReplySettingsEntity arsDraft = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(),
-                modelMapper);
-        arsDraft.setUid(uidUtils.getUid());
-        syncOrgUser(arsDraft, orgUid, userUid);
-        entity.setDraftAutoReplySettings(arsDraft);
-
         QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(request.getQueueSettings(), modelMapper);
         qs.setUid(uidUtils.getUid());
         syncOrgUser(qs, orgUid, userUid);
@@ -432,25 +421,6 @@ public class AgentSettingsRestService
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getWorktimeSettings(), draft);
-                draft.setUid(originalUid);
-            }
-            entity.setHasUnpublishedChanges(true);
-        }
-
-        if (request.getAutoReplySettings() != null) {
-            AutoReplySettingsEntity draft = entity.getDraftAutoReplySettings();
-            if (draft == null) {
-                draft = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(), modelMapper);
-                draft.setUid(uidUtils.getUid());
-                entity.setDraftAutoReplySettings(draft);
-                //
-                AutoReplySettingsEntity settings = AutoReplySettingsEntity.fromRequest(request.getAutoReplySettings(),
-                        modelMapper);
-                settings.setUid(uidUtils.getUid());
-                entity.setAutoReplySettings(settings);
-            } else {
-                String originalUid = draft.getUid();
-                modelMapper.map(request.getAutoReplySettings(), draft);
                 draft.setUid(originalUid);
             }
             entity.setHasUnpublishedChanges(true);
@@ -761,16 +731,6 @@ public class AgentSettingsRestService
             settings.setWorktimeSettings(worktimePublished);
             settings.setDraftWorktimeSettings(worktimeDraft);
 
-            // 自动回复设置（发布 + 草稿）
-            AutoReplySettingsEntity ars = AutoReplySettingsEntity.fromRequest(null, modelMapper);
-            ars.setUid(uidUtils.getUid());
-            syncOrgUser(ars, orgUid, userUid);
-            AutoReplySettingsEntity arsDraft = AutoReplySettingsEntity.fromRequest(null, modelMapper);
-            arsDraft.setUid(uidUtils.getUid());
-            syncOrgUser(arsDraft, orgUid, userUid);
-            settings.setAutoReplySettings(ars);
-            settings.setDraftAutoReplySettings(arsDraft);
-
             // 排队设置（发布 + 草稿）
             QueueSettingsEntity qs = QueueSettingsEntity.fromRequest(null, modelMapper);
             qs.setUid(uidUtils.getUid());
@@ -904,18 +864,6 @@ public class AgentSettingsRestService
                 copyWorktimeSettings(entity.getDraftWorktimeSettings(), newPublished);
                 newPublished.setUid(uidUtils.getUid());
                 entity.setWorktimeSettings(newPublished);
-            }
-        }
-
-        if (entity.getDraftAutoReplySettings() != null) {
-            AutoReplySettingsEntity published = entity.getAutoReplySettings();
-            if (published != null) {
-                copyPropertiesExcludingIds(entity.getDraftAutoReplySettings(), published);
-            } else {
-                AutoReplySettingsEntity newPublished = new AutoReplySettingsEntity();
-                copyPropertiesExcludingIds(entity.getDraftAutoReplySettings(), newPublished);
-                newPublished.setUid(uidUtils.getUid());
-                entity.setAutoReplySettings(newPublished);
             }
         }
 

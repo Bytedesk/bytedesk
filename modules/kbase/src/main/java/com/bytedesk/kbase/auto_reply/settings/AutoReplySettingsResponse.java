@@ -37,36 +37,36 @@ public class AutoReplySettingsResponse implements Serializable {
 
     // 自动回复开关
     private static final long serialVersionUID = 1L;
+
     @Builder.Default
     private Boolean autoReplyEnabled = false;
 
     // 自动回复类型
     @Builder.Default
     private String autoReplyType = AutoReplyTypeEnum.FIXED.name();
-
-    // 固定回复类型所需要字段
-    @Builder.Default
-    private String autoReplyUid = BytedeskConsts.EMPTY_STRING;
     
     // 自动回复内容类型
     @Builder.Default
     private String autoReplyContentType = MessageTypeEnum.TEXT.name();
+
+    // 固定回复类型所需要字段
+    @Builder.Default
+    private String autoReplyUid = BytedeskConsts.EMPTY_STRING;
 
     // 自动回复内容
     @Builder.Default
     private String autoReplyContent = BytedeskConsts.EMPTY_STRING;
 
     // 关键词回复类型所需要字段
-    // 大模型回复类型所需要字段
     private String kbUid;
 
-    // 是否启用大模型接管会话
-    @Builder.Default
-    private Boolean takeoverEnabled = false;
+    // 暂时停用大模型接管会话配置
+    // @Builder.Default
+    // private Boolean takeoverEnabled = false;
 
-    // 接管会话的机器人 uid（RobotEntity.uid）
-    @Builder.Default
-    private String robotUid = BytedeskConsts.EMPTY_STRING;
+    // 暂时停用接管会话机器人配置
+    // @Builder.Default
+    // private String robotUid = BytedeskConsts.EMPTY_STRING;
 
     /**
      * 从 AutoReplySettings 实体创建 AutoReplySettingsResponse
@@ -80,12 +80,10 @@ public class AutoReplySettingsResponse implements Serializable {
         return AutoReplySettingsResponse.builder()
                 .autoReplyEnabled(settings.getAutoReplyEnabled())
                 .autoReplyType(settings.getAutoReplyType())
-                .autoReplyUid(settings.getAutoReplyUid())
+                // .autoReplyUid(settings.getAutoReplyUid())
                 .autoReplyContentType(settings.getAutoReplyContentType())
                 .autoReplyContent(settings.getAutoReplyContent())
                 .kbUid(settings.getKbUid())
-                .takeoverEnabled(settings.getTakeoverEnabled())
-                .robotUid(settings.getRobotUid())
                 .build();
     }
 

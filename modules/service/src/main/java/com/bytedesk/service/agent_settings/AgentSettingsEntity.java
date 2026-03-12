@@ -5,7 +5,6 @@
  */
 package com.bytedesk.service.agent_settings;
 
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
@@ -51,7 +50,7 @@ import lombok.experimental.SuperBuilder;
  * - serviceSettings, inviteSettings, intentionSettings
  * 
  * Agent-specific fields:
- * - messageLeaveSettings, autoReplySettings, queueSettings, rateDownSettings
+ * - messageLeaveSettings, queueSettings, rateDownSettings
  * 
  * Database Table: bytedesk_service_agent_settings
  */
@@ -162,18 +161,6 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     private WorktimeSettingEntity draftWorktimeSettings;
 
     /**
-     * Auto-reply settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private AutoReplySettingsEntity autoReplySettings;
-
-    /**
-     * Draft Auto-reply settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private AutoReplySettingsEntity draftAutoReplySettings;
-
-    /**
      * Queue settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
@@ -209,16 +196,4 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private AgentStatusSettingEntity draftAgentStatusSettings;
 
-    /**
-     * Convenience accessor so queue notice batching is surfaced even when agent settings are shared.
-     */
-    // public int resolveQueueNoticeBatchWindowMs() {
-    //     if (queueSettings != null && queueSettings.getQueueNoticeBatchWindowMs() != null) {
-    //         return queueSettings.getQueueNoticeBatchWindowMs();
-    //     }
-    //     if (draftQueueSettings != null && draftQueueSettings.getQueueNoticeBatchWindowMs() != null) {
-    //         return draftQueueSettings.getQueueNoticeBatchWindowMs();
-    //     }
-    //     return QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
-    // }
 }

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260310-add-shop-max-agents" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not>
+                    <columnExists tableName="bytedesk_core_shop" columnName="max_agents"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="max_agents" type="INT" defaultValueNumeric="20">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-agents-relation" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <tableExists tableName="bytedesk_service_agent"/>
+                <not>
+                    <tableExists tableName="bytedesk_core_shop_agents"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <createTable tableName="bytedesk_core_shop_agents">
+            <column name="shop_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="agent_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+            tableName="bytedesk_core_shop_agents"
+            columnNames="shop_id,agent_id"
+            constraintName="pk_shop_agents"/>
+
+        <createIndex tableName="bytedesk_core_shop_agents" indexName="idx_shop_agents_shop">
+            <column name="shop_id"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_core_shop_agents" indexName="idx_shop_agents_agent">
+            <column name="agent_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_core_shop_agents"
+            baseColumnNames="shop_id"
+            referencedTableName="bytedesk_core_shop"
+            referencedColumnNames="id"
+            constraintName="fk_shop_agents_shop"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_core_shop_agents"
+            baseColumnNames="agent_id"
+            referencedTableName="bytedesk_service_agent"
+            referencedColumnNames="id"
+            constraintName="fk_shop_agents_agent"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="260310-add-shop-workgroups-relation" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <tableExists tableName="bytedesk_service_workgroup"/>
+                <not>
+                    <tableExists tableName="bytedesk_core_shop_workgroups"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <createTable tableName="bytedesk_core_shop_workgroups">
+            <column name="shop_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workgroup_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+            tableName="bytedesk_core_shop_workgroups"
+            columnNames="shop_id,workgroup_id"
+            constraintName="pk_shop_workgroups"/>
+
+        <createIndex tableName="bytedesk_core_shop_workgroups" indexName="idx_shop_wgs_shop">
+            <column name="shop_id"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_core_shop_workgroups" indexName="idx_shop_wgs_workgroup">
+            <column name="workgroup_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_core_shop_workgroups"
+            baseColumnNames="shop_id"
+            referencedTableName="bytedesk_core_shop"
+            referencedColumnNames="id"
+            constraintName="fk_shop_wgs_shop"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_core_shop_workgroups"
+            baseColumnNames="workgroup_id"
+            referencedTableName="bytedesk_service_workgroup"
+            referencedColumnNames="id"
+            constraintName="fk_shop_wgs_workgroup"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

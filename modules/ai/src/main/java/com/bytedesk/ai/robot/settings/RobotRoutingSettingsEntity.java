@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -68,13 +67,6 @@ public class RobotRoutingSettingsEntity extends BaseEntity {
     @lombok.Builder.Default
     private Boolean nonWorktimeRobot = false;
 
-    @lombok.Builder.Default
-    @Column(name = "auto_reply_enabled")
-    private Boolean autoReplyEnabled = false;
-
-    @Column(name = "auto_reply_kb_uid")
-    private String autoReplyKbUid;
-    
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private RobotEntity robot;
@@ -94,8 +86,6 @@ public class RobotRoutingSettingsEntity extends BaseEntity {
                 .defaultRobot(Boolean.TRUE.equals(request.getDefaultRobot()))
                 .offlineRobot(Boolean.TRUE.equals(request.getOfflineRobot()))
                 .nonWorktimeRobot(Boolean.TRUE.equals(request.getNonWorktimeRobot()))
-                .autoReplyEnabled(Boolean.TRUE.equals(request.getAutoReplyEnabled()))
-                .autoReplyKbUid(request.getAutoReplyKbUid())
                 // create 阶段不设置 robot 关联
                 .build();
     }

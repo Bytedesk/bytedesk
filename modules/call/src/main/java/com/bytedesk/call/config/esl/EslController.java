@@ -5,6 +5,7 @@
 package com.bytedesk.call.config.esl;
 
 import com.bytedesk.call.config.esl.client.internal.IModEslApi;
+import com.bytedesk.call.xml_curl.XmlCurlTraceService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -25,21 +27,25 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RestController
-@RequestMapping("/freeswitch/api/v1/esl")
+@RequestMapping("/api/v1/freeswitch/esl")
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class EslController {
 
     private final EslService eslService;
     private final EslEventStreamService eslEventStreamService;
+    private final ObjectProvider<XmlCurlTraceService> xmlCurlTraceServiceProvider;
 
-    public EslController(EslService eslService, EslEventStreamService eslEventStreamService) {
+    public EslController(EslService eslService,
+                         EslEventStreamService eslEventStreamService,
+                         ObjectProvider<XmlCurlTraceService> xmlCurlTraceServiceProvider) {
         this.eslService = eslService;
         this.eslEventStreamService = eslEventStreamService;
+        this.xmlCurlTraceServiceProvider = xmlCurlTraceServiceProvider;
     }
 
     // 健康与通用
     /** FreeSWITCH 运行状态 */
-    // http://127.0.0.1:9003/freeswitch/api/v1/esl/status
+    // http://127.0.0.1:9003/api/v1/freeswitch/esl/status
     @GetMapping("/status")
     public ResponseEntity<JsonResult<?>> status() {
         Map<String, Object> res = eslService.status();
@@ -125,23 +131,37 @@ public class EslController {
         return ResponseEntity.ok(JsonResult.success("stream state", eslEventStreamService.streamState()));
     }
 
+    /** 获取最近 xml_curl 请求，用于排查分机加载/注册加载/CDR配置加载 */
+    @GetMapping("/xmlcurl/recent")
+    public ResponseEntity<JsonResult<?>> recentXmlCurlRequests(
+            @RequestParam(defaultValue = "50") int limit,
+            @RequestParam(required = false) String section,
+            @RequestParam(required = false) String category) {
+        XmlCurlTraceService traceService = xmlCurlTraceServiceProvider.getIfAvailable();
+        if (traceService == null) {
+            return ResponseEntity.ok(JsonResult.success("xmlcurl recent", java.util.Collections.emptyList()));
+        }
+        return ResponseEntity.ok(JsonResult.success("xmlcurl recent",
+            traceService.recent(limit, section, category)));
+    }
+
     // 配置相关
     /** 触发 reloadxml（重载 XML 配置与拨号计划） */
-    // http://127.0.0.1:9003/freeswitch/api/v1/esl/reloadxml
+    // http://127.0.0.1:9003/api/v1/freeswitch/esl/reloadxml
     @PostMapping("/reloadxml")
     public ResponseEntity<JsonResult<?>> reloadxml() {
         return ResponseEntity.ok(JsonResult.success("reloadxml", eslService.reloadXml()));
     }
 
     /** 触发 reloadacl（重载 ACL） */
-    // http://127.0.0.1:9003/freeswitch/api/v1/esl/reloadacl
+    // http://127.0.0.1:9003/api/v1/freeswitch/esl/reloadacl
     @PostMapping("/reloadacl")
     public ResponseEntity<JsonResult<?>> reloadacl() {
         return ResponseEntity.ok(JsonResult.success("reloadacl", eslService.reloadAcl()));
     }
 
     /** 刷新 XML 缓存（配合 mod_xml_curl） */
-    // http://127.0.0.1:9003/freeswitch/api/v1/esl/xml_flush_cache
+    // http://127.0.0.1:9003/api/v1/freeswitch/esl/xml_flush_cache
     @PostMapping("/xml_flush_cache")
     public ResponseEntity<JsonResult<?>> xmlFlushCache() {
         return ResponseEntity.ok(JsonResult.success("xml_flush_cache", eslService.xmlFlushCache()));
@@ -155,7 +175,7 @@ public class EslController {
 
     // sofia
     /** 获取 sofia 总览状态 */
-    // http://127.0.0.1:9003/freeswitch/api/v1/esl/sofia/status
+    // http://127.0.0.1:9003/api/v1/freeswitch/esl/sofia/status
     @GetMapping("/sofia/status")
     public ResponseEntity<JsonResult<?>> sofiaStatus() {
         return ResponseEntity.ok(JsonResult.success("sofia status", eslService.sofiaStatus()));

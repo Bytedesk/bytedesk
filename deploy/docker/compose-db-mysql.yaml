@@ -11,6 +11,12 @@ services:
       - "${MYSQL_HOST_PORT:-13306}:${MYSQL_PORT:-3306}"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
     networks:
       bytedesk-network:
         aliases:

@@ -76,5 +76,9 @@
     <include file="db/changelog/migration/260306_add_robot_routing_auto_reply_fields.xml" />
     <include file="db/changelog/migration/260306_add_workgroup_type_column.xml" />
     <include file="db/changelog/migration/260307_add_toolbar_voice_input.xml" />
+    <include file="db/changelog/migration/260308_migrate_agent_auto_reply_settings_to_agent.xml" />
+    <include file="db/changelog/migration/260308_drop_legacy_agent_settings_auto_reply_columns.xml" />
+    <include file="db/changelog/migration/260310_add_shop_capacity_and_relations.xml" />
+    <include file="db/changelog/migration/260310_add_shop_profile_and_billing_fields.xml" />
 
 </databaseChangeLog>
