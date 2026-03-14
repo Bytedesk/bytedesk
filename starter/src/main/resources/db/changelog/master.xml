@@ -80,5 +80,6 @@
     <include file="db/changelog/migration/260308_drop_legacy_agent_settings_auto_reply_columns.xml" />
     <include file="db/changelog/migration/260310_add_shop_capacity_and_relations.xml" />
     <include file="db/changelog/migration/260310_add_shop_profile_and_billing_fields.xml" />
+    <include file="db/changelog/migration/260312_add_call_esl_event_columns.xml" />
 
 </databaseChangeLog>

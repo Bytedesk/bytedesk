@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260312-add-esl-event-event-name" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="event_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="event_name" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="event_name"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-event-subclass" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="event_subclass"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="event_subclass" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="event_subclass"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-unique-id" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="unique_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="unique_id" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="unique_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-caller-number" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="caller_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="caller_number" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="caller_number"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-destination-number" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="destination_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="destination_number" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="destination_number"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-hangup-cause" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="hangup_cause"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="hangup_cause" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="hangup_cause"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-contact" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="contact"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="contact" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="contact"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-status" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="status" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="status"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-api-command" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="api_command"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="api_command" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="api_command"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-api-argument" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="api_argument"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="api_argument" type="varchar(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="api_argument"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-headers-json" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="headers_json"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="headers_json" type="TEXT"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="headers_json"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260312-add-esl-event-body-json" author="jackning">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_esl_event"/>
+            <not>
+                <columnExists tableName="bytedesk_call_esl_event" columnName="body_json"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_esl_event">
+            <column name="body_json" type="TEXT"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_call_esl_event" columnName="body_json"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

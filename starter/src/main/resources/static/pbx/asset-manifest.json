@@ -1,6 +1,6 @@
 {
   "/pbx/umi.css": "/pbx/umi.4a93a148.css",
-  "/pbx/umi.js": "/pbx/umi.df7327c8.js",
+  "/pbx/umi.js": "/pbx/umi.7bb886e6.js",
   "/pbx/5098.8e850d44.async.js": "/pbx/5098.8e850d44.async.js",
   "/pbx/623.c4e65ced.async.js": "/pbx/623.c4e65ced.async.js",
   "/pbx/1898.d566b711.async.js": "/pbx/1898.d566b711.async.js",
@@ -15,7 +15,8 @@
   "/pbx/p__Dashboard__Call__Trunk__index.js": "/pbx/p__Dashboard__Call__Trunk__index.bb8c8059.async.js",
   "/pbx/p__Dashboard__Call__Cti__index.js": "/pbx/p__Dashboard__Call__Cti__index.d2a8966e.async.js",
   "/pbx/p__Dashboard__Call__Extension__index.js": "/pbx/p__Dashboard__Call__Extension__index.a29c014c.async.js",
-  "/pbx/p__Dashboard__Call__Registration__index.js": "/pbx/p__Dashboard__Call__Registration__index.73dc983e.async.js",
+  "/pbx/p__Dashboard__Call__Registration__index.js": "/pbx/p__Dashboard__Call__Registration__index.3fa44137.async.js",
+  "/pbx/p__Dashboard__Call__EslEvent__index.js": "/pbx/p__Dashboard__Call__EslEvent__index.ec5b29fe.async.js",
   "/pbx/p__Dashboard__Call__Recordings__index.js": "/pbx/p__Dashboard__Call__Recordings__index.039b34dc.async.js",
   "/pbx/p__Dashboard__Call__Acd__index.js": "/pbx/p__Dashboard__Call__Acd__index.7572a822.async.js",
   "/pbx/p__Dashboard__Call__IvrMenu__index.js": "/pbx/p__Dashboard__Call__IvrMenu__index.03dbf7d0.async.js",

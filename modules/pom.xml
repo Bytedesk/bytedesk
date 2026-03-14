@@ -18,12 +18,12 @@
         <module>ai</module>
         <module>bi</module>
         <module>call</module>
-        <module>conference</module>
         <module>core</module>
         <module>crm</module>
         <module>forum</module>
         <module>kbase</module>
         <module>marketing</module>
+        <module>meet</module>
         <module>opinion</module>
         <module>pan</module>
         <module>service</module>

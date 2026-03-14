@@ -4,11 +4,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.call.config.esl.CallSwitchEvent;
-import com.bytedesk.call.config.esl.EslEventNames;
-import com.bytedesk.call.config.esl.client.inbound.IEslEventListener;
-import com.bytedesk.call.config.esl.client.internal.Context;
-import com.bytedesk.call.config.esl.client.transport.event.EslEvent;
+import com.bytedesk.call.esl.EslEventNames;
+import com.bytedesk.call.esl.client.inbound.IEslEventListener;
+import com.bytedesk.call.esl.client.internal.Context;
+import com.bytedesk.call.esl.client.transport.event.EslEvent;
+import com.bytedesk.call.esl_event.EslEventIngestService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CallEventListener implements IEslEventListener {
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final EslEventIngestService eslEventIngestService;
 
     // 实现 IEslEventListener 的回调
     @Override
@@ -33,6 +34,7 @@ public class CallEventListener implements IEslEventListener {
             return;
         }
 
+        eslEventIngestService.ingest(eslEvent);
         publishSwitchEvent(eslEvent);
         // log.info("收到Call事件: {}", eventName); // HEARTBEAT/RE_SCHEDULE
 
@@ -359,5 +361,4 @@ public class CallEventListener implements IEslEventListener {
         }
     }
 
-    
 }

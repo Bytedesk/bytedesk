@@ -502,6 +502,42 @@ public class PageRouteController {
 		return "forward:/forum/index.html";
 	}
 
+	@GetMapping({
+			"/call",
+			"/call/",
+			"/call/{path:[^\\.]*}",
+			"/call/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/call/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/call/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String call() {
+		return "forward:/call/index.html";
+	}
+
+	@GetMapping({
+			"/pbx",
+			"/pbx/",
+			"/pbx/{path:[^\\.]*}",
+			"/pbx/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/pbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/pbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String pbx() {
+		return "forward:/pbx/index.html";
+	}
+
+	@GetMapping({
+			"/meet",
+			"/meet/",
+			"/meet/{path:[^\\.]*}",
+			"/meet/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/meet/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/meet/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String meet() {
+		return "forward:/meet/index.html";
+	}
+
 	/**
 	 * Features pages - support both with and without /features/ prefix
 	 * For dynamic FTL template rendering (non-.html requests)

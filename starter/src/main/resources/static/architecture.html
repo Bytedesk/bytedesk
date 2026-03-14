@@ -498,6 +498,189 @@
         .section-dialog { border-color: #8fdcc8; }
         .section-insight { border-color: #9fd0ff; }
         .section-cloud { border-color: #b3e5ff; }
+
+        /* 硬件部署架构 */
+        .deployment-architecture {
+            background: linear-gradient(180deg, #f5f9ff 0%, #eef4fb 100%);
+            border: 1px solid #d9e4f0;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(31, 59, 100, 0.08);
+        }
+        .deployment-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .deployment-intro,
+        .deployment-principles {
+            background: rgba(255,255,255,0.82);
+            border: 1px solid #d8e4f2;
+            border-radius: 14px;
+            padding: 18px 20px;
+        }
+        .deployment-intro h2,
+        .deployment-principles h3,
+        .deployment-tier h3,
+        .deployment-notes h3 {
+            margin: 0 0 12px 0;
+            color: #1f3b64;
+            text-align: left;
+        }
+        .deployment-intro p,
+        .deployment-principles p {
+            margin: 0;
+            color: #4f6480;
+            line-height: 1.7;
+        }
+        .deployment-badges,
+        .deployment-list,
+        .deployment-node-tags,
+        .deployment-note-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .deployment-badge,
+        .deployment-list span,
+        .deployment-node-tags span,
+        .deployment-note-tags span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            line-height: 1;
+        }
+        .deployment-badge {
+            background: #e8f1ff;
+            border: 1px solid #bfd4f6;
+            color: #244a87;
+        }
+        .deployment-principles {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .deployment-list span {
+            background: #f3f7fd;
+            border: 1px solid #d6e0ee;
+            color: #36506f;
+        }
+        .deployment-diagram-shell {
+            margin-top: 24px;
+            background: rgba(255,255,255,0.82);
+            border: 1px solid #d8e4f2;
+            border-radius: 16px;
+            padding: 18px;
+        }
+        .deployment-diagram-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+        .deployment-diagram-header h3,
+        .deployment-spec-card h3,
+        .deployment-legend-title {
+            margin: 0;
+            color: #1f3b64;
+            text-align: left;
+        }
+        .deployment-diagram-header p {
+            margin: 6px 0 0 0;
+            color: #5b7087;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        .deployment-diagram-badge {
+            flex-shrink: 0;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #2f80ed 0%, #2357c8 100%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        .deployment-svg-wrap {
+            width: 100%;
+            overflow: auto;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #fbfdff 0%, #f3f8ff 100%);
+            border: 1px solid #dbe7f4;
+        }
+        .deployment-svg {
+            width: 100%;
+            min-width: 980px;
+            height: auto;
+            display: block;
+        }
+        .deployment-legend {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 14px;
+        }
+        .deployment-legend-box,
+        .deployment-spec-card {
+            background: rgba(255,255,255,0.88);
+            border: 1px solid #d8e4f2;
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .deployment-legend-list,
+        .deployment-spec-tags,
+        .deployment-spec-points {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .deployment-legend-item,
+        .deployment-spec-tags span,
+        .deployment-spec-points span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            border: 1px solid #d6e2ef;
+            background: #f7fbff;
+            color: #36506f;
+            font-size: 13px;
+        }
+        .legend-line {
+            width: 26px;
+            height: 0;
+            border-top-width: 3px;
+            border-top-style: solid;
+            display: inline-block;
+        }
+        .legend-line.sync { border-top-color: #3d7cf4; }
+        .legend-line.message { border-top-color: #ef8b17; border-top-style: dashed; }
+        .legend-line.async { border-top-color: #94a3b8; border-top-style: dashed; }
+        .deployment-spec-grid {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .deployment-spec-card p {
+            margin: 10px 0 12px 0;
+            color: #566f88;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        @media (max-width: 980px) {
+            .deployment-hero,
+            .deployment-legend,
+            .deployment-spec-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -514,6 +697,7 @@
         <!-- 选项卡导航 -->
         <div class="tabs">
             <button class="tab-button active" onclick="openTab('layered-view')">分层视图</button>
+            <button class="tab-button" onclick="openTab('deployment-view')">硬件部署</button>
             <button class="tab-button" onclick="openTab('module-view')">模块视图</button>
             <button class="tab-button" onclick="openTab('ecommerce-view')">业务模块</button>
             <button class="tab-button" onclick="openTab('frontend-view')">前端技术栈</button>
@@ -617,6 +801,219 @@
                         <div class="layer-component">阿里云主机</div>
                         <div class="layer-component">独立服务器</div>
                         <div class="layer-component">第三方VPS主机</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 硬件部署架构选项卡 -->
+        <div id="deployment-view" class="tab-content">
+            <div class="deployment-architecture">
+                <div class="deployment-hero">
+                    <div class="deployment-intro">
+                        <h2>硬件部署架构</h2>
+                        <p>面向企业版与平台版集群部署，推荐将接入层、应用层、消息中间件、数据存储与文件存储拆分到独立节点或独立资源池中。多个微语服务实例共享同一套消息总线与存储资源，通过负载均衡统一接入，对外提供高可用、可横向扩展的客服与 IM 服务。</p>
+                    </div>
+                    <div class="deployment-principles">
+                        <h3>部署原则</h3>
+                        <div class="deployment-badges">
+                            <span class="deployment-badge">开源社区版适合单机</span>
+                            <span class="deployment-badge">企业版建议 3 个以上应用节点</span>
+                            <span class="deployment-badge">所有节点共享同一消息中间件</span>
+                            <span class="deployment-badge">文件存储配置必须统一</span>
+                        </div>
+                        <div class="deployment-list">
+                            <span>蓝色实线：同步直连</span>
+                            <span>橙色虚线：消息广播与状态同步</span>
+                            <span>灰色虚线：异步落库与处理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deployment-diagram-shell">
+                    <div class="deployment-diagram-header">
+                        <div>
+                            <h3>集群部署拓扑图</h3>
+                            <p>通过一张主图展示终端入口、负载均衡、应用集群、消息中间件、数据存储与文件存储之间的同步链路、广播链路和异步链路。</p>
+                        </div>
+                        <span class="deployment-diagram-badge">SVG 风格拓扑</span>
+                    </div>
+                    <div class="deployment-svg-wrap">
+                        <svg class="deployment-svg" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="微语集群部署拓扑图">
+                            <defs>
+                                <linearGradient id="bgCard" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#ffffff"/>
+                                    <stop offset="100%" stop-color="#f6fbff"/>
+                                </linearGradient>
+                                <linearGradient id="entryNode" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#4f8cff"/>
+                                    <stop offset="100%" stop-color="#2a62d6"/>
+                                </linearGradient>
+                                <linearGradient id="appNode" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#38c997"/>
+                                    <stop offset="100%" stop-color="#1d8d68"/>
+                                </linearGradient>
+                                <linearGradient id="mqNode" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#ffb257"/>
+                                    <stop offset="100%" stop-color="#ef7e11"/>
+                                </linearGradient>
+                                <linearGradient id="dataNode" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#7d97ff"/>
+                                    <stop offset="100%" stop-color="#546de5"/>
+                                </linearGradient>
+                                <linearGradient id="fileNode" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#27c8d7"/>
+                                    <stop offset="100%" stop-color="#0f90a0"/>
+                                </linearGradient>
+                                <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#8aa7c7" flood-opacity="0.20"/>
+                                </filter>
+                                <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                                    <path d="M0,0 L10,5 L0,10 z" fill="#3d7cf4"/>
+                                </marker>
+                                <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                                    <path d="M0,0 L10,5 L0,10 z" fill="#ef8b17"/>
+                                </marker>
+                                <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                                    <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+                                </marker>
+                            </defs>
+
+                            <rect x="24" y="22" width="1152" height="716" rx="24" fill="#f5f9ff"/>
+
+                            <text x="600" y="58" text-anchor="middle" font-size="22" font-weight="700" fill="#1f3b64">微语企业版集群硬件部署拓扑</text>
+                            <text x="600" y="84" text-anchor="middle" font-size="13" fill="#67809d">统一入口 + 多实例应用 + 共享消息总线 + 共享存储资源</text>
+
+                            <g filter="url(#softShadow)">
+                                <rect x="62" y="118" width="160" height="72" rx="16" fill="url(#bgCard)" stroke="#d4e2f1"/>
+                                <rect x="248" y="118" width="160" height="72" rx="16" fill="url(#bgCard)" stroke="#d4e2f1"/>
+                                <rect x="434" y="118" width="160" height="72" rx="16" fill="url(#bgCard)" stroke="#d4e2f1"/>
+                                <rect x="620" y="118" width="160" height="72" rx="16" fill="url(#bgCard)" stroke="#d4e2f1"/>
+                                <rect x="806" y="118" width="300" height="72" rx="16" fill="url(#bgCard)" stroke="#d4e2f1"/>
+                            </g>
+                            <text x="142" y="148" text-anchor="middle" font-size="16" font-weight="700" fill="#35527d">Web / H5</text>
+                            <text x="142" y="170" text-anchor="middle" font-size="13" fill="#68819d">访客站点与官网</text>
+                            <text x="328" y="148" text-anchor="middle" font-size="16" font-weight="700" fill="#35527d">PC 客服端</text>
+                            <text x="328" y="170" text-anchor="middle" font-size="13" fill="#68819d">后台与运营台</text>
+                            <text x="514" y="148" text-anchor="middle" font-size="16" font-weight="700" fill="#35527d">App / 小程序</text>
+                            <text x="514" y="170" text-anchor="middle" font-size="13" fill="#68819d">移动入口</text>
+                            <text x="700" y="148" text-anchor="middle" font-size="16" font-weight="700" fill="#35527d">企业微信 / 公众号</text>
+                            <text x="700" y="170" text-anchor="middle" font-size="13" fill="#68819d">企业渠道</text>
+                            <text x="956" y="148" text-anchor="middle" font-size="16" font-weight="700" fill="#35527d">第三方渠道 / 电商 / 社媒</text>
+                            <text x="956" y="170" text-anchor="middle" font-size="13" fill="#68819d">全渠道接入</text>
+
+                            <line x1="600" y1="190" x2="600" y2="240" stroke="#3d7cf4" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+                            <g filter="url(#softShadow)">
+                                <rect x="370" y="242" width="460" height="90" rx="20" fill="url(#entryNode)"/>
+                            </g>
+                            <text x="600" y="278" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">Nginx / 云负载均衡 / WAF</text>
+                            <text x="600" y="306" text-anchor="middle" font-size="14" fill="#eaf2ff">统一域名入口 · 健康检查 · TLS 终止 · API 9003 / WebSocket 9885</text>
+
+                            <line x1="600" y1="332" x2="600" y2="382" stroke="#3d7cf4" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+                            <rect x="118" y="386" width="702" height="170" rx="22" fill="#ecfbf5" stroke="#b6ecd8" stroke-width="2"/>
+                            <text x="152" y="418" font-size="18" font-weight="700" fill="#1d7d5d">应用服务层</text>
+                            <text x="152" y="441" font-size="13" fill="#487665">所有实例使用相同 bytedesk.mq.type 与同一套共享存储配置</text>
+
+                            <g filter="url(#softShadow)">
+                                <rect x="150" y="456" width="190" height="72" rx="16" fill="url(#appNode)"/>
+                                <rect x="374" y="456" width="190" height="72" rx="16" fill="url(#appNode)"/>
+                                <rect x="598" y="456" width="190" height="72" rx="16" fill="url(#appNode)"/>
+                            </g>
+                            <text x="245" y="486" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">应用节点 A</text>
+                            <text x="245" y="508" text-anchor="middle" font-size="13" fill="#eafff7">IM / 客服 / AI / 工单</text>
+                            <text x="469" y="486" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">应用节点 B</text>
+                            <text x="469" y="508" text-anchor="middle" font-size="13" fill="#eafff7">水平扩容 / 故障切换</text>
+                            <text x="693" y="486" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">应用节点 C+</text>
+                            <text x="693" y="508" text-anchor="middle" font-size="13" fill="#eafff7">高并发继续扩展</text>
+
+                            <g filter="url(#softShadow)">
+                                <rect x="870" y="396" width="248" height="116" rx="20" fill="url(#mqNode)"/>
+                            </g>
+                            <text x="994" y="434" text-anchor="middle" font-size="22" font-weight="700" fill="#ffffff">消息中间件</text>
+                            <text x="994" y="462" text-anchor="middle" font-size="15" fill="#fff6ea">Apache Artemis / RabbitMQ</text>
+                            <text x="994" y="486" text-anchor="middle" font-size="13" fill="#fff6ea">实时消息路由 · 客服状态同步 · 系统通知</text>
+
+                            <line x1="820" y1="470" x2="870" y2="470" stroke="#ef8b17" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#arrowOrange)"/>
+                            <text x="846" y="454" text-anchor="middle" font-size="12" fill="#c56b00">广播 / 路由</text>
+
+                            <line x1="246" y1="528" x2="246" y2="618" stroke="#3d7cf4" stroke-width="4" marker-end="url(#arrowBlue)"/>
+                            <line x1="469" y1="528" x2="469" y2="618" stroke="#3d7cf4" stroke-width="4" marker-end="url(#arrowBlue)"/>
+                            <line x1="692" y1="528" x2="692" y2="618" stroke="#3d7cf4" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+                            <g filter="url(#softShadow)">
+                                <rect x="92" y="620" width="180" height="78" rx="16" fill="url(#dataNode)"/>
+                                <rect x="307" y="620" width="180" height="78" rx="16" fill="url(#dataNode)"/>
+                                <rect x="522" y="620" width="180" height="78" rx="16" fill="url(#dataNode)"/>
+                                <rect x="737" y="620" width="180" height="78" rx="16" fill="url(#fileNode)"/>
+                            </g>
+                            <text x="182" y="652" text-anchor="middle" font-size="20" font-weight="700" fill="#ffffff">MySQL</text>
+                            <text x="182" y="676" text-anchor="middle" font-size="13" fill="#eef2ff">事务数据 / 组织 / 配置</text>
+                            <text x="397" y="652" text-anchor="middle" font-size="20" font-weight="700" fill="#ffffff">Redis</text>
+                            <text x="397" y="676" text-anchor="middle" font-size="13" fill="#eef2ff">缓存 / 会话状态共享</text>
+                            <text x="612" y="652" text-anchor="middle" font-size="20" font-weight="700" fill="#ffffff">ElasticSearch</text>
+                            <text x="612" y="676" text-anchor="middle" font-size="13" fill="#eef2ff">检索 / 分析 / 查询</text>
+                            <text x="827" y="652" text-anchor="middle" font-size="20" font-weight="700" fill="#ffffff">MinIO / 共享文件系统</text>
+                            <text x="827" y="676" text-anchor="middle" font-size="13" fill="#eefcff">附件 / 图片 / 录音统一存储</text>
+
+                            <line x1="994" y1="512" x2="994" y2="590" stroke="#94a3b8" stroke-width="4" stroke-dasharray="10 8"/>
+                            <line x1="994" y1="590" x2="610" y2="590" stroke="#94a3b8" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#arrowGray)"/>
+                            <text x="845" y="576" text-anchor="middle" font-size="12" fill="#5f6b79">异步处理 / 落库 / 数据同步</text>
+                        </svg>
+                    </div>
+
+                    <div class="deployment-legend">
+                        <div class="deployment-legend-box">
+                            <div class="deployment-legend-title">链路说明</div>
+                            <div class="deployment-legend-list" style="margin-top: 12px;">
+                                <span class="deployment-legend-item"><span class="legend-line sync"></span>同步直连：鉴权、查询、配置、缓存、文件访问</span>
+                                <span class="deployment-legend-item"><span class="legend-line message"></span>消息广播：实时聊天、客服上下线、状态同步、系统通知</span>
+                                <span class="deployment-legend-item"><span class="legend-line async"></span>异步处理：消息消费、任务处理、异步落库、削峰填谷</span>
+                            </div>
+                        </div>
+                        <div class="deployment-legend-box">
+                            <div class="deployment-legend-title">落地建议</div>
+                            <div class="deployment-spec-points" style="margin-top: 12px;">
+                                <span>消息中间件建议内网地址</span>
+                                <span>所有应用节点同构配置</span>
+                                <span>文件存储必须共享同一配置</span>
+                                <span>生产环境配套监控与备份</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deployment-spec-grid">
+                    <div class="deployment-spec-card">
+                        <h3>推荐部署规格：3 节点最小生产拓扑</h3>
+                        <p>适合中小规模正式环境，目标是以最少机器满足高可用基础能力。建议将入口、应用和数据角色做最小拆分，避免全部混布在单机上。</p>
+                        <div class="deployment-spec-tags">
+                            <span>节点 1：Nginx / WAF / 反向代理</span>
+                            <span>节点 2：应用实例 A + 应用实例 B</span>
+                            <span>节点 3：MySQL + Redis + Artemis + MinIO</span>
+                        </div>
+                        <div class="deployment-spec-points" style="margin-top: 12px;">
+                            <span>适合初期生产</span>
+                            <span>建议额外做数据库备份</span>
+                            <span>应用至少双实例</span>
+                        </div>
+                    </div>
+                    <div class="deployment-spec-card">
+                        <h3>推荐部署规格：5 节点标准生产拓扑</h3>
+                        <p>适合稳定运营和持续扩容场景。入口、应用、中间件、数据、文件存储各自独立，故障域更清晰，后续横向扩展成本更低。</p>
+                        <div class="deployment-spec-tags">
+                            <span>节点 1：Nginx / 云负载均衡接入</span>
+                            <span>节点 2：应用实例 A</span>
+                            <span>节点 3：应用实例 B</span>
+                            <span>节点 4：Artemis / RabbitMQ</span>
+                            <span>节点 5：MySQL + Redis + ElasticSearch + MinIO</span>
+                        </div>
+                        <div class="deployment-spec-points" style="margin-top: 12px;">
+                            <span>更适合正式商用</span>
+                            <span>支持继续扩应用节点</span>
+                            <span>中间件与业务隔离</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1176,7 +1573,7 @@
                     <div class="module parent-module">
                         <div class="module-title" lang="en">Parent POM (im)</div>
                         <div class="module-title" lang="zh">父级 POM (im)</div>
-                        <div class="submodule">Spring Boot 3.5.8</div>
+                        <div class="submodule">Spring Boot 3.5.11</div>
                         <div class="submodule">Java 17</div>
                         <div class="submodule" lang="en">Manages all modules</div>
                         <div class="submodule" lang="zh">管理所有模块</div>
@@ -1996,7 +2393,7 @@
                 <li>
                     <strong lang="en">Framework:</strong>
                     <strong lang="zh">框架:</strong>
-                    <span>Spring Boot 3.5.8</span>
+                    <span>Spring Boot 3.5.11</span>
                 </li>
                 <li>
                     <strong lang="en">Web Server:</strong>

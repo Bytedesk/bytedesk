@@ -31,6 +31,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings_trigger.TriggerSettingsEntity;
 import com.bytedesk.kbase.trigger.TriggerKeyConsts;
+import com.bytedesk.service.message_leave.MessageLeaveExtra;
 
 import lombok.experimental.UtilityClass;
 
@@ -190,6 +191,31 @@ public class ThreadMessageUtil {
      */
     public static MessageProtobuf getAgentQueueAcceptMessage(QueueNotification payload, ThreadEntity thread) {
         return buildAgentQueueMessage(MessageTypeEnum.QUEUE_ACCEPT, payload, thread);
+    }
+
+    /**
+     * 构造发送给客服辅助线程的留言提交通知。
+     */
+    public static MessageProtobuf getAgentLeaveMsgSubmitMessage(MessageLeaveExtra payload, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String json = payload != null ? payload.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .type(MessageTypeEnum.LEAVE_MSG_SUBMIT.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
     private static MessageProtobuf buildThreadQueueMessage(MessageTypeEnum messageType, QueueContent content,

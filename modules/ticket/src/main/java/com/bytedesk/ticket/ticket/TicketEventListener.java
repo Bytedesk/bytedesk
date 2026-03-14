@@ -15,6 +15,7 @@ package com.bytedesk.ticket.ticket;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,13 +28,28 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageExtra;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRepository;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
@@ -55,6 +71,12 @@ public class TicketEventListener {
     private final TaskService taskService;
 
     private final ThreadRestService threadRestService;
+
+    private final AgentRepository agentRepository;
+
+    private final QueueMemberRestService queueMemberRestService;
+
+    private final IMessageSendService messageSendService;
 
     @Order(3)
     @EventListener
@@ -143,6 +165,8 @@ public class TicketEventListener {
             ticketEntity.setProcessInstanceId(processInstance.getId());
             ticketRestService.save(ticketEntity);
         }
+
+        notifyAgentsTicketSubmit(ticket);
     }
 
     // 监听工单更新事件
@@ -193,6 +217,62 @@ public class TicketEventListener {
             // ProcessInstance processInstance =
             // runtimeService.startProcessInstanceByKey(upload.getFileName());
         }
+    }
+
+    private void notifyAgentsTicketSubmit(TicketEntity ticket) {
+        if (ticket == null || !StringUtils.hasText(ticket.getOrgUid())) {
+            return;
+        }
+
+        List<AgentEntity> agents = agentRepository.findByOrgUidAndDeletedFalse(ticket.getOrgUid());
+        if (agents == null || agents.isEmpty()) {
+            log.debug("ticket submit notify skipped, no agents found: orgUid={}", ticket.getOrgUid());
+            return;
+        }
+
+        TicketNoticeExtra payload = TicketNoticeExtra.builder()
+                .uid(ticket.getUid())
+                .title(ticket.getTitle())
+                .ticketNumber(ticket.getTicketNumber())
+                .status(ticket.getStatus())
+                .priority(ticket.getPriority())
+                .type(ticket.getType())
+                .reporterUid(ticket.getReporter() != null ? ticket.getReporter().getUid() : null)
+                .assigneeUid(ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null)
+                .build();
+
+        for (AgentEntity agent : agents) {
+            try {
+                ThreadEntity agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
+                MessageProtobuf message = buildAgentTicketSubmitMessage(payload, agentQueueThread);
+                messageSendService.sendProtobufMessage(message);
+            } catch (Exception e) {
+                log.error("Failed to send TICKET_SUBMIT notice: orgUid={}, agentUid={}, ticketUid={}, error={}",
+                        ticket.getOrgUid(), agent.getUid(), ticket.getUid(), e.getMessage(), e);
+            }
+        }
+    }
+
+    private MessageProtobuf buildAgentTicketSubmitMessage(TicketNoticeExtra payload, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String json = payload != null ? payload.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .type(MessageTypeEnum.TICKET_SUBMIT.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
     }
 
 }

@@ -45,16 +45,7 @@ public class InitDataRunner implements ApplicationRunner {
         // List<String> allIPs = NetworkUtils.getLocalIPs();
 
         log.info("InitDataRunner(ApplicationRunner) executing...");
-        log.info("bytedesk.im v{} started at:", version);
-        log.info("Local Access:  http://127.0.0.1:{}", port);
-        // log.info("Network Access: http://{}:{}", localIP, port);
-        
-        // if (allIPs.size() > 1) {
-        //     log.info("Other Network IPs:");
-        //     allIPs.stream()
-        //         .filter(ip -> !ip.equals(localIP))
-        //         .forEach(ip -> log.info("http://{}:{}", ip, port));
-        // }
+        log.info("bytedesk v{} started, http://127.0.0.1:{}", version, port);
     }
 
     @EventListener(ApplicationReadyEvent.class)
