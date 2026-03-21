@@ -15,6 +15,7 @@ package com.bytedesk.call.esl_event;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
@@ -116,14 +117,14 @@ public class EslEventEntity extends BaseEntity {
      * Serialized event headers in JSON format
      */
     @Lob
-    @Column(name = "headers_json")
+    @Column(name = "headers_json", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String headersJson;
 
     /**
      * Serialized event body lines in JSON format
      */
     @Lob
-    @Column(name = "body_json")
+    @Column(name = "body_json", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String bodyJson;
 
     /**

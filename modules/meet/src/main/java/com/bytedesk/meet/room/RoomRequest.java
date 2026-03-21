@@ -14,6 +14,7 @@
 package com.bytedesk.meet.room;
 
 import com.bytedesk.core.base.BaseRequest;
+import org.springframework.data.domain.Pageable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,10 +36,14 @@ public class RoomRequest extends BaseRequest {
 
     private String description;
 
-    // @Builder.Default
-    // private String type = RoomTypeEnum.CUSTOMER.name();
+    private String inviteUid;
 
     private String color;
 
     private Integer order;
+
+    @Override
+    public Pageable getPageable() {
+        return super.getPageable();
+    }
 }

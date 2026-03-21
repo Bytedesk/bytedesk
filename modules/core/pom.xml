@@ -239,6 +239,16 @@
 			<version>2.7.0</version>
 		</dependency>
 
+		<!-- maxmind -->
+		<!-- https://github.com/maxmind/GeoIP2-java -->
+		<!-- https://maxmind.github.io/GeoIP2-java/ -->
+		<!-- https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2 -->
+		<dependency>
+			<groupId>com.maxmind.geoip2</groupId>
+			<artifactId>geoip2</artifactId>
+			<version>5.0.2</version>
+		</dependency>
+
 		<!-- 身份证/手机号脱敏 -->
 		<!-- https://doc.hutool.cn/pages/IdcardUtil/ -->
 		<!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->

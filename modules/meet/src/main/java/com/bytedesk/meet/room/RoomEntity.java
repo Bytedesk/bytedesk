@@ -59,10 +59,16 @@ public class RoomEntity extends BaseEntity {
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of room (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Public invite identifier used as the meeting number / share code.
+     */
+    @Column(name = "invite_uid", nullable = false, unique = true, length = 64)
+    private String inviteUid;
+
+    /**
+     * Type of room for meeting scenarios.
      */
     @Builder.Default
     @Column(name = "room_type")
-    private String type = RoomTypeEnum.CUSTOMER.name();
+    private String type = RoomTypeEnum.MEETING.name();
 
 }

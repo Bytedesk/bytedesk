@@ -244,7 +244,7 @@ services:
       SERVER_PORT: 9003
       # bytedesk config
       BYTEDESK_DEBUG: "false"
-      BYTEDESK_VERSION: 1.5.1
+      BYTEDESK_VERSION: 1.6.0
       # open profile 数据源类型：mysql / postgresql / oracle / kingbase / h2
       BYTEDESK_DATASOURCE_ACTIVE: mysql
       # 申请licenseKey
@@ -272,7 +272,7 @@ services:
       # 密码错误最大重试次数, 默认3次, 0表示不限制。
       BYTEDESK_CUSTOM_LOGIN_MAX_RETRY_COUNT: 3
       # 超过次数默认锁定10分钟, 0表示不锁定
-      BYTEDESK_CUSTOM_LOGIN_LOCK_TIME_MINUTES: 10
+      BYTEDESK_CUSTOM_LOGIN_MAX_RETRY_LOCK_TIME: 10
       # enable login mobile 手机号登录开启
       BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE: "true"
       # enable login scan 扫码登录开启
@@ -390,7 +390,7 @@ services:
       # BYTEDESK_KBASE_API_URL: http://127.0.0.1:9003
       # split config: helpcenter/blog
       BYTEDESK_KBASE_HELPCENTER_THEME: default
-      BYTEDESK_KBASE_HELPCENTER_HTML_PATH: /app/helpcenter
+      BYTEDESK_KBASE_HTML_PATH: /app/helpcenter
       BYTEDESK_KBASE_HELPCENTER_API_URL: http://127.0.0.1:9003
       BYTEDESK_KBASE_BLOG_THEME: default
       BYTEDESK_KBASE_BLOG_HTML_PATH: /app/blog

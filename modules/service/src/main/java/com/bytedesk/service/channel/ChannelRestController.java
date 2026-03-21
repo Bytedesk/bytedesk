@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -42,6 +44,7 @@ public class ChannelRestController extends BaseRestController<ChannelRequest, Ch
     @ActionAnnotation(title = "Channel", action = "组织查询", description = "query channel by org")
     @Operation(summary = "Query Channels by Organization", description = "Retrieve channels for the current organization")
     @PreAuthorize(ChannelPermissions.HAS_CHANNEL_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(ChannelRequest request) {
         
@@ -53,6 +56,7 @@ public class ChannelRestController extends BaseRestController<ChannelRequest, Ch
     @ActionAnnotation(title = "Channel", action = "用户查询", description = "query channel by user")
     @Operation(summary = "Query Channels by User", description = "Retrieve channels for the current user")
     @PreAuthorize(ChannelPermissions.HAS_CHANNEL_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(ChannelRequest request) {
         
@@ -64,6 +68,7 @@ public class ChannelRestController extends BaseRestController<ChannelRequest, Ch
     @ActionAnnotation(title = "Channel", action = "查询详情", description = "query channel by uid")
     @Operation(summary = "Query Channel by UID", description = "Retrieve a specific channel by its unique identifier")
     @PreAuthorize(ChannelPermissions.HAS_CHANNEL_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(ChannelRequest request) {
         
@@ -75,8 +80,9 @@ public class ChannelRestController extends BaseRestController<ChannelRequest, Ch
     @ActionAnnotation(title = "Channel", action = "新建", description = "create channel")
     @Operation(summary = "Create Channel", description = "Create a new channel")
     @Override
+    @PostMapping("/create")
     @PreAuthorize(ChannelPermissions.HAS_CHANNEL_CREATE)
-    public ResponseEntity<?> create(ChannelRequest request) {
+    public ResponseEntity<?> create(@RequestBody ChannelRequest request) {
         
         ChannelResponse channel = channelRestService.create(request);
 
@@ -86,8 +92,9 @@ public class ChannelRestController extends BaseRestController<ChannelRequest, Ch
     @ActionAnnotation(title = "Channel", action = "更新", description = "update channel")
     @Operation(summary = "Update Channel", description = "Update an existing channel")
     @Override
+    @PostMapping("/update")
     @PreAuthorize(ChannelPermissions.HAS_CHANNEL_UPDATE)
-    public ResponseEntity<?> update(ChannelRequest request) {
+    public ResponseEntity<?> update(@RequestBody ChannelRequest request) {
         
         ChannelResponse channel = channelRestService.update(request);
 
@@ -97,8 +104,9 @@ public class ChannelRestController extends BaseRestController<ChannelRequest, Ch
     @ActionAnnotation(title = "Channel", action = "删除", description = "delete channel")
     @Operation(summary = "Delete Channel", description = "Delete a channel")
     @Override
+    @PostMapping("/delete")
     @PreAuthorize(ChannelPermissions.HAS_CHANNEL_DELETE)
-    public ResponseEntity<?> delete(ChannelRequest request) {
+    public ResponseEntity<?> delete(@RequestBody ChannelRequest request) {
         
         channelRestService.delete(request);
 

@@ -30,6 +30,11 @@
 				<#assign docBaseUrl = 'https://www.weiyuai.cn/docs/zh-TW/'>
 			</#if>
 			<#assign pricingUrl = docBaseUrl + 'docs/payment'>
+			<#assign helpCenterUrl = 'https://www.weiyuai.cn/helpcenter/df_org_uid_df_kb_hc_uid/index.html'>
+			<#assign aiAgentDemoUrl = 'https://www.weiyuai.cn/demos/'>
+			<#assign visitorDemoUrl = 'https://www.weiyuai.cn/reactdemo/'>
+			<#assign githubUrl = 'https://github.com/Bytedesk/bytedesk'>
+			<#assign giteeUrl = 'https://gitee.com/270580156/weiyu'>
 
 			<!-- Logo START -->
 			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 一切以客户服务为中心'}">
@@ -57,17 +62,30 @@
 					<a class="nav-link active" href="${langPrefix}/index.html" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
 				</li>
 				<!-- Nav item 2 Course -->
-				<li class="nav-item dropdown"><a class="nav-link" href="${docBaseUrl}" target="_blank"><@t key="nav.docs">文档</@t></a></li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="docsMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="nav.docs">文档</@t></a>
+					<ul class="dropdown-menu" aria-labelledby="docsMenu">
+						<li><a class="dropdown-item" href="${docBaseUrl}" target="_blank"><@t key="nav.docs">文档</@t></a></li>
+						<li><a class="dropdown-item" href="${helpCenterUrl}" target="_blank"><@t key="nav.helpcenter">帮助中心</@t></a></li>
+						<li><a class="dropdown-item" href="${aiAgentDemoUrl}" target="_blank">AI Agent 演示</a></li>
+						<li><a class="dropdown-item" href="${visitorDemoUrl}" target="_blank">访客对接演示</a></li>
+					</ul>
+				</li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${pricingUrl}" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/blog/df_org_uid_df_kb_bg_uid/index.html" target="_blank"><@t key="nav.blog">博客</@t></a></li>
-				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/helpcenter/df_org_uid_df_kb_hc_uid/index.html" target="_blank"><@t key="nav.helpcenter">帮助中心</@t></a></li>
 				
 				<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
 				<#-- pruned: voice, forum, help, architecture -->
 				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/download.html"><@t key="nav.download">下载</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/about.html"><@t key="nav.about">关于</@t></a></li>
 				<!-- Nav item 3 link-->
-				<li class="nav-item"><a class="nav-link" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>				<!-- Language Switch Dropdown -->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="repoMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="nav.github">Github</@t></a>
+					<ul class="dropdown-menu" aria-labelledby="repoMenu">
+						<li><a class="dropdown-item" href="${githubUrl}" target="_blank">Github</a></li>
+						<li><a class="dropdown-item" href="${giteeUrl}" target="_blank">Gitee</a></li>
+					</ul>
+				</li>				<!-- Language Switch Dropdown -->
 					<li class="nav-item dropdown">
 						<#-- Language switch label shows target language; highlight current in the list -->
 

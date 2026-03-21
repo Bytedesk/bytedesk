@@ -26,6 +26,7 @@ import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.I18Consts;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -113,8 +114,8 @@ public class SmsSendService {
         String normalizedMobile = normalizeAndValidateMobile(mobile);
         log.info("send sms to {}, country: {}, content: {}", normalizedMobile, country, content);
 
-        // 白名单手机号使用固定验证码，无需真正发送验证码
-        if (bytedeskProperties.isInWhitelist(normalizedMobile)) {
+        // 白名单手机号使用固定验证码，无需真正发送验证码。超级管理员手机号也认为发送成功，无论是否在白名单中，方便测试和管理员使用。
+        if (bytedeskProperties.isInWhitelist(normalizedMobile) || bytedeskProperties.isAdminIdentifier(normalizedMobile)) {
             return SmsSendResult.success(); // 白名单手机号认为发送成功
         }
 
@@ -168,10 +169,17 @@ public class SmsSendService {
             return parseAliyunSmsResponse(response.getData());
         } catch (ServerException e) {
             log.error("阿里云短信发送失败 - ServerException", e);
-            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "阿里云服务器错误: " + e.getErrMsg());
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED,
+                    resolveAliyunErrorMessage(e.getErrCode(), e.getErrMsg()));
         } catch (ClientException e) {
-            log.error("阿里云短信发送失败 - ClientException", e);
-            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "阿里云客户端错误: " + e.getErrMsg());
+            String errorCode = e.getErrCode();
+            String errorMessage = resolveAliyunErrorMessage(errorCode, e.getErrMsg());
+            if (isAliyunCredentialOrPermissionError(errorCode)) {
+                log.warn("阿里云短信配置异常: code={}, message={}", errorCode, e.getErrMsg());
+            } else {
+                log.error("阿里云短信发送失败 - ClientException: code={}, message={}", errorCode, e.getErrMsg(), e);
+            }
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, errorMessage);
         }
     }
 
@@ -227,13 +235,33 @@ public class SmsSendService {
                 return SmsSendResult.success();
             } else {
                 // 根据错误代码返回中文错误信息
-                String errorMessage = getChineseErrorMessage(code, message);
+                String errorMessage = resolveAliyunErrorMessage(code, message);
                 return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, errorMessage);
             }
         } catch (Exception e) {
             log.error("解析阿里云短信响应失败", e);
-            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "解析短信服务响应失败");
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, I18Consts.I18N_SMS_SERVICE_UNAVAILABLE);
         }
+    }
+
+    String resolveAliyunErrorMessage(String code, String originalMessage) {
+        // if (isAliyunCredentialOrPermissionError(code)) {
+        //     return I18Consts.I18N_SMS_SERVICE_CONFIG_ERROR;
+        // }
+        String resolvedMessage = getChineseErrorMessage(code, originalMessage);
+        if (resolvedMessage.startsWith("短信发送失败:")) {
+            return I18Consts.I18N_SMS_SERVICE_UNAVAILABLE;
+        }
+        return resolvedMessage;
+    }
+
+    boolean isAliyunCredentialOrPermissionError(String code) {
+        return "InvalidAccessKeyId.Inactive".equals(code)
+                || "InvalidAccessKeyId.NotFound".equals(code)
+                || "SignatureDoesNotMatch".equals(code)
+                || "Forbidden.RAM".equals(code)
+                || "InvalidSecurityToken.Expired".equals(code)
+                || "InvalidSecurityToken.MismatchWithAccessKey".equals(code);
     }
 
     /**
@@ -242,7 +270,7 @@ public class SmsSendService {
      * @param originalMessage 原始错误信息
      * @return 中文错误信息
      */
-    private String getChineseErrorMessage(String code, String originalMessage) {
+    String getChineseErrorMessage(String code, String originalMessage) {
         switch (code) {
             case "isv.MOBILE_NUMBER_ILLEGAL":
                 return "手机号码格式错误";

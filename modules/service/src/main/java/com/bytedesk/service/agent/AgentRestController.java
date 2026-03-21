@@ -70,6 +70,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
@@ -84,6 +85,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
@@ -112,6 +114,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(AgentRequest request) {
         
@@ -139,6 +142,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_CREATE)
+    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
@@ -153,6 +157,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
+    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
 
@@ -207,6 +212,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     @ActionAnnotation(title = "客服", action = "删除", description = "delete agent")
     @Operation(summary = "删除客服", description = "删除指定的客服")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
 

@@ -149,6 +149,11 @@ public class FaqEntity extends BaseEntity {
     @Column(name = "is_enabled")
     private Boolean enabled = true;
 
+    // 点击 FAQ 时是否改走机器人消息链路，避免进入默认 FAQ 点击流
+    @Builder.Default
+    @Column(name = "route_to_robot")
+    private Boolean routeToRobot = false;
+
     // 有效开始日期
     @Builder.Default
     private ZonedDateTime startDate = BdDateUtils.now();

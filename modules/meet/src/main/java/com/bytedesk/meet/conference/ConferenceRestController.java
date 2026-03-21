@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.meet.room.RoomRestService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +20,8 @@ import lombok.AllArgsConstructor;
 public class ConferenceRestController {
 
     private final ConferenceRoomRegistry conferenceRoomRegistry;
+
+    private final RoomRestService roomRestService;
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -35,6 +38,7 @@ public class ConferenceRestController {
                             request.audioEnabled() == null ? true : request.audioEnabled(),
                             request.videoEnabled() == null ? true : request.videoEnabled(),
                             request.password()));
+            roomRestService.recordRoomParticipation(request.roomId());
             publishRoomState(snapshot);
             return ResponseEntity.ok(JsonResult.success(snapshot));
         } catch (ConferenceAccessDeniedException exception) {

@@ -42,6 +42,8 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.call.call_settings.CallSettingsEntity;
+import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
@@ -196,6 +198,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         } else {
             agent.setSettings(agentSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
+        applyCallSettings(agent, request.getCallSettings());
         //
         // 保存Agent并检查返回值
         AgentEntity savedAgent = save(agent);
@@ -275,6 +278,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
                 agent.setSettings(settingsOptional.get());
             }
         }
+        if (request.getCallSettings() != null) {
+            applyCallSettings(agent, request.getCallSettings());
+        }
         //
         // 保存Agent，并检查返回值
         AgentEntity updatedAgent = save(agent);
@@ -284,6 +290,28 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         }
         // 转换并返回AgentResponse
         return convertToResponse(updatedAgent);
+    }
+
+    private void applyCallSettings(AgentEntity agent, CallSettingsRequest request) {
+        if (request == null) {
+            return;
+        }
+        CallSettingsEntity settings = agent.getCallSettings();
+        if (settings == null) {
+            settings = CallSettingsEntity.fromRequest(request, modelMapper);
+            settings.setUid(uidUtils.getUid());
+            settings.setOrgUid(agent.getOrgUid());
+            settings.setUserUid(agent.getUserUid());
+            agent.setCallSettings(settings);
+            return;
+        }
+        String originalUid = settings.getUid();
+        Long originalId = settings.getId();
+        modelMapper.map(request, settings);
+        settings.setUid(originalUid);
+        settings.setId(originalId);
+        settings.setOrgUid(agent.getOrgUid());
+        settings.setUserUid(agent.getUserUid());
     }
 
     @Transactional

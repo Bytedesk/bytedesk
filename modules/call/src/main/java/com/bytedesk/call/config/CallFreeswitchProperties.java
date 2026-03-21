@@ -45,7 +45,12 @@ public class CallFreeswitchProperties {
     /**
      * Call服务器地址
      */
-    private String server = "127.0.0.1";
+    private String server = CallConstants.LOOPBACK_IPV4;
+
+    /**
+     * SIP 域名或可达主机名，用于 visitor call 返回 aor/target/domain
+     */
+    private String domain;
 
     /**
      * ESL端口

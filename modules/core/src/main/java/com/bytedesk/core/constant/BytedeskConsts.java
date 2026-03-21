@@ -39,6 +39,7 @@ public class BytedeskConsts {
     public static final String DEFAULT_UNIFIED_UID = "df_un_uid";
     public static final String DEFAULT_AGENT_UID = "df_ag_uid";
     public static final String DEFAULT_WORKGROUP_UID = "df_wg_uid"; // 默认工作组uid
+    public static final String DEFAULT_WORKGROUP_UID_BOOKING = "df_wg_booking"; // booking 场景工作组uid
     public static final String DEFAULT_WORKGROUP_UID_PRESALES = "df_wg_presales"; // 售前
     public static final String DEFAULT_WORKGROUP_UID_AFTERSALES = "df_wg_aftersales"; // 售后
     public static final String DEFAULT_WORKGROUP_UID_TICKET = "df_wg_ticket"; // 工单

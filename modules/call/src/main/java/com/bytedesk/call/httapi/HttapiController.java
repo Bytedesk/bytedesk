@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.call.config.CallConstants;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +51,9 @@ public class HttapiController {
         String turn = vars.getOrDefault("turn", vars.getOrDefault("variable_turn", "1"));
         // MRCP 连通性探测：默认关闭（避免分离部署/容器环境中误判）。
         // 可通过环境变量 HTTAPI_MRCP_PROBE=true 与 HTTAPI_MRCP_HOST/PORT 开启。
-        boolean probe = Boolean.parseBoolean(System.getenv().getOrDefault("HTTAPI_MRCP_PROBE", "false"));
-        String mrcpHost = System.getenv().getOrDefault("HTTAPI_MRCP_HOST", "127.0.0.1");
-        int mrcpPort = parseIntOrDefault(System.getenv().get("HTTAPI_MRCP_PORT"), 8060);
+        boolean probe = Boolean.parseBoolean(System.getenv().getOrDefault(CallConstants.ENV_HTTAPI_MRCP_PROBE, "false"));
+        String mrcpHost = System.getenv().getOrDefault(CallConstants.ENV_HTTAPI_MRCP_HOST, CallConstants.LOOPBACK_IPV4);
+        int mrcpPort = parseIntOrDefault(System.getenv().get(CallConstants.ENV_HTTAPI_MRCP_PORT), CallConstants.DEFAULT_HTTAPI_MRCP_PORT);
         boolean mrcpReady = probe && mrcpUp(mrcpHost, mrcpPort, 300);
 
         // -- Incoming request trace for troubleshooting no-audio/hangup on 9201

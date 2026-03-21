@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.bytedesk.call.config.CallConstants;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,9 @@ public class XmlCurlService {
     private static final boolean ENABLE_PHRASES        = boolEnv("XMLCURL_ENABLE_PHRASES", false);
 
     // directory 用户清单（user@domain:password），未写域名默认 default
-    private static final Map<String, String> DIRECTORY_USERS = usersEnv("XMLCURL_DIRECTORY_USERS", "1000@default:1234");
+        private static final Map<String, String> DIRECTORY_USERS = usersEnv(
+            "XMLCURL_DIRECTORY_USERS",
+            "1000@" + CallConstants.DIRECTORY_DOMAIN_DEFAULT + ":1234");
     // configuration 白名单（示例："ivr.conf,acl.conf"），默认空：不返回任何配置，由本地接管
     private static final Set<String> CONFIG_WHITELIST = csvEnv("XMLCURL_CONFIG_WHITELIST", "");
 
@@ -43,7 +47,7 @@ public class XmlCurlService {
             return resultNotFound();
         }
         String context = pick(p, "Caller-Context", "context", "variable_context");
-        if (context == null || context.isBlank()) context = "default";
+        if (context == null || context.isBlank()) context = CallConstants.USER_CONTEXT_DEFAULT;
         String dest = pick(p, "Caller-Destination-Number", "destination_number", "variable_destination_number");
         if (dest == null) {
             logNotFound("dialplan", "missing destination_number");
@@ -77,7 +81,7 @@ public class XmlCurlService {
     public byte[] handleDirectory(Map<String, String> p) {
         String user = pick(p, "user", "User", "login", "variable_user_name", "Caller-Username");
         String domain = pick(p, "domain", "Domain", "variable_domain_name", "sip_from_host");
-        if (domain == null || domain.isBlank()) domain = "default";
+        if (domain == null || domain.isBlank()) domain = CallConstants.DIRECTORY_DOMAIN_DEFAULT;
         if (user == null || user.isBlank()) {
             logNotFound("directory", "missing user");
             return resultNotFound();
@@ -102,7 +106,7 @@ public class XmlCurlService {
         String pwd = DIRECTORY_USERS.get(key);
         if (pwd == null) {
             // 兼容仅配置 user:pwd 的情况（默认 domain=default）
-            pwd = DIRECTORY_USERS.get((user + "@default").toLowerCase(Locale.ROOT));
+            pwd = DIRECTORY_USERS.get((user + "@" + CallConstants.DIRECTORY_DOMAIN_DEFAULT).toLowerCase(Locale.ROOT));
         }
         if (pwd == null) {
             logNotFound("directory", "user not in DIRECTORY_USERS: " + key);
@@ -120,7 +124,7 @@ public class XmlCurlService {
                 "          <param name=\"password\" value=\"" + xmlEscape(pwd) + "\"/>\n" +
                 "        </params>\n" +
                 "        <variables>\n" +
-                "          <variable name=\"user_context\" value=\"default\"/>\n" +
+                "          <variable name=\"user_context\" value=\"" + CallConstants.USER_CONTEXT_DEFAULT + "\"/>\n" +
                 "        </variables>\n" +
                 "      </user>\n" +
                 "    </domain>\n" +
@@ -241,7 +245,7 @@ public class XmlCurlService {
             String dom;
             int j = left.indexOf('@');
             if (j > 0) { user = left.substring(0, j); dom = left.substring(j + 1); }
-            else { user = left; dom = "default"; }
+            else { user = left; dom = CallConstants.DIRECTORY_DOMAIN_DEFAULT; }
             if (!user.isEmpty()) {
                 m.put((user + "@" + dom).toLowerCase(Locale.ROOT), pwd);
             }

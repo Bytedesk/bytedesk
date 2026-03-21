@@ -8,6 +8,8 @@
  */
 package com.bytedesk.call.esl;
 
+import com.bytedesk.call.config.CallI18nConsts;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.call.config.CallEventListener;
+import com.bytedesk.call.config.CallConstants;
 import com.bytedesk.call.config.CallFreeswitchProperties;
 import com.bytedesk.call.esl.client.inbound.Client;
 import com.bytedesk.call.esl.client.inbound.InboundConnectionFailure;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -79,7 +83,7 @@ public class EslService {
         boolean ok = false;
         if (reply != null && reply.trim().startsWith("+OK")) {
             ok = true;
-        } else if (!bodyLines.isEmpty() && bodyLines.get(0).trim().startsWith("+OK")) {
+        } else if (bodyLines.stream().filter(Objects::nonNull).map(String::trim).anyMatch(line -> line.startsWith("+OK"))) {
             ok = true;
         }
 
@@ -108,7 +112,7 @@ public class EslService {
             if (!isConnectionError(ex)) {
                 throw ex;
             }
-            log.warn("ESL action={} 执行时检测到连接问题，尝试重连后重试: {}", action, ex.getMessage());
+            log.warn(CallI18nConsts.ESL_ACTION_CONNECTION_ISSUE_RETRY, action, ex.getMessage());
             reconnect();
             return operation.get();
         }
@@ -158,7 +162,7 @@ public class EslService {
                     try {
                         eslClient.close();
                     } catch (Exception closeEx) {
-                        log.debug("ESL close during reconnect ignored: {}", closeEx.getMessage());
+                        log.debug(CallI18nConsts.ESL_CLOSE_RECONNECT_IGNORED, closeEx.getMessage());
                     }
                 }
 
@@ -178,23 +182,23 @@ public class EslService {
                 logCommandResponse("setEventSubscriptions", subscriptionResp);
                 registerEventFilters();
 
-                log.info("ESL连接可用: {}:{}", callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
+                log.info(CallI18nConsts.ESL_CONNECTION_READY, callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
                 return;
             } catch (InboundConnectionFailure | RuntimeException ex) {
                 lastError = ex;
-                log.warn("ESL重连失败 attempt={}/{}: {}", attempt, maxRetries, ex.getMessage());
+                log.warn(CallI18nConsts.ESL_RECONNECT_FAILED, attempt, maxRetries, ex.getMessage());
                 if (attempt < maxRetries) {
                     try {
                         Thread.sleep(retryDelayMs);
                     } catch (InterruptedException interruptedException) {
                         Thread.currentThread().interrupt();
-                        throw new IllegalStateException("ESL重连被中断", interruptedException);
+                        throw new IllegalStateException(CallI18nConsts.ESL_RECONNECT_INTERRUPTED, interruptedException);
                     }
                     retryDelayMs = retryDelayMs * 2;
                 }
             }
         }
-        throw new IllegalStateException("ESL连接失败，已达到最大重试次数", lastError);
+        throw new IllegalStateException(CallI18nConsts.ESL_CONNECT_FAILED_MAX_RETRIES, lastError);
     }
 
     private void registerEventFilters() {
@@ -225,13 +229,13 @@ public class EslService {
 
     private void logCommandResponse(String action, CommandResponse response) {
         if (response == null) {
-            log.warn("ESL action={} 返回空响应", action);
+            log.warn(CallI18nConsts.ESL_ACTION_EMPTY_RESPONSE, action);
             return;
         }
         if (response.isOk()) {
-            log.info("ESL action={} 成功: {}", action, response.getReplyText());
+            log.info(CallI18nConsts.ESL_ACTION_SUCCESS, action, response.getReplyText());
         } else {
-            log.warn("ESL action={} 失败: {}", action, response.getReplyText());
+            log.warn(CallI18nConsts.ESL_ACTION_FAILED, action, response.getReplyText());
         }
     }
 
@@ -325,12 +329,12 @@ public class EslService {
 
     /** 触发 reloadxml，重载主配置与拨号计划（对 SIP Profile 变更可能还需 sofia rescan/restart） */
     public Map<String, Object> reloadXml() {
-        return api("reloadxml", null);
+        return api(CallConstants.ESL_COMMAND_RELOADXML, null);
     }
 
     /** 触发 reloadacl，重载访问控制列表 */
     public Map<String, Object> reloadAcl() {
-        return api("reloadacl", null);
+        return api(CallConstants.ESL_COMMAND_RELOADACL, null);
     }
 
     /** FreeSWITCH 运行状态 */
@@ -348,7 +352,7 @@ public class EslService {
 
     /** 刷新 XML 缓存（常与 mod_xml_curl 配合） */
     public Map<String, Object> xmlFlushCache() {
-        return api("fsctl", "xml_flush_cache");
+        return api(CallConstants.ESL_COMMAND_XML_FLUSH_CACHE, null);
     }
 
     // ===================== Sofia 相关 =====================

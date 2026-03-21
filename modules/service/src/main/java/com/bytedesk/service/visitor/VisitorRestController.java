@@ -54,6 +54,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(VisitorRequest request) {
 
@@ -68,6 +69,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(VisitorRequest visitorRequest) {
         //
@@ -82,6 +84,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(VisitorRequest request) {
         
@@ -110,8 +113,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_CREATE)
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(VisitorRequest request) {
+    public ResponseEntity<?> create(@RequestBody VisitorRequest request) {
         
         VisitorResponse visitorResponse = visitorRestService.create(request);
         //
@@ -124,6 +128,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE)
+    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody VisitorRequest visitorRequest) {
 
@@ -151,6 +156,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @Operation(summary = "删除访客", description = "删除指定的访客")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_DELETE)
+    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody VisitorRequest visitorRequest) {
 

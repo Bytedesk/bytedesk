@@ -37,6 +37,8 @@ public class RoomResponse extends BaseResponse {
 
     private String description;
 
+    private String inviteUid;
+
     private String type;
 
     private String color;

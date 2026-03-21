@@ -60,11 +60,13 @@ public class ConvertUtils {
             response.getCustom().setEnabled(bytedeskProperties.getCustom().getEnabled());
             response.getCustom().setName(bytedeskProperties.getCustom().getName());
             response.getCustom().setLogo(bytedeskProperties.getCustom().getLogo());
+            response.getCustom().setFavicon(bytedeskProperties.getCustom().getFavicon());
             response.getCustom().setDescription(bytedeskProperties.getCustom().getDescription());
             response.getCustom().setPrivacyPolicyUrl(bytedeskProperties.getCustom().getPrivacyPolicyUrl());
             response.getCustom().setTermsOfServiceUrl(bytedeskProperties.getCustom().getTermsOfServiceUrl());
             // 
             response.getCustom().setAllowRegister(bytedeskProperties.getCustom().getAllowRegister());
+            response.getCustom().setAutoRegisterOnLogin(bytedeskProperties.getCustom().getAutoRegisterOnLogin());
             response.getCustom().setForceValidateMobile(bytedeskProperties.getCustom().getForceValidateMobile());
             response.getCustom().setForceValidateEmail(bytedeskProperties.getCustom().getForceValidateEmail());
         }

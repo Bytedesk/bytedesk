@@ -67,6 +67,8 @@ public class MemberRequest extends BaseRequest {
     @Email(message = "email format error")
     private String email;
 
+    private String country;
+
     private String jobNo;
 
     private String jobTitle; // 职位

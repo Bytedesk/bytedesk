@@ -272,6 +272,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             entity.setTagList(request.getTagList());
             entity.setType(request.getType());
             entity.setEnabled(request.getEnabled());
+            entity.setRouteToRobot(request.getRouteToRobot());
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
             entity.setCategoryUid(request.getCategoryUid());

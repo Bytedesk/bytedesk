@@ -16,6 +16,9 @@ package com.bytedesk.service.queue_member;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +51,7 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(QueueMemberRequest request) {
         
@@ -62,6 +66,7 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(QueueMemberRequest request) {
         
@@ -76,6 +81,7 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(QueueMemberRequest request) {
         QueueMemberResponse response = queueMemberRestService.queryByUid(request);
@@ -89,8 +95,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(QueueMemberRequest request) {
+    public ResponseEntity<?> create(@RequestBody QueueMemberRequest request) {
         
         QueueMemberResponse response = queueMemberRestService.create(request);
 
@@ -103,8 +110,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(QueueMemberRequest request) {
+    public ResponseEntity<?> update(@RequestBody QueueMemberRequest request) {
         
         QueueMemberResponse response = queueMemberRestService.update(request);
 
@@ -115,8 +123,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @ActionAnnotation(title = "队列成员管理", action = "删除队列成员", description = "delete queue member")
     @Operation(summary = "删除队列成员", description = "删除指定的队列成员")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(QueueMemberRequest request) {
+    public ResponseEntity<?> delete(@RequestBody QueueMemberRequest request) {
         
         queueMemberRestService.delete(request);
 
@@ -127,6 +136,7 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     @ActionAnnotation(title = "队列成员管理", action = "导出队列成员", description = "export queue member")
     @Operation(summary = "导出队列成员", description = "导出队列成员数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
+    @GetMapping("/export")
     @Override
     public Object export(QueueMemberRequest request, HttpServletResponse response) {
         return exportTemplate(

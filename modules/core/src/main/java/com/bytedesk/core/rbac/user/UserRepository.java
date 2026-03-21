@@ -51,15 +51,34 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
 
     Optional<UserEntity> findByMobileAndPlatformAndDeletedFalse(String mobile, String platform);
 
+        @Query("select u from UserEntity u where u.mobile = :mobile and u.platform = :platform and u.deleted = false and (u.country = :country or (:country = '86' and (u.country is null or u.country = '')))")
+        Optional<UserEntity> findByMobileAndCountryAndPlatformAndDeletedFalse(
+            @Param("mobile") String mobile,
+            @Param("country") String country,
+            @Param("platform") String platform);
+
     Optional<UserEntity> findByUsernameAndPlatformAndDeletedFalse(String username, String platform);
 
     Boolean existsByUsernameAndPlatformAndDeletedFalse(String username, String platform);
 
     Boolean existsByMobileAndPlatformAndDeletedFalse(String mobile, String platform);
 
+        @Query("select case when count(u) > 0 then true else false end from UserEntity u where u.mobile = :mobile and u.platform = :platform and u.deleted = false and (u.country = :country or (:country = '86' and (u.country is null or u.country = '')))")
+        Boolean existsByMobileAndCountryAndPlatformAndDeletedFalse(
+            @Param("mobile") String mobile,
+            @Param("country") String country,
+            @Param("platform") String platform);
+
     Boolean existsByEmailAndPlatformAndDeletedFalse(String email, String platform);
 
     Boolean existsByUsernameAndMobileAndPlatformAndDeletedFalse(String username, String mobile, String platform);
+
+        @Query("select case when count(u) > 0 then true else false end from UserEntity u where u.username = :username and u.mobile = :mobile and u.platform = :platform and u.deleted = false and (u.country = :country or (:country = '86' and (u.country is null or u.country = '')))")
+        Boolean existsByUsernameAndMobileAndCountryAndPlatformAndDeletedFalse(
+            @Param("username") String username,
+            @Param("mobile") String mobile,
+            @Param("country") String country,
+            @Param("platform") String platform);
 
     Boolean existsBySuperUserAndDeletedFalse(Boolean superUser);
 

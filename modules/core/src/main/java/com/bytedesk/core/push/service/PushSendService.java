@@ -102,7 +102,7 @@ public class PushSendService {
     }
 
     private String generateCode(String receiver) {
-        if (bytedeskProperties.isInWhitelist(receiver) || bytedeskProperties.isSuperUser(receiver)) {
+        if (bytedeskProperties.isInWhitelist(receiver) || bytedeskProperties.isAdminIdentifier(receiver)) {
             return bytedeskProperties.getValidateCode();
         }
         return Utils.getRandomCode();

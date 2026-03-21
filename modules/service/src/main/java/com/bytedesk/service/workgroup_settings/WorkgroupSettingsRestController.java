@@ -2,6 +2,9 @@ package com.bytedesk.service.workgroup_settings;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,15 +32,30 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
     @Operation(summary = "查询组织下的工作组配置", description = "根据组织ID查询工作组配置列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @GetMapping("/query/org")
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_READ)
     @Override
     public ResponseEntity<?> queryByOrg(WorkgroupSettingsRequest request) {
         Page<WorkgroupSettingsResponse> page = workgroupSettingsRestService.queryByOrg(request);
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询用户下的工作组配置", description = "根据用户ID查询工作组配置列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_READ)
+    @Override
+    public ResponseEntity<?> queryByUser(WorkgroupSettingsRequest request) {
+        Page<WorkgroupSettingsResponse> page = workgroupSettingsRestService.queryByUser(request);
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
     @Operation(summary = "根据UID查询工作组配置", description = "根据UID查询工作组配置详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @GetMapping("/query/uid")
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_READ)
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupSettingsRequest request) {
         WorkgroupSettingsResponse resp = workgroupSettingsRestService.queryByUid(request);
@@ -47,6 +65,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
     @Operation(summary = "创建工作组配置", description = "创建新的工作组配置")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @PostMapping("/create")
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_CREATE)
     @Override
     public ResponseEntity<?> create(@RequestBody WorkgroupSettingsRequest request) {
         WorkgroupSettingsResponse resp = workgroupSettingsRestService.create(request);
@@ -59,6 +79,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
     @Operation(summary = "更新工作组配置", description = "更新工作组配置信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @PostMapping("/update")
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
     @Override
     public ResponseEntity<?> update(@RequestBody WorkgroupSettingsRequest request) {
         WorkgroupSettingsResponse resp = workgroupSettingsRestService.update(request);
@@ -67,6 +89,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
 
     @Operation(summary = "删除工作组配置", description = "删除指定的工作组配置")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_DELETE)
     @Override
     public ResponseEntity<?> delete(@RequestBody WorkgroupSettingsRequest request) {
         workgroupSettingsRestService.deleteByUid(request.getUid());
@@ -76,6 +100,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
     @Operation(summary = "启用工作组配置", description = "启用指定的工作组配置")
     @ApiResponse(responseCode = "200", description = "启用成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
     @RequestMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody WorkgroupSettingsRequest request) {
         WorkgroupSettingsResponse resp = workgroupSettingsRestService.enable(request.getUid());
@@ -85,6 +110,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
     @Operation(summary = "停用工作组配置", description = "停用指定的工作组配置")
     @ApiResponse(responseCode = "200", description = "停用成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
     @RequestMapping("/disable")
     public ResponseEntity<?> disable(@RequestBody WorkgroupSettingsRequest request) {
         WorkgroupSettingsResponse resp = workgroupSettingsRestService.disable(request.getUid());
@@ -94,6 +120,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
     @Operation(summary = "发布工作组配置", description = "将草稿版本发布为线上版本")
     @ApiResponse(responseCode = "200", description = "发布成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
+    @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
     @RequestMapping("/publish")
     public ResponseEntity<?> publish(@RequestBody WorkgroupSettingsRequest request) {
         WorkgroupSettingsResponse resp = workgroupSettingsRestService.publish(request.getUid());

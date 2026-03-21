@@ -87,7 +87,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
      * 减少子类重复代码
      * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
-    @GetMapping("/query")
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(T request) {
         try {
             S service = getService();

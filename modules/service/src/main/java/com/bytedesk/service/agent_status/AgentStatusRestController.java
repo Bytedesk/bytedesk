@@ -15,6 +15,10 @@ package com.bytedesk.service.agent_status;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +40,8 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
 
     @Override
     @Operation(summary = "根据组织查询客服状态")
+    @GetMapping("/query/org")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByOrg(AgentStatusRequest request) {
         
         Page<AgentStatusResponse> page = agentStatusService.queryByOrg(request);
@@ -45,6 +51,8 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
 
     @Override
     @Operation(summary = "根据用户查询客服状态")
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByUser(AgentStatusRequest request) {
         
         Page<AgentStatusResponse> page = agentStatusService.queryByUser(request);
@@ -54,6 +62,8 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
 
     @Override
     @Operation(summary = "根据UID查询客服状态")
+    @GetMapping("/query/uid")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByUid(AgentStatusRequest request) {
         
         AgentStatusResponse response = agentStatusService.queryByUid(request);
@@ -63,7 +73,9 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
 
     @Override
     @Operation(summary = "创建客服状态")
-    public ResponseEntity<?> create(AgentStatusRequest request) {
+    @PostMapping("/create")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_CREATE)
+    public ResponseEntity<?> create(@RequestBody AgentStatusRequest request) {
         
         AgentStatusResponse response = agentStatusService.create(request);
 
@@ -72,7 +84,9 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
 
     @Override
     @Operation(summary = "更新客服状态")
-    public ResponseEntity<?> update(AgentStatusRequest request) {
+    @PostMapping("/update")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_UPDATE)
+    public ResponseEntity<?> update(@RequestBody AgentStatusRequest request) {
         
         AgentStatusResponse response = agentStatusService.update(request);
 
@@ -81,7 +95,9 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
 
     @Override
     @Operation(summary = "删除客服状态")
-    public ResponseEntity<?> delete(AgentStatusRequest request) {
+    @PostMapping("/delete")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_DELETE)
+    public ResponseEntity<?> delete(@RequestBody AgentStatusRequest request) {
         
         agentStatusService.delete(request);
 
@@ -89,6 +105,8 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @GetMapping("/export")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_EXPORT)
     public Object export(AgentStatusRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");

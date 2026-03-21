@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +40,8 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @ActionAnnotation(title = "标签", action = "查询组织", description = "query tag by org")
+    @GetMapping("/query/org")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
     public ResponseEntity<?> queryByOrg(AgentStatusSettingRequest request) {
         
@@ -47,6 +51,8 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
     }
 
     @ActionAnnotation(title = "标签", action = "查询用户", description = "query tag by user")
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
     public ResponseEntity<?> queryByUser(AgentStatusSettingRequest request) {
         
@@ -56,6 +62,8 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
     }
 
     @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @GetMapping("/query/uid")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
     public ResponseEntity<?> queryByUid(AgentStatusSettingRequest request) {
         
@@ -66,8 +74,9 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
 
     @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
     @Override
-    @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(AgentStatusSettingRequest request) {
+    @PostMapping("/create")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_CREATE)
+    public ResponseEntity<?> create(@RequestBody AgentStatusSettingRequest request) {
         
         AgentStatusSettingResponse tag = tagService.create(request);
 
@@ -76,8 +85,9 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
 
     @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
     @Override
-    @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(AgentStatusSettingRequest request) {
+    @PostMapping("/update")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_UPDATE)
+    public ResponseEntity<?> update(@RequestBody AgentStatusSettingRequest request) {
         
         AgentStatusSettingResponse tag = tagService.update(request);
 
@@ -86,8 +96,9 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
 
     @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
     @Override
-    @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(AgentStatusSettingRequest request) {
+    @PostMapping("/delete")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_DELETE)
+    public ResponseEntity<?> delete(@RequestBody AgentStatusSettingRequest request) {
         
         tagService.delete(request);
 
@@ -96,7 +107,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
 
     @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
     @Override
-    @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_EXPORT)
     @GetMapping("/export")
     public Object export(AgentStatusSettingRequest request, HttpServletResponse response) {
         return exportTemplate(

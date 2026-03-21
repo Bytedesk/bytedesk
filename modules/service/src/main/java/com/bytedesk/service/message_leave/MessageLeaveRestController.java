@@ -44,6 +44,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     @ActionAnnotation(title = "留言管理", action = "查询组织留言", description = "queryByOrg leave message")
     @Override
     @Operation(summary = "查询留言消息")
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(MessageLeaveRequest request) {
 
         Page<MessageLeaveResponse> page = messageLeaveRestService.queryByOrg(request);
@@ -55,6 +56,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     @ActionAnnotation(title = "留言管理", action = "查询用户留言", description = "queryByUser leave message")
     @Override
     @Operation(summary = "查询用户留言消息")
+    @GetMapping({ "/query", "/query/user" })
     public ResponseEntity<?> queryByUser(MessageLeaveRequest request) {
         
         Page<MessageLeaveResponse> page = messageLeaveRestService.queryByUser(request);
@@ -66,6 +68,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     @ActionAnnotation(title = "留言管理", action = "查询留言详情", description = "queryByUid leave message")
     @Override
     @Operation(summary = "查询留言消息详情")
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.queryByUid(request);
@@ -99,6 +102,7 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     @ActionAnnotation(title = "留言管理", action = "创建留言", description = "create leave message")
     @Override
     @Operation(summary = "创建留言消息")
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveRestService.create(request);
@@ -110,7 +114,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     @ActionAnnotation(title = "留言管理", action = "更新留言", description = "update leave message")
     @Override
     @Operation(summary = "更新留言消息")
-    public ResponseEntity<?> update(MessageLeaveRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveRestService.update(request);
 
@@ -187,7 +192,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     @ActionAnnotation(title = "留言管理", action = "删除留言", description = "delete leave message")
     @Override
     @Operation(summary = "删除留言消息")
-    public ResponseEntity<?> delete(MessageLeaveRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody MessageLeaveRequest request) {
         
         messageLeaveRestService.delete(request);
 

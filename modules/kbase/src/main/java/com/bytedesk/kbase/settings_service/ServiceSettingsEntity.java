@@ -226,7 +226,7 @@ public class ServiceSettingsEntity extends BaseEntity {
     @Builder.Default
     private Integer inputPreviewShowSeconds = 5;
     
-    // 常见问题
+    // 右侧栏常见问题
     @Builder.Default
     private Boolean showFaqs = false;
     @Builder.Default

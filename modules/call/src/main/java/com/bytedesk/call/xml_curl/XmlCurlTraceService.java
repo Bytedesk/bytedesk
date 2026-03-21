@@ -1,5 +1,6 @@
 package com.bytedesk.call.xml_curl;
 
+import com.bytedesk.call.config.CallConstants;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -86,7 +87,7 @@ public class XmlCurlTraceService {
 
     private static String resolveCategory(String section, Map<String, String> params) {
         String sectionValue = normalizeLower(section);
-        if ("directory".equals(sectionValue)) {
+        if (CallConstants.DIRECTORY_NAME.equals(sectionValue)) {
             boolean registerLookup = hasAny(params,
                     "action", "sip_auth_method", "sip_auth_username", "key", "purpose", "event_name");
             return registerLookup ? "load_registered_extension" : "load_extension";

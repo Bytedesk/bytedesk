@@ -51,6 +51,7 @@ import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.utils.CountryCodeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +62,11 @@ import org.modelmapper.ModelMapper;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private static final Set<String> RESTRICTED_ROLE_UIDS = Set.of(
+            BytedeskConsts.DEFAULT_ROLE_USER_UID,
+            BytedeskConsts.DEFAULT_ROLE_ADMIN_UID,
+            BytedeskConsts.DEFAULT_ROLE_SUPER_UID);
 
     private final UserRepository userRepository;
 
@@ -88,7 +94,7 @@ public class UserService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "user:exists", key = "#request.username + '-' + #request.platform", condition = "#request.username != null"),
-            @CacheEvict(value = "user:exists", key = "#request.mobile + '-' + #request.platform", condition = "#request.mobile != null"),
+            @CacheEvict(value = "user:exists", key = "#request.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#request.country)) + '-' + #request.platform", condition = "#request.mobile != null"),
             @CacheEvict(value = "user:exists", key = "#request.email + '-' + #request.platform", condition = "#request.email != null"),
     })
     public UserResponse register(UserRequest request) {
@@ -105,6 +111,9 @@ public class UserService {
             throw new RuntimeException("email or mobile is required..!!");
         }
 
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
+
         // 保护超级管理员账号：仅在超级管理员已存在时进行验证
         // 首次安装时，超级管理员尚未创建，应跳过此验证
         if (existsBySuperUser()) {
@@ -117,7 +126,7 @@ public class UserService {
         }
 
         if (StringUtils.hasText(request.getMobile())
-                && existsByMobileAndPlatform(request.getMobile(), platform)) {
+                && existsByMobileAndPlatform(request.getMobile(), normalizedCountry, platform)) {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         //
@@ -240,13 +249,26 @@ public class UserService {
 
             if (StringUtils.hasText(request.getMobile())) {
                 // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
-                if (!request.getMobile().equals(user.getMobile())) {
+                String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+                boolean mobileChanged = !request.getMobile().equals(user.getMobile());
+                boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
+                if (mobileChanged || countryChanged) {
                     if (existsByMobileAndPlatform(request.getMobile(),
+                            normalizedCountry,
                             request.getPlatform())) {
                         throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
                     }
                 }
                 user.setMobile(request.getMobile());
+                user.setCountry(normalizedCountry);
+            } else if (StringUtils.hasText(request.getCountry()) && StringUtils.hasText(user.getMobile())) {
+                String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+                boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
+                if (countryChanged
+                        && existsByMobileAndPlatform(user.getMobile(), normalizedCountry, request.getPlatform())) {
+                    throw new MobileExistsException("Mobile " + user.getMobile() + " already exists..!!");
+                }
+                user.setCountry(normalizedCountry);
             }
 
             if (StringUtils.hasText(request.getDescription())) {
@@ -349,12 +371,16 @@ public class UserService {
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
+            String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
             if (StringUtils.hasText(request.getMobile())) {
                 // 保护超级管理员账号：禁止将手机号改为与超管相同（除非本人就是超管）
                 validateNotUsingSuperCredentials(null, request.getMobile(), user.getUid());
                 // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
-                if (!request.getMobile().equals(user.getMobile())) {
+                boolean mobileChanged = !request.getMobile().equals(user.getMobile());
+                boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
+                if (mobileChanged || countryChanged) {
                     if (existsByMobileAndPlatform(request.getMobile(),
+                            normalizedCountry,
                             request.getPlatform())) {
                         throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
                     }
@@ -363,6 +389,7 @@ public class UserService {
             } else {
                 throw new RuntimeException("Mobile is required..!!");
             }
+            user.setCountry(normalizedCountry);
             user.setMobileVerified(true);
             user = save(user);
 
@@ -374,6 +401,8 @@ public class UserService {
 
     @Transactional
     public UserEntity createUserFromMember(UserRequest request) {
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
         //
         // 保护超级管理员账号：仅在超级管理员已存在时进行验证
         // 首次安装时，超级管理员尚未创建，应跳过此验证
@@ -382,8 +411,8 @@ public class UserService {
         }
 
         if (StringUtils.hasText(request.getMobile())
-                && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
-            Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), request.getPlatform());
+                && existsByMobileAndPlatform(request.getMobile(), normalizedCountry, request.getPlatform())) {
+            Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), normalizedCountry, request.getPlatform());
             return userOptional.get();
         }
 
@@ -398,6 +427,7 @@ public class UserService {
                 .avatar(request.getAvatar())
                 .nickname(request.getNickname())
                 .mobile(request.getMobile())
+                .country(normalizedCountry)
                 .num(request.getMobile())
                 .email(request.getEmail())
                 .superUser(false)
@@ -590,6 +620,12 @@ public class UserService {
     }
 
     public UserEntity updateUserFromMember(UserEntity user, MemberRequest request) {
+        if (user == null) {
+            return null;
+        }
+        if (StringUtils.hasText(request.getCountry())) {
+            user.setCountry(CountryCodeUtils.normalize(request.getCountry()));
+        }
         return updateUserRoles(user, request.getRoleUids());
     }
 
@@ -642,6 +678,12 @@ public class UserService {
         // All users must have ROLE_USER (df_role_user_uid)
         normalizedRoleUids.add(BytedeskConsts.DEFAULT_ROLE_USER_UID);
 
+        Set<String> existingRestrictedRoleUids = extractRestrictedRoleUids(managedUser.getRoleUids());
+        Set<String> requestedRestrictedRoleUids = extractRestrictedRoleUids(normalizedRoleUids);
+        if (!existingRestrictedRoleUids.equals(requestedRestrictedRoleUids)) {
+            throw new RuntimeException("暂不支持在此处添加或删除普通用户、组织管理员或超级管理员角色");
+        }
+
         // 首先判断是否有变化，如果无变化则不更新
         if (managedUser.getRoleUids() != null && managedUser.getRoleUids().equals(normalizedRoleUids)) {
             return managedUser;
@@ -674,6 +716,19 @@ public class UserService {
 
         // managedUser is tracked by JPA; changes will flush on transaction commit
         return managedUser;
+    }
+
+    private Set<String> extractRestrictedRoleUids(Set<String> roleUids) {
+        Set<String> restrictedRoleUids = new LinkedHashSet<>();
+        if (roleUids == null) {
+            return restrictedRoleUids;
+        }
+        for (String roleUid : roleUids) {
+            if (RESTRICTED_ROLE_UIDS.contains(roleUid)) {
+                restrictedRoleUids.add(roleUid);
+            }
+        }
+        return restrictedRoleUids;
     }
 
     public UserEntity addRoleAgent(UserEntity user) {
@@ -816,9 +871,16 @@ public class UserService {
         return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
-    @Cacheable(value = "user", key = "#mobile + '-' + #platform", unless = "#result == null")
+    @Cacheable(value = "user", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
+    public Optional<UserEntity> findByMobileAndPlatform(String mobile, String country, String platform) {
+        return userRepository.findByMobileAndCountryAndPlatformAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                platform);
+    }
+
     public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
-        return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
+        return findByMobileAndPlatform(mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
     @Cacheable(value = "user", key = "#username + '-' + #platform", unless = "#result == null")
@@ -841,9 +903,16 @@ public class UserService {
         return userRepository.existsByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
-    @Cacheable(value = "user:exists", key = "#mobile + '-' + #platform", unless = "#result == null")
+    @Cacheable(value = "user:exists", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
+    public Boolean existsByMobileAndPlatform(@NonNull String mobile, String country, @NonNull String platform) {
+        return userRepository.existsByMobileAndCountryAndPlatformAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                platform);
+    }
+
     public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull String platform) {
-        return userRepository.existsByMobileAndPlatformAndDeletedFalse(mobile, platform);
+        return existsByMobileAndPlatform(mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#email + '-' + #platform", unless = "#result == null")
@@ -852,10 +921,20 @@ public class UserService {
     }
 
     // exists by username and mobile
-    @Cacheable(value = "user:exists", key = "#username + '-' + #mobile + '-' + #platform", unless = "#result == null")
+    @Cacheable(value = "user:exists", key = "#username + '-' + #mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
+    public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile,
+            String country,
+            @NonNull String platform) {
+        return userRepository.existsByUsernameAndMobileAndCountryAndPlatformAndDeletedFalse(
+                username,
+                mobile,
+                CountryCodeUtils.normalize(country),
+                platform);
+    }
+
     public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile,
             @NonNull String platform) {
-        return userRepository.existsByUsernameAndMobileAndPlatformAndDeletedFalse(username, mobile, platform);
+        return existsByUsernameAndMobileAndPlatform(username, mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
     public Boolean existsBySuperUser() {
@@ -865,15 +944,18 @@ public class UserService {
     @Transactional
     @Caching(put = {
             @CachePut(value = "user", key = "#user.username + '-' + #user.platform", unless = "#user.username == null"),
-            @CachePut(value = "user", key = "#user.mobile + '-' + #user.platform", unless = "#user.mobile == null"),
+            @CachePut(value = "user", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform", unless = "#user.mobile == null"),
             @CachePut(value = "user", key = "#user.email + '-' + #user.platform", unless = "#user.email == null"),
             @CachePut(value = "user", key = "#user.uid", unless = "#user.uid == null"),
     }, evict = {
             @CacheEvict(value = "user:exists", key = "#user.username + '-' + #user.platform", condition = "#user.username != null"),
-            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + #user.platform", condition = "#user.mobile != null"),
+            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform", condition = "#user.mobile != null"),
             @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform", condition = "#user.email != null"),
     })
     public UserEntity save(@NonNull UserEntity user) {
+        if (StringUtils.hasText(user.getMobile())) {
+            user.setCountry(CountryCodeUtils.normalize(user.getCountry()));
+        }
         try {
             return userRepository.save(user);
         } catch (ObjectOptimisticLockingFailureException optimisticLockingFailureException) {
@@ -887,11 +969,11 @@ public class UserService {
 
     @Caching(evict = {
             @CacheEvict(value = "user", key = "#user.username + '-' + #user.platform"),
-            @CacheEvict(value = "user", key = "#user.mobile + '-' + #user.platform"),
+            @CacheEvict(value = "user", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform"),
             @CacheEvict(value = "user", key = "#user.email + '-' + #user.platform"),
             @CacheEvict(value = "user", key = "#user.uid"),
             @CacheEvict(value = "user:exists", key = "#user.username + '-' + #user.platform"),
-            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + #user.platform"),
+            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform"),
             @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform"),
     })
     public void delete(@NonNull UserEntity user) {

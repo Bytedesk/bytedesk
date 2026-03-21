@@ -300,6 +300,9 @@ public class CallEventListener implements IEslEventListener {
         var headers = eslEvent.getEventHeaders();
         String cmd = headers.get("API-Command");
         String arg = headers.get("API-Command-Argument");
+        String uuid = headers.get("Unique-ID");
+        String eventSequence = headers.get("Event-Sequence");
+        String source = headers.get("Event-Calling-Function");
 
         // status 是高频轮询命令，默认降到 DEBUG。
         if ("status".equalsIgnoreCase(cmd)) {
@@ -307,7 +310,8 @@ public class CallEventListener implements IEslEventListener {
             return;
         }
 
-        log.info("API事件: command={} arg={} headers={}", cmd, arg, headers);
+        log.info("API事件: command={} arg={} uuid={} seq={} source={}", cmd, arg, uuid, eventSequence, source);
+        log.debug("API事件详情: headers={}", headers);
     }
 
     /**

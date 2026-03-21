@@ -81,5 +81,12 @@
     <include file="db/changelog/migration/260310_add_shop_capacity_and_relations.xml" />
     <include file="db/changelog/migration/260310_add_shop_profile_and_billing_fields.xml" />
     <include file="db/changelog/migration/260312_add_call_esl_event_columns.xml" />
+    <include file="db/changelog/migration/260316_alter_call_esl_event_payload_columns_to_text.xml" />
+    <include file="db/changelog/migration/260316_reconcile_call_esl_event_payload_columns_to_text.xml" />
+    <include file="db/changelog/migration/260316_add_meet_room_invite_uid.xml" />
+    <include file="db/changelog/migration/260317_add_callcenter_fields_to_settings.xml" />
+    <include file="db/changelog/migration/260318_add_faq_route_to_robot.xml" />
+    <include file="db/changelog/migration/260319_add_member_country.xml" />
+    <include file="db/changelog/migration/260320_add_shop_edition_and_agent_seat_expiry.xml" />
 
 </databaseChangeLog>

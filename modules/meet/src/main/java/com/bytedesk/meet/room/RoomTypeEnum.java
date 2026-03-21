@@ -14,8 +14,22 @@
 package com.bytedesk.meet.room;
 
 public enum RoomTypeEnum {
-    THREAD,
-    VISITOR,
-    CUSTOMER,
-    TICKET
+    MEETING,
+    INSTANT,
+    SCHEDULED,
+    SCREEN_SHARE;
+
+    public static RoomTypeEnum fromValue(String value) {
+        if (value == null || value.isBlank()) {
+            return MEETING;
+        }
+
+        for (RoomTypeEnum type : values()) {
+            if (type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+
+        return MEETING;
+    }
 }

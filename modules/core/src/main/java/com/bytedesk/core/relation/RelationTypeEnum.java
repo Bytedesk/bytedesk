@@ -19,6 +19,7 @@ package com.bytedesk.core.relation;
  */
 public enum RelationTypeEnum {
     // 基础关系类型
+    ROOM,       // 会议房间访问关系
     THREAD,     // 会话关系
     CUSTOMER,   // 客户关系
     TICKET,     // 工单关系
@@ -74,6 +75,8 @@ public enum RelationTypeEnum {
      */
     public String getChineseName() {
         switch (this) {
+            case ROOM:
+                return "房间关系";
             case THREAD:
                 return "会话关系";
             case CUSTOMER:

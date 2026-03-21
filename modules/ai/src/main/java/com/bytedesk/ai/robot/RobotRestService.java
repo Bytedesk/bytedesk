@@ -36,6 +36,8 @@ import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
+import com.bytedesk.call.call_settings.CallSettingsEntity;
+import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.category.CategoryEntity;
@@ -177,6 +179,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                     request.getOrgUid(), ex.getMessage());
             robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
+        applyCallSettings(robot, request.getCallSettings());
 
         // LLM 配置
         // 设置llm相关属性
@@ -279,6 +282,9 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         if (request.getLlm() != null) {
             robot.setLlm(request.getLlm());
         }
+        if (request.getCallSettings() != null) {
+            applyCallSettings(robot, request.getCallSettings());
+        }
 
         //
         RobotEntity updateRobot = save(robot);
@@ -287,6 +293,26 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
 
         return convertToResponse(updateRobot);
+    }
+
+    private void applyCallSettings(RobotEntity robot, CallSettingsRequest request) {
+        if (request == null) {
+            return;
+        }
+        CallSettingsEntity settings = robot.getCallSettings();
+        if (settings == null) {
+            settings = CallSettingsEntity.fromRequest(request, modelMapper);
+            settings.setUid(uidUtils.getUid());
+            settings.setOrgUid(robot.getOrgUid());
+            robot.setCallSettings(settings);
+            return;
+        }
+        String originalUid = settings.getUid();
+        Long originalId = settings.getId();
+        modelMapper.map(request, settings);
+        settings.setUid(originalUid);
+        settings.setId(originalId);
+        settings.setOrgUid(robot.getOrgUid());
     }
 
     @Transactional

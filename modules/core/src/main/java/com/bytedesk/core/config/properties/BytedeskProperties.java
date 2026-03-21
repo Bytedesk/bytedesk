@@ -250,6 +250,7 @@ public class BytedeskProperties {
         private Boolean enabled = false;
         private String name;
         private String logo;
+        private String favicon;
         private String description;
         /**
          * 外网可访问的上传 API 地址（完整URL，不带上传路径），用于反向代理/多节点场景。
@@ -284,6 +285,8 @@ public class BytedeskProperties {
         private String lang = "zh-CN";
         // 
         private Boolean allowRegister = false;
+        // 手机/邮箱验证码登录时，未注册用户是否允许自动创建账号
+        private Boolean autoRegisterOnLogin = true;
         private Boolean forceValidateMobile = false;
         private Boolean forceValidateEmail = false;
         private Boolean forceVisitorAuth = false; // 是否强制访客认证，默认false
@@ -633,11 +636,11 @@ public class BytedeskProperties {
                Boolean.TRUE.equals(testing.getDisableCaptcha());
     }
 
-    public Boolean isSuperUser(@NonNull String user) {
-        if (user == null || user.isEmpty()) {
+    public Boolean isAdminIdentifier(@NonNull String identifier) {
+        if (identifier == null || identifier.isEmpty()) {
             return false;
         }
-        return user.equals(admin.getMobile()) || user.equals(admin.getEmail());
+        return identifier.equals(admin.getMobile()) || identifier.equals(admin.getEmail());
     }
 
     public Boolean isInWhitelist(@NonNull String user) {

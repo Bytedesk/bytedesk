@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EslEventIngestService {
 
+    private static final int DATABASE_SAFE_PAYLOAD_LENGTH = 255;
+
     private final EslEventRepository eslEventRepository;
     private final UidUtils uidUtils;
     private final ObjectMapper objectMapper;
@@ -64,7 +66,7 @@ public class EslEventIngestService {
                             "Event-Name"))
                     .build();
 
-            eslEventRepository.save(entity);
+            saveEntity(entity);
         } catch (Exception e) {
             log.warn("写入EslEventEntity失败: {}", e.getMessage());
         }
@@ -117,6 +119,40 @@ public class EslEventIngestService {
         }
         int maxLen = Math.max(256, ingestProperties.getMaxPayloadLength());
         return value.length() <= maxLen ? value : value.substring(0, maxLen);
+    }
+
+    private void saveEntity(EslEventEntity entity) {
+        try {
+            eslEventRepository.save(entity);
+        } catch (Exception ex) {
+            if (!isPayloadTooLong(ex)) {
+                throw ex;
+            }
+
+            entity.setHeadersJson(truncateForCurrentSchema(entity.getHeadersJson()));
+            entity.setBodyJson(truncateForCurrentSchema(entity.getBodyJson()));
+            log.warn("ESL事件载荷超过当前数据库列宽，截断到 {} 字符后重试保存", DATABASE_SAFE_PAYLOAD_LENGTH);
+            eslEventRepository.save(entity);
+        }
+    }
+
+    private boolean isPayloadTooLong(Exception ex) {
+        Throwable current = ex;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null && message.contains("Data too long for column")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private String truncateForCurrentSchema(String value) {
+        if (value == null || value.length() <= DATABASE_SAFE_PAYLOAD_LENGTH) {
+            return value;
+        }
+        return value.substring(0, DATABASE_SAFE_PAYLOAD_LENGTH);
     }
 
     private String buildName(String eventName, String eventSubclass) {

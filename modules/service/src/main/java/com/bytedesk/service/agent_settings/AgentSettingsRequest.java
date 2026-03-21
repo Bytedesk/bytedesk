@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.agent_settings;
 
+import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsRequest;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingRequest;
@@ -63,6 +64,8 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
      * Whether agent can manually close thread/session
      */
     private Boolean allowAgentCloseThread;
+
+    private CallSettingsRequest callSettings;
 
     /**
      * Message leave settings (Agent-specific)

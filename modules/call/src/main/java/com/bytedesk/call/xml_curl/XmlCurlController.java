@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.call.config.CallConstants;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -80,7 +82,7 @@ public class XmlCurlController {
             case "dialplan":
                 out = xmlCurlService.handleDialplan(p);
                 break;
-            case "directory":
+            case CallConstants.DIRECTORY_NAME:
                 out = xmlCurlService.handleDirectory(p);
                 break;
             case "configuration":

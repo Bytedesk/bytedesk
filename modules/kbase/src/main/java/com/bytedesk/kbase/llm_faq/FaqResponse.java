@@ -80,6 +80,8 @@ public class FaqResponse extends BaseResponse {
 
     private Boolean enabled;
 
+    private Boolean routeToRobot;
+
     private List<String> tagList;
 
     // 有效开始日期

@@ -76,7 +76,7 @@ public class AuthController {
         }
 
         // validate sms code
-        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCountry(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
@@ -109,7 +109,7 @@ public class AuthController {
         // validate two-factor code if enabled 双重验证
         if (!performanceTestingEnabled && authRequest.getTwoFactorEnabled() != null && authRequest.getTwoFactorEnabled()) {
             log.debug("Two-factor authentication is enabled for user: {}", authRequest.getUsername());
-            if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
+            if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCountry(), authRequest.getCode(), request)) {
                 return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
             }
             // 验证用户名和手机号是否为同一个用户
@@ -117,6 +117,7 @@ public class AuthController {
                 Boolean userMatch = userService.existsByUsernameAndMobileAndPlatform(
                         authRequest.getUsername(),
                         authRequest.getMobile(),
+                    authRequest.getCountry(),
                         authRequest.getPlatform());
                 if (!userMatch) {
                     return ResponseEntity.ok().body(JsonResult.error("用户名和手机号不匹配，请检查后重新输入", -3, false));
@@ -225,13 +226,16 @@ public class AuthController {
         }
 
         // validate mobile & code
-        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
+        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCountry(), authRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
         }
 
         // if mobile already exists, if none, then register
         // 手机号是否已经注册，如果没有，则自动注册
-        if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())) {
+        if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getCountry(), authRequest.getPlatform())) {
+            if (!Boolean.TRUE.equals(bytedeskProperties.getCustom().getAutoRegisterOnLogin())) {
+                return ResponseEntity.ok().body(JsonResult.error("用户未注册，请先通过店铺对接接口创建账号", -3, false));
+            }
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getMobile());
             userRequest.setCountry(authRequest.getCountry());
@@ -246,7 +250,7 @@ public class AuthController {
             userService.register(userRequest);
         } else {
             // 如果用户已存在，检查并更新手机验证状态
-            userService.findByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())
+            userService.findByMobileAndPlatform(authRequest.getMobile(), authRequest.getCountry(), authRequest.getPlatform())
                 .ifPresent(user -> {
                     if (!user.isMobileVerified()) {
                         user.setMobileVerified(true);
@@ -258,6 +262,7 @@ public class AuthController {
 
         Authentication authentication = authService.authenticationWithMobileAndPlatform(
                 authRequest.getMobile(),
+            authRequest.getCountry(),
                 authRequest.getPlatform(),
                 authRequest.getChannel(),
                 authRequest.getDevice());
@@ -303,6 +308,9 @@ public class AuthController {
         // 邮箱是否已经注册，如果没有，则自动注册
         if (!userService.existsByEmailAndPlatform(authRequest.getEmail(),
                 authRequest.getPlatform())) {
+            if (!Boolean.TRUE.equals(bytedeskProperties.getCustom().getAutoRegisterOnLogin())) {
+                return ResponseEntity.ok().body(JsonResult.error("用户未注册，请先通过店铺对接接口创建账号", -2, false));
+            }
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getEmail());
             userRequest.setNum(authRequest.getEmail());

@@ -187,6 +187,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-call</artifactId>
+			<version>${revision}</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
 		<!-- spring ai 官方无法正常统计 token 使用量，使用这个zhipuai 官方库 -->

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,6 +51,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(FormRequest request) {
         
@@ -63,6 +66,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(FormRequest request) {
         
@@ -77,6 +81,7 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(FormRequest request) {
         
@@ -91,8 +96,9 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(FormRequest request) {
+    public ResponseEntity<?> create(@RequestBody FormRequest request) {
         
         FormResponse form = formRestService.create(request);
 
@@ -105,8 +111,9 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(FormRequest request) {
+    public ResponseEntity<?> update(@RequestBody FormRequest request) {
         
         FormResponse form = formRestService.update(request);
 
@@ -117,8 +124,9 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     @ActionAnnotation(title = "表单管理", action = "删除表单", description = "delete form")
     @Operation(summary = "删除表单", description = "删除指定的表单")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(FormRequest request) {
+    public ResponseEntity<?> delete(@RequestBody FormRequest request) {
         
         formRestService.delete(request);
 

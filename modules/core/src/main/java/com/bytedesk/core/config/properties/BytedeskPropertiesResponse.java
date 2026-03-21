@@ -40,6 +40,7 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean enabled;
         private String name;
         private String logo;
+        private String favicon;
         private String description;
         /**
          * 外网可访问的上传 API 地址（完整URL，不带上传路径），用于反向代理/多节点场景。
@@ -71,6 +72,7 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String lang = "zh-CN";
         // 
         private Boolean allowRegister;
+        private Boolean autoRegisterOnLogin;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
         private Boolean forceVisitorAuth; // 是否强制访客认证，默认false

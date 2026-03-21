@@ -55,6 +55,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(WorkgroupRequest request) {
 
@@ -69,6 +70,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(WorkgroupRequest request) {
         
@@ -83,6 +85,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ_OR_TICKET_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
         
@@ -97,6 +100,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_CREATE)
+    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest request) {
 
@@ -111,6 +115,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE)
+    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest request) {
 
@@ -151,6 +156,7 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
     @Operation(summary = "删除工作组", description = "删除指定的工作组")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_DELETE)
+    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest request) {
 

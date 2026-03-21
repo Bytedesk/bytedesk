@@ -13,6 +13,7 @@
  */
 package com.bytedesk.meet.room;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface RoomRepository extends JpaRepository<RoomEntity, Long>, JpaSpecificationExecutor<RoomEntity> {
 
     Optional<RoomEntity> findByUid(String uid);
+
+    Optional<RoomEntity> findByInviteUid(String inviteUid);
+
+    List<RoomEntity> findByUserUidAndDeletedFalse(String userUid);
 
     Boolean existsByUid(String uid);
 

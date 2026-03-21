@@ -63,7 +63,7 @@ import lombok.experimental.SuperBuilder;
 public class RobotSettingsEntity extends BaseSettingsEntity {
 
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Rating down settings
      */

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260316-add-meet-room-invite-uid-column" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_meet_room" />
+                <not>
+                    <columnExists tableName="bytedesk_meet_room" columnName="invite_uid" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_meet_room">
+            <column name="invite_uid" type="varchar(64)" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_meet_room" columnName="invite_uid" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260316-backfill-meet-room-invite-uid" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_meet_room" />
+                <columnExists tableName="bytedesk_meet_room" columnName="invite_uid" />
+                <columnExists tableName="bytedesk_meet_room" columnName="uid" />
+            </and>
+        </preConditions>
+        <update tableName="bytedesk_meet_room">
+            <column name="invite_uid" valueComputed="uid" />
+            <where>invite_uid IS NULL</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="260316-repair-meet-room-invite-uid-backfill" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_meet_room" />
+                <columnExists tableName="bytedesk_meet_room" columnName="invite_uid" />
+                <columnExists tableName="bytedesk_meet_room" columnName="uuid" />
+                <columnExists tableName="bytedesk_meet_room" columnName="id" />
+            </and>
+        </preConditions>
+        <sql>
+            UPDATE bytedesk_meet_room
+            SET invite_uid = CASE
+                WHEN uuid IS NOT NULL AND TRIM(uuid) &lt;&gt; '' THEN uuid
+                ELSE CONCAT('meet-', id)
+            END
+            WHERE invite_uid IS NULL OR TRIM(invite_uid) = '';
+        </sql>
+        <rollback>
+            <sql>
+                UPDATE bytedesk_meet_room
+                SET invite_uid = NULL
+                WHERE invite_uid = uuid OR invite_uid LIKE 'meet-%';
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260316-add-meet-room-invite-uid-not-null" author="copilot">
+        <preConditions onFail="HALT" onError="HALT">
+            <and>
+                <tableExists tableName="bytedesk_meet_room" />
+                <columnExists tableName="bytedesk_meet_room" columnName="invite_uid" />
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM bytedesk_meet_room WHERE invite_uid IS NULL OR TRIM(invite_uid) = ''
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <addNotNullConstraint tableName="bytedesk_meet_room" columnName="invite_uid" columnDataType="varchar(64)" />
+        <rollback>
+            <dropNotNullConstraint tableName="bytedesk_meet_room" columnName="invite_uid" columnDataType="varchar(64)" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260316-add-meet-room-invite-uid-unique" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_meet_room" />
+                <columnExists tableName="bytedesk_meet_room" columnName="invite_uid" />
+                <not>
+                    <uniqueConstraintExists tableName="bytedesk_meet_room" constraintName="uk_meet_room_invite_uid" />
+                </not>
+            </and>
+        </preConditions>
+        <addUniqueConstraint tableName="bytedesk_meet_room" columnNames="invite_uid" constraintName="uk_meet_room_invite_uid" />
+        <rollback>
+            <dropUniqueConstraint tableName="bytedesk_meet_room" constraintName="uk_meet_room_invite_uid" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

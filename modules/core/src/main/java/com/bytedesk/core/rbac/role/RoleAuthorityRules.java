@@ -126,6 +126,12 @@ public final class RoleAuthorityRules {
     public static final String CATEGORY_UPDATE = "CATEGORY_UPDATE";
     public static final String CATEGORY_DELETE = "CATEGORY_DELETE";
 
+    // room (modules/meet)
+    public static final String ROOM_READ = "ROOM_READ";
+    public static final String ROOM_CREATE = "ROOM_CREATE";
+    public static final String ROOM_UPDATE = "ROOM_UPDATE";
+    public static final String ROOM_DELETE = "ROOM_DELETE";
+
     // message_leave (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String MESSAGE_LEAVE_READ = "MESSAGE_LEAVE_READ";
@@ -145,6 +151,9 @@ public final class RoleAuthorityRules {
     // Keep as literals to avoid core -> service module dependency.
     public static final String AGENT_STATUS_READ = "AGENT_STATUS_READ";
     public static final String AGENT_STATUS_CREATE = "AGENT_STATUS_CREATE";
+    // 
+    public static final String AGENT_SETTINGS_READ = "AGENT_SETTINGS_READ";
+    public static final String AGENT_SETTINGS_UPDATE = "AGENT_SETTINGS_UPDATE";
 
     // queue (modules/service)
     // Keep as literals to avoid core -> service module dependency.
@@ -228,7 +237,12 @@ public final class RoleAuthorityRules {
             GROUP_READ,
             GROUP_CREATE,
             GROUP_UPDATE,
-            GROUP_DELETE
+            GROUP_DELETE,
+            // 
+            ROOM_READ,
+            ROOM_CREATE,
+            ROOM_UPDATE,
+            ROOM_DELETE
     );
 
     /**
@@ -244,6 +258,9 @@ public final class RoleAuthorityRules {
             AGENT_UPDATE,
             AGENT_STATUS_READ,
             AGENT_STATUS_CREATE,
+            AGENT_SETTINGS_READ,
+            AGENT_SETTINGS_UPDATE,
+            // 
             QUEUE_READ,
             WORKGROUP_READ,
             ROUTING_POOL_READ,

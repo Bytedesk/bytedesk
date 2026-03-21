@@ -100,6 +100,7 @@ public class MemberEventListener {
             memberRequest.setSeatNo("001");
             memberRequest.setTelephone("001");
             memberRequest.setMobile(user.getMobile());
+            memberRequest.setCountry(user.getCountry());
             memberRequest.setStatus(MemberStatusEnum.ACTIVE.name());
             memberRequest.setRoleUids(roleUids);
             memberRequest.setDeptUid(departmentResponse.getUid());

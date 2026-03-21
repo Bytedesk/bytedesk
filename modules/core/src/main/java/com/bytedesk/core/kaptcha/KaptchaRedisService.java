@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.kaptcha;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -55,9 +56,15 @@ public class KaptchaRedisService {
         if (bytedeskProperties.isDisableCaptcha()) {
             return true;
         }
-        // flutter手机端验证码暂时不做校验
-        if (channel != null && channel.toLowerCase().contains(ChannelEnum.FLUTTER.name().toLowerCase())) {
-            return true;
+        // 移动端及 uniapp 渠道验证码暂时不做校验
+        if (channel != null) {
+            String normalizedChannel = channel.toLowerCase(Locale.ROOT);
+            if (normalizedChannel.contains(ChannelEnum.FLUTTER.name().toLowerCase(Locale.ROOT))
+                    || normalizedChannel.contains(ChannelEnum.IOS.name().toLowerCase(Locale.ROOT))
+                    || normalizedChannel.contains(ChannelEnum.ANDROID.name().toLowerCase(Locale.ROOT))
+                    || normalizedChannel.contains(ChannelEnum.UNIAPP.name().toLowerCase(Locale.ROOT))) {
+                return true;
+            }
         }
         // log.info("checkKaptcha key: " + key + ", value: " + value);
         String cachedValue = stringRedisTemplate.opsForValue().get(RedisConsts.KAPTCHA_PREFIX + key);

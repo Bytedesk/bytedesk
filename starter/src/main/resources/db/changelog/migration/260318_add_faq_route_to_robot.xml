@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260318-01-add-faq-route-to-booking-assistant" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_faq"/>
+            <not>
+                <columnExists tableName="bytedesk_kbase_faq" columnName="route_to_robot"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_kbase_faq">
+            <column name="route_to_robot" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

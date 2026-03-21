@@ -116,8 +116,8 @@ public class AuthService {
         return authentication;
     }
 
-    public AuthToken authenticationWithMobileAndPlatform(String mobile, String platform, String client, String device) {
-        UserDetailsImpl userDetails = userDetailsService.loadUserByMobileAndPlatform(mobile, platform);
+    public AuthToken authenticationWithMobileAndPlatform(String mobile, String country, String platform, String client, String device) {
+        UserDetailsImpl userDetails = userDetailsService.loadUserByMobileAndPlatform(mobile, country, platform);
         userDetails.setChannel(client);
         userDetails.setDevice(device);
         return new AuthToken(userDetails);

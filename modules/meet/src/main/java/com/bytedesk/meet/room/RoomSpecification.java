@@ -14,6 +14,7 @@
 package com.bytedesk.meet.room;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -27,6 +28,31 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RoomSpecification extends BaseSpecification<RoomEntity, RoomRequest> {
+
+    private static void appendRoomFilters(
+            List<Predicate> predicates,
+            jakarta.persistence.criteria.Root<RoomEntity> root,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            RoomRequest request) {
+        if (StringUtils.hasText(request.getName())) {
+            predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+        }
+        if (StringUtils.hasText(request.getDescription())) {
+            predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+        }
+        if (StringUtils.hasText(request.getInviteUid())) {
+            predicates.add(criteriaBuilder.equal(root.get("inviteUid"), request.getInviteUid()));
+        }
+        if (StringUtils.hasText(request.getType())) {
+            predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+        }
+        if (StringUtils.hasText(request.getLevel())) {
+            predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
+        }
+        if (StringUtils.hasText(request.getUserUid())) {
+            predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
+        }
+    }
     
     public static Specification<RoomEntity> search(RoomRequest request, AuthService authService) {
         // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
@@ -35,27 +61,20 @@ public class RoomSpecification extends BaseSpecification<RoomEntity, RoomRequest
             List<Predicate> predicates = new ArrayList<>();
             // 使用带层级过滤的基础条件
             predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, RoomPermissions.MODULE_NAME));
-            // name
-            if (StringUtils.hasText(request.getName())) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
-            }
-            // description
-            if (StringUtils.hasText(request.getDescription())) {
-                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
-            }
-            // type
-            if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
-            }
-            // level - 如果指定了level则精确过滤
-            if (StringUtils.hasText(request.getLevel())) {
-                predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
-            }
-            // 
-            if (StringUtils.hasText(request.getUserUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
-            }
-            //
+            appendRoomFilters(predicates, root, criteriaBuilder, request);
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<RoomEntity> searchVisibleToUser(
+            RoomRequest request,
+            AuthService authService,
+            Collection<String> visibleRoomUids) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
+            appendRoomFilters(predicates, root, criteriaBuilder, request);
+            predicates.add(root.get("uid").in(visibleRoomUids));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

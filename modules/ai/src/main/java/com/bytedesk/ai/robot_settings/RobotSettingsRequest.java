@@ -14,6 +14,7 @@
 package com.bytedesk.ai.robot_settings;
 
 import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsRequest;
+import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsRequest;
 
@@ -33,6 +34,8 @@ import lombok.experimental.SuperBuilder;
 public class RobotSettingsRequest extends BaseSettingsRequest {
 
     private static final long serialVersionUID = 1L;
+
+    private CallSettingsRequest callSettings;
 
     /**
      * Rating down settings (Robot-specific)

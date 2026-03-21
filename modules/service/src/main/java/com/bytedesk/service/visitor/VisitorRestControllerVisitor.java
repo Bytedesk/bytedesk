@@ -96,6 +96,7 @@ public class VisitorRestControllerVisitor {
     private final ExecutorService executorService;
 
     @ApiRateLimiter(value = 1, timeout = 1)
+    @BlackIpFilter(title = "black", action = "init")
     @PostMapping("/init")
     public ResponseEntity<?> init(@RequestBody VisitorRequest request, HttpServletRequest httpRequest) {
         //
@@ -114,6 +115,7 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(visitor));
     }
 
+    @BlackIpFilter(title = "black", action = "thread")
     @PostMapping("/thread")
     public ResponseEntity<?> requestThread(@RequestBody VisitorRequest request, HttpServletRequest httpRequest) {
         //
@@ -321,6 +323,7 @@ public class VisitorRestControllerVisitor {
     }
 
     // 访客发送http消息
+    @BlackIpFilter(title = "black", action = "sendRestMessage")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {

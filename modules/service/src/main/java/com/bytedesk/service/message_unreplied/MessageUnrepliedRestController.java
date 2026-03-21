@@ -16,11 +16,13 @@ package com.bytedesk.service.message_unreplied;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,7 +46,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @GetMapping("/query/org")
+    @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_READ)
     @Override
     public ResponseEntity<?> queryByOrg(MessageUnrepliedRequest request) {
         
@@ -57,6 +60,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_READ)
     @Override
     public ResponseEntity<?> queryByUser(MessageUnrepliedRequest request) {
         
@@ -69,8 +74,10 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
+    @PostMapping("/create")
+    @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_CREATE)
     @Override
-    public ResponseEntity<?> create(MessageUnrepliedRequest request) {
+    public ResponseEntity<?> create(@RequestBody MessageUnrepliedRequest request) {
         
         MessageUnrepliedResponse message_unreplied = messageUnrepliedService.create(request);
 
@@ -81,8 +88,10 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
+    @PostMapping("/update")
+    @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_UPDATE)
     @Override
-    public ResponseEntity<?> update(MessageUnrepliedRequest request) {
+    public ResponseEntity<?> update(@RequestBody MessageUnrepliedRequest request) {
         
         MessageUnrepliedResponse message_unreplied = messageUnrepliedService.update(request);
 
@@ -91,8 +100,10 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
 
     @Operation(summary = "删除未回复消息", description = "删除指定的未回复消息")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
+    @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_DELETE)
     @Override
-    public ResponseEntity<?> delete(MessageUnrepliedRequest request) {
+    public ResponseEntity<?> delete(@RequestBody MessageUnrepliedRequest request) {
         
         messageUnrepliedService.delete(request);
 
@@ -101,6 +112,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
 
     @Operation(summary = "导出未回复消息", description = "导出未回复消息数据")
     @ApiResponse(responseCode = "200", description = "导出成功")
+    @GetMapping("/export")
+    @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_EXPORT)
     @Override
     public Object export(MessageUnrepliedRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
@@ -111,6 +124,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
+    @GetMapping("/query/uid")
+    @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_READ)
     @Override
     public ResponseEntity<?> queryByUid(MessageUnrepliedRequest request) {
         // TODO Auto-generated method stub

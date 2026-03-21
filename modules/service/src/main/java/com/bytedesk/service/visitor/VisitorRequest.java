@@ -85,6 +85,9 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private String callType = VisitorCallTypeEnum.TEXT.name();
 
+	// 访客呼叫目标分机/AOR，由呼叫页面显式传入
+	private String target;
+
 	// 强制转人工服务，默认false
 	@Builder.Default
 	private Boolean forceAgent = false;

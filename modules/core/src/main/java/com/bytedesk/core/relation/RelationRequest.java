@@ -23,6 +23,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+
 @Data
 @SuperBuilder
 @Accessors(chain = true)
@@ -30,9 +32,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RelationRequest extends BaseRequest {
+
     private static final long serialVersionUID = 1L;
-
-
 
     // ==================== 社交关系相关字段 ====================
     
@@ -195,4 +196,9 @@ public class RelationRequest extends BaseRequest {
      * 关系质量评分（0-100）
      */
     private Integer relationQualityScore;
+
+    @Override
+	public Pageable getPageable() {
+		return super.getPageable();
+	}
 }

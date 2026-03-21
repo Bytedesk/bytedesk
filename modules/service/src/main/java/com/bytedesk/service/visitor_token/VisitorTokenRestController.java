@@ -15,6 +15,8 @@ package com.bytedesk.service.visitor_token;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +40,8 @@ public class VisitorTokenRestController extends BaseRestController<VisitorTokenR
 
     private final VisitorTokenRestService tokenRestService;
 
+    @GetMapping("/query/org")
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_READ)
     @Override
     public ResponseEntity<?> queryByOrg(VisitorTokenRequest request) {
         
@@ -45,6 +50,8 @@ public class VisitorTokenRestController extends BaseRestController<VisitorTokenR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_READ)
     @Override
     public ResponseEntity<?> queryByUser(VisitorTokenRequest request) {
         
@@ -53,6 +60,8 @@ public class VisitorTokenRestController extends BaseRestController<VisitorTokenR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @GetMapping("/query/uid")
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_READ)
     @Override
     public ResponseEntity<?> queryByUid(VisitorTokenRequest request) {
 
@@ -61,24 +70,30 @@ public class VisitorTokenRestController extends BaseRestController<VisitorTokenR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PostMapping("/create")
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_CREATE)
     @Override
-    public ResponseEntity<?> create(VisitorTokenRequest request) {
+    public ResponseEntity<?> create(@RequestBody VisitorTokenRequest request) {
         
         VisitorTokenResponse response = tokenRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PostMapping("/update")
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_UPDATE)
     @Override
-    public ResponseEntity<?> update(VisitorTokenRequest request) {
+    public ResponseEntity<?> update(@RequestBody VisitorTokenRequest request) {
         
         VisitorTokenResponse response = tokenRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PostMapping("/delete")
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_DELETE)
     @Override
-    public ResponseEntity<?> delete(VisitorTokenRequest request) {
+    public ResponseEntity<?> delete(@RequestBody VisitorTokenRequest request) {
         
         tokenRestService.delete(request);
 
@@ -86,12 +101,20 @@ public class VisitorTokenRestController extends BaseRestController<VisitorTokenR
     }
 
     @PostMapping("/generate")
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_CREATE)
     @ActionAnnotation(title = "用户", action = "generate_token", description = "Generate Access VisitorToken")
     public ResponseEntity<?> generateAccessVisitorToken(@RequestBody VisitorTokenRequest request) {
 
         String accessVisitorToken = tokenRestService.generateAccessVisitorToken(request);
 
         return ResponseEntity.ok(JsonResult.success("success", accessVisitorToken));
+    }
+
+    @GetMapping("/export")
+    @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_EXPORT)
+    @Override
+    public Object export(VisitorTokenRequest request, HttpServletResponse response) {
+        throw new UnsupportedOperationException("Method export needs to be implemented in child class");
     }
 
     

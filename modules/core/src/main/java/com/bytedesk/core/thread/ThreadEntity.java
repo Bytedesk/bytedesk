@@ -62,6 +62,9 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     private static final long serialVersionUID = 1L;
 
+    @Transient
+    private String originalStatus;
+
     /**
      * Messages associated with this conversation thread
      * One-to-many relationship: one thread can have multiple messages
@@ -70,6 +73,16 @@ public class ThreadEntity extends AbstractThreadEntity {
     @OneToMany(mappedBy = "thread", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<MessageEntity> messages = new ArrayList<>();
+
+    @PostLoad
+    @PostPersist
+    public void captureOriginalStatus() {
+        originalStatus = getStatus();
+    }
+
+    public boolean hasStatusChanged() {
+        return originalStatus != null && !originalStatus.equals(getStatus());
+    }
 
     public Boolean isNew() {
         return ThreadProcessStatusEnum.NEW.name().equals(getStatus());

@@ -343,7 +343,6 @@ public class AgentSettingsRestService
             entity.setTimeoutRemindTip(request.getTimeoutRemindTip());
             entity.setHasUnpublishedChanges(true);
         }
-
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
             // 复用并更新现有草稿，避免新建导致孤儿记录

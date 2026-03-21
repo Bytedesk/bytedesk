@@ -49,13 +49,20 @@ services:
     container_name: freeswitch-bytedesk
     restart: always
     entrypoint: ["/usr/local/bin/bytedesk-entrypoint.sh"]
-    command: ["freeswitch", "-nf", "-nonat", "-nonatmap"]
+    command: ["freeswitch", "-nf"]
     sysctls:
       net.ipv6.conf.all.disable_ipv6: "0"
       net.ipv6.conf.default.disable_ipv6: "0"
     environment:
       TZ: Asia/Shanghai
       DISABLE_IPV6: "true"
+      # 默认分机密码（对应 vars.xml 的 default_password）
+      FREESWITCH_DEFAULT_PASSWORD: ${FREESWITCH_DEFAULT_PASSWORD:-12345679}
+      # SIP 注册/鉴权默认域名（对应 vars.xml 的 domain）
+      FREESWITCH_DOMAIN: ${FREESWITCH_DOMAIN:-localhost}
+      # 对外宣告给 SIP/SDP 的地址。局域网硬话机场景应固定为宿主机可达地址，避免容器 NAT/STUN 误判。
+      FREESWITCH_EXTERNAL_SIP_IP: ${FREESWITCH_EXTERNAL_SIP_IP:-}
+      FREESWITCH_EXTERNAL_RTP_IP: ${FREESWITCH_EXTERNAL_RTP_IP:-}
       # ESL 入站口令（与 vars.xml 的 esl_password 对应）
       FREESWITCH_ESL_PASSWORD: ${FREESWITCH_ESL_PASSWORD}
       # xml_cdr Basic 凭据密码
@@ -74,8 +81,8 @@ services:
       FREESWITCH_DB_PASSWORD: ${FREESWITCH_DB_PASSWORD:-r8FqfdbWUaN3}
       # WebRTC / RTP 参数（默认使用 compose 内 coturn 服务）
       FREESWITCH_STUN_SERVER: ${FREESWITCH_STUN_SERVER:-stun:bytedesk-coturn:3478}
-      FREESWITCH_RTP_START_PORT: ${FREESWITCH_RTP_START_PORT:-16384}
-      FREESWITCH_RTP_END_PORT: ${FREESWITCH_RTP_END_PORT:-32768}
+      FREESWITCH_RTP_START_PORT: ${FREESWITCH_RTP_START_PORT:-16000}
+      FREESWITCH_RTP_END_PORT: ${FREESWITCH_RTP_END_PORT:-16129}
     ports:
       - "15060:5060/tcp"
       - "15060:5060/udp"
@@ -87,7 +94,7 @@ services:
       - "17443:7443/tcp"
       - "18021:8021/tcp"
       - "18081-18082:8081-8082/tcp"
-      - "16000-16129:6000-6129/udp"
+      - "16000-16129:16000-16129/udp"
     volumes:
       - ../freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
       - ../freeswitch/conf:/usr/local/freeswitch/conf

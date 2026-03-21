@@ -21,6 +21,7 @@ import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.utils.CountryCodeUtils;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -35,7 +36,7 @@ public class ResetValidationStrategy implements AuthValidationStrategy {
     @Override
     public void validateUserStatus(AuthRequest authRequest, String receiver, String platform) {
         // 重置验证码，如果账号已经存在，则直接抛出异常
-        if (authRequest.isMobile() && userService.existsByMobileAndPlatform(receiver, platform)) {
+        if (authRequest.isMobile() && userService.existsByMobileAndPlatform(receiver, CountryCodeUtils.normalize(authRequest.getCountry()), platform)) {
             throw new MobileExistsException(I18Consts.I18N_MOBILE_ALREADY_EXISTS);
         }
         if (authRequest.isEmail() && userService.existsByEmailAndPlatform(receiver, platform)) {

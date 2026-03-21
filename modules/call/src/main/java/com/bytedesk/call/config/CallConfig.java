@@ -89,53 +89,53 @@ public class CallConfig {
                     // FusionPBX风格过滤器：event plain all + filter Event-Name/Event-Subclass
                     registerEventFilters(inboundClient);
                     
-                    log.info("Call ESL连接成功，服务器: {}:{}", 
+                        log.info(CallI18nConsts.CONFIG_ESL_CONNECTED, 
                             callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
                     
                     // 连接成功，跳出重试循环
                     break;
                 } else {
-                    log.warn("ESL连接建立但无法发送命令，连接可能不稳定");
+                    log.warn(CallI18nConsts.CONFIG_ESL_CONNECTED_UNSTABLE);
                     throw new InboundConnectionFailure("Connection established but cannot send commands");
                 }
                 
             } catch (InboundConnectionFailure e) {
-                log.error("第{}次ESL连接失败: {}", attempt, e.getMessage());
+                log.error(CallI18nConsts.CONFIG_ESL_CONNECT_ATTEMPT_FAILED, attempt, e.getMessage());
                 
                 // 检查具体的错误类型
                 if (e.getMessage() != null) {
                     if (e.getMessage().contains("rude-rejection") || e.getMessage().contains("Access Denied")) {
-                        log.error("Call ESL拒绝连接 - 可能的原因:");
-                        log.error("1. ESL密码错误 (当前密码: {})", callFreeswitchProperties.getEslPassword());
-                        log.error("2. IP地址不在Call的访问控制列表(ACL)中");
-                        log.error("3. Call的event_socket.conf.xml配置限制了外部连接");
-                        log.error("4. 防火墙阻止了连接");
+                        log.error(CallI18nConsts.CONFIG_ESL_ACL_REJECTED_REASON);
+                        log.error(CallI18nConsts.CONFIG_ESL_PASSWORD_WRONG, callFreeswitchProperties.getEslPassword());
+                        log.error(CallI18nConsts.CONFIG_ESL_IP_NOT_ALLOWED);
+                        log.error(CallI18nConsts.CONFIG_ESL_SOCKET_CONFIG_RESTRICTED);
+                        log.error(CallI18nConsts.CONFIG_ESL_FIREWALL_BLOCKED);
                         
                         // ACL拒绝错误通常不需要重试
                         if (attempt == maxRetries) {
-                            log.error("所有连接尝试都被拒绝，请检查Call的ESL配置");
+                            log.error(CallI18nConsts.CONFIG_ESL_ALL_ATTEMPTS_REJECTED);
                         }
                     } else if (e.getMessage().contains("Connection refused") || e.getMessage().contains("timeout")) {
-                        log.error("网络连接问题 - 可能的原因:");
-                        log.error("1. Call服务未运行");
-                        log.error("2. 端口{}未开放或被防火墙阻止", callFreeswitchProperties.getEslPort());
-                        log.error("3. 网络连接超时");
+                        log.error(CallI18nConsts.CONFIG_ESL_NETWORK_ISSUE_REASON);
+                        log.error(CallI18nConsts.CONFIG_ESL_SERVICE_NOT_RUNNING);
+                        log.error(CallI18nConsts.CONFIG_ESL_PORT_BLOCKED, callFreeswitchProperties.getEslPort());
+                        log.error(CallI18nConsts.CONFIG_ESL_NETWORK_TIMEOUT);
                     }
                 }
                 
                 // 如果不是最后一次尝试，等待后重试
                 if (attempt < maxRetries) {
                     try {
-                        log.info("等待{}毫秒后重试...", retryDelayMs);
+                        log.info(CallI18nConsts.CONFIG_ESL_WAIT_RETRY, retryDelayMs);
                         Thread.sleep(retryDelayMs);
                         retryDelayMs *= 2; // 指数退避
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("连接重试被中断");
+                        log.error(CallI18nConsts.CONFIG_ESL_RETRY_INTERRUPTED);
                         break;
                     }
                 } else {
-                    log.error("Call ESL连接最终失败，已尝试{}次", maxRetries);
+                    log.error(CallI18nConsts.CONFIG_ESL_FINAL_FAILURE, maxRetries);
                 }
             }
         }
@@ -145,7 +145,7 @@ public class CallConfig {
 
     private void registerEventFilters(Client inboundClient) {
         if (!callFreeswitchProperties.isEnableEventFilters()) {
-            log.info("跳过ESL事件过滤器注册（bytedesk.call.freeswitch.enableEventFilters=false）");
+            log.info(CallI18nConsts.CONFIG_ESL_SKIP_FILTER_REGISTER);
             return;
         }
 
@@ -174,13 +174,13 @@ public class CallConfig {
 
     private void logCommandResponse(String action, CommandResponse response) {
         if (response == null) {
-            log.warn("ESL action={} 返回空响应", action);
+            log.warn(CallI18nConsts.ESL_ACTION_EMPTY_RESPONSE, action);
             return;
         }
         if (response.isOk()) {
-            log.info("ESL action={} 成功: {}", action, response.getReplyText());
+            log.info(CallI18nConsts.ESL_ACTION_SUCCESS, action, response.getReplyText());
         } else {
-            log.warn("ESL action={} 失败: {}", action, response.getReplyText());
+            log.warn(CallI18nConsts.ESL_ACTION_FAILED, action, response.getReplyText());
         }
     }
 

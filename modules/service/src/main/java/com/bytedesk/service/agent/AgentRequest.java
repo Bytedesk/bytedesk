@@ -13,7 +13,10 @@
  */
 package com.bytedesk.service.agent;
 
+import java.time.ZonedDateTime;
+
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
@@ -68,6 +71,9 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private Boolean enabled = true;
 
+    // 坐席有效期，null 表示永久有效
+    private ZonedDateTime seatExpireAt;
+
     /**
      * Agent settings reference UID
      * If not provided, will use the default settings
@@ -85,4 +91,9 @@ public class AgentRequest extends BaseRequest {
      * Per-agent auto reply settings payload for /api/v1/agent/update/autoreply.
      */
     private AutoReplySettingsRequest autoReplySettings;
+
+    /**
+     * Per-agent call center settings payload.
+     */
+    private CallSettingsRequest callSettings;
 }

@@ -46,6 +46,8 @@ public class MemberResponse extends BaseResponse {
 
     private String email;
 
+    private String country;
+
     private String mobile;
 
     private String seatNo;

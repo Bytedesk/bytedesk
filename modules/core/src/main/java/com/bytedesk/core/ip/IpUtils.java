@@ -66,7 +66,6 @@ public class IpUtils {
      * 
      * @return ip
      */
-    @SuppressWarnings("null")
     public static String getClientIp(HttpServletRequest request) {
 
         String unknown = "unknown";

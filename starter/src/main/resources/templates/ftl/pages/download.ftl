@@ -22,7 +22,7 @@
 
 <!-- =======================
 Listed course START -->
-<section class="position-relative pb-0 pb-sm-5">
+<section class="position-relative pt-4 pt-sm-5 pb-0 pb-sm-5">
 	<div class="container">
 		<!-- Title -->
 		<div class="row mb-4">

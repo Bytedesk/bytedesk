@@ -13,23 +13,33 @@
  */
 package com.bytedesk.meet.room;
 
+import java.time.ZonedDateTime;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.relation.RelationEntity;
+import com.bytedesk.core.relation.RelationRepository;
+import com.bytedesk.core.relation.RelationTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,6 +49,8 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomRequest, RoomResponse, RoomExcel> {
 
     private final RoomRepository roomRepository;
+
+    private final RelationRepository relationRepository;
 
     private final ModelMapper modelMapper;
 
@@ -64,14 +76,94 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
     @Override
     public Page<RoomResponse> queryByUser(RoomRequest request) {
         UserEntity user = authService.getUser();
-        request.setUserUid(user.getUid());
-        return queryByOrg(request);
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return Page.empty(request.getPageable());
+        }
+
+        Set<String> visibleRoomUids = getVisibleRoomUidsForUser(user.getUid());
+        if (visibleRoomUids.isEmpty()) {
+            Pageable pageable = request.getPageable();
+            return new PageImpl<>(java.util.List.of(), pageable, 0);
+        }
+
+        Pageable pageable = request.getPageable();
+        Specification<RoomEntity> specs = RoomSpecification.searchVisibleToUser(request, authService, visibleRoomUids);
+        return roomRepository.findAll(specs, pageable).map(this::convertToResponse);
+    }
+
+    Set<String> getVisibleRoomUidsForUser(String userUid) {
+        LinkedHashSet<String> visibleRoomUids = roomRepository.findByUserUidAndDeletedFalse(userUid).stream()
+                .map(RoomEntity::getUid)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        relationRepository.findBySubjectUserUidAndTypeAndDeletedFalse(userUid, RelationTypeEnum.ROOM.name()).stream()
+                .map(RelationEntity::getObjectContentUid)
+                .filter(StringUtils::hasText)
+                .forEach(visibleRoomUids::add);
+
+        relationRepository.findByObjectUserUidAndTypeAndDeletedFalse(userUid, RelationTypeEnum.ROOM.name()).stream()
+            .map(RelationEntity::getObjectContentUid)
+            .filter(StringUtils::hasText)
+            .forEach(visibleRoomUids::add);
+
+        return visibleRoomUids;
+    }
+
+    @Transactional
+    public void recordRoomParticipation(String roomIdOrInviteUid) {
+        UserEntity user = authService.getUser();
+        if (user == null || !StringUtils.hasText(user.getUid()) || !StringUtils.hasText(roomIdOrInviteUid)) {
+            return;
+        }
+
+        Optional<RoomEntity> optionalRoom = findByInviteUid(roomIdOrInviteUid);
+        if (optionalRoom.isEmpty()) {
+            optionalRoom = findByUid(roomIdOrInviteUid);
+        }
+        if (optionalRoom.isEmpty()) {
+            return;
+        }
+
+        RoomEntity room = optionalRoom.get();
+        if (!StringUtils.hasText(room.getUid())) {
+            return;
+        }
+
+        Optional<RelationEntity> existing = relationRepository.findBySubjectUserUidAndObjectContentUidAndTypeAndDeletedFalse(
+                user.getUid(),
+                room.getUid(),
+                RelationTypeEnum.ROOM.name());
+        if (existing.isPresent()) {
+            RelationEntity relation = existing.get();
+            relation.setLastInteractionTime(ZonedDateTime.now());
+            relationRepository.save(relation);
+            return;
+        }
+
+        RelationEntity relation = RelationEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(room.getOrgUid())
+                .userUid(user.getUid())
+                .subjectUserUid(user.getUid())
+                .objectContentUid(room.getUid())
+                .type(RelationTypeEnum.ROOM.name())
+                .source("MEET_JOIN")
+                .relationStartTime(ZonedDateTime.now())
+                .lastInteractionTime(ZonedDateTime.now())
+                .build();
+        relationRepository.save(relation);
     }
 
     @Cacheable(value = "room", key = "#uid", unless="#result==null")
     @Override
     public Optional<RoomEntity> findByUid(String uid) {
         return roomRepository.findByUid(uid);
+    }
+
+    @Cacheable(value = "room", key = "'invite_' + #inviteUid", unless="#result==null")
+    public Optional<RoomEntity> findByInviteUid(String inviteUid) {
+        return roomRepository.findByInviteUid(inviteUid);
     }
 
     @Cacheable(value = "room", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
@@ -95,9 +187,19 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
     }
 
     private RoomResponse createInternal(RoomRequest request, boolean skipPermissionCheck) {
+        String normalizedType = RoomTypeEnum.fromValue(request.getType()).name();
+        request.setType(normalizedType);
+
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
+        }
+        // 检查inviteUid是否已经存在
+        if (StringUtils.hasText(request.getInviteUid())) {
+            Optional<RoomEntity> room = findByInviteUid(request.getInviteUid());
+            if (room.isPresent()) {
+                return convertToResponse(room.get());
+            }
         }
         // 检查name+orgUid+type是否已经存在
         if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
@@ -118,6 +220,14 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
         if (!StringUtils.hasText(level)) {
             level = LevelEnum.ORGANIZATION.name();
             request.setLevel(level);
+        }
+
+        if (!StringUtils.hasText(request.getInviteUid())) {
+            request.setInviteUid(uidUtils.getUid());
+        }
+
+        if (!StringUtils.hasText(request.getName())) {
+            request.setName("会议室-" + request.getInviteUid());
         }
         
         // 检查用户是否有权限创建该层级的数据
@@ -144,6 +254,7 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
         Optional<RoomEntity> optional = roomRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             RoomEntity entity = optional.get();
+            String existingInviteUid = entity.getInviteUid();
             
             // 检查用户是否有权限更新该实体
             if (!permissionService.hasEntityPermission(RoomPermissions.MODULE_NAME, "UPDATE", entity)) {
@@ -151,6 +262,13 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
             }
             
             modelMapper.map(request, entity);
+            entity.setType(RoomTypeEnum.fromValue(entity.getType()).name());
+            if (!StringUtils.hasText(request.getInviteUid())) {
+                entity.setInviteUid(existingInviteUid);
+            }
+            if (!StringUtils.hasText(entity.getInviteUid())) {
+                entity.setInviteUid(uidUtils.getUid());
+            }
             //
             RoomEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -176,6 +294,9 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
                 RoomEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
+                latestEntity.setDescription(entity.getDescription());
+                latestEntity.setType(entity.getType());
+                latestEntity.setInviteUid(entity.getInviteUid());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
                 return roomRepository.save(latestEntity);

@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +51,7 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     @ActionAnnotation(title = "WorkgroupRouting", action = "组织查询", description = "query workgroup_routing by org")
     @Operation(summary = "Query WorkgroupRoutings by Organization", description = "Retrieve workgroup_routings for the current organization")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(WorkgroupRoutingRequest request) {
         
@@ -61,6 +63,7 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     @ActionAnnotation(title = "WorkgroupRouting", action = "用户查询", description = "query workgroup_routing by user")
     @Operation(summary = "Query WorkgroupRoutings by User", description = "Retrieve workgroup_routings for the current user")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(WorkgroupRoutingRequest request) {
         
@@ -72,6 +75,7 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     @ActionAnnotation(title = "WorkgroupRouting", action = "查询详情", description = "query workgroup_routing by uid")
     @Operation(summary = "Query WorkgroupRouting by UID", description = "Retrieve a specific workgroup_routing by its unique identifier")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRoutingRequest request) {
         
@@ -83,8 +87,9 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     @ActionAnnotation(title = "WorkgroupRouting", action = "新建", description = "create workgroup_routing")
     @Operation(summary = "Create WorkgroupRouting", description = "Create a new workgroup_routing")
     @Override
+    @PostMapping("/create")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_CREATE)
-    public ResponseEntity<?> create(WorkgroupRoutingRequest request) {
+    public ResponseEntity<?> create(@RequestBody WorkgroupRoutingRequest request) {
         
         WorkgroupRoutingResponse workgroup_routing = agentNextRestService.create(request);
 
@@ -94,8 +99,9 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     @ActionAnnotation(title = "WorkgroupRouting", action = "更新", description = "update workgroup_routing")
     @Operation(summary = "Update WorkgroupRouting", description = "Update an existing workgroup_routing")
     @Override
+    @PostMapping("/update")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_UPDATE)
-    public ResponseEntity<?> update(WorkgroupRoutingRequest request) {
+    public ResponseEntity<?> update(@RequestBody WorkgroupRoutingRequest request) {
         
         WorkgroupRoutingResponse workgroup_routing = agentNextRestService.update(request);
 
@@ -105,8 +111,9 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     @ActionAnnotation(title = "WorkgroupRouting", action = "删除", description = "delete workgroup_routing")
     @Operation(summary = "Delete WorkgroupRouting", description = "Delete a workgroup_routing")
     @Override
+    @PostMapping("/delete")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_DELETE)
-    public ResponseEntity<?> delete(WorkgroupRoutingRequest request) {
+    public ResponseEntity<?> delete(@RequestBody WorkgroupRoutingRequest request) {
         
         agentNextRestService.delete(request);
 

@@ -258,7 +258,6 @@ public class WorkgroupSettingsRestService
         if (request.getManualRoutingTip() != null) {
             entity.setManualRoutingTip(request.getManualRoutingTip());
         }
-
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
             ServiceSettingsEntity draft = entity.getDraftServiceSettings();

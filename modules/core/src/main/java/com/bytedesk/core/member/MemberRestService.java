@@ -55,6 +55,7 @@ import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.CountryCodeUtils;
 import com.bytedesk.core.department.DepartmentEntity;
 import com.bytedesk.core.department.DepartmentRequest;
 import com.bytedesk.core.department.DepartmentRestService;
@@ -161,8 +162,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                 && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {
             throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
         }
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
         if (StringUtils.hasText(request.getMobile())
-                && existsByMobileAndOrgUid(request.getMobile(), request.getOrgUid())) {
+            && existsByMobileAndOrgUid(request.getMobile(), normalizedCountry, request.getOrgUid())) {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         assertMemberCapacityAvailable(request.getOrgUid());
@@ -187,6 +190,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         UserEntity user = null;
         if (StringUtils.hasText(request.getMobile())) {
             user = userService.findByMobileAndPlatform(request.getMobile(),
+                    normalizedCountry,
                     PlatformEnum.BYTEDESK.name())
                     .orElseGet(() -> userService.createUserFromMember(userRequest));
         } else if (StringUtils.hasText(request.getEmail())) {
@@ -199,7 +203,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
         // 确保 user 处于当前组织上下文，并按请求写入角色
         userService.ensureCurrentOrganization(user, request.getOrgUid());
-        user = userService.updateUserRoles(user, normalizedRoleUids);
+        if (!StringUtils.hasText(member.getCountry()) && StringUtils.hasText(user.getCountry())) {
+            member.setCountry(user.getCountry());
+        }
+        user = userService.updateUserFromMember(user, request);
         // 设置用户到成员对象中
         member.setUser(user);
         //
@@ -220,10 +227,21 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         //
         MemberEntity member = memberOptional.get();
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
 
         // 保护超级管理员账号：禁止将非超管成员的邮箱/手机号改成超管的
         String targetUserUid = member.getUser() != null ? member.getUser().getUid() : null;
         userService.validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), targetUserUid);
+
+        if (StringUtils.hasText(request.getMobile())) {
+            boolean mobileChanged = !request.getMobile().equals(member.getMobile());
+            boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(member.getCountry()));
+            if ((mobileChanged || countryChanged)
+                    && existsByMobileAndOrgUid(request.getMobile(), normalizedCountry, member.getOrgUid())) {
+                throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+            }
+        }
 
         // modelMapper.map(memberRequest, member);
         member.setDeptUid(request.getDeptUid());
@@ -231,6 +249,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         member.setAvatar(request.getAvatar());
         member.setDescription(request.getDescription());
         member.setEmail(request.getEmail());
+        member.setCountry(normalizedCountry);
         member.setMobile(request.getMobile());
         member.setJobTitle(request.getJobTitle());
         member.setJobNo(request.getJobNo());
@@ -241,7 +260,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         // 
         UserEntity user = member.getUser();
         userService.ensureCurrentOrganization(user, member.getOrgUid());
-        userService.updateUserRoles(user, normalizedRoleUids);
+        user = userService.updateUserFromMember(user, request);
+        member.setUser(user);
         //
         MemberEntity savedMember = save(member);
         if (savedMember == null) {
@@ -323,9 +343,12 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
-    @Cacheable(value = "member", key = "#mobile", unless = "#result == null")
-    public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
-        Optional<MemberEntity> memberOptional = memberRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
+    @Cacheable(value = "member", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #orgUid", unless = "#result == null")
+    public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String country, String orgUid) {
+        Optional<MemberEntity> memberOptional = memberRepository.findByMobileAndCountryAndOrgUidAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                orgUid);
         if (memberOptional.isPresent()) {
             MemberEntity member = memberOptional.get();
             // 预加载user，确保user数据被包含在缓存中
@@ -334,6 +357,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             }
         }
         return memberOptional;
+    }
+
+    public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
+        return findByMobileAndOrgUid(mobile, CountryCodeUtils.DEFAULT_COUNTRY, orgUid);
     }
 
     @Cacheable(value = "member", key = "#email", unless = "#result == null")
@@ -366,8 +393,15 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberRepository.existsByEmailAndOrgUidAndDeletedFalse(email, orgUid);
     }
 
+    public Boolean existsByMobileAndOrgUid(String mobile, String country, String orgUid) {
+        return memberRepository.existsByMobileAndCountryAndOrgUidAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                orgUid);
+    }
+
     public Boolean existsByMobileAndOrgUid(String mobile, String orgUid) {
-        return memberRepository.existsByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
+        return existsByMobileAndOrgUid(mobile, CountryCodeUtils.DEFAULT_COUNTRY, orgUid);
     }
 
     @CachePut(value = "member", key = "#member.uid")
@@ -425,7 +459,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (StringUtils.hasText(excel.getEmail()) && existsByEmailAndOrgUid(excel.getEmail(), orgUid)) {
             return null;
         }
-        if (StringUtils.hasText(excel.getMobile()) && existsByMobileAndOrgUid(excel.getMobile(), orgUid)) {
+        if (StringUtils.hasText(excel.getMobile())
+            && existsByMobileAndOrgUid(excel.getMobile(), CountryCodeUtils.DEFAULT_COUNTRY, orgUid)) {
             return null;
         }
         assertMemberCapacityAvailable(orgUid);
@@ -476,7 +511,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             // 先尝试查找现有用户，避免创建重复用户
             if (StringUtils.hasText(excel.getMobile())) {
                 Optional<UserEntity> existingUser = userService.findByMobileAndPlatform(
-                        excel.getMobile(), PlatformEnum.BYTEDESK.name());
+                        excel.getMobile(), CountryCodeUtils.DEFAULT_COUNTRY, PlatformEnum.BYTEDESK.name());
                 if (existingUser.isPresent()) {
                     user = existingUser.get();
                 }
@@ -495,6 +530,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                     .nickname(excel.getNickname())
                     .email(excel.getEmail())
                     .mobile(excel.getMobile())
+                    .country(CountryCodeUtils.DEFAULT_COUNTRY)
                     .password(excel.getPassword())
                     .platform(PlatformEnum.BYTEDESK.name())
                     .registerSource(RegisterSource.ADMIN.name())
@@ -639,6 +675,9 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             entity.getUser().getUid();
             response.setUser(modelMapper.map(entity.getUser(), UserResponseSimple.class));
             response.setRoles(getRolesForOrg(entity.getUser(), entity.getOrgUid()));
+            if (!StringUtils.hasText(response.getCountry()) && StringUtils.hasText(entity.getUser().getCountry())) {
+                response.setCountry(entity.getUser().getCountry());
+            }
         }
         return response;
     }

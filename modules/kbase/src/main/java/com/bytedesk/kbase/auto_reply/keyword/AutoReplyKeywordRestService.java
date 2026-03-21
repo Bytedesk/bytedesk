@@ -214,7 +214,7 @@ public class AutoReplyKeywordRestService extends BaseRestServiceWithExport<AutoR
         log.info("reply {} replyList: {}", excel.getReplyList(), replyList);
         // 
         AutoReplyKeywordEntity keyword = AutoReplyKeywordEntity.builder().build();
-        keyword.setUid(uidUtils.getCacheSerialUid());
+        keyword.setUid(uidUtils.getUid());
         keyword.setKeywordList(keywordList);
         keyword.setReplyList(replyList);
         // 

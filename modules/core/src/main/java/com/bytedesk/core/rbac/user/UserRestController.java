@@ -192,7 +192,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     public ResponseEntity<?> changeMobile(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
         // 验证手机验证码
-        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCountry(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +53,7 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueResponse.class)))
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(QueueRequest request) {
         
@@ -65,6 +68,7 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(QueueRequest request) {
         
@@ -79,6 +83,7 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueResponse.class)))
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(QueueRequest request) {
         
@@ -145,8 +150,9 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueResponse.class)))
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(QueueRequest request) {
+    public ResponseEntity<?> create(@RequestBody QueueRequest request) {
         
         QueueResponse queue = queueRestService.create(request);
 
@@ -159,8 +165,9 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueResponse.class)))
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(QueueRequest request) {
+    public ResponseEntity<?> update(@RequestBody QueueRequest request) {
         
         QueueResponse queue = queueRestService.update(request);
 
@@ -171,8 +178,9 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
     @ActionAnnotation(title = "队列管理", action = "删除队列", description = "delete queue")
     @Operation(summary = "删除队列", description = "删除指定的队列")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(QueueRequest request) {
+    public ResponseEntity<?> delete(@RequestBody QueueRequest request) {
         
         queueRestService.delete(request);
 

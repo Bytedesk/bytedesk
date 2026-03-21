@@ -14,7 +14,10 @@
  */
 package com.bytedesk.service.agent;
 
+import java.time.ZonedDateTime;
+
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.call.call_settings.CallSettingsEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -106,6 +109,16 @@ public class AgentEntity extends BaseEntity {
     @JoinColumn(name = "auto_reply_settings_id", unique = true)
     private AutoReplySettingsEntity autoReplySettings;
 
+        /**
+         * Per-agent call center settings.
+         */
+        @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
+            jakarta.persistence.CascadeType.PERSIST,
+            jakarta.persistence.CascadeType.MERGE,
+            jakarta.persistence.CascadeType.REMOVE })
+        @JoinColumn(name = "call_settings_id", unique = true)
+        private CallSettingsEntity callSettings;
+
     // 以下设置项已迁移至 AgentSettingsEntity
     // 为保持兼容性，保留委托型 getter，以 settings 中的值为准
 
@@ -118,6 +131,10 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_enabled")
     private Boolean enabled = true;
+
+    // 坐席有效期，null 表示永久有效
+    @Column(name = "seat_expire_at")
+    private ZonedDateTime seatExpireAt;
 
     // org member
     @ManyToOne(fetch = FetchType.LAZY)

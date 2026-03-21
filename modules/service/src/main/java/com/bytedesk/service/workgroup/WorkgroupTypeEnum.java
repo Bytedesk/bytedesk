@@ -23,6 +23,8 @@ public enum WorkgroupTypeEnum {
 
     /** 通用接待（默认） */
     GENERAL,
+    /** Booking/航旅自助服务 */
+    BOOKING,
     /** 售前咨询 */
     PRESALES,
     /** 售后服务 */

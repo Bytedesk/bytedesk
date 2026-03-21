@@ -92,7 +92,7 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     public ClipboardResponse create(ClipboardRequest request) {
        
         ClipboardEntity Clipboard = modelMapper.map(request, ClipboardEntity.class);
-        Clipboard.setUid(uidUtils.getCacheSerialUid());
+        Clipboard.setUid(uidUtils.getUid());
 
         ClipboardEntity saved = save(Clipboard);
         if (saved == null) {

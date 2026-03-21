@@ -202,7 +202,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoRep
     public AutoReplyFixedEntity convertExcelToAutoReplyFixed(AutoReplyFixedExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, AutoReplyFixed.class);
         AutoReplyFixedEntity autoReply = AutoReplyFixedEntity.builder().build();
-        autoReply.setUid(uidUtils.getCacheSerialUid());
+        autoReply.setUid(uidUtils.getUid());
         autoReply.setContent(excel.getContent());
         // 
         // autoReply.setType(MessageTypeEnum.TEXT); // TODO: 根据实际类型设置

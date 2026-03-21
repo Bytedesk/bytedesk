@@ -19,6 +19,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 // import org.springframework.data.repository.query.Param;
 // import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,6 +46,12 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
 
     Optional<MemberEntity> findByMobileAndOrgUidAndDeletedFalse(String mobile, String orgUid);
 
+        @Query("select m from MemberEntity m where m.mobile = :mobile and m.orgUid = :orgUid and m.deleted = false and (m.country = :country or (:country = '86' and (m.country is null or m.country = '')))")
+        Optional<MemberEntity> findByMobileAndCountryAndOrgUidAndDeletedFalse(
+            @Param("mobile") String mobile,
+            @Param("country") String country,
+            @Param("orgUid") String orgUid);
+
     Optional<MemberEntity> findByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);
 
     Optional<MemberEntity> findByUserAndOrgUidAndDeletedFalse(UserEntity user, String orgUid);
@@ -53,6 +61,12 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
     Boolean existsByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);
 
     Boolean existsByMobileAndOrgUidAndDeletedFalse(String email, String orgUid);
+
+        @Query("select case when count(m) > 0 then true else false end from MemberEntity m where m.mobile = :mobile and m.orgUid = :orgUid and m.deleted = false and (m.country = :country or (:country = '86' and (m.country is null or m.country = '')))")
+        Boolean existsByMobileAndCountryAndOrgUidAndDeletedFalse(
+            @Param("mobile") String mobile,
+            @Param("country") String country,
+            @Param("orgUid") String orgUid);
 
     Boolean existsByUid(String uid);
 }

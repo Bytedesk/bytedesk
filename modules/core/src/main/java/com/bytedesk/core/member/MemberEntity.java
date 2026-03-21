@@ -73,6 +73,11 @@ public class MemberEntity extends BaseEntity {
     private String email;
 
     /**
+     * Country or region dialing code for the mobile number
+     */
+    private String country;
+
+    /**
      * Mobile phone number (Chinese format supported)
      */
     private String mobile;

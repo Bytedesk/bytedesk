@@ -45,6 +45,7 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
     @ActionAnnotation(title = "RoutingPool", action = "组织查询", description = "query routing_pool by org")
     @Operation(summary = "Query RoutingPools by Organization", description = "Retrieve routing_pools for the current organization")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(RoutingPoolRequest request) {
         
@@ -56,6 +57,7 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
     @ActionAnnotation(title = "RoutingPool", action = "用户查询", description = "query routing_pool by user")
     @Operation(summary = "Query RoutingPools by User", description = "Retrieve routing_pools for the current user")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(RoutingPoolRequest request) {
         
@@ -67,6 +69,7 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
     @ActionAnnotation(title = "RoutingPool", action = "查询详情", description = "query routing_pool by uid")
     @Operation(summary = "Query RoutingPool by UID", description = "Retrieve a specific routing_pool by its unique identifier")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(RoutingPoolRequest request) {
         
@@ -78,8 +81,9 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
     @ActionAnnotation(title = "RoutingPool", action = "新建", description = "create routing_pool")
     @Operation(summary = "Create RoutingPool", description = "Create a new routing_pool")
     @Override
+    @PostMapping("/create")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_CREATE)
-    public ResponseEntity<?> create(RoutingPoolRequest request) {
+    public ResponseEntity<?> create(@RequestBody RoutingPoolRequest request) {
         
         RoutingPoolResponse routing_pool = routingPoolRestService.create(request);
 
@@ -89,8 +93,9 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
     @ActionAnnotation(title = "RoutingPool", action = "更新", description = "update routing_pool")
     @Operation(summary = "Update RoutingPool", description = "Update an existing routing_pool")
     @Override
+    @PostMapping("/update")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_UPDATE)
-    public ResponseEntity<?> update(RoutingPoolRequest request) {
+    public ResponseEntity<?> update(@RequestBody RoutingPoolRequest request) {
         
         RoutingPoolResponse routing_pool = routingPoolRestService.update(request);
 
@@ -100,8 +105,9 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
     @ActionAnnotation(title = "RoutingPool", action = "删除", description = "delete routing_pool")
     @Operation(summary = "Delete RoutingPool", description = "Delete a routing_pool")
     @Override
+    @PostMapping("/delete")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_DELETE)
-    public ResponseEntity<?> delete(RoutingPoolRequest request) {
+    public ResponseEntity<?> delete(@RequestBody RoutingPoolRequest request) {
         
         routingPoolRestService.delete(request);
 

@@ -102,7 +102,7 @@ public class QuartzTaskRestService extends BaseRestServiceWithExport<QuartzTaskE
         // 
         QuartzTaskEntity entity = modelMapper.map(request, QuartzTaskEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
-            entity.setUid(uidUtils.getCacheSerialUid());
+            entity.setUid(uidUtils.getUid());
         }
         // 
         QuartzTaskEntity savedEntity = save(entity);

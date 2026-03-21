@@ -16,8 +16,11 @@ package com.bytedesk.service.channel_app;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
@@ -43,6 +46,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
+    @GetMapping("/query/org")
+    @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_READ)
     @Override
     public ResponseEntity<?> queryByOrg(ChannelAppRequest request) {
         
@@ -55,6 +60,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_READ)
     @Override
     public ResponseEntity<?> queryByUser(ChannelAppRequest request) {
         
@@ -67,6 +74,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
+    @GetMapping("/query/uid")
+    @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_READ)
     @Override
     public ResponseEntity<?> queryByUid(ChannelAppRequest request) {
         
@@ -79,8 +88,10 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
+    @PostMapping("/create")
+    @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_CREATE)
     @Override
-    public ResponseEntity<?> create(ChannelAppRequest request) {
+    public ResponseEntity<?> create(@RequestBody ChannelAppRequest request) {
         
         ChannelAppResponse app = channelRestService.create(request);
 
@@ -91,8 +102,10 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
+    @PostMapping("/update")
+    @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_UPDATE)
     @Override
-    public ResponseEntity<?> update(ChannelAppRequest request) {
+    public ResponseEntity<?> update(@RequestBody ChannelAppRequest request) {
         
         ChannelAppResponse app = channelRestService.update(request);
 
@@ -101,8 +114,10 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
 
     @Operation(summary = "删除渠道应用", description = "删除指定的渠道应用")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
+    @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_DELETE)
     @Override
-    public ResponseEntity<?> delete(ChannelAppRequest request) {
+    public ResponseEntity<?> delete(@RequestBody ChannelAppRequest request) {
         
         channelRestService.delete(request);
 
@@ -113,6 +128,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
     @ApiResponse(responseCode = "200", description = "导出成功")
     @Override
     @GetMapping("/export")
+    @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_EXPORT)
     public Object export(ChannelAppRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260317-01-create-call-settings-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_call_settings"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_call_settings">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_call_settings" nullable="false"/>
+            </column>
+            <column name="uuid" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_bytedesk_call_settings_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="datetime"/>
+            <column name="updated_at" type="datetime"/>
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false"/>
+            <column name="org_uid" type="varchar(255)"/>
+            <column name="user_uid" type="varchar(255)"/>
+            <column name="level_type" type="varchar(64)" defaultValue="ORGANIZATION"/>
+            <column name="platform_type" type="varchar(64)" defaultValue="BYTEDESK"/>
+            <column name="enabled" type="boolean" defaultValueBoolean="false"/>
+            <column name="number" type="varchar(64)"/>
+            <column name="display_name" type="varchar(128)"/>
+            <column name="target" type="varchar(128)"/>
+        </createTable>
+        <createIndex tableName="bytedesk_call_settings" indexName="idx_call_settings_uid">
+            <column name="uuid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260317-02-agent-settings-call-settings-fk" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_service_agent_settings" columnName="call_settings_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_settings">
+            <column name="call_settings_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_agent_settings"
+            baseColumnNames="call_settings_id"
+            referencedTableName="bytedesk_call_settings"
+            referencedColumnNames="id"
+            constraintName="fk_agent_settings_call_settings"/>
+    </changeSet>
+
+    <changeSet id="260317-02b-agent-settings-draft-call-settings-fk" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_service_agent_settings" columnName="draft_call_settings_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_settings">
+            <column name="draft_call_settings_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_agent_settings"
+            baseColumnNames="draft_call_settings_id"
+            referencedTableName="bytedesk_call_settings"
+            referencedColumnNames="id"
+            constraintName="fk_agent_settings_draft_call_settings"/>
+    </changeSet>
+
+    <changeSet id="260317-03-workgroup-settings-call-settings-fk" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="call_settings_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="call_settings_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_workgroup_settings"
+            baseColumnNames="call_settings_id"
+            referencedTableName="bytedesk_call_settings"
+            referencedColumnNames="id"
+            constraintName="fk_workgroup_settings_call_settings"/>
+    </changeSet>
+
+    <changeSet id="260317-03b-workgroup-settings-draft-call-settings-fk" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="draft_call_settings_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="draft_call_settings_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_workgroup_settings"
+            baseColumnNames="draft_call_settings_id"
+            referencedTableName="bytedesk_call_settings"
+            referencedColumnNames="id"
+            constraintName="fk_workgroup_settings_draft_call_settings"/>
+    </changeSet>
+
+    <changeSet id="260317-04-robot-settings-call-settings-fk" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_ai_robot_settings" columnName="call_settings_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_robot_settings">
+            <column name="call_settings_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_ai_robot_settings"
+            baseColumnNames="call_settings_id"
+            referencedTableName="bytedesk_call_settings"
+            referencedColumnNames="id"
+            constraintName="fk_robot_settings_call_settings"/>
+    </changeSet>
+
+    <changeSet id="260317-04b-robot-settings-draft-call-settings-fk" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_ai_robot_settings" columnName="draft_call_settings_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_robot_settings">
+            <column name="draft_call_settings_id" type="BIGINT"/>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_ai_robot_settings"
+            baseColumnNames="draft_call_settings_id"
+            referencedTableName="bytedesk_call_settings"
+            referencedColumnNames="id"
+            constraintName="fk_robot_settings_draft_call_settings"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -2,6 +2,9 @@ package com.bytedesk.service.agent_settings;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,15 +32,29 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
     @Operation(summary = "查询组织下的客服配置", description = "根据组织ID查询客服配置列表")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @GetMapping("/query/org")
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_READ)
     @Override
     public ResponseEntity<?> queryByOrg(AgentSettingsRequest request) {
         Page<AgentSettingsResponse> page = agentSettingsRestService.queryByOrg(request);
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "查询用户下的客服配置", description = "根据用户ID查询客服配置列表")
+    @ApiResponse(responseCode = "200", description = "查询成功",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_READ)
+    @Override
+    public ResponseEntity<?> queryByUser(AgentSettingsRequest request) {
+        Page<AgentSettingsResponse> page = agentSettingsRestService.queryByUser(request);
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
     @Operation(summary = "根据客服UID查询客服配置", description = "根据客服UID查询其绑定的客服配置；若未绑定则返回组织默认配置")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_READ)
     @RequestMapping("/query/agent")
     public ResponseEntity<?> queryByAgent(AgentSettingsRequest request) {
         AgentSettingsResponse resp = agentSettingsRestService.queryByAgentUid(request.getAgentUid());
@@ -50,6 +67,8 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
     @Operation(summary = "根据UID查询客服配置", description = "根据UID查询客服配置详情")
     @ApiResponse(responseCode = "200", description = "查询成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @GetMapping("/query/uid")
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_READ)
     @Override
     public ResponseEntity<?> queryByUid(AgentSettingsRequest request) {
         AgentSettingsResponse resp = agentSettingsRestService.queryByUid(request);
@@ -59,6 +78,8 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
     @Operation(summary = "创建客服配置", description = "创建新的客服配置")
     @ApiResponse(responseCode = "200", description = "创建成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @PostMapping("/create")
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_CREATE)
     @Override
     public ResponseEntity<?> create(@RequestBody AgentSettingsRequest request) {
         AgentSettingsResponse resp = agentSettingsRestService.create(request);
@@ -71,6 +92,8 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
     @Operation(summary = "更新客服配置", description = "更新客服配置信息")
     @ApiResponse(responseCode = "200", description = "更新成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @PostMapping("/update")
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_UPDATE)
     @Override
     public ResponseEntity<?> update(@RequestBody AgentSettingsRequest request) {
         AgentSettingsResponse resp = agentSettingsRestService.update(request);
@@ -79,6 +102,8 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
 
     @Operation(summary = "删除客服配置", description = "删除指定的客服配置")
     @ApiResponse(responseCode = "200", description = "删除成功")
+    @PostMapping("/delete")
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_DELETE)
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentSettingsRequest request) {
         agentSettingsRestService.deleteByUid(request.getUid());
@@ -88,6 +113,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
     @Operation(summary = "启用客服配置", description = "启用指定的客服配置")
     @ApiResponse(responseCode = "200", description = "启用成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_UPDATE)
     @RequestMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody AgentSettingsRequest request) {
         AgentSettingsResponse resp = agentSettingsRestService.enable(request.getUid());
@@ -97,6 +123,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
     @Operation(summary = "停用客服配置", description = "停用指定的客服配置")
     @ApiResponse(responseCode = "200", description = "停用成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_UPDATE)
     @RequestMapping("/disable")
     public ResponseEntity<?> disable(@RequestBody AgentSettingsRequest request) {
         AgentSettingsResponse resp = agentSettingsRestService.disable(request.getUid());
@@ -106,6 +133,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
     @Operation(summary = "发布客服配置", description = "将草稿版本发布为线上版本")
     @ApiResponse(responseCode = "200", description = "发布成功",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
+    @PreAuthorize(AgentSettingsPermissions.HAS_AGENT_SETTINGS_UPDATE)
     @RequestMapping("/publish")
     public ResponseEntity<?> publish(@RequestBody AgentSettingsRequest request) {
         AgentSettingsResponse resp = agentSettingsRestService.publish(request.getUid());

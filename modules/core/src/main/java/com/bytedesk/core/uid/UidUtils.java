@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.uid.impl.CachedUidGenerator;
-import com.bytedesk.core.uid.impl.DefaultUidGenerator;
+// import com.bytedesk.core.uid.impl.DefaultUidGenerator;
 
 import jakarta.annotation.PostConstruct;
 
@@ -31,8 +31,8 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class UidUtils {
 
-    @Autowired
-    private DefaultUidGenerator defaultUidGenerator;
+    // @Autowired
+    // private DefaultUidGenerator defaultUidGenerator;
 
     @Autowired
     private CachedUidGenerator cachedUidGenerator;
@@ -44,7 +44,7 @@ public class UidUtils {
         instance = this;
     }
 
-    // 使用方法：String uid = UidUtils.getInstance().getDefaultSerialUid();
+    // 使用方法：String uid = UidUtils.getInstance().getCacheSerialUid();
     public static UidUtils getInstance() {
         return instance;
     }
@@ -55,15 +55,14 @@ public class UidUtils {
      * 
      * @return string
      */
-    public String getDefaultSerialUid() {
-        // Generate UID
-        long uid = defaultUidGenerator.getUID();
-        // Parse UID into [Timestamp, WorkerId, Sequence]
-        // {"UID":"1165810429067392","timestamp":"2023-07-17 12:17:13","workerId":"1","sequence":"0"}
-        // log.info(defaultUidGenerator.parseUID(uid));
-        return String.valueOf(uid);
-    }
-
+    // public String getDefaultSerialUid() {
+    //     // Generate UID
+    //     long uid = defaultUidGenerator.getUID();
+    //     // Parse UID into [Timestamp, WorkerId, Sequence]
+    //     // {"UID":"1165810429067392","timestamp":"2023-07-17 12:17:13","workerId":"1","sequence":"0"}
+    //     // log.info(defaultUidGenerator.parseUID(uid));
+    //     return String.valueOf(uid);
+    // }
 
     /**
      * 生成一次id之后，按序列号+1生成一批id，缓存，供之后请求
@@ -81,7 +80,7 @@ public class UidUtils {
     }
 
     public String getUid() {
-        return getDefaultSerialUid();
+        return getCacheSerialUid();
     }
 
 }

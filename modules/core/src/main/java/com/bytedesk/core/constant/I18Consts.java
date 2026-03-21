@@ -105,10 +105,12 @@ public class I18Consts {
     public static final String I18N_UNIFIED_DESCRIPTION = "统一描述"; // 统一描述
     // 工作组
     public static final String I18N_WORKGROUP_NICKNAME = "默认工作组"; // 工作组昵称
+    public static final String I18N_WORKGROUP_BOOKING_NICKNAME = "Booking 工作组"; // booking 工作组昵称
     public static final String I18N_WORKGROUP_BEFORE_NICKNAME = "售前工作组"; // 工作组前缀昵称
     public static final String I18N_WORKGROUP_AFTER_NICKNAME = "售后工作组"; // 工作组后缀昵称
     public static final String I18N_WORKGROUP_TICKET_NICKNAME = "工单工作组"; // 工单工作组昵称
     public static final String I18N_WORKGROUP_DESCRIPTION = "工作组描述"; // 工作组描述
+    public static final String I18N_WORKGROUP_BOOKING_DESCRIPTION = "Booking 场景工作组描述"; // booking 工作组描述
     public static final String I18N_WORKGROUP_BEFORE_DESCRIPTION = "售前工作组描述"; // 工作组前缀描述
     public static final String I18N_WORKGROUP_AFTER_DESCRIPTION = "售后工作组描述"; // 工作组后缀描述
     public static final String I18N_WORKGROUP_TICKET_DESCRIPTION = "工单工作组描述"; // 工单工作组描述
@@ -279,6 +281,18 @@ public class I18Consts {
 
     // "不支持的发送类型"
     public static final String I18N_CAPTCHA_UNSUPPORTED_TYPE = "不支持的发送类型"; // 不支持的发送类型
+
+    // "短信服务配置异常，请联系管理员"
+    // public static final String I18N_SMS_SERVICE_CONFIG_ERROR = "短信服务配置异常，请联系管理员"; // 短信服务配置异常，请联系管理员
+
+    // "短信服务暂时不可用，请稍后重试"
+    public static final String I18N_SMS_SERVICE_UNAVAILABLE = "短信服务暂时不可用，请稍后重试"; // 短信服务暂时不可用，请稍后重试
+
+    // "邮件服务配置异常，请联系管理员"
+    public static final String I18N_EMAIL_SERVICE_CONFIG_ERROR = "邮件服务配置异常，请联系管理员"; // 邮件服务配置异常，请联系管理员
+
+    // "邮件服务暂时不可用，请稍后重试"
+    public static final String I18N_EMAIL_SERVICE_UNAVAILABLE = "邮件服务暂时不可用，请稍后重试"; // 邮件服务暂时不可用，请稍后重试
 
     // "处理请求时发生错误，请稍后重试"
     public static final String I18N_ROBOT_PROCESSING_ERROR = "处理请求时发生错误，请稍后重试"; // 处理请求时发生错误，请稍后重试

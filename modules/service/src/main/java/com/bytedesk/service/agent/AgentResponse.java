@@ -13,6 +13,9 @@
  */
 package com.bytedesk.service.agent;
 
+import java.time.ZonedDateTime;
+
+import com.bytedesk.call.call_settings.CallSettingsResponse;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.member.MemberProtobuf;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
@@ -57,6 +60,9 @@ public class AgentResponse extends BaseResponse {
 
     private Boolean enabled;
 
+    // 坐席有效期，null 表示永久有效
+    private ZonedDateTime seatExpireAt;
+
     /**
      * Agent settings (loaded from settings entity)
      */
@@ -66,6 +72,11 @@ public class AgentResponse extends BaseResponse {
      * Per-agent auto-reply settings.
      */
     private AutoReplySettingsResponse autoReplySettings;
+
+    /**
+     * Per-agent call center settings.
+     */
+    private CallSettingsResponse callSettings;
 
     /**
      * Agent queue statistics (loaded from queue service)

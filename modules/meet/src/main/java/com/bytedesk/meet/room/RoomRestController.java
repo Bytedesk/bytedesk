@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -42,6 +44,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
     @ActionAnnotation(title = "Room", action = "组织查询", description = "query room by org")
     @Operation(summary = "Query Rooms by Organization", description = "Retrieve rooms for the current organization")
     @PreAuthorize(RoomPermissions.HAS_ROOM_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(RoomRequest request) {
         
@@ -53,6 +56,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
     @ActionAnnotation(title = "Room", action = "用户查询", description = "query room by user")
     @Operation(summary = "Query Rooms by User", description = "Retrieve rooms for the current user")
     @PreAuthorize(RoomPermissions.HAS_ROOM_READ)
+    @GetMapping({"/query", "/query/user"})
     @Override
     public ResponseEntity<?> queryByUser(RoomRequest request) {
         
@@ -64,6 +68,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
     @ActionAnnotation(title = "Room", action = "查询详情", description = "query room by uid")
     @Operation(summary = "Query Room by UID", description = "Retrieve a specific room by its unique identifier")
     @PreAuthorize(RoomPermissions.HAS_ROOM_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(RoomRequest request) {
         
@@ -76,7 +81,8 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
     @Operation(summary = "Create Room", description = "Create a new room")
     @Override
     @PreAuthorize(RoomPermissions.HAS_ROOM_CREATE)
-    public ResponseEntity<?> create(RoomRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody RoomRequest request) {
         
         RoomResponse room = roomRestService.create(request);
 
@@ -87,7 +93,8 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
     @Operation(summary = "Update Room", description = "Update an existing room")
     @Override
     @PreAuthorize(RoomPermissions.HAS_ROOM_UPDATE)
-    public ResponseEntity<?> update(RoomRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody RoomRequest request) {
         
         RoomResponse room = roomRestService.update(request);
 
@@ -98,7 +105,8 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
     @Operation(summary = "Delete Room", description = "Delete a room")
     @Override
     @PreAuthorize(RoomPermissions.HAS_ROOM_DELETE)
-    public ResponseEntity<?> delete(RoomRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody RoomRequest request) {
         
         roomRestService.delete(request);
 
