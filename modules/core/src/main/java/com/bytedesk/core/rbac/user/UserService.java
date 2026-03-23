@@ -824,6 +824,22 @@ public class UserService {
             throw new RuntimeException("Role not found by id: " + roleId + ", name: " + roleName);
         }
 
+        RoleEntity managedRoleUser = null;
+        if (managedUser.getCurrentOrganization() != null) {
+            Optional<RoleEntity> roleUserOptional = roleRestService.findByNamePlatform(RoleConsts.ROLE_USER);
+            if (!roleUserOptional.isPresent()) {
+                throw new RuntimeException("Role not found: " + RoleConsts.ROLE_USER);
+            }
+            Long roleUserId = roleUserOptional.get().getId();
+            if (roleUserId == null) {
+                throw new RuntimeException("Role id is null for name: " + RoleConsts.ROLE_USER);
+            }
+            managedRoleUser = entityManager.find(RoleEntity.class, roleUserId);
+            if (managedRoleUser == null) {
+                throw new RuntimeException("Role not found by id: " + roleUserId + ", name: " + RoleConsts.ROLE_USER);
+            }
+        }
+
         // Allow ROLE_USER without organization context so auto-registered users have a
         // default role
         if (managedUser.getCurrentOrganization() == null) {
@@ -837,6 +853,7 @@ public class UserService {
                 managedUser.getCurrentRoles().add(managedRole);
             }
         } else {
+            managedUser.addOrganizationRole(managedRoleUser);
             managedUser.addOrganizationRole(managedRole);
         }
 

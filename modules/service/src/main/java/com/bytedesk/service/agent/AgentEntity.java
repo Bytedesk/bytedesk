@@ -109,15 +109,15 @@ public class AgentEntity extends BaseEntity {
     @JoinColumn(name = "auto_reply_settings_id", unique = true)
     private AutoReplySettingsEntity autoReplySettings;
 
-        /**
-         * Per-agent call center settings.
-         */
-        @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
+    /**
+     * Per-agent call center settings.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
             jakarta.persistence.CascadeType.PERSIST,
             jakarta.persistence.CascadeType.MERGE,
             jakarta.persistence.CascadeType.REMOVE })
-        @JoinColumn(name = "call_settings_id", unique = true)
-        private CallSettingsEntity callSettings;
+    @JoinColumn(name = "call_settings_id", unique = true)
+    private CallSettingsEntity callSettings;
 
     // 以下设置项已迁移至 AgentSettingsEntity
     // 为保持兼容性，保留委托型 getter，以 settings 中的值为准

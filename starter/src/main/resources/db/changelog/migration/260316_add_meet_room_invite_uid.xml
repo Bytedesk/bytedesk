@@ -62,7 +62,8 @@
     </changeSet>
 
     <changeSet id="260316-add-meet-room-invite-uid-not-null" author="copilot">
-        <preConditions onFail="HALT" onError="HALT">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
             <and>
                 <tableExists tableName="bytedesk_meet_room" />
                 <columnExists tableName="bytedesk_meet_room" columnName="invite_uid" />

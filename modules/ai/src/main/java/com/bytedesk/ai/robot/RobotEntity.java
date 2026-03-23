@@ -46,7 +46,8 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * AI robot entity for automated customer service
- * Supports different service types: agent (human-only), robot (AI-only), workgroup (hybrid)
+ * Supports different service types: agent (human-only), robot (AI-only),
+ * workgroup (hybrid)
  * 
  * Database Table: bytedesk_ai_robot
  * Purpose: Stores AI robot configurations, LLM settings, and service parameters
@@ -59,7 +60,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ RobotEntityListener.class })
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
 @Table(name = "bytedesk_ai_robot")
 public class RobotEntity extends BaseEntity {
@@ -89,7 +90,7 @@ public class RobotEntity extends BaseEntity {
      */
     @Builder.Default
     private String description = I18Consts.I18N_ROBOT_DESCRIPTION;
-    
+
     // LLM 配置已迁移至 RobotSettingsEntity
 
     /**
@@ -99,15 +100,15 @@ public class RobotEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotSettingsEntity settings;
 
-        /**
-         * Per-robot call center settings.
-         */
-        @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
+    /**
+     * Per-robot call center settings.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
             jakarta.persistence.CascadeType.PERSIST,
             jakarta.persistence.CascadeType.MERGE,
             jakarta.persistence.CascadeType.REMOVE })
-        @JoinColumn(name = "call_settings_id", unique = true)
-        private CallSettingsEntity callSettings;
+    @JoinColumn(name = "call_settings_id", unique = true)
+    private CallSettingsEntity callSettings;
 
     /**
      * Type of robot service (SERVICE, ASK, CHAT)
@@ -139,12 +140,13 @@ public class RobotEntity extends BaseEntity {
     @Embedded
     @Builder.Default
     private RobotLlm llm = new RobotLlm();
-    
+
     /**
      * LLM 配置（已从 RobotEntity 迁移到 Settings）
      * llm每个robot不同，可以单独配置，不需要模板
      */
-    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    // @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = {
+    // CascadeType.PERSIST, CascadeType.MERGE })
     // private RobotLlmEntity llm;
 
     // @Builder.Default
@@ -176,10 +178,10 @@ public class RobotEntity extends BaseEntity {
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
-            .uid(this.getUid())
-            .nickname(this.getNickname())
-            .avatar(this.getAvatar())
-            .type(UserTypeEnum.ROBOT.name())
-            .build();
+                .uid(this.getUid())
+                .nickname(this.getNickname())
+                .avatar(this.getAvatar())
+                .type(UserTypeEnum.ROBOT.name())
+                .build();
     }
 }

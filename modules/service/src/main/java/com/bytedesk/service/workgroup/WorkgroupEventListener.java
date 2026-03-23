@@ -47,6 +47,9 @@ public class WorkgroupEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
+        if (workgroupRestService.findAnyByOrgUid(orgUid).isPresent()) {
+            return;
+        }
         // 创建默认workgroup
         log.info("workgroup - organization created: {}", organization.getName());
 

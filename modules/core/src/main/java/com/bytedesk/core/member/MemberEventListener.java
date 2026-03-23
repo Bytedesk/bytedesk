@@ -81,14 +81,22 @@ public class MemberEventListener {
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
         log.info("organization created: {}", organization.getName());
+        if (memberRestService.findByUserAndOrgUid(user, orgUid).isPresent()) {
+            return;
+        }
         //
-        DepartmentRequest departmentRequest = DepartmentRequest.builder()
-                .uid(uidUtils.getUid())
-                .name(DepartmentConsts.DEPT_ADMIN)
-                .description("Description for" + DepartmentConsts.DEPT_ADMIN)
-                .orgUid(orgUid)
-                .build();
-        DepartmentResponse departmentResponse = departmentRestService.create(departmentRequest);
+        DepartmentResponse departmentResponse = departmentRestService
+                .findByNameAndOrgUid(DepartmentConsts.DEPT_ADMIN, orgUid)
+                .map(departmentRestService::convertToResponse)
+                .orElseGet(() -> {
+                    DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                            .uid(uidUtils.getUid())
+                            .name(DepartmentConsts.DEPT_ADMIN)
+                            .description("Description for" + DepartmentConsts.DEPT_ADMIN)
+                            .orgUid(orgUid)
+                            .build();
+                    return departmentRestService.create(departmentRequest);
+                });
         //
         if (departmentResponse != null) {
             // DEFAULT_MEMBER_UID 是 member uid，不是 role uid；这里需要授予默认管理员角色

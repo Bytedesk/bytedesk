@@ -61,7 +61,7 @@ public class RoomEntity extends BaseEntity {
     /**
      * Public invite identifier used as the meeting number / share code.
      */
-    @Column(name = "invite_uid", nullable = false, unique = true, length = 64)
+    @Column(name = "invite_uid", unique = true, length = 64)
     private String inviteUid;
 
     /**

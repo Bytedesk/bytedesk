@@ -88,5 +88,6 @@
     <include file="db/changelog/migration/260318_add_faq_route_to_robot.xml" />
     <include file="db/changelog/migration/260319_add_member_country.xml" />
     <include file="db/changelog/migration/260320_add_shop_edition_and_agent_seat_expiry.xml" />
+    <include file="db/changelog/migration/260323_drop_meet_room_invite_uid_not_null.xml" />
 
 </databaseChangeLog>

@@ -42,6 +42,9 @@ public class DepartmentEventListener {
         // UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
         log.info("organization created: {}", organization.getName());
+        if (departmentService.findByNameAndOrgUid(DepartmentConsts.DEPT_CUSTOMER_SERVICE, orgUid).isPresent()) {
+            return;
+        }
         // 
         DepartmentRequest csDept = DepartmentRequest.builder()
             .name(DepartmentConsts.DEPT_CUSTOMER_SERVICE)

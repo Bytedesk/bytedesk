@@ -65,6 +65,10 @@ public class AgentEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
+        if (StringUtils.hasText(user.getUid())
+                && agentRestService.findByUserUidAndOrgUid(user.getUid(), orgUid).isPresent()) {
+            return;
+        }
         // log.info("agent - organization created: {}", organization.getName());
         String mobile = user.getMobile();
         if (StringUtils.hasText(mobile)) {

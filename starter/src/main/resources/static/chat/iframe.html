@@ -27,50 +27,483 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="email=no">
+    <!-- <link rel="icon" type="image/x-icon" href="/favicon.ico" /> -->
     <title></title>
     <link rel="stylesheet" href="/chat/assets/css/iframe.css">
     <style type="text/css">
-        /* 白天模式样式 */
-        body.day-mode {
-            background-color: #ffffff;
-            /* 白色背景 */
-            color: #000000;
-            /* 黑色文本 */
+        :root {
+            color-scheme: light dark;
         }
 
-        /* 黑夜模式样式 */
-        body.night-mode {
-            background-color: #333333;
-            /* 深色背景 */
+        body {
+            background: #f5f7fb;
+            color: #111827;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        body[data-theme='dark'] {
+            background: #111827;
+            color: #f3f4f6;
+        }
+
+        #settingsSwitcher {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 8;
+        }
+
+        #settingsSwitcher.is-hidden {
+            display: none;
+        }
+
+        .settings-switcher-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 0;
+            border-radius: 999px;
+            color: #111827;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+            backdrop-filter: blur(14px);
+            transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .settings-switcher-trigger:hover {
+            transform: translateY(-1px);
+        }
+
+        body[data-theme='dark'] .settings-switcher-trigger {
+            color: #f3f4f6;
+            background: rgba(17, 24, 39, 0.92);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+        }
+
+        .settings-switcher-trigger svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        #settingsMenu {
+            position: absolute;
+            top: 48px;
+            right: 0;
+            min-width: 168px;
+            display: none;
+            padding: 8px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+            backdrop-filter: blur(14px);
+        }
+
+        #settingsMenu.is-open {
+            display: block;
+        }
+
+        body[data-theme='dark'] #settingsMenu {
+            background: rgba(17, 24, 39, 0.96);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+        }
+
+        .settings-section + .settings-section {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(107, 114, 128, 0.18);
+        }
+
+        body[data-theme='dark'] .settings-section + .settings-section {
+            border-top-color: rgba(209, 213, 219, 0.12);
+        }
+
+        .settings-section-title {
+            padding: 4px 10px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+
+        body[data-theme='dark'] .settings-section-title {
+            color: #9ca3af;
+        }
+
+        .theme-switcher-btn {
+            width: 100%;
+            border: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+            color: inherit;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 13px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .theme-switcher-btn + .theme-switcher-btn {
+            margin-top: 4px;
+        }
+
+        .theme-switcher-btn::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: transparent;
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-switcher-btn.is-active {
+            background: #111827;
             color: #ffffff;
-            /* 白色文本 */
         }
 
-        /* 切换按钮样式（可选） */
-        #toggleModeBtn {
-            /* 添加您喜欢的样式 */
+        .theme-switcher-btn.is-active::after {
+            background: currentColor;
+        }
+
+        body[data-theme='dark'] .theme-switcher-btn.is-active {
+            background: #f9fafb;
+            color: #111827;
+        }
+
+        .locale-switcher-btn {
+            width: 100%;
+            border: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+            color: inherit;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 13px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .locale-switcher-btn + .locale-switcher-btn {
+            margin-top: 4px;
+        }
+
+        .locale-switcher-btn::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: transparent;
+            transition: background-color 0.2s ease;
+        }
+
+        .locale-switcher-btn.is-active {
+            background: #111827;
+            color: #ffffff;
+        }
+
+        .locale-switcher-btn.is-active::after {
+            background: currentColor;
+        }
+
+        body[data-theme='dark'] .locale-switcher-btn.is-active {
+            background: #f9fafb;
+            color: #111827;
+        }
+
+        #closedState {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+        }
+
+        body[data-theme='dark'] #closedState {
+            background: rgba(17, 24, 39, 0.88);
+        }
+
+        #closedState.is-visible {
+            display: flex;
+        }
+
+        .closed-card {
+            width: min(360px, calc(100vw - 48px));
+            padding: 28px 24px;
+            border-radius: 24px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+        }
+
+        body[data-theme='dark'] .closed-card {
+            background: rgba(31, 41, 55, 0.96);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+        }
+
+        .closed-card h1 {
+            margin: 0 0 12px;
+            font-size: 22px;
+            line-height: 1.2;
+        }
+
+        .closed-card p {
+            margin: 0 0 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #6b7280;
+        }
+
+        body[data-theme='dark'] .closed-card p {
+            color: #d1d5db;
+        }
+
+        .closed-card button {
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 18px;
+            min-width: 160px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.28);
+        }
+
+        #iframePanel.fusion.fullscreen {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            min-width: 320px;
+            min-height: 480px;
+        }
+
+        #minimizedLauncher {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 6;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
+        }
+
+        #minimizedLauncher.is-visible {
+            display: inline-flex;
+        }
+
+        #minimizedLauncher svg {
+            display: none;
+        }
+
+        .minimized-launcher-icon {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            flex: 0 0 18px;
+        }
+
+        .minimized-launcher-icon::before,
+        .minimized-launcher-icon::after {
+            content: '';
+            position: absolute;
+            border-radius: 4px;
+            border: 2px solid currentColor;
+            box-sizing: border-box;
+        }
+
+        .minimized-launcher-icon::before {
+            inset: 4px 0 0 4px;
+            opacity: 0.7;
+        }
+
+        .minimized-launcher-icon::after {
+            inset: 0 4px 4px 0;
+            background: transparent;
         }
     </style>
     <!-- <style type="text/css"></style> -->
 </head>
 
 <body>
-    <!-- 切换白天/夜间模式按钮 -->
-    <!-- <button id="toggleModeBtn">切换模式</button> -->
-    <!-- TODO: 切换白天/夜间模式 -->
+    <div id="settingsSwitcher" aria-label="设置菜单">
+        <button id="settingsSwitcherTrigger" class="settings-switcher-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="settingsMenu" aria-label="打开设置菜单">
+            <svg viewBox="0 0 1024 1024" aria-hidden="true">
+                <path d="M512 298.666667a213.333333 213.333333 0 1 1 0 426.666666 213.333333 213.333333 0 0 1 0-426.666666z m0 85.333333a128 128 0 1 0 0 256 128 128 0 0 0 0-256z"></path>
+                <path d="M892.416 452.693333l-72.96-12.117333a315.392 315.392 0 0 0-22.186667-53.546667l42.752-60.501333a42.666667 42.666667 0 0 0-4.608-54.954667l-60.330666-60.330666a42.666667 42.666667 0 0 0-54.954667-4.608l-60.501333 42.752a315.392 315.392 0 0 0-53.546667-22.186667L571.306667 154.624a42.666667 42.666667 0 0 0-42.112-36.624h-85.333334a42.666667 42.666667 0 0 0-42.112 36.693333l-12.117333 72.96a315.392 315.392 0 0 0-53.546667 22.186667l-60.501333-42.752a42.666667 42.666667 0 0 0-54.954667 4.608l-60.330666 60.330667a42.666667 42.666667 0 0 0-4.608 54.954666l42.752 60.501334a315.392 315.392 0 0 0-22.186667 53.546666L131.584 452.693333A42.666667 42.666667 0 0 0 96 494.805333v85.333334a42.666667 42.666667 0 0 0 36.693333 42.112l72.96 12.117333a315.392 315.392 0 0 0 22.186667 53.546667l-42.752 60.501333a42.666667 42.666667 0 0 0 4.608 54.954667l60.330667 60.330666a42.666667 42.666667 0 0 0 54.954666 4.608l60.501334-42.752a315.392 315.392 0 0 0 53.546666 22.186667l12.117334 72.96A42.666667 42.666667 0 0 0 494.805333 928h85.333334a42.666667 42.666667 0 0 0 42.112-36.693333l12.117333-72.96a315.392 315.392 0 0 0 53.546667-22.186667l60.501333 42.752a42.666667 42.666667 0 0 0 54.954667-4.608l60.330666-60.330667a42.666667 42.666667 0 0 0 4.608-54.954666l-42.752-60.501334a315.392 315.392 0 0 0 22.186667-53.546666l72.96-12.117334A42.666667 42.666667 0 0 0 928 529.194667v-85.333334a42.666667 42.666667 0 0 0-35.584-42.112z"></path>
+            </svg>
+        </button>
+        <div id="settingsMenu" role="menu" aria-label="设置菜单">
+            <div class="settings-section">
+                <div class="settings-section-title">Theme</div>
+                <button class="theme-switcher-btn" data-mode="light" type="button" role="menuitem">浅色</button>
+                <button class="theme-switcher-btn" data-mode="dark" type="button" role="menuitem">深色</button>
+                <button class="theme-switcher-btn" data-mode="system" type="button" role="menuitem">跟随系统</button>
+            </div>
+            <div class="settings-section">
+                <div class="settings-section-title">Language</div>
+                <button class="locale-switcher-btn" data-lang="en" type="button" role="menuitem">English</button>
+                <button class="locale-switcher-btn" data-lang="zh-cn" type="button" role="menuitem">简体中文</button>
+                <button class="locale-switcher-btn" data-lang="zh-tw" type="button" role="menuitem">繁体中文</button>
+            </div>
+        </div>
+    </div>
     <div id="panelHolder">
         <iframe id="iframePanel" class="fusion" src=""></iframe>
+        <div id="closedState" aria-live="polite">
+            <div class="closed-card">
+                <h1>会话已关闭</h1>
+                <p>当前会话已经结束，可以重新开始新的对话。</p>
+                <button id="restartChatButton" type="button">重新开始会话</button>
+            </div>
+        </div>
     </div>
+    <button id="minimizedLauncher" type="button" aria-label="恢复会话窗口">
+        <span class="minimized-launcher-icon" aria-hidden="true"></span>
+        恢复会话
+    </button>
     <script>
+        var POST_MESSAGE_CLOSE_CHAT_WINDOW = 'CLOSE_CHAT_WINDOW';
+        var POST_MESSAGE_MAXIMIZE_WINDOW = 'MAXIMIZE_WINDOW';
+        var POST_MESSAGE_MINIMIZE_WINDOW = 'MINIMIZE_WINDOW';
+        var THEME_SYNC_EVENT = 'BYTEDESK_IFRAME_THEME_MODE_SYNC';
+        var LANG_SYNC_EVENT = 'BYTEDESK_IFRAME_LANG_SYNC';
+        var LOCAL_LOOPBACK_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0'];
+        var DEFAULT_API_BASE_URL = 'http://127.0.0.1:9003';
+        var DEFAULT_TITLE = '微语';
+        var DEFAULT_FAVICON = '/chat/favicon.ico';
+        var SUPPORTED_MODES = ['light', 'dark', 'system'];
+        var SUPPORTED_LANGUAGES = ['zh-cn', 'zh-tw', 'en'];
+        var systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+        var iframePanel = document.getElementById('iframePanel');
+        var closedState = document.getElementById('closedState');
+        var themeButtons = Array.prototype.slice.call(document.querySelectorAll('.theme-switcher-btn'));
+        var localeButtons = Array.prototype.slice.call(document.querySelectorAll('.locale-switcher-btn'));
+        var settingsSwitcherTrigger = document.getElementById('settingsSwitcherTrigger');
+        var settingsMenu = document.getElementById('settingsMenu');
+        var restartChatButton = document.getElementById('restartChatButton');
+        var minimizedLauncher = document.getElementById('minimizedLauncher');
+        var settingsSwitcher = document.getElementById('settingsSwitcher');
+        var isFullscreen = false;
+        var isMinimized = false;
+        var wasFullscreenBeforeMinimize = false;
+
+        function setFavicon(url) {
+            var link = document.querySelector("link[rel*='icon']");
+
+            if (!link) {
+                link = document.createElement('link');
+                link.type = 'image/x-icon';
+                link.rel = 'shortcut icon';
+                document.getElementsByTagName('head')[0].appendChild(link);
+            }
+
+            link.href = url;
+        }
+
+        function updateDocumentTitle(title, defaultTitle) {
+            document.title = title || defaultTitle || '';
+        }
+
+        function isValidFaviconUrl(url) {
+            if (!url) {
+                return false;
+            }
+
+            return /^https?:\/\//i.test(url) || url.charAt(0) === '/';
+        }
+
+        function removeTrailingSlash(url) {
+            if (!url) {
+                return '';
+            }
+
+            return url.charAt(url.length - 1) === '/' ? url.slice(0, -1) : url;
+        }
+
+        function resolveHostFromCurrentUrl(rawUrl) {
+            if (!rawUrl) {
+                return rawUrl;
+            }
+
+            try {
+                var parsed = new URL(rawUrl);
+                var currentHost = window.location.hostname;
+                var isLoopbackTarget = LOCAL_LOOPBACK_HOSTS.indexOf(parsed.hostname) !== -1;
+                var isLoopbackCurrent = LOCAL_LOOPBACK_HOSTS.indexOf(currentHost) !== -1;
+
+                if (!isLoopbackTarget || !currentHost || isLoopbackCurrent) {
+                    return rawUrl;
+                }
+
+                parsed.hostname = currentHost;
+                return parsed.toString();
+            } catch (error) {
+                console.warn('Failed to resolve host from current URL:', error);
+                return rawUrl;
+            }
+        }
+
+        async function getApiBaseUrl() {
+            try {
+                var response = await fetch('/chat/config.json', { cache: 'no-store' });
+                if (response.ok) {
+                    var config = await response.json();
+                    var apiUrl = config && typeof config.apiUrl === 'string' ? config.apiUrl.trim() : '';
+                    if (apiUrl) {
+                        return removeTrailingSlash(resolveHostFromCurrentUrl(apiUrl));
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to load /chat/config.json:', error);
+            }
+
+            return removeTrailingSlash(resolveHostFromCurrentUrl(DEFAULT_API_BASE_URL));
+        }
+
         async function initializeTitle() {
             try {
-                const response = await fetch('/config/bytedesk/properties');
+                const apiBaseUrl = await getApiBaseUrl();
+                const response = await fetch(apiBaseUrl + '/config/bytedesk/properties');
                 const config = await response.json();
+                const customConfig = config?.data?.custom;
+                const faviconUrl = (customConfig?.favicon || customConfig?.logo || '').trim();
+
                 console.log('config:', config?.data);
-                if (config?.data?.custom?.enabled) {
-                    document.title = config?.data?.custom?.name || '微语'
+                if (customConfig?.enabled) {
+                    updateDocumentTitle(customConfig?.name, DEFAULT_TITLE);
+                    if (isValidFaviconUrl(faviconUrl)) {
+                        setFavicon(faviconUrl);
+                    } else {
+                        setFavicon(DEFAULT_FAVICON);
+                    }
                 } else {
-                    document.title = '微语'
+                    updateDocumentTitle(DEFAULT_TITLE, DEFAULT_TITLE);
+                    setFavicon(DEFAULT_FAVICON);
                 }
                 // 获取当前语言
                 // const lang = getUrlParam('lang') || 'zh-cn';
@@ -80,61 +513,296 @@
                 // document.title = config?.data?.name || i18nMessages['i18n.app.title'];
             } catch (error) {
                 console.error('Failed to load title:', error);
-                document.title = 'ByteDesk'; // 使用一个基础默认值
+                updateDocumentTitle(DEFAULT_TITLE, DEFAULT_TITLE);
+                setFavicon(DEFAULT_FAVICON);
             }
         }
         
         // 在其他初始化之前调用
-        initializeTitle();
+        // initializeTitle();
 
-        //
-        function getUrlParam(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-            var r = window.location.search.substr(1).match(reg); //匹配目标参数
-            if (r != null) return decodeURIComponent(r[2]);
-            return null; //返回参数值
-        }
-        //
-        var org = getUrlParam('org')
-        var t = getUrlParam('t')
-        var sid = getUrlParam('sid')
-        var lang = getUrlParam('lang')
-        var theme = getUrlParam('theme')
-        var navbar = getUrlParam('navbar')
-        //
-        //var websiteUrl = window.location.href
-        //var websiteTitle = document.title
-        //var refererUrl = document.referrer
-        var src = '/chat/?org=' + org + '&t=' + t + '&sid=' + sid + '&'
-
-        if (lang) {
-            src += 'lang=' + lang
+        function normalizeMode(mode) {
+            var value = (mode || '').toLowerCase();
+            if (SUPPORTED_MODES.indexOf(value) !== -1) {
+                return value;
+            }
+            return 'system';
         }
 
-        if (theme) {
-            src += '&theme=' + theme
+        function normalizeLang(lang) {
+            var value = (lang || '').toLowerCase();
+            if (SUPPORTED_LANGUAGES.indexOf(value) !== -1) {
+                return value;
+            }
+            return 'zh-cn';
         }
 
-        if (navbar) {
-            src += '&navbar=' + navbar
+        function resolveThemeName(mode) {
+            if (mode === 'system') {
+                return systemThemeMedia.matches ? 'dark' : 'light';
+            }
+            return mode;
         }
 
-        // console.log('urll:', src)
-        document.getElementById('iframePanel').setAttribute('src', src)
-        //
-        // 切换白天/夜间模式功能
-        //document.getElementById('toggleModeBtn').addEventListener('click', function () {
-        //    var body = document.body;
-        //    if (body.classList.contains('day-mode')) {
-        //        body.classList.remove('day-mode');
-        //        body.classList.add('night-mode');
-        //    } else {
-        //        body.classList.remove('night-mode');
-        //        body.classList.add('day-mode');
-        //    }
-        //});
-        // 初始设置为白天模式（可选）
-        // document.body.classList.add('day-mode');
+        function getOuterParams() {
+            return new URLSearchParams(window.location.search);
+        }
+
+        function getCurrentMode() {
+            var params = getOuterParams();
+            return normalizeMode(params.get('mode') || params.get('theme') || 'system');
+        }
+
+        function getCurrentLang() {
+            return normalizeLang(getOuterParams().get('lang') || 'zh-cn');
+        }
+
+        function updateOuterModeParam(mode) {
+            var params = getOuterParams();
+            params.set('mode', mode);
+            params.delete('theme');
+            var query = params.toString();
+            var nextUrl = window.location.pathname + (query ? ('?' + query) : '');
+            window.history.replaceState(null, '', nextUrl);
+        }
+
+        function updateOuterLangParam(lang) {
+            var params = getOuterParams();
+            params.set('lang', normalizeLang(lang));
+            var query = params.toString();
+            var nextUrl = window.location.pathname + (query ? ('?' + query) : '');
+            window.history.replaceState(null, '', nextUrl);
+        }
+
+        function buildInnerChatUrl(mode, lang) {
+            var params = getOuterParams();
+            if (params.has('theme') && !params.has('mode')) {
+                params.set('mode', params.get('theme'));
+            }
+            params.delete('theme');
+            params.set('mode', normalizeMode(mode));
+            params.set('lang', normalizeLang(lang || params.get('lang') || 'zh-cn'));
+            return '/chat/?' + params.toString();
+        }
+
+        function applyShellTheme(mode) {
+            var resolvedTheme = resolveThemeName(mode);
+            document.body.setAttribute('data-theme', resolvedTheme);
+            themeButtons.forEach(function (button) {
+                button.classList.toggle('is-active', button.getAttribute('data-mode') === mode);
+            });
+        }
+
+        function applyShellLang(lang) {
+            var nextLang = normalizeLang(lang);
+            localeButtons.forEach(function (button) {
+                button.classList.toggle('is-active', button.getAttribute('data-lang') === nextLang);
+            });
+        }
+
+        function setSettingsMenuOpen(isOpen) {
+            settingsMenu.classList.toggle('is-open', isOpen);
+            settingsSwitcherTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        function syncThemeModeToIframe(mode) {
+            if (!iframePanel || !iframePanel.contentWindow) {
+                return;
+            }
+            var innerUrl = buildInnerChatUrl(mode, getCurrentLang());
+            try {
+                iframePanel.contentWindow.history.replaceState(null, '', innerUrl);
+            } catch (error) {
+                console.warn('Failed to sync iframe URL:', error);
+            }
+            iframePanel.contentWindow.postMessage({
+                type: THEME_SYNC_EVENT,
+                mode: mode,
+            }, '*');
+        }
+
+        function syncLangToIframe(lang) {
+            if (!iframePanel || !iframePanel.contentWindow) {
+                return;
+            }
+            var innerUrl = buildInnerChatUrl(getCurrentMode(), lang);
+            try {
+                iframePanel.contentWindow.history.replaceState(null, '', innerUrl);
+            } catch (error) {
+                console.warn('Failed to sync iframe URL:', error);
+            }
+            iframePanel.contentWindow.postMessage({
+                type: LANG_SYNC_EVENT,
+                lang: normalizeLang(lang),
+            }, '*');
+        }
+
+        function setThemeMode(mode, syncIframe) {
+            var nextMode = normalizeMode(mode);
+            updateOuterModeParam(nextMode);
+            applyShellTheme(nextMode);
+            if (syncIframe !== false) {
+                syncThemeModeToIframe(nextMode);
+            }
+        }
+
+        function setLang(lang, syncIframe) {
+            var nextLang = normalizeLang(lang);
+            updateOuterLangParam(nextLang);
+            applyShellLang(nextLang);
+            if (syncIframe !== false) {
+                syncLangToIframe(nextLang);
+            }
+        }
+
+        function showClosedState() {
+            exitMinimizedState();
+            closedState.classList.add('is-visible');
+            iframePanel.style.visibility = 'hidden';
+        }
+
+        function hideClosedState() {
+            closedState.classList.remove('is-visible');
+            iframePanel.style.visibility = 'visible';
+        }
+
+        function reloadChatFrame() {
+            hideClosedState();
+            exitMinimizedState();
+            iframePanel.setAttribute('src', buildInnerChatUrl(getCurrentMode(), getCurrentLang()));
+        }
+
+        function syncTopControlsVisibility() {
+            settingsSwitcher.classList.toggle('is-hidden', isFullscreen);
+            if (isFullscreen) {
+                setSettingsMenuOpen(false);
+            }
+        }
+
+        function applyFullscreenState() {
+            iframePanel.classList.toggle('fullscreen', isFullscreen);
+            syncTopControlsVisibility();
+        }
+
+        function setFullscreenState(nextValue) {
+            isFullscreen = !!nextValue;
+            applyFullscreenState();
+        }
+
+        function enterFullscreenState() {
+            setFullscreenState(true);
+        }
+
+        function exitFullscreenState() {
+            setFullscreenState(false);
+        }
+
+        function toggleFullscreenState() {
+            setFullscreenState(!isFullscreen);
+        }
+
+        function exitMinimizedState() {
+            isMinimized = false;
+            iframePanel.style.display = 'block';
+            minimizedLauncher.classList.remove('is-visible');
+        }
+
+        function enterMinimizedState() {
+            wasFullscreenBeforeMinimize = isFullscreen;
+            isMinimized = true;
+            iframePanel.style.display = 'none';
+            closedState.classList.remove('is-visible');
+            minimizedLauncher.classList.add('is-visible');
+        }
+
+        function restoreFromMinimizedState() {
+            exitMinimizedState();
+            if (wasFullscreenBeforeMinimize) {
+                enterFullscreenState();
+            } else {
+                exitFullscreenState();
+            }
+        }
+
+        function handleMessage(event) {
+            var messageType = event && event.data && event.data.type;
+            if (!messageType) {
+                return;
+            }
+
+            if (messageType === POST_MESSAGE_CLOSE_CHAT_WINDOW) {
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: POST_MESSAGE_CLOSE_CHAT_WINDOW }, '*');
+                } else {
+                    showClosedState();
+                }
+                return;
+            }
+
+            if (messageType === POST_MESSAGE_MAXIMIZE_WINDOW) {
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: POST_MESSAGE_MAXIMIZE_WINDOW }, '*');
+                } else {
+                    exitMinimizedState();
+                    toggleFullscreenState();
+                }
+                return;
+            }
+
+            if (messageType === POST_MESSAGE_MINIMIZE_WINDOW) {
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: POST_MESSAGE_MINIMIZE_WINDOW }, '*');
+                } else {
+                    enterMinimizedState();
+                }
+            }
+        }
+
+        themeButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                setThemeMode(button.getAttribute('data-mode'));
+                setSettingsMenuOpen(false);
+            });
+        });
+
+        localeButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                setLang(button.getAttribute('data-lang'));
+                setSettingsMenuOpen(false);
+            });
+        });
+
+        settingsSwitcherTrigger.addEventListener('click', function () {
+            setSettingsMenuOpen(!settingsMenu.classList.contains('is-open'));
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!document.getElementById('settingsSwitcher').contains(event.target)) {
+                setSettingsMenuOpen(false);
+            }
+        });
+
+        restartChatButton.addEventListener('click', function () {
+            reloadChatFrame();
+        });
+
+        minimizedLauncher.addEventListener('click', function () {
+            restoreFromMinimizedState();
+        });
+
+        systemThemeMedia.addEventListener('change', function () {
+            if (getCurrentMode() === 'system') {
+                applyShellTheme('system');
+                syncThemeModeToIframe('system');
+            }
+        });
+
+        window.addEventListener('message', handleMessage);
+
+        applyShellTheme(getCurrentMode());
+        applyShellLang(getCurrentLang());
+        syncTopControlsVisibility();
+        reloadChatFrame();
     </script>
 </body>
 
